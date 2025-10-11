@@ -150,10 +150,15 @@ class LogistikController extends Controller
     }
     public function transaction_product_in_save_incoming(Request $request)
     {
-        DB::table('log_schedule_product')->where('schedule_product_code', $request->code)->update([
-            'schedule_product_status' => 1
-        ]);
-        return 123;
+        $cekbarang = DB::table('log_m_product_in')->where('schedule_product_code', $request->code)->count();
+        if ($cekbarang == 0) {
+            return 0;
+        } else {
+            DB::table('log_schedule_product')->where('schedule_product_code', $request->code)->update([
+                'schedule_product_status' => 1
+            ]);
+            return 123;
+        }
     }
     public function transaction_product_in_preview_schedule(Request $request)
     {

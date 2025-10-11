@@ -659,10 +659,10 @@
                     <div class="col-md-11 col-lg-8 col-xl-4 pb-7 pb-xl-9 text-center text-xl-start"><a
                             class="btn btn-outline-danger mb-4 fs--1 border-2 rounded-pill" href="#!"><span class="me-2"
                                 role="img" aria-label="Gift">🎁</span>Become a pro</a>
-                        <h1 class="text-white fw-light"><strong>Innoventra</strong> <small>Bring</small> <span
+                        <h2 class="text-white fw-light"><strong>Innoventra</strong> <small> <span
                                 class="typed-text fw-bold"
-                                data-typed-text='["design","beauty","elegance","perfection"]'></span><br />to your
-                            webapp</h1>
+                                data-typed-text='["Accounting","Logistik","Purchasing","Resourcing"]'></span></small><br />Build your
+                            webapp</h2>
                         <p class="lead text-white opacity-75 text-justify">Lorem ipsum dolor sit amet consectetur
                             adipisicing elit.
                             Adipisci officiis at minus non atque id iure saepe ipsum, explicabo, optio quam!.!</p><a
@@ -823,70 +823,6 @@
         <!-- ============================================-->
 
 
-
-
-        <!-- ============================================-->
-        <!-- <section> begin ============================-->
-        <section class="bg-200 text-center">
-
-            <div class="container">
-                <div class="row justify-content-center">
-                    <div class="col-lg-9 col-xl-8">
-                        <div class="swiper-container theme-slider"
-                            data-swiper='{"autoplay":true,"spaceBetween":5,"loop":true,"loopedSlides":5,"slideToClickedSlide":true}'>
-                            <div class="swiper-wrapper">
-                                <div class="swiper-slide">
-                                    <div class="px-5 px-sm-6">
-                                        <p class="fs-sm-1 fs-md-2 fst-italic text-dark">Innoventra is the best option if
-                                            you
-                                            are looking for a theme built with Bootstrap. On top of that,
-                                            Innoventra&apos;s
-                                            creators and support staff are very brilliant and attentive to users&apos;
-                                            needs.</p>
-                                        <p class="fs-0 text-600">- Scott Tolinski, Web Developer</p><img
-                                            class="w-auto mx-auto" src="{{ asset('asset/img/logos/google.png') }}"
-                                            alt="" height="45" />
-                                    </div>
-                                </div>
-                                <div class="swiper-slide">
-                                    <div class="px-5 px-sm-6">
-                                        <p class="fs-sm-1 fs-md-2 fst-italic text-dark">We&apos;ve become fanboys! Easy
-                                            to change the modular design, great dashboard UI, enterprise-class support,
-                                            fast loading time. What else do you want from a Bootstrap Theme?</p>
-                                        <p class="fs-0 text-600">- Jeff Escalante, Developer</p><img
-                                            class="w-auto mx-auto" src="{{ asset('asset/img/logos/netflix.png') }}"
-                                            alt="" height="30" />
-                                    </div>
-                                </div>
-                                <div class="swiper-slide">
-                                    <div class="px-5 px-sm-6">
-                                        <p class="fs-sm-1 fs-md-2 fst-italic text-dark">When I first saw Innoventra, I
-                                            was
-                                            totally blown away by the care taken in the interface. It felt like
-                                            something that I&apos;d really want to use and something I could see being a
-                                            true modern replacement to the current class of Bootstrap themes.</p>
-                                        <p class="fs-0 text-600">- Liam Martens, Designer</p><img class="w-auto mx-auto"
-                                            src="{{ asset('asset/img/logos/paypal.png') }}" alt="" height="45" />
-                                    </div>
-                                </div>
-                            </div>
-                            <div class="swiper-nav">
-                                <div class="swiper-button-next swiper-button-white"></div>
-                                <div class="swiper-button-prev swiper-button-white"> </div>
-                            </div>
-                        </div>
-                    </div>
-                </div>
-            </div>
-            <!-- end of .container-->
-
-        </section>
-        <!-- <section> close ============================-->
-        <!-- ============================================-->
-
-
-
-
         <!-- ============================================-->
         <!-- <section> begin ============================-->
         <section class="light">
@@ -1031,66 +967,7 @@
         <!-- ============================================-->
 
 
-        <div class="modal fade" id="authentication-modal" tabindex="-1" role="dialog"
-            aria-labelledby="authentication-modal-label" aria-hidden="true">
-            <div class="modal-dialog mt-6" role="document">
-                <div class="modal-content border-0">
-                    <div class="modal-header px-5 position-relative modal-shape-header bg-shape">
-                        <div class="position-relative z-index-1 light">
-                            <h4 class="mb-0 text-white" id="authentication-modal-label">Register</h4>
-                            <p class="fs--1 mb-0 text-white">Please create your free Innoventra account</p>
-                        </div>
-                        <button class="btn-close btn-close-white position-absolute top-0 end-0 mt-2 me-2"
-                            data-bs-dismiss="modal" aria-label="Close"></button>
-                    </div>
-                    <div class="modal-body py-4 px-5">
-                        <form>
-                            <div class="mb-3">
-                                <label class="form-label" for="modal-auth-name">Name</label>
-                                <input class="form-control" type="text" autocomplete="on" id="modal-auth-name" />
-                            </div>
-                            <div class="mb-3">
-                                <label class="form-label" for="modal-auth-email">Email address</label>
-                                <input class="form-control" type="email" autocomplete="on" id="modal-auth-email" />
-                            </div>
-                            <div class="row gx-2">
-                                <div class="mb-3 col-sm-6">
-                                    <label class="form-label" for="modal-auth-password">Password</label>
-                                    <input class="form-control" type="password" autocomplete="on"
-                                        id="modal-auth-password" />
-                                </div>
-                                <div class="mb-3 col-sm-6">
-                                    <label class="form-label" for="modal-auth-confirm-password">Confirm Password</label>
-                                    <input class="form-control" type="password" autocomplete="on"
-                                        id="modal-auth-confirm-password" />
-                                </div>
-                            </div>
-                            <div class="form-check">
-                                <input class="form-check-input" type="checkbox" id="modal-auth-register-checkbox" />
-                                <label class="form-label" for="modal-auth-register-checkbox">I accept the <a
-                                        href="#!">terms </a>and <a href="#!">privacy policy</a></label>
-                            </div>
-                            <div class="mb-3">
-                                <button class="btn btn-primary d-block w-100 mt-3" type="submit"
-                                    name="submit">Register</button>
-                            </div>
-                        </form>
-                        <div class="position-relative mt-5">
-                            <hr class="bg-300" />
-                            <div class="divider-content-center">or register with</div>
-                        </div>
-                        <div class="row g-2 mt-2">
-                            <div class="col-sm-6"><a class="btn btn-outline-google-plus btn-sm d-block w-100"
-                                    href="#"><span class="fab fa-google-plus-g me-2" data-fa-transform="grow-8"></span>
-                                    google</a></div>
-                            <div class="col-sm-6"><a class="btn btn-outline-facebook btn-sm d-block w-100"
-                                    href="#"><span class="fab fa-facebook-square me-2"
-                                        data-fa-transform="grow-8"></span> facebook</a></div>
-                        </div>
-                    </div>
-                </div>
-            </div>
-        </div>
+
     </main>
     <!-- ===============================================-->
     <!--    End of Main Content-->

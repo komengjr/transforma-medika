@@ -156,7 +156,23 @@
                                                 <div style="text-align: right;">
                                                     <h6 class="text-primary">Hi! {{Auth::user()->fullname}}</h6>
                                                 </div>
+
                                                 <div class="btn-group float-end" role="group">
+                                                    <div class="theme-control-toggle fa-icon-wait pe-2 ">
+                                                        <input class="form-check-input ms-0 theme-control-toggle-input"
+                                                            id="themeControlToggle" type="checkbox"
+                                                            data-theme-control="theme" value="dark" />
+                                                        <label
+                                                            class="mb-0 theme-control-toggle-label theme-control-toggle-light"
+                                                            for="themeControlToggle" data-bs-toggle="tooltip"
+                                                            data-bs-placement="left" title="Switch to light theme"><span
+                                                                class="fas fa-sun fs-0"></span></label>
+                                                        <label
+                                                            class="mb-0 theme-control-toggle-label theme-control-toggle-dark"
+                                                            for="themeControlToggle" data-bs-toggle="tooltip"
+                                                            data-bs-placement="left" title="Switch to dark theme"><span
+                                                                class="fas fa-moon fs-0"></span></label>
+                                                    </div>
                                                     <button
                                                         class="btn btn-sm btn-falcon-primary dropdown-toggle form-control"
                                                         id="btnGroupVerticalDrop2" type="button"

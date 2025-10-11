@@ -108,9 +108,10 @@
                                                     class="far fa-edit"></span>
                                                 Proses Barang Masuk</button>
                                         @elseif ($datas->schedule_product_status == 1)
-                                             <button class="dropdown-item" data-bs-toggle="modal" data-bs-target="#modal-pr-xl"
-                                            id="button-preview-schedule" data-code="{{ $datas->schedule_product_code }}"><span class="fas fa-file-pdf"></span>
-                                            Preview</button>
+                                            <button class="dropdown-item" data-bs-toggle="modal" data-bs-target="#modal-pr-xl"
+                                                id="button-preview-schedule" data-code="{{ $datas->schedule_product_code }}"><span
+                                                    class="fas fa-file-pdf"></span>
+                                                Preview</button>
                                         @endif
 
                                         <div class="dropdown-divider"></div>
@@ -334,15 +335,27 @@
                         },
                         dataType: 'html',
                     }).done(function (data) {
-                        swalWithBootstrapButtons.fire({
-                            title: "Verified!",
-                            text: "Your Product Has Been to.",
-                            icon: "success"
-                        }).then((result) => {
-                            if (result.isConfirmed) {
-                                location.reload();
-                            }
-                        });
+                        if (data == 0) {
+                            Swal.fire({
+                                icon: "error",
+                                title: "Oops...",
+                                text: "Tidak Ada Barang Yang dipilih!",
+                                footer: '<a href="#">Why do I have this issue?</a>'
+                            });
+                            $('#menu-add-data-schedule').html(
+                                '<button class="btn btn-success float-end" id="button-simpan-data-product-in" data-code="' + code + '"> Simpan Data </button>'
+                            );
+                        } else {
+                            swalWithBootstrapButtons.fire({
+                                title: "Verified!",
+                                text: "Your Product Has Been to.",
+                                icon: "success"
+                            }).then((result) => {
+                                if (result.isConfirmed) {
+                                    location.reload();
+                                }
+                            });
+                        }
 
                     }).fail(function () {
                         $('#menu-add-data-schedule').html('eror');
