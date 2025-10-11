@@ -14,7 +14,7 @@
                         <img class="ms-3 mx-3 m-2" src="{{ asset('img/ledger.png') }}" alt="" width="50" />
                         <div>
                             <h6 class="text-white fs--1 mb-0 pt-2" style="color: white !important;">Welcome to </h6>
-                            <h4 class="text-white fw-bold mb-1" style="color: white !important;">Trans <span
+                            <h4 class="text-white fw-bold mb-1" style="color: white !important;">{{ Env('APP_LABEL') }} <span
                                     class="text-white fw-medium" style="color: white !important;">Management
                                     System</span></h4>
                         </div>
