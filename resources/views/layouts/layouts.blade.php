@@ -111,9 +111,9 @@
                                 class="navbar-toggle-icon"><span class="toggle-line"></span></span></button>
 
                     </div><a class="navbar-brand" href="{{ route('dashboard.home') }}">
-                        <div class="d-flex align-items-center py-3">
-                            <img class="me-2" src="{{ asset('img/favicon.png') }}" alt="" width="30" /><span
-                                class="font-sans-serif fs--3">TRANS</span>
+                        <div class="d-flex align-items-center py-2">
+                            <img class="mx-3" src="{{ asset('img/favicon.png') }}" alt="" width="90" />
+                            <!-- <span class="font-sans-serif fs--3">App</span> -->
                         </div>
                     </a>
                 </div>
@@ -195,7 +195,7 @@
                                                                     </a>
                                                                     <?php
                                                 $show = Illuminate\Support\Facades\DB::table('z_menu_sub_main')->where('menu_main_sub_code', $akses)->where('menu_sub_code', $sub_menus->menu_sub_code)->first();
-                                                                                                                                                                                                                                                                                            ?>
+                                                                                                                                                                                                                                                                                                                                                                    ?>
                                                                     @if ($show)
                                                                         <?php                $shown = 'show' ?>
                                                                     @else
@@ -271,8 +271,9 @@
                         aria-label="Toggle Navigation"><span class="navbar-toggle-icon"><span
                                 class="toggle-line"></span></span></button>
                     <a class="navbar-brand me-1 me-sm-3" href="{{ route('dashboard.home') }}">
-                        <div class="d-flex align-items-center"><img class="me-2" src="{{ asset('img/favicon.png') }}"
-                                alt="" width="35" /><span class="font-sans-serif">App</span>
+                        <div class="d-flex align-items-center">
+                            <img class="mx-3" src="{{ asset('img/favicon.png') }}" alt="" width="65" /><span
+                                class="fs-2 text-linkedin">ver 1.2</span>
                         </div>
                     </a>
                     <ul class="navbar-nav align-items-center d-none d-lg-block">
