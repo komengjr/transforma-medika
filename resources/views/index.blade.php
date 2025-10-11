@@ -175,20 +175,22 @@
                                         <div class="row">
                                             <div class="col-6 col-xxl-3">
                                                 <div class="nav flex-column">
-                                                    <p class="nav-link text-700 mb-0 fw-bold">Simple Auth</p><a
-                                                        class="nav-link py-1 link-600 fw-medium"
-                                                        href="../pages/authentication/simple/login.html">Login</a><a
-                                                        class="nav-link py-1 link-600 fw-medium"
-                                                        href="../pages/authentication/simple/logout.html">Logout</a><a
-                                                        class="nav-link py-1 link-600 fw-medium"
-                                                        href="../pages/authentication/simple/register.html">Register</a><a
-                                                        class="nav-link py-1 link-600 fw-medium"
+                                                    <p class="nav-link text-700 mb-0 fw-bold">Simple Auth</p>
+                                                    <a class="nav-link py-1 link-600 fw-medium" href="#">Login</a>
+                                                    <a class="nav-link py-1 link-600 fw-medium"
+                                                        href="../pages/authentication/simple/logout.html">Logout</a>
+                                                    <a class="nav-link py-1 link-600 fw-medium"
+                                                        href="../pages/authentication/simple/register.html">Register</a>
+                                                    <a class="nav-link py-1 link-600 fw-medium"
                                                         href="../pages/authentication/simple/forgot-password.html">Forgot
-                                                        password</a><a class="nav-link py-1 link-600 fw-medium"
+                                                        password</a>
+                                                    <a class="nav-link py-1 link-600 fw-medium"
                                                         href="../pages/authentication/simple/confirm-mail.html">Confirm
-                                                        mail</a><a class="nav-link py-1 link-600 fw-medium"
+                                                        mail</a>
+                                                    <a class="nav-link py-1 link-600 fw-medium"
                                                         href="../pages/authentication/simple/reset-password.html">Reset
-                                                        password</a><a class="nav-link py-1 link-600 fw-medium"
+                                                        password</a>
+                                                    <a class="nav-link py-1 link-600 fw-medium"
                                                         href="../pages/authentication/simple/lock-screen.html">Lock
                                                         screen</a>
                                                 </div>
@@ -660,8 +662,9 @@
                             class="btn btn-outline-danger mb-4 fs--1 border-2 rounded-pill" href="#!"><span class="me-2"
                                 role="img" aria-label="Gift">🎁</span>Become a pro</a>
                         <h2 class="text-white fw-light"><strong>Innoventra</strong> <small> <span
-                                class="typed-text fw-bold"
-                                data-typed-text='["Accounting","Logistik","Purchasing","Resourcing"]'></span></small><br />Build your
+                                    class="typed-text fw-bold"
+                                    data-typed-text='["Accounting","Logistik","Purchasing","Resourcing"]'></span></small><br />Build
+                            your
                             webapp</h2>
                         <p class="lead text-white opacity-75 text-justify">Lorem ipsum dolor sit amet consectetur
                             adipisicing elit.
@@ -951,8 +954,8 @@
                     <div class="row justify-content-between fs--1">
                         <div class="col-12 col-sm-auto text-center">
                             <p class="mb-0 text-600 opacity-85">Thank you for creating with Innoventra <span
-                                    class="d-none d-sm-inline-block">| </span><br class="d-sm-none" /> 2021 &copy; <a
-                                    class="text-white opacity-85" href="https://themewagon.com">Themewagon</a></p>
+                                    class="d-none d-sm-inline-block">| </span><br class="d-sm-none" /> 2025 &copy; <a
+                                    class="text-white opacity-85" href="https://Innoventra.site">Innoventra</a></p>
                         </div>
                         <div class="col-12 col-sm-auto text-center">
                             <p class="mb-0 text-600 opacity-85">v3.4.0</p>
