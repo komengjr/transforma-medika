@@ -197,24 +197,24 @@
     <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
     @if (session('success'))
         <!-- <div class="toast hide notice shadow-none bg-transparent my-2" id="cookie-notice" role="alert"
-                data-options='{"autoShow":true,"showOnce":true,"cookieExpireTime":20}' data-autohide="false"
-                aria-live="assertive" aria-atomic="true" style="">
-                <div class="toast-body my-2 ms-1 md-2">
-                    <div class="card border-2 border-secondary">
-                        <div class="card-body ">
-                            <div class="d-flex">
-                                <div class="pe-3"><img src="{{ asset('asset/img/icons/alert.png') }}" width="40" alt="cookie" />
-                                </div>
-                                <div>
-                                    <p>{{ session('success') }}</p>
-                                    <button class="btn btn-sm btn-falcon-primary me-3" type="button" data-bs-dismiss="toast"
-                                        aria-label="Close">Okay</button>
+                    data-options='{"autoShow":true,"showOnce":true,"cookieExpireTime":20}' data-autohide="false"
+                    aria-live="assertive" aria-atomic="true" style="">
+                    <div class="toast-body my-2 ms-1 md-2">
+                        <div class="card border-2 border-secondary">
+                            <div class="card-body ">
+                                <div class="d-flex">
+                                    <div class="pe-3"><img src="{{ asset('asset/img/icons/alert.png') }}" width="40" alt="cookie" />
+                                    </div>
+                                    <div>
+                                        <p>{{ session('success') }}</p>
+                                        <button class="btn btn-sm btn-falcon-primary me-3" type="button" data-bs-dismiss="toast"
+                                            aria-label="Close">Okay</button>
+                                    </div>
                                 </div>
                             </div>
                         </div>
                     </div>
-                </div>
-            </div> -->
+                </div> -->
         <script>
             const Toast = Swal.mixin({
                 toast: true,
@@ -242,12 +242,11 @@
                 '<div class="spinner-border my-0" style="display: block; margin-left: auto; margin-right: auto;" role="status"><span class="visually-hidden">Loading...</span></div>'
             );
             if (username == "" || password == "") {
-                Lobibox.notify('warning', {
-                    pauseDelayOnHover: true,
-                    continueDelayOnInactiveTab: true,
-                    position: 'top right',
-                    icon: 'fas fa-info-circle',
-                    msg: 'Pastikan Field Diisi'
+                Swal.fire({
+                    icon: "error",
+                    title: "Oops...",
+                    text: "Something went wrong!",
+                    footer: '<a href="#">Why do I have this issue?</a>'
                 });
                 $('#button-login-system').html('<span class="fab fa-500px"></span> Log in');
             } else {

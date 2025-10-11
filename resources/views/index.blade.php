@@ -79,15 +79,16 @@
                                 data-bs-toggle="dropdown" aria-haspopup="true" aria-expanded="false"
                                 id="dashboards">Dashboard</a>
                             <div class="dropdown-menu dropdown-menu-card border-0 mt-0" aria-labelledby="dashboards">
-                                <div class="bg-white dark__bg-1000 rounded-3 py-2"><a
-                                        class="dropdown-item link-600 fw-medium" href="../index.html">Default</a><a
-                                        class="dropdown-item link-600 fw-medium"
-                                        href="../dashboard/analytics.html">Analytics</a><a
-                                        class="dropdown-item link-600 fw-medium" href="../dashboard/crm.html">CRM</a><a
-                                        class="dropdown-item link-600 fw-medium" href="../dashboard/e-commerce.html">E
-                                        commerce</a><a class="dropdown-item link-600 fw-medium"
-                                        href="../dashboard/project-management.html">Management</a><a
-                                        class="dropdown-item link-600 fw-medium" href="../dashboard/saas.html">SaaS</a>
+                                <div class="bg-white dark__bg-1000 rounded-3 py-2">
+                                    <a class="dropdown-item link-600 fw-medium" href="../index.html">Default</a>
+                                    <!-- <a class="dropdown-item link-600 fw-medium"
+                                        href="../dashboard/analytics.html">Analytics</a>
+                                    <a class="dropdown-item link-600 fw-medium" href="../dashboard/crm.html">CRM</a>
+                                    <a class="dropdown-item link-600 fw-medium" href="../dashboard/e-commerce.html">E
+                                        commerce</a>
+                                    <a class="dropdown-item link-600 fw-medium"
+                                        href="../dashboard/project-management.html">Management</a>
+                                    <a class="dropdown-item link-600 fw-medium" href="../dashboard/saas.html">SaaS</a> -->
                                 </div>
                             </div>
                         </li>
@@ -797,7 +798,8 @@
                             <div class="card-span-img"><span class="fab fa-node-js fs-5 text-success"></span></div>
                             <div class="card-body pt-6 pb-4">
                                 <h5 class="mb-2">SCSS &amp; Javascript files</h5>
-                                <p>With your purchased copy of Innoventra, you will get all the uncompressed & documented
+                                <p>With your purchased copy of Innoventra, you will get all the uncompressed &
+                                    documented
                                     SCSS and Javascript source code files.</p>
                             </div>
                         </div>
@@ -835,8 +837,10 @@
                             <div class="swiper-wrapper">
                                 <div class="swiper-slide">
                                     <div class="px-5 px-sm-6">
-                                        <p class="fs-sm-1 fs-md-2 fst-italic text-dark">Innoventra is the best option if you
-                                            are looking for a theme built with Bootstrap. On top of that, Innoventra&apos;s
+                                        <p class="fs-sm-1 fs-md-2 fst-italic text-dark">Innoventra is the best option if
+                                            you
+                                            are looking for a theme built with Bootstrap. On top of that,
+                                            Innoventra&apos;s
                                             creators and support staff are very brilliant and attentive to users&apos;
                                             needs.</p>
                                         <p class="fs-0 text-600">- Scott Tolinski, Web Developer</p><img
@@ -856,7 +860,8 @@
                                 </div>
                                 <div class="swiper-slide">
                                     <div class="px-5 px-sm-6">
-                                        <p class="fs-sm-1 fs-md-2 fst-italic text-dark">When I first saw Innoventra, I was
+                                        <p class="fs-sm-1 fs-md-2 fst-italic text-dark">When I first saw Innoventra, I
+                                            was
                                             totally blown away by the care taken in the interface. It felt like
                                             something that I&apos;d really want to use and something I could see being a
                                             true modern replacement to the current class of Bootstrap themes.</p>
@@ -980,7 +985,8 @@
                                         <p class="text-600 opacity-50">Dec 25 &bull; 2min read</p>
                                     </li>
                                     <li>
-                                        <h5 class="fs-0 mb-0"><a class="link-600" href="#!"> The New Innoventra Theme</a>
+                                        <h5 class="fs-0 mb-0"><a class="link-600" href="#!"> The New Innoventra
+                                                Theme</a>
                                         </h5>
                                         <p class="text-600 opacity-50">Dec 23 &bull; 10min read </p>
                                     </li>
@@ -1104,6 +1110,8 @@
     <script src="{{ asset('vendors/lodash/lodash.min.js') }}"></script>
     <script src="{{ asset('vendors/list.js/list.min.js') }}"></script>
     <script src="{{ asset('asset/js/theme.js') }}"></script>
+    <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+
     <script>
         $(document).on("click", "#button-login-system", function (e) {
             e.preventDefault();
@@ -1113,12 +1121,11 @@
                 '<div class="spinner-border my-0" style="display: block; margin-left: auto; margin-right: auto;" role="status"><span class="visually-hidden">Loading...</span></div>'
             );
             if (username == "" || password == "") {
-                Lobibox.notify('warning', {
-                    pauseDelayOnHover: true,
-                    continueDelayOnInactiveTab: true,
-                    position: 'top right',
-                    icon: 'fas fa-info-circle',
-                    msg: 'Pastikan Field Diisi'
+                Swal.fire({
+                    icon: "error",
+                    title: "Oops...",
+                    text: "Something went wrong!",
+                    footer: '<a href="#">Why do I have this issue?</a>'
                 });
                 $('#button-login-system').html('<span class="fab fa-500px"></span> Log in');
             } else {
