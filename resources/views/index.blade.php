@@ -10,7 +10,7 @@
     <!-- ===============================================-->
     <!--    Document Title-->
     <!-- ===============================================-->
-    <title>Innoventra | Dashboard &amp; Web App Template</title>
+    <title>Innoventra | Dashboard &amp; Web App Build</title>
 
 
     <!-- ===============================================-->
