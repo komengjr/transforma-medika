@@ -95,7 +95,7 @@ class AccountingController extends Controller
     public function master_accounting_coa($akses, $id)
     {
         if ($this->url_akses($akses, $id) == true) {
-            $total = DB::table('acc_master_coa_data')->where('acc_coa_data_opt',0)->count();
+            $total = DB::table('acc_master_coa_data')->where('acc_coa_data_opt', 0)->count();
             $data = DB::table('acc_master_coa')->get();
             return view('app-accounting.master.master-coa', [
                 'akses' => $akses,
@@ -130,6 +130,8 @@ class AccountingController extends Controller
                 'acc_coa_data_status' => 1,
                 'created_at' => now()
             ]);
+            $total = DB::table('acc_master_coa_data')->where('acc_coa_data_opt', 0)->count();
+            $data = DB::table('acc_master_coa')->get();
             return 'berhasil Input';
         } catch (\Throwable $e) {
             return 0;

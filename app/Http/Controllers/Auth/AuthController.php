@@ -16,11 +16,7 @@ class AuthController extends Controller
 {
     public function fisrt()
     {
-        if (Auth::check()) {
-            return Redirect('dashboard/home');
-        } else {
-            return view('auth.login');
-        }
+        return view('index');
     }
 
     public function index()

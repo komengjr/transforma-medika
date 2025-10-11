@@ -39,7 +39,7 @@
 </div>
 <div class="modal-footer px-4 bg-300">
     <span id="menu-add-data-coa">
-        <button class="btn btn-success float-end" id="button-simpan-data-level-coa" data-code="">Simpan
+        <button class="btn btn-success float-end" id="button-simpan-data-level-coa" >Simpan
             Data</button>
     </span>
 </div>
