@@ -14,10 +14,7 @@ use Illuminate\Support\Str;
 
 class AuthController extends Controller
 {
-    public function fisrt()
-    {
-        return view('index');
-    }
+
 
     public function index()
     {

@@ -13,6 +13,7 @@ use App\Http\Controllers\LaboratoriumController;
 use App\Http\Controllers\Logsitik\LogistikController;
 use App\Http\Controllers\MasterController;
 use App\Http\Controllers\MasterDataController;
+use App\Http\Controllers\PageController;
 use App\Http\Controllers\PelayananController;
 use App\Http\Controllers\Pembelian\PurchaseController;
 use App\Http\Controllers\PoliklinikController;
@@ -25,12 +26,16 @@ use Illuminate\Support\Facades\Route;
 use Illuminate\Support\Facades\Auth;
 
 
+Route::controller(PageController::class)->group(function () {
+    Route::get('/', 'fisrt')->name('/');
+    Route::get('/changelog', 'changelog')->name('changelog');
+
+});
 
 Route::get('log-eror', [\Rap2hpoutre\LaravelLogViewer\LogViewerController::class, 'index']);
 // PUBLIC
 // Route::get('reader', [PelayananController::class, 'reader_pasien']);
 Route::controller(AuthController::class)->group(function () {
-    Route::get('/', 'fisrt')->name('/');
     Route::get('login', 'index')->name('login');
     Route::get('registration', 'registration')->name('register');
     Route::get('confrim_user', 'confrim_user')->name('confrim_user');
@@ -42,6 +47,7 @@ Route::controller(AuthController::class)->group(function () {
     Route::post('verifikasi-Login', 'verifikasi_Login')->name('verifikasi_Login');
     // Route::get('dashboard', [AuthController::class, 'dashboard']);
 });
+
 
 // DASHBOARD CEK
 Route::prefix('app')->group(function () {

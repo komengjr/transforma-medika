@@ -67,19 +67,18 @@
     <!--    Main Content-->
     <!-- ===============================================-->
     <main class="main" id="top">
-        <nav class="navbar navbar-standard navbar-expand-lg fixed-top navbar-dark"
-            data-navbar-darken-on-scroll="data-navbar-darken-on-scroll">
+        <nav class="navbar navbar-expand-lg fixed-top" style="background: black !important;">
             <div class="container"><a class="navbar-brand" href="#">
                     <img src="{{ asset('img/favicon.png') }}" alt="" width="90">
                 </a>
-                <button class="navbar-toggler collapsed" type="button" data-bs-toggle="collapse"
+                <button class="navbar-toggler collapsed bg-300" type="button" data-bs-toggle="collapse"
                     data-bs-target="#navbarStandard" aria-controls="navbarStandard" aria-expanded="false"
-                    aria-label="Toggle navigation"><span class="navbar-toggler-icon"></span></button>
+                    aria-label="Toggle navigation"><span class="fas fa-cogs text-primary"></span></button>
                 <div class="collapse navbar-collapse scrollbar" id="navbarStandard">
                     <ul class="navbar-nav" data-top-nav-dropdowns="data-top-nav-dropdowns">
-                        <li class="nav-item dropdown"><a class="nav-link dropdown-toggle" href="#" role="button"
-                                data-bs-toggle="dropdown" aria-haspopup="true" aria-expanded="false"
-                                id="dashboards">Dashboard</a>
+                        <li class="nav-item dropdown ">
+                            <a class="nav-link dropdown-toggle  text-twitter" href="#" role="button" data-bs-toggle="dropdown"
+                                aria-haspopup="true" aria-expanded="false" id="dashboards">Dashboard</a>
                             <div class="dropdown-menu dropdown-menu-card border-0 mt-0" aria-labelledby="dashboards">
                                 <div class="bg-white dark__bg-1000 rounded-3 py-2">
                                     <a class="dropdown-item link-600 fw-medium" href="../index.html">Default</a>
@@ -312,26 +311,17 @@
                         </li>
                     </ul>
                     <ul class="navbar-nav ms-auto">
-                        <li class="nav-item">
-                            <div class="theme-control-toggle fa-icon-wait ">
-                                <input class="form-check-input ms-0 theme-control-toggle-input" id="themeControlToggle"
-                                    type="checkbox" data-theme-control="theme" value="dark" />
-                                <label class="mb-0 theme-control-toggle-label theme-control-toggle-light"
-                                    for="themeControlToggle" data-bs-toggle="tooltip" data-bs-placement="left"
-                                    title="Switch to light theme"><span class="fas fa-sun fs-0"></span></label>
-                                <label class="mb-0 theme-control-toggle-label theme-control-toggle-dark"
-                                    for="themeControlToggle" data-bs-toggle="tooltip" data-bs-placement="left"
-                                    title="Switch to dark theme"><span class="fas fa-moon fs-0"></span></label>
-                            </div>
-                        </li>
                         <li class="nav-item"><a class="nav-link" href="../index.html"><span
                                     class="d-none d-lg-inline-block" data-bs-toggle="tooltip" data-bs-placement="bottom"
                                     title="Dashboard"><span class="fas fa-chart-pie"></span></span><span
                                     class="d-lg-none">Dashboard</span></a></li>
+                        <li class="nav-item"><a class="nav-link" href="../app/social/feed.html"><span
+                                    class="d-none d-lg-inline-block" data-bs-toggle="tooltip" data-bs-placement="bottom"
+                                    title="Feed"><span class="fas fa-list-alt"></span></span><span
+                                    class="d-lg-none">Feed</span></a></li>
 
-
-                        <li class="nav-item"><a class="nav-link text-warning" href="#!" data-bs-toggle="modal"
-                                data-bs-target="#exampleModal">Login</a> </li>
+                        <li class="nav-item"><a class="nav-link" href="#!" data-bs-toggle="modal"
+                                data-bs-target="#exampleModal">Login</a></li>
                     </ul>
                 </div>
             </div>
@@ -398,69 +388,13 @@
         </div>
 
 
-        <!-- ============================================-->
-        <!-- <section> begin ============================-->
-        <section class="py-0 overflow-hidden light" id="banner">
-
-            <div class="bg-holder overlay"
-                style="background-image:url(../asset/img/generic/bg-2.jpg);background-position: center bottom;">
-            </div>
-            <!--/.bg-holder-->
-
-            <div class="container">
-                <div class="row flex-center pt-8 pt-lg-10 pb-lg-9 pb-xl-0">
-                    <div class="col-md-11 col-lg-8 col-xl-4 pb-7 pb-xl-9 text-center text-xl-start"><a
-                            class="btn btn-outline-danger mb-4 fs--1 border-2 rounded-pill" href="#!"><span class="me-2"
-                                role="img" aria-label="Gift">🎁</span>Become a pro</a>
-                        <h2 class="text-white fw-light"><strong>Innoventra</strong> <small> <span
-                                    class="typed-text fw-bold"
-                                    data-typed-text='["Accounting","Logistik","Purchasing","Resourcing"]'></span></small><br />Build
-                            your
-                            webapp</h2>
-                        <p class="lead text-white opacity-75 text-justify">Lorem ipsum dolor sit amet consectetur
-                            adipisicing elit.
-                            Adipisci officiis at minus non atque id iure saepe ipsum, explicabo, optio quam!.!</p><a
-                            class="btn btn-outline-light border-2 rounded-pill btn-lg mt-4 fs-0 py-2" href="#!">Start
-                            building with the falcon<span class="fas fa-play ms-2"
-                                data-fa-transform="shrink-6 down-1"></span></a>
-                    </div>
-                    <div class="col-xl-7 offset-xl-1 align-self-end mt-4 mt-xl-0"><a class="img-landing-banner rounded"
-                            href="../index.html"><img class="img-fluid"
-                                src="{{ asset('asset/img/generic/dashboard-alt.png') }}" alt="" /></a></div>
-                </div>
-            </div>
-            <!-- end of .container-->
-
-        </section>
-        <!-- <section> close ============================-->
-        <!-- ============================================-->
-
-
 
 
         <!-- ============================================-->
         <!-- <section> begin ============================-->
-        <section class="py-3 bg-light shadow-sm">
+        <section class="py-4 bg-dark shadow-sm">
 
-            <div class="container">
-                <div class="row flex-center">
-                    <div class="col-3 col-sm-auto my-1 my-sm-3 px-card"><img class="landing-cta-img" height="40"
-                            src="{{ asset('asset/img/logos/b&w/6.png') }}" alt="" /></div>
-                    <div class="col-3 col-sm-auto my-1 my-sm-3 px-card"><img class="landing-cta-img" height="45"
-                            src="{{ asset('asset/img/logos/b&w/11.png') }}" alt="" /></div>
-                    <div class="col-3 col-sm-auto my-1 my-sm-3 px-card"><img class="landing-cta-img" height="30"
-                            src="{{ asset('asset/img/logos/b&w/1.png') }}" alt="" /></div>
-                    <div class="col-3 col-sm-auto my-1 my-sm-3 px-card"><img class="landing-cta-img" height="30"
-                            src="{{ asset('asset/img/logos/b&w/4.png') }}" alt="" /></div>
-                    <div class="col-3 col-sm-auto my-1 my-sm-3 px-card"><img class="landing-cta-img" height="35"
-                            src="{{ asset('asset/img/logos/b&w/10.png') }}" alt="" /></div>
-                    <!-- <div class="col-3 col-sm-auto my-1 my-sm-3 px-card"><img class="landing-cta-img" height="40"
-                            src="{{ asset('asset/img/logos/b&w/9.png') }}" alt="" /></div>
-                    <div class="col-3 col-sm-auto my-1 my-sm-3 px-card"><img class="landing-cta-img" height="40"
-                            src="{{ asset('asset/img/logos/b&w/8.png') }}" alt="" /></div> -->
-                </div>
-            </div>
-            <!-- end of .container-->
+
 
         </section>
         <!-- <section> close ============================-->
