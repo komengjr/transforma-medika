@@ -649,7 +649,7 @@
         <section class="py-0 overflow-hidden light" id="banner">
 
             <div class="bg-holder overlay"
-                style="background-image:url(../asset/img/generic/bg-1.jpg);background-position: center bottom;">
+                style="background-image:url(../asset/img/generic/bg-2.jpg);background-position: center bottom;">
             </div>
             <!--/.bg-holder-->
 
