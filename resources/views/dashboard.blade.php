@@ -135,7 +135,7 @@
                     <div class="d-lg-block d-none card bg-100 border border-3 border-primary mb-3">
                         <div class="row gx-0 flex-between-center">
                             <div class="col-sm-auto d-flex align-items-center border-bottom">
-                                <img class="ms-3 m-2" src="{{asset('img/favicon.png')}}" alt="" width="60">
+                                <img class="ms-3 m-2" src="{{asset('img/favicon.png')}}" alt="" width="90">
                                 <div>
                                     <h6 class="text-primary fs--1 mb-0">Welcome to </h6>
                                     <h4 class="text-primary fw-bold mb-0">Dashboard <span

@@ -31,9 +31,7 @@
     <!--    Stylesheets-->
     <!-- ===============================================-->
     <link rel="preconnect" href="https://fonts.gstatic.com">
-    <link
-        href="https://fonts.googleapis.com/css?family=Open+Sans:300,400,500,600,700%7cPoppins:300,400,500,600,700,800,900&amp;display=swap"
-        rel="stylesheet">
+
     <link href="{{ asset('vendors/overlayscrollbars/OverlayScrollbars.min.css') }}" rel="stylesheet">
     <link href="{{ asset('asset/css/theme-rtl.min.css') }}" rel="stylesheet" id="style-rtl">
     <link href="{{ asset('asset/css/theme.min.css') }}" rel="stylesheet" id="style-default">
@@ -69,8 +67,9 @@
     <main class="main" id="top">
         <nav class="navbar navbar-standard navbar-expand-lg fixed-top navbar-dark"
             data-navbar-darken-on-scroll="data-navbar-darken-on-scroll">
-            <div class="container"><a class="navbar-brand" href="../index.html"><span
-                        class="text-white dark__text-white">Innoventra</span></a>
+            <div class="container"><a class="navbar-brand" href="#">
+                    <img src="{{ asset('img/favicon.png') }}" alt="" width="90">
+                </a>
                 <button class="navbar-toggler collapsed" type="button" data-bs-toggle="collapse"
                     data-bs-target="#navbarStandard" aria-controls="navbarStandard" aria-expanded="false"
                     aria-label="Toggle navigation"><span class="navbar-toggler-icon"></span></button>
@@ -689,19 +688,19 @@
             <div class="container">
                 <div class="row flex-center">
                     <div class="col-3 col-sm-auto my-1 my-sm-3 px-card"><img class="landing-cta-img" height="40"
-                            src="{{ asset('asset/img/logos/b&amp;w/6.png') }}" alt="" /></div>
+                            src="{{ asset('asset/img/logos/b&w/6.png') }}" alt="" /></div>
                     <div class="col-3 col-sm-auto my-1 my-sm-3 px-card"><img class="landing-cta-img" height="45"
-                            src="{{ asset('asset/img/logos/b&amp;w/11.png') }}" alt="" /></div>
+                            src="{{ asset('asset/img/logos/b&w/11.png') }}" alt="" /></div>
                     <div class="col-3 col-sm-auto my-1 my-sm-3 px-card"><img class="landing-cta-img" height="30"
-                            src="{{ asset('asset/img/logos/b&amp;w/2.png') }}" alt="" /></div>
+                            src="{{ asset('asset/img/logos/b&w/1.png') }}" alt="" /></div>
                     <div class="col-3 col-sm-auto my-1 my-sm-3 px-card"><img class="landing-cta-img" height="30"
-                            src="../assets/img/logos/b&amp;w/4.png" alt="" /></div>
-                    <!-- <div class="col-3 col-sm-auto my-1 my-sm-3 px-card"><img class="landing-cta-img" height="35"
-                            src="../assets/img/logos/b&amp;w/1.png" alt="" /></div>
+                            src="{{ asset('asset/img/logos/b&w/4.png') }}" alt="" /></div>
+                    <div class="col-3 col-sm-auto my-1 my-sm-3 px-card"><img class="landing-cta-img" height="35"
+                            src="{{ asset('asset/img/logos/b&w/10.png') }}" alt="" /></div>
+                    <!-- <div class="col-3 col-sm-auto my-1 my-sm-3 px-card"><img class="landing-cta-img" height="40"
+                            src="{{ asset('asset/img/logos/b&w/9.png') }}" alt="" /></div>
                     <div class="col-3 col-sm-auto my-1 my-sm-3 px-card"><img class="landing-cta-img" height="40"
-                            src="../assets/img/logos/b&amp;w/10.png" alt="" /></div>
-                    <div class="col-3 col-sm-auto my-1 my-sm-3 px-card"><img class="landing-cta-img" height="40"
-                            src="../assets/img/logos/b&amp;w/12.png" alt="" /></div> -->
+                            src="{{ asset('asset/img/logos/b&w/8.png') }}" alt="" /></div> -->
                 </div>
             </div>
             <!-- end of .container-->
@@ -727,7 +726,7 @@
                 </div>
                 <div class="row flex-center mt-8">
                     <div class="col-md col-lg-5 col-xl-4 ps-lg-6"><img class="img-fluid px-6 px-md-0"
-                            src="../assets/img/icons/spot-illustrations/50.png" alt="" /></div>
+                            src="{{ asset('asset/img/icons/spot-illustrations/50.png') }}" alt="" /></div>
                     <div class="col-md col-lg-5 col-xl-4 mt-4 mt-md-0">
                         <h5 class="text-danger"><span class="far fa-lightbulb me-2"></span>PLAN</h5>
                         <h3>Blueprint &amp; design </h3>
@@ -737,7 +736,7 @@
                 </div>
                 <div class="row flex-center mt-7">
                     <div class="col-md col-lg-5 col-xl-4 pe-lg-6 order-md-2"><img class="img-fluid px-6 px-md-0"
-                            src="../assets/img/icons/spot-illustrations/49.png" alt="" /></div>
+                            src="{{ asset('asset/img/icons/spot-illustrations/49.png') }}" alt="" /></div>
                     <div class="col-md col-lg-5 col-xl-4 mt-4 mt-md-0">
                         <h5 class="text-info"> <span class="far fa-object-ungroup me-2"></span>BUILD</h5>
                         <h3>38 Sets of components</h3>
@@ -747,7 +746,7 @@
                 </div>
                 <div class="row flex-center mt-7">
                     <div class="col-md col-lg-5 col-xl-4 ps-lg-6"><img class="img-fluid px-6 px-md-0"
-                            src="../assets/img/icons/spot-illustrations/48.png" alt="" /></div>
+                            src="{{ asset('asset/img/icons/spot-illustrations/48.png') }}" alt="" /></div>
                     <div class="col-md col-lg-5 col-xl-4 mt-4 mt-md-0">
                         <h5 class="text-success"><span class="far fa-paper-plane me-2"></span>DEPLOY</h5>
                         <h3>Review and test</h3>
@@ -835,8 +834,8 @@
                                             creators and support staff are very brilliant and attentive to users&apos;
                                             needs.</p>
                                         <p class="fs-0 text-600">- Scott Tolinski, Web Developer</p><img
-                                            class="w-auto mx-auto" src="../assets/img/logos/google.png" alt=""
-                                            height="45" />
+                                            class="w-auto mx-auto" src="{{ asset('asset/img/logos/google.png') }}"
+                                            alt="" height="45" />
                                     </div>
                                 </div>
                                 <div class="swiper-slide">
@@ -845,8 +844,8 @@
                                             to change the modular design, great dashboard UI, enterprise-class support,
                                             fast loading time. What else do you want from a Bootstrap Theme?</p>
                                         <p class="fs-0 text-600">- Jeff Escalante, Developer</p><img
-                                            class="w-auto mx-auto" src="../assets/img/logos/netflix.png" alt=""
-                                            height="30" />
+                                            class="w-auto mx-auto" src="{{ asset('asset/img/logos/netflix.png') }}"
+                                            alt="" height="30" />
                                     </div>
                                 </div>
                                 <div class="swiper-slide">
@@ -856,7 +855,7 @@
                                             something that I&apos;d really want to use and something I could see being a
                                             true modern replacement to the current class of Bootstrap themes.</p>
                                         <p class="fs-0 text-600">- Liam Martens, Designer</p><img class="w-auto mx-auto"
-                                            src="../assets/img/logos/paypal.png" alt="" height="45" />
+                                            src="{{ asset('asset/img/logos/paypal.png') }}" alt="" height="45" />
                                     </div>
                                 </div>
                             </div>
@@ -882,7 +881,7 @@
         <section class="light">
 
             <div class="bg-holder overlay"
-                style="background-image:url(../assets/img/generic/bg-2.jpg);background-position: center top;">
+                style="background-image:url(../asset/img/generic/bg-2.jpg);background-position: center top;">
             </div>
             <!--/.bg-holder-->
 
