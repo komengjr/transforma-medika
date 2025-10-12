@@ -28,7 +28,13 @@ use Illuminate\Support\Facades\Auth;
 
 Route::controller(PageController::class)->group(function () {
     Route::get('/', 'fisrt')->name('/');
-    Route::get('/app-hrm', 'app_hrm')->name('app_hrm');
+    Route::get('/app-hrm', 'app_hrm')->name('public-hrm');
+    Route::get('/app-medical', 'app_medical')->name('public-medical');
+    Route::get('/app-accounting', 'app_accounting')->name('public-accounting');
+    Route::get('/app-inventaris', 'app_inventaris')->name('public-inventaris');
+    Route::get('/app-logistik', 'app_logistik')->name('public-logistik');
+    Route::get('/app-purchase', 'app_purchase')->name('public-purchase');
+    Route::get('/app-supplier', 'app_supplier')->name('public-supplier');
     Route::get('/changelog', 'changelog')->name('changelog');
 
 });

@@ -103,7 +103,7 @@
                                                 <div class="nav flex-column">
                                                     @foreach ($app as $apps)
                                                         <a class="dropdown-item link-600 fw-medium text-700 my-1 fw-bold"
-                                                            href="{{route('app_hrm')}}"> <span
+                                                            href="{{route($apps->menu_public_link)}}"> <span
                                                                 class="fas fa-pager text-primary me-3"></span>
                                                             {{$apps->menu_super_name}}
                                                         </a>
