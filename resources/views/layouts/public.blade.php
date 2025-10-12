@@ -116,47 +116,11 @@
                                 </div>
                             </div>
                         </li>
-                        <li class="nav-item dropdown"><a class="nav-link dropdown-toggle" href="#" role="button"
-                                data-bs-toggle="dropdown" aria-haspopup="true" aria-expanded="false" id="pagess">Pages
+                        <li class="nav-item dropdown">
+                            <a class="nav-link" href="{{asset('product')}}" role="button" aria-haspopup="true"
+                                aria-expanded="false" id="pagess">Product
                             </a>
-                            <div class="dropdown-menu dropdown-menu-card border-0 mt-0" aria-labelledby="pagess">
-                                <div class="card navbar-card-pages shadow-none dark__bg-1000">
-                                    <div class="card-body scrollbar max-h-dropdown"><img class="img-dropdown"
-                                            src="{{ asset('asset/img/icons/spot-illustrations/authentication-corner.png') }}"
-                                            width="130" alt="" />
-                                        <div class="row">
-                                            <div class="col-6 col-xxl-3">
-                                                <div class="nav flex-column">
-                                                    <p class="nav-link text-700 mb-0 fw-bold">Feature</p>
-                                                    @foreach ($menu as $menus)
-                                                        <a class="nav-link py-1 link-600 fw-medium"
-                                                            href="#">{{$menus->menu_name}}</a>
-                                                    @endforeach
 
-                                                </div>
-                                            </div>
-
-                                            <div class="col-6 col-xxl-3">
-                                                <div class="nav flex-column">
-                                                    <p class="nav-link text-700 mb-0 fw-bold">Other Feature</p><a
-                                                        class="nav-link py-1 link-600 fw-medium"
-                                                        href="../pages/authentication/wizard.html">Wizard</a><a
-                                                        class="nav-link py-1 link-600 fw-medium"
-                                                        href="../#authentication-modal" data-bs-toggle="modal">Modal</a>
-                                                    <p class="nav-link text-700 mb-0 fw-bold">Miscellaneous</p><a
-                                                        class="nav-link py-1 link-600 fw-medium"
-                                                        href="../pages/miscellaneous/associations.html">Associations</a><a
-                                                        class="nav-link py-1 link-600 fw-medium"
-                                                        href="../pages/miscellaneous/invite-people.html">Invite
-                                                        people</a><a class="nav-link py-1 link-600 fw-medium"
-                                                        href="../pages/miscellaneous/privacy-policy.html">Privacy
-                                                        policy</a>
-                                                </div>
-                                            </div>
-                                        </div>
-                                    </div>
-                                </div>
-                            </div>
                         </li>
                         <li class="nav-item dropdown"><a class="nav-link dropdown-toggle" href="#" role="button"
                                 data-bs-toggle="dropdown" aria-haspopup="true" aria-expanded="false"

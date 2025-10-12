@@ -40,6 +40,11 @@ class PageController extends Controller
     {
         return view('public.app-supplier');
     }
+    public function product()
+    {
+        $product = DB::table('log_m_product')->get();
+        return view('public.product', ['product' => $product]);
+    }
     public function changelog()
     {
         return view('public.changelog');
