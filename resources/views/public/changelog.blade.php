@@ -68,7 +68,7 @@
     <!-- ===============================================-->
     <main class="main" id="top">
         <nav class="navbar navbar-expand-lg fixed-top" style="background: black !important;">
-            <div class="container"><a class="navbar-brand" href="#">
+            <div class="container"><a class="navbar-brand" href="{{route('/')}}">
                     <img src="{{ asset('img/favicon.png') }}" alt="" width="90">
                 </a>
                 <button class="navbar-toggler collapsed bg-300" type="button" data-bs-toggle="collapse"
@@ -305,7 +305,7 @@
                                 aria-labelledby="documentations">
                                 <div class="bg-white dark__bg-1000 rounded-3 py-2">
 
-                                    <a class="dropdown-item link-600 fw-medium" href="../changelog.html">Changelog</a>
+                                    <a class="dropdown-item link-600 fw-medium" href="{{route('changelog')}}">Changelog</a>
                                 </div>
                             </div>
                         </li>
