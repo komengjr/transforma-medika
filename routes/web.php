@@ -28,6 +28,7 @@ use Illuminate\Support\Facades\Auth;
 
 Route::controller(PageController::class)->group(function () {
     Route::get('/', 'fisrt')->name('/');
+    Route::get('/app-hrm', 'app_hrm')->name('app_hrm');
     Route::get('/changelog', 'changelog')->name('changelog');
 
 });
