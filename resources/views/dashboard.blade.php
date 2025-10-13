@@ -149,7 +149,7 @@
                                         <div class="d-flex align-items-center m-2">
                                             <div class="avatar avatar-3xl me-2">
                                                 <img class="rounded-circle border border-2"
-                                                    src="{{asset('img/my.jpg')}}" alt="" />
+                                                    src="{{asset('img/pp.png')}}" alt="" />
 
                                             </div>
                                             <div class="flex-1">
