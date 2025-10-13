@@ -12,9 +12,10 @@
                 <div class="card">
                     <div class="row g-4">
                         <div class="col-12 ">
-                            <input type="text" name="code_product" id="code_product" value="{{ $code }}">
+                            <input type="text" name="code_product" id="code_product" value="{{ $code }}" hidden>
                             @if ($data)
-                                <textarea class="tinymce d-none min-vh-50" name="textAreaName" id="mytextarea">{{ $data->log_m_product_desc_text }}</textarea>
+                                <textarea class="tinymce d-none min-vh-50" name="textAreaName"
+                                    id="mytextarea">{{ $data->log_m_product_desc_text }}</textarea>
                             @else
                                 <textarea class="tinymce d-none min-vh-50" name="textAreaName" id="mytextarea"></textarea>
                             @endif
