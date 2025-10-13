@@ -310,8 +310,7 @@
                                 <h5 id="modalLabel">Login System</h5>
                             </div>
                             <div class="col-auto">
-                                <p class="fs--1 text-600 mb-0">Have an account? <a
-                                        href="../pages/authentication/simple/login.html">Login</a></p>
+                                <p class="fs--1 text-600 mb-0">Have an account? <a  href="#">Login</a></p>
                             </div>
                         </div>
                         <form>
