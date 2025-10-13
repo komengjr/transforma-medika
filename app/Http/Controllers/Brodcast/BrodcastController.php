@@ -1,0 +1,106 @@
+<?php
+
+namespace App\Http\Controllers\Brodcast;
+
+use App\Http\Controllers\Controller;
+use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Auth;
+use Illuminate\Support\Facades\DB;
+use Illuminate\Support\Facades\Hash;
+use Illuminate\Support\Facades\Redirect;
+use Illuminate\Support\Facades\Storage;
+use Illuminate\Support\Str;
+use League\CommonMark\Extension\CommonMark\Node\Inline\Code;
+use Maatwebsite\Excel\Facades\Excel;
+use Pion\Laravel\ChunkUpload\Handler\HandlerFactory;
+use Pion\Laravel\ChunkUpload\Receiver\FileReceiver;
+
+class BrodcastController extends Controller
+{
+    public function __construct()
+    {
+        $this->middleware('auth');
+    }
+    public function url_akses($akses, $id)
+    {
+        $data = DB::table('z_menu_user')
+            ->join('z_menu_sub', 'z_menu_sub.menu_sub_code', '=', 'z_menu_user.menu_sub_code')
+            ->join('z_menu', 'z_menu.menu_code', '=', 'z_menu_sub.menu_code')
+            ->where('z_menu.menu_super_code', $id)
+            ->where('z_menu_user.menu_sub_code', $akses)
+            ->where('z_menu_user.access_code', Auth::user()->access_code)->first();
+        if ($data) {
+            return true;
+        } else {
+            return false;
+        }
+    }
+    public function url_akses_sub($akses, $id)
+    {
+        $data = DB::table('z_menu_user_sub')
+            ->join('z_menu_sub_main', 'z_menu_sub_main.menu_main_sub_code', '=', 'z_menu_user_sub.menu_main_sub_code')
+            ->join('z_menu_sub', 'z_menu_sub.menu_sub_code', '=', 'z_menu_sub_main.menu_sub_code')
+            ->join('z_menu', 'z_menu.menu_code', '=', 'z_menu_sub.menu_code')
+            ->where('z_menu.menu_super_code', $id)
+            ->where('z_menu_user_sub.menu_main_sub_code', $akses)
+            ->where('z_menu_user_sub.access_code', Auth::user()->access_code)->first();
+        if ($data) {
+            return true;
+        } else {
+            return false;
+        }
+    }
+    // BRODCAST WHATSAPP
+    public function menu_brodcast_whatsapp($akses, $id)
+    {
+        if ($this->url_akses($akses, $id) == true) {
+            $data = DB::table('log_schedule_product')->orderBy('id_schedule_product', 'DESC')->get();
+            return view('app-brodcast.menu.brodcast-whatsapp', ['akses' => $akses, 'code' => $id, 'data' => $data]);
+        } else {
+            return Redirect::to('dashboard/home');
+        }
+    }
+    public function menu_brodcast_whatsapp_send(Request $request)
+    {
+        $nomorhp = $request->number;
+        //Terlebih dahulu kita trim dl
+        $nomorhp = trim($nomorhp);
+        //bersihkan dari karakter yang tidak perlu
+        $nomorhp = strip_tags($nomorhp);
+        // Berishkan dari spasi
+        $nomorhp = str_replace(" ", "", $nomorhp);
+        // Berishkan dari -
+        $nomorhp = str_replace("-", "", $nomorhp);
+        // bersihkan dari bentuk seperti  (022) 66677788
+        $nomorhp = str_replace("(", "", $nomorhp);
+        // bersihkan dari format yang ada titik seperti 0811.222.333.4
+        $nomorhp = str_replace(".", "", $nomorhp);
+
+        if (!preg_match('/[^+0-9]/', trim($nomorhp))) {
+            // cek apakah no hp karakter 1-3 adalah +62
+            if (substr(trim($nomorhp), 0, 3) == '+62') {
+                $nomorhp = trim($nomorhp);
+            }
+            // cek apakah no hp karakter 1 adalah 0
+            elseif (substr($nomorhp, 0, 1) == '0') {
+                $nomorhp = '+62' . substr($nomorhp, 1);
+            }
+        }
+        $text = "Hi *" . Auth::user()->fullname . "* \nSelamat Anda Terdaftar Sebagai Peserta \n\n" . $request->text . "\n\nSupport By. Innoverta";
+        DB::table('v_log_whatsapp')->insert([
+            'v_log_whatsapp_code' => str::uuid(),
+            'd_reg_order_list_code' => str::uuid(),
+            'v_log_whatsapp_number' => $nomorhp,
+            'v_log_whatsapp_name' => Auth::user()->fullname,
+            'v_log_whatsapp_filename' => Auth::user()->fullname,
+            'v_log_whatsapp_text' => $text,
+            'v_log_whatsapp_file' => 'N',
+            'v_log_whatsapp_picture' => 0,
+            'v_log_whatsapp_status' => 0,
+            'v_log_whatsapp_date' => now(),
+            'v_log_whatsapp_pass' => mt_rand(10000, 90000),
+            'created_at' => now()
+        ]);
+        return 123;
+    }
+}

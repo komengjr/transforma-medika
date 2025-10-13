@@ -3,6 +3,7 @@
 use App\Http\Controllers\Accounting\AccountingController;
 use App\Http\Controllers\ApplicationController;
 use App\Http\Controllers\Auth\AuthController;
+use App\Http\Controllers\Brodcast\BrodcastController;
 use App\Http\Controllers\dashboardController;
 use App\Http\Controllers\Hrm\HrmController;
 use App\Http\Controllers\inventaris\MasterBarangController;
@@ -111,6 +112,9 @@ Route::prefix('{akses}/{id}')->group(function (): void {
     Route::get('transaction-product/product-out', [LogistikController::class, 'transaction_product_out'])->name('transaction_product_out');
     Route::get('master-logistik/master-item', [LogistikController::class, 'master_logistik_item'])->name('master_logistik_item');
     Route::get('master-logistik/master-product', [LogistikController::class, 'master_logistik_product'])->name('master_logistik_product');
+
+    // BRODCAST
+    Route::get('menu-brodcast/brodcast-whatsapp', [BrodcastController::class, 'menu_brodcast_whatsapp'])->name('menu_brodcast_whatsapp');
 });
 
 Route::prefix('{akses}/{id}/application')->group(function () {
@@ -437,6 +441,10 @@ Route::prefix('pembelian/')->group(function (): void {
 Route::prefix('supplier/')->group(function (): void {
     Route::post('master-supplier/data-supplier/add', [SupplierController::class, 'master_data_supplier_add'])->name('master_data_supplier_add');
     Route::post('master-supplier/data-supplier/save', [SupplierController::class, 'master_data_supplier_save'])->name('master_data_supplier_save');
+});
+// SUPLLIER
+Route::prefix('brodcast/')->group(function (): void {
+    Route::post('menu-brodcast/brodcast-whatsapp/send', [BrodcastController::class, 'menu_brodcast_whatsapp_send'])->name('menu_brodcast_whatsapp_send');
 });
 
 // LOGISTIK
