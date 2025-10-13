@@ -15,16 +15,16 @@
                             role="img" aria-label="Gift">🎁</span>Become a pro</a>
                     <h2 class="text-white fw-light"><strong>Innoventra</strong>
                         <!-- <small>
-                                                                                        <span class="typed-text fw-bold"
-                                                                                            data-typed-text='["Human","Resource","Management","System"]'></span>
-                                                                                    </small> -->
+                                                                                                            <span class="typed-text fw-bold"
+                                                                                                                data-typed-text='["Human","Resource","Management","System"]'></span>
+                                                                                                        </small> -->
                         <br />Our Product
                     </h2>
 
                 </div>
                 <div class="col-xl-7 offset-xl-1">
                     <!-- <a class="img-landing-banner rounded" href="../index.html"><img class="img-fluid"
-                                                                                    src="{{ asset('img/ilus.png') }}" alt="" width="500" /></a> -->
+                                                                                                        src="{{ asset('img/ilus.png') }}" alt="" width="500" /></a> -->
                 </div>
             </div>
         </div>
@@ -48,9 +48,9 @@
                 <div class="col-3 col-sm-auto my-1 my-sm-3 px-card"><img class="landing-cta-img" height="35"
                         src="{{ asset('asset/img/logos/b&w/10.png') }}" alt="" /></div>
                 <!-- <div class="col-3 col-sm-auto my-1 my-sm-3 px-card"><img class="landing-cta-img" height="40"
-                                                                                                                                src="{{ asset('asset/img/logos/b&w/9.png') }}" alt="" /></div>
-                                                                                                                        <div class="col-3 col-sm-auto my-1 my-sm-3 px-card"><img class="landing-cta-img" height="40"
-                                                                                                                                src="{{ asset('asset/img/logos/b&w/8.png') }}" alt="" /></div> -->
+                                                                                                                                                    src="{{ asset('asset/img/logos/b&w/9.png') }}" alt="" /></div>
+                                                                                                                                            <div class="col-3 col-sm-auto my-1 my-sm-3 px-card"><img class="landing-cta-img" height="40"
+                                                                                                                                                    src="{{ asset('asset/img/logos/b&w/8.png') }}" alt="" /></div> -->
             </div>
         </div>
         <!-- end of .container-->
@@ -104,20 +104,19 @@
                             class="badge border link-secondary me-1 text-decoration-none" href="#!">Party</a><a
                             class="badge border link-secondary me-1 text-decoration-none" href="#!">Music</a>
                         <h5 class="fs-0 mt-5 mb-2">Share with friends</h5>
-                        <div class="icon-group"><a class="icon-item text-facebook" href="#!"><span
-                                    class="fab fa-facebook-f"></span></a><a class="icon-item text-twitter" href="#!"><span
-                                    class="fab fa-twitter"></span></a><a class="icon-item text-google-plus" href="#!"><span
-                                    class="fab fa-google-plus-g"></span></a><a class="icon-item text-linkedin"
-                                href="#!"><span class="fab fa-linkedin-in"></span></a><a class="icon-item text-700"
-                                href="#!"><span class="fab fa-medium-m"></span></a></div>
-                        <div class="googlemap min-vh-50 rounded-3 mt-5" id="view-map" data-latlng="23.8383608,90.3680554"
-                            data-scrollwheel="false" data-icon="{{ asset('asset/img/icons/map-marker.png') }}" data-zoom="17"
-                            data-theme="Default">
-                            <div class="marker-content pb-3 light">
-                                <h5>Eiffel Tower</h5>
-                                <p>Gustave Eiffel's iconic, wrought-iron 1889 tower,<br /> with steps and elevators to
-                                    observation decks.</p>
-                            </div>
+                        <div class="icon-group">
+                            <a class="icon-item text-facebook" href="#!"><span class="fab fa-facebook-f"></span></a>
+                            <a class="icon-item text-twitter" href="#!"><span class="fab fa-twitter"></span></a>
+                            <a class="icon-item text-google-plus" href="#!"><span class="fab fa-google-plus-g"></span></a>
+                            <a class="icon-item text-linkedin" href="#!"><span class="fab fa-linkedin-in"></span></a>
+                            <a class="icon-item text-700" href="#!"><span class="fab fa-medium-m"></span></a>
+                        </div>
+                        <div class="min-vh-50 rounded-3 mt-5"  >
+                            <iframe style="width: 100%; height: 400px;"
+                                src="https://www.youtube.com/embed/1g8nl9SAG70?si=CI0jayYHphoMC6qV"
+                                title="YouTube video player" frameborder="0"
+                                allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share"
+                                referrerpolicy="strict-origin-when-cross-origin" allowfullscreen></iframe>
                         </div>
                     </div>
                 </div>
@@ -218,5 +217,4 @@
     <!-- <section> close ============================-->
     <!-- ============================================-->
 
-    <script src="https://maps.googleapis.com/maps/api/js?key=AIzaSyARdVcREeBK44lIWnv5-iPijKqvlSAVwbw&callback=initMap" async></script>
 @endsection
