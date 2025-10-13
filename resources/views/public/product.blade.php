@@ -15,16 +15,16 @@
                             role="img" aria-label="Gift">🎁</span>Become a pro</a>
                     <h2 class="text-white fw-light"><strong>Innoventra</strong>
                         <!-- <small>
-                                                            <span class="typed-text fw-bold"
-                                                                data-typed-text='["Human","Resource","Management","System"]'></span>
-                                                        </small> -->
+                                                                <span class="typed-text fw-bold"
+                                                                    data-typed-text='["Human","Resource","Management","System"]'></span>
+                                                            </small> -->
                         <br />Our Product
                     </h2>
 
                 </div>
                 <div class="col-xl-7 offset-xl-1">
                     <!-- <a class="img-landing-banner rounded" href="../index.html"><img class="img-fluid"
-                                                        src="{{ asset('img/ilus.png') }}" alt="" width="500" /></a> -->
+                                                            src="{{ asset('img/ilus.png') }}" alt="" width="500" /></a> -->
                 </div>
             </div>
         </div>
@@ -48,9 +48,9 @@
                 <div class="col-3 col-sm-auto my-1 my-sm-3 px-card"><img class="landing-cta-img" height="35"
                         src="{{ asset('asset/img/logos/b&w/10.png') }}" alt="" /></div>
                 <!-- <div class="col-3 col-sm-auto my-1 my-sm-3 px-card"><img class="landing-cta-img" height="40"
-                                                                                                    src="{{ asset('asset/img/logos/b&w/9.png') }}" alt="" /></div>
-                                                                                            <div class="col-3 col-sm-auto my-1 my-sm-3 px-card"><img class="landing-cta-img" height="40"
-                                                                                                    src="{{ asset('asset/img/logos/b&w/8.png') }}" alt="" /></div> -->
+                                                                                                        src="{{ asset('asset/img/logos/b&w/9.png') }}" alt="" /></div>
+                                                                                                <div class="col-3 col-sm-auto my-1 my-sm-3 px-card"><img class="landing-cta-img" height="40"
+                                                                                                        src="{{ asset('asset/img/logos/b&w/8.png') }}" alt="" /></div> -->
             </div>
         </div>
         <!-- end of .container-->
@@ -111,7 +111,7 @@
                                     </div>
                                     <div class="p-3">
                                         <h5 class="fs-0">
-                                            <a class="text-dark" href="#">
+                                            <a class="text-dark" href="{{route('product_detail', ['detail' => $products->log_m_product_code])}}">
                                                 {{ $products->log_m_product_name }}
                                             </a>
                                         </h5>
