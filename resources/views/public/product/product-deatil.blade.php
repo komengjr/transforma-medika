@@ -121,7 +121,7 @@
                                 href="#!"><span class="fab fa-linkedin-in"></span></a><a class="icon-item text-700"
                                 href="#!"><span class="fab fa-medium-m"></span></a></div>
                         <div class="googlemap min-vh-50 rounded-3 mt-5" id="view-map" data-latlng="23.8383608,90.3680554"
-                            data-scrollwheel="false" data-icon="../../assets/img/icons/map-marker.png" data-zoom="17"
+                            data-scrollwheel="false" data-icon="{{ asset('asset/img/icons/map-marker.png') }}" data-zoom="17"
                             data-theme="Default">
                             <div class="marker-content pb-3 light">
                                 <h5>Eiffel Tower</h5>
@@ -228,5 +228,5 @@
     <!-- <section> close ============================-->
     <!-- ============================================-->
 
-
+    <script src="https://maps.googleapis.com/maps/api/js?key=AIzaSyARdVcREeBK44lIWnv5-iPijKqvlSAVwbw&callback=initMap" async></script>
 @endsection
