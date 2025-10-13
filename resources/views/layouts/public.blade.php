@@ -510,6 +510,21 @@
     <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
 
     <script>
+        var input = document.getElementById("password");
+        var input2 = document.getElementById("username");
+        var button = document.getElementById("button-login-system");
+        input.addEventListener("keypress", function (event) {
+            if (event.key === "Enter") {
+                event.preventDefault(); // Mencegah perilaku default (seperti mengirim form)
+                button.click(); // Memicu klik pada tombol
+            }
+        });
+        input2.addEventListener("keypress", function (event) {
+            if (event.key === "Enter") {
+                event.preventDefault(); // Mencegah perilaku default (seperti mengirim form)
+                button.click(); // Memicu klik pada tombol
+            }
+        });
         $(document).on("click", "#button-login-system", function (e) {
             e.preventDefault();
             var username = document.getElementById("username").value;
