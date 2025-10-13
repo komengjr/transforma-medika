@@ -359,7 +359,7 @@ class LogistikController extends Controller
         $total = DB::table('master_item')->count();
         try {
             DB::table('master_item')->insert([
-                'master_item_code' => 'ITEM' . str_pad($total + 1, 10, '0', STR_PAD_LEFT),
+                'master_item_code' => str::uuid() . '-' . str_pad($total + 1, 10, '0', STR_PAD_LEFT),
                 'master_item_name' => $request->name,
                 'master_item_type' => $request->type,
                 'master_item_class' => $request->class,

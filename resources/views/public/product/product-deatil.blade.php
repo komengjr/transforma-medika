@@ -15,16 +15,16 @@
                             role="img" aria-label="Gift">🎁</span>Become a pro</a>
                     <h2 class="text-white fw-light"><strong>Innoventra</strong>
                         <!-- <small>
-                                                                                <span class="typed-text fw-bold"
-                                                                                    data-typed-text='["Human","Resource","Management","System"]'></span>
-                                                                            </small> -->
+                                                                                        <span class="typed-text fw-bold"
+                                                                                            data-typed-text='["Human","Resource","Management","System"]'></span>
+                                                                                    </small> -->
                         <br />Our Product
                     </h2>
 
                 </div>
                 <div class="col-xl-7 offset-xl-1">
                     <!-- <a class="img-landing-banner rounded" href="../index.html"><img class="img-fluid"
-                                                                            src="{{ asset('img/ilus.png') }}" alt="" width="500" /></a> -->
+                                                                                    src="{{ asset('img/ilus.png') }}" alt="" width="500" /></a> -->
                 </div>
             </div>
         </div>
@@ -48,9 +48,9 @@
                 <div class="col-3 col-sm-auto my-1 my-sm-3 px-card"><img class="landing-cta-img" height="35"
                         src="{{ asset('asset/img/logos/b&w/10.png') }}" alt="" /></div>
                 <!-- <div class="col-3 col-sm-auto my-1 my-sm-3 px-card"><img class="landing-cta-img" height="40"
-                                                                                                                        src="{{ asset('asset/img/logos/b&w/9.png') }}" alt="" /></div>
-                                                                                                                <div class="col-3 col-sm-auto my-1 my-sm-3 px-card"><img class="landing-cta-img" height="40"
-                                                                                                                        src="{{ asset('asset/img/logos/b&w/8.png') }}" alt="" /></div> -->
+                                                                                                                                src="{{ asset('asset/img/logos/b&w/9.png') }}" alt="" /></div>
+                                                                                                                        <div class="col-3 col-sm-auto my-1 my-sm-3 px-card"><img class="landing-cta-img" height="40"
+                                                                                                                                src="{{ asset('asset/img/logos/b&w/8.png') }}" alt="" /></div> -->
             </div>
         </div>
         <!-- end of .container-->
@@ -87,6 +87,9 @@
         </div>
         <div class="row g-0">
             <div class="col-lg-8 pe-lg-2">
+                <div class="card-header bg-300">
+                    <h5 class="mb-0">Detail</h5>
+                </div>
                 <div class="card mb-3 mb-lg-0">
                     <div class="card-body">
                         <h5 class="fs-0 mb-3">New Year's Eve on the Waterfront</h5>
@@ -131,9 +134,12 @@
             </div>
             <div class="col-lg-4 ps-lg-2">
                 <div class="sticky-sidebar">
+                    <div class="card-header bg-300">
+                        <h5 class="mb-0">Date And Time</h5>
+                    </div>
                     <div class="card mb-3 fs--1">
                         <div class="card-body">
-                            <h6>Date And Time</h6>
+                            <h6></h6>
                             <p class="mb-1">Mon, Dec 31, 2018, 11:59 PM – <br />Tue, Jan 1, 2019, 12:19 AM EST</p><a
                                 href="#!">Add to Calendar</a>
                             <h6 class="mt-4">Location</h6>
@@ -144,7 +150,7 @@
                         </div>
                     </div>
                     <div class="card mb-3 mb-lg-0">
-                        <div class="card-header bg-light">
+                        <div class="card-header bg-300">
                             <h5 class="mb-0">Events you may like</h5>
                         </div>
                         <div class="card-body fs--1">
