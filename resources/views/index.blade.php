@@ -9,7 +9,7 @@
         <!--/.bg-holder-->
 
         <div class="container">
-            <div class="row flex-center pt-8 pt-lg-10 pb-lg-9 pb-xl-0">
+            <div class="row flex-center pt-8 pt-lg-8 pb-lg-9 pb-xl-0">
                 <div class="col-md-11 col-lg-8 col-xl-4 pb-7 pb-xl-9 text-center text-xl-start"><a
                         class="btn btn-outline-danger mb-4 fs--1 border-2 rounded-pill" href="#!"><span class="me-2"
                             role="img" aria-label="Gift">🎁</span>Become a pro</a>
@@ -24,9 +24,10 @@
                         building with the falcon<span class="fas fa-play ms-2"
                             data-fa-transform="shrink-6 down-1"></span></a>
                 </div>
-                <div class="col-xl-7 offset-xl-1 align-self-end mt-4 mt-xl-0"><a class="img-landing-banner rounded"
+                <div class="col-xl-7 offset-xl-1  mt-0 mt-xl-0"><a class="img-landing-banner rounded"
                         href="../index.html"><img class="img-fluid" src="{{ asset('asset/img/generic/dashboard-alt.png') }}"
-                            alt="" /></a></div>
+                            alt="" /></a>
+                </div>
             </div>
         </div>
         <!-- end of .container-->
@@ -49,9 +50,9 @@
                 <div class="col-3 col-sm-auto my-1 my-sm-3 px-card"><img class="landing-cta-img" height="35"
                         src="{{ asset('asset/img/logos/b&w/10.png') }}" alt="" /></div>
                 <!-- <div class="col-3 col-sm-auto my-1 my-sm-3 px-card"><img class="landing-cta-img" height="40"
-                                            src="{{ asset('asset/img/logos/b&w/9.png') }}" alt="" /></div>
-                                    <div class="col-3 col-sm-auto my-1 my-sm-3 px-card"><img class="landing-cta-img" height="40"
-                                            src="{{ asset('asset/img/logos/b&w/8.png') }}" alt="" /></div> -->
+                                                src="{{ asset('asset/img/logos/b&w/9.png') }}" alt="" /></div>
+                                        <div class="col-3 col-sm-auto my-1 my-sm-3 px-card"><img class="landing-cta-img" height="40"
+                                                src="{{ asset('asset/img/logos/b&w/8.png') }}" alt="" /></div> -->
             </div>
         </div>
         <!-- end of .container-->
