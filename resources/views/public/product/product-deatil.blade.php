@@ -15,16 +15,16 @@
                             role="img" aria-label="Gift">🎁</span>Become a pro</a>
                     <h2 class="text-white fw-light"><strong>Innoventra</strong>
                         <!-- <small>
-                                                                                                            <span class="typed-text fw-bold"
-                                                                                                                data-typed-text='["Human","Resource","Management","System"]'></span>
-                                                                                                        </small> -->
+                                                                                                                    <span class="typed-text fw-bold"
+                                                                                                                        data-typed-text='["Human","Resource","Management","System"]'></span>
+                                                                                                                </small> -->
                         <br />Our Product
                     </h2>
 
                 </div>
                 <div class="col-xl-7 offset-xl-1">
                     <!-- <a class="img-landing-banner rounded" href="../index.html"><img class="img-fluid"
-                                                                                                        src="{{ asset('img/ilus.png') }}" alt="" width="500" /></a> -->
+                                                                                                                src="{{ asset('img/ilus.png') }}" alt="" width="500" /></a> -->
                 </div>
             </div>
         </div>
@@ -48,9 +48,9 @@
                 <div class="col-3 col-sm-auto my-1 my-sm-3 px-card"><img class="landing-cta-img" height="35"
                         src="{{ asset('asset/img/logos/b&w/10.png') }}" alt="" /></div>
                 <!-- <div class="col-3 col-sm-auto my-1 my-sm-3 px-card"><img class="landing-cta-img" height="40"
-                                                                                                                                                    src="{{ asset('asset/img/logos/b&w/9.png') }}" alt="" /></div>
-                                                                                                                                            <div class="col-3 col-sm-auto my-1 my-sm-3 px-card"><img class="landing-cta-img" height="40"
-                                                                                                                                                    src="{{ asset('asset/img/logos/b&w/8.png') }}" alt="" /></div> -->
+                                                                                                                                                            src="{{ asset('asset/img/logos/b&w/9.png') }}" alt="" /></div>
+                                                                                                                                                    <div class="col-3 col-sm-auto my-1 my-sm-3 px-card"><img class="landing-cta-img" height="40"
+                                                                                                                                                            src="{{ asset('asset/img/logos/b&w/8.png') }}" alt="" /></div> -->
             </div>
         </div>
         <!-- end of .container-->
@@ -66,21 +66,21 @@
                 <div class="row justify-content-between align-items-center">
                     <div class="col">
                         <div class="d-flex">
-                            <div class="calendar me-2"><span class="calendar-month">Dec</span><span class="calendar-day">31
+                            <div class="calendar me-2"><span class="calendar-month">Dec</span><span class="calendar-day">0
                                 </span></div>
                             <div class="flex-1 fs--1">
                                 <h5 class="fs-0">{{$data->log_m_product_name}}</h5>
-                                <p class="mb-0">by <a href="#!">Boston Harbor Now</a></p><span
-                                    class="fs-0 text-warning fw-semi-bold">$49.99 – $89.99</span>
+                                <p class="mb-0">by <a href="#!">Admin</a></p><span class="fs-0 text-warning fw-semi-bold">
+                                    @currency(mt_rand(1000000, 9999999))</span>
                             </div>
                         </div>
                     </div>
                     <div class="col-md-auto mt-4 mt-md-0">
                         <button class="btn btn-falcon-default btn-sm me-2" type="button"><span
-                                class="fas fa-heart text-danger me-1"></span>235</button>
+                                class="fas fa-heart text-danger me-1"></span>{{mt_rand(1000, 9999)}}</button>
                         <button class="btn btn-falcon-default btn-sm me-2" type="button"><span
                                 class="fas fa-share-alt me-1"></span>Share</button>
-                        <button class="btn btn-falcon-primary btn-sm px-4 px-sm-5" type="button">Register</button>
+                        <!-- <button class="btn btn-falcon-primary btn-sm px-4 px-sm-5" type="button">Register</button> -->
                     </div>
                 </div>
             </div>
@@ -99,10 +99,11 @@
                         @else
                             TIdak ada Conten
                         @endif
-                        <h5 class="fs-0 mt-5 mb-2">Tags</h5><a class="badge border link-secondary me-1 text-decoration-none"
-                            href="#!">Things To Do In Brooklyn, NY</a><a
-                            class="badge border link-secondary me-1 text-decoration-none" href="#!">Party</a><a
-                            class="badge border link-secondary me-1 text-decoration-none" href="#!">Music</a>
+                        <h5 class="fs-0 mt-5 mb-2">Tags</h5>
+                        <a class="badge border link-secondary me-1 text-decoration-none" href="#!">Log</a>
+                        <a class="badge border link-secondary me-1 text-decoration-none" href="#!">Human Resource</a>
+                        <a class="badge border link-secondary me-1 text-decoration-none" href="#!">Purchase</a>
+                        <a class="badge border link-secondary me-1 text-decoration-none" href="#!">Accounting</a>
                         <h5 class="fs-0 mt-5 mb-2">Share with friends</h5>
                         <div class="icon-group">
                             <a class="icon-item text-facebook" href="#!"><span class="fab fa-facebook-f"></span></a>
@@ -111,7 +112,7 @@
                             <a class="icon-item text-linkedin" href="#!"><span class="fab fa-linkedin-in"></span></a>
                             <a class="icon-item text-700" href="#!"><span class="fab fa-medium-m"></span></a>
                         </div>
-                        <div class="min-vh-50 rounded-3 mt-5"  >
+                        <div class="min-vh-50 rounded-3 mt-5">
                             <iframe style="width: 100%; height: 400px;"
                                 src="https://www.youtube.com/embed/1g8nl9SAG70?si=CI0jayYHphoMC6qV"
                                 title="YouTube video player" frameborder="0"
@@ -129,18 +130,19 @@
                     <div class="card mb-3 fs--1">
                         <div class="card-body">
                             <h6></h6>
-                            <p class="mb-1">Mon, Dec 31, 2018, 11:59 PM – <br />Tue, Jan 1, 2019, 12:19 AM EST</p><a
-                                href="#!">Add to Calendar</a>
+                            <p class="mb-1">Mon, Dec 31, 2018, 11:59 PM – <br />Tue, Jan 1, 2019, 12:19 AM EST</p>
+                            <a href="#!">Add to Calendar</a>
                             <h6 class="mt-4">Location</h6>
                             <div class="mb-1">Boston Harborwalk<br />Christopher Columbus Park<br />Boston, MA
-                                02109<br />United States</div><a href="#view-map">View Map</a>
+                                02109<br />United States</div>
+                            <a href="#view-map">View Map</a>
                             <h6 class="mt-4">Refund Policy</h6>
                             <p class="fs--1 mb-0">No Refunds</p>
                         </div>
                     </div>
                     <div class="card mb-3 mb-lg-0">
                         <div class="card-header bg-300">
-                            <h5 class="mb-0">Events you may like</h5>
+                            <h5 class="mb-0">Your Order may like</h5>
                         </div>
                         <div class="card-body fs--1">
                             <div class="d-flex btn-reveal-trigger">
@@ -156,30 +158,7 @@
                                     <div class="border-dashed-bottom my-3"></div>
                                 </div>
                             </div>
-                            <div class="d-flex btn-reveal-trigger">
-                                <div class="calendar"><span class="calendar-month">Dec</span><span
-                                        class="calendar-day">31</span></div>
-                                <div class="flex-1 position-relative ps-3">
-                                    <h6 class="fs-0 mb-0"><a href="../../app/events/event-detail.html">31st Night
-                                            Celebration</a></h6>
-                                    <p class="mb-1">Organized by <a href="#!" class="text-700">Chamber Music Society</a></p>
-                                    <p class="text-1000 mb-0">Time: 11:00PM</p>
-                                    <p class="text-1000 mb-0">280 people interested</p>Place: Tavern on the Greend, New York
-                                    <div class="border-dashed-bottom my-3"></div>
-                                </div>
-                            </div>
-                            <div class="d-flex btn-reveal-trigger">
-                                <div class="calendar"><span class="calendar-month">Dec</span><span
-                                        class="calendar-day">16</span></div>
-                                <div class="flex-1 position-relative ps-3">
-                                    <h6 class="fs-0 mb-0"><a href="../../app/events/event-detail.html">Folk Festival</a>
-                                    </h6>
-                                    <p class="mb-1">Organized by <a href="#!" class="text-700">Harvard University</a></p>
-                                    <p class="text-1000 mb-0">Time: 9:00AM</p>
-                                    <p class="text-1000 mb-0">Location: Cambridge Masonic Hall Association</p>Place: Porter
-                                    Square, North Cambridge
-                                </div>
-                            </div>
+
                         </div>
                         <div class="card-footer bg-light p-0 border-top"><a class="btn btn-link d-block w-100"
                                 href="../../app/events/event-list.html">All Events<span
