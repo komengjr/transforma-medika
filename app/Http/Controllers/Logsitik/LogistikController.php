@@ -258,9 +258,9 @@ class LogistikController extends Controller
                                     class="fas fa-align-left me-1" data-fa-transform="shrink-3"></span>Menu</button>
                             <div class="dropdown-menu" aria-labelledby="btnGroupVerticalDrop2">
                                 <button class="dropdown-item" data-bs-toggle="modal"
-                                    data-bs-target="#modal-master-barang-xl" id="button-update-barang"
+                                    data-bs-target="#modal-master-barang-xl" id="button-update-deskripsi-product"
                                     data-code="' . $record->master_item_code . '"><span class="far fa-edit"></span>
-                                    Edit Barang</button>
+                                    Update Deskripsi Product</button>
                                 <div class="dropdown-divider"></div>
                                 <button class="dropdown-item" data-bs-toggle="modal" data-bs-target="#modal-cabang"
                                     // id="button-data-barang-cabang" data-code="' . $record->master_item_code . '"><span
@@ -438,12 +438,12 @@ class LogistikController extends Controller
                                     class="fas fa-align-left me-1" data-fa-transform="shrink-3"></span>Menu</button>
                             <div class="dropdown-menu" aria-labelledby="btnGroupVerticalDrop2">
                                 <button class="dropdown-item" data-bs-toggle="modal"
-                                    data-bs-target="#modal-master-barang-xl" id="button-update-barang"
-                                    data-code="' . $record->log_m_product_name . '"><span class="far fa-edit"></span>
-                                    Edit Barang</button>
+                                    data-bs-target="#modal-product-xl" id="button-update-deskripsi-product"
+                                    data-code="' . $record->log_m_product_code . '"><span class="far fa-edit"></span>
+                                    Update Deskripsi Product</button>
                                 <div class="dropdown-divider"></div>
-                                <button class="dropdown-item" data-bs-toggle="modal" data-bs-target="#modal-cabang"
-                                    // id="button-data-barang-cabang" data-code="' . $record->log_m_product_name . '"><span
+                                <button class="dropdown-item" data-bs-toggle="modal" data-bs-target="#modal-product"
+                                     id="button-data-barang-cabang" data-code="' . $record->log_m_product_code . '"><span
                                         class="fas fa-file-import"></span> -
                                     Import Excel</button>
                             </div>
@@ -556,5 +556,30 @@ class LogistikController extends Controller
     {
         Excel::import(new ProductImport($request->type, 454), request()->file('file'));
         return redirect()->back()->withSuccess('Great! Berhasil Menambahkan Data Perusahaan');
+    }
+    public function master_logistik_add_desc_product(Request $request)
+    {
+        $data = DB::table('log_m_product_desc')->where('log_m_product_code', $request->code)->first();
+        return view('app-logistik.master.form.form-add-product-desc', [
+            'code' => $request->code,
+            'data' => $data
+        ]);
+    }
+    public function master_logistik_save_desc_product(Request $request)
+    {
+        $cek = DB::table('log_m_product_desc')->where('log_m_product_code', $request->code)->first();
+        if ($cek) {
+            DB::table('log_m_product_desc')->where('log_m_product_code', $request->code)->update([
+                'log_m_product_desc_text' => $request->text,
+                'updated_at' => now()
+            ]);
+        } else {
+            DB::table('log_m_product_desc')->insert([
+                'log_m_product_code' => $request->code,
+                'log_m_product_desc_text' => $request->text,
+                'created_at' => now()
+            ]);
+        }
+        return 123;
     }
 }

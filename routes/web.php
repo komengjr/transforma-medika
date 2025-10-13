@@ -57,7 +57,10 @@ Route::controller(AuthController::class)->group(function () {
     // Route::get('dashboard', [AuthController::class, 'dashboard']);
 });
 
-
+Route::prefix('dashboard')->group(function () {
+    Route::get('home', [dashboardController::class, 'index'])->name('dashboard.home');
+    Route::get('profile', [dashboardController::class, 'profile'])->name('dashboard.profile');
+});
 // DASHBOARD CEK
 Route::prefix('app')->group(function () {
     Route::post('check-menu', [dashboardController::class, 'app_check_menu'])->name('app_check_menu');
@@ -197,10 +200,7 @@ Route::prefix('application')->group(function () {
     Route::post('menu-pelayanan/menu-supervisior/find', [PelayananController::class, 'menu_pelayanan_supervisior_find'])->name('menu_pelayanan_supervisior_find');
 
 });
-Route::prefix('dashboard')->group(function () {
-    Route::get('home', [dashboardController::class, 'index'])->name('dashboard.home');
-    Route::get('profile', [dashboardController::class, 'profile'])->name('dashboard.profile');
-});
+
 Route::prefix('master-data')->group(function () {
     Route::get('dashboard', [MasterController::class, 'master_dashboard'])->name('master_dashboard');
     Route::get('user', [MasterController::class, 'master_user'])->name('master_user');
@@ -463,6 +463,8 @@ Route::prefix('logistik/')->group(function (): void {
     Route::post('master-logistik/master-product/upload-file-product', [LogistikController::class, 'master_logistik_upload_file_product'])->name('master_logistik_upload_file_product');
     Route::post('master-logistik/master-product/add-product-upload-file', [LogistikController::class, 'master_logistik_add_product_upload_file'])->name('master_logistik_add_product_upload_file');
     Route::post('master-logistik/master-product/proses-product-upload-file', [LogistikController::class, 'master_logistik_proses_product_upload_file'])->name('master_logistik_proses_product_upload_file');
+    Route::post('master-logistik/master-product/add-deskripsi-product', [LogistikController::class, 'master_logistik_add_desc_product'])->name('master_logistik_add_desc_product');
+    Route::post('master-logistik/master-product/save-deskripsi-product', [LogistikController::class, 'master_logistik_save_desc_product'])->name('master_logistik_save_desc_product');
 });
 
 

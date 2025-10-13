@@ -97,7 +97,7 @@
             <div class="modal-content border-0">
                 <div class="position-absolute top-0 end-0 mt-3 me-3 z-index-1">
                     <!-- <button class="btn-close btn btn-sm btn-circle d-flex flex-center transition-base"
-                                                                                                                data-bs-dismiss="modal" aria-label="Close"></button> -->
+                                                                                                                                data-bs-dismiss="modal" aria-label="Close"></button> -->
                 </div>
                 <div id="menu-product-xl"></div>
             </div>
@@ -109,6 +109,7 @@
     <script src="https://cdn.datatables.net/responsive/3.0.4/js/responsive.bootstrap5.js"></script>
     <script src="{{ asset('vendors/choices/choices.min.js') }}"></script>
     <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+    <script src="{{ asset('vendors/tinymce/tinymce.min.js') }}"></script>
     <script type="text/javascript">
         $(document).ready(function () {
             var table = $('#example').DataTable({
@@ -265,6 +266,53 @@
                         alert('Your form was not sent successfully.');
                     }
                 });
+            });
+        });
+        $(document).on("click", "#button-update-deskripsi-product", function (e) {
+            e.preventDefault();
+            var code = $(this).data("code");
+            $('#menu-product-xl').html(
+                '<div class="spinner-border my-3" style="display: block; margin-left: auto; margin-right: auto;" role="status"><span class="visually-hidden">Loading...</span></div>'
+            );
+            $.ajax({
+                url: "{{ route('master_logistik_add_desc_product') }}",
+                type: "POST",
+                cache: false,
+                data: {
+                    "_token": "{{ csrf_token() }}",
+                    "code": code
+                },
+                dataType: 'html',
+            }).done(function (data) {
+                $('#menu-product-xl').html(data);
+            }).fail(function () {
+                $('#menu-product-xl').html('eror');
+            });
+        });
+        $(document).on("click", "#button-save-deskripsi-product", function (e) {
+            e.preventDefault();
+            var code = document.getElementById("code_product").value;
+            var text = tinymce.activeEditor.getContent();
+            console.log(text);
+
+            $('#menu-simpan-data').html(
+                '<div class="spinner-border my-3" style="display: block; margin-left: auto; margin-right: auto;" role="status"><span class="visually-hidden">Loading...</span></div>'
+            );
+            $.ajax({
+                url: "{{ route('master_logistik_save_desc_product') }}",
+                type: "POST",
+                cache: false,
+                data: {
+                    "_token": "{{ csrf_token() }}",
+                    "code": code,
+                    "text": text
+                },
+                dataType: 'html',
+            }).done(function (data) {
+                $('#menu-simpan-data').html(data);
+                location.reload();
+            }).fail(function () {
+                $('#menu-simpan-data').html('eror');
             });
         });
     </script>

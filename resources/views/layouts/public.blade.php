@@ -294,8 +294,14 @@
                                     class="d-lg-none">Dashboard</span></a></li>
 
 
-                        <li class="nav-item"><a class="nav-link text-warning" href="#!" data-bs-toggle="modal"
-                                data-bs-target="#exampleModal">Login</a> </li>
+                        <li class="nav-item">
+                            @guest
+                                <a class="nav-link text-warning" href="#!" data-bs-toggle="modal"
+                                    data-bs-target="#exampleModal">Login</a>
+                            @else
+                                <a class="nav-link text-warning" href="{{ route('dashboard.home') }}">Home : {{ Auth::user()->fullname }}</a>
+                            @endguest
+                        </li>
                     </ul>
                 </div>
             </div>
@@ -310,7 +316,7 @@
                                 <h5 id="modalLabel">Login System</h5>
                             </div>
                             <div class="col-auto">
-                                <p class="fs--1 text-600 mb-0">Have an account? <a  href="#">Login</a></p>
+                                <p class="fs--1 text-600 mb-0">Have an account? <a href="#">Login</a></p>
                             </div>
                         </div>
                         <form>

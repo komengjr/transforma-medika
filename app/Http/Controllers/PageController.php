@@ -48,7 +48,11 @@ class PageController extends Controller
     public function product_detail($detail)
     {
         $data = DB::table('log_m_product')->where('log_m_product_code', $detail)->first();
-        return view('public.product.product-deatil', ['data' => $data]);
+        $desc = DB::table('log_m_product_desc')->where('log_m_product_code', $detail)->first();
+        return view('public.product.product-deatil', [
+            'data' => $data,
+            'desc' => $desc
+        ]);
     }
     public function changelog()
     {

@@ -180,15 +180,19 @@
                                                         aria-expanded="false"><span class="fas fa-align-left me-1"
                                                             data-fa-transform="shrink-3"></span>Option</button>
                                                     <div class="dropdown-menu" aria-labelledby="btnGroupVerticalDrop2">
+                                                        <button class="dropdown-item text-dark"
+                                                            id="button-menu-utama">
+                                                            <span class="fab fa-dashcube"></span>
+                                                            Menu Utama</button>
                                                         <button class="dropdown-item text-warning"
                                                             data-bs-toggle="modal" data-bs-target="#modal-keuangan"
                                                             id="button-proses-transaksi" data-code=""><span
                                                                 class="fab fa-keycdn"></span>
                                                             Ubah Kata Sandi</button>
                                                         @if (Auth::user()->access_code == 'master')
-                                                            <button class="dropdown-item text-dark"
+                                                            <button class="dropdown-item text-facebook"
                                                                 id="button-master-dashboard">
-                                                                <span class="fas fa-user-cog"></span> Master Page
+                                                                <span class="fas fa-cog"></span> Master Page
                                                             </button>
                                                         @endif
                                                         <div class="dropdown-divider"></div>
@@ -528,6 +532,10 @@
         $(document).on("click", "#button-master-dashboard", function (e) {
             e.preventDefault();
             window.location.href = "{{route('master_dashboard')}}";
+        });
+        $(document).on("click", "#button-menu-utama", function (e) {
+            e.preventDefault();
+            window.location.href = "{{route('/')}}";
         });
 
     </script>
