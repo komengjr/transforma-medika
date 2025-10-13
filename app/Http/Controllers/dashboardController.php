@@ -59,7 +59,9 @@ class dashboardController extends Controller
             return view('app-pembelian.dashboard', ['akses' => $id, 'code' => $id]);
         } elseif ($id == 'supplier') {
             return view('app-supplier.dashboard', ['akses' => $id, 'code' => $id]);
-        } else {
+        } elseif ($id == 'brodcast') {
+            return view('app-brodcast.dashboard', ['akses' => $id, 'code' => $id]);
+        }else {
             return Redirect::to('dashboard/home');
         }
     }

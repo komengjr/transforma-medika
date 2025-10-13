@@ -292,6 +292,17 @@
                                         </div>
                                     </div>
                                 </div>
+                                <div class="col-sm-6 col-lg-4">
+                                    <div class="card text-white bg-github" id="menu" data-code="brodcast">
+                                        <div class="card-body">
+                                            <div class="card-title">BRODCAST MESSAGE</div>
+                                            <p class="card-text">perangkat lunak (software) digital yang dirancang untuk
+                                                mengelola, mengoptimalkan, dan mengotomatisasi proses logistik dan
+                                                rantai pasok suatu perusahaan, mulai dari perencanaan hingga pengiriman
+                                                akhir.</p>
+                                        </div>
+                                    </div>
+                                </div>
 
                                 <div class="col-sm-6 col-lg-4">
                                     <div class="card text-white bg-400">
