@@ -36,6 +36,7 @@ Route::controller(PageController::class)->group(function () {
     Route::get('/app-logistik', 'app_logistik')->name('public-logistik');
     Route::get('/app-purchase', 'app_purchase')->name('public-purchase');
     Route::get('/app-supplier', 'app_supplier')->name('public-supplier');
+    Route::get('/app-brodcast', 'app_brodcast')->name('public-brodcast');
     Route::get('/product', 'product')->name('product');
     Route::get('/product/detail/{detail}', 'product_detail')->name('product_detail');
     Route::get('/changelog', 'changelog')->name('changelog');
