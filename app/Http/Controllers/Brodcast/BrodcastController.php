@@ -14,6 +14,8 @@ use League\CommonMark\Extension\CommonMark\Node\Inline\Code;
 use Maatwebsite\Excel\Facades\Excel;
 use Pion\Laravel\ChunkUpload\Handler\HandlerFactory;
 use Pion\Laravel\ChunkUpload\Receiver\FileReceiver;
+use SimpleSoftwareIO\QrCode\Facades\QrCode;
+use Svg\Tag\Rect;
 
 class BrodcastController extends Controller
 {
@@ -102,5 +104,128 @@ class BrodcastController extends Controller
             'created_at' => now()
         ]);
         return 123;
+    }
+    // BRODCAST WHATSAPP
+    public function menu_brodcast_management($akses, $id)
+    {
+        if ($this->url_akses($akses, $id) == true) {
+            $data = DB::table('b_event')->orderBy('id_b_event', 'DESC')->get();
+            return view('app-brodcast.menu.brodcast-management', ['akses' => $akses, 'code' => $id, 'data' => $data]);
+        } else {
+            return Redirect::to('dashboard/home');
+        }
+    }
+    public function menu_brodcast_management_add(Request $request)
+    {
+        return view('app-brodcast.menu.form.form-add-event');
+    }
+    public function menu_brodcast_management_save(Request $request)
+    {
+        try {
+            DB::table('b_event')->insert([
+                'b_event_code' => str::uuid(),
+                'b_event_name' => $request->name,
+                'b_event_location' => $request->location,
+                'b_event_class' => $request->class,
+                'b_event_date' => $request->date,
+                'b_event_status' => 1,
+                'created_at' => now()
+            ]);
+            return 'sukses';
+        } catch (\Throwable $th) {
+            return 0;
+        }
+    }
+    public function menu_brodcast_management_add_peserta(Request $request)
+    {
+        return view('app-brodcast.menu.form.form-add-peserta', ['code' => $request->code]);
+    }
+    public function menu_brodcast_management_save_peserta(Request $request)
+    {
+        try {
+            DB::table('b_event_peserta')->insert([
+                'b_event_peserta_code' => str::uuid(),
+                'b_event_code' => $request->code_event,
+                'b_event_peserta_name' => $request->name,
+                'b_event_peserta_booking' => $request->booking,
+                'b_event_peserta_class' => $request->class,
+                'b_event_peserta_room' => 1,
+                'b_event_peserta_hp' => $request->hp,
+                'b_event_peserta_email' => $request->email,
+                'b_event_peserta_lembaga' => $request->lembaga,
+                'b_event_peserta_desc' => $request->desc,
+                'b_event_peserta_status' => 1,
+                'created_at' => now(),
+            ]);
+            return 'sukses';
+        } catch (\Throwable $e) {
+            return 0;
+        }
+    }
+    public function menu_brodcast_management_brodcast_whatsapp(Request $request)
+    {
+        $data = DB::table('b_event_peserta')->where('b_event_code', $request->code)->get();
+        return view('app-brodcast.menu.form.form-brodcast-whatsapp', [
+            'data' => $data,
+            'code' => $request->code
+        ]);
+    }
+    public function menu_brodcast_management_brodcast_whatsapp_send(Request $request)
+    {
+        $data = DB::table('b_event_peserta')->where('b_event_code', $request->code)->get();
+        foreach ($data as $datas) {
+            $cek = DB::table('v_log_whatsapp')->where('d_reg_order_list_code', $datas->b_event_peserta_code)->first();
+            if (!$cek) {
+                $nomorhp = $datas->b_event_peserta_hp;
+                //Terlebih dahulu kita trim dl
+                $nomorhp = trim($nomorhp);
+                //bersihkan dari karakter yang tidak perlu
+                $nomorhp = strip_tags($nomorhp);
+                // Berishkan dari spasi
+                $nomorhp = str_replace(" ", "", $nomorhp);
+                // Berishkan dari -
+                $nomorhp = str_replace("-", "", $nomorhp);
+                // bersihkan dari bentuk seperti  (022) 66677788
+                $nomorhp = str_replace("(", "", $nomorhp);
+                // bersihkan dari format yang ada titik seperti 0811.222.333.4
+                $nomorhp = str_replace(".", "", $nomorhp);
+
+                if (!preg_match('/[^+0-9]/', trim($nomorhp))) {
+                    // cek apakah no hp karakter 1-3 adalah +62
+                    if (substr(trim($nomorhp), 0, 3) == '+62') {
+                        $nomorhp = trim($nomorhp);
+                    }
+                    // cek apakah no hp karakter 1 adalah 0
+                    elseif (substr($nomorhp, 0, 1) == '0') {
+                        $nomorhp = '+62' . substr($nomorhp, 1);
+                    }
+                }
+                $text = "Hi *" . $datas->b_event_peserta_name . "* \nSelamat Anda Terdaftar Sebagai Peserta \n\n" . $request->text . "\n\nSupport By. Innoverta";
+                $qrcode = base64_encode(QrCode::format('png')
+                    ->size(500)
+                    ->errorCorrection('H')
+                    ->eyeColor(2, 100, 100, 255, 0, 0, 0)
+                    ->style('round')
+                    ->margin(2)
+                    ->generate($datas->b_event_peserta_booking));
+                DB::table('v_log_whatsapp')->insert([
+                    'v_log_whatsapp_code' => str::uuid(),
+                    'd_reg_order_list_code' => $datas->b_event_peserta_code,
+                    'v_log_whatsapp_number' => $nomorhp,
+                    'v_log_whatsapp_name' => $datas->b_event_peserta_name,
+                    'v_log_whatsapp_filename' => 'N',
+                    'v_log_whatsapp_text' => $text,
+                    'v_log_whatsapp_file' => 'N',
+                    'v_log_whatsapp_picture' => $qrcode,
+                    'v_log_whatsapp_status' => 0,
+                    'v_log_whatsapp_date' => now(),
+                    'v_log_whatsapp_pass' => mt_rand(100000, 9999999),
+                    'created_at' => now()
+
+                ]);
+            }
+        }
+        $data = DB::table('b_event_peserta')->where('b_event_code', $request->code)->get();
+        return view('app-brodcast.menu.table.table-peserta-event', ['data' => $data]);
     }
 }

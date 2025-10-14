@@ -49,17 +49,17 @@
                 <textarea class="form-control" rows="15" name="content" id="pesan-wa"></textarea>
             </div>
             <!-- <div class="bg-light px-card py-3">
-                        <div class="d-inline-flex flex-column">
-                            <div class="border px-2 rounded-3 d-flex flex-between-center bg-white dark__bg-1000 my-1 fs--1"><span
-                                    class="fs-1 far fa-image"></span><span class="ms-2">winter.jpg (873kb)</span><a
-                                    class="text-300 p-1 ms-6" href="#!" data-bs-toggle="tooltip" data-bs-placement="right"
-                                    title="Detach"><span class="fas fa-times"></span></a></div>
-                            <div class="border px-2 rounded-3 d-flex flex-between-center bg-white dark__bg-1000 my-1 fs--1"><span
-                                    class="fs-1 far fa-file-archive"></span><span class="ms-2">coffee.zip (342kb)</span><a
-                                    class="text-300 p-1 ms-6" href="#!" data-bs-toggle="tooltip" data-bs-placement="right"
-                                    title="Detach"><span class="fas fa-times"></span></a></div>
-                        </div>
-                    </div> -->
+                                <div class="d-inline-flex flex-column">
+                                    <div class="border px-2 rounded-3 d-flex flex-between-center bg-white dark__bg-1000 my-1 fs--1"><span
+                                            class="fs-1 far fa-image"></span><span class="ms-2">winter.jpg (873kb)</span><a
+                                            class="text-300 p-1 ms-6" href="#!" data-bs-toggle="tooltip" data-bs-placement="right"
+                                            title="Detach"><span class="fas fa-times"></span></a></div>
+                                    <div class="border px-2 rounded-3 d-flex flex-between-center bg-white dark__bg-1000 my-1 fs--1"><span
+                                            class="fs-1 far fa-file-archive"></span><span class="ms-2">coffee.zip (342kb)</span><a
+                                            class="text-300 p-1 ms-6" href="#!" data-bs-toggle="tooltip" data-bs-placement="right"
+                                            title="Detach"><span class="fas fa-times"></span></a></div>
+                                </div>
+                            </div> -->
         </div>
         <div class="card-footer border-top border-200 d-flex flex-between-center">
             <div class="d-flex align-items-center">
@@ -108,26 +108,35 @@
             var number = document.getElementById("number").value;
             var subject = document.getElementById("subject").value;
             var editorContent = document.getElementById("pesan-wa").value;
-            $('#loading-button').html(
-                '<div class="spinner-border my-3" style="display: block; margin-left: auto; margin-right: auto;" role="status"><span class="visually-hidden">Loading...</span></div>'
-            );
-            $.ajax({
-                url: "{{ route('menu_brodcast_whatsapp_send') }}",
-                type: "POST",
-                cache: false,
-                data: {
-                    "_token": "{{ csrf_token() }}",
-                    "number": number,
-                    "subject": subject,
-                    "text": editorContent,
-                },
-                dataType: 'html',
-            }).done(function (data) {
-                $('#loading-button').html(data);
-                location.reload();
-            }).fail(function () {
-                $('#loading-button').html('eror');
-            });
+            if (number == "" || editorContent == "") {
+                Swal.fire({
+                    icon: "error",
+                    title: "Oops...",
+                    text: "Hal Yang Kosong Itu Tidak Bagus",
+                    footer: '<a href="#">Why do I have this issue?</a>'
+                });
+            } else {
+                $('#loading-button').html(
+                    '<div class="spinner-border my-3" style="display: block; margin-left: auto; margin-right: auto;" role="status"><span class="visually-hidden">Loading...</span></div>'
+                );
+                $.ajax({
+                    url: "{{ route('menu_brodcast_whatsapp_send') }}",
+                    type: "POST",
+                    cache: false,
+                    data: {
+                        "_token": "{{ csrf_token() }}",
+                        "number": number,
+                        "subject": subject,
+                        "text": editorContent,
+                    },
+                    dataType: 'html',
+                }).done(function (data) {
+                    $('#loading-button').html(data);
+                    location.reload();
+                }).fail(function () {
+                    $('#loading-button').html('eror');
+                });
+            }
         });
     </script>
 @endsection
