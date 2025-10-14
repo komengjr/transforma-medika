@@ -3,6 +3,7 @@
 namespace App\Http\Controllers\Brodcast;
 
 use App\Http\Controllers\Controller;
+use App\Imports\PesertaEventImport;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\DB;
@@ -143,13 +144,14 @@ class BrodcastController extends Controller
     public function menu_brodcast_management_save_peserta(Request $request)
     {
         try {
+            $event = DB::table('b_event')->where('b_event_code', $request->code_event)->first();
             DB::table('b_event_peserta')->insert([
                 'b_event_peserta_code' => str::uuid(),
                 'b_event_code' => $request->code_event,
                 'b_event_peserta_name' => $request->name,
                 'b_event_peserta_booking' => $request->booking,
-                'b_event_peserta_class' => $request->class,
-                'b_event_peserta_room' => 1,
+                'b_event_peserta_class' => $event->b_event_location,
+                'b_event_peserta_room' => $event->b_event_class,
                 'b_event_peserta_hp' => $request->hp,
                 'b_event_peserta_email' => $request->email,
                 'b_event_peserta_lembaga' => $request->lembaga,
@@ -173,59 +175,75 @@ class BrodcastController extends Controller
     public function menu_brodcast_management_brodcast_whatsapp_send(Request $request)
     {
         $data = DB::table('b_event_peserta')->where('b_event_code', $request->code)->get();
+        $event = DB::table('b_event')->where('b_event_code', $request->code)->first();
         foreach ($data as $datas) {
-            $cek = DB::table('v_log_whatsapp')->where('d_reg_order_list_code', $datas->b_event_peserta_code)->first();
-            if (!$cek) {
-                $nomorhp = $datas->b_event_peserta_hp;
-                //Terlebih dahulu kita trim dl
-                $nomorhp = trim($nomorhp);
-                //bersihkan dari karakter yang tidak perlu
-                $nomorhp = strip_tags($nomorhp);
-                // Berishkan dari spasi
-                $nomorhp = str_replace(" ", "", $nomorhp);
-                // Berishkan dari -
-                $nomorhp = str_replace("-", "", $nomorhp);
-                // bersihkan dari bentuk seperti  (022) 66677788
-                $nomorhp = str_replace("(", "", $nomorhp);
-                // bersihkan dari format yang ada titik seperti 0811.222.333.4
-                $nomorhp = str_replace(".", "", $nomorhp);
+            if ($datas->b_event_peserta_hp == "") {
+                # code...
+            } else {
+                $cek = DB::table('v_log_whatsapp')->where('d_reg_order_list_code', $datas->b_event_peserta_code)->first();
 
-                if (!preg_match('/[^+0-9]/', trim($nomorhp))) {
-                    // cek apakah no hp karakter 1-3 adalah +62
-                    if (substr(trim($nomorhp), 0, 3) == '+62') {
-                        $nomorhp = trim($nomorhp);
+                if (!$cek) {
+                    $nomorhp = $datas->b_event_peserta_hp;
+                    //Terlebih dahulu kita trim dl
+                    $nomorhp = trim($nomorhp);
+                    //bersihkan dari karakter yang tidak perlu
+                    $nomorhp = strip_tags($nomorhp);
+                    // Berishkan dari spasi
+                    $nomorhp = str_replace(" ", "", $nomorhp);
+                    // Berishkan dari -
+                    $nomorhp = str_replace("-", "", $nomorhp);
+                    // bersihkan dari bentuk seperti  (022) 66677788
+                    $nomorhp = str_replace("(", "", $nomorhp);
+                    // bersihkan dari format yang ada titik seperti 0811.222.333.4
+                    $nomorhp = str_replace(".", "", $nomorhp);
+
+                    if (!preg_match('/[^+0-9]/', trim($nomorhp))) {
+                        // cek apakah no hp karakter 1-3 adalah +62
+                        if (substr(trim($nomorhp), 0, 3) == '+62') {
+                            $nomorhp = trim($nomorhp);
+                        }
+                        // cek apakah no hp karakter 1 adalah 0
+                        elseif (substr($nomorhp, 0, 1) == '0') {
+                            $nomorhp = '+62' . substr($nomorhp, 1);
+                        }
                     }
-                    // cek apakah no hp karakter 1 adalah 0
-                    elseif (substr($nomorhp, 0, 1) == '0') {
-                        $nomorhp = '+62' . substr($nomorhp, 1);
-                    }
+                    $text = "Hi *" . $datas->b_event_peserta_name . "* \nSelamat Anda Terdaftar Sebagai Peserta Event : " . $event->b_event_name . " \nLokasi Event : " . $event->b_event_location . "\nRoom : " . $event->b_event_class . "\nTanggal : " . $event->b_event_date . "\nKode Booking : " . $datas->b_event_peserta_booking . "\n\nSupport By. Innoverta";
+                    $qrcode = base64_encode(QrCode::format('png')
+                        ->size(500)
+                        ->errorCorrection('H')
+                        ->eyeColor(2, 100, 100, 255, 0, 0, 0)
+                        ->style('round')
+                        ->margin(2)
+                        ->generate($datas->b_event_peserta_booking));
+                    DB::table('v_log_whatsapp')->insert([
+                        'v_log_whatsapp_code' => str::uuid(),
+                        'd_reg_order_list_code' => $datas->b_event_peserta_code,
+                        'v_log_whatsapp_number' => $nomorhp,
+                        'v_log_whatsapp_name' => $datas->b_event_peserta_name,
+                        'v_log_whatsapp_filename' => 'N',
+                        'v_log_whatsapp_text' => $text,
+                        'v_log_whatsapp_file' => 'N',
+                        'v_log_whatsapp_picture' => $qrcode,
+                        'v_log_whatsapp_status' => 0,
+                        'v_log_whatsapp_date' => now(),
+                        'v_log_whatsapp_pass' => mt_rand(100000, 9999999),
+                        'created_at' => now()
+
+                    ]);
                 }
-                $text = "Hi *" . $datas->b_event_peserta_name . "* \nSelamat Anda Terdaftar Sebagai Peserta \n\n" . $request->text . "\n\nSupport By. Innoverta";
-                $qrcode = base64_encode(QrCode::format('png')
-                    ->size(500)
-                    ->errorCorrection('H')
-                    ->eyeColor(2, 100, 100, 255, 0, 0, 0)
-                    ->style('round')
-                    ->margin(2)
-                    ->generate($datas->b_event_peserta_booking));
-                DB::table('v_log_whatsapp')->insert([
-                    'v_log_whatsapp_code' => str::uuid(),
-                    'd_reg_order_list_code' => $datas->b_event_peserta_code,
-                    'v_log_whatsapp_number' => $nomorhp,
-                    'v_log_whatsapp_name' => $datas->b_event_peserta_name,
-                    'v_log_whatsapp_filename' => 'N',
-                    'v_log_whatsapp_text' => $text,
-                    'v_log_whatsapp_file' => 'N',
-                    'v_log_whatsapp_picture' => $qrcode,
-                    'v_log_whatsapp_status' => 0,
-                    'v_log_whatsapp_date' => now(),
-                    'v_log_whatsapp_pass' => mt_rand(100000, 9999999),
-                    'created_at' => now()
-
-                ]);
             }
+
         }
         $data = DB::table('b_event_peserta')->where('b_event_code', $request->code)->get();
         return view('app-brodcast.menu.table.table-peserta-event', ['data' => $data]);
+    }
+    public function menu_brodcast_management_export_excel(Request $request)
+    {
+        return view('app-brodcast.menu.form.form-export-excel-peserta', ['code' => $request->code]);
+    }
+    public function menu_brodcast_management_export_excel_start(Request $request)
+    {
+        Excel::import(new PesertaEventImport($request->code, 454), request()->file('file'));
+        return redirect()->back()->withSuccess('Great! Berhasil Menambahkan Data Perusahaan');
     }
 }

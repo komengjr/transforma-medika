@@ -106,7 +106,7 @@
                                             Input Peserta Event</button>
                                         <div class="dropdown-divider"></div>
                                         <button class="dropdown-item" data-bs-toggle="modal" data-bs-target="#modal-brodcast"
-                                            id="button-add-as" data-code="{{$datas->b_event_code}}"><span
+                                            id="button-export-excel" data-code="{{$datas->b_event_code}}"><span
                                                 class="far fa-folder-open"></span>
                                             Import Excel</button>
                                         <div class="dropdown-divider"></div>
@@ -293,6 +293,29 @@
                 $('#menu-table-peserta').html(data);
             }).fail(function () {
                 $('#menu-table-peserta').html('eror');
+            });
+        });
+
+        // EXPORT EXCEL
+        $(document).on("click", "#button-export-excel", function (e) {
+            e.preventDefault();
+            var code = $(this).data("code");
+            $('#menu-brodcast').html(
+                '<div class="spinner-border my-3" style="display: block; margin-left: auto; margin-right: auto;" role="status"><span class="visually-hidden">Loading...</span></div>'
+            );
+            $.ajax({
+                url: "{{ route('menu_brodcast_management_export_excel') }}",
+                type: "POST",
+                cache: false,
+                data: {
+                    "_token": "{{ csrf_token() }}",
+                    "code": code
+                },
+                dataType: 'html',
+            }).done(function (data) {
+                $('#menu-brodcast').html(data);
+            }).fail(function () {
+                $('#menu-brodcast').html('eror');
             });
         });
     </script>

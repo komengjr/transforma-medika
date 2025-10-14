@@ -9,7 +9,7 @@
             <div class="col-12">
                 <form class="row" id="form-input-peserta">
                     @csrf
-                    <div class="col-md-6">
+                    <div class="col-md-4">
                         <label for="inputLastName1" class="form-label text-youtube">Nama Peserta</label>
                         <div class="input-group"> <span class="input-group-text"><i
                                     class="fas fa-money-check"></i></span>
@@ -17,20 +17,14 @@
                         </div>
                         <input type="text" name="code_event" value="{{ $code }}" hidden>
                     </div>
-                    <div class="col-md-3">
+                    <div class="col-md-4">
                         <label for="inputLastName1" class="form-label text-youtube">Kode Booking</label>
                         <div class="input-group"> <span class="input-group-text"><i
                                     class="fas fa-money-check"></i></span>
                             <input type="text" name="booking" class="form-control form-control-lg border-start-0 bg-white">
                         </div>
                     </div>
-                    <div class="col-md-3">
-                        <label for="inputLastName1" class="form-label text-youtube">Peserta Class</label>
-                        <div class="input-group"> <span class="input-group-text"><i
-                                    class="fas fa-money-check"></i></span>
-                            <input type="text" name="class" class="form-control form-control-lg border-start-0 bg-white">
-                        </div>
-                    </div>
+
                     <div class="col-md-4">
                         <label for="inputLastName1" class="form-label text-youtube">Nomor Hp Peserta</label>
                         <div class="input-group"> <span class="input-group-text"><i
@@ -38,14 +32,14 @@
                             <input type="text" name="hp" class="form-control form-control-lg border-start-0 bg-white" >
                         </div>
                     </div>
-                    <div class="col-md-4">
+                    <div class="col-md-6">
                         <label for="inputLastName1" class="form-label text-youtube">Email Peserta</label>
                         <div class="input-group"> <span class="input-group-text"><i
                                     class="fas fa-money-check"></i></span>
                             <input type="text" name="email" class="form-control form-control-lg border-start-0 bg-white" >
                         </div>
                     </div>
-                    <div class="col-md-4">
+                    <div class="col-md-6">
                         <label for="inputLastName1" class="form-label text-youtube">Lembaga Peserta</label>
                         <div class="input-group"> <span class="input-group-text"><i
                                     class="fas fa-money-check"></i></span>

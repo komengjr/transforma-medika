@@ -453,6 +453,8 @@ Route::prefix('brodcast/')->group(function (): void {
     Route::post('menu-brodcast/brodcast-management/save-peserta', [BrodcastController::class, 'menu_brodcast_management_save_peserta'])->name('menu_brodcast_management_save_peserta');
     Route::post('menu-brodcast/brodcast-management/brodcast-whatsapp', [BrodcastController::class, 'menu_brodcast_management_brodcast_whatsapp'])->name('menu_brodcast_management_brodcast_whatsapp');
     Route::post('menu-brodcast/brodcast-management/brodcast-whatsapp-send', [BrodcastController::class, 'menu_brodcast_management_brodcast_whatsapp_send'])->name('menu_brodcast_management_brodcast_whatsapp_send');
+    Route::post('menu-brodcast/brodcast-management/export-excel', [BrodcastController::class, 'menu_brodcast_management_export_excel'])->name('menu_brodcast_management_export_excel');
+    Route::post('menu-brodcast/brodcast-management/export-excel-start', [BrodcastController::class, 'menu_brodcast_management_export_excel_start'])->name('menu_brodcast_management_export_excel_start');
 });
 
 // LOGISTIK
