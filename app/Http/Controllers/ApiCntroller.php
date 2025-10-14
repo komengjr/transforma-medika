@@ -12,7 +12,7 @@ class ApiCntroller extends Controller
     public function data_product()
     {
         try {
-            $category = DB::table('log_m_product')->get();
+            $category = DB::table('log_m_product')->inRandomOrder()->limit(1)->get();
             return response()->json($category);
         } catch (QueryException $e) {
             $error = [
