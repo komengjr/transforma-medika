@@ -9,22 +9,22 @@
         <div class="px-3 py-3 pb-3">
             <ul class="nav nav-pills" id="pill-myTab" role="tablist">
                 <li class="nav-item">
-                    <a class="nav-link active" id="pill-home-tab" data-bs-toggle="tab" href="#pill-tab-home"
-                        role="tab" aria-controls="pill-tab-home" aria-selected="true">
+                    <a class="nav-link active" id="pill-home-tab" data-bs-toggle="tab" href="#pill-tab-home" role="tab"
+                        aria-controls="pill-tab-home" aria-selected="true">
                         <span class="far fa-user"></span>
                         <span class="d-none d-md-inline-block mx-2">Data Pasien</span>
                     </a>
                 </li>
                 <li class="nav-item" style="display: none;" id="menu-fasilitas-layanan">
-                    <a class="nav-link" id="pill-profile-tab" data-bs-toggle="tab" href="#pill-tab-profile"
-                        role="tab" aria-controls="pill-tab-profile" aria-selected="false">
+                    <a class="nav-link" id="pill-profile-tab" data-bs-toggle="tab" href="#pill-tab-profile" role="tab"
+                        aria-controls="pill-tab-profile" aria-selected="false">
                         <span class="fas fa-cogs"></span>
                         <span class="d-none d-md-inline-block mx-2">Fasilitas Layanan</span>
                     </a>
                 </li>
                 <li class="nav-item" style="display: none;" id="menu-cetak-data-registrasi">
-                    <a class="nav-link" id="pill-contact-tab" data-bs-toggle="tab" href="#pill-tab-contact"
-                        role="tab" aria-controls="pill-tab-contact" aria-selected="false">
+                    <a class="nav-link" id="pill-contact-tab" data-bs-toggle="tab" href="#pill-tab-contact" role="tab"
+                        aria-controls="pill-tab-contact" aria-selected="false">
                         <span class="fas fa-file-invoice"></span>
                         <span class="d-none d-md-inline-block mx-2">Cetak No Registrasi <i id="button-pilih-end-proses"
                                 data-code="{{ $no_reg }}" data-id="{{ $data->master_patient_code }}"
@@ -37,11 +37,17 @@
                     <div class="card border mt-2">
                         <div class="row g-3 px-3 px-sm-4 py-3 bg-200">
                             <div class="col-md-2 d-flex justify-content-center">
-                                <div
-                                    class="avatar avatar-5xl shadow-sm img-thumbnail justify-content-center">
+                                <div class="avatar avatar-5xl shadow-sm img-thumbnail justify-content-center">
                                     <div class="h-100 w-100 overflow-hidden ">
-                                        <img src="{{ asset($data->master_patient_profile) }}" class="img-thumbnail shadow-sm"
-                                            alt="" id="videoPreview" data-dz-thumbnail="data-dz-thumbnail">
+                                        @if ($data->master_patient_profile == "")
+                                            <img src="{{ asset('img/pp.png') }}"
+                                                class="img-thumbnail shadow-sm" alt="" id="videoPreview"
+                                                data-dz-thumbnail="data-dz-thumbnail">
+                                        @else
+                                            <img src="{{ Storage::url($data->master_patient_profile) }}"
+                                                class="img-thumbnail shadow-sm" alt="" id="videoPreview"
+                                                data-dz-thumbnail="data-dz-thumbnail">
+                                        @endif
                                     </div>
 
                                 </div>
@@ -63,8 +69,8 @@
                                         <div class="input-group"> <span class="input-group-text"><i
                                                     class="fas fa-money-check"></i></span>
                                             <input type="text" name="nik"
-                                                class="form-control form-control-lg border-start-0 bg-white"
-                                                id="nik" value="{{ $data->master_patient_nik }}" disabled>
+                                                class="form-control form-control-lg border-start-0 bg-white" id="nik"
+                                                value="{{ $data->master_patient_nik }}" disabled>
                                         </div>
                                     </div>
                                     <div class="col-md-4">
@@ -73,8 +79,8 @@
                                         <div class="input-group"> <span class="input-group-text"><i
                                                     class="fas fa-money-check"></i></span>
                                             <input type="text" name="nik"
-                                                class="form-control form-control-lg border-start-0 bg-white"
-                                                id="nik" value="{{ $data->master_patient_code }}" disabled>
+                                                class="form-control form-control-lg border-start-0 bg-white" id="nik"
+                                                value="{{ $data->master_patient_code }}" disabled>
                                             <input type="text" name="no_rm" id="no_rm"
                                                 value="{{ $data->master_patient_code }}" hidden>
                                         </div>
@@ -109,17 +115,15 @@
                                 <div class="input-group"> <span class="input-group-text"><i
                                             class="fas fa-map-marked-alt"></i></span>
                                     <input type="text" name="tempat_lahir"
-                                        class="form-control form-control-lg border-start-0 bg-white"
-                                        id="inputLastName1" value="{{ $data->master_patient_tempat_lahir }}"
-                                        disabled>
+                                        class="form-control form-control-lg border-start-0 bg-white" id="inputLastName1"
+                                        value="{{ $data->master_patient_tempat_lahir }}" disabled>
                                 </div>
                             </div>
                             <div class="col-md-4">
                                 <label for="inputEmailAddress" class="form-label text-youtube">Agama</label>
                                 <div class="input-group"> <span class="input-group-text"><i
                                             class="fas fa-pray"></i></span>
-                                    <select name="agama" id="agama"
-                                        class="form-control form-control-lg single-select">
+                                    <select name="agama" id="agama" class="form-control form-control-lg single-select">
                                         <option value="">Pilih Agama</option>
                                         <option value="Islam">Islam</option>
                                         <option value="Kristen">Kristen</option>
@@ -143,16 +147,15 @@
                                 <div class="input-group"> <span class="input-group-text"><i
                                             class="fas fa-mail-bulk"></i></span>
                                     <input type="email" name="email"
-                                        class="form-control form-control-lg border-start-0 bg-white"
-                                        id="inputLastName2" value="{{ $data->master_patient_email }}">
+                                        class="form-control form-control-lg border-start-0 bg-white" id="inputLastName2"
+                                        value="{{ $data->master_patient_email }}">
                                 </div>
                             </div>
                             <div class="col-md-4">
                                 <label for="inputLastName1" class="form-label text-youtube">Provinsi</label>
                                 <div class="input-group"> <span class="input-group-text"><i
                                             class="fas fa-map-marker-alt"></i></span>
-                                    <select name="provinsi" id=""
-                                        class="form-control form-control-lg single-select">
+                                    <select name="provinsi" id="" class="form-control form-control-lg single-select">
                                         <option value="">Pilih Provinsi</option>
                                         <option value="KB">Kalimantan Barat</option>
                                     </select>
@@ -162,8 +165,7 @@
                                 <label for="inputLastName1" class="form-label">Kota</label>
                                 <div class="input-group"> <span class="input-group-text"><i
                                             class="fas fa-city"></i></span>
-                                    <select name="kota" id=""
-                                        class="form-control form-control-lg single-select">
+                                    <select name="kota" id="" class="form-control form-control-lg single-select">
                                         <option value="">Pilih Kota</option>
                                         <option value="pontianak">Pontianak</option>
                                     </select>
@@ -171,7 +173,8 @@
                             </div>
                             <div class="col-12">
                                 <label for="inputAddress3" class="form-label text-youtube">Deskripsi Alamat</label>
-                                <textarea class="form-control" name="alamat" id="inputAddress3" placeholder="Enter Address" rows="3"></textarea>
+                                <textarea class="form-control" name="alamat" id="inputAddress3"
+                                    placeholder="Enter Address" rows="3"></textarea>
                             </div>
                             <div class="col-12">
                                 <button class="btn btn-success float-end" id="button-pilih-kebutuhan"

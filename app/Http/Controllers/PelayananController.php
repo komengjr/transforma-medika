@@ -54,7 +54,12 @@ class PelayananController extends Controller
     public function registrasi_pasien($akses, $id)
     {
         if ($this->url_akses($akses, $id) == true) {
-            return view('application.pelayanan.registrasi-pasien', ['akses' => $akses, 'code' => $id]);
+            $total = DB::table('d_reg_order')->where('d_reg_order_cabang', Auth::user()->access_cabang)->count();
+            return view('application.pelayanan.registrasi-pasien', [
+                'akses' => $akses,
+                'code' => $id,
+                'total' => $total
+            ]);
         } else {
             return Redirect::to('dashboard/home');
         }
@@ -265,6 +270,7 @@ class PelayananController extends Controller
             'd_reg_order_date' => now(),
             't_layanan_cat_code' => $request->layanan,
             't_pasien_cat_code' => $request->cat,
+            'd_reg_order_cabang' => Auth::user()->access_cabang,
             'd_reg_order_status' => 0,
             'd_reg_order_user' => Auth::user()->userid,
             'created_at' => now()
@@ -308,6 +314,7 @@ class PelayananController extends Controller
             'd_reg_order_date' => now(),
             't_layanan_cat_code' => $request->layanan,
             't_pasien_cat_code' => $request->cat,
+            'd_reg_order_cabang' => Auth::user()->access_cabang,
             'd_reg_order_status' => 0,
             'd_reg_order_user' => Auth::user()->userid,
             'created_at' => now()
@@ -351,6 +358,7 @@ class PelayananController extends Controller
             'd_reg_order_date' => now(),
             't_layanan_cat_code' => $request->layanan,
             't_pasien_cat_code' => $request->cat,
+            'd_reg_order_cabang' => Auth::user()->access_cabang,
             'd_reg_order_status' => 0,
             'd_reg_order_user' => Auth::user()->userid,
             'created_at' => now()
@@ -396,7 +404,7 @@ class PelayananController extends Controller
             ');
         return base64_encode($pdf->stream());
     }
-    // DAFTAR REGISTRASI
+    // DATA REGISTRASI
     public function data_registrasi($akses, $id)
     {
         if ($this->url_akses($akses, $id) == true) {
@@ -404,11 +412,15 @@ class PelayananController extends Controller
                 ->join('master_patient', 'master_patient.master_patient_code', '=', 'd_reg_order.d_reg_order_rm')
                 ->join('t_layanan_cat', 't_layanan_cat.t_layanan_cat_code', '=', 'd_reg_order.t_layanan_cat_code')
                 ->join('t_pasien_cat', 't_pasien_cat.t_pasien_cat_code', '=', 'd_reg_order.t_pasien_cat_code')
+                ->where('d_reg_order.d_reg_order_cabang',Auth::user()->access_cabang)
                 ->get();
             return view('application.pelayanan.list-pasien-registrasi', ['data' => $data, 'akses' => $akses, 'code' => $id]);
         } else {
             return Redirect::to('dashboard/home');
         }
+    }
+    public function data_registrasi_history(Request $request){
+        return 123;
     }
     // VERIFIKASI DATA REGISTRASI
     public function menu_pelayanan_verifikasi_registrasi($akses, $id)

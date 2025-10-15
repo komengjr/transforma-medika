@@ -228,7 +228,7 @@
         </div>
         <div id="company">
             <div style="margin-top: -20px; font-size: 9px;">PR/001/LOG/213s</div><br>
-            <h2 class="name" style="margin-top: -30px;  color: #0087C3;font-size: 25px;font-weight: 800;">TRANS LOGISTIK
+            <h2 class="name" style="margin-top: -30px;  color: #0087C3;font-size: 25px;font-weight: 800;">INNOVENTRA LOGISTIK
             </h2>
             <p style="font-size: 11px; margin: 0px;">Pontianak, Jl Ahmad Yani 3 No 1234</p>
             <p style="font-size: 9px; margin: 0px;">0896 9410 7336</p>
