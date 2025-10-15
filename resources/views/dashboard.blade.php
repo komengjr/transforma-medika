@@ -208,8 +208,8 @@
                         </div>
                     </div>
                     <div class="card overflow-hidden z-index-1">
-                        <div class="card-header bg-primary">
-                            <h5 class="mb-0" style="color: white;">Menu Aplikasi</h5>
+                        <div class="card-header bg-primary py-2 pt-3">
+                            <marquee class="p-0" behavior="" direction=""><h5 class="m-0" style="color: white;">Selamat Datang di Innoventra System Management, One For All Management</h5></marquee>
                         </div>
                         <div class="card-body p-3 border border-primary">
                             <div class="row light g-3">
