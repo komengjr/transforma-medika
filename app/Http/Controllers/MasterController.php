@@ -26,7 +26,39 @@ class MasterController extends Controller
     public function master_cabang()
     {
         if (Auth::user()->access_code == 'master') {
-            return view('master.dashboard', ['akses' => 123]);
+            $data = DB::table('master_cabang')->get();
+            return view('master.master-cabang', [
+                'data' => $data,
+                'akses' => 123
+            ]);
+        } else {
+            return Redirect::to('dashboard/home');
+        }
+    }
+    public function master_cabang_add(Request $request)
+    {
+        if (Auth::user()->access_code == 'master') {
+            return view('master.cabang.form-add');
+        } else {
+            return Redirect::to('dashboard/home');
+        }
+    }
+    public function master_cabang_save(Request $request)
+    {
+        if (Auth::user()->access_code == 'master') {
+            DB::table('master_cabang')->insert([
+                'master_cabang_code' => str::uuid(),
+                'master_cabang_entitas' => $request->entitas,
+                'master_cabang_name' => $request->nama,
+                'master_cabang_latitude' => $request->lat,
+                'master_cabang_longtitude' => $request->long,
+                'master_cabang_city' => $request->city,
+                'master_cabang_alamat' => $request->alamat,
+                'master_cabang_phone' => $request->phone,
+                'master_cabang_status' => 1,
+                'created_at' => now()
+            ]);
+            return redirect()->back()->withSuccess('Great! Berhasil Menambahkan Data');
         } else {
             return Redirect::to('dashboard/home');
         }
@@ -52,7 +84,11 @@ class MasterController extends Controller
     {
         if (Auth::user()->access_code == 'master') {
             $akses = DB::table('master_access')->get();
-            return view('master.user.form-add', ['akses' => $akses]);
+            $cabang = DB::table('master_cabang')->get();
+            return view('master.user.form-add', [
+                'cabang' => $cabang,
+                'akses' => $akses
+            ]);
         } else {
             return Redirect::to('dashboard/home');
         }

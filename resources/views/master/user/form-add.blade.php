@@ -10,8 +10,9 @@
             <label class="form-label" for="inputAddress">Akses Cabang</label>
             <select name="cabang" class="form-select choices-single-cabang" id="" required>
                 <option value="">Pilih Cabang</option>
-                <option value="CM">Cabang Master</option>
-
+                @foreach ($cabang as $cab)
+                    <option value="{{ $cab->master_cabang_code }}">{{ $cab->master_cabang_name }}</option>
+                @endforeach
             </select>
         </div>
         <div class="col-6">

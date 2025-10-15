@@ -21,7 +21,7 @@
                     </div>
                     <div class="col-xl-auto px-3 py-2">
                         <h6 class="text-primary fs--1 mb-0">Menu : </h6>
-                        <h4 class="text-primary fw-bold mb-0">Master <span class="text-info fw-medium">User</span></h4>
+                        <h4 class="text-primary fw-bold mb-0">Master <span class="text-info fw-medium">Cabang</span></h4>
                     </div>
                 </div>
             </div>
@@ -31,17 +31,18 @@
         <div class="card-header bg-primary">
             <div class="row align-items-center">
                 <div class="col">
-                    <h3 class="m-0"><span class="badge bg-primary m-0 p-0">Master User</span></h3>
+                    <h3 class="m-0"><span class="badge bg-primary m-0 p-0">Master Cabang</span></h3>
                 </div>
                 <div class="col-auto">
+
                     <div class="btn-group" role="group">
                         <button class="btn btn-sm btn-falcon-primary dropdown-toggle" id="btnGroupVerticalDrop2"
                             type="button" data-bs-toggle="dropdown" aria-haspopup="true" aria-expanded="false"><span
                                 class="fas fa-align-left me-1" data-fa-transform="shrink-3"></span>Option</button>
                         <div class="dropdown-menu" aria-labelledby="btnGroupVerticalDrop2">
                             <button class="dropdown-item" data-bs-toggle="modal" data-bs-target="#modal-user"
-                                id="button-add-data-user" data-code="123"><span class="far fa-edit"></span>
-                                Add User</button>
+                                id="button-add-data-cabang" data-code="123"><span class="far fa-edit"></span>
+                                Add Cabang</button>
                             <div class="dropdown-divider"></div>
                             <button class="dropdown-item" data-bs-toggle="modal" data-bs-target="#modal-cabang"
                                 id="button-data-barang-cabang" data-code="123"><span class="far fa-folder-open"></span>
@@ -52,13 +53,14 @@
             </div>
         </div>
         <div class="card-body border-top p-3">
-            <table id="example" class="table table-striped nowrap" style="width:100%">
+            <table id="example" class="table table-striped" style="width:100%">
                 <thead class="bg-200 text-700">
                     <tr>
                         <th>No</th>
-                        <th>Nama User</th>
-                        <th>Username</th>
-                        <th>Akses Cabang</th>
+                        <th>Nama Cabang</th>
+                        <th>Kota</th>
+                        <th>Phone</th>
+                        <th>Alamat</th>
                         <th>Action</th>
                     </tr>
                 </thead>
@@ -66,13 +68,30 @@
                     @php
                         $no = 1;
                     @endphp
-                    @foreach ($user as $users)
+                    @foreach ($data as $datas)
                         <tr>
                             <td>{{ $no++ }}</td>
-                            <td>{{ $users->fullname }}</td>
-                            <td>{{ $users->username }}</td>
-                            <td>{{ $users->access_cabang }}</td>
-                            <td></td>
+                            <td>{{ $datas->master_cabang_name }}</td>
+                            <td>{{ $datas->master_cabang_city }}</td>
+                            <td>{{ $datas->master_cabang_phone }}</td>
+                            <td>{{ $datas->master_cabang_alamat }}</td>
+                            <td>
+                                <div class="btn-group" role="group">
+                                    <button class="btn btn-sm btn-falcon-primary dropdown-toggle" id="btnGroupVerticalDrop2"
+                                        type="button" data-bs-toggle="dropdown" aria-haspopup="true" aria-expanded="false"><span
+                                            class="fas fa-align-left me-1" data-fa-transform="shrink-3"></span>Option</button>
+                                    <div class="dropdown-menu" aria-labelledby="btnGroupVerticalDrop2">
+                                        <button class="dropdown-item" data-bs-toggle="modal" data-bs-target="#modal-user"
+                                            id="button-add-data-user" data-code="123"><span class="far fa-edit"></span>
+                                            Detail Cabang</button>
+                                        <div class="dropdown-divider"></div>
+                                        <button class="dropdown-item" data-bs-toggle="modal" data-bs-target="#modal-cabang"
+                                            id="button-data-barang-cabang" data-code="123"><span
+                                                class="far fa-folder-open"></span>
+                                            History</button>
+                                    </div>
+                                </div>
+                            </td>
                         </tr>
                     @endforeach
                 </tbody>
@@ -104,14 +123,14 @@
         });
     </script>
     <script>
-        $(document).on("click", "#button-add-data-user", function (e) {
+        $(document).on("click", "#button-add-data-cabang", function (e) {
             e.preventDefault();
             var code = $(this).data("code");
             $('#menu-user').html(
                 '<div class="spinner-border my-3" style="display: block; margin-left: auto; margin-right: auto;" role="status"><span class="visually-hidden">Loading...</span></div>'
             );
             $.ajax({
-                url: "{{ route('master_user_add') }}",
+                url: "{{ route('master_cabang_add') }}",
                 type: "POST",
                 cache: false,
                 data: {
