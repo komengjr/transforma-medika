@@ -288,18 +288,49 @@
                                     title="Switch to dark theme"><span class="fas fa-moon fs-0"></span></label>
                             </div>
                         </li>
-                        <li class="nav-item"><a class="nav-link" href="../index.html"><span
-                                    class="d-none d-lg-inline-block" data-bs-toggle="tooltip" data-bs-placement="bottom"
-                                    title="Dashboard"><span class="fas fa-chart-pie"></span></span><span
-                                    class="d-lg-none">Dashboard</span></a></li>
-
-
                         <li class="nav-item">
+                            <a class="nav-link" href="#"><span class="d-none d-lg-inline-block"
+                                    data-bs-toggle="tooltip" data-bs-placement="bottom" title="Dashboard"><span
+                                        class="fas fa-chart-pie"></span></span><span
+                                    class="d-lg-none">Dashboard</span>         |</a>
+                        </li>
+
+                        <li class="nav-item dropdown">
                             @guest
                                 <a class="nav-link text-warning" href="#!" data-bs-toggle="modal"
-                                    data-bs-target="#exampleModal">Login</a>
+                                    data-bs-target="#exampleModal"><span class="fab fa-keycdn"></span> Login</a>
                             @else
-                                <a class="nav-link text-warning" href="{{ route('dashboard.home') }}">Home : {{ Auth::user()->fullname }}</a>
+                                <a class="nav-link py-0 my-0" id="navbarDropdownUser" href="#" role="button"
+                                    data-bs-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+                                    <div class="avatar avatar-xl">
+                                        <img class="rounded-circle" src="{{ asset('img/my.jpg') }}" alt="" />
+
+                                    </div>
+                                </a>
+                                <div class="dropdown-menu dropdown-menu-end py-0" aria-labelledby="navbarDropdownUser">
+                                    <div class="bg-white dark__bg-1000 rounded-2 py-2">
+                                        {{-- <a class="dropdown-item fw-bold text-warning" href="#!"><span
+                                                class="fas fa-crown me-1"></span><span>Go Pro</span></a> --}}
+                                        <a class="dropdown-item text-primary text-center">{{ Auth::user()->fullname }}</a>
+                                        <div class="dropdown-divider"></div>
+                                        <a class="dropdown-item text-warning" href="#!" id="button-setup-notification"
+                                            data-bs-toggle="modal" data-bs-target="#modal-template-sm"><span
+                                                class="fas fa-user-cog"></span> Set Notification</a>
+                                        <a class="dropdown-item text-info" href="#" id="button-setup-profil"
+                                            data-bs-toggle="modal" data-bs-target="#modal-template-xl"><span
+                                                class="fas fa-user-cog"></span>
+                                            Profile &amp;
+                                            account</a>
+                                        @if (Auth::user()->access_code == 'master')
+                                            <a class="dropdown-item text-danger" href="{{route('master_dashboard')}}"><span
+                                                    class="fas fa-user-cog"></span> Master Page</a>
+                                        @endif
+                                        <div class="dropdown-divider"></div>
+                                        {{-- <a class="dropdown-item" href="#">Settings</a> --}}
+                                        <a class="dropdown-item" href="{{ route('logout') }}"><span
+                                                class="fab fa-keycdn"></span> Logout</a>
+                                    </div>
+                                </div>
                             @endguest
                         </li>
                     </ul>

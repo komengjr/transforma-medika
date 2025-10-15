@@ -14,6 +14,7 @@ use App\Http\Controllers\LaboratoriumController;
 use App\Http\Controllers\Logsitik\LogistikController;
 use App\Http\Controllers\MasterController;
 use App\Http\Controllers\MasterDataController;
+use App\Http\Controllers\Medic\MasterMedController;
 use App\Http\Controllers\PageController;
 use App\Http\Controllers\PelayananController;
 use App\Http\Controllers\Pembelian\PurchaseController;
@@ -161,6 +162,11 @@ Route::prefix('{akses}/{id}/application')->group(function () {
     Route::get('master-pemeriksaan/group-pemeriksaan', [MasterDataController::class, 'master_pemeriksaan_group'])->name('master_pemeriksaan_group');
     Route::get('master-pemeriksaan/harga-pemeriksaan', [MasterDataController::class, 'master_pemeriksaan_harga'])->name('master_pemeriksaan_harga');
     Route::get('master-pemeriksaan/specimen-pemeriksaan', [MasterDataController::class, 'master_pemeriksaan_specimen'])->name('master_pemeriksaan_specimen');
+
+    // MASTER MEDIK PASIEN
+    Route::get('master-data-patient', [MasterMedController::class, 'master_data_patient'])->name('master_data_patient');
+    Route::get('master-member-patient', [MasterMedController::class, 'master_member_patient'])->name('master_member_patient');
+
 
     Route::get('master-perusahaan/data-perusahaan', [MasterDataController::class, 'master_perusahaan_data'])->name('master_perusahaan_data');
     Route::get('master-perusahaan/mou-perusahaan', [MasterDataController::class, 'master_perusahaan_mou'])->name('master_perusahaan_mou');

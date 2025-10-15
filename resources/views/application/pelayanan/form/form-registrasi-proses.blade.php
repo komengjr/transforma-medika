@@ -2,7 +2,7 @@
     <div class="bg-dark rounded-top-lg py-3 ps-4 pe-6">
         <h4 class="mb-1 text-white" id="staticBackdropLabel">Registrasi Pasien : {{ $no_reg }}</h4>
         <input type="text" name="no_registrasi" id="no_registrasi" value="{{ $no_reg }}" hidden>
-        <p class="fs--2 mb-0 text-warning">Support by <a class="text-warning fw-semi-bold" href="#!">Transforma</a>
+        <p class="fs--2 mb-0 text-warning">Support by <a class="text-warning fw-semi-bold" href="#!">{{ env('APP_LABEL')}}</a>
         </p>
     </div>
     <div class="card m-3 border border-info">
