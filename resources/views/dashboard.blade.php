@@ -180,8 +180,7 @@
                                                         aria-expanded="false"><span class="fas fa-align-left me-1"
                                                             data-fa-transform="shrink-3"></span>Option</button>
                                                     <div class="dropdown-menu" aria-labelledby="btnGroupVerticalDrop2">
-                                                        <button class="dropdown-item text-dark"
-                                                            id="button-menu-utama">
+                                                        <button class="dropdown-item text-dark" id="button-menu-utama">
                                                             <span class="fab fa-dashcube"></span>
                                                             Menu Utama</button>
                                                         <button class="dropdown-item text-warning"
@@ -214,18 +213,28 @@
                         </div>
                         <div class="card-body p-3 border border-primary">
                             <div class="row light g-3">
-                                @php
-                                    $menu = DB::table('z_menu_super')->get();
-                                @endphp
+                                @if (Auth::user()->access_code == 'master')
+                                    @php
+                                        $menu = DB::table('z_menu_super')->get();
+                                    @endphp
+                                @else
+                                    @php
+                                        $menu = DB::table('z_menu_super')
+                                        ->join('z_menu_user_super','z_menu_user_super.menu_super_code','=','z_menu_super.menu_super_code')
+                                        ->where('z_menu_user_super.access_code',Auth::user()->access_code)
+                                        ->get();
+                                    @endphp
+                                @endif
                                 @foreach ($menu as $menus)
-                                <div class="col-sm-6 col-lg-4">
-                                    <div class="card text-white {{$menus->menu_super_bg}}" id="menu" data-code="{{$menus->menu_super_code}}">
-                                        <div class="card-body">
-                                            <div class="card-title fs--1">{{$menus->menu_super_name}}</div>
-                                            <p class="card-text">{{$menus->menu_super_desc}}.</p>
+                                    <div class="col-sm-6 col-lg-4">
+                                        <div class="card text-white {{$menus->menu_super_bg}}" id="menu"
+                                            data-code="{{$menus->menu_super_code}}">
+                                            <div class="card-body">
+                                                <div class="card-title fs--1">{{$menus->menu_super_name}}</div>
+                                                <p class="card-text">{{$menus->menu_super_desc}}.</p>
+                                            </div>
                                         </div>
                                     </div>
-                                </div>
                                 @endforeach
 
                                 <!-- <div class="col-sm-6 col-lg-4">
