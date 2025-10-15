@@ -74,7 +74,8 @@ class MasterController extends Controller
     public function master_user()
     {
         if (Auth::user()->access_code == 'master') {
-            $user = DB::table('user_mains')->get();
+            $user = DB::table('user_mains')
+                ->join('master_cabang', 'master_cabang.master_cabang_code', 'user_mains.access_cabang')->get();
             return view('master.master-user', ['akses' => 123, 'user' => $user]);
         } else {
             return Redirect::to('dashboard/home');

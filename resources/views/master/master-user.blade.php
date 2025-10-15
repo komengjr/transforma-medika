@@ -71,7 +71,7 @@
                             <td>{{ $no++ }}</td>
                             <td>{{ $users->fullname }}</td>
                             <td>{{ $users->username }}</td>
-                            <td>{{ $users->access_cabang }}</td>
+                            <td>{{ $users->master_cabang_name }}</td>
                             <td></td>
                         </tr>
                     @endforeach
