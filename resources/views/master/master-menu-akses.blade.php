@@ -83,7 +83,22 @@
                                 @endforeach
                             </td>
                             <td>
-
+                                @php
+                                    $menu = DB::table('z_menu_user')
+                                        ->join('z_menu_sub', 'z_menu_sub.menu_sub_code', '=', 'z_menu_user.menu_sub_code')
+                                        ->where('z_menu_user.access_code', $datas->master_access_code)->get();
+                                @endphp
+                                @foreach ($menu as $menus)
+                                    <li><strong class="text-primary">{{ $menus->menu_sub_name }}</strong></li>
+                                    @php
+                                        $sub = DB::table('z_menu_user_sub')
+                                            ->join('z_menu_sub_main', 'z_menu_sub_main.menu_main_sub_code', '=', 'z_menu_user_sub.menu_main_sub_code')
+                                            ->where('z_menu_user_sub.access_code', $datas->master_access_code)->get();
+                                    @endphp
+                                    @foreach ($sub as $subs)
+                                        <li class="ms-3">{{ $subs->menu_main_sub_name }}</li>
+                                    @endforeach
+                                @endforeach
                             </td>
                             <td>
                                 <div class="btn-group" role="group">
