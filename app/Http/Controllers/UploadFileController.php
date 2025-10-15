@@ -31,13 +31,13 @@ class UploadFileController extends Controller
             $fileName .= '_' . md5(time()) . '.' . $extension; // a unique file name
 
             $disk = Storage::disk(config('filesystems.default'));
-            $path = $disk->putFileAs('upload/data/profile/' . auth::user()->access_cabang . '/', $file, $fileName);
+            $path = $disk->putFileAs('public/profile/data_pasien/' . auth::user()->access_cabang, $file, $fileName);
             // $path1 = $disk('videos', $file, $fileName);
 
             // delete chunked file
             unlink($file->getPathname());
             return [
-                'path' => asset('upload/data/profile/' . auth::user()->access_cabang . '/' . $fileName),
+                'path' => Storage::url('profile/data_pasien/' . auth::user()->access_cabang . '/' . $fileName),
                 'filename' => $fileName
             ];
         }

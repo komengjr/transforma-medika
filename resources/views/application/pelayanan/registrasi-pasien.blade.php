@@ -388,7 +388,6 @@
     $(document).on("click", "#button-save-create-pasien-baru", function(e) {
         e.preventDefault();
         var data = $("#form-create-pasien-baru").serialize();
-
         var nama = document.getElementById("nama_lengkap").value;
         var nik = document.getElementById("nik").value;
         var jk = document.getElementById("jenis_kelamin").value;

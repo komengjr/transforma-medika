@@ -101,7 +101,7 @@ class PelayananController extends Controller
         if ($request->link == "") {
             $file = null;
         } else {
-            $file = 'upload/data/profile/' . auth::user()->access_cabang . '/' . $request->link;
+            $file = 'profile/data_pasien/' . auth::user()->access_cabang . '/' . $request->link;
         }
         $cek = DB::table('master_patient')->where('master_patient_nik', $request->nik)->first();
         if (!$cek) {

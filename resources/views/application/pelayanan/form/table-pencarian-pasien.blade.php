@@ -25,10 +25,17 @@
             @foreach ($data as $datas)
                 <tr>
                     <td>
-                        <img class="h-60 w-60 overflow-hidden img-thumbnail shadow-sm"
-                            src="{{ asset($datas->master_patient_profile) }}" width="100" alt="">
+                        @if ($datas->master_patient_profile == "")
+                            <img class="h-60 w-60 overflow-hidden img-thumbnail shadow-sm" src="{{ asset('img/pp.png') }}"
+                                width="100" alt="">
+                        @else
+                            <img class="h-60 w-60 overflow-hidden img-thumbnail shadow-sm"
+                                src="{{ Storage::url($datas->master_patient_profile) }}" width="100" alt="">
+                        @endif
+
                     </td>
-                    <td><strong id="button-pilih-data-pasien" data-code="{{ $datas->master_patient_code }}">{{ $datas->master_patient_code }}</strong></td>
+                    <td><strong id="button-pilih-data-pasien"
+                            data-code="{{ $datas->master_patient_code }}">{{ $datas->master_patient_code }}</strong></td>
                     <td>{{ $datas->master_patient_name }}</td>
                     <td>{{ $datas->master_patient_nik }}</td>
                     <td>
