@@ -93,6 +93,8 @@
                                     @php
                                         $sub = DB::table('z_menu_user_sub')
                                             ->join('z_menu_sub_main', 'z_menu_sub_main.menu_main_sub_code', '=', 'z_menu_user_sub.menu_main_sub_code')
+                                            ->join('z_menu_sub', 'z_menu_sub.menu_sub_code', '=', 'z_menu_sub_main.menu_sub_code')
+                                            ->where('z_menu_sub.menu_sub_code', $menus->menu_sub_code)
                                             ->where('z_menu_user_sub.access_code', $datas->master_access_code)->get();
                                     @endphp
                                     @foreach ($sub as $subs)
