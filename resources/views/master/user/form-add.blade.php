@@ -18,9 +18,9 @@
             <label class="form-label" for="inputAddress">Akses Cabang</label>
             <select name="akses" class="form-select choices-single-akses" required>
                 <option value="">Pilih Akses</option>
-                <option value="master">Master</option>
-                <option value="123123">User</option>
-
+                @foreach ($akses as $aksess)
+                    <option value="{{$aksess->master_access_code}}">{{$aksess->master_access_name}}</option>
+                @endforeach
             </select>
         </div>
         <div class="col-md-4">

@@ -13,9 +13,9 @@
     <!-- ===============================================-->
     <title>Demo | Management System</title>
     @if (Auth::user()->access_status == 0)
-    <script>
-        window.location.replace("{{route('logout')}}")
-    </script>
+        <script>
+            window.location.replace("{{route('logout')}}")
+        </script>
     @endif
 
     <!-- ===============================================-->
@@ -97,8 +97,8 @@
 
                     </div><a class="navbar-brand" href="#">
                         <div class="d-flex align-items-center py-3">
-                            <img class="me-2" src="{{ asset('img/favicon.png') }}" alt=""
-                                width="30" /><span class="font-sans-serif fs-3">Master</span>
+                            <img class="me-2" src="{{ asset('img/favicon.png') }}" alt="" width="30" /><span
+                                class="font-sans-serif fs-3">Master</span>
                         </div>
                     </a>
                 </div>
@@ -117,8 +117,8 @@
                                 <ul class="nav collapse false" id="dashboard">
                                     <li class="nav-item">
                                         <a class="nav-link" href="{{ route('dashboard.home') }}" aria-expanded="false">
-                                            <div class="d-flex align-items-center"><span
-                                                    class="nav-link-text ps-1">Back to Home</span>
+                                            <div class="d-flex align-items-center"><span class="nav-link-text ps-1">Back
+                                                    to Home</span>
                                             </div>
                                         </a>
                                         <!-- more inner pages-->
@@ -130,106 +130,101 @@
 
 
                             @if (Auth::user()->access_code == 'master')
-                            <li class="nav-item">
-                                <div class="row navbar-vertical-label-wrapper mt-3 mb-2">
-                                    <div class="col-auto navbar-vertical-label">Master Admin Data
+                                <li class="nav-item">
+                                    <div class="row navbar-vertical-label-wrapper mt-3 mb-2">
+                                        <div class="col-auto navbar-vertical-label">Master Admin Data
+                                        </div>
+                                        <div class="col ps-0">
+                                            <hr class="mb-0 navbar-vertical-divider" />
+                                        </div>
                                     </div>
-                                    <div class="col ps-0">
-                                        <hr class="mb-0 navbar-vertical-divider" />
-                                    </div>
-                                </div>
-                                <a class="nav-link" href="{{ route('master_user') }}" role="button"
-                                    aria-expanded="false">
-                                    <div class="d-flex align-items-center"><span class="nav-link-icon"><span
-                                                class="far fa-user"></span></span><span
-                                            class="nav-link-text ps-1">Master User</span>
-                                    </div>
-                                </a>
-                                <a class="nav-link" href="{{ route('master_user') }}" role="button"
-                                    aria-expanded="false">
-                                    <div class="d-flex align-items-center"><span class="nav-link-icon"><span
-                                                class="fas fa-city"></span></span><span
-                                            class="nav-link-text ps-1">Master Cabang</span>
-                                    </div>
-                                </a>
-                            <li class="nav-item">
-                                <!-- parent pages--><a class="nav-link dropdown-indicator" href="#master_coa"
-                                    role="button" data-bs-toggle="collapse" aria-expanded="false"
-                                    aria-controls="dashboard">
-                                    <div class="d-flex align-items-center"><span class="nav-link-icon"><span
-                                                class="fas fa-universal-access"></span></span><span
-                                            class="nav-link-text ps-1">Master COA</span>
-                                    </div>
-                                </a>
-                                <ul class="nav collapse false" id="master_coa">
-                                    <li class="nav-item">
-                                        <a class="nav-link" href="{{ route('master_coa') }}"
-                                            aria-expanded="false">
-                                            <div class="d-flex align-items-center"><span
-                                                    class="nav-link-text ps-1">Master Chart Of Account</span>
-                                            </div>
-                                        </a>
-                                    </li>
-                                    <li class="nav-item">
-                                        <a class="nav-link" href="{{ route('dashboard.home') }}"
-                                            aria-expanded="false">
-                                            <div class="d-flex align-items-center"><span
-                                                    class="nav-link-text ps-1">Chart Of Account</span>
-                                            </div>
-                                        </a>
-                                    </li>
-                                </ul>
-                            </li>
-                            <li class="nav-item">
-                                <!-- parent pages--><a class="nav-link dropdown-indicator" href="#master_menu"
-                                    role="button" data-bs-toggle="collapse" aria-expanded="false"
-                                    aria-controls="dashboard">
-                                    <div class="d-flex align-items-center"><span class="nav-link-icon"><span
-                                                class="fab fa-windows"></span></span><span
-                                            class="nav-link-text ps-1">Master Menu</span>
-                                    </div>
-                                </a>
-                                <ul class="nav collapse false" id="master_menu">
-                                    <li class="nav-item">
-                                        <a class="nav-link" href="{{ route('master_menu') }}"
-                                            aria-expanded="false">
-                                            <div class="d-flex align-items-center"><span
-                                                    class="nav-link-text ps-1">Main Menu</span>
-                                            </div>
-                                        </a>
-                                    </li>
-                                    <li class="nav-item">
-                                        <a class="nav-link" href="{{ route('dashboard.home') }}"
-                                            aria-expanded="false">
-                                            <div class="d-flex align-items-center"><span
-                                                    class="nav-link-text ps-1">Akses Menu</span>
-                                            </div>
-                                        </a>
-                                    </li>
-                                </ul>
-                            </li>
-                            <li class="nav-item">
-                                <!-- parent pages--><a class="nav-link dropdown-indicator" href="#gateway"
-                                    role="button" data-bs-toggle="collapse" aria-expanded="false"
-                                    aria-controls="dashboard">
-                                    <div class="d-flex align-items-center"><span class="nav-link-icon"><span
-                                                class="fab fa-dev"></span></span><span
-                                            class="nav-link-text ps-1">Master Getway</span>
-                                    </div>
-                                </a>
-                                <ul class="nav collapse false" id="gateway">
-                                    <li class="nav-item">
-                                        <a class="nav-link" href="{{ route('master_gateway_whatsapp') }}"
-                                            aria-expanded="false">
-                                            <div class="d-flex align-items-center"><span
-                                                    class="nav-link-text ps-1">Getway Whatsapp</span>
-                                            </div>
-                                        </a>
-                                    </li>
+                                    <a class="nav-link" href="{{ route('master_user') }}" role="button"
+                                        aria-expanded="false">
+                                        <div class="d-flex align-items-center"><span class="nav-link-icon"><span
+                                                    class="far fa-user"></span></span><span
+                                                class="nav-link-text ps-1">Master User</span>
+                                        </div>
+                                    </a>
+                                    <a class="nav-link" href="{{ route('master_cabang') }}" role="button"
+                                        aria-expanded="false">
+                                        <div class="d-flex align-items-center"><span class="nav-link-icon"><span
+                                                    class="fas fa-city"></span></span><span
+                                                class="nav-link-text ps-1">Master Cabang</span>
+                                        </div>
+                                    </a>
+                                <li class="nav-item">
+                                    <!-- parent pages--><a class="nav-link dropdown-indicator" href="#master_coa"
+                                        role="button" data-bs-toggle="collapse" aria-expanded="false"
+                                        aria-controls="dashboard">
+                                        <div class="d-flex align-items-center"><span class="nav-link-icon"><span
+                                                    class="fas fa-universal-access"></span></span><span
+                                                class="nav-link-text ps-1">Master COA</span>
+                                        </div>
+                                    </a>
+                                    <ul class="nav collapse false" id="master_coa">
+                                        <li class="nav-item">
+                                            <a class="nav-link" href="{{ route('master_coa') }}" aria-expanded="false">
+                                                <div class="d-flex align-items-center"><span
+                                                        class="nav-link-text ps-1">Master Chart Of Account</span>
+                                                </div>
+                                            </a>
+                                        </li>
+                                        <li class="nav-item">
+                                            <a class="nav-link" href="{{ route('dashboard.home') }}" aria-expanded="false">
+                                                <div class="d-flex align-items-center"><span
+                                                        class="nav-link-text ps-1">Chart Of Account</span>
+                                                </div>
+                                            </a>
+                                        </li>
+                                    </ul>
+                                </li>
+                                <li class="nav-item">
+                                    <a class="nav-link dropdown-indicator" href="#master_menu" role="button"
+                                        data-bs-toggle="collapse" aria-expanded="false" aria-controls="dashboard">
+                                        <div class="d-flex align-items-center"><span class="nav-link-icon"><span
+                                                    class="fab fa-windows"></span></span><span
+                                                class="nav-link-text ps-1">Master Menu</span>
+                                        </div>
+                                    </a>
+                                    <ul class="nav collapse false" id="master_menu">
+                                        <li class="nav-item">
+                                            <a class="nav-link" href="{{ route('master_menu') }}" aria-expanded="false">
+                                                <div class="d-flex align-items-center"><span class="nav-link-text ps-1">Main
+                                                        Menu</span>
+                                                </div>
+                                            </a>
+                                        </li>
+                                        <li class="nav-item">
+                                            <a class="nav-link" href="{{ route('master_menu_akses') }}"
+                                                aria-expanded="false">
+                                                <div class="d-flex align-items-center"><span
+                                                        class="nav-link-text ps-1">Akses Menu</span>
+                                                </div>
+                                            </a>
+                                        </li>
+                                    </ul>
+                                </li>
+                                <li class="nav-item">
+                                    <!-- parent pages--><a class="nav-link dropdown-indicator" href="#gateway" role="button"
+                                        data-bs-toggle="collapse" aria-expanded="false" aria-controls="dashboard">
+                                        <div class="d-flex align-items-center"><span class="nav-link-icon"><span
+                                                    class="fab fa-dev"></span></span><span class="nav-link-text ps-1">Master
+                                                Getway</span>
+                                        </div>
+                                    </a>
+                                    <ul class="nav collapse false" id="gateway">
+                                        <li class="nav-item">
+                                            <a class="nav-link" href="{{ route('master_gateway_whatsapp') }}"
+                                                aria-expanded="false">
+                                                <div class="d-flex align-items-center"><span
+                                                        class="nav-link-text ps-1">Getway Whatsapp</span>
+                                                </div>
+                                            </a>
+                                        </li>
 
-                                </ul>
-                            </li>
-                            </li>
+                                    </ul>
+                                </li>
+                                </li>
                             @endif
                         </ul>
 
@@ -245,9 +240,8 @@
                         aria-label="Toggle Navigation"><span class="navbar-toggle-icon"><span
                                 class="toggle-line"></span></span></button>
                     <a class="navbar-brand me-1 me-sm-3" href="#">
-                        <div class="d-flex align-items-center"><img class="me-2"
-                                src="{{ asset('img/favicon.png') }}" alt=""
-                                width="35" /><span class="font-sans-serif">Master</span>
+                        <div class="d-flex align-items-center"><img class="me-2" src="{{ asset('img/favicon.png') }}"
+                                alt="" width="35" /><span class="font-sans-serif">Master</span>
                         </div>
                     </a>
                     <ul class="navbar-nav align-items-center d-none d-lg-block">
@@ -289,9 +283,8 @@
                     <ul class="navbar-nav navbar-nav-icons ms-auto flex-row align-items-center">
                         <li class="nav-item">
                             <div class="theme-control-toggle fa-icon-wait px-2">
-                                <input class="form-check-input ms-0 theme-control-toggle-input"
-                                    id="themeControlToggle" type="checkbox" data-theme-control="theme"
-                                    value="dark" />
+                                <input class="form-check-input ms-0 theme-control-toggle-input" id="themeControlToggle"
+                                    type="checkbox" data-theme-control="theme" value="dark" />
                                 <label class="mb-0 theme-control-toggle-label theme-control-toggle-light"
                                     for="themeControlToggle" data-bs-toggle="tooltip" data-bs-placement="left"
                                     title="Switch to light theme"><span class="fas fa-sun fs-0"></span></label>
@@ -302,17 +295,16 @@
                         </li>
                         {{-- <li class="nav-item">
                             <a class="nav-link px-0 notification-indicator notification-indicator-warning notification-indicator-fill fa-icon-wait"
-                                href="#"><span class="fas fa-shopping-cart"
-                                    data-fa-transform="shrink-7" style="font-size: 33px;"></span><span
+                                href="#"><span class="fas fa-shopping-cart" data-fa-transform="shrink-7"
+                                    style="font-size: 33px;"></span><span
                                     class="notification-indicator-number">1</span></a>
 
                         </li> --}}
                         <li class="nav-item dropdown">
                             <a class="nav-link notification-indicator notification-indicator-primary px-0 fa-icon-wait"
-                                id="navbarDropdownNotification" href="#" role="button"
-                                data-bs-toggle="dropdown" aria-haspopup="true" aria-expanded="false"><span
-                                    class="fas fa-bell" data-fa-transform="shrink-6"
-                                    style="font-size: 33px;"></span></a>
+                                id="navbarDropdownNotification" href="#" role="button" data-bs-toggle="dropdown"
+                                aria-haspopup="true" aria-expanded="false"><span class="fas fa-bell"
+                                    data-fa-transform="shrink-6" style="font-size: 33px;"></span></a>
                             <div class="dropdown-menu dropdown-menu-end dropdown-menu-card dropdown-menu-notification"
                                 aria-labelledby="navbarDropdownNotification">
                                 <div class="card card-notification shadow-none">
@@ -333,12 +325,10 @@
                                 </div>
                             </div>
                         </li>
-                        <li class="nav-item dropdown"><a class="nav-link pe-0" id="navbarDropdownUser"
-                                href="#" role="button" data-bs-toggle="dropdown" aria-haspopup="true"
-                                aria-expanded="false">
+                        <li class="nav-item dropdown"><a class="nav-link pe-0" id="navbarDropdownUser" href="#"
+                                role="button" data-bs-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
                                 <div class="avatar avatar-xl">
-                                    <img class="rounded-circle" src="{{ asset('img/my.jpg') }}"
-                                        alt="" />
+                                    <img class="rounded-circle" src="{{ asset('img/my.jpg') }}" alt="" />
 
                                 </div>
                             </a>
@@ -400,28 +390,27 @@
             <div class="btn-group d-block w-100 btn-group-navbar-style">
                 <div class="row gx-2">
                     <div class="col-6">
-                        <input class="btn-check" id="themeSwitcherLight" name="theme-color" type="radio"
-                            value="light" data-theme-control="theme" />
+                        <input class="btn-check" id="themeSwitcherLight" name="theme-color" type="radio" value="light"
+                            data-theme-control="theme" />
                         <label class="btn d-inline-block btn-navbar-style fs--1" for="themeSwitcherLight"> <span
                                 class="hover-overlay mb-2 rounded d-block"><img class="img-fluid img-prototype mb-0"
-                                    src="{{ asset('asset/img/generic/falcon-mode-default.jpg') }}"
-                                    alt="" /></span><span class="label-text">Light</span></label>
+                                    src="{{ asset('asset/img/generic/falcon-mode-default.jpg') }}" alt="" /></span><span
+                                class="label-text">Light</span></label>
                     </div>
                     <div class="col-6">
-                        <input class="btn-check" id="themeSwitcherDark" name="theme-color" type="radio"
-                            value="dark" data-theme-control="theme" />
+                        <input class="btn-check" id="themeSwitcherDark" name="theme-color" type="radio" value="dark"
+                            data-theme-control="theme" />
                         <label class="btn d-inline-block btn-navbar-style fs--1" for="themeSwitcherDark"> <span
                                 class="hover-overlay mb-2 rounded d-block"><img class="img-fluid img-prototype mb-0"
-                                    src="{{ asset('asset/img/generic/falcon-mode-dark.jpg') }}"
-                                    alt="" /></span><span class="label-text"> Dark</span></label>
+                                    src="{{ asset('asset/img/generic/falcon-mode-dark.jpg') }}" alt="" /></span><span
+                                class="label-text"> Dark</span></label>
                     </div>
                 </div>
             </div>
             <hr />
             <div class="d-flex justify-content-between">
                 <div class="d-flex align-items-start"><img class="me-2"
-                        src="{{ asset('asset/img/icons/left-arrow-from-left.svg') }}" width="20"
-                        alt="" />
+                        src="{{ asset('asset/img/icons/left-arrow-from-left.svg') }}" width="20" alt="" />
                     <div class="flex-1">
                         <h5 class="fs-0">RTL Mode</h5>
                         <p class="fs--1 mb-0">Pariatur labore dolorem laboriosam eum at ratione, nesciunt, tenetur
@@ -430,8 +419,7 @@
                     </div>
                 </div>
                 <div class="form-check form-switch">
-                    <input class="form-check-input ms-0" id="mode-rtl" type="checkbox"
-                        data-theme-control="isRTL" />
+                    <input class="form-check-input ms-0" id="mode-rtl" type="checkbox" data-theme-control="isRTL" />
                 </div>
             </div>
             <hr />
@@ -444,8 +432,7 @@
                     </div>
                 </div>
                 <div class="form-check form-switch">
-                    <input class="form-check-input ms-0" id="mode-fluid" type="checkbox"
-                        data-theme-control="isFluid" />
+                    <input class="form-check-input ms-0" id="mode-fluid" type="checkbox" data-theme-control="isFluid" />
                 </div>
             </div>
             <hr />
@@ -468,8 +455,8 @@
                                 alt="" /><span class="label-text"> Inverted</span></label>
                     </div>
                     <div class="col-6">
-                        <input class="btn-check" id="navbar-style-card" type="radio" name="navbarStyle"
-                            value="card" data-theme-control="navbarStyle" />
+                        <input class="btn-check" id="navbar-style-card" type="radio" name="navbarStyle" value="card"
+                            data-theme-control="navbarStyle" />
                         <label class="btn d-block w-100 btn-navbar-style fs--1" for="navbar-style-card"> <img
                                 class="img-fluid img-prototype" src="{{ asset('asset/img/generic/card.png') }}"
                                 alt="" /><span class="label-text"> Card</span></label>
@@ -518,8 +505,8 @@
             </div>
         </div>
     </div>
-    <div class="modal fade" id="modal-template-xl" data-bs-keyboard="false" data-bs-backdrop="static"
-        tabindex="-1" aria-labelledby="staticBackdropLabel" aria-hidden="false">
+    <div class="modal fade" id="modal-template-xl" data-bs-keyboard="false" data-bs-backdrop="static" tabindex="-1"
+        aria-labelledby="staticBackdropLabel" aria-hidden="false">
         <div class="modal-dialog modal-dialog-centered modal-xl" role="document">
             <div class="modal-content border-0">
                 <div class="position-absolute top-0 end-0 mt-3 me-3 z-index-1">
@@ -530,8 +517,8 @@
             </div>
         </div>
     </div>
-    <div class="modal fade" id="modal-template-sm" data-bs-keyboard="false" data-bs-backdrop="static"
-        tabindex="-1" aria-labelledby="staticBackdropLabel" aria-hidden="false">
+    <div class="modal fade" id="modal-template-sm" data-bs-keyboard="false" data-bs-backdrop="static" tabindex="-1"
+        aria-labelledby="staticBackdropLabel" aria-hidden="false">
         <div class="modal-dialog modal-dialog-centered modal-lg" role="document">
             <div class="modal-content border-0">
                 <div class="position-absolute top-0 end-0 mt-3 me-3 z-index-1">
@@ -560,29 +547,29 @@
 
 
     @if (session('success'))
-    <div class="position-fixed bottom-0 end-0 p-3" style="z-index: 99999">
-        <div class="toast show" id="liveToast" role="alert" aria-live="assertive" aria-atomic="true"
-            data-options='{"autoShow":true,"showOnce":true,"cookieExpireTime":3}' data-autohide="false">
-            <div class="toast-header bg-primary text-white"><strong class="me-auto">Notice</strong><small>1 sec
-                    ago</small>
-                <button class="btn-close btn-close-white" type="button" data-bs-dismiss="toast"
-                    aria-label="Close"></button>
+        <div class="position-fixed bottom-0 end-0 p-3" style="z-index: 99999">
+            <div class="toast show" id="liveToast" role="alert" aria-live="assertive" aria-atomic="true"
+                data-options='{"autoShow":true,"showOnce":true,"cookieExpireTime":3}' data-autohide="false">
+                <div class="toast-header bg-primary text-white"><strong class="me-auto">Notice</strong><small>1 sec
+                        ago</small>
+                    <button class="btn-close btn-close-white" type="button" data-bs-dismiss="toast"
+                        aria-label="Close"></button>
+                </div>
+                <div class="toast-body">{{ session('success') }}</div>
             </div>
-            <div class="toast-body">{{ session('success') }}</div>
         </div>
-    </div>
     @elseif (session('error'))
-    <div class="position-fixed bottom-0 end-0 p-3" style="z-index: 99999">
-        <div class="toast show" id="liveToast" role="alert" aria-live="assertive" aria-atomic="true"
-            data-options='{"autoShow":true,"showOnce":true,"cookieExpireTime":720}' data-autohide="false">
-            <div class="toast-header bg-danger text-white"><strong class="me-auto">Notice</strong><small>1 sec
-                    ago</small>
-                <button class="btn-close btn-close-white" type="button" data-bs-dismiss="toast"
-                    aria-label="Close"></button>
+        <div class="position-fixed bottom-0 end-0 p-3" style="z-index: 99999">
+            <div class="toast show" id="liveToast" role="alert" aria-live="assertive" aria-atomic="true"
+                data-options='{"autoShow":true,"showOnce":true,"cookieExpireTime":720}' data-autohide="false">
+                <div class="toast-header bg-danger text-white"><strong class="me-auto">Notice</strong><small>1 sec
+                        ago</small>
+                    <button class="btn-close btn-close-white" type="button" data-bs-dismiss="toast"
+                        aria-label="Close"></button>
+                </div>
+                <div class="toast-body">{{ session('error') }}</div>
             </div>
-            <div class="toast-body">{{ session('error') }}</div>
         </div>
-    </div>
     @endif
 
 
@@ -598,8 +585,9 @@
         </div>
     </div>
 
-    {{-- <script>
-        $(document).on("click", "#navbarDropdownNotification", function(e) {
+    {{--
+    <script>
+        $(document).on("click", "#navbarDropdownNotification", function (e) {
             e.preventDefault();
             // var code = $(this).data("code");
             $('#show-notification').html(
@@ -607,63 +595,64 @@
             );
             $.ajax({
                 url: "{{ route('dashboard_notif') }}",
-    type: "POST",
-    cache: false,
-    data: {
-    "_token": "{{ csrf_token() }}",
-    "code": 0
-    },
-    dataType: 'html',
-    }).done(function(data) {
-    $('#show-notification').html(data);
-    }).fail(function() {
-    $('#show-notification').html('eror');
-    });
+                type: "POST",
+                cache: false,
+                data: {
+                    "_token": "{{ csrf_token() }}",
+                    "code": 0
+                },
+                dataType: 'html',
+            }).done(function (data) {
+                $('#show-notification').html(data);
+            }).fail(function () {
+                $('#show-notification').html('eror');
+            });
 
-    });
+        });
     </script> --}}
 
-    {{-- <script>
-        $(document).on("click", "#button-setup-profil", function(e) {
+    {{--
+    <script>
+        $(document).on("click", "#button-setup-profil", function (e) {
             e.preventDefault();
             $('#menu-template-xl').html(
                 '<div class="spinner-border my-3" style="display: block; margin-left: auto; margin-right: auto;" role="status"><span class="visually-hidden">Loading...</span></div>'
             );
             $.ajax({
                 url: "{{ route('dashboard_setup_profile') }}",
-    type: "POST",
-    cache: false,
-    data: {
-    "_token": "{{ csrf_token() }}",
-    "code": 0,
-    },
-    dataType: 'html',
-    }).done(function(data) {
-    $('#menu-template-xl').html(data);
-    }).fail(function() {
-    $('#menu-template-xl').html('eror');
-    });
-    });
-    $(document).on("click", "#button-setup-notification", function(e) {
-    e.preventDefault();
-    $('#menu-template-sm').html(
-    '<div class="spinner-border my-3" style="display: block; margin-left: auto; margin-right: auto;" role="status"><span class="visually-hidden">Loading...</span></div>'
-    );
-    $.ajax({
-    url: "{{ route('dashboard_setup_notification') }}",
-    type: "POST",
-    cache: false,
-    data: {
-    "_token": "{{ csrf_token() }}",
-    "code": 0,
-    },
-    dataType: 'html',
-    }).done(function(data) {
-    $('#menu-template-sm').html(data);
-    }).fail(function() {
-    $('#menu-template-sm').html('eror');
-    });
-    });
+                type: "POST",
+                cache: false,
+                data: {
+                    "_token": "{{ csrf_token() }}",
+                    "code": 0,
+                },
+                dataType: 'html',
+            }).done(function (data) {
+                $('#menu-template-xl').html(data);
+            }).fail(function () {
+                $('#menu-template-xl').html('eror');
+            });
+        });
+        $(document).on("click", "#button-setup-notification", function (e) {
+            e.preventDefault();
+            $('#menu-template-sm').html(
+                '<div class="spinner-border my-3" style="display: block; margin-left: auto; margin-right: auto;" role="status"><span class="visually-hidden">Loading...</span></div>'
+            );
+            $.ajax({
+                url: "{{ route('dashboard_setup_notification') }}",
+                type: "POST",
+                cache: false,
+                data: {
+                    "_token": "{{ csrf_token() }}",
+                    "code": 0,
+                },
+                dataType: 'html',
+            }).done(function (data) {
+                $('#menu-template-sm').html(data);
+            }).fail(function () {
+                $('#menu-template-sm').html('eror');
+            });
+        });
     </script> --}}
 </body>
 

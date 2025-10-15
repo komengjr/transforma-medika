@@ -21,7 +21,8 @@
                     </div>
                     <div class="col-xl-auto px-3 py-2">
                         <h6 class="text-primary fs--1 mb-0">Menu : </h6>
-                        <h4 class="text-primary fw-bold mb-0">Master <span class="text-info fw-medium">Menu</span></h4>
+                        <h4 class="text-primary fw-bold mb-0">Master <span class="text-info fw-medium">Menu Akses</span>
+                        </h4>
                     </div>
                 </div>
             </div>
@@ -31,7 +32,7 @@
         <div class="card-header bg-primary">
             <div class="row align-items-center">
                 <div class="col">
-                    <h3 class="m-0"><span class="badge bg-primary m-0 p-0">Master Menu</span></h3>
+                    <h3 class="m-0"><span class="badge bg-primary m-0 p-0">Master Menu Akses</span></h3>
                 </div>
                 <div class="col-auto">
 
@@ -41,12 +42,12 @@
                                 class="fas fa-align-left me-1" data-fa-transform="shrink-3"></span>Option</button>
                         <div class="dropdown-menu" aria-labelledby="btnGroupVerticalDrop2">
                             <button class="dropdown-item" data-bs-toggle="modal" data-bs-target="#modal-menu"
-                                id="button-tambah-data-menu" data-code="123"><span class="far fa-plus"></span>
-                                Tambah Menu</button>
+                                id="button-tambah-data-access" data-code="123"><span class="far fa-plus"></span>
+                                Tambah Akses</button>
                             {{-- <div class="dropdown-divider"></div>
                             <button class="dropdown-item" data-bs-toggle="modal" data-bs-target="#modal-cabang"
-                                id="button-data-barang-cabang" data-code="123"><span
-                                    class="far fa-folder-open"></span> History</button> --}}
+                                id="button-data-barang-cabang" data-code="123"><span class="far fa-folder-open"></span>
+                                History</button> --}}
                         </div>
                     </div>
                 </div>
@@ -57,12 +58,9 @@
                 <thead class="bg-200 text-700">
                     <tr>
                         <th>No</th>
-                        {{-- <th>Kode Menu</th> --}}
-                        <th>Nama Menu</th>
+                        <th>Nama Akses</th>
+                        <th>Super Menu</th>
                         <th>Link Menu</th>
-                        <th>Option Menu</th>
-                        <th>Sub Menu</th>
-                        <th>Icon Menu</th>
                         <th>Action</th>
                     </tr>
                 </thead>
@@ -73,33 +71,26 @@
                     @foreach ($data as $datas)
                         <tr>
                             <td>{{ $no++ }}</td>
-                            {{-- <td>{{ $datas->menu_sub_code }}</td> --}}
-                            <td>{{ $datas->menu_sub_name }}</td>
-                            <td>{{ $datas->menu_sub_link }}</td>
-                            <td>{{ $datas->menu_sub_option }}</td>
+                            <td>{{ $datas->master_access_name }}</td>
+                            <td></td>
                             <td>
-                                @php
-                                    $cek = DB::table('z_menu_sub_main')->where('menu_sub_code',$datas->menu_sub_code)->get();
-                                @endphp
-                                @foreach ($cek as $ceks)
-                                    <li>{{$ceks->menu_main_sub_name}}</li>
-                                @endforeach
+
                             </td>
-                            <td>{{ $datas->menu_sub_icon }}</td>
                             <td>
                                 <div class="btn-group" role="group">
                                     <button class="btn btn-sm btn-falcon-primary dropdown-toggle" id="btnGroupVerticalDrop2"
-                                        type="button" data-bs-toggle="dropdown" aria-haspopup="true"
-                                        aria-expanded="false"><span class="fas fa-align-left me-1"
-                                            data-fa-transform="shrink-3"></span>Option</button>
+                                        type="button" data-bs-toggle="dropdown" aria-haspopup="true" aria-expanded="false"><span
+                                            class="fas fa-align-left me-1" data-fa-transform="shrink-3"></span>Option</button>
                                     <div class="dropdown-menu" aria-labelledby="btnGroupVerticalDrop2">
                                         <button class="dropdown-item" data-bs-toggle="modal" data-bs-target="#modal-menu"
-                                            id="button-update-data-menu" data-code="{{$datas->menu_sub_code}}"><span class="fas fa-edit"></span>
-                                            Update Menu</button>
+                                            id="button-setup-super-menu" data-code="{{ $datas->master_access_code }}"><span
+                                                class="far fa-plus"></span>
+                                            Setup Super Menu</button>
                                         <div class="dropdown-divider"></div>
-                                        <button class="dropdown-item text=danger" data-bs-toggle="modal" data-bs-target="#modal-cabang"
+                                        <button class="dropdown-item" data-bs-toggle="modal" data-bs-target="#modal-cabang"
                                             id="button-data-barang-cabang" data-code="123"><span
-                                                class="fas fa-trash"></span> Remove</button>
+                                                class="far fa-folder-open"></span>
+                                            Setup sub Menu</button>
                                     </div>
                                 </div>
                             </td>
@@ -134,14 +125,14 @@
         });
     </script>
     <script>
-        $(document).on("click", "#button-tambah-data-menu", function(e) {
+        $(document).on("click", "#button-tambah-data-access", function (e) {
             e.preventDefault();
             var code = $(this).data("code");
             $('#menu-menu').html(
                 '<div class="spinner-border my-3" style="display: block; margin-left: auto; margin-right: auto;" role="status"><span class="visually-hidden">Loading...</span></div>'
             );
             $.ajax({
-                url: "{{ route('master_menu_add') }}",
+                url: "{{ route('master_menu_akses_add') }}",
                 type: "POST",
                 cache: false,
                 data: {
@@ -149,20 +140,20 @@
                     "code": code
                 },
                 dataType: 'html',
-            }).done(function(data) {
+            }).done(function (data) {
                 $('#menu-menu').html(data);
-            }).fail(function() {
+            }).fail(function () {
                 $('#menu-menu').html('eror');
             });
         });
-        $(document).on("click", "#button-update-data-menu", function(e) {
+        $(document).on("click", "#button-setup-super-menu", function (e) {
             e.preventDefault();
             var code = $(this).data("code");
             $('#menu-menu').html(
                 '<div class="spinner-border my-3" style="display: block; margin-left: auto; margin-right: auto;" role="status"><span class="visually-hidden">Loading...</span></div>'
             );
             $.ajax({
-                url: "{{ route('master_menu_update') }}",
+                url: "{{ route('master_menu_akses_setup_super_menu') }}",
                 type: "POST",
                 cache: false,
                 data: {
@@ -170,9 +161,9 @@
                     "code": code
                 },
                 dataType: 'html',
-            }).done(function(data) {
+            }).done(function (data) {
                 $('#menu-menu').html(data);
-            }).fail(function() {
+            }).fail(function () {
                 $('#menu-menu').html('eror');
             });
         });

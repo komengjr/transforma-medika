@@ -13,7 +13,7 @@
                         <img class="ms-3 mx-3" src="{{ asset('img/coa.png') }}" alt="" width="50" />
                         <div>
                             <h6 class="text-primary fs--1 mb-0 pt-2">Welcome to </h6>
-                            <h4 class="text-primary fw-bold mb-1">TRANS <span class="text-info fw-medium">Management
+                            <h4 class="text-primary fw-bold mb-1">Innoventra <span class="text-info fw-medium">Management
                                     System</span></h4>
                         </div>
                         <img class="ms-n4 d-none d-lg-block "

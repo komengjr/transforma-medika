@@ -23,6 +23,14 @@ class MasterController extends Controller
             return Redirect::to('dashboard/home');
         }
     }
+    public function master_cabang()
+    {
+        if (Auth::user()->access_code == 'master') {
+            return view('master.dashboard', ['akses' => 123]);
+        } else {
+            return Redirect::to('dashboard/home');
+        }
+    }
     public function master_coa()
     {
         if (Auth::user()->access_code == 'master') {
@@ -34,7 +42,8 @@ class MasterController extends Controller
     public function master_user()
     {
         if (Auth::user()->access_code == 'master') {
-            return view('master.master-user', ['akses' => 123]);
+            $user = DB::table('user_mains')->get();
+            return view('master.master-user', ['akses' => 123, 'user' => $user]);
         } else {
             return Redirect::to('dashboard/home');
         }
@@ -42,7 +51,8 @@ class MasterController extends Controller
     public function master_user_add()
     {
         if (Auth::user()->access_code == 'master') {
-            return view('master.user.form-add');
+            $akses = DB::table('master_access')->get();
+            return view('master.user.form-add', ['akses' => $akses]);
         } else {
             return Redirect::to('dashboard/home');
         }
@@ -140,6 +150,51 @@ class MasterController extends Controller
                 'created_at' => now(),
             ]);
             return redirect()->back()->withSuccess('Great! Berhasil Menambahkan Data');
+        } else {
+            return view('application.error.404');
+        }
+    }
+    public function master_menu_akses()
+    {
+        if (Auth::user()->access_code == 'master') {
+            $data = DB::table('master_access')->get();
+            return view('master.master-menu-akses', ['data' => $data, 'akses' => 123]);
+        } else {
+            return view('application.error.404');
+        }
+    }
+    public function master_menu_akses_add()
+    {
+        if (Auth::user()->access_code == 'master') {
+            $data = DB::table('master_access')->get();
+            return view('master.access.form-add', ['data' => $data, 'akses' => 123]);
+        } else {
+            return view('application.error.404');
+        }
+    }
+    public function master_menu_akses_save(Request $request)
+    {
+        if (Auth::user()->access_code == 'master') {
+            DB::table('master_access')->insert([
+                'master_access_code' => str::uuid(),
+                'master_access_name' => $request->name,
+                'master_access_status' => 1,
+                'created_at' => now()
+            ]);
+            return redirect()->back()->withSuccess('Great! Berhasil Menambahkan Data');
+        } else {
+            return view('application.error.404');
+        }
+    }
+    public function master_menu_akses_setup_super_menu(Request $request)
+    {
+        if (Auth::user()->access_code == 'master') {
+            $data = DB::table('z_menu_super')->get();
+            return view('master.access.form-setup-super-menu', [
+                'code' => $request->code,
+                'data' => $data,
+                'akses' => 123
+            ]);
         } else {
             return view('application.error.404');
         }

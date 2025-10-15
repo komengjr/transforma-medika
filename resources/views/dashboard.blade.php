@@ -214,19 +214,21 @@
                         </div>
                         <div class="card-body p-3 border border-primary">
                             <div class="row light g-3">
+                                @php
+                                    $menu = DB::table('z_menu_super')->get();
+                                @endphp
+                                @foreach ($menu as $menus)
                                 <div class="col-sm-6 col-lg-4">
-                                    <div class="card text-white bg-linkedin" id="menu" data-code="hrm">
+                                    <div class="card text-white {{$menus->menu_super_bg}}" id="menu" data-code="{{$menus->menu_super_code}}">
                                         <div class="card-body">
-                                            <div class="card-title">HRM</div>
-                                            <p class="card-text">program perangkat lunak (software) yang dirancang untuk
-                                                mengotomatisasi dan menyederhanakan pengelolaan serta pencatatan
-                                                transaksi keuangan suatu bisnis, seperti penjualan, pembelian,
-                                                utang-piutang, dan penggajian.</p>
+                                            <div class="card-title fs--1">{{$menus->menu_super_name}}</div>
+                                            <p class="card-text">{{$menus->menu_super_desc}}.</p>
                                         </div>
                                     </div>
                                 </div>
+                                @endforeach
 
-                                <div class="col-sm-6 col-lg-4">
+                                <!-- <div class="col-sm-6 col-lg-4">
                                     <div class="card text-white bg-success" id="menu" data-code="accounting">
                                         <div class="card-body">
                                             <div class="card-title">ACCOUNTING</div>
@@ -302,7 +304,7 @@
                                                 akhir.</p>
                                         </div>
                                     </div>
-                                </div>
+                                </div> -->
 
                                 <div class="col-sm-6 col-lg-4">
                                     <div class="card text-white bg-400">

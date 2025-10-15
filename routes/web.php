@@ -209,11 +209,16 @@ Route::prefix('application')->group(function () {
 
 Route::prefix('master-data')->group(function () {
     Route::get('dashboard', [MasterController::class, 'master_dashboard'])->name('master_dashboard');
+    Route::get('cabang', [MasterController::class, 'master_cabang'])->name('master_cabang');
     Route::get('user', [MasterController::class, 'master_user'])->name('master_user');
     Route::post('user/add', [MasterController::class, 'master_user_add'])->name('master_user_add');
     Route::post('user/save', [MasterController::class, 'master_user_save'])->name('master_user_save');
     Route::get('coa', [MasterController::class, 'master_coa'])->name('master_coa');
     Route::get('menu', [MasterController::class, 'master_menu'])->name('master_menu');
+    Route::get('menu-akses', [MasterController::class, 'master_menu_akses'])->name('master_menu_akses');
+    Route::post('menu-akses/add', [MasterController::class, 'master_menu_akses_add'])->name('master_menu_akses_add');
+    Route::post('menu-akses/save', [MasterController::class, 'master_menu_akses_save'])->name('master_menu_akses_save');
+    Route::post('menu-akses/setup-super-menu', [MasterController::class, 'master_menu_akses_setup_super_menu'])->name('master_menu_akses_setup_super_menu');
     Route::post('menu/add', [MasterController::class, 'master_menu_add'])->name('master_menu_add');
     Route::post('menu/save', [MasterController::class, 'master_menu_save'])->name('master_menu_save');
     Route::post('menu/update', [MasterController::class, 'master_menu_update'])->name('master_menu_update');
