@@ -26,9 +26,11 @@
                                     ->where('access_code', $code)->first();
                             @endphp
                             @if ($cek)
-                                <button class="btn btn-primary btn-sm" data-code="{{ $datas->menu_super_code }}">Aktif</button>
+                                <button class="btn btn-primary btn-sm" id="button-pilih-akses"
+                                    data-code="{{ $datas->menu_super_code }}" data-id="{{ $code }}">Aktif</button>
                             @else
-                                <button class="btn btn-danger btn-sm">Belum Aktif</button>
+                                <button class="btn btn-danger btn-sm" id="button-pilih-akses"
+                                    data-code="{{ $datas->menu_super_code }}" data-id="{{ $code }}">Belum Aktif</button>
                             @endif
                         </td>
                     </tr>

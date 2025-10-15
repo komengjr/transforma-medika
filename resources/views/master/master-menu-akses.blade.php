@@ -72,7 +72,16 @@
                         <tr>
                             <td>{{ $no++ }}</td>
                             <td>{{ $datas->master_access_name }}</td>
-                            <td></td>
+                            <td>
+                                @php
+                                    $super = DB::table('z_menu_user_super')
+                                        ->join('z_menu_super', 'z_menu_super.menu_super_code', '=', 'z_menu_user_super.menu_super_code')
+                                        ->where('z_menu_user_super.access_code', $datas->master_access_code)->get();
+                                @endphp
+                                @foreach ($super as $supers)
+                                    <li>{{ $supers->menu_super_name }}</li>
+                                @endforeach
+                            </td>
                             <td>
 
                             </td>
@@ -87,8 +96,8 @@
                                                 class="far fa-plus"></span>
                                             Setup Super Menu</button>
                                         <div class="dropdown-divider"></div>
-                                        <button class="dropdown-item" data-bs-toggle="modal" data-bs-target="#modal-cabang"
-                                            id="button-data-barang-cabang" data-code="123"><span
+                                        <button class="dropdown-item" data-bs-toggle="modal" data-bs-target="#modal-menu"
+                                            id="button-setup-sub-menu" data-code="{{ $datas->master_access_code }}"><span
                                                 class="far fa-folder-open"></span>
                                             Setup sub Menu</button>
                                     </div>
@@ -165,6 +174,96 @@
                 $('#menu-menu').html(data);
             }).fail(function () {
                 $('#menu-menu').html('eror');
+            });
+        });
+        $(document).on("click", "#button-pilih-akses", function (e) {
+            e.preventDefault();
+            var code = $(this).data("code");
+            var id = $(this).data("id");
+            $('#menu-menu').html(
+                '<div class="spinner-border my-3" style="display: block; margin-left: auto; margin-right: auto;" role="status"><span class="visually-hidden">Loading...</span></div>'
+            );
+            $.ajax({
+                url: "{{ route('master_menu_akses_update_akses_super_menu') }}",
+                type: "POST",
+                cache: false,
+                data: {
+                    "_token": "{{ csrf_token() }}",
+                    "id": id,
+                    "code": code,
+                },
+                dataType: 'html',
+            }).done(function (data) {
+                location.reload();
+            }).fail(function () {
+                $('#menu-menu').html('eror');
+            });
+        });
+        $(document).on("click", "#button-setup-sub-menu", function (e) {
+            e.preventDefault();
+            var code = $(this).data("code");
+            $('#menu-menu').html(
+                '<div class="spinner-border my-3" style="display: block; margin-left: auto; margin-right: auto;" role="status"><span class="visually-hidden">Loading...</span></div>'
+            );
+            $.ajax({
+                url: "{{ route('master_menu_akses_setup_sub_menu') }}",
+                type: "POST",
+                cache: false,
+                data: {
+                    "_token": "{{ csrf_token() }}",
+                    "code": code,
+                },
+                dataType: 'html',
+            }).done(function (data) {
+                $('#menu-menu').html(data);
+            }).fail(function () {
+                $('#menu-menu').html('eror');
+            });
+        });
+        $(document).on("click", "#button-update-menu", function (e) {
+            e.preventDefault();
+            var id = $(this).data("id");
+            var code = $(this).data("code");
+            $('#table-menu-akses').html(
+                '<div class="spinner-border my-3" style="display: block; margin-left: auto; margin-right: auto;" role="status"><span class="visually-hidden">Loading...</span></div>'
+            );
+            $.ajax({
+                url: "{{ route('master_menu_akses_update_menu') }}",
+                type: "POST",
+                cache: false,
+                data: {
+                    "_token": "{{ csrf_token() }}",
+                    "id": id,
+                    "code": code
+                },
+                dataType: 'html',
+            }).done(function (data) {
+                $('#table-menu-akses').html(data);
+            }).fail(function () {
+                $('#table-menu-akses').html('eror');
+            });
+        });
+        $(document).on("click", "#button-update-sub-menu", function (e) {
+            e.preventDefault();
+            var id = $(this).data("id");
+            var code = $(this).data("code");
+            $('#table-menu-akses').html(
+                '<div class="spinner-border my-3" style="display: block; margin-left: auto; margin-right: auto;" role="status"><span class="visually-hidden">Loading...</span></div>'
+            );
+            $.ajax({
+                url: "{{ route('master_menu_akses_update_sub_menu') }}",
+                type: "POST",
+                cache: false,
+                data: {
+                    "_token": "{{ csrf_token() }}",
+                    "id": id,
+                    "code": code
+                },
+                dataType: 'html',
+            }).done(function (data) {
+                $('#table-menu-akses').html(data);
+            }).fail(function () {
+                $('#table-menu-akses').html('eror');
             });
         });
 

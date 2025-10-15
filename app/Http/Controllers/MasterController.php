@@ -199,6 +199,93 @@ class MasterController extends Controller
             return view('application.error.404');
         }
     }
+    public function master_menu_akses_update_akses_super_menu(Request $request)
+    {
+        if (Auth::user()->access_code == 'master') {
+            $cek = DB::table('z_menu_user_super')->where('menu_super_code', $request->code)->where('access_code', $request->id)->first();
+            if ($cek) {
+                DB::table('z_menu_user_super')->where('menu_super_code', $request->code)->where('access_code', $request->id)->delete();
+            } else {
+                DB::table('z_menu_user_super')->insert([
+                    'menu_super_code' => $request->code,
+                    'access_code' => $request->id,
+                ]);
+            }
+
+            return 123;
+        } else {
+            return view('application.error.404');
+        }
+    }
+    public function master_menu_akses_setup_sub_menu(Request $request)
+    {
+        if (Auth::user()->access_code == 'master') {
+            $data = DB::table('z_menu')
+                ->join('z_menu_super', 'z_menu_super.menu_super_code', '=', 'z_menu.menu_super_code')
+                ->join('z_menu_user_super', 'z_menu_user_super.menu_super_code', '=', 'z_menu_super.menu_super_code')
+                ->where('z_menu_user_super.access_code', $request->code)
+                ->get();
+            return view('master.access.form-setup-sub-menu', [
+                'code' => $request->code,
+                'data' => $data,
+                'akses' => 123
+            ]);
+        } else {
+            return view('application.error.404');
+        }
+    }
+    public function master_menu_akses_update_menu(Request $request)
+    {
+        if (Auth::user()->access_code == 'master') {
+            $cek = DB::table('z_menu_user')->where('menu_sub_code', $request->code)->where('access_code', $request->id)->first();
+            if ($cek) {
+                DB::table('z_menu_user')->where('menu_sub_code', $request->code)->where('access_code', $request->id)->delete();
+            } else {
+                DB::table('z_menu_user')->insert([
+                    'menu_sub_code' => $request->code,
+                    'access_code' => $request->id,
+                    'created_at' => now()
+                ]);
+            }
+            $data = DB::table('z_menu')
+                ->join('z_menu_super', 'z_menu_super.menu_super_code', '=', 'z_menu.menu_super_code')
+                ->join('z_menu_user_super', 'z_menu_user_super.menu_super_code', '=', 'z_menu_super.menu_super_code')
+                ->where('z_menu_user_super.access_code', $request->id)
+                ->get();
+            return view('master.access.table-menu-akses', [
+                'code' => $request->id,
+                'data' => $data,
+            ]);
+        } else {
+            return view('application.error.404');
+        }
+    }
+    public function master_menu_akses_update_sub_menu(Request $request)
+    {
+        if (Auth::user()->access_code == 'master') {
+            $cek = DB::table('z_menu_user_sub')->where('menu_main_sub_code', $request->code)->where('access_code', $request->id)->first();
+            if ($cek) {
+                DB::table('z_menu_user_sub')->where('menu_main_sub_code', $request->code)->where('access_code', $request->id)->delete();
+            } else {
+                DB::table('z_menu_user_sub')->insert([
+                    'menu_main_sub_code' => $request->code,
+                    'access_code' => $request->id,
+                    'created_at' => now()
+                ]);
+            }
+            $data = DB::table('z_menu')
+                ->join('z_menu_super', 'z_menu_super.menu_super_code', '=', 'z_menu.menu_super_code')
+                ->join('z_menu_user_super', 'z_menu_user_super.menu_super_code', '=', 'z_menu_super.menu_super_code')
+                ->where('z_menu_user_super.access_code', $request->id)
+                ->get();
+            return view('master.access.table-menu-akses', [
+                'code' => $request->id,
+                'data' => $data,
+            ]);
+        } else {
+            return view('application.error.404');
+        }
+    }
     public function master_gateway_whatsapp(Request $request)
     {
         if (Auth::user()->access_code == 'master') {

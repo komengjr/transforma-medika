@@ -219,6 +219,10 @@ Route::prefix('master-data')->group(function () {
     Route::post('menu-akses/add', [MasterController::class, 'master_menu_akses_add'])->name('master_menu_akses_add');
     Route::post('menu-akses/save', [MasterController::class, 'master_menu_akses_save'])->name('master_menu_akses_save');
     Route::post('menu-akses/setup-super-menu', [MasterController::class, 'master_menu_akses_setup_super_menu'])->name('master_menu_akses_setup_super_menu');
+    Route::post('menu-akses/update-akses-super-menu', [MasterController::class, 'master_menu_akses_update_akses_super_menu'])->name('master_menu_akses_update_akses_super_menu');
+    Route::post('menu-akses/setup-sub-menu', [MasterController::class, 'master_menu_akses_setup_sub_menu'])->name('master_menu_akses_setup_sub_menu');
+    Route::post('menu-akses/update-akses-menu', [MasterController::class, 'master_menu_akses_update_menu'])->name('master_menu_akses_update_menu');
+    Route::post('menu-akses/update-akses-sub-menu', [MasterController::class, 'master_menu_akses_update_sub_menu'])->name('master_menu_akses_update_sub_menu');
     Route::post('menu/add', [MasterController::class, 'master_menu_add'])->name('master_menu_add');
     Route::post('menu/save', [MasterController::class, 'master_menu_save'])->name('master_menu_save');
     Route::post('menu/update', [MasterController::class, 'master_menu_update'])->name('master_menu_update');
