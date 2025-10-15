@@ -152,10 +152,9 @@
                                                 class="nav-link-text ps-1">Master Cabang</span>
                                         </div>
                                     </a>
-                                <li class="nav-item">
-                                    <!-- parent pages--><a class="nav-link dropdown-indicator" href="#master_coa"
-                                        role="button" data-bs-toggle="collapse" aria-expanded="false"
-                                        aria-controls="dashboard">
+                                <!-- <li class="nav-item">
+                                    <a class="nav-link dropdown-indicator" href="#master_coa" role="button"
+                                        data-bs-toggle="collapse" aria-expanded="false" aria-controls="dashboard">
                                         <div class="d-flex align-items-center"><span class="nav-link-icon"><span
                                                     class="fas fa-universal-access"></span></span><span
                                                 class="nav-link-text ps-1">Master COA</span>
@@ -177,16 +176,16 @@
                                             </a>
                                         </li>
                                     </ul>
-                                </li>
+                                </li> -->
                                 <li class="nav-item">
                                     <a class="nav-link dropdown-indicator" href="#master_menu" role="button"
-                                        data-bs-toggle="collapse" aria-expanded="false" aria-controls="dashboard">
+                                        data-bs-toggle="collapse" aria-expanded="true" aria-controls="dashboard">
                                         <div class="d-flex align-items-center"><span class="nav-link-icon"><span
                                                     class="fab fa-windows"></span></span><span
                                                 class="nav-link-text ps-1">Master Menu</span>
                                         </div>
                                     </a>
-                                    <ul class="nav collapse false" id="master_menu">
+                                    <ul class="nav collapse show" id="master_menu">
                                         <li class="nav-item">
                                             <a class="nav-link" href="{{ route('master_menu') }}" aria-expanded="false">
                                                 <div class="d-flex align-items-center"><span class="nav-link-text ps-1">Main
@@ -206,13 +205,13 @@
                                 </li>
                                 <li class="nav-item">
                                     <!-- parent pages--><a class="nav-link dropdown-indicator" href="#gateway" role="button"
-                                        data-bs-toggle="collapse" aria-expanded="false" aria-controls="dashboard">
+                                        data-bs-toggle="collapse" aria-expanded="true" aria-controls="dashboard">
                                         <div class="d-flex align-items-center"><span class="nav-link-icon"><span
                                                     class="fab fa-dev"></span></span><span class="nav-link-text ps-1">Master
                                                 Getway</span>
                                         </div>
                                     </a>
-                                    <ul class="nav collapse false" id="gateway">
+                                    <ul class="nav collapse show" id="gateway">
                                         <li class="nav-item">
                                             <a class="nav-link" href="{{ route('master_gateway_whatsapp') }}"
                                                 aria-expanded="false">
