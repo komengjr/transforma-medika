@@ -209,7 +209,10 @@
                     </div>
                     <div class="card overflow-hidden z-index-1">
                         <div class="card-header bg-primary py-2 pt-3">
-                            <marquee class="p-0" behavior="" direction=""><h5 class="m-0" style="color: white;">Selamat Datang di Innoventra System Management, One For All Management</h5></marquee>
+                            <marquee class="p-0" behavior="" direction="">
+                                <h5 class="m-0" style="color: white;">Selamat Datang di Innoventra System Management,
+                                    One For All Management</h5>
+                            </marquee>
                         </div>
                         <div class="card-body p-3 border border-primary">
                             <div class="row light g-3">
@@ -220,9 +223,9 @@
                                 @else
                                     @php
                                         $menu = DB::table('z_menu_super')
-                                        ->join('z_menu_user_super','z_menu_user_super.menu_super_code','=','z_menu_super.menu_super_code')
-                                        ->where('z_menu_user_super.access_code',Auth::user()->access_code)
-                                        ->get();
+                                            ->join('z_menu_user_super', 'z_menu_user_super.menu_super_code', '=', 'z_menu_super.menu_super_code')
+                                            ->where('z_menu_user_super.access_code', Auth::user()->access_code)
+                                            ->get();
                                     @endphp
                                 @endif
                                 @foreach ($menu as $menus)
@@ -332,6 +335,23 @@
             </div>
         </div>
     </main>
+    <section class="py-0 bg-light ">
+        <div>
+            <hr class="my-0 text-600 opacity-25" />
+            <div class="container py-3">
+                <div class="row justify-content-between fs--1">
+                    <div class="col-12 col-sm-auto text-center">
+                        <p class="mb-0 text-600 opacity-85">Thank you for creating with Innoventra <span
+                                class="d-none d-sm-inline-block">| </span><br class="d-sm-none" /> 2025 &copy; <a
+                                class="text-dark opacity-85" href="https://Innoventra.site">Innoventra</a></p>
+                    </div>
+                    <div class="col-12 col-sm-auto text-center">
+                        <p class="mb-0 text-600 opacity-85">v3.4.0</p>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
     <!-- ===============================================-->
     <!--    End of Main Content-->
     <!-- ===============================================-->
