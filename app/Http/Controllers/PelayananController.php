@@ -412,14 +412,15 @@ class PelayananController extends Controller
                 ->join('master_patient', 'master_patient.master_patient_code', '=', 'd_reg_order.d_reg_order_rm')
                 ->join('t_layanan_cat', 't_layanan_cat.t_layanan_cat_code', '=', 'd_reg_order.t_layanan_cat_code')
                 ->join('t_pasien_cat', 't_pasien_cat.t_pasien_cat_code', '=', 'd_reg_order.t_pasien_cat_code')
-                ->where('d_reg_order.d_reg_order_cabang',Auth::user()->access_cabang)
+                ->where('d_reg_order.d_reg_order_cabang', Auth::user()->access_cabang)
                 ->get();
             return view('application.pelayanan.list-pasien-registrasi', ['data' => $data, 'akses' => $akses, 'code' => $id]);
         } else {
             return Redirect::to('dashboard/home');
         }
     }
-    public function data_registrasi_history(Request $request){
+    public function data_registrasi_history(Request $request)
+    {
         return 123;
     }
     // VERIFIKASI DATA REGISTRASI
@@ -430,6 +431,7 @@ class PelayananController extends Controller
                 ->join('master_patient', 'master_patient.master_patient_code', '=', 'd_reg_order.d_reg_order_rm')
                 ->join('t_layanan_cat', 't_layanan_cat.t_layanan_cat_code', '=', 'd_reg_order.t_layanan_cat_code')
                 ->join('t_pasien_cat', 't_pasien_cat.t_pasien_cat_code', '=', 'd_reg_order.t_pasien_cat_code')
+                ->where('d_reg_order.d_reg_order_cabang', Auth::user()->access_cabang)
                 ->get();
             return view('application.pelayanan.menu-verifikasi-data-registrasi', ['data' => $data, 'akses' => $akses, 'code' => $id]);
         } else {
@@ -444,6 +446,7 @@ class PelayananController extends Controller
                 ->join('master_patient', 'master_patient.master_patient_code', '=', 'd_reg_order.d_reg_order_rm')
                 ->join('t_layanan_cat', 't_layanan_cat.t_layanan_cat_code', '=', 'd_reg_order.t_layanan_cat_code')
                 ->join('t_pasien_cat', 't_pasien_cat.t_pasien_cat_code', '=', 'd_reg_order.t_pasien_cat_code')
+                ->where('d_reg_order.d_reg_order_cabang', Auth::user()->access_cabang)
                 ->get();
             $kategori = DB::table('t_pasien_cat')->get();
             $layanan = DB::table('t_layanan_cat')->get();
@@ -465,6 +468,7 @@ class PelayananController extends Controller
                 ->join('master_patient', 'master_patient.master_patient_code', '=', 'd_reg_order.d_reg_order_rm')
                 ->join('t_layanan_cat', 't_layanan_cat.t_layanan_cat_code', '=', 'd_reg_order.t_layanan_cat_code')
                 ->join('t_pasien_cat', 't_pasien_cat.t_pasien_cat_code', '=', 'd_reg_order.t_pasien_cat_code')
+                ->where('d_reg_order.d_reg_order_cabang', Auth::user()->access_cabang)
                 ->where('d_reg_order.t_pasien_cat_code', $request->kategori)->get();
             // return $data;
             return view('application.pelayanan.menu-supervisior.data-pencarian-pasien', ['data' => $data]);
