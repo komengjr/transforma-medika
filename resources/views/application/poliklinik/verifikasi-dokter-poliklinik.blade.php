@@ -13,7 +13,7 @@
                     <img class="ms-3 mx-3" src="{{ asset('img/verif.png') }}" alt="" width="80" />
                     <div>
                         <h6 class="text-warning fs--1 mb-0 pt-2">Welcome to </h6>
-                        <h4 class="text-warning fw-bold mb-1">Trans <span class="text-warning fw-medium">Management
+                        <h4 class="text-warning fw-bold mb-1">{{ Env('APP_LABEL')}} <span class="text-warning fw-medium">Management
                                 System</span></h4>
                     </div>
                     <img class="ms-n4 d-none d-lg-block "
@@ -21,7 +21,7 @@
                 </div>
                 <div class="col-xl-auto px-3 py-2">
                     <h6 class="text-warning fs--1 mb-0">Menu : </h6>
-                    <h4 class="text-warning fw-bold mb-0">Poliklinik <span class="text-warning fw-medium">Verifikasi</span>
+                    <h4 class="text-warning fw-bold mb-0">Poli <span class="text-warning fw-medium">Verifikasi</span>
                     </h4>
                 </div>
             </div>

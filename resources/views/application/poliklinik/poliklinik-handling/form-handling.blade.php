@@ -8,8 +8,13 @@
                 <div class="col-md-2 d-flex justify-content-center">
                     <div class="avatar avatar-5lg shadow-sm justify-content-center">
                         <div class="h-100 w-100 overflow-hidden ">
-                            <img src="{{ asset($data->master_patient_profile) }}" class="img-thumbnail " alt=""
-                                id="videoPreview" data-dz-thumbnail="data-dz-thumbnail">
+                            @if ($data->master_patient_profile == "")
+                                <img src="{{ asset('img/pasien.png') }}" class="img-thumbnail " alt=""
+                                    id="videoPreview" data-dz-thumbnail="data-dz-thumbnail">
+                            @else
+                                <img src="{{ Storage::url($data->master_patient_profile) }}" class="img-thumbnail " alt=""
+                                    id="videoPreview" data-dz-thumbnail="data-dz-thumbnail">
+                            @endif
                         </div>
 
                     </div>
@@ -53,9 +58,8 @@
                     <label for="inputLastName1" class="form-label text-youtube">Tanggal
                         Lahir</label>
                     <div class="input-group"> <span class="input-group-text"><i class="fas fa-calendar-day"></i></span>
-                        <input type="date" name="tgl_lahir"
-                            class="form-control form-control-lg bg-white border-start-0" id="tgl_lahir"
-                            value="{{ $data->master_patient_tgl_lahir }}" disabled>
+                        <input type="date" name="tgl_lahir" class="form-control form-control-lg bg-white border-start-0"
+                            id="tgl_lahir" value="{{ $data->master_patient_tgl_lahir }}" disabled>
                     </div>
                 </div>
                 <div class="col-md-4">
@@ -63,7 +67,7 @@
                         Kelamin</label>
                     <div class="input-group"> <span class="input-group-text"><i
                                 class="fas fa-transgender fs-2"></i></span>
-                        <input type="text"class="form-control form-control-lg bg-white border-start-0" id="tgl_lahir"
+                        <input type="text" class="form-control form-control-lg bg-white border-start-0" id="tgl_lahir"
                             value="{{ $data->master_patient_jk }}" disabled>
                     </div>
                 </div>
@@ -79,7 +83,7 @@
                 <div class="col-md-4">
                     <label for="inputEmailAddress" class="form-label text-youtube">Agama</label>
                     <div class="input-group"> <span class="input-group-text"><i class="fas fa-pray fs-2"></i></span>
-                        <input type="text"class="form-control form-control-lg bg-white border-start-0"
+                        <input type="text" class="form-control form-control-lg bg-white border-start-0"
                             value="{{ $data->master_patient_agama }}" disabled>
                     </div>
 
@@ -88,17 +92,15 @@
                     <label for="inputLastName2" class="form-label text-youtube">No Handphone</label>
                     <div class="input-group"> <span class="input-group-text"><i
                                 class="fas fa-phone-square-alt"></i></span>
-                        <input type="text" name="no_hp"
-                            class="form-control form-control-lg border-start-0 bg-white" id="no_hp"
-                            value="{{ $data->master_patient_no_hp }}" disabled>
+                        <input type="text" name="no_hp" class="form-control form-control-lg border-start-0 bg-white"
+                            id="no_hp" value="{{ $data->master_patient_no_hp }}" disabled>
                     </div>
                 </div>
                 <div class="col-md-4">
                     <label for="inputLastName2" class="form-label">Email</label>
                     <div class="input-group"> <span class="input-group-text"><i class="fas fa-mail-bulk"></i></span>
-                        <input type="email" name="email"
-                            class="form-control form-control-lg border-start-0 bg-white" id="inputLastName2"
-                            value="{{ $data->master_patient_email }}" disabled>
+                        <input type="email" name="email" class="form-control form-control-lg border-start-0 bg-white"
+                            id="inputLastName2" value="{{ $data->master_patient_email }}" disabled>
                     </div>
                 </div>
 
@@ -152,8 +154,9 @@
     </div>
     <div class="card-body bg-light">
         @foreach ($layanan as $lay)
-            <button class="btn btn-falcon-warning btn-sm me-2" type="button" id="button-order-layanan-dokter" data-code="{{$lay->t_layanan_cat_code}}" data-reg="{{$code}}"><span
-                    class="fab fa-squarespace"></span> {{ $lay->t_layanan_cat_name }}</button>
+            <button class="btn btn-falcon-warning btn-sm me-2" type="button" id="button-order-layanan-dokter"
+                data-code="{{$lay->t_layanan_cat_code}}" data-reg="{{$code}}"><span class="fab fa-squarespace"></span>
+                {{ $lay->t_layanan_cat_name }}</button>
         @endforeach
         <hr />
         <div id="menu-order-layanan-dokter">
