@@ -40,7 +40,7 @@
                                 <div class="avatar avatar-5xl shadow-sm img-thumbnail justify-content-center">
                                     <div class="h-100 w-100 overflow-hidden ">
                                         @if ($data->master_patient_profile == "")
-                                            <img src="{{ asset('img/pp.png') }}"
+                                            <img src="{{ asset('img/pasien.png') }}"
                                                 class="img-thumbnail shadow-sm" alt="" id="videoPreview"
                                                 data-dz-thumbnail="data-dz-thumbnail">
                                         @else

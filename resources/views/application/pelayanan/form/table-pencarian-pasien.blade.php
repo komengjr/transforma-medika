@@ -1,6 +1,6 @@
 <style>
     #button-pilih-data-pasien:hover {
-        color: rgb(222, 218, 12);
+        color: rgba(222, 15, 12, 1);
         cursor: pointer;
     }
 </style>
@@ -18,15 +18,15 @@
                 <th>No Handphone</th>
             </tr>
         </thead>
-        <tbody class="fs--2 list">
+        <tbody class="fs--1 list">
             @php
                 $no = 1;
             @endphp
             @foreach ($data as $datas)
-                <tr>
+                <tr id="button-pilih-data-pasien" data-code="{{ $datas->master_patient_code }}">
                     <td>
                         @if ($datas->master_patient_profile == "")
-                            <img class="h-60 w-60 overflow-hidden img-thumbnail shadow-sm" src="{{ asset('img/pp.png') }}"
+                            <img class="h-60 w-60 overflow-hidden img-thumbnail shadow-sm" src="{{ asset('img/pasien.png') }}"
                                 width="100" alt="">
                         @else
                             <img class="h-60 w-60 overflow-hidden img-thumbnail shadow-sm"
@@ -34,8 +34,7 @@
                         @endif
 
                     </td>
-                    <td><strong id="button-pilih-data-pasien"
-                            data-code="{{ $datas->master_patient_code }}">{{ $datas->master_patient_code }}</strong></td>
+                    <td><strong >{{ $datas->master_patient_code }}</strong></td>
                     <td>{{ $datas->master_patient_name }}</td>
                     <td>{{ $datas->master_patient_nik }}</td>
                     <td>

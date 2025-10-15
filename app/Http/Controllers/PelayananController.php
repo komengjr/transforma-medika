@@ -421,7 +421,7 @@ class PelayananController extends Controller
     }
     public function data_registrasi_history(Request $request)
     {
-        return 123;
+        return view('application.pelayanan.data-registrasi.form-data-registrasi-pasien');
     }
     // VERIFIKASI DATA REGISTRASI
     public function menu_pelayanan_verifikasi_registrasi($akses, $id)

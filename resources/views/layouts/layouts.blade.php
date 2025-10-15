@@ -374,7 +374,7 @@
                         <li class="nav-item dropdown"><a class="nav-link pe-0" id="navbarDropdownUser" href="#"
                                 role="button" data-bs-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
                                 <div class="avatar avatar-xl">
-                                    <img class="rounded-circle" src="{{ asset('asset/img/team/avatar.png') }}" alt="" />
+                                    <img class="rounded-circle" src="{{ asset('img/pp.png') }}" alt="" />
 
                                 </div>
                             </a>
