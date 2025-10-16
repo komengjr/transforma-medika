@@ -4,7 +4,7 @@
 <head>
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width,initial-scale=1">
-    <title>DICOM Viewer - {{ env('APP_NAME')}}</title>
+    <title>DICOM Viewer - Auto Load File</title>
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet">
 
     <!-- Cornerstone libraries -->
@@ -37,7 +37,6 @@
             border-radius: 8px;
             position: relative;
             overflow: hidden;
-            cursor: grab;
         }
 
         .toolbar {
@@ -67,19 +66,15 @@
 
 <body>
     <div class="container-fluid py-3">
-        <h3 class="text-center text-info fw-bold">🩻 DICOM Viewer - Auto Load + Zoom & Move</h3>
+        <h3 class="text-center text-info fw-bold">🩻 DICOM Viewer - Auto Load</h3>
 
         <div class="toolbar mt-3">
+            <button class="btn btn-sm btn-outline-light" onclick="setTool('Zoom')">Zoom</button>
+            <button class="btn btn-sm btn-outline-light" onclick="setTool('Pan')">Pan</button>
             <button class="btn btn-sm btn-outline-light" onclick="setTool('Wwwc')">Kontras Manual</button>
-            <button class="btn btn-sm btn-outline-light" onclick="setTool('Zoom')">Zoom Tool</button>
-            <button class="btn btn-sm btn-outline-light" onclick="setTool('Pan')">🖐️ Hand Move</button>
             <button class="btn btn-sm btn-outline-warning" onclick="autoWindow()">Auto Kontras</button>
-            <button class="btn btn-sm btn-outline-info" onclick="zoomIn()">🔍 Zoom In</button>
-            <button class="btn btn-sm btn-outline-info" onclick="zoomOut()">🔎 Zoom Out</button>
             <button class="btn btn-sm btn-outline-light" onclick="invertImage()">Invert</button>
             <button class="btn btn-sm btn-outline-danger" onclick="resetView()">Reset</button>
-            <button class="btn btn-sm btn-outline-success" onclick="exportPNG()">Export PNG</button>
-            <button class="btn btn-sm btn-outline-warning" onclick="printImage()">Print</button>
         </div>
 
         <div class="viewer-container">
@@ -98,44 +93,27 @@
 
         const tools = cornerstoneTools;
         tools.init();
-        // REGISTER & ACTIVATE TOOLS (recommended)
-        cornerstoneTools.addTool(cornerstoneTools.PanTool);
-        cornerstoneTools.addTool(cornerstoneTools.ZoomTool);
-        cornerstoneTools.addTool(cornerstoneTools.WwwcTool);
-
-        // Default: set Pan tool to left mouse button when user clicks Pan button
-        function setTool(name) {
-            if (!stack.imageIds.length) return alert("File belum dimuat!");
-            // name: 'Pan' | 'Zoom' | 'Wwwc'
-            if (name === 'Pan') {
-                cornerstoneTools.setToolActive('Pan', { mouseButtonMask: 1 }); // left mouse
-            } else if (name === 'Zoom') {
-                cornerstoneTools.setToolActive('Zoom', { mouseButtonMask: 1 });
-            } else if (name === 'Wwwc') {
-                cornerstoneTools.setToolActive('Wwwc', { mouseButtonMask: 1 });
-            }
-            // cursor visual
-            element.style.cursor = (name === 'Pan') ? 'grab' : 'default';
-        }
 
         const mouseToolPairs = {
-            Wwwc: tools.WwwcTool,
             Zoom: tools.ZoomTool,
-            Pan: tools.PanTool, // ini untuk hand tool (move)
+            Pan: tools.PanTool,
+            Wwwc: tools.WwwcTool
         };
 
-        let inverted = false;
+        let activeTool = null, inverted = false;
         let stack = { imageIds: [], currentImageIdIndex: 0 };
 
         // ========================
         // KONFIGURASI AUTO LOAD
         // ========================
-        // Ganti URL di bawah ini sesuai lokasi file DICOM kamu
+        // Ganti URL di bawah ini sesuai lokasi file DICOM kamu.
+        // Bisa juga daftar array untuk multi-slice:
         const dicomFiles = [
             '/digital/1.2.392.200036.9125.9.0.3827876910.17322556.1753351843',
             // '/digital/1.3.6.1.4.1.19179.2.1124211101284520.3.9845.2312',
             // '/digital/1.3.6.1.4.1.19179.2.1124211101284520.3.15866.2316'
         ];
+
         // ========================
 
         window.onload = function () {
@@ -185,7 +163,7 @@
             if (!stack.imageIds.length) return alert("File belum dimuat!");
             tools.addTool(mouseToolPairs[name]);
             tools.setToolActive(name, { mouseButtonMask: 1 });
-            element.style.cursor = name === "Pan" ? "grab" : "default";
+            activeTool = name;
         }
 
         function invertImage() {
@@ -203,6 +181,7 @@
             displaySlice(0);
         }
 
+        // === AUTO WINDOW LEVEL (Histogram-based) ===
         function autoWindow() {
             if (!stack.imageIds.length) return alert("File belum dimuat!");
             const imageId = stack.imageIds[stack.currentImageIdIndex];
@@ -220,101 +199,6 @@
                 vp.voi.windowWidth = width;
                 cornerstone.setViewport(element, vp);
             });
-        }
-
-        // === ZOOM IN / OUT ===
-        function zoomIn() {
-            const vp = cornerstone.getViewport(element);
-            vp.scale *= 1.2;
-            cornerstone.setViewport(element, vp);
-        }
-
-        function zoomOut() {
-            const vp = cornerstone.getViewport(element);
-            vp.scale /= 1.2;
-            cornerstone.setViewport(element, vp);
-        }
-        // FALLBACK MANUAL PAN (hand move) — reliable
-        let handMode = false;
-        let isHandDown = false;
-        let lastMouse = { x: 0, y: 0 };
-
-        function enableHandMode(enable) {
-            handMode = !!enable;
-            element.style.cursor = handMode ? 'grab' : 'default';
-        }
-
-        // update setTool to toggle handMode when Pan requested
-        function setTool(name) {
-            if (!stack.imageIds.length) return alert("File belum dimuat!");
-            if (name === 'Pan') {
-                // prefer cornerstoneTools if available
-                try {
-                    cornerstoneTools.setToolActive('Pan', { mouseButtonMask: 1 });
-                } catch (e) {
-                    // fallback to manual
-                }
-                enableHandMode(true);
-            } else {
-                enableHandMode(false);
-                // set other tools
-                try { cornerstoneTools.setToolActive(name, { mouseButtonMask: 1 }); } catch (e) { }
-            }
-        }
-
-        // mouse handlers for manual panning
-        element.addEventListener('mousedown', (evt) => {
-            if (!handMode) return;
-            isHandDown = true;
-            lastMouse.x = evt.clientX;
-            lastMouse.y = evt.clientY;
-            element.style.cursor = 'grabbing';
-            evt.preventDefault();
-        });
-        document.addEventListener('mouseup', (evt) => {
-            if (!isHandDown) return;
-            isHandDown = false;
-            element.style.cursor = handMode ? 'grab' : 'default';
-        });
-        document.addEventListener('mousemove', (evt) => {
-            if (!isHandDown) return;
-            const dx = evt.clientX - lastMouse.x;
-            const dy = evt.clientY - lastMouse.y;
-            lastMouse.x = evt.clientX;
-            lastMouse.y = evt.clientY;
-
-            // update cornerstone viewport translation (in image pixels)
-            const vp = cornerstone.getViewport(element);
-            // translation is in canvas pixels; divide by scale to keep consistent behaviour
-            vp.translation.x = (vp.translation.x || 0) + dx / (vp.scale || 1);
-            vp.translation.y = (vp.translation.y || 0) + dy / (vp.scale || 1);
-            cornerstone.setViewport(element, vp);
-            evt.preventDefault();
-        });
-        // FITUR EXPORT PNG
-        function exportPNG() {
-            const canvas = element.querySelector('canvas');
-            const link = document.createElement('a');
-            link.download = 'dicom-view.png';
-            link.href = canvas.toDataURL('image/png');
-            link.click();
-        }
-
-        // FITUR PRINT GAMBAR
-        function printImage() {
-            const canvas = element.querySelector('canvas');
-            const imgData = canvas.toDataURL('image/png');
-            const win = window.open('', '_blank');
-            win.document.write(`
-        <html>
-          <head><title>Print DICOM Image</title></head>
-          <body style="margin:0;display:flex;justify-content:center;align-items:center;background:black;">
-            <img src="${imgData}" style="max-width:100%;max-height:100vh;"/>
-            <script>window.print();<\/script>
-          </body>
-        </html>
-      `);
-            win.document.close();
         }
     </script>
 </body>

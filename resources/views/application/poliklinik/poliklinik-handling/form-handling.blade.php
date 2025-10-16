@@ -1,8 +1,4 @@
 <style>
-    body {
-        background-color: #f8fafc;
-    }
-
     .tooth {
         width: 70px;
         height: 100px;
@@ -13,8 +9,8 @@
 
     .crown {
         width: 60px;
-        height: 40px;
-        background: #ffffff;
+        height: 30px;
+        /* background: #ffffff; */
         border: 2px solid #dee2e6;
         border-radius: 10px 10px 0 0;
         margin: auto;
@@ -22,8 +18,8 @@
 
     .root {
         width: 20px;
-        height: 45px;
-        background: #ffffff;
+        height: 25px;
+        /* background: #ffffff; */
         border: 2px solid #dee2e6;
         border-radius: 0 0 10px 10px;
         margin: auto;
@@ -62,8 +58,11 @@
         top: -8px;
         left: 50%;
         transform: translateX(-50%);
-        font-size: 10px;
-        color: #6c757d;
+        font-size: 15px;
+        color: #0bff64ff;
+        background-color: #495057;
+        border-radius: 20px;
+        padding: 5px;
     }
 </style>
 <div class="card mb-3">
@@ -225,12 +224,12 @@
             <h2 class="text-center mb-3 fw-bold">🦷 Odontogram Diagnosa Detail</h2>
             <p class="text-center text-muted">Klik gigi untuk mengisi diagnosa dan catatan.</p>
 
-            <div class="text-center my-3 fw-semibold text-secondary">Rahang Atas</div>
+            <div class="text-center my-3 fw-semibold text-danger">Rahang Atas</div>
             <div class="d-flex flex-wrap justify-content-center" id="upperJaw"></div>
 
             <hr class="my-4">
 
-            <div class="text-center my-3 fw-semibold text-secondary">Rahang Bawah</div>
+            <div class="text-center my-3 fw-semibold text-danger">Rahang Bawah</div>
             <div class="d-flex flex-wrap justify-content-center" id="lowerJaw"></div>
 
             <div class="mt-4 d-flex flex-wrap gap-2 justify-content-center">
@@ -247,14 +246,15 @@
 
         <!-- Modal Diagnosa -->
         <div class="modal fade" id="diagnosisModal" tabindex="-1" aria-hidden="true">
-            <div class="modal-dialog modal-dialog-centered">
+            <div class="modal-dialog modal-dialog-centered modal-lg">
                 <div class="modal-content">
-                    <div class="modal-header bg-primary text-white">
+                    <div class="modal-header bg-300">
                         <h5 class="modal-title">Diagnosa Gigi <span id="toothNumber"></span></h5>
-                        <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal"></button>
+                        <button class="btn-close btn btn-circle d-flex flex-center transition-base"
+                            data-bs-dismiss="modal" aria-label="Close"></button>
                     </div>
                     <div class="modal-body">
-                        <div id="diagnosisList" class="form-check"></div>
+                        <div id="diagnosisList" class="row g-3"></div>
                         <label for="note" class="form-label mt-2">Catatan:</label>
                         <textarea id="note" class="form-control" placeholder="Tambahkan catatan khusus..."></textarea>
                     </div>
@@ -265,6 +265,7 @@
                 </div>
             </div>
         </div>
+
     </div>
 </div>
 <div class="card mb-3">
@@ -284,6 +285,9 @@
     </div>
 
 </div>
+@php
+    $ran = mt_rand(100, 999);
+@endphp
 <script>
     var upperNums = [18, 17, 16, 15, 14, 13, 12, 11, 21, 22, 23, 24, 25, 26, 27, 28];
     var lowerNums = [48, 47, 46, 45, 44, 43, 42, 41, 31, 32, 33, 34, 35, 36, 37, 38];
@@ -310,7 +314,6 @@
         t.onclick = () => openModal(num);
         return t;
     }
-
     function buildOdontogram() {
         var uj = document.getElementById("upperJaw");
         var lj = document.getElementById("lowerJaw");
@@ -323,13 +326,13 @@
     var diagList = document.getElementById("diagnosisList");
     var toothNumLabel = document.getElementById("toothNumber");
     var noteField = document.getElementById("note");
-    let currentTooth = null;
+    let currentTooth<?php echo $ran ?> = null;
 
     function openModal(num) {
-        currentTooth = num;
+        currentTooth<?php echo $ran ?> = num;
         toothNumLabel.textContent = num;
         diagList.innerHTML = diagnoses.map((d, i) => `
-        <div class="form-check">
+        <div class="col-md-4">
           <input class="form-check-input" type="checkbox" value="${d}" id="d${i}">
           <label class="form-check-label" for="d${i}">${d}</label>
         </div>
@@ -345,8 +348,8 @@
     document.getElementById("saveBtn").onclick = () => {
         var selected = [...diagList.querySelectorAll("input:checked")].map(i => i.value);
         var note = noteField.value.trim();
-        data[currentTooth] = { diagnosis: selected, note };
-        updateToothDisplay(currentTooth);
+        data[currentTooth<?php echo $ran ?>] = { diagnosis: selected, note };
+        updateToothDisplay(currentTooth<?php echo $ran ?>);
         modal.hide();
     };
 
@@ -373,7 +376,6 @@
     var reset = document.getElementById("resetBtn");
     var text = document.getElementById("exportArea");
 
-    exp.onclick = () => text.value = JSON.stringify(data, null, 2);
     imp.onclick = () => {
         try {
             var obj = JSON.parse(text.value);
@@ -391,4 +393,42 @@
             text.value = "";
         }
     };
+    $(document).on("click", "#exportBtn", function (e) {
+        e.preventDefault();
+        const swalWithBootstrapButtons = Swal.mixin({
+            customClass: {
+                confirmButton: "btn btn-success",
+                cancelButton: "btn btn-danger"
+            },
+            buttonsStyling: true
+        });
+        swalWithBootstrapButtons.fire({
+            title: "Are you sure?",
+            text: "You won't be able to revert this!",
+            icon: "warning",
+            showCancelButton: true,
+            confirmButtonText: "Yes, Verif it!",
+            cancelButtonText: "No, cancel!",
+            reverseButtons: true
+        }).then((result) => {
+            if (result.isConfirmed) {
+                swalWithBootstrapButtons.fire({
+                    title: "Success!",
+                    text: JSON.stringify(data, null, 2),
+                    icon: "success"
+                });
+            } else if (
+                /* Read more about handling dismissals below */
+                result.dismiss === Swal.DismissReason.cancel
+            ) {
+                swalWithBootstrapButtons.fire({
+                    title: "Cancelled",
+                    text: "Your Data file is safe :)",
+                    icon: "error"
+                });
+            }
+        });
+        // alert(JSON.stringify(data, null, 2))
+
+    });
 </script>

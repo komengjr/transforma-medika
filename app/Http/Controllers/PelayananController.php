@@ -144,7 +144,9 @@ class PelayananController extends Controller
     }
     public function registrasi_pasien_pilih_data_pasien_kebutuhan(Request $request)
     {
-        $layanan = DB::table('t_layanan_cat')->get();
+        $layanan = DB::table('t_layanan_cat')
+        ->join('t_layanan_cabang','t_layanan_cabang.t_layanan_cat_code','=','t_layanan_cat.t_layanan_cat_code')
+        ->where('access_cabang',Auth::user()->access_cabang)->get();
         return view('application.pelayanan.form.form-kebutuhan-pasien', ['code' => $request->code, 'layanan' => $layanan]);
     }
     public function registrasi_pasien_pilih_data_pasien_kebutuhan_pilih_layanan(Request $request)
