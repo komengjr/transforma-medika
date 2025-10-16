@@ -109,7 +109,7 @@
         // Ganti URL di bawah ini sesuai lokasi file DICOM kamu.
         // Bisa juga daftar array untuk multi-slice:
         const dicomFiles = [
-            '/digital/1.3.6.1.4.1.19179.2.1124211101284520.3.27348.2322',
+            '/digital/1.2.392.200036.9125.9.0.3827827802.218649148.1753351843',
             // '/digital/1.3.6.1.4.1.19179.2.1124211101284520.3.9845.2312',
             // '/digital/1.3.6.1.4.1.19179.2.1124211101284520.3.15866.2316'
         ];
