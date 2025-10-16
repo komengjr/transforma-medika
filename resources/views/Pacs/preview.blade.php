@@ -67,7 +67,7 @@
 
 <body>
     <div class="container-fluid py-3">
-        <h3 class="text-center text-info fw-bold">🩻 DICOM Viewer - Auto Load + Zoom & Move</h3>
+        <h3 class="text-center text-info fw-bold">🩻 DICOM Viewer - {{ env('APP_NAME')}}</h3>
 
         <div class="toolbar mt-3">
             <button class="btn btn-sm btn-outline-light" onclick="setTool('Wwwc')">Kontras Manual</button>
