@@ -90,6 +90,7 @@
     </div>
 
     <script>
+        document.getElementById('sliceLabel').innerHTML = '<div class="spinner-border m-3" style="display: block; margin-left: auto; margin-right: auto;" role="status"><span class="visually-hidden">Loading...</span></div>';
         cornerstoneWADOImageLoader.external.cornerstone = cornerstone;
         cornerstoneWADOImageLoader.configure({ useWebWorkers: true });
 
@@ -140,6 +141,7 @@
 
         window.onload = function () {
             loadDicomFiles(dicomFiles);
+
         };
 
         function loadDicomFiles(files) {
@@ -148,6 +150,7 @@
 
             Promise.all(stack.imageIds.map(id => cornerstone.loadAndCacheImage(id))).then(() => {
                 displaySlice(0);
+
             });
 
             element.addEventListener('wheel', evt => {
@@ -169,6 +172,7 @@
                 cornerstone.displayImage(element, image);
                 cornerstone.fitToWindow(element);
                 updateSliceLabel();
+
             });
         }
 
