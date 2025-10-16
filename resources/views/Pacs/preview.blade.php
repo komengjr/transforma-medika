@@ -70,8 +70,8 @@
         <h3 class="text-center text-info fw-bold">🩻 DICOM Viewer - {{ env('APP_NAME')}}</h3>
 
         <div class="toolbar mt-3">
-            <button class="btn btn-sm btn-outline-light" onclick="setTool('Wwwc')">Kontras Manual</button>
-            <button class="btn btn-sm btn-outline-light" onclick="setTool('Zoom')">Zoom Tool</button>
+            <button class="btn btn-sm btn-outline-light d-none" onclick="setTool('Wwwc')">Kontras Manual</button>
+            <button class="btn btn-sm btn-outline-light d-none" onclick="setTool('Zoom')">Zoom Tool</button>
             <button class="btn btn-sm btn-outline-light" onclick="setTool('Pan')">🖐️ Hand Move</button>
             <button class="btn btn-sm btn-outline-warning" onclick="autoWindow()">Auto Kontras</button>
             <button class="btn btn-sm btn-outline-info" onclick="zoomIn()">🔍 Zoom In</button>
