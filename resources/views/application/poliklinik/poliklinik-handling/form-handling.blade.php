@@ -1,3 +1,71 @@
+<style>
+    body {
+        background-color: #f8fafc;
+    }
+
+    .tooth {
+        width: 70px;
+        height: 100px;
+        position: relative;
+        cursor: pointer;
+        margin: 4px;
+    }
+
+    .crown {
+        width: 60px;
+        height: 40px;
+        background: #ffffff;
+        border: 2px solid #dee2e6;
+        border-radius: 10px 10px 0 0;
+        margin: auto;
+    }
+
+    .root {
+        width: 20px;
+        height: 45px;
+        background: #ffffff;
+        border: 2px solid #dee2e6;
+        border-radius: 0 0 10px 10px;
+        margin: auto;
+        margin-top: -1px;
+    }
+
+    .tooth[data-status="karies"] .crown {
+        background: #ffe6e6;
+        border-color: #ff7a7a;
+    }
+
+    .tooth[data-status="tambalan"] .crown {
+        background: #e6fff0;
+        border-color: #31cf94;
+    }
+
+    .tooth[data-status="hilang"] .crown {
+        background: #e2e8f0;
+        border-color: #94a3b8;
+    }
+
+    .tooth[data-status="lainnya"] .crown {
+        background: #fffce6;
+        border-color: #facc15;
+    }
+
+    .tooth .label {
+        font-size: 11px;
+        text-align: center;
+        color: #495057;
+        margin-top: 2px;
+    }
+
+    .tooth .num {
+        position: absolute;
+        top: -8px;
+        left: 50%;
+        transform: translateX(-50%);
+        font-size: 10px;
+        color: #6c757d;
+    }
+</style>
 <div class="card mb-3">
     <div class="card-header bg-300">
         <h5 class="mb-0">Pasien Details</h5>
@@ -9,8 +77,8 @@
                     <div class="avatar avatar-5lg shadow-sm justify-content-center">
                         <div class="h-100 w-100 overflow-hidden ">
                             @if ($data->master_patient_profile == "")
-                                <img src="{{ asset('img/pasien.png') }}" class="img-thumbnail " alt=""
-                                    id="videoPreview" data-dz-thumbnail="data-dz-thumbnail">
+                                <img src="{{ asset('img/pasien.png') }}" class="img-thumbnail " alt="" id="videoPreview"
+                                    data-dz-thumbnail="data-dz-thumbnail">
                             @else
                                 <img src="{{ Storage::url($data->master_patient_profile) }}" class="img-thumbnail " alt=""
                                     id="videoPreview" data-dz-thumbnail="data-dz-thumbnail">
@@ -110,7 +178,7 @@
 </div>
 <div class="card mb-3">
     <div class="card-header bg-300">
-        <h5 class="mb-0">Custom Fields</h5>
+        <h5 class="mb-0">Diagnosa Pasien</h5>
     </div>
     <div class="card-body bg-light">
         <div class="position-relative rounded-1 border bg-white dark__bg-1100 p-3">
@@ -150,6 +218,57 @@
 </div>
 <div class="card mb-3">
     <div class="card-header bg-300">
+        <h5 class="mb-0">Odontogram Interaktif</h5>
+    </div>
+    <div class="card-body bg-light">
+        <div class="container py-4">
+            <h2 class="text-center mb-3 fw-bold">🦷 Odontogram Diagnosa Detail</h2>
+            <p class="text-center text-muted">Klik gigi untuk mengisi diagnosa dan catatan.</p>
+
+            <div class="text-center my-3 fw-semibold text-secondary">Rahang Atas</div>
+            <div class="d-flex flex-wrap justify-content-center" id="upperJaw"></div>
+
+            <hr class="my-4">
+
+            <div class="text-center my-3 fw-semibold text-secondary">Rahang Bawah</div>
+            <div class="d-flex flex-wrap justify-content-center" id="lowerJaw"></div>
+
+            <div class="mt-4 d-flex flex-wrap gap-2 justify-content-center">
+                <button class="btn btn-teal btn-sm btn-primary" id="exportBtn">Ekspor JSON</button>
+                <button class="btn btn-outline-primary btn-sm" id="importBtn">Impor JSON</button>
+                <button class="btn btn-outline-danger btn-sm" id="resetBtn">Reset</button>
+            </div>
+
+            <div class="mt-3">
+                <textarea id="exportArea" class="form-control" rows="5"
+                    placeholder="Hasil ekspor / tempel JSON di sini..."></textarea>
+            </div>
+        </div>
+
+        <!-- Modal Diagnosa -->
+        <div class="modal fade" id="diagnosisModal" tabindex="-1" aria-hidden="true">
+            <div class="modal-dialog modal-dialog-centered">
+                <div class="modal-content">
+                    <div class="modal-header bg-primary text-white">
+                        <h5 class="modal-title">Diagnosa Gigi <span id="toothNumber"></span></h5>
+                        <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal"></button>
+                    </div>
+                    <div class="modal-body">
+                        <div id="diagnosisList" class="form-check"></div>
+                        <label for="note" class="form-label mt-2">Catatan:</label>
+                        <textarea id="note" class="form-control" placeholder="Tambahkan catatan khusus..."></textarea>
+                    </div>
+                    <div class="modal-footer">
+                        <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Batal</button>
+                        <button type="button" class="btn btn-primary" id="saveBtn">Simpan</button>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+<div class="card mb-3">
+    <div class="card-header bg-300">
         <h5 class="mb-0">Fasilitas Order</h5>
     </div>
     <div class="card-body bg-light">
@@ -165,3 +284,111 @@
     </div>
 
 </div>
+<script>
+    var upperNums = [18, 17, 16, 15, 14, 13, 12, 11, 21, 22, 23, 24, 25, 26, 27, 28];
+    var lowerNums = [48, 47, 46, 45, 44, 43, 42, 41, 31, 32, 33, 34, 35, 36, 37, 38];
+    var diagnoses = [
+        "Karies superfisialis", "Karies media", "Karies profunda", "Pulpitis",
+        "Abses periapikal", "Tambalan baik", "Tambalan bocor", "Kalkulus",
+        "Gingivitis", "Periodontitis", "Gigi hilang", "Gigi goyah",
+        "Gigi impaksi", "Gigi fraktur", "Gigi erupsi parsial",
+        "Crown / bridge", "Protesa", "Lainnya"
+    ];
+    var data = {};
+
+    function makeTooth(num) {
+        var t = document.createElement("div");
+        t.className = "tooth";
+        t.dataset.num = num;
+        t.dataset.status = "sehat";
+        t.innerHTML = `
+        <div class="num">${num}</div>
+        <div class="crown"></div>
+        <div class="root"></div>
+        <div class="label">Sehat</div>
+      `;
+        t.onclick = () => openModal(num);
+        return t;
+    }
+
+    function buildOdontogram() {
+        var uj = document.getElementById("upperJaw");
+        var lj = document.getElementById("lowerJaw");
+        upperNums.forEach(n => uj.appendChild(makeTooth(n)));
+        lowerNums.forEach(n => lj.appendChild(makeTooth(n)));
+    }
+    buildOdontogram();
+
+    var modal = new bootstrap.Modal(document.getElementById('diagnosisModal'));
+    var diagList = document.getElementById("diagnosisList");
+    var toothNumLabel = document.getElementById("toothNumber");
+    var noteField = document.getElementById("note");
+    let currentTooth = null;
+
+    function openModal(num) {
+        currentTooth = num;
+        toothNumLabel.textContent = num;
+        diagList.innerHTML = diagnoses.map((d, i) => `
+        <div class="form-check">
+          <input class="form-check-input" type="checkbox" value="${d}" id="d${i}">
+          <label class="form-check-label" for="d${i}">${d}</label>
+        </div>
+      `).join("");
+        var existing = data[num] || { diagnosis: [], note: "" };
+        [...diagList.querySelectorAll("input")].forEach(i => {
+            if (existing.diagnosis.includes(i.value)) i.checked = true;
+        });
+        noteField.value = existing.note;
+        modal.show();
+    }
+
+    document.getElementById("saveBtn").onclick = () => {
+        var selected = [...diagList.querySelectorAll("input:checked")].map(i => i.value);
+        var note = noteField.value.trim();
+        data[currentTooth] = { diagnosis: selected, note };
+        updateToothDisplay(currentTooth);
+        modal.hide();
+    };
+
+    function updateToothDisplay(num) {
+        var el = document.querySelector(`.tooth[data-num='${num}']`);
+        if (!el) return;
+        var info = data[num];
+        if (!info || info.diagnosis.length === 0) {
+            el.dataset.status = "sehat";
+            el.querySelector(".label").textContent = "Sehat";
+            return;
+        }
+        let status = "lainnya";
+        if (info.diagnosis.some(d => d.toLowerCase().includes("karies"))) status = "karies";
+        else if (info.diagnosis.some(d => d.toLowerCase().includes("tambalan"))) status = "tambalan";
+        else if (info.diagnosis.some(d => d.toLowerCase().includes("hilang"))) status = "hilang";
+        el.dataset.status = status;
+        el.querySelector(".label").textContent = info.diagnosis[0];
+    }
+
+    // Export / Import / Reset
+    var exp = document.getElementById("exportBtn");
+    var imp = document.getElementById("importBtn");
+    var reset = document.getElementById("resetBtn");
+    var text = document.getElementById("exportArea");
+
+    exp.onclick = () => text.value = JSON.stringify(data, null, 2);
+    imp.onclick = () => {
+        try {
+            var obj = JSON.parse(text.value);
+            for (var k in obj) { data[k] = obj[k]; updateToothDisplay(k); }
+            alert("Data diimpor!");
+        } catch (e) { alert("Format JSON salah."); }
+    };
+    reset.onclick = () => {
+        if (confirm("Yakin ingin reset semua data?")) {
+            for (var k in data) delete data[k];
+            document.querySelectorAll(".tooth").forEach(el => {
+                el.dataset.status = "sehat";
+                el.querySelector(".label").textContent = "Sehat";
+            });
+            text.value = "";
+        }
+    };
+</script>

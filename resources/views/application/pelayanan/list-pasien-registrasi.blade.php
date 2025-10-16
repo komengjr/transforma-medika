@@ -22,7 +22,7 @@
                     </div>
                     <div class="col-xl-auto px-3 py-2">
                         <h6 class="text-info fs--1 mb-0">Menu : </h6>
-                        <h4 class="text-info fw-bold mb-0">Data <span class="text-info fw-medium">Registrasi</span>
+                        <h4 class="text-info fw-bold mb-0">Data <span class="text-info fw-medium">List Pasien</span>
                         </h4>
                     </div>
                 </div>

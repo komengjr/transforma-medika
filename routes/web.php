@@ -15,6 +15,7 @@ use App\Http\Controllers\Logsitik\LogistikController;
 use App\Http\Controllers\MasterController;
 use App\Http\Controllers\MasterDataController;
 use App\Http\Controllers\Medic\MasterMedController;
+use App\Http\Controllers\PacsController;
 use App\Http\Controllers\PageController;
 use App\Http\Controllers\PelayananController;
 use App\Http\Controllers\Pembelian\PurchaseController;
@@ -512,4 +513,7 @@ Route::prefix('app/')->group(function (): void {
     Route::post('supplier/r_token/simpan-order', [PublicController::class, 'app_supp_simpan_order'])->name('app_supp_simpan_order');
     Route::post('supplier/r_token/user_token_last', [PublicController::class, 'app_supp_user_token_last'])->name('app_supp_user_token_last');
     Route::get('testpdf', [PublicController::class, 'app_testpdf'])->name('app_testpdf');
+});
+Route::prefix('pacs')->group(function (): void {
+    Route::get('data/{id}', [PacsController::class, 'pacs_preview'])->name('pacs_preview');
 });

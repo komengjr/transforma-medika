@@ -8,8 +8,13 @@
             <div class="col-md-2 d-flex justify-content-center">
                 <div class="avatar avatar-5xl shadow-sm img-thumbnail justify-content-center">
                     <div class="h-100 w-100 overflow-hidden">
-                        <img src="{{ asset($data->master_patient_profile) }}" width="200" alt=""
-                            id="videoPreview" data-dz-thumbnail="data-dz-thumbnail">
+                        @if ($data->master_patient_profile == "")
+                            <img src="{{ asset('img/pasien.png') }}" class="img-thumbnail " alt="" id="videoPreview"
+                                data-dz-thumbnail="data-dz-thumbnail">
+                        @else
+                            <img src="{{ Storage::url($data->master_patient_profile) }}" class="img-thumbnail " alt=""
+                                id="videoPreview" data-dz-thumbnail="data-dz-thumbnail">
+                        @endif
                     </div>
 
                 </div>
@@ -21,8 +26,7 @@
                         <label for="inputLastName1" class="form-label text-primary">Nama Lengkap</label>
                         <div class="input-group"> <span class="input-group-text"><i
                                     class="fas fa-user-friends"></i></span>
-                            <input type="text" name="nama"
-                                class="form-control form-control-lg border-start-0 bg-white"
+                            <input type="text" name="nama" class="form-control form-control-lg border-start-0 bg-white"
                                 value="{{ $data->master_patient_name }}" disabled>
                         </div>
                     </div>
@@ -30,9 +34,8 @@
                         <label for="inputLastName1" class="form-label text-youtube">NIK</label>
                         <div class="input-group"> <span class="input-group-text"><i
                                     class="fas fa-money-check"></i></span>
-                            <input type="text" name="nik"
-                                class="form-control form-control-lg border-start-0 bg-white" id="nik"
-                                value="{{ $data->master_patient_nik }}" disabled>
+                            <input type="text" name="nik" class="form-control form-control-lg border-start-0 bg-white"
+                                id="nik" value="{{ $data->master_patient_nik }}" disabled>
                         </div>
                     </div>
                     <div class="col-md-5">
@@ -40,11 +43,9 @@
                             Medis</label>
                         <div class="input-group"> <span class="input-group-text"><i
                                     class="fas fa-money-check"></i></span>
-                            <input type="text" name="nik"
-                                class="form-control form-control-lg border-start-0 bg-white" id="nik"
-                                value="{{ $data->master_patient_code }}" disabled>
-                            <input type="text" name="no_rm" id="no_rm" value="{{ $data->master_patient_code }}"
-                                hidden>
+                            <input type="text" name="nik" class="form-control form-control-lg border-start-0 bg-white"
+                                id="nik" value="{{ $data->master_patient_code }}" disabled>
+                            <input type="text" name="no_rm" id="no_rm" value="{{ $data->master_patient_code }}" hidden>
                         </div>
                     </div>
                     <div class="col-md-3">
@@ -132,8 +133,7 @@
                                         <span class="fw-medium font-sans-serif text-warning">Suhu Badan</span></button>
                                 </div>
                                 <div class="bg-light collapse show" id="collapseFaqAccordion2"
-                                    aria-labelledby="faqAccordionHeading2" data-parent="#accordionFaq"
-                                    style="">
+                                    aria-labelledby="faqAccordionHeading2" data-parent="#accordionFaq" style="">
                                     <div class="card-body">
                                         <p class="ps-4 mb-0">You can issue either partial or full refunds. There are no
                                             fees to refund a charge, but the fees from the original charge are not
@@ -149,11 +149,11 @@
                                         data-bs-toggle="collapse" data-bs-target="#collapseFaqAccordion2"
                                         aria-expanded="false" aria-controls="collapseFaqAccordion2">
                                         <span class="far fa-dot-circle me-3"></span>
-                                        <span class="fw-medium font-sans-serif text-warning">Keluhan Saat Ini</span></button>
+                                        <span class="fw-medium font-sans-serif text-warning">Keluhan Saat
+                                            Ini</span></button>
                                 </div>
                                 <div class="bg-light collapse show" id="collapseFaqAccordion2"
-                                    aria-labelledby="faqAccordionHeading2" data-parent="#accordionFaq"
-                                    style="">
+                                    aria-labelledby="faqAccordionHeading2" data-parent="#accordionFaq" style="">
                                     <div class="card-body">
                                         <textarea name="" class="form-control" id=""></textarea>
                                     </div>
@@ -166,7 +166,8 @@
             </div>
             <div class="col-12">
                 <span id="menu-handling-pasien-poliklinik">
-                    <button class="btn btn-warning float-end" id="button-handling-pasien-poliklinik" data-code="{{$code}}">Proses
+                    <button class="btn btn-warning float-end" id="button-handling-pasien-poliklinik"
+                        data-code="{{$code}}">Proses
                         Handling</button>
                 </span>
             </div>

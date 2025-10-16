@@ -16,10 +16,11 @@
             <div class="card bg-200 shadow border border-warning">
                 <div class="row gx-0 flex-between-center">
                     <div class="col-sm-auto d-flex align-items-center border-bottom">
-                        <img class="ms-3 mx-3" src="{{ asset('img/poli.png') }}" alt="" width="80" />
+                        <img class="ms-3 mx-3" src="{{ asset('img/gigi.png') }}" alt="" width="60" />
                         <div>
                             <h6 class="text-warning fs--1 mb-0 pt-2">Welcome to </h6>
-                            <h4 class="text-warning fw-bold mb-1">{{ Env('APP_LABEL')}} <span class="text-warning fw-medium">Management
+                            <h4 class="text-warning fw-bold mb-1">{{ Env('APP_LABEL')}} <span
+                                    class="text-warning fw-medium">Management
                                     System</span></h4>
                         </div>
                         <img class="ms-n4 d-none d-lg-block "
@@ -27,8 +28,7 @@
                     </div>
                     <div class="col-xl-auto px-3 py-2">
                         <h6 class="text-warning fs--1 mb-0">Menu : </h6>
-                        <h4 class="text-warning fw-bold mb-0">Poli <span
-                                class="text-warning fw-medium">Handling</span>
+                        <h4 class="text-warning fw-bold mb-0">Poli <span class="text-warning fw-medium">Handling</span>
                         </h4>
                     </div>
                 </div>
@@ -44,10 +44,9 @@
                     </div>
                     <div class="card-body bg-light">
                         <div class="col-12 mb-2">
-                            <div class="input-group"> <span class="input-group-text"><i
-                                        class="fas fa-qrcode"></i></span>
-                                <input type="text" name="nik"
-                                    class="form-control form-control-lg border-start-0 bg-white" id="nik" placeholder="Scan Disini">
+                            <div class="input-group"> <span class="input-group-text"><i class="fas fa-qrcode"></i></span>
+                                <input type="text" name="nik" class="form-control form-control-lg border-start-0 bg-white"
+                                    id="nik" placeholder="Scan Disini">
                             </div>
                         </div>
                         @foreach ($data as $datas)
@@ -58,7 +57,8 @@
                                         <div class="card-title my-0">{{ $datas->master_patient_name }}</div>
                                         <p class="card-text">No. reg : <strong
                                                 class="text-primary">{{ $datas->d_reg_order_code }}</strong>, Menuju Poli
-                                            <strong class="text-dark">{{ $datas->t_layanan_data_name }}</strong> dengan dokter Spesialis
+                                            <strong class="text-dark">{{ $datas->t_layanan_data_name }}</strong> dengan dokter
+                                            Spesialis
                                             <strong class="text-dark">{{$datas->master_doctor_name}}</strong>
                                         </p>
                                     </div>
@@ -123,7 +123,7 @@
         });
     </script>
     <script>
-        $(document).on("click", "#button-handling-pasien-poli", function(e) {
+        $(document).on("click", "#button-handling-pasien-poli", function (e) {
             e.preventDefault();
             var code = $(this).data("code");
             $(".remove-class").removeClass("bg-warning");
@@ -140,13 +140,13 @@
                     "code": code
                 },
                 dataType: 'html',
-            }).done(function(data) {
+            }).done(function (data) {
                 $('#menu-detail-handling').html(data);
-            }).fail(function() {
+            }).fail(function () {
                 $('#menu-detail-handling').html('eror');
             });
         });
-        $(document).on("click", "#button-order-layanan-dokter", function(e) {
+        $(document).on("click", "#button-order-layanan-dokter", function (e) {
             e.preventDefault();
             var code = $(this).data("code");
             var reg = $(this).data("reg");
@@ -163,11 +163,12 @@
                     "reg": reg,
                 },
                 dataType: 'html',
-            }).done(function(data) {
+            }).done(function (data) {
                 $('#menu-order-layanan-dokter').html(data);
-            }).fail(function() {
+            }).fail(function () {
                 $('#menu-order-layanan-dokter').html('eror');
             });
         });
     </script>
+
 @endsection
