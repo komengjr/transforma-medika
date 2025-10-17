@@ -132,6 +132,7 @@ Route::prefix('{akses}/{id}/application')->group(function () {
     Route::get('menu-poliklinik/data-registrasi', [PoliklinikController::class, 'data_registrasi_poli'])->name('data_registrasi_poli');
     Route::get('menu-poliklinik/poliklinik-handling', [PoliklinikController::class, 'data_registrasi_poliklinik_handling'])->name('data_registrasi_poliklinik_handling');
     Route::get('verifikasi-poliklinik/verifikasi-dokter', [PoliklinikController::class, 'verifikasi_poliklinik_dokter'])->name('verifikasi_poliklinik_dokter');
+    Route::get('verifikasi-poliklinik/dokumentasi-hasil', [PoliklinikController::class, 'verifikasi_poliklinik_dokumentasi_hasil'])->name('verifikasi_poliklinik_dokumentasi_hasil');
     // LABORATORIUM
     Route::get('menu-laboratorium/data-registrasi', [LaboratoriumController::class, 'data_registrasi_lab'])->name('data_registrasi_lab');
     Route::get('menu-laboratorium/specimen-collection', [LaboratoriumController::class, 'data_specimen_collection_lab'])->name('data_specimen_collection_lab');

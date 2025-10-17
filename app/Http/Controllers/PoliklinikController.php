@@ -248,4 +248,25 @@ class PoliklinikController extends Controller
             return Redirect::to('dashboard/home');
         }
     }
+    // POLIKLINIK VERIFIKASI DOKTER
+    public function verifikasi_poliklinik_dokumentasi_hasil($akses, $id)
+    {
+        if ($this->url_akses_sub($akses, $id) == true) {
+            $data = DB::table('d_reg_order_poli')
+                ->join('d_reg_order', 'd_reg_order.d_reg_order_code', '=', 'd_reg_order_poli.d_reg_order_code')
+                ->join('master_patient', 'master_patient.master_patient_code', '=', 'd_reg_order.d_reg_order_rm')
+                ->join('m_doctor_poli', 'm_doctor_poli.m_doctor_poli_code', '=', 'd_reg_order_poli.m_doctor_poli_code')
+                ->join('t_layanan_data', 't_layanan_data.t_layanan_data_code', '=', 'm_doctor_poli.t_layanan_data_code')
+                ->join('master_doctor', 'master_doctor.master_doctor_code', '=', 'm_doctor_poli.master_doctor_code')
+                ->where('d_reg_order.d_reg_order_cabang', Auth::user()->access_cabang)
+                ->where('d_reg_order_poli.d_reg_order_poli_status', 3)->get();
+            return view('application.poliklinik.dokumntasi-hasil-poli', [
+                'akses' => $akses,
+                'code' => $id,
+                'data' => $data
+            ]);
+        } else {
+            return Redirect::to('dashboard/home');
+        }
+    }
 }
