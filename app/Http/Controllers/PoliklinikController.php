@@ -11,6 +11,7 @@ use Illuminate\Support\Str;
 use League\CommonMark\Extension\CommonMark\Node\Inline\Code;
 use Maatwebsite\Excel\Facades\Excel;
 use Session;
+use Svg\Tag\Rect;
 
 class PoliklinikController extends Controller
 {
@@ -56,7 +57,7 @@ class PoliklinikController extends Controller
                 ->join('master_patient', 'master_patient.master_patient_code', '=', 'd_reg_order.d_reg_order_rm')
                 ->join('t_layanan_data', 't_layanan_data.t_layanan_data_code', '=', 'm_doctor_poli.t_layanan_data_code')
                 ->join('master_doctor', 'master_doctor.master_doctor_code', '=', 'm_doctor_poli.master_doctor_code')
-                ->where('d_reg_order.d_reg_order_cabang',Auth::user()->access_cabang)
+                ->where('d_reg_order.d_reg_order_cabang', Auth::user()->access_cabang)
                 ->get();
             return view('application.poliklinik.data-registrasi-poliklinik', ['data' => $data, 'akses' => $akses, 'code' => $id]);
         } else {
@@ -89,7 +90,7 @@ class PoliklinikController extends Controller
                 ->join('m_doctor_poli', 'm_doctor_poli.m_doctor_poli_code', '=', 'd_reg_order_poli.m_doctor_poli_code')
                 ->join('t_layanan_data', 't_layanan_data.t_layanan_data_code', '=', 'm_doctor_poli.t_layanan_data_code')
                 ->join('master_doctor', 'master_doctor.master_doctor_code', '=', 'm_doctor_poli.master_doctor_code')
-                ->where('d_reg_order.d_reg_order_cabang',Auth::user()->access_cabang)
+                ->where('d_reg_order.d_reg_order_cabang', Auth::user()->access_cabang)
                 ->where('d_reg_order_poli.d_reg_order_poli_status', 1)->get();
             return view('application.poliklinik.poliklinik-handling', ['data' => $data, 'akses' => $akses, 'code' => $id]);
         } else {
@@ -154,11 +155,95 @@ class PoliklinikController extends Controller
         ]);
         return redirect()->back()->withSuccess('Great! Berhasil Menambahkan Data Order');
     }
+
+    public function data_registrasi_poliklinik_save_odontogram(Request $request)
+    {
+        $datas = $request->data;
+        $json = $request->data;
+
+        // Ubah JSON jadi array
+        $data = json_decode($json, true);
+
+        // Ambil semua key di level atas
+        $keys = array_keys($data);
+        if ($datas == '[]') {
+            return 0;
+        } else {
+            foreach ($data as $key => $value) {
+                $cek = DB::table('diag_poli_gigi_odon')->where('d_reg_order_poli_code', $request->id)->where('diag_poli_gigi_odon_no', $key)->first();
+                if ($cek) {
+                    DB::table('diag_poli_gigi_odon')->where('d_reg_order_poli_code', $request->id)->where('diag_poli_gigi_odon_no', $key)->update([
+                        'diag_poli_gigi_odon_val' => implode(", ", $value['diagnosis']),
+                        'diag_poli_gigi_odon_note' => $value['note'],
+                    ]);
+                } else {
+                    DB::table('diag_poli_gigi_odon')->insert([
+                        'diag_poli_gigi_odon_code' => str::uuid(),
+                        'd_reg_order_poli_code' => $request->id,
+                        'diag_poli_gigi_odon_no' => $key,
+                        'diag_poli_gigi_odon_val' => implode(", ", $value['diagnosis']),
+                        'diag_poli_gigi_odon_note' => $value['note'],
+                        'diag_poli_gigi_odon_status' => 0,
+                        'created_at' => now()
+                    ]);
+                }
+                // echo "Key: $key <br>";
+                // echo "Diagnosis: " . implode(", ", $value['diagnosis']) . "<br>";
+                // echo "Note: " . $value['note'] . "<br><br>";
+            }
+            return $datas;
+            # code...
+        }
+
+        // return $data['15']['diagnosis'][0];
+        // return $data['15']['note'];
+    }
+    public function data_registrasi_poliklinik_reset_odontogram(Request $request)
+    {
+        DB::table('diag_poli_gigi_odon')->where('d_reg_order_poli_code', $request->id)->delete();
+    }
+    public function data_registrasi_poliklinik_save_diagnosa(Request $request)
+    {
+        $cek = DB::table('diag_poli_gigi_umum')->where('d_reg_order_poli_code', $request->id)->where('diag_poli_gigi_umum_name', $request->name)->first();
+        if ($cek) {
+            return 0;
+        } else {
+            DB::table('diag_poli_gigi_umum')->insert([
+                'diag_poli_gigi_umum_code' => str::uuid(),
+                'd_reg_order_poli_code' => $request->id,
+                'diag_poli_gigi_umum_name' => $request->name,
+                'diag_poli_gigi_umum_desc' => $request->desc,
+                'created_at' => now()
+            ]);
+            return view('application.poliklinik.poliklinik-handling.table.data-diagnosa-umum');
+        }
+
+    }
+    public function data_registrasi_poliklinik_save_diagnosa_pasien_poli(Request $request)
+    {
+        DB::table('d_reg_order_poli')->where('d_reg_order_poli_code', $request->id)->update([
+            'd_reg_order_poli_status' => 2
+        ]);
+        return "done";
+    }
+
     // POLIKLINIK VERIFIKASI DOKTER
     public function verifikasi_poliklinik_dokter($akses, $id)
     {
         if ($this->url_akses_sub($akses, $id) == true) {
-            return view('application.poliklinik.verifikasi-dokter-poliklinik', ['akses' => $akses, 'code' => $id]);
+            $data = DB::table('d_reg_order_poli')
+                ->join('d_reg_order', 'd_reg_order.d_reg_order_code', '=', 'd_reg_order_poli.d_reg_order_code')
+                ->join('master_patient', 'master_patient.master_patient_code', '=', 'd_reg_order.d_reg_order_rm')
+                ->join('m_doctor_poli', 'm_doctor_poli.m_doctor_poli_code', '=', 'd_reg_order_poli.m_doctor_poli_code')
+                ->join('t_layanan_data', 't_layanan_data.t_layanan_data_code', '=', 'm_doctor_poli.t_layanan_data_code')
+                ->join('master_doctor', 'master_doctor.master_doctor_code', '=', 'm_doctor_poli.master_doctor_code')
+                ->where('d_reg_order.d_reg_order_cabang', Auth::user()->access_cabang)
+                ->where('d_reg_order_poli.d_reg_order_poli_status', 2)->get();
+            return view('application.poliklinik.verifikasi-dokter-poliklinik', [
+                'akses' => $akses,
+                'code' => $id,
+                'data' => $data
+            ]);
         } else {
             return Redirect::to('dashboard/home');
         }

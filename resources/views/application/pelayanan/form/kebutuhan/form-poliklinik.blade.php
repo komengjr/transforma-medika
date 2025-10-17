@@ -25,7 +25,7 @@
 </div>
 <div class="row">
     <div class="col-md-4">
-        <label for="inputLastName2" class="form-label text-success">Tanggal</label>
+        <label for="inputLastName2" class="form-label text-success">Tanggals</label>
         <div class="input-group"> <span class="input-group-text"><i class="far fa-calendar-alt"></i></span>
             <input type="date" name="tanggal_periksa" id="tanggal_periksa"
                 class="form-control form-control-lg border-start-0">

@@ -27,17 +27,17 @@
     }
 
     .tooth[data-status="karies"] .crown {
-        background: #ffe6e6;
+        background: #fa0303ff;
         border-color: #ff7a7a;
     }
 
     .tooth[data-status="tambalan"] .crown {
-        background: #e6fff0;
+        background: #ea04ffff;
         border-color: #31cf94;
     }
 
     .tooth[data-status="hilang"] .crown {
-        background: #e2e8f0;
+        background: #ffc907ff;
         border-color: #94a3b8;
     }
 
@@ -67,7 +67,14 @@
 </style>
 <div class="card mb-3">
     <div class="card-header bg-300">
-        <h5 class="mb-0">Pasien Details</h5>
+        <div class="row gx-0 flex-between-center">
+            <dic class="col-auto d-flex">
+                <h5 class="mb-0">Pasien Details</h5>
+            </dic>
+            <div class="col-auto" id="menu-pasien-poliklinik">
+                <button class="btn btn-warning btn-sm" id="button-save-data-diagnosa-pasien-poli">Skip / Simpan Data</button>
+            </div>
+        </div>
     </div>
     <div class="card-body bg-light">
         <form>
@@ -186,33 +193,23 @@
                         data-fa-transform="shrink-1"></span></button>
             </div>
             <div class="row gx-2">
-                <div class="col-sm-6 mb-3">
+                <div class="col-md-6 mb-3">
                     <label class="form-label" for="field-name">Name</label>
-                    <input class="form-control form-control-sm" id="field-name" type="text"
-                        placeholder="Name (e.g. T-shirt)" />
-                </div>
-                <div class="col-sm-6 mb-3">
-                    <label class="form-label" for="field-type">Type</label>
-                    <select class="form-select form-select-sm" id="field-type">
-                        <option>Select a type</option>
-                        <option>Text</option>
-                        <option>Checkboxes</option>
-                        <option>Radio Buttons</option>
-                        <option>Textarea</option>
-                        <option>Date</option>
-                        <option>Dropdowns</option>
-                        <option>File</option>
-                    </select>
-                </div>
-                <div class="col-12">
-                    <label class="form-label" for="field-options">Field Options</label>
-                    <textarea class="form-control form-control-sm" id="field-options" rows="3"></textarea>
+                    <input class="form-control form-control-sm" id="data-name" type="text"
+                        placeholder="Name (e.g. Bagian Kepala)" />
                     <div class="form-text fs--1 text-warning">* Separate your options with comma</div>
+                </div>
+
+                <div class="col-md-6">
+                    <label class="form-label" for="field-options">Deskripsi</label>
+                    <textarea class="form-control form-control-sm" id="data-desc" rows="3"></textarea>
+
                 </div>
             </div>
         </div>
-        <button class="btn btn-falcon-default btn-sm mt-2" type="submit"><span class="fas fa-plus fs--2 me-1"
-                data-fa-transform="up-1"></span>Add Item</button>
+        <button class="btn btn-falcon-default btn-sm mt-2" type="submit" id="button-simpan-data-diagnosa-umum"><span class="fas fa-plus fs--2 me-1"
+                data-fa-transform="up-1"></span>Add Diagnosa</button>
+        <div id="menu-diagnosa-umum"></div>
     </div>
 </div>
 <div class="card mb-3">
@@ -223,7 +220,7 @@
         <div class="container py-4">
             <h2 class="text-center mb-3 fw-bold">🦷 Odontogram Diagnosa Detail</h2>
             <p class="text-center text-muted">Klik gigi untuk mengisi diagnosa dan catatan.</p>
-
+            <input type="text" name="code_gigi" value="{{ $data->d_reg_order_poli_code }}" id="code_gigi" hidden>
             <div class="text-center my-3 fw-semibold text-danger">Rahang Atas</div>
             <div class="d-flex flex-wrap justify-content-center" id="upperJaw"></div>
 
@@ -233,12 +230,12 @@
             <div class="d-flex flex-wrap justify-content-center" id="lowerJaw"></div>
 
             <div class="mt-4 d-flex flex-wrap gap-2 justify-content-center">
-                <button class="btn btn-teal btn-sm btn-primary" id="exportBtn">Ekspor JSON</button>
-                <button class="btn btn-outline-primary btn-sm" id="importBtn">Impor JSON</button>
+                <button class="btn btn-teal btn-sm btn-primary" id="exportBtn">Simpan Diagnosa</button>
+                <button class="btn btn-outline-primary btn-sm d-none" id="importBtn">Impor JSON</button>
                 <button class="btn btn-outline-danger btn-sm" id="resetBtn">Reset</button>
             </div>
 
-            <div class="mt-3">
+            <div class="mt-3 d-none">
                 <textarea id="exportArea" class="form-control" rows="5"
                     placeholder="Hasil ekspor / tempel JSON di sini..."></textarea>
             </div>
@@ -268,7 +265,7 @@
 
     </div>
 </div>
-<div class="card mb-3">
+<!-- <div class="card mb-3">
     <div class="card-header bg-300">
         <h5 class="mb-0">Fasilitas Order</h5>
     </div>
@@ -284,7 +281,7 @@
         </div>
     </div>
 
-</div>
+</div> -->
 @php
     $ran = mt_rand(100, 999);
 @endphp
@@ -305,12 +302,10 @@
         t.className = "tooth";
         t.dataset.num = num;
         t.dataset.status = "sehat";
-        t.innerHTML = `
-        <div class="num">${num}</div>
+        t.innerHTML = `<div class="num">${num}</div>
         <div class="crown"></div>
         <div class="root"></div>
-        <div class="label">Sehat</div>
-      `;
+        <div class="label">Sehat</div>`;
         t.onclick = () => openModal(num);
         return t;
     }
@@ -385,16 +380,32 @@
     };
     reset.onclick = () => {
         if (confirm("Yakin ingin reset semua data?")) {
+            var id = document.getElementById('code_gigi').value;
             for (var k in data) delete data[k];
             document.querySelectorAll(".tooth").forEach(el => {
                 el.dataset.status = "sehat";
                 el.querySelector(".label").textContent = "Sehat";
             });
-            text.value = "";
+
+            $.ajax({
+                url: "{{ route('data_registrasi_poliklinik_reset_odontogram') }}",
+                type: "POST",
+                cache: false,
+                data: {
+                    "_token": "{{ csrf_token() }}",
+                    "id": id
+                },
+                dataType: 'html',
+            }).done(function (data) {
+                text.value = "";
+            }).fail(function () {
+                alert('error');
+            });
         }
     };
     $(document).on("click", "#exportBtn", function (e) {
         e.preventDefault();
+        var id = document.getElementById('code_gigi').value;
         const swalWithBootstrapButtons = Swal.mixin({
             customClass: {
                 confirmButton: "btn btn-success",
@@ -412,11 +423,38 @@
             reverseButtons: true
         }).then((result) => {
             if (result.isConfirmed) {
-                swalWithBootstrapButtons.fire({
-                    title: "Success!",
-                    text: JSON.stringify(data, null, 2),
-                    icon: "success"
+                $.ajax({
+                    url: "{{ route('data_registrasi_poliklinik_save_odontogram') }}",
+                    type: "POST",
+                    cache: false,
+                    data: {
+                        "_token": "{{ csrf_token() }}",
+                        "id": id,
+                        "data": JSON.stringify(data, null, 2),
+                    },
+                    dataType: 'html',
+                }).done(function (data) {
+                    if (data == 0) {
+                        swalWithBootstrapButtons.fire({
+                            title: "Kosong",
+                            text: "Data Masih Kosong :)",
+                            icon: "error"
+                        });
+                    } else {
+                        swalWithBootstrapButtons.fire({
+                            title: "Success!",
+                            text: data,
+                            icon: "success"
+                        });
+                    }
+                }).fail(function () {
+                    swalWithBootstrapButtons.fire({
+                        title: "Failed",
+                        text: "Your Data Failed :)",
+                        icon: "error"
+                    });
                 });
+
             } else if (
                 /* Read more about handling dismissals below */
                 result.dismiss === Swal.DismissReason.cancel

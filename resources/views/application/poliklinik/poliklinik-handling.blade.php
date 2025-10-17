@@ -171,6 +171,66 @@
                 $('#menu-order-layanan-dokter').html('eror');
             });
         });
+        $(document).on("click", "#button-simpan-data-diagnosa-umum", function (e) {
+            e.preventDefault();
+            var name = document.getElementById('data-name').value;
+            var desc = document.getElementById('data-desc').value;
+            var id = document.getElementById('code_gigi').value;
+            if (name == "" || desc == "") {
+                Swal.fire({
+                    icon: "error",
+                    title: "Oops...",
+                    text: "Something went wrong!",
+                    footer: '<a href="#">Why do I have this issue?</a>'
+                });
+            } else {
+                $('#menu-diagnosa-umum').html(
+                    '<div class="spinner-border my-3" style="display: block; margin-left: auto; margin-right: auto;" role="status"><span class="visually-hidden">Loading...</span></div>'
+                );
+                $.ajax({
+                    url: "{{ route('data_registrasi_poliklinik_save_diagnosa') }}",
+                    type: "POST",
+                    cache: false,
+                    data: {
+                        "_token": "{{ csrf_token() }}",
+                        "name": name,
+                        "desc": desc,
+                        "id": id,
+                    },
+                    dataType: 'html',
+                }).done(function (data) {
+                    document.getElementById('data-name').value = "";
+                    document.getElementById('data-desc').value = "";
+                    $('#menu-diagnosa-umum').html(data);
+                }).fail(function () {
+                    alert('eror');
+                });
+            }
+        });
+        $(document).on("click", "#button-save-data-diagnosa-pasien-poli", function (e) {
+            e.preventDefault();
+            var id = document.getElementById('code_gigi').value;
+
+            $('#menu-pasien-poliklinik').html(
+                '<div class="spinner-border my-3" style="display: block; margin-left: auto; margin-right: auto;" role="status"><span class="visually-hidden">Loading...</span></div>'
+            );
+            $.ajax({
+                url: "{{ route('data_registrasi_poliklinik_save_diagnosa_pasien_poli') }}",
+                type: "POST",
+                cache: false,
+                data: {
+                    "_token": "{{ csrf_token() }}",
+                    "id": id,
+                },
+                dataType: 'html',
+            }).done(function (data) {
+                $('#menu-pasien-poliklinik').html(data);
+                location.reload();
+            }).fail(function () {
+                alert('eror');
+            });
+
+        });
     </script>
 
 @endsection

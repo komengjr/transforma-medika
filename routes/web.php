@@ -249,6 +249,10 @@ Route::prefix('application')->group(function () {
     Route::post('menu-poliklinik/poliklinik-handling/detail', [PoliklinikController::class, 'data_registrasi_poliklinik_handling_detail'])->name('data_registrasi_poliklinik_handling_detail');
     Route::post('menu-poliklinik/poliklinik-handling/order-layanan', [PoliklinikController::class, 'data_registrasi_poliklinik_handling_order_layanan'])->name('data_registrasi_poliklinik_handling_order_layanan');
     Route::post('menu-poliklinik/poliklinik-handling/order-layanan/rad', [PoliklinikController::class, 'data_registrasi_poliklinik_handling_order_layanan_rad'])->name('data_registrasi_poliklinik_handling_order_layanan_rad');
+    Route::post('menu-poliklinik/poliklinik-handling/poli-gigi/save-odontogram', [PoliklinikController::class, 'data_registrasi_poliklinik_save_odontogram'])->name('data_registrasi_poliklinik_save_odontogram');
+    Route::post('menu-poliklinik/poliklinik-handling/poli-gigi/reset-odontogram', [PoliklinikController::class, 'data_registrasi_poliklinik_reset_odontogram'])->name('data_registrasi_poliklinik_reset_odontogram');
+    Route::post('menu-poliklinik/poliklinik-handling/poli-gigi/save-diagnosa', [PoliklinikController::class, 'data_registrasi_poliklinik_save_diagnosa'])->name('data_registrasi_poliklinik_save_diagnosa');
+    Route::post('menu-poliklinik/poliklinik-handling/poli-gigi/save-diagnosa-pasien-poli', [PoliklinikController::class, 'data_registrasi_poliklinik_save_diagnosa_pasien_poli'])->name('data_registrasi_poliklinik_save_diagnosa_pasien_poli');
 });
 // MENU RADIOLOGI
 Route::prefix('application')->group(function () {
