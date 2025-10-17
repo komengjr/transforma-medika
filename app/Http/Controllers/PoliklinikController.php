@@ -260,7 +260,7 @@ class PoliklinikController extends Controller
                 ->join('master_doctor', 'master_doctor.master_doctor_code', '=', 'm_doctor_poli.master_doctor_code')
                 ->where('d_reg_order.d_reg_order_cabang', Auth::user()->access_cabang)
                 ->where('d_reg_order_poli.d_reg_order_poli_status', 3)->get();
-            return view('application.poliklinik.dokumntasi-hasil-poli', [
+            return view('application.poliklinik.dokumentasi-hasil-poli', [
                 'akses' => $akses,
                 'code' => $id,
                 'data' => $data
