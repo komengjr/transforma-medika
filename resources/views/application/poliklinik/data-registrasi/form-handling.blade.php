@@ -122,7 +122,7 @@
                         <div class="accordion border-x border-top rounded" id="accordionFaq">
                             <form class="p-0 m-0" id="form-fisik-umum">
                                 @csrf
-                                <input type="text" name="no_registrasi" value="{{$code}}" id="">
+                                <input type="text" name="no_registrasi" value="{{$code}}" id="" hidden>
                                 <div class="card shadow-none border-bottom rounded-bottom-0">
                                     <div class="card-header p-0" id="faqAccordionHeading1">
                                         <button
