@@ -71,10 +71,44 @@ class PoliklinikController extends Controller
             ->join('master_patient', 'master_patient.master_patient_code', '=', 'd_reg_order.d_reg_order_rm')
             ->where('d_reg_order_poli.d_reg_order_poli_code', $request->code)
             ->first();
-        return view('application.poliklinik.data-registrasi.form-handling', ['data' => $data, 'code' => $request->code]);
+        $fisik = DB::table('diag_poli_fisik_umum')->where('diag_poli_fisik_type', 'text')->get();
+        $fisik1 = DB::table('diag_poli_fisik_umum')->where('diag_poli_fisik_type', 'textarea')->get();
+        return view('application.poliklinik.data-registrasi.form-handling', [
+            'data' => $data,
+            'code' => $request->code,
+            'fisik' => $fisik,
+            'fisik1' => $fisik1
+        ]);
     }
     public function data_registrasi_poli_handling_pasien(Request $request)
     {
+        $form = DB::table('diag_poli_fisik_umum')->get();
+        foreach ($form as $f) {
+            $data = $f->diag_poli_fisik_umum_code;
+            if ($request[$data] == "") {
+                # code...
+            } else {
+                $cek = DB::table('diag_poli_fisik_umum_d')
+                    ->where('diag_poli_fisik_umum_code', $f->diag_poli_fisik_umum_code)
+                    ->where('d_reg_order_poli_code', $request->no_registrasi)->first();
+                if ($cek) {
+                    $cek = DB::table('diag_poli_fisik_umum_d')
+                        ->where('diag_poli_fisik_umum_code', $f->diag_poli_fisik_umum_code)
+                        ->where('d_reg_order_poli_code', $request->no_registrasi)->update([
+                                'diag_poli_fisik_umum_d_val' => $request[$data],
+                                'updated_at' => now()
+                            ]);
+                } else {
+                    DB::table('diag_poli_fisik_umum_d')->insert([
+                        'diag_poli_fisik_umum_d_code' => str::uuid(),
+                        'diag_poli_fisik_umum_code' => $f->diag_poli_fisik_umum_code,
+                        'd_reg_order_poli_code' => $request->no_registrasi,
+                        'diag_poli_fisik_umum_d_val' => $request[$data],
+                        'created_at' => now()
+                    ]);
+                }
+            }
+        }
         DB::table('d_reg_order_poli')->where('d_reg_order_poli_code', $request->code)->update([
             'd_reg_order_poli_status' => 1
         ]);
@@ -247,6 +281,28 @@ class PoliklinikController extends Controller
         } else {
             return Redirect::to('dashboard/home');
         }
+    }
+    public function verifikasi_poliklinik_dokter_verify(Request $request)
+    {
+        $data = DB::table('d_reg_order_poli')
+            ->join('d_reg_order', 'd_reg_order.d_reg_order_code', '=', 'd_reg_order_poli.d_reg_order_code')
+            ->join('master_patient', 'master_patient.master_patient_code', '=', 'd_reg_order.d_reg_order_rm')
+            ->where('d_reg_order_poli.d_reg_order_poli_code', $request->code)
+            ->first();
+        $fisik = DB::table('diag_poli_fisik_umum')->where('diag_poli_fisik_type', 'text')->get();
+        $fisik1 = DB::table('diag_poli_fisik_umum')->where('diag_poli_fisik_type', 'textarea')->get();
+        return view('application.poliklinik.verifikasi-poli.form-verifikasi', [
+            'data' => $data,
+            'code' => $request->code,
+            'fisik' => $fisik,
+            'fisik1' => $fisik1
+        ]);
+    }
+    public function verifikasi_poliklinik_dokter_save_verify(Request $request)
+    {
+        DB::table('d_reg_order_poli')->where('d_reg_order_poli_code', $request->code)->update([
+            'd_reg_order_poli_status' => 3
+        ]);
     }
     // POLIKLINIK VERIFIKASI DOKTER
     public function verifikasi_poliklinik_dokumentasi_hasil($akses, $id)

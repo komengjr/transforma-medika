@@ -104,14 +104,14 @@
                                             class="fas fa-align-left me-1" data-fa-transform="shrink-3"></span>Option</button>
                                     <div class="dropdown-menu" aria-labelledby="btnGroupVerticalDrop2">
                                         <button class="dropdown-item text-warning" data-bs-toggle="modal"
-                                            data-bs-target="#modal-poliklinik" id="button-proses-handling"
+                                            data-bs-target="#modal-poliklinik" id="button-proses-verifikasi"
                                             data-code="{{ $datas->d_reg_order_poli_code }}"><span class="fas fa-dna"></span>
                                             Verifikasi Pasien Poli</button>
                                         <div class="dropdown-divider"></div>
                                         <!-- <button class="dropdown-item" data-bs-toggle="modal" data-bs-target="#modal-cabang"
-                                            id="button-data-barang-cabang" data-code="123"><span
-                                                class="far fa-folder-open"></span>
-                                            History</button> -->
+                                                            id="button-data-barang-cabang" data-code="123"><span
+                                                                class="far fa-folder-open"></span>
+                                                            History</button> -->
                                     </div>
                                 </div>
                             </td>
@@ -157,5 +157,49 @@
             responsive: true
         });
     </script>
-
+    <script>
+        $(document).on("click", "#button-proses-verifikasi", function (e) {
+            e.preventDefault();
+            var code = $(this).data("code");
+            $('#menu-poliklinik').html(
+                '<div class="spinner-border my-3" style="display: block; margin-left: auto; margin-right: auto;" role="status"><span class="visually-hidden">Loading...</span></div>'
+            );
+            $.ajax({
+                url: "{{ route('verifikasi_poliklinik_dokter_verify') }}",
+                type: "POST",
+                cache: false,
+                data: {
+                    "_token": "{{ csrf_token() }}",
+                    "code": code
+                },
+                dataType: 'html',
+            }).done(function (data) {
+                $('#menu-poliklinik').html(data);
+            }).fail(function () {
+                $('#menu-poliklinik').html('eror');
+            });
+        });
+        $(document).on("click", "#button-verifikasi-pasien-poli", function (e) {
+            e.preventDefault();
+            var code = $(this).data("code");
+            $('#menu-verifikasi-pasien-poli').html(
+                '<div class="spinner-border my-3" style="display: block; margin-left: auto; margin-right: auto;" role="status"><span class="visually-hidden">Loading...</span></div>'
+            );
+            $.ajax({
+                url: "{{ route('verifikasi_poliklinik_dokter_save_verify') }}",
+                type: "POST",
+                cache: false,
+                data: {
+                    "_token": "{{ csrf_token() }}",
+                    "code": code
+                },
+                dataType: 'html',
+            }).done(function (data) {
+                $('#menu-verifikasi-pasien-poli').html(data);
+                location.reload();
+            }).fail(function () {
+                $('#menu-verifikasi-pasien-poli').html('eror');
+            });
+        });
+    </script>
 @endsection

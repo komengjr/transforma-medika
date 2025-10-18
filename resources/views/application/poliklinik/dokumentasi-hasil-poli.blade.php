@@ -105,9 +105,9 @@
                                             class="fas fa-align-left me-1" data-fa-transform="shrink-3"></span>Option</button>
                                     <div class="dropdown-menu" aria-labelledby="btnGroupVerticalDrop2">
                                         <button class="dropdown-item text-warning" data-bs-toggle="modal"
-                                            data-bs-target="#modal-poliklinik" id="button-proses-handling"
+                                            data-bs-target="#modal-poliklinik" id="button-cetak-hasil"
                                             data-code="{{ $datas->d_reg_order_poli_code }}"><span class="fas fa-dna"></span>
-                                            Verifikasi Pasien Poli</button>
+                                            Cetak Hasil Pasien</button>
                                         <div class="dropdown-divider"></div>
                                         <!-- <button class="dropdown-item" data-bs-toggle="modal" data-bs-target="#modal-cabang"
                                                     id="button-data-barang-cabang" data-code="123"><span

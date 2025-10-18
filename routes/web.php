@@ -254,6 +254,9 @@ Route::prefix('application')->group(function () {
     Route::post('menu-poliklinik/poliklinik-handling/poli-gigi/reset-odontogram', [PoliklinikController::class, 'data_registrasi_poliklinik_reset_odontogram'])->name('data_registrasi_poliklinik_reset_odontogram');
     Route::post('menu-poliklinik/poliklinik-handling/poli-gigi/save-diagnosa', [PoliklinikController::class, 'data_registrasi_poliklinik_save_diagnosa'])->name('data_registrasi_poliklinik_save_diagnosa');
     Route::post('menu-poliklinik/poliklinik-handling/poli-gigi/save-diagnosa-pasien-poli', [PoliklinikController::class, 'data_registrasi_poliklinik_save_diagnosa_pasien_poli'])->name('data_registrasi_poliklinik_save_diagnosa_pasien_poli');
+
+    Route::post('verifikasi-poliklinik/verifikasi-dokter/verify', [PoliklinikController::class, 'verifikasi_poliklinik_dokter_verify'])->name('verifikasi_poliklinik_dokter_verify');
+    Route::post('verifikasi-poliklinik/verifikasi-dokter/save-verify', [PoliklinikController::class, 'verifikasi_poliklinik_dokter_save_verify'])->name('verifikasi_poliklinik_dokter_save_verify');
 });
 // MENU RADIOLOGI
 Route::prefix('application')->group(function () {

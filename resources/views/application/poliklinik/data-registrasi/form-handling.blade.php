@@ -120,31 +120,36 @@
                 <div class="card border">
                     <div class="card-body">
                         <div class="accordion border-x border-top rounded" id="accordionFaq">
-                            <div class="card shadow-none border-bottom rounded-bottom-0">
-                                <div class="card-header p-0" id="faqAccordionHeading1">
-                                    <button
-                                        class="accordion-button btn btn-link text-decoration-none d-block w-100 py-2 px-3 border-0 text-start"
-                                        data-bs-toggle="collapse" data-bs-target="#collapseFaqAccordion1"
-                                        aria-expanded="false" aria-controls="collapseFaqAccordion1">
-                                        <span class="far fa-dot-circle me-3"></span>
-                                        <span class="fw-medium font-sans-serif text-warning">Berat dan Tinggi
-                                            Badan</span></button>
-                                </div>
-                                <div class="bg-light collapse show" id="collapseFaqAccordion1"
-                                    aria-labelledby="faqAccordionHeading1" data-parent="#accordionFaq" style="">
-                                    <div class="card-body">
-                                        <div class="row">
-                                            <div class="col-md-4">
-                                                <label for="">Berat Badan</label>
-                                                <div class="input-group">
-                                                    <span class="input-group-text">
-                                                        <i class="fas fa-weight"></i>
-                                                    </span>
-                                                    <input type="text" name="tgl_lahir"
-                                                        class="form-control form-control-lg bg-white border-start-0">
-                                                </div>
-                                            </div>
-                                            <div class="col-md-4">
+                            <form class="p-0 m-0" id="form-fisik-umum">
+                                @csrf
+                                <input type="text" name="no_registrasi" value="{{$code}}" id="">
+                                <div class="card shadow-none border-bottom rounded-bottom-0">
+                                    <div class="card-header p-0" id="faqAccordionHeading1">
+                                        <button
+                                            class="accordion-button btn btn-link text-decoration-none d-block w-100 py-2 px-3 border-0 text-start"
+                                            data-bs-toggle="collapse" data-bs-target="#collapseFaqAccordion1"
+                                            aria-expanded="false" aria-controls="collapseFaqAccordion1">
+                                            <span class="far fa-dot-circle me-3"></span>
+                                            <span class="fw-medium font-sans-serif text-warning">Fisik
+                                                Umum</span></button>
+                                    </div>
+                                    <div class="bg-light collapse show" id="collapseFaqAccordion1"
+                                        aria-labelledby="faqAccordionHeading1" data-parent="#accordionFaq">
+                                        <div class="card-body">
+                                            <div class="row">
+                                                @foreach ($fisik as $f)
+                                                    <div class="col-md-4">
+                                                        <label for="">{{$f->diag_poli_fisik_umum_name}}</label>
+                                                        <div class="input-group">
+                                                            <input type="text" name="{{$f->diag_poli_fisik_umum_code}}"
+                                                                class="form-control form-control-lg bg-white border-end-0">
+                                                            <span class="input-group-text">
+                                                                {{$f->diag_poli_fisik_satuan}}
+                                                            </span>
+                                                        </div>
+                                                    </div>
+                                                @endforeach
+                                                <!-- <div class="col-md-4">
                                                 <label for="">Tinggi Badan</label>
                                                 <div class="input-group">
                                                     <span class="input-group-text">
@@ -155,7 +160,7 @@
                                                 </div>
                                             </div>
                                             <div class="col-md-4">
-                                                <label for="">Lingkar Perut</label>
+                                                <label for="">Tensi</label>
                                                 <div class="input-group">
                                                     <span class="input-group-text">
                                                         <i class="fas fa-weight"></i>
@@ -163,57 +168,41 @@
                                                     <input type="text" name="tgl_lahir"
                                                         class="form-control form-control-lg bg-white border-start-0">
                                                 </div>
+                                            </div> -->
                                             </div>
                                         </div>
                                     </div>
                                 </div>
-                            </div>
-                            <!-- <div class="card shadow-none border-bottom rounded-0">
-                                <div class="card-header p-0" id="faqAccordionHeading2">
-                                    <button
-                                        class="accordion-button btn btn-link text-decoration-none d-block w-100 py-2 px-3 border-0 text-start"
-                                        data-bs-toggle="collapse" data-bs-target="#collapseFaqAccordion2"
-                                        aria-expanded="false" aria-controls="collapseFaqAccordion2">
-                                        <span class="far fa-dot-circle me-3"></span>
-                                        <span class="fw-medium font-sans-serif text-warning">Form
-                                            Screening</span></button>
-                                </div>
-                                <div class="bg-light collapse show" id="collapseFaqAccordion2"
-                                    aria-labelledby="faqAccordionHeading2" data-parent="#accordionFaq" style="">
-                                    <div class="card-body">
-                                        <p class="ps-4 mb-0">You can issue either partial or full refunds. There are no
-                                            fees to refund a charge, but the fees from the original charge are not
-                                            returned.
-                                        </p>
+                                <div class="card shadow-none border-bottom rounded-0">
+                                    <div class="card-header p-0" id="faqAccordionHeading2">
+                                        <button
+                                            class="accordion-button btn btn-link text-decoration-none d-block w-100 py-2 px-3 border-0 text-start"
+                                            data-bs-toggle="collapse" data-bs-target="#collapseFaqAccordion2"
+                                            aria-expanded="false" aria-controls="collapseFaqAccordion2">
+                                            <span class="far fa-dot-circle me-3"></span>
+                                            <span class="fw-medium font-sans-serif text-warning">Keluhan Saat
+                                                Ini</span></button>
+                                    </div>
+                                    <div class="bg-light collapse show" id="collapseFaqAccordion2"
+                                        aria-labelledby="faqAccordionHeading2" data-parent="#accordionFaq" style="">
+                                        <div class="card-body">
+                                            @foreach ($fisik1 as $f1)
+                                                <label for="">{{$f1->diag_poli_fisik_umum_name}}</label>
+                                                <textarea name="{{$f1->diag_poli_fisik_umum_code}}" class="form-control"
+                                                    id=""></textarea>
+                                            @endforeach
+                                        </div>
                                     </div>
                                 </div>
-                            </div> -->
-                            <div class="card shadow-none border-bottom rounded-0">
-                                <div class="card-header p-0" id="faqAccordionHeading2">
-                                    <button
-                                        class="accordion-button btn btn-link text-decoration-none d-block w-100 py-2 px-3 border-0 text-start"
-                                        data-bs-toggle="collapse" data-bs-target="#collapseFaqAccordion2"
-                                        aria-expanded="false" aria-controls="collapseFaqAccordion2">
-                                        <span class="far fa-dot-circle me-3"></span>
-                                        <span class="fw-medium font-sans-serif text-warning">Keluhan Saat
-                                            Ini</span></button>
-                                </div>
-                                <div class="bg-light collapse show" id="collapseFaqAccordion2"
-                                    aria-labelledby="faqAccordionHeading2" data-parent="#accordionFaq" style="">
-                                    <div class="card-body">
-                                        <textarea name="" class="form-control" id=""></textarea>
-                                    </div>
-                                </div>
-                            </div>
 
+                            </form>
                         </div>
                     </div>
                 </div>
             </div>
             <div class="col-12">
                 <span id="menu-handling-pasien-poliklinik">
-                    <button class="btn btn-warning float-end" id="button-handling-pasien-poliklinik"
-                        data-code="{{$code}}">Proses
+                    <button class="btn btn-warning float-end" id="button-handling-pasien-poliklinik">Proses
                         Handling</button>
                 </span>
             </div>
