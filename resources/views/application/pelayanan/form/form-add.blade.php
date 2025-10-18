@@ -5,6 +5,13 @@
     <br>
 </div>
 <br>
+<style>
+    .choices {
+        width: 100%;
+        border: 1px yellow solid;
+        border-radius: 5px;
+    }
+</style>
 <form class="row g-3 px-3 px-sm-4 pb-3" id="form-create-pasien-baru" method="POST">
     @csrf
     <div class="col-md-2 d-flex justify-content-center">
@@ -27,15 +34,15 @@
             <div class="col-md-6">
                 <label for="inputLastName1" class="form-label text-youtube">Nama Lengkap</label>
                 <div class="input-group"> <span class="input-group-text"><i class="fas fa-user-friends"></i></span>
-                    <input type="text" name="nama" class="form-control form-control-lg border-start-0"
-                        id="nama_lengkap" placeholder="Ex. Jhon Doe">
+                    <input type="text" name="nama" class="form-control form-control-lg border-start-0" id="nama_lengkap"
+                        placeholder="Ex. Jhon Doe">
                 </div>
             </div>
             <div class="col-md-6">
                 <label for="inputLastName1" class="form-label text-youtube">NIK</label>
                 <div class="input-group"> <span class="input-group-text"><i class="fas fa-money-check"></i></span>
-                    <input type="text" name="nik" class="form-control form-control-lg border-start-0"
-                        id="nik" placeholder="*12 Digit">
+                    <input type="text" name="nik" class="form-control form-control-lg border-start-0" id="nik"
+                        placeholder="*12 Digit">
                 </div>
             </div>
             <div class="col-md-6">
@@ -87,46 +94,26 @@
     <div class="col-md-4">
         <label for="inputLastName2" class="form-label">Email</label>
         <div class="input-group"> <span class="input-group-text"><i class="fas fa-mail-bulk"></i></span>
-            <input type="email" name="email" class="form-control form-control-lg border-start-0"
-                id="inputLastName2" placeholder="Ex. Contoh@gmail.com">
+            <input type="email" name="email" class="form-control form-control-lg border-start-0" id="inputLastName2"
+                placeholder="Ex. Contoh@gmail.com">
         </div>
     </div>
     <div class="col-md-4">
         <label for="inputLastName1" class="form-label text-youtube">Provinsi</label>
-        <div class="input-group"> <span class="input-group-text"><i class="fas fa-map-marker-alt"></i></span>
-            <select name="provinsi" id="" class="form-control form-control-lg single-select">
-                <option value="">Pilih Provinsi</option>
-                <option value="KB">Kalimantan Barat</option>
-            </select>
-        </div>
-    </div>
-    <div class="col-md-4">
-        <label for="inputLastName1" class="form-label">Kota</label>
-        <div class="input-group"> <span class="input-group-text"><i class="fas fa-city"></i></span>
-            <select name="kota" id="" class="form-control form-control-lg single-select">
-                <option value="">Pilih Kota</option>
-                <option value="pontianak">Pontianak</option>
-            </select>
-        </div>
-    </div>
-    <div class="col-md-4">
-        <label for="inputLastName1" class="form-label">Kecamatan</label>
-        <div class="input-group"> <span class="input-group-text"><i class="fas fa-city"></i></span>
-            <select name="kecamatan" id="" class="form-control form-control-lg single-select">
-                <option value="">Pilih Kecamatan</option>
-                <option value="sui.bangkon">Sungai Bangkong</option>
-            </select>
-        </div>
-    </div>
-    <div class="col-md-4">
-        <label for="inputLastName1" class="form-label">Kelurahan</label>
-        <div class="input-group"> <span class="input-group-text"><i class="fas fa-city"></i></span>
-            <select name="keluarahan" id="" class="form-control form-control-lg single-select">
-                <option value="">Pilih Kelurahan</option>
-            </select>
-        </div>
-    </div>
 
+        <select name="provinsi" id="data_provinsi" class="form-control choices-single-provinsi" id="data_company"
+            size="1" name="organizerSingle" data-options='{"removeItemButton":true,"placeholder":true}'>
+            <option value="">Pilih Provinsi</option>
+            @foreach ($provinsi as $pro)
+                <option value="{{$pro->M_ProvinceID}}">{{$pro->M_ProvinceName}}</option>
+            @endforeach
+        </select>
+
+    </div>
+    <div class="col-md-4" id="detail-prov">
+        <input type="text" name="data_city" id="data_city">
+    </div>
+    <!-- <div id="detail-city"></div> -->
     <div class="col-12">
         <label for="inputAddress3" class="form-label text-youtube">Deskripsi Alamat</label>
         <textarea class="form-control" name="alamat" id="inputAddress3" placeholder="Enter Address" rows="3"></textarea>
@@ -139,6 +126,39 @@
             Simpan Data</button>
     </div>
 </form>
+<script>
+    new window.Choices(document.querySelector(".choices-single-provinsi"));
+    // new window.Choices(document.querySelector(".choices-single-paket"));
+</script>
+<script>
+    $('#data_provinsi').on("change", function () {
+        var dataid = document.getElementById('data_provinsi').value;
+        if (dataid == null) {
+            Lobibox.notify('warning', {
+                pauseDelayOnHover: true,
+                continueDelayOnInactiveTab: true,
+                position: 'top right',
+                icon: 'fas fa-info-circle',
+                msg: 'Pastikan Kategori & Layanan Sudah dipilih'
+            });
+        } else {
+            $.ajax({
+                url: "{{ route('registrasi_pasien_create_pilih_provinsi') }}",
+                type: "POST",
+                cache: false,
+                data: {
+                    "_token": "{{ csrf_token() }}",
+                    "id": dataid,
+                },
+                dataType: 'html',
+            }).done(function (data) {
+                $("#detail-prov").html(data);
+            }).fail(function () {
+                console.log('eror');
+            });
+        }
+    });
+</script>
 {{-- UPLOAD PERSENTASI --}}
 <script type="text/javascript">
     var browseFile = $('#profile-image');
@@ -155,14 +175,14 @@
         throttleProgressCallbacks: 1,
     });
     resumable.assignBrowse(browseFile);
-    resumable.on('fileAdded', function(file) { // trigger wn file picked
+    resumable.on('fileAdded', function (file) { // trigger wn file picked
         showProgress();
         resumable.upload() // to actually start uploading.
     });
-    resumable.on('fileProgress', function(file) { // trigger when file progress update
+    resumable.on('fileProgress', function (file) { // trigger when file progress update
         updateProgress(Math.floor(file.progress() * 100));
     });
-    resumable.on('fileSuccess', function(file, response) { // trigger when file upload complete
+    resumable.on('fileSuccess', function (file, response) { // trigger when file upload complete
         response = JSON.parse(response)
         $('#videoPreview').show();
         $('#videoPreview').attr('src', response.path);
@@ -170,7 +190,7 @@
         $('.card-footer').show();
         $('#browseFile').hide();
     });
-    resumable.on('fileError', function(file, response) { // trigger when there is any error
+    resumable.on('fileError', function (file, response) { // trigger when there is any error
         alert('file uploading error.')
     });
     var progress = $('.progress');

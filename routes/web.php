@@ -188,6 +188,7 @@ Route::prefix('application')->group(function () {
     Route::post('registrasi-pasien/reader-passport-pasien', [PelayananController::class, 'registrasi_pasien_reader_passport'])->name('registrasi_pasien_reader_passport');
     Route::post('registrasi-pasien/reader-passport-pasien/scan', [PelayananController::class, 'registrasi_pasien_reader_passport_scan'])->name('registrasi_pasien_reader_passport_scan');
     Route::post('registrasi-pasien/create-pasien', [PelayananController::class, 'registrasi_pasien_create'])->name('registrasi_pasien_create');
+    Route::post('registrasi-pasien/create-pasien-pilih-provinsi', [PelayananController::class, 'registrasi_pasien_create_pilih_provinsi'])->name('registrasi_pasien_create_pilih_provinsi');
     Route::post('registrasi-pasien/create-pasien/save', [PelayananController::class, 'registrasi_pasien_create_save'])->name('registrasi_pasien_create_save');
     Route::post('registrasi-pasien/cari-data-pasien', [PelayananController::class, 'registrasi_pasien_cari_data_pasien'])->name('registrasi_pasien_cari_data_pasien');
     Route::post('registrasi-pasien/pilih-data-pasien', [PelayananController::class, 'registrasi_pasien_pilih_data_pasien'])->name('registrasi_pasien_pilih_data_pasien');

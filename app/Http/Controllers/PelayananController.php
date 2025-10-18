@@ -70,7 +70,13 @@ class PelayananController extends Controller
     }
     public function registrasi_pasien_create(Request $request)
     {
-        return view('application.pelayanan.form.form-add');
+        $provinsi = DB::table('m_province')->get();
+        return view('application.pelayanan.form.form-add', ['provinsi' => $provinsi]);
+    }
+    public function registrasi_pasien_create_pilih_provinsi(Request $request)
+    {
+        $city = DB::table('m_city')->where('M_CityM_ProvinceID', $request->id)->get();
+        return view('application.pelayanan.form.location.detail-city', ['city' => $city]);
     }
     public function registrasi_pasien_reader_passport(Request $request)
     {
@@ -120,7 +126,7 @@ class PelayananController extends Controller
                 'master_patient_agama' => $request->agama,
                 'master_patient_no_hp' => $request->no_hp,
                 'master_patient_email' => $request->email,
-                'master_patient_place' => 29992029,
+                'master_patient_place' => $request->data_city,
                 'master_patient_alamat' => $request->alamat,
                 'master_patient_profile' => $file,
                 'created_at' => now()
@@ -145,8 +151,8 @@ class PelayananController extends Controller
     public function registrasi_pasien_pilih_data_pasien_kebutuhan(Request $request)
     {
         $layanan = DB::table('t_layanan_cat')
-        ->join('t_layanan_cabang','t_layanan_cabang.t_layanan_cat_code','=','t_layanan_cat.t_layanan_cat_code')
-        ->where('access_cabang',Auth::user()->access_cabang)->get();
+            ->join('t_layanan_cabang', 't_layanan_cabang.t_layanan_cat_code', '=', 't_layanan_cat.t_layanan_cat_code')
+            ->where('access_cabang', Auth::user()->access_cabang)->get();
         return view('application.pelayanan.form.form-kebutuhan-pasien', ['code' => $request->code, 'layanan' => $layanan]);
     }
     public function registrasi_pasien_pilih_data_pasien_kebutuhan_pilih_layanan(Request $request)

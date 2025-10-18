@@ -2,6 +2,7 @@
 
 namespace App\Http\Controllers;
 
+use Carbon\Carbon;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\DB;
@@ -332,7 +333,27 @@ class PoliklinikController extends Controller
     public function verifikasi_poliklinik_dokumentasi_hasil_preview_report(Request $request)
     {
         $image = base64_encode(file_get_contents(public_path('img/favicon.png')));
-        $pdf = \Barryvdh\DomPDF\Facade\Pdf::loadview('application.poliklinik.dokumentasi-hasil.report.report-preview-hasil', ['code' => $request->code], compact('image'))
+        $odon = DB::table('diag_poli_gigi_odon')->where('d_reg_order_poli_code', $request->code)->get();
+        $fisik = DB::table('diag_poli_fisik_umum_d')
+            ->join('diag_poli_fisik_umum', 'diag_poli_fisik_umum.diag_poli_fisik_umum_code', '=', 'diag_poli_fisik_umum_d.diag_poli_fisik_umum_code')
+            ->where('d_reg_order_poli_code', $request->code)->get();
+        $umum = DB::table('diag_poli_gigi_umum')->where('d_reg_order_poli_code', $request->code)->get();
+        $pasien = DB::table('d_reg_order')
+            ->join('d_reg_order_poli', 'd_reg_order_poli.d_reg_order_code', '=', 'd_reg_order.d_reg_order_code')
+            ->join('master_patient', 'master_patient.master_patient_code', '=', 'd_reg_order.d_reg_order_rm')
+            ->where('d_reg_order_poli.d_reg_order_poli_code', $request->code)->first();
+        $tgl_lahir_carbon = Carbon::parse($pasien->master_patient_tgl_lahir);
+        $umur_tahun = $tgl_lahir_carbon->diffInYears(); // Menghitung umur dalam tahun
+
+        $umur = $umur_tahun.' Th ';
+        $pdf = \Barryvdh\DomPDF\Facade\Pdf::loadview('application.poliklinik.dokumentasi-hasil.report.report-preview-hasil', [
+            'code' => $request->code,
+            'odon' => $odon,
+            'fisik' => $fisik,
+            'umum' => $umum,
+            'pasien' => $pasien,
+            'umur' => $umur,
+        ], compact('image'))
             ->setPaper('A5', 'potrait')->setOptions([
                     'isHtml5ParserEnabled' => true,
                     'isRemoteEnabled' => true,

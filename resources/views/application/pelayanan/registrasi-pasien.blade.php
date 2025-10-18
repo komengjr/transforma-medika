@@ -393,6 +393,7 @@
             var tgl = document.getElementById("tgl_lahir").value;
             var agama = document.getElementById("agama").value;
             var no_hp = document.getElementById("no_hp").value;
+            var lokasi = document.getElementById("data_city").value;
             if (nama == '' || nik == '' || jk == '' || tgl == '' || agama == '' || no_hp == '') {
                 Lobibox.notify('warning', {
                     pauseDelayOnHover: true,

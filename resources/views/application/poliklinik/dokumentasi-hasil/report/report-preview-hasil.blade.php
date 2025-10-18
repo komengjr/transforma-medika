@@ -4,18 +4,16 @@
     <meta charset="utf-8">
     <title>Document Stockopname</title>
     <link rel="stylesheet" href="style.css" media="all" />
-    <link href="https://fonts.googleapis.com/css2?family=Hubot+Sans:ital,wght@0,200..900;1,200..900&display=swap"
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Roboto+Mono:ital,wght@0,100..700;1,100..700&display=swap"
         rel="stylesheet">
     <style>
         * {
-            font-family: "Hubot Sans", sans-serif;
+            font-family: "Roboto Mono", monospace;
             font-optical-sizing: auto;
-            font-weight: 500;
+            font-weight: <weight>;
             font-style: normal;
-            font-variation-settings:
-                "wdth" 100;
-
-            /* padding: 10px; */
         }
     </style>
     <style>
@@ -72,8 +70,7 @@
         }
 
         #client {
-            padding-top: 30px;
-            ;
+            padding-top: 35px;
             padding-left: 6px;
             border-left: 6px solid #db3311;
             float: left;
@@ -217,6 +214,15 @@
             padding: 8px 0;
             text-align: center;
         }
+
+        #kepala {
+            border: 1px solid #badadbff;
+            border-style: solid solid solid solid;
+            border-radius: 10px;
+            /* background-color: #138cc0ff; */
+            color: black;
+            padding: 10px;
+        }
     </style>
 </head>
 
@@ -252,14 +258,21 @@
                         <td style="padding: 1;">Nama Pasien</td>
                         <td style="padding-top: 0;padding-bottom: 0px;">:</td>
                         <td style="padding: 1;">
-                            Sulaiman Iskandar Maulana S.L.K
+                            {{$pasien->master_patient_name}}
+                        </td>
+                    </tr>
+                    <tr>
+                        <td style="padding: 1;">Umur / Tanggal Lahir</td>
+                        <td style="padding-top: 0;padding-bottom: 0px;">:</td>
+                        <td style="padding: 1;">
+                           {{ $umur }} / {{$pasien->master_patient_tgl_lahir}}
                         </td>
                     </tr>
                     <tr>
                         <td style="padding: 1;">Tanggal Registrasi</td>
                         <td style="padding-top: 0;padding-bottom: 0px;">:</td>
                         <td style="padding: 1;">
-                            -
+                            {{$pasien->d_reg_order_date}}
                         </td>
                     </tr>
                 </table>
@@ -268,30 +281,55 @@
             <div id="invoice">
                 <img src="data:image/png;base64,' . {{DNS1D::getBarcodePNG($code, 'C39', 1, 35)}} . '" alt="barcode" />
                 <div class="date" style="color: #0087C3">{{ date('d-m-Y H-i-s') }}</div><br>
-                <span style="font-size: 1em">Form Registrasi Pasien</span>
+                <!-- <span style="font-size: 1em">Form Registrasi Pasien</span> -->
                 {{-- <div class="date" style="color: red; font-size: 12px;">Print By : {{ Auth::user()->fullname }}
                 </div> --}}
 
             </div>
         </div>
-        <br>
-        <table style="width: 100%;" border="1">
+        <div class="details" id="kepala">
+            <strong style="margin: 0; padding: 0; margin-left: 4px;">Pemeriksaan Fisik</strong>
+            <table style="font-size: 8px;">
+                <tr>
+                    @foreach ($fisik as $f)
+                        <td style="padding: 4px;">
+                            <div id="kepala">
+                                {{ $f->diag_poli_fisik_umum_name }} <br><small>{{ $f->diag_poli_fisik_umum_d_val }}
+                                    {{ $f->diag_poli_fisik_satuan }}</small>
+                            </div>
+                        </td>
+                    @endforeach
+                </tr>
+            </table>
+        </div>
+        <table style="padding-top: 10px; font-size: 10px;">
             <tr>
-                <td style="text-align: center;"><strong>DATA PASIEN</strong></td>
-            </tr>
-            <tr>
-                <td style="margin: 5px; padding: 10px;">
-                    <div><strong>1. Dasar Pengajuan :</strong></div>
-                    <p style="padding-left: 17px;">123</p>
+                <td style="padding: 0; padding-right: 5px; vertical-align: top; width: 40%;">
+                    <div class="details" id="kepala">
+                        <strong style="margin: 0; padding: 0;">Diagnosa Pada Gigi</strong>
+                        <hr>
+                        @foreach ($umum as $umums)
+                            <li style="margin-left: 15px;">{{ $umums->diag_poli_gigi_umum_name }}
+                                <small>{{ $umums->diag_poli_gigi_umum_desc }}</small>
+                            </li>
+                        @endforeach
+                    </div>
+                </td>
+                <td style="padding: 0; padding-left: 5px;vertical-align: top; width: 60%;">
+                    <div class="details" id="kepala">
+                        <strong style="margin: 0; padding: 0;">Diagnosa Odontogram</strong>
+                        <hr>
+                        @foreach ($odon as $od)
+                            <li style="margin-left: 15px;">Gigi No. {{ $od->diag_poli_gigi_odon_no }}
+                                <small style="color: #db3311;">{{ $od->diag_poli_gigi_odon_val }}</small>
+                            </li>
+                        @endforeach
+                    </div>
                 </td>
             </tr>
-
         </table>
         {{-- <div id="thanks">Thank you!</div> --}}
         <div id="notices">
-            <img style="padding-top: 1px; left: 10px;" src="data:image/png;base64, {!! base64_encode(
-    QrCode::style('round')->eye('circle')->format('svg')->size(50)->errorCorrection('H')->generate(123),
-) !!}">
             <div class="notice">Notes: We really appreciate your business , please
                 let us know!</div>
         </div>
