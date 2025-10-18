@@ -8,18 +8,21 @@
             </tr>
         </thead>
         <tbody>
-            <tr>
-                <td>Ricky Antony</td>
-                <td>ricky@example.com</td>
-                <td class="text-end">
-                    <div>
-                        <button class="btn p-0" type="button" data-bs-toggle="tooltip" data-bs-placement="top"
-                            title="Edit"><span class="text-500 fas fa-edit"></span></button>
-                        <button class="btn p-0 ms-2" type="button" data-bs-toggle="tooltip" data-bs-placement="top"
-                            title="Delete"><span class="text-500 fas fa-trash-alt"></span></button>
-                    </div>
-                </td>
-            </tr>
+            @foreach ($data as $datas)
+                <tr>
+                    <td>{{ $datas->diag_poli_gigi_umum_name }}</td>
+                    <td>{{ $datas->diag_poli_gigi_umum_desc }}</td>
+                    <td class="text-end">
+                        <div>
+                            <button class="btn p-0" type="button" data-bs-toggle="tooltip" data-bs-placement="top"
+                                title="Edit"><span class="text-500 fas fa-edit"></span></button>
+                            <button class="btn p-0 ms-2" type="button" data-bs-toggle="tooltip" data-bs-placement="top"
+                                title="Delete"><span class="text-500 fas fa-trash-alt"></span></button>
+                        </div>
+                    </td>
+                </tr>
+            @endforeach
 
         </tbody>
     </table>
+</div>

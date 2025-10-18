@@ -249,7 +249,8 @@ class PoliklinikController extends Controller
                 'diag_poli_gigi_umum_desc' => $request->desc,
                 'created_at' => now()
             ]);
-            return view('application.poliklinik.poliklinik-handling.table.data-diagnosa-umum');
+            $data = DB::table('diag_poli_gigi_umum')->where('d_reg_order_poli_code', $request->id)->get();
+            return view('application.poliklinik.poliklinik-handling.table.data-diagnosa-umum',['data'=>$data]);
         }
 
     }

@@ -72,7 +72,8 @@
                 <h5 class="mb-0">Pasien Details</h5>
             </dic>
             <div class="col-auto" id="menu-pasien-poliklinik">
-                <button class="btn btn-warning btn-sm" id="button-save-data-diagnosa-pasien-poli">Skip / Simpan Data</button>
+                <button class="btn btn-warning btn-sm" id="button-save-data-diagnosa-pasien-poli">Skip / Simpan
+                    Data</button>
             </div>
         </div>
     </div>
@@ -207,9 +208,43 @@
                 </div>
             </div>
         </div>
-        <button class="btn btn-falcon-default btn-sm mt-2" type="submit" id="button-simpan-data-diagnosa-umum"><span class="fas fa-plus fs--2 me-1"
-                data-fa-transform="up-1"></span>Add Diagnosa</button>
-        <div id="menu-diagnosa-umum"></div>
+        <button class="btn btn-falcon-default btn-sm mt-2" type="submit" id="button-simpan-data-diagnosa-umum"><span
+                class="fas fa-plus fs--2 me-1" data-fa-transform="up-1"></span>Add Diagnosa</button>
+        <div id="menu-diagnosa-umum">
+            @php
+                $umum = DB::table('diag_poli_gigi_umum')->where('d_reg_order_poli_code', $data->d_reg_order_poli_code)->get();
+            @endphp
+            <div class="table-responsive scrollbar pt-3">
+                <table class="table border" border="1">
+                    <thead>
+                        <tr>
+                            <th scope="col">Title</th>
+                            <th scope="col">Deskripsi</th>
+                            <th class="text-end" scope="col">Actions</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        @foreach ($umum as $umums)
+                            <tr>
+                                <td>{{ $umums->diag_poli_gigi_umum_name }}</td>
+                                <td>{{ $umums->diag_poli_gigi_umum_desc }}</td>
+                                <td class="text-end">
+                                    <div>
+                                        <button class="btn p-0" type="button" data-bs-toggle="tooltip"
+                                            data-bs-placement="top" title="Edit"><span
+                                                class="text-500 fas fa-edit"></span></button>
+                                        <button class="btn p-0 ms-2" type="button" data-bs-toggle="tooltip"
+                                            data-bs-placement="top" title="Delete"><span
+                                                class="text-500 fas fa-trash-alt"></span></button>
+                                    </div>
+                                </td>
+                            </tr>
+                        @endforeach
+
+                    </tbody>
+                </table>
+            </div>
+        </div>
     </div>
 </div>
 <div class="card mb-3">
