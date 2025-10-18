@@ -109,7 +109,7 @@ class PoliklinikController extends Controller
                 }
             }
         }
-        DB::table('d_reg_order_poli')->where('d_reg_order_poli_code', $request->code)->update([
+        DB::table('d_reg_order_poli')->where('d_reg_order_poli_code', $request->no_registrasi)->update([
             'd_reg_order_poli_status' => 1
         ]);
         return '<span class="badge bg-primary">Done</span>';
