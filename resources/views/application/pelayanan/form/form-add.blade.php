@@ -111,7 +111,7 @@
 
     </div>
     <div class="col-md-4" id="detail-prov">
-        <input type="text" name="data_city" id="data_city">
+        <input type="text" name="data_city" id="data_city" hidden>
     </div>
     <!-- <div id="detail-city"></div> -->
     <div class="col-12">
