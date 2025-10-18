@@ -333,7 +333,10 @@ class PoliklinikController extends Controller
     {
         $image = base64_encode(file_get_contents(public_path('img/favicon.png')));
         $pdf = \Barryvdh\DomPDF\Facade\Pdf::loadview('application.poliklinik.dokumentasi-hasil.report.report-preview-hasil', ['code' => $request->code], compact('image'))
-            ->setPaper('A5', 'potrait')->setOptions(['defaultFont' => 'helvetica']);
+            ->setPaper('A5', 'potrait')->setOptions([
+                    'isHtml5ParserEnabled' => true,
+                    'isRemoteEnabled' => true,
+                ]);
         $pdf->output();
         $dompdf = $pdf->getDomPDF();
         $font = $dompdf->getFontMetrics()->get_font("helvetica", "bold");
@@ -347,7 +350,8 @@ class PoliklinikController extends Controller
             ');
         return base64_encode($pdf->stream());
     }
-    public function verifikasi_poliklinik_dokumentasi_hasil_send_report(Request $request){
+    public function verifikasi_poliklinik_dokumentasi_hasil_send_report(Request $request)
+    {
         return 123;
     }
 }
