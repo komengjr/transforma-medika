@@ -23,7 +23,8 @@
                     </div>
                     <div class="col-xl-auto px-3 py-2">
                         <h6 class="text-warning fs--1 mb-0">Menu : </h6>
-                        <h4 class="text-warning fw-bold mb-0">Poli <span class="text-warning fw-medium">Dokumentasi Hasil</span>
+                        <h4 class="text-warning fw-bold mb-0">Poli <span class="text-warning fw-medium">Dokumentasi
+                                Hasil</span>
                         </h4>
                     </div>
                 </div>
@@ -109,10 +110,10 @@
                                             data-code="{{ $datas->d_reg_order_poli_code }}"><span class="fas fa-dna"></span>
                                             Cetak Hasil Pasien</button>
                                         <div class="dropdown-divider"></div>
-                                        <!-- <button class="dropdown-item" data-bs-toggle="modal" data-bs-target="#modal-cabang"
-                                                    id="button-data-barang-cabang" data-code="123"><span
-                                                        class="far fa-folder-open"></span>
-                                                    History</button> -->
+                                        <button class="dropdown-item" id="button-kirim-hasil"
+                                            data-code="{{ $datas->d_reg_order_poli_code }}"><span
+                                                class="fas fa-mail-bulk"></span>
+                                            Kirim Hasil Ke Pasien</button>
                                     </div>
                                 </div>
                             </td>
@@ -154,10 +155,92 @@
     <script src="https://cdn.datatables.net/responsive/3.0.4/js/responsive.bootstrap5.js"></script>
     <script src="{{ asset('vendors/choices/choices.min.js') }}"></script>
     <script src="{{ asset('asset/js/flatpickr.js') }}"></script>
+    <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+
     <script>
         new DataTable('#example', {
             responsive: true
         });
     </script>
+    <script>
+        $(document).on("click", "#button-cetak-hasil", function (e) {
+            e.preventDefault();
+            var code = $(this).data("code");
+            $('#menu-poliklinik').html(
+                '<div class="spinner-border my-3" style="display: block; margin-left: auto; margin-right: auto;" role="status"><span class="visually-hidden">Loading...</span></div>'
+            );
+            $.ajax({
+                url: "{{ route('verifikasi_poliklinik_dokumentasi_hasil_preview') }}",
+                type: "POST",
+                cache: false,
+                data: {
+                    "_token": "{{ csrf_token() }}",
+                    "code": code
+                },
+                dataType: 'html',
+            }).done(function (data) {
+                $('#menu-poliklinik').html(data);
+            }).fail(function () {
+                $('#menu-poliklinik').html('eror');
+            });
+        });
+        $(document).on("click", "#button-kirim-hasil", function (e) {
+            e.preventDefault();
+            var code = $(this).data("code");
+            const swalWithBootstrapButtons = Swal.mixin({
+                customClass: {
+                    confirmButton: "btn btn-success",
+                    cancelButton: "btn btn-danger"
+                },
+                buttonsStyling: false
+            });
+            swalWithBootstrapButtons.fire({
+                title: "Are you sure?",
+                text: "You won Send this Report!",
+                icon: "success",
+                showCancelButton: true,
+                confirmButtonText: "Yes, Send it!",
+                cancelButtonText: "No, cancel!",
+                reverseButtons: true
+            }).then((result) => {
+                if (result.isConfirmed) {
+                    $('#menu-poliklinik').html(
+                        '<div class="spinner-border my-3" style="display: block; margin-left: auto; margin-right: auto;" role="status"><span class="visually-hidden">Loading...</span></div>'
+                    );
+                    $.ajax({
+                        url: "{{ route('verifikasi_poliklinik_dokumentasi_hasil_send_report') }}",
+                        type: "POST",
+                        cache: false,
+                        data: {
+                            "_token": "{{ csrf_token() }}",
+                            "code": code
+                        },
+                        dataType: 'html',
+                    }).done(function (data) {
+                        swalWithBootstrapButtons.fire({
+                            title: "success!",
+                            text: "Your Report Has been Success.",
+                            icon: "success"
+                        });
+                    }).fail(function () {
+                        swalWithBootstrapButtons.fire({
+                            title: "Failed",
+                            text: "Gagal Kirim :)",
+                            icon: "error"
+                        });
+                    });
+                } else if (
+                    /* Read more about handling dismissals below */
+                    result.dismiss === Swal.DismissReason.cancel
+                ) {
+                    swalWithBootstrapButtons.fire({
+                        title: "Cancelled",
+                        text: "Your imaginary file is safe :)",
+                        icon: "error"
+                    });
+                }
+            });
 
+        });
+    </script>
 @endsection

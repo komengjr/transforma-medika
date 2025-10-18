@@ -250,9 +250,8 @@ class PoliklinikController extends Controller
                 'created_at' => now()
             ]);
             $data = DB::table('diag_poli_gigi_umum')->where('d_reg_order_poli_code', $request->id)->get();
-            return view('application.poliklinik.poliklinik-handling.table.data-diagnosa-umum',['data'=>$data]);
+            return view('application.poliklinik.poliklinik-handling.table.data-diagnosa-umum', ['data' => $data]);
         }
-
     }
     public function data_registrasi_poliklinik_save_diagnosa_pasien_poli(Request $request)
     {
@@ -325,5 +324,30 @@ class PoliklinikController extends Controller
         } else {
             return Redirect::to('dashboard/home');
         }
+    }
+    public function verifikasi_poliklinik_dokumentasi_hasil_preview(Request $request)
+    {
+        return view('application.poliklinik.dokumentasi-hasil.form-preview-hasil', ['code' => $request->code]);
+    }
+    public function verifikasi_poliklinik_dokumentasi_hasil_preview_report(Request $request)
+    {
+        $image = base64_encode(file_get_contents(public_path('img/favicon.png')));
+        $pdf = \Barryvdh\DomPDF\Facade\Pdf::loadview('application.poliklinik.dokumentasi-hasil.report.report-preview-hasil', ['code' => $request->code], compact('image'))
+            ->setPaper('A5', 'potrait')->setOptions(['defaultFont' => 'helvetica']);
+        $pdf->output();
+        $dompdf = $pdf->getDomPDF();
+        $font = $dompdf->getFontMetrics()->get_font("helvetica", "bold");
+        $font1 = $dompdf->getFontMetrics()->get_font("helvetica", "normal");
+        $dompdf->get_canvas()->page_text(300, 820, "{PAGE_NUM} / {PAGE_COUNT}", $font, 10, array(0, 0, 0));
+        $dompdf->get_canvas()->page_text(34, 820, "Print by. " . Auth::user()->fullname, $font1, 10, array(0, 0, 0));
+        $canvas = $pdf->getDomPDF()->getCanvas();
+        $canvas->page_script('
+            // $pdf->set_opacity(.9);
+            $pdf->image("img/cover.png", 12, 12, 400, 575);
+            ');
+        return base64_encode($pdf->stream());
+    }
+    public function verifikasi_poliklinik_dokumentasi_hasil_send_report(Request $request){
+        return 123;
     }
 }
