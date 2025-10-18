@@ -138,14 +138,23 @@ class PelayananController extends Controller
     }
     public function registrasi_pasien_cari_data_pasien(Request $request)
     {
-        $data = DB::table('master_patient')->get();
-        return view('application.pelayanan.form.table-pencarian-pasien', ['data' => $data]);
+        if ($request->option_pencarian == "") {
+            return 0;
+        } elseif ($request->option_pencarian == "nama") {
+            $data = DB::table('master_patient')->where('master_patient_name', 'like', '%' . $request->option_nama . '%')->get();
+            return view('application.pelayanan.form.table-pencarian-pasien', ['data' => $data]);
+        } elseif ($request->option_pencarian == "tanggal_lahir") {
+            $data = DB::table('master_patient')->where('master_patient_tgl_lahir', 'like', '%' . $request->option_nama . '%')->get();
+            return view('application.pelayanan.form.table-pencarian-pasien', ['data' => $data]);
+        }
     }
     public function registrasi_pasien_pilih_data_pasien(Request $request)
     {
         $list = DB::table('d_reg_order')->where('d_reg_order_date', date('Y-m-d'))->count();
         $no_reg = date('Ymdhis') . str_pad($list + 1, 3, '0', STR_PAD_LEFT);
-        $data = DB::table('master_patient')->where('master_patient_code', $request->code)->first();
+        $data = DB::table('master_patient')
+        ->join('m_city','m_city.M_CityID','=','master_patient.master_patient_place')
+        ->where('master_patient_code', $request->code)->first();
         return view('application.pelayanan.form.form-registrasi-proses', ['data' => $data, 'no_reg' => $no_reg]);
     }
     public function registrasi_pasien_pilih_data_pasien_kebutuhan(Request $request)
@@ -161,7 +170,7 @@ class PelayananController extends Controller
             ->join('t_pasien_cat_data', 't_pasien_cat_data.t_pasien_cat_code', '=', 't_pasien_cat.t_pasien_cat_code')
             ->where('t_pasien_cat.t_pasien_cat_code', $request->cat)->get();
         if ($request->id == '14de0404-0c88-4cff-bae1-d28ea75b53ad') {
-            $poli = DB::table('t_layanan_data')->where('t_layanan_cat_code', '14de0404-0c88-4cff-bae1-d28ea75b53ad')->get();
+            $poli = DB::table('t_layanan_data')->where('t_layanan_cat_code', '14de0404-0c88-4cff-bae1-d28ea75b53ad')->where('t_layanan_data_status',1)->get();
             return view('application.pelayanan.form.kebutuhan.form-poliklinik', ['poli' => $poli, 'cat' => $pasien_cat]);
         } elseif ($request->id == '0bd4ea7f-bd6e-4fa7-878a-29295f74f0ac') {
             $dokter = DB::table('master_doctor')->get();

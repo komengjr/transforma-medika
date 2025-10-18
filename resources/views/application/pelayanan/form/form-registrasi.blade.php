@@ -12,19 +12,18 @@
                     <label class="form-label text-dark" for="basic-form-name">Pencarian Data</label>
                     <div class="input-group"> <span class="input-group-text border border-warning"><i
                                 class="fas fa-user-friends"></i></span>
-                        <input type="text" name="nama" class="form-control form-control-lg border border-warning"
-                            id="inputLastName1" placeholder="Ex. Bambang Junaidi">
+                        <input type="text" name="option_nama" class="form-control form-control-lg border border-warning"
+                            id="option_nama" placeholder="Ex. Bambang Junaidi">
                         <input type="text" name="ss" required hidden>
                     </div>
                 </div>
                 <div class="col-md-4">
                     <label class="form-label text-dark" for="basic-form-gender">Option</label>
                     <div class="input-group"> <span class="input-group-text"><i class="fas fa-cogs"></i></span>
-                        <select name="jk" id="" class="form-control single-select form-control-lg" required>
+                        <select name="option_pencarian" id="option_pencarian" class="form-control single-select form-control-lg" required>
                             <option value="">Pilih</option>
-                            <option value="l">Cari By Name</option>
-                            <option value="p">Cari By Tanggal Lahir</option>
-
+                            <option value="nama">Cari By Name</option>
+                            <option value="tanggal_lahir">Cari By Tanggal Lahir</option>
                         </select>
                     </div>
                 </div>

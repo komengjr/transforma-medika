@@ -69,9 +69,11 @@ Route::prefix('dashboard')->group(function () {
 Route::prefix('app')->group(function () {
     Route::post('check-menu', [dashboardController::class, 'app_check_menu'])->name('app_check_menu');
 });
+// CONSOL DASHBOARD
 Route::prefix('console/')->group(function (): void {
     Route::get('{id}/dashboard', [dashboardController::class, 'dashboard_all'])->name('dashboard_all');
 });
+
 Route::prefix('{akses}/{id}')->group(function (): void {
     // HRM
     Route::get('dashboard/personal-data', [HrmController::class, 'personal_data'])->name('personal_data');
@@ -120,7 +122,7 @@ Route::prefix('{akses}/{id}')->group(function (): void {
     Route::get('menu-brodcast/brodcast-whatsapp', [BrodcastController::class, 'menu_brodcast_whatsapp'])->name('menu_brodcast_whatsapp');
     Route::get('menu-brodcast/brodcast-management', [BrodcastController::class, 'menu_brodcast_management'])->name('menu_brodcast_management');
 });
-
+// MEDICA HEALTH
 Route::prefix('{akses}/{id}/application')->group(function () {
     Route::get('home', [ApplicationController::class, 'home'])->name('home');
     // PELAYANAN
@@ -300,6 +302,7 @@ Route::prefix('application')->group(function () {
     Route::post('keuangan/menu-kasir/fix-payment', [KeuanganController::class, 'keuangan_menu_cashier_find_fix_payment'])->name('keuangan_menu_cashier_find_fix_payment');
     Route::post('transaksi-keuangan/penerimaan-transaksi/proses-transaksi', [KeuanganController::class, 'keuangan_penerimaan_proses_transaksi'])->name('keuangan_penerimaan_proses_transaksi');
 });
+// MASTER DATA
 Route::prefix('application')->group(function () {
     Route::post('master-doctor/data-doctor/add', [MasterDataController::class, 'master_doctor_data_doctor_add'])->name('master_doctor_data_doctor_add');
     Route::post('master-doctor/data-doctor/save', [MasterDataController::class, 'master_doctor_data_doctor_save'])->name('master_doctor_data_doctor_save');

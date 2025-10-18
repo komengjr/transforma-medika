@@ -2,7 +2,8 @@
     <div class="bg-dark rounded-top-lg py-3 ps-4 pe-6">
         <h4 class="mb-1 text-white" id="staticBackdropLabel">Registrasi Pasien : {{ $no_reg }}</h4>
         <input type="text" name="no_registrasi" id="no_registrasi" value="{{ $no_reg }}" hidden>
-        <p class="fs--2 mb-0 text-warning">Support by <a class="text-warning fw-semi-bold" href="#!">{{ env('APP_LABEL')}}</a>
+        <p class="fs--2 mb-0 text-warning">Support by <a class="text-warning fw-semi-bold"
+                href="#!">{{ env('APP_LABEL')}}</a>
         </p>
     </div>
     <div class="card m-3 border border-info">
@@ -40,9 +41,8 @@
                                 <div class="avatar avatar-5xl shadow-sm img-thumbnail justify-content-center">
                                     <div class="h-100 w-100 overflow-hidden ">
                                         @if ($data->master_patient_profile == "")
-                                            <img src="{{ asset('img/pasien.png') }}"
-                                                class="img-thumbnail shadow-sm" alt="" id="videoPreview"
-                                                data-dz-thumbnail="data-dz-thumbnail">
+                                            <img src="{{ asset('img/pasien.png') }}" class="img-thumbnail shadow-sm" alt=""
+                                                id="videoPreview" data-dz-thumbnail="data-dz-thumbnail">
                                         @else
                                             <img src="{{ Storage::url($data->master_patient_profile) }}"
                                                 class="img-thumbnail shadow-sm" alt="" id="videoPreview"
@@ -92,9 +92,11 @@
                                                     class="fas fa-transgender fs-2"></i></span>
                                             <select name="jk" id="jenis_kelamin"
                                                 class="form-control form-control-lg single-select" disabled>
-                                                <option value="">Pilih Jenis Kelamin</option>
-                                                <option value="l">Laki Laki</option>
-                                                <option value="p">Perempuan</option>
+                                                @if ($data->master_patient_jk == 'L')
+                                                    <option value="l">Laki Laki</option>
+                                                @else
+                                                    <option value="p">Perempuan</option>
+                                                @endif
                                             </select>
                                         </div>
                                     </div>
@@ -123,14 +125,9 @@
                                 <label for="inputEmailAddress" class="form-label text-youtube">Agama</label>
                                 <div class="input-group"> <span class="input-group-text"><i
                                             class="fas fa-pray"></i></span>
-                                    <select name="agama" id="agama" class="form-control form-control-lg single-select">
-                                        <option value="">Pilih Agama</option>
-                                        <option value="Islam">Islam</option>
-                                        <option value="Kristen">Kristen</option>
-                                        <option value="Katolik">Katolik</option>
-                                        <option value="Hindu">Hindu</option>
-                                        <option value="Budha">Budha</option>
-                                    </select>
+                                    <input type="text" name="tempat_lahir"
+                                        class="form-control form-control-lg border-start-0 bg-white" id="inputLastName1"
+                                        value="{{ $data->master_patient_agama }}" disabled>
                                 </div>
                             </div>
                             <div class="col-md-4">
@@ -152,29 +149,19 @@
                                 </div>
                             </div>
                             <div class="col-md-4">
-                                <label for="inputLastName1" class="form-label text-youtube">Provinsi</label>
-                                <div class="input-group"> <span class="input-group-text"><i
-                                            class="fas fa-map-marker-alt"></i></span>
-                                    <select name="provinsi" id="" class="form-control form-control-lg single-select">
-                                        <option value="">Pilih Provinsi</option>
-                                        <option value="KB">Kalimantan Barat</option>
-                                    </select>
-                                </div>
-                            </div>
-                            <div class="col-md-4">
                                 <label for="inputLastName1" class="form-label">Kota</label>
                                 <div class="input-group"> <span class="input-group-text"><i
                                             class="fas fa-city"></i></span>
-                                    <select name="kota" id="" class="form-control form-control-lg single-select">
-                                        <option value="">Pilih Kota</option>
-                                        <option value="pontianak">Pontianak</option>
-                                    </select>
+                                    <input type="text" name="tempat_lahir"
+                                        class="form-control form-control-lg border-start-0 bg-white" id="inputLastName1"
+                                        value="{{ $data->M_CityName }}" disabled>
                                 </div>
                             </div>
                             <div class="col-12">
                                 <label for="inputAddress3" class="form-label text-youtube">Deskripsi Alamat</label>
                                 <textarea class="form-control" name="alamat" id="inputAddress3"
-                                    placeholder="Enter Address" rows="3"></textarea>
+                                    placeholder="Enter Address" rows="3"
+                                    disabled>{{ $data->master_patient_alamat }}</textarea>
                             </div>
                             <div class="col-12">
                                 <button class="btn btn-success float-end" id="button-pilih-kebutuhan"
