@@ -174,6 +174,7 @@ Route::prefix('{akses}/{id}/application')->group(function () {
 
     Route::get('master-perusahaan/data-perusahaan', [MasterDataController::class, 'master_perusahaan_data'])->name('master_perusahaan_data');
     Route::get('master-perusahaan/mou-perusahaan', [MasterDataController::class, 'master_perusahaan_mou'])->name('master_perusahaan_mou');
+    Route::get('master-perusahaan/agreement-perusahaan', [MasterDataController::class, 'master_perusahaan_agreement'])->name('master_perusahaan_agreement');
     Route::get('master-layanan/category-layanan', [MasterDataController::class, 'master_layanan_category'])->name('master_layanan_category');
     Route::get('master-layanan/data-layanan', [MasterDataController::class, 'master_layanan_data'])->name('master_layanan_data');
     Route::get('master-layanan/formulir-layanan', [MasterDataController::class, 'master_layanan_formulir'])->name('master_layanan_formulir');
@@ -261,6 +262,8 @@ Route::prefix('application')->group(function () {
     Route::post('menu-poliklinik/poliklinik-handling/poli-gigi/data-penunjang', [PoliklinikController::class, 'data_registrasi_poliklinik_data_penunjang'])->name('data_registrasi_poliklinik_data_penunjang');
 
     Route::post('verifikasi-poliklinik/verifikasi-dokter/verify', [PoliklinikController::class, 'verifikasi_poliklinik_dokter_verify'])->name('verifikasi_poliklinik_dokter_verify');
+    Route::post('verifikasi-poliklinik/verifikasi-dokter/pilih-penjualan', [PoliklinikController::class, 'verifikasi_poliklinik_dokter_pilih_penjualan'])->name('verifikasi_poliklinik_dokter_pilih_penjualan');
+    Route::post('verifikasi-poliklinik/verifikasi-dokter/pilih-sub-penjualan', [PoliklinikController::class, 'verifikasi_poliklinik_dokter_pilih_sub_penjualan'])->name('verifikasi_poliklinik_dokter_pilih_sub_penjualan');
     Route::post('verifikasi-poliklinik/verifikasi-dokter/save-verify', [PoliklinikController::class, 'verifikasi_poliklinik_dokter_save_verify'])->name('verifikasi_poliklinik_dokter_save_verify');
 
     Route::post('verifikasi-poliklinik/dokumentasi-hasil/preview', [PoliklinikController::class, 'verifikasi_poliklinik_dokumentasi_hasil_preview'])->name('verifikasi_poliklinik_dokumentasi_hasil_preview');

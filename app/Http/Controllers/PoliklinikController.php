@@ -257,9 +257,9 @@ class PoliklinikController extends Controller
     public function data_registrasi_poliklinik_data_penunjang(Request $request)
     {
         $data = DB::table('t_pasien_cat_data_poli')
-        ->join('t_pasien_cat_data','t_pasien_cat_data.id_t_pasien_cat_data','=','t_pasien_cat_data_poli.id_t_pasien_cat_data')
-        ->where('t_pasien_cat_data.t_pasien_cat_data_type','file')
-        ->where('t_pasien_cat_data_poli.d_reg_order_poli_code', $request->id)->first();
+            ->join('t_pasien_cat_data', 't_pasien_cat_data.id_t_pasien_cat_data', '=', 't_pasien_cat_data_poli.id_t_pasien_cat_data')
+            ->where('t_pasien_cat_data.t_pasien_cat_data_type', 'file')
+            ->where('t_pasien_cat_data_poli.d_reg_order_poli_code', $request->id)->first();
         return view('application.poliklinik.poliklinik-handling.form-penunjang-poliklinik', ['data' => $data]);
     }
     public function data_registrasi_poliklinik_save_diagnosa_pasien_poli(Request $request)
@@ -300,12 +300,28 @@ class PoliklinikController extends Controller
             ->first();
         $fisik = DB::table('diag_poli_fisik_umum')->where('diag_poli_fisik_type', 'text')->get();
         $fisik1 = DB::table('diag_poli_fisik_umum')->where('diag_poli_fisik_type', 'textarea')->get();
+        $paket = DB::table('p_m_sales')->where('p_m_sales_status', 1)->get();
         return view('application.poliklinik.verifikasi-poli.form-verifikasi', [
             'data' => $data,
             'code' => $request->code,
             'fisik' => $fisik,
-            'fisik1' => $fisik1
+            'fisik1' => $fisik1,
+            'paket' => $paket
         ]);
+    }
+    public function verifikasi_poliklinik_dokter_pilih_penjualan(Request $request)
+    {
+        $data = DB::table('p_sales')->where('p_m_sales_code', $request->id)->get();
+        return view('application.poliklinik.verifikasi-poli.data-sub-penjualan', ['data' => $data]);
+    }
+    public function verifikasi_poliklinik_dokter_pilih_sub_penjualan(Request $request)
+    {
+        $data = DB::table('p_sales_data')
+            ->join('p_sales_cat', 'p_sales_cat.p_sales_cat_code', '=', 'p_sales_data.p_sales_cat_code')
+            ->join('p_sales', 'p_sales.p_sales_code', '=', 'p_sales_cat.p_sales_code')
+            ->join('t_pemeriksaan_list', 't_pemeriksaan_list.t_pemeriksaan_list_code', '=', 'p_sales_data.t_pemeriksaan_list_code')
+            ->where('p_sales.p_sales_code', $request->code)->get();
+        return view('application.poliklinik.verifikasi-poli.data-sub-paket', ['data' => $data]);
     }
     public function verifikasi_poliklinik_dokter_save_verify(Request $request)
     {

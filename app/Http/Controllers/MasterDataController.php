@@ -51,11 +51,11 @@ class MasterDataController extends Controller
         }
     }
     // MASTER DOKTER
-    public function master_doctor_data_doctor($akses)
+    public function master_doctor_data_doctor($akses, $id)
     {
-        if ($this->url_akses_sub($akses) == true) {
+        if ($this->url_akses_sub($akses, $id) == true) {
             $data = DB::table('master_doctor')->get();
-            return view('application.master-data.master-data-doctor', ['akses' => $akses, 'data' => $data]);
+            return view('application.master-data.master-data-doctor', ['akses' => $akses, 'data' => $data, 'code' => $id]);
         } else {
             return Redirect::to('dashboard/home');
         }
@@ -81,14 +81,14 @@ class MasterDataController extends Controller
         return redirect()->back()->withSuccess('Great! Berhasil Menambahkan Data Dokter');
     }
     // MASTER DOKTER POLIKLINIK
-    public function master_doctor_poliklinik($akses)
+    public function master_doctor_poliklinik($akses, $id)
     {
-        if ($this->url_akses_sub($akses) == true) {
+        if ($this->url_akses_sub($akses, $id) == true) {
             $data = DB::table('m_poli')->get();
             $layanan = DB::table('t_layanan_data')
                 ->join('t_layanan_cat', 't_layanan_cat.t_layanan_cat_code', '=', 't_layanan_data.t_layanan_cat_code')
                 ->where('t_layanan_cat.t_layanan_cat_name', 'POLIKLINIK')->get();
-            return view('application.master-data.master-doctor-poliklinik', ['data' => $data, 'layanan' => $layanan, 'akses' => $akses]);
+            return view('application.master-data.master-doctor-poliklinik', ['data' => $data, 'layanan' => $layanan, 'akses' => $akses, 'code' => $id]);
         } else {
             return Redirect::to('dashboard/home');
         }
@@ -129,21 +129,21 @@ class MasterDataController extends Controller
         }
     }
     // MASTER JADWAL DOKTER
-    public function master_jadwal_doctor_poliklinik($akses)
+    public function master_jadwal_doctor_poliklinik($akses, $id)
     {
-        if ($this->url_akses_sub($akses) == true) {
+        if ($this->url_akses_sub($akses, $id) == true) {
             $data = DB::table('m_poli')->get();
-            return view('application.master-data.master-doctor-poli-jadwal', ['akses' => $akses, 'data' => $data]);
+            return view('application.master-data.master-doctor-poli-jadwal', ['akses' => $akses, 'data' => $data, 'code' => $id]);
         } else {
             return Redirect::to('dashboard/home');
         }
     }
     // MASTER KATEGORI DOKTER
-    public function master_pemeriksaan_category($akses)
+    public function master_pemeriksaan_category($akses, $id)
     {
-        if ($this->url_akses_sub($akses) == true) {
+        if ($this->url_akses_sub($akses, $id) == true) {
             $data = DB::table('t_pemeriksaan_cat')->get();
-            return view('application.master-data.master-pemeriksaan-category', ['akses' => $akses, 'data' => $data]);
+            return view('application.master-data.master-pemeriksaan-category', ['akses' => $akses, 'data' => $data, 'code' => $id]);
         } else {
             return Redirect::to('dashboard/home');
         }
@@ -164,13 +164,13 @@ class MasterDataController extends Controller
         return redirect()->back()->withSuccess('Great! Berhasil Menambahkan Data Kategori Pemeriksaan');
     }
     // MASTER DATA PEMERIKSAAN
-    public function master_pemeriksaan_data($akses)
+    public function master_pemeriksaan_data($akses, $id)
     {
-        if ($this->url_akses_sub($akses) == true) {
+        if ($this->url_akses_sub($akses, $id) == true) {
             $data = DB::table('t_pemeriksaan_data')
                 ->join('t_pemeriksaan_cat', 't_pemeriksaan_cat.t_pemeriksaan_cat_code', '=', 't_pemeriksaan_data.t_pemeriksaan_cat_code')
                 ->get();
-            return view('application.master-data.master-pemeriksaan-data', ['akses' => $akses, 'data' => $data]);
+            return view('application.master-data.master-pemeriksaan-data', ['akses' => $akses, 'data' => $data, 'code' => $id]);
         } else {
             return Redirect::to('dashboard/home');
         }
@@ -193,14 +193,14 @@ class MasterDataController extends Controller
         return redirect()->back()->withSuccess('Great! Berhasil Menambahkan Data Kategori Pemeriksaan');
     }
     // MASTER GROUP PEMERIKSAAN
-    public function master_pemeriksaan_group($akses)
+    public function master_pemeriksaan_group($akses, $id)
     {
-        if ($this->url_akses_sub($akses) == true) {
+        if ($this->url_akses_sub($akses, $id) == true) {
             $data = DB::table('t_pemeriksaan_data')
                 ->join('t_pemeriksaan_cat', 't_pemeriksaan_cat.t_pemeriksaan_cat_code', '=', 't_pemeriksaan_data.t_pemeriksaan_cat_code')
                 ->get();
             $layanan = DB::table('t_pemeriksaan_cat')->get();
-            return view('application.master-data.master-pemeriksaan-group', ['akses' => $akses, 'data' => $data, 'layanan' => $layanan]);
+            return view('application.master-data.master-pemeriksaan-group', ['akses' => $akses, 'data' => $data, 'layanan' => $layanan, 'code' => $id]);
         } else {
             return Redirect::to('dashboard/home');
         }
@@ -252,12 +252,12 @@ class MasterDataController extends Controller
         return redirect()->back()->withSuccess('Great! Berhasil Menambahkan Data List Pemeriksaan');
     }
     // MASTER HARGA PEMERIKSAAN
-    public function master_pemeriksaan_harga($akses)
+    public function master_pemeriksaan_harga($akses, $id)
     {
-        if ($this->url_akses_sub($akses) == true) {
+        if ($this->url_akses_sub($akses, $id) == true) {
             $data = DB::table('p_m_pemeriksaan')->get();
             $cat = DB::table('t_pemeriksaan_cat')->get();
-            return view('application.master-data.master-pemeriksaan-harga', ['data' => $data, 'cat' => $cat, 'akses' => $akses]);
+            return view('application.master-data.master-pemeriksaan-harga', ['data' => $data, 'cat' => $cat, 'akses' => $akses, 'code' => $id]);
         } else {
             return Redirect::to('dashboard/home');
         }
@@ -274,9 +274,9 @@ class MasterDataController extends Controller
         return view('application.master-data.pemeriksaan-harga.data-gorup-pemeriksaan', ['data' => $data, 'layanan' => $layanan]);
     }
     // MASTER SPECIMEN PEMERIKSAAN
-    public function master_pemeriksaan_specimen($akses)
+    public function master_pemeriksaan_specimen($akses, $id)
     {
-        if ($this->url_akses_sub($akses) == true) {
+        if ($this->url_akses_sub($akses, $id) == true) {
 
             $cat = DB::table('t_pemeriksaan_cat')->get();
             $data = DB::table('t_pemeriksaan_data')
@@ -287,6 +287,7 @@ class MasterDataController extends Controller
                 'data' => $data,
                 'cat' => $cat,
                 'akses' => $akses,
+                'code' => $id
             ]);
         } else {
             return Redirect::to('dashboard/home');
@@ -320,33 +321,46 @@ class MasterDataController extends Controller
         }
     }
     // MASTER DATA PERUSAHAAN
-    public function master_perusahaan_data($akses)
+    public function master_perusahaan_data($akses, $id)
     {
-        if ($this->url_akses_sub($akses) == true) {
+        if ($this->url_akses_sub($akses, $id) == true) {
             $data = DB::table('master_company')->get();
-            return view('application.master-data.master-company', ['data' => $data, 'akses' => $akses]);
+            return view('application.master-data.master-company', ['data' => $data, 'akses' => $akses, 'code' => $id]);
         } else {
             return Redirect::to('dashboard/home');
         }
     }
     // MASTER MOU PERUSAHAAN
-    public function master_perusahaan_mou($akses)
+    public function master_perusahaan_mou($akses, $id)
     {
-        if ($this->url_akses_sub($akses) == true) {
+        if ($this->url_akses_sub($akses, $id) == true) {
             $data = DB::table('company_mou')
                 ->join('master_company', 'master_company.master_company_code', '=', 'company_mou.master_company_code')
                 ->orderBy('id_company_mou', 'DESC')->get();
-            return view('application.master-data.mou-company', ['data' => $data, 'akses' => $akses]);
+            return view('application.master-data.mou-company', ['data' => $data, 'akses' => $akses, 'code' => $id]);
+        } else {
+            return Redirect::to('dashboard/home');
+        }
+    }
+    // MASTER AGREEMENT PERUSAHAAN
+    public function master_perusahaan_agreement($akses, $id)
+    {
+        if ($this->url_akses_sub($akses, $id) == true) {
+            $data = DB::table('company_mou_agreement')
+                ->join('company_mou', 'company_mou.company_mou_code', '=', 'company_mou_agreement.company_mou_code')
+                ->join('master_company', 'master_company.master_company_code', '=', 'company_mou.master_company_code')
+                ->get();
+            return view('application.master-data.agreement-perusahaan', ['data' => $data, 'akses' => $akses, 'code' => $id]);
         } else {
             return Redirect::to('dashboard/home');
         }
     }
     // MASTER LAYANAN KATEGORI
-    public function master_layanan_category($akses)
+    public function master_layanan_category($akses, $id)
     {
-        if ($this->url_akses_sub($akses) == true) {
+        if ($this->url_akses_sub($akses, $id) == true) {
             $data = DB::table('t_layanan_cat')->get();
-            return view('application.master-data.master-layanan-category', ['data' => $data, 'akses' => $akses]);
+            return view('application.master-data.master-layanan-category', ['data' => $data, 'akses' => $akses, 'code' => $id]);
         } else {
             return Redirect::to('dashboard/home');
         }
@@ -366,13 +380,13 @@ class MasterDataController extends Controller
         return redirect()->back()->withSuccess('Great! Berhasil Menambahkan Data Kategori Layanan');
     }
     // MASTER LAYANAN DATA
-    public function master_layanan_data($akses)
+    public function master_layanan_data($akses, $id)
     {
-        if ($this->url_akses_sub($akses) == true) {
+        if ($this->url_akses_sub($akses, $id) == true) {
             $data = DB::table('t_layanan_data')
                 ->join('t_layanan_cat', 't_layanan_cat.t_layanan_cat_code', '=', 't_layanan_data.t_layanan_cat_code')
                 ->get();
-            return view('application.master-data.master-layanan-data', ['data' => $data, 'akses' => $akses]);
+            return view('application.master-data.master-layanan-data', ['data' => $data, 'akses' => $akses, 'code' => $id]);
         } else {
             return Redirect::to('dashboard/home');
         }
@@ -394,14 +408,14 @@ class MasterDataController extends Controller
         return redirect()->back()->withSuccess('Great! Berhasil Menambahkan Data Layanan');
     }
     // FORMULIR LAYANAN
-    public function master_layanan_formulir($akses)
+    public function master_layanan_formulir($akses, $id)
     {
-        if ($this->url_akses_sub($akses) == true) {
+        if ($this->url_akses_sub($akses, $id) == true) {
             $data = DB::table('t_layanan_form')
                 ->join('t_layanan_data', 't_layanan_data.t_layanan_data_code', '=', 't_layanan_form.t_layanan_data_code')
                 ->get();
             // dd($data);
-            return view('application.master-data.master-layanan-formulir', ['data' => $data, 'akses' => $akses]);
+            return view('application.master-data.master-layanan-formulir', ['data' => $data, 'akses' => $akses, 'code' => $id]);
         } else {
             return Redirect::to('dashboard/home');
         }
@@ -441,11 +455,11 @@ class MasterDataController extends Controller
         return redirect()->back()->withSuccess('Great! Berhasil Menambahkan Data Layanan');
     }
     // MASTER PENJUALAN DATA
-    public function master_penjualan_data($akses)
+    public function master_penjualan_data($akses, $id)
     {
-        if ($this->url_akses_sub($akses) == true) {
+        if ($this->url_akses_sub($akses, $id) == true) {
             $data = DB::table('p_m_sales')->get();
-            return view('application.master-data.master-penjualan-data', ['data' => $data, 'akses' => $akses]);
+            return view('application.master-data.master-penjualan-data', ['data' => $data, 'akses' => $akses, 'code' => $id]);
         } else {
             return Redirect::to('dashboard/home');
         }
@@ -509,11 +523,11 @@ class MasterDataController extends Controller
         return redirect()->back()->withSuccess('Great! Upload Data Pemeriksaan');
     }
     // PENJUALAN KATEGORI
-    public function master_penjualan_kategori($akses)
+    public function master_penjualan_kategori($akses, $id)
     {
-        if ($this->url_akses_sub($akses) == true) {
+        if ($this->url_akses_sub($akses, $id) == true) {
             $data = DB::table('p_sales')->get();
-            return view('application.master-data.master-penjualan-kategori', ['data' => $data, 'akses' => $akses]);
+            return view('application.master-data.master-penjualan-kategori', ['data' => $data, 'akses' => $akses, 'code' => $id]);
         } else {
             return Redirect::to('dashboard/home');
         }

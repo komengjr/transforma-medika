@@ -109,9 +109,9 @@
                                             Verifikasi Pasien Poli</button>
                                         <div class="dropdown-divider"></div>
                                         <!-- <button class="dropdown-item" data-bs-toggle="modal" data-bs-target="#modal-cabang"
-                                                            id="button-data-barang-cabang" data-code="123"><span
-                                                                class="far fa-folder-open"></span>
-                                                            History</button> -->
+                                                                                    id="button-data-barang-cabang" data-code="123"><span
+                                                                                        class="far fa-folder-open"></span>
+                                                                                    History</button> -->
                                     </div>
                                 </div>
                             </td>
@@ -152,6 +152,8 @@
     <script src="https://cdn.datatables.net/responsive/3.0.4/js/dataTables.responsive.js"></script>
     <script src="https://cdn.datatables.net/responsive/3.0.4/js/responsive.bootstrap5.js"></script>
     <script src="{{ asset('vendors/choices/choices.min.js') }}"></script>
+    <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+
     <script>
         new DataTable('#example', {
             responsive: true
@@ -182,24 +184,34 @@
         $(document).on("click", "#button-verifikasi-pasien-poli", function (e) {
             e.preventDefault();
             var code = $(this).data("code");
-            $('#menu-verifikasi-pasien-poli').html(
-                '<div class="spinner-border my-3" style="display: block; margin-left: auto; margin-right: auto;" role="status"><span class="visually-hidden">Loading...</span></div>'
-            );
-            $.ajax({
-                url: "{{ route('verifikasi_poliklinik_dokter_save_verify') }}",
-                type: "POST",
-                cache: false,
-                data: {
-                    "_token": "{{ csrf_token() }}",
-                    "code": code
-                },
-                dataType: 'html',
-            }).done(function (data) {
-                $('#menu-verifikasi-pasien-poli').html(data);
-                location.reload();
-            }).fail(function () {
-                $('#menu-verifikasi-pasien-poli').html('eror');
-            });
+            var payment = document.getElementById('payment_code').value;
+            if (payment == "") {
+                Swal.fire({
+                    icon: "error",
+                    title: "Oops...",
+                    text: "Belom Ape ape dah maen asal klik!",
+                    footer: '<a href="#">Why do I have this issue?</a>'
+                });
+            } else {
+                $('#menu-verifikasi-pasien-poli').html(
+                    '<div class="spinner-border my-3" style="display: block; margin-left: auto; margin-right: auto;" role="status"><span class="visually-hidden">Loading...</span></div>'
+                );
+                $.ajax({
+                    url: "{{ route('verifikasi_poliklinik_dokter_save_verify') }}",
+                    type: "POST",
+                    cache: false,
+                    data: {
+                        "_token": "{{ csrf_token() }}",
+                        "code": code
+                    },
+                    dataType: 'html',
+                }).done(function (data) {
+                    $('#menu-verifikasi-pasien-poli').html(data);
+                    location.reload();
+                }).fail(function () {
+                    $('#menu-verifikasi-pasien-poli').html('eror');
+                });
+            }
         });
     </script>
 @endsection

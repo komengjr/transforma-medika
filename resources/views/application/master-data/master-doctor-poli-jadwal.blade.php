@@ -1,4 +1,4 @@
-@extends('layouts.template')
+@extends('layouts.layouts')
 @section('base.css')
     <link href="{{ asset('vendors/fullcalendar/main.min.css') }}" rel="stylesheet">
     <link href="{{ asset('vendors/flatpickr/flatpickr.min.css') }}" rel="stylesheet">

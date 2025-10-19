@@ -232,14 +232,116 @@
                 </div>
             </div>
             <div class="col-12">
+                <div class="card h-100 border">
+                    <div class="card-header bg-300">
+                        <h5 class="mb-0">Tindakan Yang Harus dilakukan</h5>
+                    </div>
+                    <div class="card-body bg-light">
+                        <div class="row">
+                            <div class="col-md-6">
+                                <select class="form-select mb-3" aria-label="Default select example"
+                                    id="pilihan-penjualan">
+                                    <option value="">Pilih Penjualan</option>
+                                    @foreach ($paket as $pakets)
+                                        <option value="{{$pakets->p_m_sales_code}}">{{$pakets->p_m_sales_name}}</option>
+                                    @endforeach
+                                </select>
+                            </div>
+                            <div id="menu-penjualan" class="col-md-6">
 
+                            </div>
+                            <div id="menu-sub-penjualan" class="col-md-12">
+                                <input type="text" name="payment_code" id="payment_code" hidden>
+                            </div>
+                        </div>
+                        <div class="d-flex justify-content-between fs--1 mb-1">
+                            <button class="btn btn-warning btn-sm">Pilih</button>
+                        </div>
+
+                        <hr>
+                        <div class="row">
+                            <div class="col-md-7">
+                                <table class="table table-borderless fs--1 mb-0">
+                                    <tbody>
+                                        <tr class="border-bottom">
+                                            <th class="ps-0 pt-0">Penambalan Gigi
+                                                <div class="text-400 fw-normal fs--2">{{ mt_rand(100, 90000) }}</div>
+                                            </th>
+                                            <th class="pe-0 text-end pt-0">@currency(mt_rand(100000, 900000))</th>
+                                        </tr>
+
+                                        <tr class="border-bottom">
+                                            <th class="ps-0">Subtotal</th>
+                                            <th class="pe-0 text-end">@currency(mt_rand(100000, 900000))</th>
+                                        </tr>
+                                        <tr>
+                                            <th class="ps-0 pb-0">Total</th>
+                                            <th class="pe-0 text-end pb-0">@currency(mt_rand(100000, 900000))</th>
+                                        </tr>
+                                    </tbody>
+                                </table>
+                            </div>
+                            <div class="col-md-5">
+                                <p class="fs--1 text-600">Once you start your trial, you will have 30 days to use Falcon
+                                    Premium
+                                    for free. After 30 days you’ll be charged based on your selected plan.</p>
+
+                                <span id="menu-verifikasi-pasien-poli" class="d-block w-100">
+                                    <button class="btn btn-primary d-block w-100" id="button-verifikasi-pasien-poli"
+                                        data-code="{{$code}}">Proses
+                                        Tindakan</button>
+                                </span>
+                            </div>
+                        </div>
+                        <div class="text-center mt-2"><small class="d-inline-block">By continuing, you are agreeing to
+                                our subscriber <a href="#!">terms</a> and will be charged at the end of the trial.
+                            </small></div>
+                    </div>
+                </div>
             </div>
         </div>
     </div>
 </div>
 <div class="modal-footer">
-    <span id="menu-verifikasi-pasien-poli">
-        <button class="btn btn-primary float-end" id="button-verifikasi-pasien-poli" data-code="{{$code}}">Proses
-            Verifikasi</button>
-    </span>
+
 </div>
+<script>
+    $('#pilihan-penjualan').on("change", function () {
+        var dataid = document.getElementById('pilihan-penjualan').value;
+        if (dataid == "") {
+            const Toast = Swal.mixin({
+                toast: true,
+                position: "top-end",
+                showConfirmButton: false,
+                timer: 3000,
+                timerProgressBar: true,
+                didOpen: (toast) => {
+                    toast.onmouseenter = Swal.stopTimer;
+                    toast.onmouseleave = Swal.resumeTimer;
+                }
+            });
+            Toast.fire({
+                icon: "error",
+                title: "Pilih dulu Yang bener"
+            });
+            $("#menu-penjualan").html('');
+            $("#menu-sub-penjualan").html('');
+        } else {
+            $.ajax({
+                url: "{{ route('verifikasi_poliklinik_dokter_pilih_penjualan') }}",
+                type: "POST",
+                cache: false,
+                data: {
+                    "_token": "{{ csrf_token() }}",
+                    "id": dataid,
+                },
+                dataType: 'html',
+            }).done(function (data) {
+                $("#menu-penjualan").html(data);
+            }).fail(function () {
+                console.log('eror');
+            });
+        }
+    });
+
+</script>

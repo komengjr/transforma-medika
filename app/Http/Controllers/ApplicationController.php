@@ -302,11 +302,11 @@ class ApplicationController extends Controller
     }
 
     // MASTER PEMERIKSAAN
-    public function master_pemeriksaan($akses)
+    public function master_pemeriksaan($akses, $id)
     {
-        if ($this->url_akses($akses) == true) {
+        if ($this->url_akses($akses, $id) == true) {
             $data = DB::table('master_pemeriksaan')->get();
-            return view('application.master-data.master-pemeriksaan', ['data' => $data, 'akses' => $akses]);
+            return view('application.master-data.master-pemeriksaan', ['data' => $data, 'akses' => $akses, 'code' => $id]);
         } else {
             return Redirect::to('dashboard/home');
         }
