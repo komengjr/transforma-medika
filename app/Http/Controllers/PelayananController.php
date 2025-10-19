@@ -11,10 +11,14 @@ use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Hash;
 use Illuminate\Support\Facades\Redirect;
+use Illuminate\Support\Facades\Storage;
 use Illuminate\Support\Str;
 use League\CommonMark\Extension\CommonMark\Node\Inline\Code;
 use Maatwebsite\Excel\Facades\Excel;
+use Pion\Laravel\ChunkUpload\Handler\HandlerFactory;
+use Pion\Laravel\ChunkUpload\Receiver\FileReceiver;
 use Session;
+use Svg\Tag\Rect;
 
 class PelayananController extends Controller
 {
@@ -190,6 +194,38 @@ class PelayananController extends Controller
             return '<span class="badge bg-warning">Coming Soon</span>';
         }
     }
+    public function registrasi_pasien_pilih_data_pasien_kebutuhan_upload_file(Request $request)
+    {
+        $receiver = new FileReceiver('file', $request, HandlerFactory::classFromRequest($request));
+        if (!$receiver->isUploaded()) {
+            // file not uploaded
+        }
+        $fileReceived = $receiver->receive(); // receive file
+        if ($fileReceived->isFinished()) { // file uploading is complete / all chunks are uploaded
+            $file = $fileReceived->getFile(); // get file
+            $extension = $file->getClientOriginalExtension();
+            $fileName = str_replace('.' . $extension, '', $file->getClientOriginalName()); //file name without extenstion
+            $fileName .= '_' . md5(time()) . '.' . $extension; // a unique file name
+
+            $disk = Storage::disk(config('filesystems.default'));
+            $path = $disk->putFileAs('public/data_pasien/penunjang/' . auth::user()->access_cabang, $file, $fileName);
+            // $path1 = $disk('videos', $file, $fileName);
+
+            // delete chunked file
+            unlink($file->getPathname());
+            return [
+                'path' => Storage::url('data_pasien/penunjang/' . auth::user()->access_cabang . '/' . $fileName),
+                'filename' => $fileName
+            ];
+        }
+
+        // otherwise return percentage informatoin
+        $handler = $fileReceived->handler();
+        return [
+            'done' => $handler->getPercentageDone(),
+            'status' => true
+        ];
+    }
     public function registrasi_pasien_pilih_data_pasien_kebutuhan_pilih_lab_agrement(Request $request)
     {
         $data = DB::table('p_sales_cat')
@@ -319,6 +355,24 @@ class PelayananController extends Controller
             'd_reg_order_poli_user' => Auth::user()->userid,
             'created_at' => now()
         ]);
+        $cat = DB::table('t_pasien_cat_data')->where('t_pasien_cat_code', $request->cat)->get();
+        foreach ($cat as $value) {
+            if ($value->t_pasien_cat_data_type == 'text') {
+                DB::table('t_pasien_cat_data_poli')->insert([
+                    'id_t_pasien_cat_data' => $value->id_t_pasien_cat_data,
+                    'd_reg_order_poli_code' => $code,
+                    't_pasien_cat_data_poli_desc' => $request->data_penunjang,
+                    'created_at' => now()
+                ]);
+            } elseif ($value->t_pasien_cat_data_type == 'file') {
+                DB::table('t_pasien_cat_data_poli')->insert([
+                    'id_t_pasien_cat_data' => $value->id_t_pasien_cat_data,
+                    'd_reg_order_poli_code' => $code,
+                    't_pasien_cat_data_poli_desc' => 'data_pasien/penunjang/' . Auth::user()->access_cabang . '/' . $request->data_link,
+                    'created_at' => now()
+                ]);
+            }
+        }
         return 13;
     }
     public function registrasi_pasien_pilih_data_pasien_kebutuhan_fix_registrasi_lab(Request $request)

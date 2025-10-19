@@ -58,7 +58,7 @@ class PoliklinikController extends Controller
                 ->join('master_patient', 'master_patient.master_patient_code', '=', 'd_reg_order.d_reg_order_rm')
                 ->join('t_layanan_data', 't_layanan_data.t_layanan_data_code', '=', 'm_doctor_poli.t_layanan_data_code')
                 ->join('master_doctor', 'master_doctor.master_doctor_code', '=', 'm_doctor_poli.master_doctor_code')
-                ->where('d_reg_order.d_reg_order_cabang', Auth::user()->access_cabang)->orderBy('id_d_reg_order','DESC')
+                ->where('d_reg_order.d_reg_order_cabang', Auth::user()->access_cabang)->orderBy('id_d_reg_order', 'DESC')
                 ->get();
             return view('application.poliklinik.data-registrasi-poliklinik', ['data' => $data, 'akses' => $akses, 'code' => $id]);
         } else {
@@ -254,8 +254,13 @@ class PoliklinikController extends Controller
             return view('application.poliklinik.poliklinik-handling.table.data-diagnosa-umum', ['data' => $data]);
         }
     }
-    public function data_registrasi_poliklinik_data_penunjang(Request $request){
-        return view('application.poliklinik.poliklinik-handling.form-penunjang-poliklinik');
+    public function data_registrasi_poliklinik_data_penunjang(Request $request)
+    {
+        $data = DB::table('t_pasien_cat_data_poli')
+        ->join('t_pasien_cat_data','t_pasien_cat_data.id_t_pasien_cat_data','=','t_pasien_cat_data_poli.id_t_pasien_cat_data')
+        ->where('t_pasien_cat_data.t_pasien_cat_data_type','file')
+        ->where('t_pasien_cat_data_poli.d_reg_order_poli_code', $request->id)->first();
+        return view('application.poliklinik.poliklinik-handling.form-penunjang-poliklinik', ['data' => $data]);
     }
     public function data_registrasi_poliklinik_save_diagnosa_pasien_poli(Request $request)
     {
@@ -348,7 +353,7 @@ class PoliklinikController extends Controller
         $tgl_lahir_carbon = Carbon::parse($pasien->master_patient_tgl_lahir);
         $umur_tahun = $tgl_lahir_carbon->diffInYears(); // Menghitung umur dalam tahun
 
-        $umur = $umur_tahun.' Th ';
+        $umur = $umur_tahun . ' Th ';
         $pdf = \Barryvdh\DomPDF\Facade\Pdf::loadview('application.poliklinik.dokumentasi-hasil.report.report-preview-hasil', [
             'code' => $request->code,
             'odon' => $odon,

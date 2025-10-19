@@ -19,9 +19,9 @@
             <div class="input-group">
                 <span class="input-group-text"><i class="far fa-file-alt"></i></span>
                 @if ($cats->t_pasien_cat_data_type == 'text')
-                    <input type="text" class="form-control form-control-lg border-start-0">
+                    <input type="text" class="form-control form-control-lg border-start-0" id="data_penunjang">
                 @elseif($cats->t_pasien_cat_data_type == 'file')
-                    <input type="file" class="form-control form-control-lg border-start-0">
+                    <input type="file" class="form-control form-control-lg border-start-0" id="upload-penunjang">
                 @endif
             </div>
         </div>
@@ -47,6 +47,8 @@
         </div>
     </div>
 </div>
+<input id="link_penunjang" type="text" name="link_penunjang" class="form-control" hidden>
+
 <div id="menu-pilihan-poliklinik"></div>
 
 <script>
@@ -81,4 +83,51 @@
     $('#tanggal_periksa').on("change", function () {
         $("#menu-pilihan-dokter-poli").html('');
     });
+</script>
+<script type="text/javascript">
+    var browseFile = $('#upload-penunjang');
+    var resumable = new Resumable({
+        target: "{{ route('registrasi_pasien_pilih_data_pasien_kebutuhan_upload_file') }}",
+        query: {
+            _token: '{{ csrf_token() }}'
+        }, // CSRF token
+        fileType: ['jpg', 'png'],
+        headers: {
+            'Accept': 'application/json'
+        },
+        testChunks: false,
+        throttleProgressCallbacks: 1,
+    });
+    resumable.assignBrowse(browseFile);
+    resumable.on('fileAdded', function (file) { // trigger wn file picked
+        showProgress();
+        resumable.upload() // to actually start uploading.
+    });
+    resumable.on('fileProgress', function (file) { // trigger when file progress update
+        updateProgress(Math.floor(file.progress() * 100));
+    });
+    resumable.on('fileSuccess', function (file, response) { // trigger when file upload complete
+        response = JSON.parse(response)
+        document.getElementById('upload-penunjang').style.display = 'none';
+        $('#link_penunjang').attr('value', response.filename);
+        $('.card-footer').show();
+        $('#browseFile').hide();
+    });
+    resumable.on('fileError', function (file, response) { // trigger when there is any error
+        alert('file uploading error.')
+    });
+    var progress = $('.progress');
+    function showProgress() {
+        progress.find('.loading').css('width', '0%');
+        progress.find('.loading').html('0%');
+        progress.find('.loading').removeClass('bg-info');
+        progress.show();
+    }
+    function updateProgress(value) {
+        progress.find('.loading').css('width', ` ${value}%`)
+        progress.find('.loading').html(`${value}%`)
+    }
+    function hideProgress() {
+        progress.hide();
+    }
 </script>
