@@ -18,7 +18,7 @@
                 <th>No Handphone</th>
             </tr>
         </thead>
-        <tbody class="fs--1 list" style="color: white;">
+        <tbody class="fs--1 list">
             @php
                 $no = 1;
             @endphp

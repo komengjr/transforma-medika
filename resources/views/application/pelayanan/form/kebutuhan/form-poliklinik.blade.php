@@ -18,7 +18,11 @@
             <label for="inputLastName2" class="form-label text-info">{{ $cats->t_pasien_cat_data_name }}</label>
             <div class="input-group">
                 <span class="input-group-text"><i class="far fa-file-alt"></i></span>
-                <input type="text" class="form-control form-control-lg border-start-0">
+                @if ($cats->t_pasien_cat_data_type == 'text')
+                    <input type="text" class="form-control form-control-lg border-start-0">
+                @elseif($cats->t_pasien_cat_data_type == 'file')
+                    <input type="file" class="form-control form-control-lg border-start-0">
+                @endif
             </div>
         </div>
     @endforeach
@@ -46,7 +50,7 @@
 <div id="menu-pilihan-poliklinik"></div>
 
 <script>
-    $('#poli').on("change", function() {
+    $('#poli').on("change", function () {
         var dataid = $("#poli option:selected").attr('data-id');
         var tgl = document.getElementById("tanggal_periksa").value;
         if (dataid == null || tgl == '') {
@@ -67,14 +71,14 @@
                     "id": dataid,
                 },
                 dataType: 'html',
-            }).done(function(data) {
+            }).done(function (data) {
                 $("#menu-pilihan-poliklinik").html(data);
-            }).fail(function() {
+            }).fail(function () {
                 console.log('eror');
             });
         }
     });
-    $('#tanggal_periksa').on("change", function() {
+    $('#tanggal_periksa').on("change", function () {
         $("#menu-pilihan-dokter-poli").html('');
     });
 </script>

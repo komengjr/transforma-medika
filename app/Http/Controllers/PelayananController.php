@@ -6,6 +6,7 @@ use App\Imports\PesertaAllImport;
 use App\Imports\PesertaImport;
 use Exception;
 use Illuminate\Http\Request;
+use Illuminate\Support\Carbon;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Hash;
@@ -153,8 +154,8 @@ class PelayananController extends Controller
         $list = DB::table('d_reg_order')->where('d_reg_order_date', date('Y-m-d'))->count();
         $no_reg = date('Ymdhis') . str_pad($list + 1, 3, '0', STR_PAD_LEFT);
         $data = DB::table('master_patient')
-        ->join('m_city','m_city.M_CityID','=','master_patient.master_patient_place')
-        ->where('master_patient_code', $request->code)->first();
+            ->join('m_city', 'm_city.M_CityID', '=', 'master_patient.master_patient_place')
+            ->where('master_patient_code', $request->code)->first();
         return view('application.pelayanan.form.form-registrasi-proses', ['data' => $data, 'no_reg' => $no_reg]);
     }
     public function registrasi_pasien_pilih_data_pasien_kebutuhan(Request $request)
@@ -170,7 +171,7 @@ class PelayananController extends Controller
             ->join('t_pasien_cat_data', 't_pasien_cat_data.t_pasien_cat_code', '=', 't_pasien_cat.t_pasien_cat_code')
             ->where('t_pasien_cat.t_pasien_cat_code', $request->cat)->get();
         if ($request->id == '14de0404-0c88-4cff-bae1-d28ea75b53ad') {
-            $poli = DB::table('t_layanan_data')->where('t_layanan_cat_code', '14de0404-0c88-4cff-bae1-d28ea75b53ad')->where('t_layanan_data_status',1)->get();
+            $poli = DB::table('t_layanan_data')->where('t_layanan_cat_code', '14de0404-0c88-4cff-bae1-d28ea75b53ad')->where('t_layanan_data_status', 1)->get();
             return view('application.pelayanan.form.kebutuhan.form-poliklinik', ['poli' => $poli, 'cat' => $pasien_cat]);
         } elseif ($request->id == '0bd4ea7f-bd6e-4fa7-878a-29295f74f0ac') {
             $dokter = DB::table('master_doctor')->get();
@@ -277,7 +278,16 @@ class PelayananController extends Controller
         $dokter = DB::table('m_doctor_poli')->join('t_layanan_data', 't_layanan_data.t_layanan_data_code', '=', 'm_doctor_poli.t_layanan_data_code')
             ->join('master_doctor', 'master_doctor.master_doctor_code', '=', 'm_doctor_poli.master_doctor_code')
             ->where('m_doctor_poli.m_doctor_poli_code', $request->code)->first();
-        return view('application.pelayanan.form.kebutuhan.form-dokter-poliklinik', ['dokter' => $dokter, 'tgl' => $request->tgl]);
+        $antrian = DB::table('d_reg_order_poli')
+            ->join('d_reg_order', 'd_reg_order.d_reg_order_code', '=', 'd_reg_order_poli.d_reg_order_code')
+            ->join('master_patient', 'master_patient.master_patient_code', '=', 'd_reg_order.d_reg_order_rm')
+            ->where('d_reg_order_date', $request->tgl)
+            ->where('m_doctor_poli_code', $request->code)->get();
+        return view('application.pelayanan.form.kebutuhan.form-dokter-poliklinik', [
+            'dokter' => $dokter,
+            'tgl' => $request->tgl,
+            'antrian' => $antrian
+        ]);
     }
     public function registrasi_pasien_pilih_data_pasien_kebutuhan_fix_registrasi_poli(Request $request)
     {
@@ -400,14 +410,32 @@ class PelayananController extends Controller
     }
     public function registrasi_pasien_pilih_data_pasien_end_proses(Request $request)
     {
-        return view('application.pelayanan.form.form-nomor-registrasi', ['code' => $request->code]);
+        $data = DB::table('d_reg_order')->join('master_patient', 'master_patient.master_patient_code', '=', 'd_reg_order.d_reg_order_rm')
+            ->where('d_reg_order.d_reg_order_code', $request->code)->first();
+        return view('application.pelayanan.form.form-nomor-registrasi', [
+            'code' => $request->code,
+            'data' => $data
+        ]);
     }
     public function registrasi_pasien_pilih_data_pasien_preview_pdf(Request $request)
     {
+        $pasien = DB::table('d_reg_order')
+            ->join('master_patient', 'master_patient.master_patient_code', '=', 'd_reg_order.d_reg_order_rm')
+            ->where('d_reg_order.d_reg_order_code', $request->code)->first();
+        $tgl_lahir_carbon = Carbon::parse($pasien->master_patient_tgl_lahir);
+        $umur_tahun = $tgl_lahir_carbon->diffInYears(); // Menghitung umur dalam tahun
 
+        $umur = $umur_tahun . ' Th ';
         $image = base64_encode(file_get_contents(public_path('img/favicon.png')));
-        $pdf = \Barryvdh\DomPDF\Facade\Pdf::loadview('application.pelayanan.form.report.preview-registrasi', ['code' => $request->code], compact('image'))
-            ->setPaper('A5', 'potrait')->setOptions(['defaultFont' => 'helvetica']);
+        $pdf = \Barryvdh\DomPDF\Facade\Pdf::loadview('application.pelayanan.form.report.preview-registrasi', [
+            'code' => $request->code,
+            'pasien' => $pasien,
+            'umur' => $umur,
+        ], compact('image'))
+            ->setPaper('A5', 'potrait')->setOptions([
+                    'isHtml5ParserEnabled' => true,
+                    'isRemoteEnabled' => true,
+                ]);
         $pdf->output();
         $dompdf = $pdf->getDomPDF();
         $font = $dompdf->getFontMetrics()->get_font("helvetica", "bold");
@@ -429,7 +457,7 @@ class PelayananController extends Controller
                 ->join('master_patient', 'master_patient.master_patient_code', '=', 'd_reg_order.d_reg_order_rm')
                 ->join('t_layanan_cat', 't_layanan_cat.t_layanan_cat_code', '=', 'd_reg_order.t_layanan_cat_code')
                 ->join('t_pasien_cat', 't_pasien_cat.t_pasien_cat_code', '=', 'd_reg_order.t_pasien_cat_code')
-                ->where('d_reg_order.d_reg_order_cabang', Auth::user()->access_cabang)
+                ->where('d_reg_order.d_reg_order_cabang', Auth::user()->access_cabang)->orderBy('id_d_reg_order', 'DESC')
                 ->get();
             return view('application.pelayanan.list-pasien-registrasi', ['data' => $data, 'akses' => $akses, 'code' => $id]);
         } else {

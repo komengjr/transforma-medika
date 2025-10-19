@@ -18,9 +18,11 @@
             <div class="col-sm-6 text-sm-start"><img src="{{ asset('img/favicon.png') }}" alt="invoice" width="100">
             </div>
             <div class="col text-sm-end mt-3 mt-sm-0">
-                <h3 class="mb-1 text-warning">Transforma Medika</h3>
+                <h3 class="mb-1 text-warning">Innoverta Medika</h3>
                 {{-- <h5>Transforma Design Studio</h5> --}}
-                <p class="fs--1 mb-0">156 University Ave, Toronto<br>On, Canada, M5H 2H7</p>
+                <p class="fs--1 mb-0">Lorem, ipsum dolor sit amet consectetur adipisicing elit. <br> Ipsum optio sunt
+                    fugit
+                    necessitatibus reprehenderit numquam dicta vero molestiae minima</p>
             </div>
             <div class="col-12">
                 <hr style="color: black;">
@@ -29,30 +31,30 @@
         <div class="row align-items-center">
             <div class="col">
                 <h6 class="text-500">Pendaftaran</h6>
-                <h5>Antonio Banderas</h5>
-                <p class="fs--1">1954 Bloor Street West<br>Torronto ON, M6P 3K9<br>Canada</p>
-                <p class="fs--1"><a href="mailto:example@gmail.com">example@gmail.com</a><br><a
-                        href="tel:444466667777">+4444-6666-7777</a></p>
+                <h5>{{$data->master_patient_name}}</h5>
+                <p class="fs--1">-<br>-<br>-</p>
+                <p class="fs--1"><a href="mailto:example@gmail.com">{{$data->master_patient_email}}</a><br><a
+                        href="tel:444466667777">{{$data->master_patient_no_hp}}</a></p>
             </div>
             <div class="col-sm-auto ms-auto">
                 <div class="table-responsive">
                     <table class="table table-sm table-borderless fs--1">
                         <tbody>
                             <tr>
-                                <th class="text-sm-end">Invoice No:</th>
-                                <td>14</td>
+                                <th class="text-sm-end">No Registrasi :</th>
+                                <td>{{$code}}</td>
                             </tr>
                             <tr>
-                                <th class="text-sm-end">Order Number:</th>
-                                <td>AD20294</td>
+                                <th class="text-sm-end">No Registrasi Poli:</th>
+                                <td>{{$data->d_reg_order_code}}</td>
                             </tr>
                             <tr>
-                                <th class="text-sm-end">Invoice Date:</th>
-                                <td>2018-09-25</td>
+                                <th class="text-sm-end">Tanggal Registrasi :</th>
+                                <td>{{$data->d_reg_order_date}}</td>
                             </tr>
                             <tr>
                                 <th class="text-sm-end">Payment Due:</th>
-                                <td>Upon receipt</td>
+                                <td>Pending</td>
                             </tr>
                             <tr class="bg-success fw-bold">
                                 @php
@@ -64,7 +66,7 @@
                 </div>
             </div>
         </div>
-        <div class="table-responsive scrollbar mt-4 fs--1">
+        <!-- <div class="table-responsive scrollbar mt-4 fs--1">
             <table class="table table-striped border-bottom">
                 <thead class="light">
                     <tr class="bg-primary text-white dark__bg-1000">
@@ -137,7 +139,7 @@
                     </tbody>
                 </table>
             </div>
-        </div>
+        </div> -->
     </div>
     <div class="card-footer bg-light">
         <div class="d-flex justify-content-between">

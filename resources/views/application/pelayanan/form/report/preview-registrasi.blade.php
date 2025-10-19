@@ -3,19 +3,14 @@
 <head>
     <meta charset="utf-8">
     <title>Document Stockopname</title>
-    <link rel="stylesheet" href="style.css" media="all" />
-    <link href="https://fonts.googleapis.com/css2?family=Hubot+Sans:ital,wght@0,200..900;1,200..900&display=swap"
+    <link href="https://fonts.googleapis.com/css2?family=Roboto+Mono:ital,wght@0,100..700;1,100..700&display=swap"
         rel="stylesheet">
     <style>
         * {
-            font-family: "Hubot Sans", sans-serif;
+            font-family: "Roboto Mono", monospace;
             font-optical-sizing: auto;
-            font-weight: 500;
+            font-weight: <weight>;
             font-style: normal;
-            font-variation-settings:
-                "wdth" 100;
-
-            /* padding: 10px; */
         }
     </style>
     <style>
@@ -67,10 +62,12 @@
             padding: 10px;
             border: 1px solid #0b0909;
             border-style: solid solid dashed double;
+            border-radius: 5px;
             margin-bottom: 10px;
         }
 
         #client {
+            padding-top: 35px;
             padding-left: 6px;
             border-left: 6px solid #db3311;
             float: left;
@@ -214,6 +211,15 @@
             padding: 8px 0;
             text-align: center;
         }
+
+        #kepala {
+            border: 1px solid #badadbff;
+            border-style: solid solid solid solid;
+            border-radius: 10px;
+            /* background-color: #138cc0ff; */
+            color: black;
+            padding: 10px;
+        }
     </style>
 </head>
 
@@ -224,11 +230,10 @@
         </div>
         <div id="company">
             <div style="margin-top: -20px; font-size: 9px;;">REG/001/POLI/20250201/PRIBADI</div><br>
-            <h2 class="name" style="margin-top: -20px;  color: #0087C3;font-size: 25px;font-weight: 800;">Innovenrta Medic
+            <h2 class="name" style="margin-top: -20px;  color: #0087C3;font-size: 25px;font-weight: 800;">Innovenrta
+                Medic
             </h2>
-            <br>
             <div>Lorem, ipsum dolor sit amet thanks</div>
-            <div>092 82733</div>
         </div>
         </div>
     </header>
@@ -241,46 +246,50 @@
 
                 <table style="margin: 0px; padding: 0px; font-size: 0.8em;">
                     <tr>
-                        <td style="padding: 0;">No Registrasi</td>
+                        <td style="padding: 1;">No Registrasi</td>
                         <td style="padding-top: 0;padding-bottom: 0px;">:</td>
-                        <td style="padding: 0;">{{$code}}</td>
+                        <td style="padding: 1;">{{$code}}</td>
                     </tr>
                     <tr>
-                        <td style="padding: 0;">Tanggal Registrasi</td>
+                        <td style="padding: 1;">Nama Pasien</td>
                         <td style="padding-top: 0;padding-bottom: 0px;">:</td>
-                        <td style="padding: 0;">
-                            -
+                        <td style="padding: 1;">
+                            {{$pasien->master_patient_name}}
+                        </td>
+                    </tr>
+                    <tr>
+                        <td style="padding: 1;">Umur / Tanggal Lahir</td>
+                        <td style="padding-top: 0;padding-bottom: 0px;">:</td>
+                        <td style="padding: 1;">
+                            {{ $umur }} / {{$pasien->master_patient_tgl_lahir}}
+                        </td>
+                    </tr>
+                    <tr>
+                        <td style="padding: 1;">Tanggal Registrasi</td>
+                        <td style="padding-top: 0;padding-bottom: 0px;">:</td>
+                        <td style="padding: 1;">
+                            {{$pasien->d_reg_order_date}}
                         </td>
                     </tr>
                 </table>
 
             </div>
             <div id="invoice">
-                <span style="font-size: 1em">Form Registrasi Pasien</span>
+                <img src="data:image/png;base64,' . {{DNS1D::getBarcodePNG($code, 'C39', 1, 35)}} . '" alt="barcode" />
+                <!-- <span style="font-size: 1em">Form Registrasi Pasien</span> -->
                 {{-- <div class="date" style="color: red; font-size: 12px;">Print By : {{ Auth::user()->fullname }}
                 </div> --}}
                 <div class="date" style="color: #0087C3">{{ date('d-m-Y H-i-s') }}</div><br>
-                <img src="data:image/png;base64,' . {{DNS1D::getBarcodePNG($code, 'C39', 1, 35)}} . '" alt="barcode" />
             </div>
         </div>
         <br>
-        <table style="width: 100%;" border="1">
-            <tr>
-                <td style="text-align: center;"><strong>DATA PASIEN</strong></td>
-            </tr>
-            <tr>
-                <td style="margin: 5px; padding: 10px;">
-                    <div><strong>1. Dasar Pengajuan :</strong></div>
-                    <p style="padding-left: 17px;">123</p>
-                </td>
-            </tr>
-
-        </table>
+        <div class="details" id="kepala">
+            <strong style="margin: 0; padding: 0;">Data Penunjang</strong>
+            <hr>
+            Foto Panoramic Terlampir
+        </div>
         {{-- <div id="thanks">Thank you!</div> --}}
         <div id="notices">
-            <img style="padding-top: 1px; left: 10px;" src="data:image/png;base64, {!! base64_encode(
-    QrCode::style('round')->eye('circle')->format('svg')->size(50)->errorCorrection('H')->generate(123),
-) !!}">
             <div class="notice">Notes: We really appreciate your business , please
                 let us know!</div>
         </div>
