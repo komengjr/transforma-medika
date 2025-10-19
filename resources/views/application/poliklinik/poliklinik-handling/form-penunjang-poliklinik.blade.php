@@ -30,8 +30,8 @@
             <div class="controls">
                 <button class="btn btn-outline-warning btn-sm" id="modeWindow">🩻 Window/Level</button>
                 <button class="btn btn-outline-danger btn-sm" id="modeMove">✋ Move</button>
-                <button class="btn btn-outline-dark btn-sm" id="zoomIn">🔍 Zoom In</button>
-                <button class="btn btn-outline-dark btn-sm" id="zoomOut">🔎 Zoom Out</button>
+                <button class="btn btn-dark btn-sm" id="zoomIn">🔍 Zoom In</button>
+                <button class="btn btn-dark btn-sm" id="zoomOut">🔎 Zoom Out</button>
                 <button class="btn btn-outline-secondary btn-sm" id="resetView">🔄 Reset View</button>
             </div>
 
