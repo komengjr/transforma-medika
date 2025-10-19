@@ -185,7 +185,14 @@
 </div>
 <div class="card mb-3">
     <div class="card-header bg-300">
-        <h5 class="mb-0">Diagnosa Pasien</h5>
+        <div class="row gx-0 flex-between-center">
+            <dic class="col-auto d-flex">
+                <h5 class="mb-0">Diagnosa Pasien</h5>
+            </dic>
+            <div class="col-auto" id="menu-pasien-poliklinik">
+                <button class="btn btn-primary btn-sm" data-bs-toggle="modal" data-bs-target="#modal-poliklinik" id="button-penunjang-poliklinik">Data Penunjang</button>
+            </div>
+        </div>
     </div>
     <div class="card-body bg-light">
         <div class="position-relative rounded-1 border bg-white dark__bg-1100 p-3">
@@ -249,7 +256,16 @@
 </div>
 <div class="card mb-3">
     <div class="card-header bg-300">
-        <h5 class="mb-0">Odontogram Interaktif</h5>
+        <div class="row gx-0 flex-between-center">
+            <dic class="col-auto d-flex">
+                <h5 class="mb-0">Odontogram Interaktif</h5>
+            </dic>
+            <div class="col-auto" id="menu-pasien-poliklinik">
+                <button class="btn btn-warning btn-sm" id="button-save-data-diagnosa-pasien-poli">Skip / Simpan
+                    Data</button>
+            </div>
+        </div>
+
     </div>
     <div class="card-body bg-light">
         <div class="container py-4">

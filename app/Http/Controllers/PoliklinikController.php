@@ -254,6 +254,9 @@ class PoliklinikController extends Controller
             return view('application.poliklinik.poliklinik-handling.table.data-diagnosa-umum', ['data' => $data]);
         }
     }
+    public function data_registrasi_poliklinik_data_penunjang(Request $request){
+        return view('application.poliklinik.poliklinik-handling.form-penunjang-poliklinik');
+    }
     public function data_registrasi_poliklinik_save_diagnosa_pasien_poli(Request $request)
     {
         DB::table('d_reg_order_poli')->where('d_reg_order_poli_code', $request->id)->update([

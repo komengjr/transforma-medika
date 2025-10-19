@@ -210,7 +210,6 @@
         $(document).on("click", "#button-save-data-diagnosa-pasien-poli", function (e) {
             e.preventDefault();
             var id = document.getElementById('code_gigi').value;
-
             $('#menu-pasien-poliklinik').html(
                 '<div class="spinner-border my-3" style="display: block; margin-left: auto; margin-right: auto;" role="status"><span class="visually-hidden">Loading...</span></div>'
             );
@@ -229,7 +228,27 @@
             }).fail(function () {
                 alert('eror');
             });
-
+        });
+        $(document).on("click", "#button-penunjang-poliklinik", function (e) {
+            e.preventDefault();
+            var id = document.getElementById('code_gigi').value;
+            $('#menu-poliklinik').html(
+                '<div class="spinner-border my-3" style="display: block; margin-left: auto; margin-right: auto;" role="status"><span class="visually-hidden">Loading...</span></div>'
+            );
+            $.ajax({
+                url: "{{ route('data_registrasi_poliklinik_data_penunjang') }}",
+                type: "POST",
+                cache: false,
+                data: {
+                    "_token": "{{ csrf_token() }}",
+                    "id": id,
+                },
+                dataType: 'html',
+            }).done(function (data) {
+                $('#menu-poliklinik').html(data);
+            }).fail(function () {
+                alert('eror');
+            });
         });
     </script>
 
