@@ -286,7 +286,13 @@
         <div class="details" id="kepala">
             <strong style="margin: 0; padding: 0;">Data Penunjang</strong>
             <hr>
-            Foto Panoramic Terlampir
+            @foreach ($poli_gigi as $gigi)
+                @if ($gigi->t_pasien_cat_data_type == 'text')
+                    {{ $gigi->t_pasien_cat_data_poli_desc }} <br>
+                @elseif($gigi->t_pasien_cat_data_type == 'file')
+                <img src="data:image/png;base64, {{ $file_gigi }}" width="450">
+                @endif
+            @endforeach
         </div>
         {{-- <div id="thanks">Thank you!</div> --}}
         <div id="notices">

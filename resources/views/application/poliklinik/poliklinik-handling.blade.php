@@ -210,24 +210,58 @@
         $(document).on("click", "#button-save-data-diagnosa-pasien-poli", function (e) {
             e.preventDefault();
             var id = document.getElementById('code_gigi').value;
-            $('#menu-pasien-poliklinik').html(
-                '<div class="spinner-border my-3" style="display: block; margin-left: auto; margin-right: auto;" role="status"><span class="visually-hidden">Loading...</span></div>'
-            );
-            $.ajax({
-                url: "{{ route('data_registrasi_poliklinik_save_diagnosa_pasien_poli') }}",
-                type: "POST",
-                cache: false,
-                data: {
-                    "_token": "{{ csrf_token() }}",
-                    "id": id,
+            const swalWithBootstrapButtons = Swal.mixin({
+                customClass: {
+                    confirmButton: "btn btn-success",
+                    cancelButton: "btn btn-danger"
                 },
-                dataType: 'html',
-            }).done(function (data) {
-                $('#menu-pasien-poliklinik').html(data);
-                location.reload();
-            }).fail(function () {
-                alert('eror');
+                buttonsStyling: true
             });
+            swalWithBootstrapButtons.fire({
+                title: "Are you sure?",
+                text: "Pastikan Semua Diisi dengan benar!",
+                icon: "warning",
+                showCancelButton: true,
+                cancelButtonText: "No, cancel!",
+                confirmButtonText: "Yes, Prosess it!",
+                reverseButtons: true
+            }).then((result) => {
+                if (result.isConfirmed) {
+                    $('#menu-pasien-poliklinik').html(
+                        '<div class="spinner-border my-3" style="display: block; margin-left: auto; margin-right: auto;" role="status"><span class="visually-hidden">Loading...</span></div>'
+                    );
+                    $.ajax({
+                        url: "{{ route('data_registrasi_poliklinik_save_diagnosa_pasien_poli') }}",
+                        type: "POST",
+                        cache: false,
+                        data: {
+                            "_token": "{{ csrf_token() }}",
+                            "id": id,
+                        },
+                        dataType: 'html',
+                    }).done(function (data) {
+                        swalWithBootstrapButtons.fire({
+                            title: "Success!",
+                            text: "Your Pasien Has Been Handling.",
+                            icon: "success"
+                        });
+                        location.reload();
+                    }).fail(function () {
+                        alert('eror');
+                    });
+
+                } else if (
+                    /* Read more about handling dismissals below */
+                    result.dismiss === Swal.DismissReason.cancel
+                ) {
+                    swalWithBootstrapButtons.fire({
+                        title: "Cancelled",
+                        text: "Your Proses is cancel:)",
+                        icon: "error"
+                    });
+                }
+            });
+
         });
         $(document).on("click", "#button-penunjang-poliklinik", function (e) {
             e.preventDefault();

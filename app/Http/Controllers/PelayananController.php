@@ -357,21 +357,25 @@ class PelayananController extends Controller
         ]);
         $cat = DB::table('t_pasien_cat_data')->where('t_pasien_cat_code', $request->cat)->get();
         foreach ($cat as $value) {
-            if ($value->t_pasien_cat_data_type == 'text') {
-                DB::table('t_pasien_cat_data_poli')->insert([
-                    'id_t_pasien_cat_data' => $value->id_t_pasien_cat_data,
-                    'd_reg_order_poli_code' => $code,
-                    't_pasien_cat_data_poli_desc' => $request->data_penunjang,
-                    'created_at' => now()
-                ]);
-            } elseif ($value->t_pasien_cat_data_type == 'file') {
-                DB::table('t_pasien_cat_data_poli')->insert([
-                    'id_t_pasien_cat_data' => $value->id_t_pasien_cat_data,
-                    'd_reg_order_poli_code' => $code,
-                    't_pasien_cat_data_poli_desc' => 'data_pasien/penunjang/' . Auth::user()->access_cabang . '/' . $request->data_link,
-                    'created_at' => now()
-                ]);
+            if ($request->data_penunjang == "") {
+            } else {
+                if ($value->t_pasien_cat_data_type == 'text') {
+                    DB::table('t_pasien_cat_data_poli')->insert([
+                        'id_t_pasien_cat_data' => $value->id_t_pasien_cat_data,
+                        'd_reg_order_poli_code' => $code,
+                        't_pasien_cat_data_poli_desc' => $request->data_penunjang,
+                        'created_at' => now()
+                    ]);
+                } elseif ($value->t_pasien_cat_data_type == 'file') {
+                    DB::table('t_pasien_cat_data_poli')->insert([
+                        'id_t_pasien_cat_data' => $value->id_t_pasien_cat_data,
+                        'd_reg_order_poli_code' => $code,
+                        't_pasien_cat_data_poli_desc' => 'data_pasien/penunjang/' . Auth::user()->access_cabang . '/' . $request->data_link,
+                        'created_at' => now()
+                    ]);
+                }
             }
+
         }
         return 13;
     }
@@ -478,14 +482,26 @@ class PelayananController extends Controller
             ->where('d_reg_order.d_reg_order_code', $request->code)->first();
         $tgl_lahir_carbon = Carbon::parse($pasien->master_patient_tgl_lahir);
         $umur_tahun = $tgl_lahir_carbon->diffInYears(); // Menghitung umur dalam tahun
-
+        $poli_gigi = DB::table('t_pasien_cat_data_poli')
+            ->join('d_reg_order_poli', 'd_reg_order_poli.d_reg_order_poli_code', '=', 't_pasien_cat_data_poli.d_reg_order_poli_code')
+            ->join('d_reg_order', 'd_reg_order.d_reg_order_code', '=', 'd_reg_order_poli.d_reg_order_code')
+            ->join('t_pasien_cat_data', 't_pasien_cat_data.id_t_pasien_cat_data', '=', 't_pasien_cat_data_poli.id_t_pasien_cat_data')
+            ->where('d_reg_order.d_reg_order_code', $request->code)->get();
+        $poli_gigi_doc = DB::table('t_pasien_cat_data_poli')
+            ->join('d_reg_order_poli', 'd_reg_order_poli.d_reg_order_poli_code', '=', 't_pasien_cat_data_poli.d_reg_order_poli_code')
+            ->join('d_reg_order', 'd_reg_order.d_reg_order_code', '=', 'd_reg_order_poli.d_reg_order_code')
+            ->join('t_pasien_cat_data', 't_pasien_cat_data.id_t_pasien_cat_data', '=', 't_pasien_cat_data_poli.id_t_pasien_cat_data')
+            ->where('d_reg_order.d_reg_order_code', $request->code)->where('t_pasien_cat_data.t_pasien_cat_data_type', 'file')->first();
+        // $file_gigi = base64_encode(Storage::url($poli_gigi_doc->t_pasien_cat_data_poli_desc));
+        $file_gigi = base64_encode(file_get_contents(public_path('storage/' . $poli_gigi_doc->t_pasien_cat_data_poli_desc)));
         $umur = $umur_tahun . ' Th ';
         $image = base64_encode(file_get_contents(public_path('img/favicon.png')));
         $pdf = \Barryvdh\DomPDF\Facade\Pdf::loadview('application.pelayanan.form.report.preview-registrasi', [
             'code' => $request->code,
             'pasien' => $pasien,
             'umur' => $umur,
-        ], compact('image'))
+            'poli_gigi' => $poli_gigi,
+        ], compact('image', 'file_gigi'))
             ->setPaper('A5', 'potrait')->setOptions([
                     'isHtml5ParserEnabled' => true,
                     'isRemoteEnabled' => true,

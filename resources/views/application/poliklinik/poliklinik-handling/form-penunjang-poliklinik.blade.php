@@ -46,135 +46,135 @@
 @endphp
 @if ($data)
     <script>
-        const canvas = document.getElementById("xrayCanvas");
-        const ctx = canvas.getContext("2d");
-        const info = document.getElementById("info");
+        const canvas<?php echo $no ?> = document.getElementById("xrayCanvas");
+        const ctx<?php echo $no ?> = canvas<?php echo $no ?>.getContext("2d");
+        const info<?php echo $no ?> = document.getElementById("info");
 
-        const img = new Image();
-        img.src = "{{ Storage::url($data->t_pasien_cat_data_poli_desc) }}";
+        const img<?php echo $no ?> = new Image();
+        img<?php echo $no ?>.src = "{{ Storage::url($data->t_pasien_cat_data_poli_desc) }}";
 
-        let originalImage = null;
-        let brightness = 0;
-        let contrast = 1;
-        let scale = 1.0;
-        let offsetX = 0;
-        let offsetY = 0;
-        let isDragging = false;
-        let mode = "window";
-        let lastX, lastY;
+        let originalImage<?php echo $no ?> = null;
+        let brightness<?php echo $no ?> = 0;
+        let contrast<?php echo $no ?> = 1;
+        let scale<?php echo $no ?> = 1.0;
+        let offsetX<?php echo $no ?> = 0;
+        let offsetY<?php echo $no ?> = 0;
+        let isDragging<?php echo $no ?> = false;
+        let mode<?php echo $no ?> = "window";
+        let lastX<?php echo $no ?>, lastY<?php echo $no ?>;
 
-        const btnWindow = document.getElementById("modeWindow");
-        const btnMove = document.getElementById("modeMove");
+        const btnWindow<?php echo $no ?> = document.getElementById("modeWindow");
+        const btnMove<?php echo $no ?> = document.getElementById("modeMove");
 
         function updateActiveModeButton() {
-            btnWindow.classList.toggle("active-mode", mode === "window");
-            btnMove.classList.toggle("active-mode", mode === "pan");
+            btnWindow<?php echo $no ?>.classList.toggle("active-mode", mode<?php echo $no ?> === "window");
+            btnMove<?php echo $no ?>.classList.toggle("active-mode", mode<?php echo $no ?> === "pan");
         }
 
-        img.onload = () => {
-            ctx.drawImage(img, 0, 0, canvas.width, canvas.height);
-            originalImage = ctx.getImageData(0, 0, canvas.width, canvas.height);
+        img<?php echo $no ?>.onload = () => {
+            ctx<?php echo $no ?>.drawImage(img<?php echo $no ?>, 0, 0, canvas<?php echo $no ?>.width, canvas<?php echo $no ?>.height);
+            originalImage<?php echo $no ?> = ctx<?php echo $no ?>.getImageData(0, 0, canvas<?php echo $no ?>.width, canvas<?php echo $no ?>.height);
             updateActiveModeButton();
         };
 
         function drawImageTransformed() {
-            if (!originalImage) return;
+            if (!originalImage<?php echo $no ?>) return;
 
-            ctx.save();
-            ctx.clearRect(0, 0, canvas.width, canvas.height);
+            ctx<?php echo $no ?>.save();
+            ctx<?php echo $no ?>.clearRect(0, 0, canvas<?php echo $no ?>.width, canvas<?php echo $no ?>.height);
 
-            const centerX = canvas.width / 2;
-            const centerY = canvas.height / 2;
+            const centerX = canvas<?php echo $no ?>.width / 2;
+            const centerY = canvas<?php echo $no ?>.height / 2;
 
-            ctx.translate(centerX + offsetX, centerY + offsetY);
-            ctx.scale(scale, scale);
-            ctx.translate(-centerX, -centerY);
+            ctx<?php echo $no ?>.translate(centerX + offsetX<?php echo $no ?>, centerY + offsetY<?php echo $no ?>);
+            ctx<?php echo $no ?>.scale(scale<?php echo $no ?>, scale<?php echo $no ?>);
+            ctx<?php echo $no ?>.translate(-centerX, -centerY);
 
             const tempCanvas = document.createElement("canvas");
-            tempCanvas.width = originalImage.width;
-            tempCanvas.height = originalImage.height;
+            tempCanvas.width = originalImage<?php echo $no ?>.width;
+            tempCanvas.height = originalImage<?php echo $no ?>.height;
             const tempCtx = tempCanvas.getContext("2d");
-            tempCtx.putImageData(originalImage, 0, 0);
+            tempCtx.putImageData(originalImage<?php echo $no ?>, 0, 0);
 
             const imgData = tempCtx.getImageData(0, 0, tempCanvas.width, tempCanvas.height);
             const data = imgData.data;
             for (let i = 0; i < data.length; i += 4) {
                 for (let j = 0; j < 3; j++) {
                     let value = data[i + j];
-                    value = ((value - 128) * contrast) + 128 + brightness;
+                    value = ((value - 128) * contrast<?php echo $no ?>) + 128 + brightness<?php echo $no ?>;
                     data[i + j] = Math.max(0, Math.min(255, value));
                 }
             }
             tempCtx.putImageData(imgData, 0, 0);
-            ctx.drawImage(tempCanvas, 0, 0, canvas.width, canvas.height);
-            ctx.restore();
+            ctx<?php echo $no ?>.drawImage(tempCanvas, 0, 0, canvas<?php echo $no ?>.width, canvas<?php echo $no ?>.height);
+            ctx<?php echo $no ?>.restore();
         }
 
         // Mouse control
-        canvas.addEventListener("mousedown", (e) => {
-            isDragging = true;
-            lastX = e.clientX;
-            lastY = e.clientY;
+        canvas<?php echo $no ?>.addEventListener("mousedown", (e) => {
+            isDragging<?php echo $no ?> = true;
+            lastX<?php echo $no ?> = e.clientX;
+            lastY<?php echo $no ?> = e.clientY;
         });
 
-        canvas.addEventListener("mouseup", () => isDragging = false);
-        canvas.addEventListener("mouseleave", () => isDragging = false);
+        canvas<?php echo $no ?>.addEventListener("mouseup", () => isDragging<?php echo $no ?> = false);
+        canvas<?php echo $no ?>.addEventListener("mouseleave", () => isDragging<?php echo $no ?> = false);
 
-        canvas.addEventListener("mousemove", (e) => {
-            if (!isDragging) return;
-            const dx = e.clientX - lastX;
-            const dy = e.clientY - lastY;
+        canvas<?php echo $no ?>.addEventListener("mousemove", (e) => {
+            if (!isDragging<?php echo $no ?>) return;
+            const dx = e.clientX - lastX<?php echo $no ?>;
+            const dy = e.clientY - lastY<?php echo $no ?>;
 
-            if (mode === "window") {
-                contrast += dx * 0.01;
-                brightness += dy * 1.0;
-                contrast = Math.max(0.1, Math.min(5, contrast));
-                brightness = Math.max(-255, Math.min(255, brightness));
-            } else if (mode === "pan") {
-                offsetX += dx;
-                offsetY += dy;
+            if (mode<?php echo $no ?> === "window") {
+                contrast<?php echo $no ?> += dx * 0.01;
+                brightness<?php echo $no ?> += dy * 1.0;
+                contrast<?php echo $no ?> = Math.max(0.1, Math.min(5, contrast<?php echo $no ?>));
+                brightness<?php echo $no ?> = Math.max(-255, Math.min(255, brightness<?php echo $no ?>));
+            } else if (mode<?php echo $no ?> === "pan") {
+                offsetX<?php echo $no ?> += dx;
+                offsetY<?php echo $no ?> += dy;
             }
 
             drawImageTransformed();
-            info.innerText = `Mode: ${mode === "window" ? "Window/Level" : "Move"} | Kontras: ${contrast.toFixed(2)} | Brightness: ${brightness.toFixed(0)} | Zoom: ${(scale * 100).toFixed(0)}%`;
+            info<?php echo $no ?>.innerText = `Mode: ${mode<?php echo $no ?> === "window" ? "Window/Level" : "Move"} | Kontras: ${contrast<?php echo $no ?>.toFixed(2)} | Brightness: ${brightness<?php echo $no ?>.toFixed(0)} | Zoom: ${(scale<?php echo $no ?> * 100).toFixed(0)}%`;
 
-            lastX = e.clientX;
-            lastY = e.clientY;
+            lastX<?php echo $no ?> = e.clientX;
+            lastY<?php echo $no ?> = e.clientY;
         });
 
         // Zoom
         document.getElementById("zoomIn").addEventListener("click", () => {
-            scale = Math.min(scale * 1.2, 10);
+            scale<?php echo $no ?> = Math.min(scale<?php echo $no ?> * 1.2, 10);
             drawImageTransformed();
         });
 
         document.getElementById("zoomOut").addEventListener("click", () => {
-            scale = Math.max(scale / 1.2, 0.2);
+            scale<?php echo $no ?> = Math.max(scale<?php echo $no ?> / 1.2, 0.2);
             drawImageTransformed();
         });
 
         // Reset
         document.getElementById("resetView").addEventListener("click", () => {
-            brightness = 0;
-            contrast = 1;
+            brightness<?php echo $no ?> = 0;
+            contrast<?php echo $no ?> = 1;
             scale = 1;
-            offsetX = 0;
-            offsetY = 0;
+            offsetX<?php echo $no ?> = 0;
+            offsetY<?php echo $no ?> = 0;
             drawImageTransformed();
-            info.innerText = "Tampilan direset ke posisi awal.";
+            info<?php echo $no ?>.innerText = "Tampilan direset ke posisi awal.";
         });
 
         // Mode buttons
-        btnWindow.addEventListener("click", () => {
-            mode = "window";
+        btnWindow<?php echo $no ?>.addEventListener("click", () => {
+            mode<?php echo $no ?> = "window";
             updateActiveModeButton();
-            info.innerText = "Mode: Window/Level (klik dan drag untuk ubah kontras & brightness)";
+            info<?php echo $no ?>.innerText = "Mode: Window/Level (klik dan drag untuk ubah kontras & brightness)";
         });
 
-        btnMove.addEventListener("click", () => {
-            mode = "pan";
+        btnMove<?php echo $no ?>.addEventListener("click", () => {
+            mode<?php echo $no ?> = "pan";
             updateActiveModeButton();
-            info.innerText = "Mode: Move (klik dan drag untuk geser gambar)";
+            info<?php echo $no ?>.innerText = "Mode: Move (klik dan drag untuk geser gambar)";
         });
     </script>
 @endif
