@@ -36,90 +36,102 @@
             <table class="table table-sm table-striped fs--1 mb-0 overflow-hidden" id="data-ledger">
                 <thead class="bg-200 text-900 fs--2">
                     <tr>
-                        <th class="align-middle white-space-nowrap">Post ID</th>
-                        <th class="align-middle white-space-nowrap">Account</th>
+                        <th class="align-middle white-space-nowrap">No</th>
+                        <th class="align-middle white-space-nowrap">Name</th>
+                        <th class="align-middle white-space-nowrap">Layanan</th>
                         <th class="align-middle white-space-nowrap">Debit ( IDR )</th>
                         <th class="align-middle white-space-nowrap">Credit ( IDR )</th>
                         <th class="align-middle white-space-nowrap">Balance ( IDR )</th>
-                        <th class="align-middle">Vocher Type</th>
-                        <th>Voucher Subtype</th>
-                        <th class="align-middle white-space-nowrap">Voucher No</th>
+                        <!-- <th class="align-middle">Vocher Type</th> -->
+                        <th>Tipe Pasien</th>
+                        <th class="align-middle white-space-nowrap">Nota No</th>
                         <th>Aggaints Account</th>
-                        <th>Party Type</th>
-                        <th>Party</th>
-                        <th>Cost Center</th>
-                        <th>Aggaints Vocher Type</th>
-                        <th>Aggaints Vocher</th>
-                        <th>Supplier</th>
                     </tr>
                 </thead>
-                <tbody class="list fs--2" >
-                    <tr class="btn-reveal-trigger">
-                        <td class="align-middle py-2 white-space-nowrap">D002</td>
-                        <td class="align-middle white-space-nowrap">
-                            <a href="#">
-                                <div class="d-flex d-flex align-items-center">
-                                    <div class="avatar avatar-l me-2">
-                                        <div class="avatar-name rounded-circle"><span>BK</span></div>
+                <tbody class="list fs--2">
+                    @php
+                        $no = 1;
+                    @endphp
+                    @foreach ($data as $datas)
+                        <tr class="btn-reveal-trigger">
+                            <td class="align-middle py-2 white-space-nowrap">{{$no++}}</td>
+                            <td class="align-middle white-space-nowrap">
+                                <a href="#">
+                                    <div class="d-flex d-flex align-items-center">
+                                        <!-- <div class="avatar avatar-l me-2">
+                                            <div class="avatar-name rounded-circle"><span>P</span></div>
+                                        </div> -->
+                                        <div class="flex-1">
+                                            <h5 class="mb-0 fs--2">{{ $datas->master_patient_name }}</h5>
+                                        </div>
                                     </div>
-                                    <div class="flex-1">
-                                        <h5 class="mb-0 fs--2">BEBAN KELUARGA</h5>
-                                    </div>
-                                </div>
-                            </a>
-                        </td>
-                        <td class="align-middle py-2 white-space-nowrap">@currency(423000000)</td>
-                        <td class="align-middle py-2 white-space-nowrap">@currency(4210000)</td>
-                        <td class="align-middle py-2 white-space-nowrap">@currency(533000000)</td>
+                                </a>
+                            </td>
+                            <td>
+                                @php
+                                    $layanan = DB::table('d_reg_order_list')->where('d_reg_order_code', $datas->d_reg_order_code)
+                                        ->join('t_layanan_cat', 't_layanan_cat.t_layanan_cat_code', '=', 'd_reg_order_list.t_layanan_cat_code')
+                                        ->get();
+                                @endphp
+                                @foreach ($layanan as $layanans)
+                                    <li class="ms-2"><strong>{{$layanans->d_reg_order_list_code }}</strong> <br> <span
+                                            class="text-warning">{{$layanans->t_layanan_cat_name}}</span></li>
+                                @endforeach
+                            </td>
+                            @php
+                                $debit = DB::table('d_reg_order_poli')
+                                    ->join('m_doctor_poli', 'm_doctor_poli.m_doctor_poli_code', '=', 'd_reg_order_poli.m_doctor_poli_code')
+                                    ->join('master_doctor', 'master_doctor.master_doctor_code', '=', 'm_doctor_poli.master_doctor_code')
+                                    ->where('d_reg_order_poli.d_reg_order_code', $datas->d_reg_order_code)->get();
+                            @endphp
+                            <td class="align-top py-2 white-space-nowrap">
+                                @foreach ($debit as $debits)
+                                        @php
+                                            $total_debit = DB::table('d_reg_order_poli_list')->where('d_reg_order_poli_code',$debits->d_reg_order_poli_code)->sum('order_poli_log_price');
+                                        @endphp
+                                    <li class="ms-2"><strong>@currency($total_debit)</strong></li>
+                                @endforeach
+                            </td>
+                            <td class="align-top py-2 white-space-nowrap">
+                                @foreach ($debit as $debits)
+                                        @php
+                                            $total_kredit = 0;
+                                        @endphp
+                                    <li class="ms-2"><strong>@currency($total_kredit)</strong></li>
+                                @endforeach
+                            </td>
+                            <td class="align-top py-2 white-space-nowrap"><strong>@currency($total_kredit-$total_debit)</strong></td>
 
-                        <td class="align-middle">Sales Invoice</td>
-                        <td class="joined align-middle py-2">Asuransi</td>
-                        <td class="joined align-middle py-2">INV-PA-0293-2025</td>
-                        <td class="joined align-middle py-2">Stock Rechive</td>
-                        <td class="joined align-middle py-2">Supplier</td>
-                        <td class="joined align-middle py-2">Bote Jirsa</td>
-                        <td class="joined align-middle py-2">-</td>
-                        <td class="joined align-middle py-2">-</td>
-                        <td class="joined align-middle py-2">-</td>
-                        <td class="joined align-middle py-2">-</td>
+                            <!-- <td class="align-middle">Sales Invoice</td> -->
+                            <td class="joined align-middle py-2">{{$datas->t_pasien_cat_name}}</td>
+                            <td class="joined align-middle py-2">INV{{$datas->d_reg_order_code}}</td>
+                            <td class="joined align-middle py-2">Pendapatan Pili Gigi</td>
 
-                    </tr>
-                    <tr class="btn-reveal-trigger">
-                        <td class="align-middle py-2 white-space-nowrap">D003</td>
-                        <td class="name align-middle white-space-nowrap py-2"><a href="#">
-                                <div class="d-flex d-flex align-items-center">
-                                    <div class="avatar avatar-l me-2">
-                                        <div class="avatar-name rounded-circle"><span>PP</span></div>
-                                    </div>
-                                    <div class="flex-1">
-                                        <h5 class="mb-0 fs--2">PENDAPATAN POLIKLINIK</h5>
-                                    </div>
-                                </div>
-                            </a></td>
-                        <td class="align-middle py-2 white-space-nowrap">@currency(223000000)</td>
-                        <td class="align-middle py-2 white-space-nowrap">@currency(23000000)</td>
-                        <td class="align-middle py-2 white-space-nowrap">@currency(233000000)</td>
+                        </tr>
+                    @endforeach
 
-                        <td class="white-space-nowrap">Sales Invoice</td>
-                        <td class="joined align-middle py-2">-</td>
-                        <td class="joined align-middle py-2">INV-GA-0293-2025</td>
-                        <td class="joined align-middle py-2">Stock Kocor</td>
-                        <td class="joined align-middle py-2">Supplier</td>
-                        <td class="joined align-middle py-2">Boti A</td>
-                        <td class="joined align-middle py-2">-</td>
-                        <td class="joined align-middle py-2">-</td>
-                        <td class="joined align-middle py-2">-</td>
-                        <td class="joined align-middle py-2">-</td>
-
-                    </tr>
 
                 </tbody>
             </table>
         </div>
     </div>
 </div>
+
 <script>
     new DataTable('#data-ledger', {
-        responsive: true
+        responsive: true,
+
+        layout: {
+            topStart: {
+                buttons: [{
+                    extend: 'excel',
+                    exportOptions: {
+                        orthogonal: 'export'
+                    },
+                    text: 'Export Excel',
+                    title: 'Data Laporan Keuangan'
+                }],
+            }
+        }
     });
 </script>

@@ -77,6 +77,13 @@ class KeuanganController extends Controller
             return 0;
         }
     }
+    public function keuangan_menu_cashier_find_data(Request $request)
+    {
+        $data = DB::table('d_reg_order')
+            ->join('master_patient', 'master_patient.master_patient_code', '=', 'd_reg_order.d_reg_order_rm')
+            ->get();
+        return view('application.keuangan.menu-cashier.find-data-tagihan', ['data' => $data]);
+    }
     public function keuangan_menu_cashier_find_fix_payment(Request $request)
     {
         $list = DB::table('d_reg_order_list')->where('d_reg_order_code', $request->code)->get();

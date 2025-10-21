@@ -307,6 +307,7 @@ Route::prefix('application')->group(function () {
 });
 // MENU KEUANGAN
 Route::prefix('application')->group(function () {
+    Route::post('keuangan/menu-kasir/find-data', [KeuanganController::class, 'keuangan_menu_cashier_find_data'])->name('keuangan_menu_cashier_find_data');
     Route::post('keuangan/menu-kasir/find', [KeuanganController::class, 'keuangan_menu_cashier_find'])->name('keuangan_menu_cashier_find');
     Route::post('keuangan/menu-kasir/fix-payment', [KeuanganController::class, 'keuangan_menu_cashier_find_fix_payment'])->name('keuangan_menu_cashier_find_fix_payment');
     Route::post('transaksi-keuangan/penerimaan-transaksi/proses-transaksi', [KeuanganController::class, 'keuangan_penerimaan_proses_transaksi'])->name('keuangan_penerimaan_proses_transaksi');

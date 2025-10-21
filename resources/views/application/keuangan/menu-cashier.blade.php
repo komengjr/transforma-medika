@@ -7,22 +7,22 @@
 @section('content')
     <div class="row mb-3">
         <div class="col">
-            <div class="card bg-200 shadow border border-primary">
+            <div class="card bg-primary shadow border border-primary">
                 <div class="row gx-0 flex-between-center">
                     <div class="col-sm-auto d-flex align-items-center border-bottom">
                         <img class="ms-3 mx-3 m-2" src="{{ asset('img/keuangan.png') }}" alt="" width="50" />
                         <div>
-                            <h6 class="text-primary fs--1 mb-0 pt-2">Welcome to </h6>
-                            <h4 class="text-primary fw-bold mb-1">{{env('APP_NAME')}} <span
-                                    class="text-primary fw-medium">Management
+                            <h6 class="text-white fs--1 mb-0 pt-2">Welcome to </h6>
+                            <h4 class="text-white fw-bold mb-1">{{env('APP_NAME')}} <span
+                                    class="text-white fw-medium">Management
                                     System</span></h4>
                         </div>
                         <img class="ms-n4 d-none d-lg-block "
                             src="{{ asset('asset/img/illustrations/crm-line-chart.png') }}" alt="" width="150" />
                     </div>
                     <div class="col-xl-auto px-3 py-2">
-                        <h6 class="text-primary fs--1 mb-0">Menu : </h6>
-                        <h4 class="text-primary fw-bold mb-0">Menu <span class="text-primary fw-medium">Cashier</span>
+                        <h6 class="text-white fs--1 mb-0">Menu : </h6>
+                        <h4 class="text-white fw-bold mb-0">Menu <span class="text-white fw-medium">Cashier</span>
                         </h4>
                     </div>
                 </div>
@@ -37,7 +37,8 @@
                         <div class="col-sm-auto">
                             <h5 class="mb-2 mb-sm-0">Cari Data Tagihan</h5>
                         </div>
-                        <div class="col-sm-auto"><a class="btn btn-falcon-default btn-sm" href="#!"><span
+                        <div class="col-sm-auto">
+                            <a class="btn btn-falcon-default btn-sm" href="#!" data-bs-toggle="modal" data-bs-target="#modal-cashier-full" id="button-find-payment"><span
                                     class="fas fa-search me-2" data-fa-transform="shrink-2"></span>Find</a></div>
                     </div>
                 </div>
@@ -89,11 +90,17 @@
                                     @if ($pays->m_pay_name == 'CASH')
 
                                     @else
+                                    @php
+                                        $card = DB::table('m_pay_detail')->where('m_pay_code',$pays->m_pay_code)->get();
+                                    @endphp
                                         <div class="row align-items-center">
                                             <div class="col-6">
                                                 <label class="form-label ls text-uppercase text-600 fw-semi-bold mb-0">Card</label>
                                                 <select name="" class="form-control" id="">
                                                     <option value="">Pilih Card</option>
+                                                    @foreach ($card as $cards)
+                                                        <option value="{{ $cards->m_pay_detail_code }}">{{ $cards->m_pay_detail_name }}</option>
+                                                    @endforeach
                                                 </select>
                                             </div>
                                             <div class="col-6">
@@ -208,6 +215,26 @@
                 $('#menu-poliklinik').html(data);
             }).fail(function () {
                 $('#menu-poliklinik').html('eror');
+            });
+        });
+        $(document).on("click", "#button-find-payment", function (e) {
+            e.preventDefault();
+            $('#menu-cashier-full').html(
+                '<div class="spinner-border my-3" style="display: block; margin-left: auto; margin-right: auto;" role="status"><span class="visually-hidden">Loading...</span></div>'
+            );
+            $.ajax({
+                url: "{{ route('keuangan_menu_cashier_find_data') }}",
+                type: "POST",
+                cache: false,
+                data: {
+                    "_token": "{{ csrf_token() }}",
+                    "code": 123
+                },
+                dataType: 'html',
+            }).done(function (data) {
+                $('#menu-cashier-full').html(data);
+            }).fail(function () {
+                $('#menu-cashier-full').html('eror');
             });
         });
         $(document).on("click", "#button-proses-payment", function (e) {

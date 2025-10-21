@@ -57,7 +57,13 @@ class AccountingController extends Controller
     }
     public function general_ledger_search(Request $request)
     {
-        return view('app-accounting.general-ledger.data-search-ledger');
+        $data = DB::table('d_reg_order')
+            ->join('master_patient', 'master_patient.master_patient_code', '=', 'd_reg_order.d_reg_order_rm')
+            ->join('t_layanan_cat', 't_layanan_cat.t_layanan_cat_code', '=', 'd_reg_order.t_layanan_cat_code')
+            ->join('t_pasien_cat', 't_pasien_cat.t_pasien_cat_code', '=', 'd_reg_order.t_pasien_cat_code')
+            ->where('d_reg_order.d_reg_order_cabang', Auth::user()->access_cabang)->orderBy('id_d_reg_order', 'DESC')
+            ->get();
+        return view('app-accounting.general-ledger.data-search-ledger', ['data' => $data]);
     }
     public function ledger_report($akses, $id)
     {

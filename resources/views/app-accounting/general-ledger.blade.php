@@ -2,6 +2,7 @@
 @section('base.css')
     <link rel="stylesheet" href="https://cdn.datatables.net/2.2.2/css/dataTables.bootstrap5.css">
     <link rel="stylesheet" href="https://cdn.datatables.net/responsive/3.0.4/css/responsive.bootstrap5.css">
+    <link rel="stylesheet" href="https://cdn.datatables.net/buttons/3.2.4/css/buttons.dataTables.css">
     <link href="{{ asset('vendors/flatpickr/flatpickr.min.css') }}" rel="stylesheet" />
     <link href="{{ asset('vendors/choices/choices.min.css') }}" rel="stylesheet" />
 @endsection
@@ -14,9 +15,10 @@
                         <img class="ms-3 mx-3 m-2" src="{{ asset('img/gl.png') }}" alt="" width="50" />
                         <div>
                             <h6 class="text-white fs--1 mb-0 pt-2" style="color: white !important;">Welcome to </h6>
-                            <h4 class="text-white fw-bold mb-1" style="color: white !important;">{{ Env('APP_LABEL') }} <span
-                                    class="text-white fw-medium" style="color: white !important;">Management
-                                    System</span></h4>
+                            <h4 class="text-white fw-bold mb-1" style="color: white !important;">{{ Env('APP_LABEL') }}
+                                <span class="text-white fw-medium" style="color: white !important;">Management
+                                    System</span>
+                            </h4>
                         </div>
                         <img class="ms-n4 d-none d-lg-block "
                             src="{{ asset('asset/img/illustrations/crm-line-chart.png') }}" alt="" width="150" />
@@ -42,16 +44,18 @@
                                 style="font-size: 9px !important;"
                                 data-options='{"removeItemButton":true,"placeholder":true}'>
                                 <option value=""><small>Select Company...</small></option>
-                                <option value="1"><small>Massachusetts Institute</small></option>
-                                <option><small>University of Chicago</small></option>
+                                <option value="1"><small>Company All</small></option>
+                                <option value="1"><small>Company B</small></option>
 
                             </select>
                         </div>
                         <div class="col-md-3 position-relative">
-                            <label for="" class="my-0 text-warning">Financial Book</label>
+                            <label for="" class="my-0 text-warning">Category Pasien</label>
                             <select class="form-select js-choice" id="data_financial" size="1" name="organizerSingle"
                                 data-options='{"removeItemButton":true,"placeholder":true}'>
-                                <option value=""><small>Select Financial</small></option>
+                                <option value=""><small>Pilih</small></option>
+                                <option value="pribadi"><small>Pasien Pribadi</small></option>
+                                <option value="perusahaan"><small>Pasien Perusahaan</small></option>
                             </select>
                         </div>
                         <div class="col-md-3 position-relative">
@@ -112,6 +116,13 @@
     <script src="https://cdn.datatables.net/2.2.2/js/dataTables.bootstrap5.js"></script>
     <script src="https://cdn.datatables.net/responsive/3.0.4/js/dataTables.responsive.js"></script>
     <script src="https://cdn.datatables.net/responsive/3.0.4/js/responsive.bootstrap5.js"></script>
+    <script src="https://cdn.datatables.net/buttons/3.2.4/js/dataTables.buttons.js"></script>
+
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jszip/3.10.1/jszip.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/pdfmake/0.2.7/pdfmake.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/pdfmake/0.2.7/vfs_fonts.js"></script>
+    <script src="https://cdn.datatables.net/buttons/3.2.4/js/buttons.html5.min.js"></script>
+    <script src="https://cdn.datatables.net/buttons/3.2.4/js/buttons.print.min.js"></script>
     <script src="{{ asset('asset/js/flatpickr.js') }}"></script>
     <script src="{{ asset('vendors/choices/choices.min.js') }}"></script>
     <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>

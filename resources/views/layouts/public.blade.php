@@ -130,7 +130,7 @@
                                     <div class="card-body scrollbar max-h-dropdown"><img class="img-dropdown"
                                             src="{{ asset('asset/img/icons/spot-illustrations/authentication-corner.png') }}"
                                             width="130" alt="" />
-                                        <div class="row">
+                                        <!-- <div class="row">
                                             <div class="col-6 col-xxl-3">
                                                 <div class="nav flex-column">
                                                     <p class="nav-link text-700 mb-0 fw-bold">Forms</p><a
@@ -257,7 +257,7 @@
                                                         href="../modules/maps/leaflet-map.html">Leaflet map</a>
                                                 </div>
                                             </div>
-                                        </div>
+                                        </div> -->
                                     </div>
                                 </div>
                             </div>
@@ -321,6 +321,8 @@
                                                 class="fas fa-user-cog"></span>
                                             Profile &amp;
                                             account</a>
+                                        <a class="dropdown-item text-github" href="{{route('dashboard.home')}}"><span
+                                                class="fas fa-chalkboard-teacher"></span> Homepage</a>
                                         @if (Auth::user()->access_code == 'master')
                                             <a class="dropdown-item text-danger" href="{{route('master_dashboard')}}"><span
                                                     class="fas fa-user-cog"></span> Master Page</a>
