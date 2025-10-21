@@ -289,10 +289,10 @@
                             </div>
                         </li>
                         <li class="nav-item">
-                            <a class="nav-link" href="#"><span class="d-none d-lg-inline-block"
-                                    data-bs-toggle="tooltip" data-bs-placement="bottom" title="Dashboard"><span
-                                        class="fas fa-chart-pie"></span></span><span
-                                    class="d-lg-none">Dashboard</span>         |</a>
+                            <a class="nav-link" href="#"><span class="d-none d-lg-inline-block" data-bs-toggle="tooltip"
+                                    data-bs-placement="bottom" title="Dashboard"><span
+                                        class="fas fa-chart-pie"></span></span><span class="d-lg-none">Dashboard</span>
+                                |</a>
                         </li>
 
                         <li class="nav-item dropdown">
@@ -347,7 +347,8 @@
                                 <h5 id="modalLabel">Login System</h5>
                             </div>
                             <div class="col-auto">
-                                <p class="fs--1 text-600 mb-0">Have an account? <a href="#">Login</a></p>
+                                <p class="fs--1 text-600 mb-0">Have an account? <a href="{{route('login')}}">Login</a>
+                                </p>
                             </div>
                         </div>
                         <form>
