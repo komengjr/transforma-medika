@@ -50,7 +50,12 @@ class KeuanganController extends Controller
     public function keuangan_menu_cashier($akses, $id)
     {
         if ($this->url_akses($akses, $id) == true) {
-            return view('application.keuangan.menu-cashier', ['akses' => $akses, 'code' => $id]);
+            $pay = DB::table('m_pay')->get();
+            return view('application.keuangan.menu-cashier', [
+                'akses' => $akses,
+                'code' => $id,
+                'pay' => $pay
+            ]);
         } else {
             return Redirect::to('dashboard/home');
         }
@@ -58,6 +63,7 @@ class KeuanganController extends Controller
     public function keuangan_menu_cashier_find(Request $request)
     {
         $data = DB::table('d_reg_order')->where('d_reg_order_code', $request->code)->first();
+        // $payment = DB::table('d_reg_order_code')->where('')
         if ($data) {
             $pasien = DB::table('d_reg_order')
                 ->join('master_patient', 'master_patient.master_patient_code', '=', 'd_reg_order.d_reg_order_rm')

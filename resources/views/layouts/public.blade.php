@@ -12,7 +12,7 @@
     <!-- ===============================================-->
     <!--    Document Title  -->
     <!-- ===============================================-->
-    <title>Innoventra | Dashboard &amp; Web App Build</title>
+    <title>Innoventra | Dashboard &amp; Welcome</title>
     @php
         $app = DB::table('z_menu_super')->get();
         $menu = DB::table('z_menu')->get();

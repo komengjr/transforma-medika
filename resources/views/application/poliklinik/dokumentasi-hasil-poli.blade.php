@@ -63,6 +63,7 @@
                         <th class="sort" data-sort="poli">Poliklinik</th>
                         <th class="sort" data-sort="doc">Dokter</th>
                         <th class="sort" data-sort="status">Status Reg</th>
+                        <th class="sort" data-sort="status">Status Payment</th>
                         <th class="sort" data-sort="act">Action</th>
                     </tr>
                 </thead>
@@ -98,6 +99,9 @@
                                 @elseif ($datas->d_reg_order_poli_status == 3)
                                     <span class="badge bg-primary">Verified</span>
                                 @endif
+                            </td>
+                            <td>
+
                             </td>
                             <td class="text-center">
                                 <div class="btn-group" role="group">

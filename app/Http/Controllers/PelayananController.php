@@ -298,7 +298,8 @@ class PelayananController extends Controller
         ]);
         $list = DB::table('d_reg_order_rad_log')
             ->join('p_sales_data', 'p_sales_data.p_sales_data_code', '=', 'd_reg_order_rad_log.p_sales_data_code')
-            ->join('t_pemeriksaan_list', 't_pemeriksaan_list.t_pemeriksaan_list_code', '=', 'p_sales_data.t_pemeriksaan_list_code')->where('d_reg_order_rad_code', $request->reg)->get();
+            ->join('t_pemeriksaan_list', 't_pemeriksaan_list.t_pemeriksaan_list_code', '=', 'p_sales_data.t_pemeriksaan_list_code')
+            ->where('d_reg_order_rad_code', $request->reg)->get();
         return view('application.pelayanan.form.kebutuhan.radiologi.data-order-radiologi', ['list' => $list]);
     }
     public function registrasi_pasien_pilih_data_pasien_kebutuhan_remove_pemeriksaan_rad(Request $request)

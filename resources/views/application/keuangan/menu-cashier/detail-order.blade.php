@@ -1,7 +1,7 @@
 <div class="card-header bg-300 btn-reveal-trigger d-flex flex-between-center">
     <h5 class="mb-0">Order</h5>
     <a class="btn btn-falcon-warning btn-sm btn-reveal" href="#" id="button-proses-payment"><span
-            class="fab fa-product-huntt"></span> Payment
+            class="fab fa-product-hunt"></span> Payment
     </a>
 </div>
 <div class="card-body pb-0">
@@ -58,7 +58,35 @@
     @foreach ($data as $datas)
         <h6>{{ $datas->t_layanan_cat_name }}</h6>
         @if ($datas->t_layanan_cat_name == 'POLIKLINIK')
-
+            @php
+                $harga = DB::table('d_reg_order_poli_list')
+                    ->join('p_sales_data', 'p_sales_data.p_sales_data_code', '=', 'd_reg_order_poli_list.p_sales_data_code')
+                    ->join('t_pemeriksaan_list', 't_pemeriksaan_list.t_pemeriksaan_list_code', '=', 'p_sales_data.t_pemeriksaan_list_code')
+                    ->where('d_reg_order_poli_list.d_reg_order_poli_code', $datas->d_reg_order_list_code)->get();
+            @endphp
+            <table class="table table-borderless fs--1 mb-0 border">
+                @foreach ($harga as $hargas)
+                    <tr class="border-bottom">
+                        <th class="align-middle py-2" style="width: 10px;">
+                            <div class="form-check fs-0 mb-0 d-flex align-items-center">
+                                <input class="form-check-input" type="checkbox" id="customer-0"
+                                    data-bulk-select-row="data-bulk-select-row" />
+                            </div>
+                        </th>
+                        <th class="ps-0 text-black">{{$hargas->t_pemeriksaan_list_name}}
+                            <div class="text-400 fw-normal fs--2">Normal Price : @currency($hargas->order_poli_log_price) Disc.
+                                {{$hargas->order_poli_log_discount}} %
+                            </div>
+                        </th>
+                        <th class="fs-1 text-end">
+                            @currency($hargas->order_poli_log_price - ($hargas->order_poli_log_discount * $hargas->order_poli_log_price / 100))
+                        </th>
+                    </tr>
+                    @php
+                        $total = $total + $hargas->order_poli_log_price - ($hargas->order_poli_log_discount * $hargas->order_poli_log_price / 100);
+                    @endphp
+                @endforeach
+            </table>
             <!-- RADIOLOGI -->
         @elseif ($datas->t_layanan_cat_name == 'RADIOLOGI')
             @php
@@ -78,7 +106,8 @@
                         </th>
                         <th class="ps-0 text-black">{{$hargas->t_pemeriksaan_list_name}}
                             <div class="text-400 fw-normal fs--2">Normal Price : @currency($hargas->order_rad_log_price) Disc.
-                                {{$hargas->order_rad_log_discount}} %</div>
+                                {{$hargas->order_rad_log_discount}} %
+                            </div>
                         </th>
                         <th class="fs-1 text-end">
                             @currency($hargas->order_rad_log_price - ($hargas->order_rad_log_discount * $hargas->order_rad_log_price / 100))
@@ -89,7 +118,6 @@
                     @endphp
                 @endforeach
             </table>
-
             <!-- LABORATORIUM -->
         @elseif ($datas->t_layanan_cat_name == 'LABORATORIUM')
             @php
@@ -109,7 +137,8 @@
                         </th>
                         <th class="ps-0 text-black">{{$hargas->t_pemeriksaan_list_name}}
                             <div class="text-400 fw-normal fs--2">Normal Price : @currency($hargas->order_lab_log_price) Disc.
-                                {{$hargas->order_lab_log_discount}} %</div>
+                                {{$hargas->order_lab_log_discount}} %
+                            </div>
                         </th>
                         <th class="fs-1 text-end">
                             @currency($hargas->order_lab_log_price - ($hargas->order_lab_log_discount * $hargas->order_lab_log_price / 100))

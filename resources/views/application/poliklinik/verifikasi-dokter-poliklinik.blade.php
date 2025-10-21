@@ -109,9 +109,9 @@
                                             Verifikasi Pasien Poli</button>
                                         <div class="dropdown-divider"></div>
                                         <!-- <button class="dropdown-item" data-bs-toggle="modal" data-bs-target="#modal-cabang"
-                                                                                    id="button-data-barang-cabang" data-code="123"><span
-                                                                                        class="far fa-folder-open"></span>
-                                                                                    History</button> -->
+                                                                                                                                                                                                            id="button-data-barang-cabang" data-code="123"><span
+                                                                                                                                                                                                                class="far fa-folder-open"></span>
+                                                                                                                                                                                                            History</button> -->
                                     </div>
                                 </div>
                             </td>
@@ -181,37 +181,111 @@
                 $('#menu-poliklinik').html('eror');
             });
         });
-        $(document).on("click", "#button-verifikasi-pasien-poli", function (e) {
+        $(document).on("click", "#button-pilih-pemeriksaan-poli", function (e) {
             e.preventDefault();
+            var id = document.getElementById('pilihan-pemeriksaan').value;
             var code = $(this).data("code");
-            var payment = document.getElementById('payment_code').value;
-            if (payment == "") {
+            if (id == "") {
                 Swal.fire({
                     icon: "error",
                     title: "Oops...",
-                    text: "Belom Ape ape dah maen asal klik!",
+                    text: "Belom Ape ape dah maen asal Pileh!",
                     footer: '<a href="#">Why do I have this issue?</a>'
                 });
             } else {
-                $('#menu-verifikasi-pasien-poli').html(
-                    '<div class="spinner-border my-3" style="display: block; margin-left: auto; margin-right: auto;" role="status"><span class="visually-hidden">Loading...</span></div>'
-                );
                 $.ajax({
-                    url: "{{ route('verifikasi_poliklinik_dokter_save_verify') }}",
+                    url: "{{ route('verifikasi_poliklinik_dokter_pilih_pemeriksaan') }}",
                     type: "POST",
                     cache: false,
                     data: {
                         "_token": "{{ csrf_token() }}",
+                        "id": id,
                         "code": code
                     },
                     dataType: 'html',
                 }).done(function (data) {
-                    $('#menu-verifikasi-pasien-poli').html(data);
-                    location.reload();
+                    if (data == 1) {
+                        Swal.fire({
+                            icon: "warning",
+                            title: "Oops...",
+                            text: "Pemeriksaan Sudah di masukan Mohon cek kembali",
+                            footer: '<a href="#">Why do I have this issue?</a>'
+                        });
+                    } else {
+                        $('#menu-pemeriksaan-poliklinik').html(
+                            '<div class="spinner-border my-3" style="display: block; margin-left: auto; margin-right: auto;" role="status"><span class="visually-hidden">Loading...</span></div>'
+                        );
+                        $('#menu-pemeriksaan-poliklinik').html(data);
+                    }
                 }).fail(function () {
-                    $('#menu-verifikasi-pasien-poli').html('eror');
+                    $('#menu-pemeriksaan-poliklinik').html('eror');
                 });
             }
+        });
+        $(document).on("click", "#button-verifikasi-pasien-poli", function (e) {
+            e.preventDefault();
+            var code = $(this).data("code");
+            var payment = document.getElementById('payment_code').value;
+            const swalWithBootstrapButtons = Swal.mixin({
+                customClass: {
+                    confirmButton: "btn btn-success",
+                    cancelButton: "btn btn-danger"
+                },
+                buttonsStyling: true
+            });
+            swalWithBootstrapButtons.fire({
+                title: "Are you sure?",
+                text: "You won't be able to revert this!",
+                icon: "warning",
+                showCancelButton: true,
+                cancelButtonText: "No, cancel!",
+                confirmButtonText: "Yes, Verify it!",
+                reverseButtons: true
+            }).then((result) => {
+                if (result.isConfirmed) {
+                    if (payment == "") {
+                        Swal.fire({
+                            icon: "error",
+                            title: "Oops...",
+                            text: "Belom Ape ape dah maen asal klik!",
+                            footer: '<a href="#">Why do I have this issue?</a>'
+                        });
+                    } else {
+                        $('#menu-verifikasi-pasien-poli').html(
+                            '<div class="spinner-border my-3" style="display: block; margin-left: auto; margin-right: auto;" role="status"><span class="visually-hidden">Loading...</span></div>'
+                        );
+                        $.ajax({
+                            url: "{{ route('verifikasi_poliklinik_dokter_save_verify') }}",
+                            type: "POST",
+                            cache: false,
+                            data: {
+                                "_token": "{{ csrf_token() }}",
+                                "code": code
+                            },
+                            dataType: 'html',
+                        }).done(function (data) {
+                            swalWithBootstrapButtons.fire({
+                                title: "Success!",
+                                text: "Berhasil Melakukan Verifikasi Pemeriksaan.",
+                                icon: "success"
+                            });
+                            location.reload();
+                        }).fail(function () {
+                            swalWithBootstrapButtons.fire({
+                                title: "Failed",
+                                text: "Gagal Melakukan Verifikasi",
+                                icon: "error"
+                            });
+                        });
+                    }
+                } else if (result.dismiss === Swal.DismissReason.cancel) {
+                    swalWithBootstrapButtons.fire({
+                        title: "Cancelled",
+                        text: "Your imaginary file is safe :)",
+                        icon: "error"
+                    });
+                }
+            });
         });
     </script>
 @endsection

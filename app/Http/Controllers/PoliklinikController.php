@@ -301,12 +301,17 @@ class PoliklinikController extends Controller
         $fisik = DB::table('diag_poli_fisik_umum')->where('diag_poli_fisik_type', 'text')->get();
         $fisik1 = DB::table('diag_poli_fisik_umum')->where('diag_poli_fisik_type', 'textarea')->get();
         $paket = DB::table('p_m_sales')->where('p_m_sales_status', 1)->get();
+        $list = DB::table('d_reg_order_poli_log')
+            ->join('p_sales_data', 'p_sales_data.p_sales_data_code', '=', 'd_reg_order_poli_log.p_sales_data_code')
+            ->join('t_pemeriksaan_list', 't_pemeriksaan_list.t_pemeriksaan_list_code', '=', 'p_sales_data.t_pemeriksaan_list_code')
+            ->where('d_reg_order_code', $request->code)->get();
         return view('application.poliklinik.verifikasi-poli.form-verifikasi', [
             'data' => $data,
             'code' => $request->code,
             'fisik' => $fisik,
             'fisik1' => $fisik1,
-            'paket' => $paket
+            'paket' => $paket,
+            'list' => $list
         ]);
     }
     public function verifikasi_poliklinik_dokter_pilih_penjualan(Request $request)
@@ -323,13 +328,48 @@ class PoliklinikController extends Controller
             ->where('p_sales.p_sales_code', $request->code)->get();
         return view('application.poliklinik.verifikasi-poli.data-sub-paket', ['data' => $data]);
     }
+    public function verifikasi_poliklinik_dokter_pilih_pemeriksaan(Request $request)
+    {
+        $data = DB::table('p_sales_data')->where('p_sales_data_code', $request->id)->first();
+        $cek = DB::table('d_reg_order_poli_log')
+            ->where('d_reg_order_code', $request->code)->where('p_sales_data_code', $request->id)->first();
+        if ($cek) {
+            return 1;
+        } else {
+            DB::table('d_reg_order_poli_log')->insert([
+                'order_poli_log_code' => str::uuid(),
+                'd_reg_order_code' => $request->code,
+                'p_sales_data_code' => $request->id,
+                'order_poli_log_price' => $data->p_sales_data_price,
+                'order_poli_log_discount' => $data->p_sales_data_disc,
+                'created_at' => now(),
+            ]);
+            $list = DB::table('d_reg_order_poli_log')
+                ->join('p_sales_data', 'p_sales_data.p_sales_data_code', '=', 'd_reg_order_poli_log.p_sales_data_code')
+                ->join('t_pemeriksaan_list', 't_pemeriksaan_list.t_pemeriksaan_list_code', '=', 'p_sales_data.t_pemeriksaan_list_code')
+                ->where('d_reg_order_code', $request->code)->get();
+            return view('application.poliklinik.verifikasi-poli.table.list-harga-pemeriksaan', ['list' => $list]);
+        }
+    }
     public function verifikasi_poliklinik_dokter_save_verify(Request $request)
     {
+        $data = DB::table('d_reg_order_poli_log')->where('d_reg_order_code', $request->code)->get();
+        $code = 'R' . $request->no_reg . '0001';
+        foreach ($data as $value) {
+            DB::table('d_reg_order_poli_list')->insert([
+                'order_poli_list_code' => str::uuid(),
+                'd_reg_order_poli_code' => $request->code,
+                'p_sales_data_code' => $value->p_sales_data_code,
+                'order_poli_log_price' => $value->order_poli_log_price,
+                'order_poli_log_discount' => $value->order_poli_log_discount,
+                'created_at' => now()
+            ]);
+        }
         DB::table('d_reg_order_poli')->where('d_reg_order_poli_code', $request->code)->update([
             'd_reg_order_poli_status' => 3
         ]);
     }
-    // POLIKLINIK VERIFIKASI DOKTER
+    // POLIKLINIK DOKUMENTASI HASIL
     public function verifikasi_poliklinik_dokumentasi_hasil($akses, $id)
     {
         if ($this->url_akses_sub($akses, $id) == true) {
@@ -340,7 +380,7 @@ class PoliklinikController extends Controller
                 ->join('t_layanan_data', 't_layanan_data.t_layanan_data_code', '=', 'm_doctor_poli.t_layanan_data_code')
                 ->join('master_doctor', 'master_doctor.master_doctor_code', '=', 'm_doctor_poli.master_doctor_code')
                 ->where('d_reg_order.d_reg_order_cabang', Auth::user()->access_cabang)
-                ->where('d_reg_order_poli.d_reg_order_poli_status', 3)->get();
+                ->where('d_reg_order_poli.d_reg_order_poli_status', 3)->orderBy('id_d_reg_order_poli','DESC')->get();
             return view('application.poliklinik.dokumentasi-hasil-poli', [
                 'akses' => $akses,
                 'code' => $id,

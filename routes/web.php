@@ -267,6 +267,7 @@ Route::prefix('application')->group(function () {
     Route::post('verifikasi-poliklinik/verifikasi-dokter/verify', [PoliklinikController::class, 'verifikasi_poliklinik_dokter_verify'])->name('verifikasi_poliklinik_dokter_verify');
     Route::post('verifikasi-poliklinik/verifikasi-dokter/pilih-penjualan', [PoliklinikController::class, 'verifikasi_poliklinik_dokter_pilih_penjualan'])->name('verifikasi_poliklinik_dokter_pilih_penjualan');
     Route::post('verifikasi-poliklinik/verifikasi-dokter/pilih-sub-penjualan', [PoliklinikController::class, 'verifikasi_poliklinik_dokter_pilih_sub_penjualan'])->name('verifikasi_poliklinik_dokter_pilih_sub_penjualan');
+    Route::post('verifikasi-poliklinik/verifikasi-dokter/pilih-pemeriksaan', [PoliklinikController::class, 'verifikasi_poliklinik_dokter_pilih_pemeriksaan'])->name('verifikasi_poliklinik_dokter_pilih_pemeriksaan');
     Route::post('verifikasi-poliklinik/verifikasi-dokter/save-verify', [PoliklinikController::class, 'verifikasi_poliklinik_dokter_save_verify'])->name('verifikasi_poliklinik_dokter_save_verify');
 
     Route::post('verifikasi-poliklinik/dokumentasi-hasil/preview', [PoliklinikController::class, 'verifikasi_poliklinik_dokumentasi_hasil_preview'])->name('verifikasi_poliklinik_dokumentasi_hasil_preview');
