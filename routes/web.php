@@ -28,25 +28,6 @@ use App\Http\Controllers\UploadFileController;
 use Illuminate\Support\Facades\Route;
 use Illuminate\Support\Facades\Auth;
 
-
-Route::controller(PageController::class)->group(function () {
-    Route::get('/', 'fisrt')->name('/');
-    Route::get('/app-hrm', 'app_hrm')->name('public-hrm');
-    Route::get('/app-medical', 'app_medical')->name('public-medical');
-    Route::get('/app-accounting', 'app_accounting')->name('public-accounting');
-    Route::get('/app-inventaris', 'app_inventaris')->name('public-inventaris');
-    Route::get('/app-logistik', 'app_logistik')->name('public-logistik');
-    Route::get('/app-purchase', 'app_purchase')->name('public-purchase');
-    Route::get('/app-supplier', 'app_supplier')->name('public-supplier');
-    Route::get('/app-brodcast', 'app_brodcast')->name('public-brodcast');
-    Route::get('/product', 'product')->name('product');
-    Route::get('/product/detail/{detail}', 'product_detail')->name('product_detail');
-    Route::get('/changelog', 'changelog')->name('changelog');
-
-});
-
-Route::get('log-eror', [\Rap2hpoutre\LaravelLogViewer\LogViewerController::class, 'index']);
-// PUBLIC
 // Route::get('reader', [PelayananController::class, 'reader_pasien']);
 Route::controller(AuthController::class)->group(function () {
     Route::get('login', 'index')->name('login');
@@ -60,6 +41,26 @@ Route::controller(AuthController::class)->group(function () {
     Route::post('verifikasi-Login', 'verifikasi_Login')->name('verifikasi_Login');
     // Route::get('dashboard', [AuthController::class, 'dashboard']);
 });
+Route::controller(PageController::class)->group(function () {
+    Route::get('/', 'fisrt')->name('/');
+    Route::get('/app-hrm', 'app_hrm')->name('public-hrm');
+    Route::get('/app-medical', 'app_medical')->name('public-medical');
+    Route::get('/app-accounting', 'app_accounting')->name('public-accounting');
+    Route::get('/app-inventaris', 'app_inventaris')->name('public-inventaris');
+    Route::get('/app-logistik', 'app_logistik')->name('public-logistik');
+    Route::get('/app-purchase', 'app_purchase')->name('public-purchase');
+    Route::get('/app-supplier', 'app_supplier')->name('public-supplier');
+    Route::get('/app-brodcast', 'app_brodcast')->name('public-brodcast');
+    Route::get('/app-farmasi', 'app_farmasi')->name('public-farmasi');
+    Route::get('/product', 'product')->name('product');
+    Route::get('/product/detail/{detail}', 'product_detail')->name('product_detail');
+    Route::get('/changelog', 'changelog')->name('changelog');
+
+});
+
+Route::get('log-eror', [\Rap2hpoutre\LaravelLogViewer\LogViewerController::class, 'index']);
+// PUBLIC
+
 
 Route::prefix('dashboard')->group(function () {
     Route::get('home', [dashboardController::class, 'index'])->name('dashboard.home');
@@ -121,6 +122,7 @@ Route::prefix('{akses}/{id}')->group(function (): void {
     // BRODCAST
     Route::get('menu-brodcast/brodcast-whatsapp', [BrodcastController::class, 'menu_brodcast_whatsapp'])->name('menu_brodcast_whatsapp');
     Route::get('menu-brodcast/brodcast-management', [BrodcastController::class, 'menu_brodcast_management'])->name('menu_brodcast_management');
+    Route::get('master-brodcast/master-contact', [BrodcastController::class, 'master_brodcast_contact'])->name('master_brodcast_contact');
 });
 // MEDICA HEALTH
 Route::prefix('{akses}/{id}/application')->group(function () {
@@ -185,6 +187,7 @@ Route::prefix('{akses}/{id}/application')->group(function () {
     // SUPPLIER
 
 });
+
 // MENU REGISTRASI
 Route::prefix('application')->group(function () {
     Route::post('registrasi-pasien/add', [PelayananController::class, 'registrasi_pasien_add'])->name('registrasi_pasien_add');
@@ -345,15 +348,6 @@ Route::prefix('application')->group(function () {
     Route::post('master-penjualan/kategori-penjualan/add-kategori', [MasterDataController::class, 'master_penjualan_kategori_add_kategori'])->name('master_penjualan_kategori_add_kategori');
     Route::post('master-penjualan/kategori-penjualan/save-kategori', [MasterDataController::class, 'master_penjualan_kategori_save_kategori'])->name('master_penjualan_kategori_save_kategori');
 });
-
-Route::post('file-upload/upload-file-profile', [UploadFileController::class, 'upload_profile'])->name('file-upload.data-profile');
-
-Route::get('test', function () {
-    $data = file_get_contents('file://192.168.61.228/pacslis/20211006/022G8N88PA-CR-01.jpg');
-    return 'data:image/' . 'jpg' . ';base64,' . base64_encode($data);
-    // dd(Storage::disk('c-drive/public'));
-});
-Route::get('scan', [App\Http\Controllers\OcrController::class, 'scan_passport']);
 // MASTER DATA
 Route::prefix('application')->group(function () {
     // MASTER COMPANY
@@ -403,6 +397,15 @@ Route::prefix('application')->group(function () {
     Route::post('master-pemeriksaan/group-pemeriksaan/add-value-pemeriksaan', [MasterDataController::class, 'master_pemeriksaan_group_add_value_pemeriksaan'])->name('master_pemeriksaan_group_add_value_pemeriksaan');
     Route::post('master-pemeriksaan/group-pemeriksaan/add-value-pemeriksaan/save', [MasterDataController::class, 'master_pemeriksaan_group_add_value_pemeriksaan_save'])->name('master_pemeriksaan_group_add_value_pemeriksaan_save');
 });
+
+Route::post('file-upload/upload-file-profile', [UploadFileController::class, 'upload_profile'])->name('file-upload.data-profile');
+
+Route::get('test', function () {
+    $data = file_get_contents('file://192.168.61.228/pacslis/20211006/022G8N88PA-CR-01.jpg');
+    return 'data:image/' . 'jpg' . ';base64,' . base64_encode($data);
+    // dd(Storage::disk('c-drive/public'));
+});
+Route::get('scan', [App\Http\Controllers\OcrController::class, 'scan_passport']);
 
 
 // INVENTARIS
@@ -484,7 +487,7 @@ Route::prefix('supplier/')->group(function (): void {
     Route::post('master-supplier/data-supplier/add', [SupplierController::class, 'master_data_supplier_add'])->name('master_data_supplier_add');
     Route::post('master-supplier/data-supplier/save', [SupplierController::class, 'master_data_supplier_save'])->name('master_data_supplier_save');
 });
-// SUPLLIER
+// BRODCAST
 Route::prefix('brodcast/')->group(function (): void {
     Route::post('menu-brodcast/brodcast-whatsapp/send', [BrodcastController::class, 'menu_brodcast_whatsapp_send'])->name('menu_brodcast_whatsapp_send');
     Route::post('menu-brodcast/brodcast-management/add', [BrodcastController::class, 'menu_brodcast_management_add'])->name('menu_brodcast_management_add');
@@ -495,6 +498,9 @@ Route::prefix('brodcast/')->group(function (): void {
     Route::post('menu-brodcast/brodcast-management/brodcast-whatsapp-send', [BrodcastController::class, 'menu_brodcast_management_brodcast_whatsapp_send'])->name('menu_brodcast_management_brodcast_whatsapp_send');
     Route::post('menu-brodcast/brodcast-management/export-excel', [BrodcastController::class, 'menu_brodcast_management_export_excel'])->name('menu_brodcast_management_export_excel');
     Route::post('menu-brodcast/brodcast-management/export-excel-start', [BrodcastController::class, 'menu_brodcast_management_export_excel_start'])->name('menu_brodcast_management_export_excel_start');
+
+    Route::post('master-brodcast/master-contact/add', [BrodcastController::class, 'master_brodcast_contact_add'])->name('master_brodcast_contact_add');
+    Route::post('master-brodcast/master-contact/save', [BrodcastController::class, 'master_brodcast_contact_save'])->name('master_brodcast_contact_save');
 });
 
 // LOGISTIK

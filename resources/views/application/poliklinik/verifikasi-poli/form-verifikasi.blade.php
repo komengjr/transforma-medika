@@ -251,10 +251,10 @@
 
                             </div>
                             <div id="menu-sub-penjualan" class="col-md-12">
-                                <input type="text" name="payment_code" id="payment_code" hidden>
                             </div>
                         </div>
                         <div class="d-flex justify-content-between fs--1 mb-1">
+                            <input type="text" name="payment_code" id="payment_code" hidden>
                             <button class="btn btn-warning btn-sm">Pilih</button>
                         </div>
 

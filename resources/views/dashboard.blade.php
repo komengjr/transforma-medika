@@ -506,7 +506,7 @@
             Swal.fire({
                 title: "Mohon Menunggu",
                 html: "I will Open in <b></b> milliseconds.",
-                timer: 1000,
+                timer: 500,
                 timerProgressBar: true,
                 allowOutsideClick: false,
                 allowEscapeKey: false,

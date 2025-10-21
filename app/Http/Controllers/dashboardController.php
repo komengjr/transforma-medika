@@ -61,6 +61,8 @@ class dashboardController extends Controller
             return view('app-supplier.dashboard', ['akses' => $id, 'code' => $id]);
         } elseif ($id == 'brodcast') {
             return view('app-brodcast.dashboard', ['akses' => $id, 'code' => $id]);
+        } elseif ($id == 'farmasi') {
+            return view('app-farmasi.dashboard', ['akses' => $id, 'code' => $id]);
         } else {
 
             return Redirect::to('dashboard/home');

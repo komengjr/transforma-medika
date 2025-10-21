@@ -246,4 +246,36 @@ class BrodcastController extends Controller
         Excel::import(new PesertaEventImport($request->code, 454), request()->file('file'));
         return redirect()->back()->withSuccess('Great! Berhasil Menambahkan Data Perusahaan');
     }
+    // BRODCAST MASTER CONTACT
+    public function master_brodcast_contact($akses, $id)
+    {
+        if ($this->url_akses($akses, $id) == true) {
+            $data = DB::table('b_master_contact')->where('b_master_contact_cabang', Auth::user()->access_cabang)->orderBy('id_b_master_contact', 'DESC')->get();
+
+            return view('app-brodcast.master.master-contact', ['akses' => $akses, 'code' => $id, 'data' => $data]);
+        } else {
+            return Redirect::to('dashboard/home');
+        }
+    }
+    public function master_brodcast_contact_add(Request $request)
+    {
+        return view('app-brodcast.master.form.form-add-contact');
+    }
+    public function master_brodcast_contact_save(Request $request)
+    {
+        try {
+            DB::table('b_master_contact')->insert([
+                'b_master_contact_code' => str::uuid(),
+                'b_master_contact_name' => $request->name,
+                'b_master_contact_email' => $request->email,
+                'b_master_contact_whatsapp' => $request->whatsapp,
+                'b_master_contact_cabang' => Auth::user()->access_cabang,
+                'b_master_contact_status' => 1,
+                'created_at' => now()
+            ]);
+            return 123;
+        } catch (\Throwable $e) {
+            return 0;
+        }
+    }
 }

@@ -26,7 +26,16 @@
     <script src="{{ asset('asset/js/config.js') }}"></script>
     {{--
     <script src="../../../vendors/overlayscrollbars/OverlayScrollbars.min.js"></script> --}}
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=Google+Sans+Code:ital,wght@0,300..800;1,300..800&display=swap');
 
+        * {
+            font-family: "Google Sans Code", monospace !important;
+            font-optical-sizing: auto;
+            font-weight: <weight>;
+            font-style: normal;
+        }
+    </style>
 
     <!-- ===============================================-->
     <!--    Stylesheets-->
@@ -58,6 +67,25 @@
             userLinkRTL.setAttribute('disabled', true);
         }
     </script>
+    <style>
+        body {
+            background: linear-gradient(90deg, rgba(74, 68, 176, 1) 0%, rgba(9, 9, 121, 1) 35%, rgba(0, 212, 255, 1) 100%);
+            background-size: 300% 300%;
+            animation: gradientMove 10s ease infinite;
+            font-family: 'Poppins', sans-serif;
+            height: 100vh;
+            margin: 0;
+            /* display: flex; */
+            align-items: center;
+            justify-content: center;
+            /* overflow: hidden; */
+        }
+
+        .card {
+
+            box-shadow: 0 30px 45px rgba(0, 0, 0, 0.25);
+        }
+    </style>
 </head>
 
 <body>
@@ -68,11 +96,11 @@
     <main class="main" id="top">
         <div class="container-fluid">
             <div class="row min-vh-100 flex-center g-0">
-                <div class="col-lg-8 col-xxl-5 py-3 position-relative"><img class="bg-auth-circle-shape"
+                <div class="col-lg-7 col-xxl-5 py-3 position-relative"><img class="bg-auth-circle-shape"
                         src="../../../asset/img/icons/spot-illustrations/bg-shape.png" alt="" width="250"><img
                         class="bg-auth-circle-shape-2" src="../../../asset/img/icons/spot-illustrations/shape-1.png"
                         alt="" width="150">
-                    <div class="card overflow-hidden z-index-1">
+                    <div class="card overflow-hidden z-index-4">
                         <div class="card-body p-0">
                             <div class="row g-0 h-100">
                                 <div class="col-md-5 text-center bg-card-gradient">
@@ -84,7 +112,7 @@
 
                                         <div class="z-index-1 position-relative"><a
                                                 class="link-light mb-4 font-sans-serif fs-4 d-inline-block fw-bolder"
-                                                href="#">Trans System</a>
+                                                href="#">{{ env('APP_NAME') }} System</a>
                                             <p class="opacity-75 text-white">With the power of Transforma, you can now
                                                 focus
                                                 only on functionaries for your digital products, while leaving the UI
@@ -197,24 +225,24 @@
     <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
     @if (session('success'))
         <!-- <div class="toast hide notice shadow-none bg-transparent my-2" id="cookie-notice" role="alert"
-                    data-options='{"autoShow":true,"showOnce":true,"cookieExpireTime":20}' data-autohide="false"
-                    aria-live="assertive" aria-atomic="true" style="">
-                    <div class="toast-body my-2 ms-1 md-2">
-                        <div class="card border-2 border-secondary">
-                            <div class="card-body ">
-                                <div class="d-flex">
-                                    <div class="pe-3"><img src="{{ asset('asset/img/icons/alert.png') }}" width="40" alt="cookie" />
-                                    </div>
-                                    <div>
-                                        <p>{{ session('success') }}</p>
-                                        <button class="btn btn-sm btn-falcon-primary me-3" type="button" data-bs-dismiss="toast"
-                                            aria-label="Close">Okay</button>
-                                    </div>
-                                </div>
-                            </div>
-                        </div>
-                    </div>
-                </div> -->
+                                        data-options='{"autoShow":true,"showOnce":true,"cookieExpireTime":20}' data-autohide="false"
+                                        aria-live="assertive" aria-atomic="true" style="">
+                                        <div class="toast-body my-2 ms-1 md-2">
+                                            <div class="card border-2 border-secondary">
+                                                <div class="card-body ">
+                                                    <div class="d-flex">
+                                                        <div class="pe-3"><img src="{{ asset('asset/img/icons/alert.png') }}" width="40" alt="cookie" />
+                                                        </div>
+                                                        <div>
+                                                            <p>{{ session('success') }}</p>
+                                                            <button class="btn btn-sm btn-falcon-primary me-3" type="button" data-bs-dismiss="toast"
+                                                                aria-label="Close">Okay</button>
+                                                        </div>
+                                                    </div>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </div> -->
         <script>
             const Toast = Swal.mixin({
                 toast: true,

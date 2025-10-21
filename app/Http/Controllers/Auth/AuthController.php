@@ -4,10 +4,12 @@ namespace App\Http\Controllers\Auth;
 
 use App\Http\Controllers\Controller;
 use App\Models\UserMain;
+use Carbon\Carbon;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use Session;
 use Hash;
+use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Hash as FacadesHash;
 use Illuminate\Support\Facades\Session as FacadesSession;
 use Illuminate\Support\Str;
@@ -27,8 +29,7 @@ class AuthController extends Controller
 
     public function registration()
     {
-
-        return view('auth.registration');
+        return Redirect('dashboard/home');
     }
 
     public function postLogin(Request $request)
@@ -64,6 +65,12 @@ class AuthController extends Controller
         $credentials = $request->only('username', 'password');
 
         if (Auth::attempt($credentials)) {
+            DB::table('user_mains_logs')->insert([
+                'userid' => Auth::user()->userid,
+                'last_login_at' => Carbon::now()->toDateTimeString(),
+                'last_login_ip' => $request->getClientIp(),
+                'created_at' => now()
+            ]);
             if (Auth::user()->access_status == 0) {
                 Auth::logout();
                 return '<div class="alert alert-warning alert-dismissible fade show my-3" role="alert"> <strong>Warning !</strong> Bermasalah Pada Akun Anda <button class="btn-close" type="button" data-bs-dismiss="alert" aria-label="Close"></button> </div>';

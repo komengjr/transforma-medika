@@ -177,14 +177,20 @@ class MasterController extends Controller
     public function master_sub_menu_save(Request $request)
     {
         if (Auth::user()->access_code == 'master') {
+            $code = str::uuid();
             DB::table('z_menu_sub_main')->insert([
-                'menu_main_sub_code' => str::uuid(),
+                'menu_main_sub_code' => $code,
                 'menu_sub_code' => $request->code,
                 'menu_main_sub_name' => $request->name,
                 'menu_main_sub_link' => $request->link,
                 'menu_main_sub_icon' => $request->icon,
                 'menu_main_sub_status' => 1,
                 'created_at' => now(),
+            ]);
+            DB::table('z_menu_user_sub')->insert([
+                'menu_main_sub_code' => $code,
+                'access_code' => 'master',
+                'created_at' => now()
             ]);
             return redirect()->back()->withSuccess('Great! Berhasil Menambahkan Data');
         } else {
