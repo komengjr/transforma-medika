@@ -10,18 +10,18 @@
     <!-- ===============================================-->
     <!--    Document Title-->
     <!-- ===============================================-->
-    <title>Trans System Managemen | Login Page</title>
+    <title>{{env('APP_LABEL')}} System Management | Login Page</title>
 
 
     <!-- ===============================================-->
     <!--    Favicons-->
     <!-- ===============================================-->
-    <link rel="apple-touch-icon" sizes="180x180" href="{{ asset('img/header.png') }}">
-    <link rel="icon" type="image/png" sizes="32x32" href="{{ asset('img/header.png') }}">
-    <link rel="icon" type="image/png" sizes="16x16" href="{{ asset('img/header.png') }}">
-    <link rel="shortcut icon" type="image/x-icon" href="{{ asset('img/header.png') }}">
-    <link rel="manifest" href="../../../asset/img/favicons/manifest.json">
-    <meta name="msapplication-TileImage" content="{{ asset('img/header.png') }}">
+   <link rel="apple-touch-icon" sizes="180x180" href="{{ asset('img/favicon.png') }}">
+    <link rel="icon" type="image/png" sizes="32x32" href="{{ asset('img/favicon.png') }}">
+    <link rel="icon" type="image/png" sizes="16x16" href="{{ asset('img/favicon.png') }}">
+    <link rel="shortcut icon" type="image/x-icon" href="{{ asset('img/favicon.png') }}">
+    <link rel="manifest" href="{{ asset('asset/img/favicons/manifest.json') }}">
+    <meta name="msapplication-TileImage" content="{{ asset('img/favicon.png') }}">
     <meta name="theme-color" content="#ffffff">
     <script src="{{ asset('asset/js/config.js') }}"></script>
     {{--
