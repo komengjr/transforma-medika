@@ -120,6 +120,9 @@
                                     ->join('m_pay_detail','m_pay_detail.m_pay_detail_code','=','m_pay_card.m_pay_detail_code')
                                     ->where('d_reg_order_code',$datas->d_reg_order_code)->get();
                                 @endphp
+                                @if ($payment->isEmpty())
+                                    CASH
+                                @endif
                                 @foreach ($payment as $pays)
                                     <li class="ms-3">{{ $pays->m_pay_detail_name }} <br>{{ $pays->m_pay_card_name }} - ( {{ $pays->m_pay_card_number }} )</li>
                                 @endforeach
