@@ -101,45 +101,91 @@ class BrodcastController extends Controller
             $img = file_get_contents($filegambar);
             $gambar = base64_encode($img);
         }
-        $nomorhp = $request->number;
-        //Terlebih dahulu kita trim dl
-        $nomorhp = trim($nomorhp);
-        //bersihkan dari karakter yang tidak perlu
-        $nomorhp = strip_tags($nomorhp);
-        // Berishkan dari spasi
-        $nomorhp = str_replace(" ", "", $nomorhp);
-        // Berishkan dari -
-        $nomorhp = str_replace("-", "", $nomorhp);
-        // bersihkan dari bentuk seperti  (022) 66677788
-        $nomorhp = str_replace("(", "", $nomorhp);
-        // bersihkan dari format yang ada titik seperti 0811.222.333.4
-        $nomorhp = str_replace(".", "", $nomorhp);
+        if ($request->tipe_pengiriman == 'personal') {
+            $nomorhp = $request->number;
+            //Terlebih dahulu kita trim dl
+            $nomorhp = trim($nomorhp);
+            //bersihkan dari karakter yang tidak perlu
+            $nomorhp = strip_tags($nomorhp);
+            // Berishkan dari spasi
+            $nomorhp = str_replace(" ", "", $nomorhp);
+            // Berishkan dari -
+            $nomorhp = str_replace("-", "", $nomorhp);
+            // bersihkan dari bentuk seperti  (022) 66677788
+            $nomorhp = str_replace("(", "", $nomorhp);
+            // bersihkan dari format yang ada titik seperti 0811.222.333.4
+            $nomorhp = str_replace(".", "", $nomorhp);
 
-        if (!preg_match('/[^+0-9]/', trim($nomorhp))) {
-            // cek apakah no hp karakter 1-3 adalah +62
-            if (substr(trim($nomorhp), 0, 3) == '+62') {
-                $nomorhp = trim($nomorhp);
+            if (!preg_match('/[^+0-9]/', trim($nomorhp))) {
+                // cek apakah no hp karakter 1-3 adalah +62
+                if (substr(trim($nomorhp), 0, 3) == '+62') {
+                    $nomorhp = trim($nomorhp);
+                }
+                // cek apakah no hp karakter 1 adalah 0
+                elseif (substr($nomorhp, 0, 1) == '0') {
+                    $nomorhp = '+62' . substr($nomorhp, 1);
+                }
             }
-            // cek apakah no hp karakter 1 adalah 0
-            elseif (substr($nomorhp, 0, 1) == '0') {
-                $nomorhp = '+62' . substr($nomorhp, 1);
+            $text = "Hi *Salam Sehat* \n" . $request->subject . "\n\n" . $request->text . "\n\nSupport By. Innoverta";
+            DB::table('v_log_whatsapp')->insert([
+                'v_log_whatsapp_code' => str::uuid(),
+                'd_reg_order_list_code' => str::uuid(),
+                'v_log_whatsapp_number' => $nomorhp,
+                'v_log_whatsapp_name' => 'Anonymous',
+                'v_log_whatsapp_filename' => $request->subject,
+                'v_log_whatsapp_text' => $text,
+                'v_log_whatsapp_file' => 'N',
+                'v_log_whatsapp_picture' => $gambar,
+                'v_log_whatsapp_status' => 0,
+                'v_log_whatsapp_date' => now(),
+                'v_log_whatsapp_pass' => mt_rand(10000, 90000),
+                'created_at' => now()
+            ]);
+        } elseif ($request->tipe_pengiriman == 'all') {
+            $contact = DB::table('b_master_contact')->where('b_master_contact_cabang', Auth::user()->access_cabang)->get();
+            foreach ($contact as $value) {
+                $nomorhp = $value->b_master_contact_whatsapp;
+                //Terlebih dahulu kita trim dl
+                $nomorhp = trim($nomorhp);
+                //bersihkan dari karakter yang tidak perlu
+                $nomorhp = strip_tags($nomorhp);
+                // Berishkan dari spasi
+                $nomorhp = str_replace(" ", "", $nomorhp);
+                // Berishkan dari -
+                $nomorhp = str_replace("-", "", $nomorhp);
+                // bersihkan dari bentuk seperti  (022) 66677788
+                $nomorhp = str_replace("(", "", $nomorhp);
+                // bersihkan dari format yang ada titik seperti 0811.222.333.4
+                $nomorhp = str_replace(".", "", $nomorhp);
+
+                if (!preg_match('/[^+0-9]/', trim($nomorhp))) {
+                    // cek apakah no hp karakter 1-3 adalah +62
+                    if (substr(trim($nomorhp), 0, 3) == '+62') {
+                        $nomorhp = trim($nomorhp);
+                    }
+                    // cek apakah no hp karakter 1 adalah 0
+                    elseif (substr($nomorhp, 0, 1) == '0') {
+                        $nomorhp = '+62' . substr($nomorhp, 1);
+                    }
+                }
+                $text = "Hi *Salam Sehat* \n" . $request->subject . "\n\n" . $request->text . "\n\nSupport By. Innoverta";
+                DB::table('v_log_whatsapp')->insert([
+                    'v_log_whatsapp_code' => str::uuid(),
+                    'd_reg_order_list_code' => str::uuid(),
+                    'v_log_whatsapp_number' => $nomorhp,
+                    'v_log_whatsapp_name' => $value->b_master_contact_name,
+                    'v_log_whatsapp_filename' => Auth::user()->fullname,
+                    'v_log_whatsapp_text' => $text,
+                    'v_log_whatsapp_file' => 'N',
+                    'v_log_whatsapp_picture' => $gambar,
+                    'v_log_whatsapp_status' => 0,
+                    'v_log_whatsapp_date' => now(),
+                    'v_log_whatsapp_pass' => mt_rand(10000, 90000),
+                    'created_at' => now()
+                ]);
             }
         }
-        $text = "Hi *Salam Sehat* \nNotifikasi Ini bisa di custom Secara berkala \n\n" . $request->text . "\n\nSupport By. Innoverta";
-        DB::table('v_log_whatsapp')->insert([
-            'v_log_whatsapp_code' => str::uuid(),
-            'd_reg_order_list_code' => str::uuid(),
-            'v_log_whatsapp_number' => $nomorhp,
-            'v_log_whatsapp_name' => Auth::user()->fullname,
-            'v_log_whatsapp_filename' => Auth::user()->fullname,
-            'v_log_whatsapp_text' => $text,
-            'v_log_whatsapp_file' => 'N',
-            'v_log_whatsapp_picture' => $gambar,
-            'v_log_whatsapp_status' => 0,
-            'v_log_whatsapp_date' => now(),
-            'v_log_whatsapp_pass' => mt_rand(10000, 90000),
-            'created_at' => now()
-        ]);
+
         return 123;
     }
     // BRODCAST WHATSAPP

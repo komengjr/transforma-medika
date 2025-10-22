@@ -37,9 +37,19 @@
             <h5 class="mb-0">New message</h5>
         </div>
         <div class="card-body p-0">
-            <div class="border border-top-0 border-200">
-                <input class="form-control border-0 rounded-0 outline-none px-card" id="number" type="text"
-                    aria-describedby="email-to" placeholder="Nomor Whatsapp . Ex. 0828829xxxx" />
+            <div class="border border-top-0 border-200 m-2">
+                <div class="row">
+                    <div class="col-md-4">
+                        <select name="tipe_pengiriman" id="tipe_pengiriman" class="form-control">
+                            <option value="personal">Personal</option>
+                            <option value="all">All Contact</option>
+                        </select>
+                    </div>
+                    <div class="col-md-8">
+                        <input class="form-control border-0 rounded-0 outline-none px-card" id="number" type="text"
+                            aria-describedby="email-to" placeholder="Nomor Whatsapp . Ex. 0828829xxxx" />
+                    </div>
+                </div>
             </div>
             <div class="border border-y-0 border-200">
                 <input class="form-control border-0 rounded-0 outline-none px-card" id="subject" type="text"
@@ -51,7 +61,7 @@
             <div class="bg-light px-card py-3">
                 <div class="d-inline-flex flex-column">
                     <div class="border px-2 rounded-3 d-flex flex-between-center bg-white dark__bg-1000 my-1 fs--1">
-                        <input id="link" type="text" name="link" class="form-control">
+                        <input id="link" type="text" name="link" class="form-control d-none">
                         <span class="fs-1 far fa-file-archive"></span>
                         <span class="ms-2" id="link_name">file.example </span><a class="text-300 p-1 ms-6" href="#!"
                             data-bs-toggle="tooltip" data-bs-placement="right" title="Detach">
@@ -88,13 +98,22 @@
     <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
     <script src="{{ asset('vendors/tinymce/tinymce.min.js') }}"></script>
     <script>
+        $('#tipe_pengiriman').on("change", function () {
+            var dataid = document.getElementById("tipe_pengiriman").value;
+            if (dataid == "personal") {
+                document.getElementById('number').value = '';
+            } else {
+                document.getElementById('number').value = 'From Master Contact';
+            }
+        });
         $(document).on("click", "#button-send-messages", function (e) {
             e.preventDefault();
             var number = document.getElementById("number").value;
             var subject = document.getElementById("subject").value;
             var editorContent = document.getElementById("pesan-wa").value;
             var link = document.getElementById("link").value;
-            if (number == "" || editorContent == "") {
+            var tipe_pengiriman = document.getElementById("tipe_pengiriman").value;
+            if (number == "" || editorContent == "" || subject == "") {
                 Swal.fire({
                     icon: "error",
                     title: "Oops...",
@@ -115,6 +134,7 @@
                         "subject": subject,
                         "text": editorContent,
                         "link": link,
+                        "tipe_pengiriman": tipe_pengiriman,
                     },
                     dataType: 'html',
                 }).done(function (data) {
