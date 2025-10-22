@@ -133,7 +133,7 @@ class KeuanganController extends Controller
                             'd_reg_order_payment_date' => now(),
                             'd_reg_order_payment_user' => Auth::user()->userid,
                             'd_reg_order_payment_card' => $payment_card,
-                            'd_reg_order_payment_total' => $nominal,
+                            'd_reg_order_payment_total' => $request->total_pembayaran,
                             'created_at' => now()
                         ]);
                     }
