@@ -295,11 +295,15 @@
                             swalWithBootstrapButtons.fire({
                                 title: "Payment success!",
                                 text: data,
-                                icon: "success"
-                            });
-                            setTimeout(() => {
-                                location.reload();
-                            }, 200);
+                                icon: "success",
+                                confirmButtonText: "Oke",
+                            }).then((result) => {
+                                if (result.isConfirmed) {
+                                    setTimeout(() => {
+                                        location.reload();
+                                    }, 200);
+                                }
+                            })
                         }
                     }).fail(function () {
                         swalWithBootstrapButtons.fire({
