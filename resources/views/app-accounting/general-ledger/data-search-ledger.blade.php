@@ -46,6 +46,7 @@
                         <th>Tipe Pasien</th>
                         <th class="align-middle white-space-nowrap">Nota No</th>
                         <th>Aggaints Account</th>
+                        <th>Methode Payment</th>
                     </tr>
                 </thead>
                 <tbody class="list fs--2">
@@ -87,7 +88,7 @@
                             <td class="align-top py-2 white-space-nowrap">
                                 @foreach ($debit as $debits)
                                         @php
-                                            $total_debit = DB::table('d_reg_order_poli_list')->where('d_reg_order_poli_code',$debits->d_reg_order_poli_code)->sum('order_poli_log_price');
+                                            $total_debit = DB::table('d_reg_order_poli_list')->where('d_reg_order_poli_code',$debits->d_reg_order_poli_code)->sum(DB::raw('order_poli_log_price - (order_poli_log_price * order_poli_log_discount / 100)'));
                                         @endphp
                                     <li class="ms-2"><strong>@currency($total_debit)</strong></li>
                                 @endforeach
@@ -95,7 +96,7 @@
                             <td class="align-top py-2 white-space-nowrap">
                                 @foreach ($debit as $debits)
                                         @php
-                                            $total_kredit = 0;
+                                            $total_kredit = DB::table('d_reg_order_payment')->where('d_reg_order_list_code',$debits->d_reg_order_poli_code)->sum('d_reg_order_payment_total');
                                         @endphp
                                     <li class="ms-2"><strong>@currency($total_kredit)</strong></li>
                                 @endforeach
@@ -106,7 +107,7 @@
                             <td class="joined align-middle py-2">{{$datas->t_pasien_cat_name}}</td>
                             <td class="joined align-middle py-2">INV{{$datas->d_reg_order_code}}</td>
                             <td class="joined align-middle py-2">Pendapatan Pili Gigi</td>
-
+                            <td>null</td>
                         </tr>
                     @endforeach
 

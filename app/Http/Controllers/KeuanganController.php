@@ -86,18 +86,65 @@ class KeuanganController extends Controller
     }
     public function keuangan_menu_cashier_find_fix_payment(Request $request)
     {
-        $list = DB::table('d_reg_order_list')->where('d_reg_order_code', $request->code)->get();
-        foreach ($list as $value) {
-            DB::table('d_reg_order_payment')->insert([
-                'd_reg_order_payment_code' => str::uuid(),
-                'd_reg_order_code' => $request->code,
-                'd_reg_order_list_code' => $value->d_reg_order_list_code,
-                'd_reg_order_payment_date' => now(),
-                'd_reg_order_payment_user' => Auth::user()->userid,
-                'created_at' => now()
-            ]);
+        if ($request['payment_method'] == 'CASH') {
+            $nominal = $request->nominalCASH;
+            $payment_card = $request->payment_cardCASH;
+            if ($nominal < $request->total_pembayaran) {
+                return 'Uang Tidak Cukup Bayar';
+            } else {
+                $sisabayar = $nominal - $request->total_pembayaran;
+                $list = DB::table('d_reg_order_list')->where('d_reg_order_code', $request->no_reg)->get();
+                foreach ($list as $value) {
+                    $check = DB::table('d_reg_order_payment')->where('d_reg_order_code', $request->no_reg)->where('d_reg_order_list_code', $value->d_reg_order_list_code)->first();
+                    if ($check) {
+                        return 'Sudah Pernah di bayar';
+                    } else {
+                        DB::table('d_reg_order_payment')->insert([
+                            'd_reg_order_payment_code' => str::uuid(),
+                            'd_reg_order_code' => $request->no_reg,
+                            'd_reg_order_list_code' => $value->d_reg_order_list_code,
+                            'd_reg_order_payment_date' => now(),
+                            'd_reg_order_payment_user' => Auth::user()->userid,
+                            'd_reg_order_payment_card' => 'CASH',
+                            'd_reg_order_payment_total' => $request->total_pembayaran,
+                            'created_at' => now()
+                        ]);
+                    }
+                }
+                return ' Berhasil Melakukan Payment, Sisa Bayar ' . $sisabayar;
+            }
+        } elseif ($request->payment_method == 'TRANSFER') {
+            $nominal = $request->nominalTRANSFER;
+            $payment_card = $request->payment_cardTRANSFER;
+            if ($nominal < $request->total_pembayaran) {
+                return 'Uang Tidak Cukup Bayar';
+            } else {
+                $sisabayar = $nominal - $request->total_pembayaran;
+                $list = DB::table('d_reg_order_list')->where('d_reg_order_code', $request->no_reg)->get();
+                foreach ($list as $value) {
+                    $check = DB::table('d_reg_order_payment')->where('d_reg_order_code', $request->no_reg)->where('d_reg_order_list_code', $value->d_reg_order_list_code)->first();
+                    if ($check) {
+                        return 'Sudah Pernah di bayar';
+                    } else {
+                        DB::table('d_reg_order_payment')->insert([
+                            'd_reg_order_payment_code' => str::uuid(),
+                            'd_reg_order_code' => $request->no_reg,
+                            'd_reg_order_list_code' => $value->d_reg_order_list_code,
+                            'd_reg_order_payment_date' => now(),
+                            'd_reg_order_payment_user' => Auth::user()->userid,
+                            'd_reg_order_payment_card' => $payment_card,
+                            'd_reg_order_payment_total' => $nominal,
+                            'created_at' => now()
+                        ]);
+                    }
+                }
+                return ' Berhasil Melakukan Payment, Sisa Bayar ' . $sisabayar;
+            }
+        } elseif ($request->payment_method == 'DEBIT') {
+
+        } else {
+            return 0;
         }
-        return 123;
     }
     // PERNERIMAAN TRANSAKSI
     public function keuangan_penerimaan_transaksi($akses, $id)

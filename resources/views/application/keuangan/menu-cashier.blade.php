@@ -29,134 +29,142 @@
             </div>
         </div>
     </div>
-    <div class="row g-3">
-        <div class="col-xl-8">
-            <div class="card mb-3">
-                <div class="card-header bg-300">
-                    <div class="row flex-between-center">
-                        <div class="col-sm-auto">
-                            <h5 class="mb-2 mb-sm-0">Cari Data Tagihan</h5>
-                        </div>
-                        <div class="col-sm-auto">
-                            <a class="btn btn-falcon-default btn-sm" href="#!" data-bs-toggle="modal" data-bs-target="#modal-cashier-full" id="button-find-payment"><span
-                                    class="fas fa-search me-2" data-fa-transform="shrink-2"></span>Find</a></div>
-                    </div>
-                </div>
-                <div class="card-body">
-                    <div class="row">
-                        <div class="col">
-                            <input type="text" class="form-control form-control-lg text-center" id="carinoregister"
-                                placeholder="Search No Registrasi" onkeydown="search(this)" autofocus>
-                        </div>
-                    </div>
-                </div>
-            </div>
-            <div class="card">
-                <span id="menu-order-cashier">
-                    <div class="card-header bg-300 btn-reveal-trigger d-flex flex-between-center">
-                        <h5 class="mb-0">Order</h5>
-                        <a class="btn btn-falcon-warning btn-sm btn-reveal" href="#"><span
-                                class="fab fa-product-hunt"></span> Payment
-                        </a>
-                    </div>
-                </span>
-            </div>
-        </div>
-        <div class="col-xl-4 order-xl-1">
-            <div class="card">
-                <div class="card-header bg-300 btn-reveal-trigger d-flex flex-between-center">
-                    <h5 class="mb-0">Metode Payment</h5>
-                </div>
-                <div class="card-body">
-                    <form>
-                        <!-- <div class="form-check d-flex align-items-center">
-                                        <input class="form-check-input" type="radio" value="" id="paypal" name="payment-method" />
-                                        <label class="form-check-label mb-0 ms-2 fs-1 text-primary" for="paypal">Cash
-                                        </label>
-                                    </div> -->
-                        @foreach ($pay as $pays)
-                            <div class="form-check mb-0">
-                                <input class="form-check-input" type="radio" value="" id="cash-card" name="payment-method" />
-                                <label class="form-check-label mb-2 fs-1 text-primary" for="credit-card">{{$pays->m_pay_name}}
-                                </label>
+    <form id="form-methode-payment-cashier">
+        @csrf
+        <div class="row g-3">
+            <div class="col-xl-8">
+                <div class="card mb-3">
+                    <div class="card-header bg-300">
+                        <div class="row flex-between-center">
+                            <div class="col-sm-auto">
+                                <h5 class="mb-2 mb-sm-0">Cari Data Tagihan</h5>
                             </div>
-                            <div class="row gx-0 ps-2 mb-2">
-                                <div class="col-sm-12 px-3">
-                                    <div class="mb-0">
-                                        <label class="form-label ls text-uppercase text-600 fw-semi-bold mb-0"
-                                            for="inputNumber">Nominal</label>
-                                        <input class="form-control" id="inputNumber" type="text" placeholder="@currency(0)" />
-                                    </div>
-                                    @if ($pays->m_pay_name == 'CASH')
-
-                                    @else
-                                    @php
-                                        $card = DB::table('m_pay_detail')->where('m_pay_code',$pays->m_pay_code)->get();
-                                    @endphp
-                                        <div class="row align-items-center">
-                                            <div class="col-6">
-                                                <label class="form-label ls text-uppercase text-600 fw-semi-bold mb-0">Card</label>
-                                                <select name="" class="form-control" id="">
-                                                    <option value="">Pilih Card</option>
-                                                    @foreach ($card as $cards)
-                                                        <option value="{{ $cards->m_pay_detail_code }}">{{ $cards->m_pay_detail_name }}</option>
-                                                    @endforeach
-                                                </select>
-                                            </div>
-                                            <div class="col-6">
-                                                <label class="form-label ls text-uppercase text-600 fw-semi-bold mb-0">EDC<a
-                                                        class="d-inline-block" href="#" data-bs-toggle="tooltip"
-                                                        data-bs-placement="top" title="Card verification value"><span
-                                                            class="fa fa-question-circle ms-2"></span></a></label>
-                                                <input class="form-control" type="text" placeholder="123" maxlength="3"
-                                                    pattern="[0-9]{3}" />
-                                            </div>
+                            <div class="col-sm-auto">
+                                <a class="btn btn-falcon-default btn-sm" href="#!" data-bs-toggle="modal"
+                                    data-bs-target="#modal-cashier-full" id="button-find-payment"><span
+                                        class="fas fa-search me-2" data-fa-transform="shrink-2"></span>Find</a>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="card-body">
+                        <div class="row">
+                            <div class="col">
+                                <input type="text" class="form-control form-control-lg text-center" id="carinoregister"
+                                    placeholder="Search No Registrasi" onkeydown="search(this)" autofocus>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <div class="card">
+                    <span id="menu-order-cashier">
+                        <div class="card-header bg-300 btn-reveal-trigger d-flex flex-between-center">
+                            <h5 class="mb-0">Order</h5>
+                            <a class="btn btn-falcon-warning btn-sm btn-reveal" href="#"><span
+                                    class="fab fa-product-hunt"></span> Payment
+                            </a>
+                        </div>
+                    </span>
+                </div>
+            </div>
+            <div class="col-xl-4 order-xl-1">
+                <div class="card">
+                    <div class="card-header bg-300 btn-reveal-trigger d-flex flex-between-center">
+                        <h5 class="mb-0">Metode Payment</h5>
+                    </div>
+                    <div class="card-body">
+                        <div>
+                            <!-- <div class="form-check d-flex align-items-center">
+                                                <input class="form-check-input" type="radio" value="" id="paypal" name="payment-method" />
+                                                <label class="form-check-label mb-0 ms-2 fs-1 text-primary" for="paypal">Cash
+                                                </label>
+                                            </div> -->
+                            @foreach ($pay as $pays)
+                                <div class="form-check mb-0">
+                                    <input class="form-check-input" type="radio" value="{{ $pays->m_pay_name }}" id="cash-card"
+                                        name="payment_method" />
+                                    <label class="form-check-label mb-2 fs-1 text-primary"
+                                        for="credit-card">{{$pays->m_pay_name}}
+                                    </label>
+                                </div>
+                                <div class="row gx-0 ps-2 mb-2">
+                                    <div class="col-sm-12 px-3">
+                                        <div class="mb-0">
+                                            <label class="form-label ls text-uppercase text-600 fw-semi-bold mb-0"
+                                                for="inputNumber">Nominal</label>
+                                            <input class="form-control" id="inputNumber" type="text" name="nominal{{ $pays->m_pay_name }}"
+                                                placeholder="@currency(0)" />
                                         </div>
-                                    @endif
+                                        @if ($pays->m_pay_name == 'CASH')
+
+                                        @else
+                                            @php
+                                                $card = DB::table('m_pay_card')
+                                                    ->join('m_pay_detail', 'm_pay_detail.m_pay_detail_code', '=', 'm_pay_card.m_pay_detail_code')
+                                                    ->where('m_pay_detail.m_pay_code', $pays->m_pay_code)->get();
+                                            @endphp
+                                            <div class="row align-items-center">
+                                                <div class="col-12">
+                                                    <label
+                                                        class="form-label ls text-uppercase text-600 fw-semi-bold mb-0">Card</label>
+                                                    <select name="payment_card{{ $pays->m_pay_name }}" class="form-control" id="">
+                                                        <option value="">Pilih Card</option>
+                                                        @foreach ($card as $cards)
+                                                            <option value="{{ $cards->m_pay_card_code }}">{{ $cards->m_pay_card_name }}
+                                                                -
+                                                                {{ $cards->m_pay_card_number }}
+                                                            </option>
+                                                        @endforeach
+                                                    </select>
+                                                </div>
+
+                                            </div>
+                                        @endif
+                                    </div>
+                                </div>
+                            @endforeach
+
+                            <!-- <div class="form-check d-flex align-items-center">
+                                                <input class="form-check-input" type="radio" value="" id="paypal" name="payment-method" />
+                                                <label class="form-check-label mb-0 ms-2" for="paypal"><img src="{{ asset('asset/img/icons/icon-paypal-full.png') }}" height="20" alt="" />
+                                                </label>
+                                            </div> -->
+                            <!-- <div class="border-dashed-bottom my-5"></div> -->
+                            <div class="row" style="display: none;" id="menu-pembayaran">
+                                <!-- <div class="col-md-7 col-xl-12 col-xxl-7 px-md-3 mb-xxl-0 position-relative">
+                                                    <div class="d-flex"><img class="me-3" src="{{ asset('asset/img/icons/shield.png') }}" alt="" width="60" height="60" />
+                                                        <div class="flex-1">
+                                                            <h5 class="mb-2">Buyer Protection</h5>
+                                                            <div class="form-check mb-0">
+                                                                <input class="form-check-input" id="protection-option-1" type="checkbox" checked="checked" />
+                                                                <label class="form-check-label mb-0" for="protection-option-1"> <strong>Full Refund </strong>If you don't <br class="d-none d-md-block d-lg-none" />receive your order</label>
+                                                            </div>
+                                                            <div class="form-check">
+                                                                <input class="form-check-input" id="protection-option-2" type="checkbox" checked="checked" />
+                                                                <label class="form-check-label mb-0" for="protection-option-2"> <strong>Full or Partial Refund, </strong>If the product is not as described in details</label>
+                                                            </div><a class="fs--1 ms-3 ps-2" href="#!">Learn More<span class="fas fa-caret-right ms-1" data-fa-transform="down-2"> </span></a>
+                                                        </div>
+                                                    </div>
+                                                    <div class="vertical-line d-none d-md-block d-xl-none d-xxl-block"> </div>
+                                                </div> -->
+                                <div
+                                    class="col-md-5 col-xl-12 col-xxl-5 ps-lg-4 ps-xl-2 ps-xxl-5 text-center text-md-start text-xl-center text-xxl-start">
+                                    <div class="border-dashed-bottom d-block d-md-none d-xl-block d-xxl-none my-4"></div>
+                                    <div class="fs-2 fw-semi-bold">All Total: <span class="text-primary"
+                                            id="total_pembayaran_pasien">0</span></div>
+                                    <button class="btn btn-success mt-3 px-5" type="button"
+                                        id="button-fix-pembayaran-pasien">Confirm &amp; Pay</button>
+                                    <p class="fs--1 mt-3 mb-0">By clicking <strong>Confirm & Pay </strong>button you agree
+                                        to
+                                        the <a href="#!">Terms &amp; Conditions</a></p>
                                 </div>
                             </div>
-                        @endforeach
-
-                        <!-- <div class="form-check d-flex align-items-center">
-                                        <input class="form-check-input" type="radio" value="" id="paypal" name="payment-method" />
-                                        <label class="form-check-label mb-0 ms-2" for="paypal"><img src="{{ asset('asset/img/icons/icon-paypal-full.png') }}" height="20" alt="" />
-                                        </label>
-                                    </div> -->
-                        <!-- <div class="border-dashed-bottom my-5"></div> -->
-                        <div class="row" style="display: none;" id="menu-pembayaran">
-                            <!-- <div class="col-md-7 col-xl-12 col-xxl-7 px-md-3 mb-xxl-0 position-relative">
-                                            <div class="d-flex"><img class="me-3" src="{{ asset('asset/img/icons/shield.png') }}" alt="" width="60" height="60" />
-                                                <div class="flex-1">
-                                                    <h5 class="mb-2">Buyer Protection</h5>
-                                                    <div class="form-check mb-0">
-                                                        <input class="form-check-input" id="protection-option-1" type="checkbox" checked="checked" />
-                                                        <label class="form-check-label mb-0" for="protection-option-1"> <strong>Full Refund </strong>If you don't <br class="d-none d-md-block d-lg-none" />receive your order</label>
-                                                    </div>
-                                                    <div class="form-check">
-                                                        <input class="form-check-input" id="protection-option-2" type="checkbox" checked="checked" />
-                                                        <label class="form-check-label mb-0" for="protection-option-2"> <strong>Full or Partial Refund, </strong>If the product is not as described in details</label>
-                                                    </div><a class="fs--1 ms-3 ps-2" href="#!">Learn More<span class="fas fa-caret-right ms-1" data-fa-transform="down-2"> </span></a>
-                                                </div>
-                                            </div>
-                                            <div class="vertical-line d-none d-md-block d-xl-none d-xxl-block"> </div>
-                                        </div> -->
-                            <div
-                                class="col-md-5 col-xl-12 col-xxl-5 ps-lg-4 ps-xl-2 ps-xxl-5 text-center text-md-start text-xl-center text-xxl-start">
-                                <div class="border-dashed-bottom d-block d-md-none d-xl-block d-xxl-none my-4"></div>
-                                <div class="fs-2 fw-semi-bold">All Total: <span class="text-primary"
-                                        id="total_pembayaran_pasien">0</span></div>
-                                <button class="btn btn-success mt-3 px-5" type="button"
-                                    id="button-fix-pembayaran-pasien">Confirm &amp; Pay</button>
-                                <p class="fs--1 mt-3 mb-0">By clicking <strong>Confirm & Pay </strong>button you agree to
-                                    the <a href="#!">Terms &amp; Conditions</a></p>
-                            </div>
                         </div>
-                    </form>
+                    </div>
                 </div>
             </div>
-        </div>
 
-    </div>
+        </div>
+    </form>
 @endsection
 @section('base.js')
     <div class="modal fade" id="modal-cashier-full" data-bs-keyboard="false" data-bs-backdrop="static" tabindex="-1"
@@ -241,6 +249,7 @@
             e.preventDefault();
             var id = $(this).data("code");
             var code = document.getElementById("total_pembayaran").value;
+            let reg = document.getElementById("no_reg").value;
             document.getElementById("menu-pembayaran").style.display = "block";
             $('#total_pembayaran_pasien').html(code);
         });
@@ -248,7 +257,8 @@
             e.preventDefault();
             var reg = document.getElementById("no_reg").value;
             var total = document.getElementById("total_pembayaran").value;
-            console.log(reg);
+            var data = $("#form-methode-payment-cashier").serialize();
+            console.log(data);
             console.log(total);
 
             const swalWithBootstrapButtons = Swal.mixin({
@@ -272,21 +282,25 @@
                         url: "{{ route('keuangan_menu_cashier_find_fix_payment') }}",
                         type: "POST",
                         cache: false,
-                        data: {
-                            "_token": "{{ csrf_token() }}",
-                            "code": reg,
-                            "total": total
-                        },
+                        data: data,
                         dataType: 'html',
                     }).done(function (data) {
-                        swalWithBootstrapButtons.fire({
-                            title: "Payment success!",
-                            text: "Your Payment Has been success.",
-                            icon: "success"
+                        if (data == 0) {
+                            swalWithBootstrapButtons.fire({
+                            title: "Payment Failed!",
+                            text: "Pilih Lok Payment",
+                            icon: "error"
                         });
-                        setTimeout(() => {
-                            location.reload();
-                        }, 200);
+                        } else {
+                            swalWithBootstrapButtons.fire({
+                                title: "Payment success!",
+                                text: data,
+                                icon: "success"
+                            });
+                            setTimeout(() => {
+                                location.reload();
+                            }, 200);
+                        }
                     }).fail(function () {
                         swalWithBootstrapButtons.fire({
                             title: "Payment Failed!",
