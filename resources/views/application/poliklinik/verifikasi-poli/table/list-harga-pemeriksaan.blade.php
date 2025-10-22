@@ -1,3 +1,8 @@
+@if ($list->isEmpty())
+    <input type="text" name="payment_code" id="payment_code" hidden>
+@else
+    <input type="text" name="payment_code" id="payment_code" value="0" hidden>
+@endif
 <table class="table table-borderless fs--1 mb-0">
     <tbody>
         @php

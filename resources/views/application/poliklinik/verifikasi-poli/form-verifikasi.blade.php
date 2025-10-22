@@ -255,11 +255,7 @@
                             </div>
                         </div>
                         <div class="d-flex justify-content-between fs--1 mb-1">
-                            @if ($list->isEmpty())
-                                <input type="text" name="payment_code" id="payment_code" hidden>
-                            @else
-                                <input type="text" name="payment_code" id="payment_code" value="0" hidden>
-                            @endif
+
                             <button class="btn btn-warning btn-sm" id="button-pilih-pemeriksaan-poli"
                                 data-code="{{ $code }}">Pilih</button>
                         </div>
@@ -267,6 +263,11 @@
                         <hr>
                         <div class="row">
                             <div class="col-md-7" id="menu-pemeriksaan-poliklinik">
+                                @if ($list->isEmpty())
+                                    <input type="text" name="payment_code" id="payment_code" hidden>
+                                @else
+                                    <input type="text" name="payment_code" id="payment_code" value="0" hidden>
+                                @endif
                                 <table class="table table-borderless fs--1 mb-0">
                                     <tbody>
                                         @php
