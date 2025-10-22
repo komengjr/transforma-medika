@@ -88,6 +88,7 @@ class KeuanganController extends Controller
     {
         if ($request['payment_method'] == 'CASH') {
             $nominal = $request->nominalCASH;
+            $nominal = preg_replace("/[^0-9]/", "", $nominal);
             $payment_card = $request->payment_cardCASH;
             if ($nominal < $request->total_pembayaran) {
                 return 'Uang Tidak Cukup Bayar';
@@ -115,6 +116,7 @@ class KeuanganController extends Controller
             }
         } elseif ($request->payment_method == 'TRANSFER') {
             $nominal = $request->nominalTRANSFER;
+            $nominal = preg_replace("/[^0-9]/", "", $nominal);
             $payment_card = $request->payment_cardTRANSFER;
             if ($nominal < $request->total_pembayaran) {
                 return 'Uang Tidak Cukup Bayar';

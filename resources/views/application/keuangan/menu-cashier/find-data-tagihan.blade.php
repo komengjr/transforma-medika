@@ -42,22 +42,7 @@
                             @endforeach
                         </td>
                         <td class="text-center">
-                            <div class="btn-group" role="group">
-                                <button class="btn btn-sm btn-falcon-primary dropdown-toggle" id="btnGroupVerticalDrop2"
-                                    type="button" data-bs-toggle="dropdown" aria-haspopup="true" aria-expanded="false"><span
-                                        class="fas fa-align-left me-1" data-fa-transform="shrink-3"></span>Option</button>
-                                <div class="dropdown-menu" aria-labelledby="btnGroupVerticalDrop2">
-                                    <button class="dropdown-item text-warning" data-bs-toggle="modal"
-                                        data-bs-target="#modal-keuangan" id="button-proses-transaksi"
-                                        data-code="{{ $datas->d_reg_order_code }}"><span class="fab fa-amazon-pay"></span>
-                                        Proses Transaksi</button>
-                                    <div class="dropdown-divider"></div>
-                                    <button class="dropdown-item" data-bs-toggle="modal" data-bs-target="#modal-cabang"
-                                        id="button-data-barang-cabang" data-code="123"><span
-                                            class="far fa-folder-open"></span>
-                                        History</button>
-                                </div>
-                            </div>
+                            <button id="button-pilih-data-payment" data-code="{{ $datas->d_reg_order_code }}" data-bs-dismiss="modal">Payment</button>
                         </td>
                     </tr>
                 @endforeach

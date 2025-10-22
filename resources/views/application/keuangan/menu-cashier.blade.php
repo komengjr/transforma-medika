@@ -73,12 +73,13 @@
                     </div>
                     <div class="card-body">
                         <div>
-                            <!-- <div class="form-check d-flex align-items-center">
-                                                <input class="form-check-input" type="radio" value="" id="paypal" name="payment-method" />
-                                                <label class="form-check-label mb-0 ms-2 fs-1 text-primary" for="paypal">Cash
-                                                </label>
-                                            </div> -->
+                            @php
+                                $idr = 0;
+                            @endphp
                             @foreach ($pay as $pays)
+                            @php
+                                $idr = $idr +1;
+                            @endphp
                                 <div class="form-check mb-0">
                                     <input class="form-check-input" type="radio" value="{{ $pays->m_pay_name }}" id="cash-card"
                                         name="payment_method" />
@@ -91,7 +92,7 @@
                                         <div class="mb-0">
                                             <label class="form-label ls text-uppercase text-600 fw-semi-bold mb-0"
                                                 for="inputNumber">Nominal</label>
-                                            <input class="form-control" id="inputNumber" type="text" name="nominal{{ $pays->m_pay_name }}"
+                                            <input class="form-control" id="payment{{$idr}}" type="text" name="nominal{{ $pays->m_pay_name }}"
                                                 placeholder="@currency(0)" />
                                         </div>
                                         @if ($pays->m_pay_name == 'CASH')
@@ -121,6 +122,13 @@
                                         @endif
                                     </div>
                                 </div>
+                                <script>
+                                    var payment<?php echo $idr; ?> = document.getElementById('payment<?php echo $idr; ?>');
+                                    payment<?php echo $idr; ?>.addEventListener('keyup', function(e)
+                                    {
+                                        payment<?php echo $idr; ?>.value = formatRupiah(this.value, 'Rp. ');
+                                    });
+                                </script>
                             @endforeach
 
                             <!-- <div class="form-check d-flex align-items-center">
@@ -197,7 +205,7 @@
     <script src="https://cdn.datatables.net/responsive/3.0.4/js/responsive.bootstrap5.js"></script>
     <script src="{{ asset('vendors/choices/choices.min.js') }}"></script>
     <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
-
+    <script src="{{ asset('asset/js/rupiah-payment.js') }}"></script>
     <script>
         new DataTable('#example', {
             responsive: true
@@ -245,6 +253,28 @@
                 $('#menu-cashier-full').html('eror');
             });
         });
+        $(document).on("click", "#button-pilih-data-payment", function (e) {
+            e.preventDefault();
+            var code = $(this).data("code");
+            $('#menu-order-cashier').html(
+                '<div class="spinner-border my-3" style="display: block; margin-left: auto; margin-right: auto;" role="status"><span class="visually-hidden">Loading...</span></div>'
+            );
+            $.ajax({
+                url: "{{ route('keuangan_menu_cashier_find') }}",
+                type: "POST",
+                cache: false,
+                data: {
+                    "_token": "{{ csrf_token() }}",
+                    "code": code
+                },
+                dataType: 'html',
+            }).done(function (data) {
+                $('#menu-order-cashier').html(data);
+            }).fail(function () {
+                $('#menu-order-cashier').html('eror');
+            });
+        });
+
         $(document).on("click", "#button-proses-payment", function (e) {
             e.preventDefault();
             var id = $(this).data("code");

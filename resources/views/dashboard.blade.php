@@ -180,7 +180,7 @@
                                                         aria-expanded="false"><span class="fas fa-align-left me-1"
                                                             data-fa-transform="shrink-3"></span>Option</button>
                                                     <div class="dropdown-menu" aria-labelledby="btnGroupVerticalDrop2">
-                                                        <button class="dropdown-item text-dark" id="button-menu-utama">
+                                                        <button class="dropdown-item text-info" id="button-menu-utama">
                                                             <span class="fab fa-dashcube"></span>
                                                             Menu Utama</button>
                                                         <button class="dropdown-item text-warning"

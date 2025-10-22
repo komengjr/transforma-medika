@@ -226,7 +226,7 @@ class PoliklinikController extends Controller
                 // echo "Diagnosis: " . implode(", ", $value['diagnosis']) . "<br>";
                 // echo "Note: " . $value['note'] . "<br><br>";
             }
-            return $datas;
+            return 'Berhasil Meenyimpan , Jika Pemeriksaan pada pasien sudah lengkap silahkan untuk melakukan skip / simpan data';
             # code...
         }
 

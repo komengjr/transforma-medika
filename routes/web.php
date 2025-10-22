@@ -5,6 +5,7 @@ use App\Http\Controllers\ApplicationController;
 use App\Http\Controllers\Auth\AuthController;
 use App\Http\Controllers\Brodcast\BrodcastController;
 use App\Http\Controllers\dashboardController;
+use App\Http\Controllers\Farmasi\FarmasiController;
 use App\Http\Controllers\Hrm\HrmController;
 use App\Http\Controllers\inventaris\MasterBarangController;
 use App\Http\Controllers\inventaris\MasterController as InventarisMasterController;
@@ -123,6 +124,10 @@ Route::prefix('{akses}/{id}')->group(function (): void {
     Route::get('menu-brodcast/brodcast-whatsapp', [BrodcastController::class, 'menu_brodcast_whatsapp'])->name('menu_brodcast_whatsapp');
     Route::get('menu-brodcast/brodcast-management', [BrodcastController::class, 'menu_brodcast_management'])->name('menu_brodcast_management');
     Route::get('master-brodcast/master-contact', [BrodcastController::class, 'master_brodcast_contact'])->name('master_brodcast_contact');
+
+    // FARMASI
+    Route::get('manajemen-farmasi/data-obat', [FarmasiController::class, 'manajemen_farmasi_data_obat'])->name('manajemen_farmasi_data_obat');
+    Route::get('manajemen-farmasi/obat-masuk-dan-keluar', [FarmasiController::class, 'manajemen_farmasi_obat_in_out'])->name('manajemen_farmasi_obat_in_out');
 });
 // MEDICA HEALTH
 Route::prefix('{akses}/{id}/application')->group(function () {
@@ -312,7 +317,7 @@ Route::prefix('application')->group(function () {
     Route::post('keuangan/menu-kasir/fix-payment', [KeuanganController::class, 'keuangan_menu_cashier_find_fix_payment'])->name('keuangan_menu_cashier_find_fix_payment');
     Route::post('transaksi-keuangan/penerimaan-transaksi/proses-transaksi', [KeuanganController::class, 'keuangan_penerimaan_proses_transaksi'])->name('keuangan_penerimaan_proses_transaksi');
 });
-// MASTER DATA
+// MASTER DATA MEDICAL
 Route::prefix('application')->group(function () {
     Route::post('master-doctor/data-doctor/add', [MasterDataController::class, 'master_doctor_data_doctor_add'])->name('master_doctor_data_doctor_add');
     Route::post('master-doctor/data-doctor/save', [MasterDataController::class, 'master_doctor_data_doctor_save'])->name('master_doctor_data_doctor_save');
@@ -350,7 +355,7 @@ Route::prefix('application')->group(function () {
     Route::post('master-penjualan/kategori-penjualan/add-kategori', [MasterDataController::class, 'master_penjualan_kategori_add_kategori'])->name('master_penjualan_kategori_add_kategori');
     Route::post('master-penjualan/kategori-penjualan/save-kategori', [MasterDataController::class, 'master_penjualan_kategori_save_kategori'])->name('master_penjualan_kategori_save_kategori');
 });
-// MASTER DATA
+// MASTER DATA MEDICAL
 Route::prefix('application')->group(function () {
     // MASTER COMPANY
     Route::post('master-company/add-company', [ApplicationController::class, 'master_company_add_company'])->name('master_company_add_company');

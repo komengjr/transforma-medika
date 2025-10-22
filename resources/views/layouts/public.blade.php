@@ -321,7 +321,7 @@
                                                 class="fas fa-user-cog"></span>
                                             Profile &amp;
                                             account</a>
-                                        <a class="dropdown-item text-github" href="{{route('dashboard.home')}}"><span
+                                        <a class="dropdown-item text-primary" href="{{route('dashboard.home')}}"><span
                                                 class="fas fa-chalkboard-teacher"></span> Homepage</a>
                                         @if (Auth::user()->access_code == 'master')
                                             <a class="dropdown-item text-danger" href="{{route('master_dashboard')}}"><span
