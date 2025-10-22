@@ -63,8 +63,44 @@ class BrodcastController extends Controller
             return Redirect::to('dashboard/home');
         }
     }
+    public function menu_brodcast_whatsapp_upload_file(Request $request)
+    {
+        $receiver = new FileReceiver('file', $request, HandlerFactory::classFromRequest($request));
+        if (!$receiver->isUploaded()) {
+            // file not uploaded
+        }
+        $fileReceived = $receiver->receive(); // receive file
+        if ($fileReceived->isFinished()) { // file uploading is complete / all chunks are uploaded
+            $file = $fileReceived->getFile(); // get file
+            $extension = $file->getClientOriginalExtension();
+            $fileName = str_replace('.' . $extension, '', $file->getClientOriginalName()); //file name without extenstion
+            $fileName .= '_' . md5(time()) . '.' . $extension; // a unique file name
+            $disk = Storage::disk(config('filesystems.default'));
+            $path = $disk->putFileAs('public/brodcast/data-send/' . auth::user()->access_cabang, $file, $fileName);
+            // $path1 = $disk('videos', $file, $fileName);
+            // delete chunked file
+            unlink($file->getPathname());
+            return [
+                'path' => Storage::url('brodcast/data-send/' . auth::user()->access_cabang . '/' . $fileName),
+                'filename' => $fileName
+            ];
+        }
+        // otherwise return percentage informatoin
+        $handler = $fileReceived->handler();
+        return [
+            'done' => $handler->getPercentageDone(),
+            'status' => true
+        ];
+    }
     public function menu_brodcast_whatsapp_send(Request $request)
     {
+        if ($request->link == "") {
+            $gambar = 0;
+        } else {
+            $filegambar = storage_path('app/public/brodcast/data-send/' . Auth::user()->access_cabang . '/' . $request->link);
+            $img = file_get_contents($filegambar);
+            $gambar = base64_encode($img);
+        }
         $nomorhp = $request->number;
         //Terlebih dahulu kita trim dl
         $nomorhp = trim($nomorhp);
@@ -89,7 +125,7 @@ class BrodcastController extends Controller
                 $nomorhp = '+62' . substr($nomorhp, 1);
             }
         }
-        $text = "Hi *" . Auth::user()->fullname . "* \nSelamat Anda Terdaftar Sebagai Peserta \n\n" . $request->text . "\n\nSupport By. Innoverta";
+        $text = "Hi *Salam Sehat* \nNotifikasi Ini bisa di custom Secara berkala \n\n" . $request->text . "\n\nSupport By. Innoverta";
         DB::table('v_log_whatsapp')->insert([
             'v_log_whatsapp_code' => str::uuid(),
             'd_reg_order_list_code' => str::uuid(),
@@ -98,7 +134,7 @@ class BrodcastController extends Controller
             'v_log_whatsapp_filename' => Auth::user()->fullname,
             'v_log_whatsapp_text' => $text,
             'v_log_whatsapp_file' => 'N',
-            'v_log_whatsapp_picture' => 0,
+            'v_log_whatsapp_picture' => $gambar,
             'v_log_whatsapp_status' => 0,
             'v_log_whatsapp_date' => now(),
             'v_log_whatsapp_pass' => mt_rand(10000, 90000),
@@ -174,6 +210,8 @@ class BrodcastController extends Controller
     }
     public function menu_brodcast_management_brodcast_whatsapp_send(Request $request)
     {
+
+
         $data = DB::table('b_event_peserta')->where('b_event_code', $request->code)->get();
         $event = DB::table('b_event')->where('b_event_code', $request->code)->first();
         foreach ($data as $datas) {
