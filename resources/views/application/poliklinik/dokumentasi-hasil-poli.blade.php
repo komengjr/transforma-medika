@@ -98,10 +98,19 @@
                                     <span class="badge bg-danger">Not Verified</span>
                                 @elseif ($datas->d_reg_order_poli_status == 3)
                                     <span class="badge bg-primary">Verified</span>
+                                @elseif ($datas->d_reg_order_poli_status == 4)
+                                    <span class="badge bg-dark">Pesan Terkirim</span>
                                 @endif
                             </td>
                             <td>
-
+                                @php
+                                    $payment = DB::table('d_reg_order_payment')->where('d_reg_order_list_code',$datas->d_reg_order_poli_code)->first();
+                                @endphp
+                                @if ($payment)
+                                    <span class="badge bg-dark">Sudah Bayar</span>
+                                @else
+                                    <span class="badge bg-danger">Belum Bayar</span>
+                                @endif
                             </td>
                             <td class="text-center">
                                 <div class="btn-group" role="group">
@@ -196,7 +205,7 @@
                     confirmButton: "btn btn-success",
                     cancelButton: "btn btn-danger"
                 },
-                buttonsStyling: false
+                buttonsStyling: true
             });
             swalWithBootstrapButtons.fire({
                 title: "Are you sure?",
@@ -208,10 +217,29 @@
                 reverseButtons: true
             }).then((result) => {
                 if (result.isConfirmed) {
-                    $('#menu-poliklinik').html(
-                        '<div class="spinner-border my-3" style="display: block; margin-left: auto; margin-right: auto;" role="status"><span class="visually-hidden">Loading...</span></div>'
-                    );
-                    $.ajax({
+                    let timerInterval;
+                    Swal.fire({
+                    title: "Proses Mengirim Pesan!",
+                    html: "I will close in <b></b> milliseconds.",
+                    timer: 6000,
+                    timerProgressBar: true,
+                    didOpen: () => {
+                        Swal.showLoading();
+                        const timer = Swal.getPopup().querySelector("b");
+                        timerInterval = setInterval(() => {
+                        timer.textContent = `${Swal.getTimerLeft()}`;
+                        }, 100);
+                    },
+                    willClose: () => {
+                        clearInterval(timerInterval);
+                    }
+                    }).then((result) => {
+                    /* Read more about handling dismissals below */
+                    if (result.dismiss === Swal.DismissReason.timer) {
+                        console.log("I was closed by the timer");
+                    }
+                    });
+                        $.ajax({
                         url: "{{ route('verifikasi_poliklinik_dokumentasi_hasil_send_report') }}",
                         type: "POST",
                         cache: false,
@@ -226,12 +254,14 @@
                             text: "Your Report Has been Success.",
                             icon: "success"
                         });
+                        location.reload();
                     }).fail(function () {
                         swalWithBootstrapButtons.fire({
                             title: "Failed",
                             text: "Gagal Kirim :)",
                             icon: "error"
                         });
+                        location.reload();
                     });
                 } else if (
                     /* Read more about handling dismissals below */

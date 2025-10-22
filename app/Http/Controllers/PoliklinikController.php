@@ -380,7 +380,7 @@ class PoliklinikController extends Controller
                 ->join('t_layanan_data', 't_layanan_data.t_layanan_data_code', '=', 'm_doctor_poli.t_layanan_data_code')
                 ->join('master_doctor', 'master_doctor.master_doctor_code', '=', 'm_doctor_poli.master_doctor_code')
                 ->where('d_reg_order.d_reg_order_cabang', Auth::user()->access_cabang)
-                ->where('d_reg_order_poli.d_reg_order_poli_status', 3)->orderBy('id_d_reg_order_poli','DESC')->get();
+                ->where('d_reg_order_poli.d_reg_order_poli_status', '>=', 3)->orderBy('id_d_reg_order_poli', 'DESC')->get();
             return view('application.poliklinik.dokumentasi-hasil-poli', [
                 'akses' => $akses,
                 'code' => $id,
@@ -437,6 +437,126 @@ class PoliklinikController extends Controller
     }
     public function verifikasi_poliklinik_dokumentasi_hasil_send_report(Request $request)
     {
+        $image = base64_encode(file_get_contents(public_path('img/favicon.png')));
+        $odon = DB::table('diag_poli_gigi_odon')->where('d_reg_order_poli_code', $request->code)->get();
+        $fisik = DB::table('diag_poli_fisik_umum_d')
+            ->join('diag_poli_fisik_umum', 'diag_poli_fisik_umum.diag_poli_fisik_umum_code', '=', 'diag_poli_fisik_umum_d.diag_poli_fisik_umum_code')
+            ->where('d_reg_order_poli_code', $request->code)->get();
+        $umum = DB::table('diag_poli_gigi_umum')->where('d_reg_order_poli_code', $request->code)->get();
+        $pasien = DB::table('d_reg_order')
+            ->join('d_reg_order_poli', 'd_reg_order_poli.d_reg_order_code', '=', 'd_reg_order.d_reg_order_code')
+            ->join('master_patient', 'master_patient.master_patient_code', '=', 'd_reg_order.d_reg_order_rm')
+            ->where('d_reg_order_poli.d_reg_order_poli_code', $request->code)->first();
+        $tgl_lahir_carbon = Carbon::parse($pasien->master_patient_tgl_lahir);
+        $umur_tahun = $tgl_lahir_carbon->diffInYears(); // Menghitung umur dalam tahun
+
+        $umur = $umur_tahun . ' Th ';
+        $pdf = \Barryvdh\DomPDF\Facade\Pdf::loadview('application.poliklinik.dokumentasi-hasil.report.report-preview-hasil', [
+            'code' => $request->code,
+            'odon' => $odon,
+            'fisik' => $fisik,
+            'umum' => $umum,
+            'pasien' => $pasien,
+            'umur' => $umur,
+        ], compact('image'))
+            ->setPaper('A5', 'potrait')->setOptions([
+                    'isHtml5ParserEnabled' => true,
+                    'isRemoteEnabled' => true,
+                ]);
+        $pdf->output();
+        $dompdf = $pdf->getDomPDF();
+        $font = $dompdf->getFontMetrics()->get_font("helvetica", "bold");
+        $font1 = $dompdf->getFontMetrics()->get_font("helvetica", "normal");
+        $dompdf->get_canvas()->page_text(300, 820, "{PAGE_NUM} / {PAGE_COUNT}", $font, 10, array(0, 0, 0));
+        $dompdf->get_canvas()->page_text(34, 820, "Print by. " . Auth::user()->fullname, $font1, 10, array(0, 0, 0));
+        $canvas = $pdf->getDomPDF()->getCanvas();
+        $canvas->page_script('
+            // $pdf->set_opacity(.9);
+            $pdf->image("img/cover.png", 12, 12, 400, 575);
+            ');
+        $pdf->output();
+        $canvas = $pdf->getDomPDF()->getCanvas();
+        $canvas->page_script('
+            // $pdf->set_opacity(.9);
+            $pdf->image("img/cover.png", 12, 12, 575, 823);
+            ');
+        $pdf->get_canvas()->get_cpdf()->setEncryption("admin", date('dmY', strtotime($pasien->master_patient_tgl_lahir)));
+        $file = base64_encode($pdf->stream());
+        $base64Pdf = 'data:application/pdf;base64,' . $file; // Your Base64 encoded PDF string
+        list($type, $data) = explode(';', $base64Pdf);
+        list(, $data) = explode(',', $data);
+        $pdfBinaryData = base64_decode($data);
+        $tempPdfPath = storage_path('app/public/hasil/poli/' . $request->code . '.pdf');
+        file_put_contents($tempPdfPath, $pdfBinaryData);
+        // PROSES KIRIM
+
+        $nomorhp = $pasien->master_patient_no_hp;
+        //Terlebih dahulu kita trim dl
+        $nomorhp = trim($nomorhp);
+        //bersihkan dari karakter yang tidak perlu
+        $nomorhp = strip_tags($nomorhp);
+        // Berishkan dari spasi
+        $nomorhp = str_replace(" ", "", $nomorhp);
+        // Berishkan dari -
+        $nomorhp = str_replace("-", "", $nomorhp);
+        // bersihkan dari bentuk seperti  (022) 66677788
+        $nomorhp = str_replace("(", "", $nomorhp);
+        // bersihkan dari format yang ada titik seperti 0811.222.333.4
+        $nomorhp = str_replace(".", "", $nomorhp);
+
+        if (!preg_match('/[^+0-9]/', trim($nomorhp))) {
+            // cek apakah no hp karakter 1-3 adalah +62
+            if (substr(trim($nomorhp), 0, 3) == '+62') {
+                $nomorhp = trim($nomorhp);
+            }
+            // cek apakah no hp karakter 1 adalah 0
+            elseif (substr($nomorhp, 0, 1) == '0') {
+                $nomorhp = '+62' . substr($nomorhp, 1);
+            }
+        }
+        // $tempPdfPath = storage_path('app/public/hasil/rpt.pdf');
+        $name = storage_path('app/public/hasil/poli/' . $request->code . '.pdf');
+
+        $img = file_get_contents($name);
+        // a route is created, (it must already be created in its repository(pdf)).
+        // $rute    = "pdf/" . $name;
+        $pass = date('dmY', strtotime($pasien->master_patient_tgl_lahir));
+        // decode base64
+        $pdf_b64 = base64_encode($img);
+        $cek = DB::table('v_log_whatsapp')->where('d_reg_order_list_code', $request->code)->first();
+        // you record the file in existing folder
+        if ($cek) {
+            DB::table('v_log_whatsapp')->where('d_reg_order_list_code', $request->code)->update([
+                'v_log_whatsapp_number' => $nomorhp,
+                'v_log_whatsapp_name' => $pasien->master_patient_name,
+                'v_log_whatsapp_filename' => $request->code . date('his'),
+                'v_log_whatsapp_text' => "Halo, " . $pasien->master_patient_name . "\nHasil Lab Dengan Password Tanggal Lahir : Ex. 01011991",
+                'v_log_whatsapp_file' => $pdf_b64,
+                'v_log_whatsapp_picture' => '0',
+                'v_log_whatsapp_status' => 0,
+                'v_log_whatsapp_date' => now(),
+                'v_log_whatsapp_pass' => $pass,
+            ]);
+        } else {
+            DB::table('v_log_whatsapp')->insert([
+                'v_log_whatsapp_code' => str::uuid() . mt_rand(1000, 9999),
+                'd_reg_order_list_code' => $request->code,
+                'v_log_whatsapp_number' => $nomorhp,
+                'v_log_whatsapp_name' => $pasien->master_patient_name,
+                'v_log_whatsapp_filename' => $request->code . date('his'),
+                'v_log_whatsapp_text' => "Halo, " . $pasien->master_patient_name . "\nHasil Lab Dengan Password Tanggal Lahir : Ex. 01011991",
+                'v_log_whatsapp_file' => $pdf_b64,
+                'v_log_whatsapp_picture' => '0',
+                'v_log_whatsapp_status' => 0,
+                'v_log_whatsapp_date' => now(),
+                'v_log_whatsapp_pass' => $pass,
+                'created_at' => now(),
+            ]);
+        }
+        DB::table('d_reg_order_poli')->where('d_reg_order_poli_code', $request->code)->update([
+            'd_reg_order_poli_status' => 4,
+            'updated_at' => now(),
+        ]);
         return 123;
     }
 }
