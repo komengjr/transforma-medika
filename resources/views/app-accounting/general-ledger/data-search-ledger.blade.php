@@ -106,8 +106,24 @@
                             <!-- <td class="align-middle">Sales Invoice</td> -->
                             <td class="joined align-middle py-2">{{$datas->t_pasien_cat_name}}</td>
                             <td class="joined align-middle py-2">INV{{$datas->d_reg_order_code}}</td>
-                            <td class="joined align-middle py-2">Pendapatan Pili Gigi</td>
-                            <td>null</td>
+                            <td class="joined align-middle py-2">
+                                @if ($total_kredit == 0)
+                                    Penagihan Poli Gigi
+                                @else
+                                    Pendapatan Poli Gigi
+                                @endif
+                            </td>
+                            <td>
+                                @php
+                                    $payment = DB::table('d_reg_order_payment')
+                                    ->join('m_pay_card','m_pay_card.m_pay_card_code','=','d_reg_order_payment.d_reg_order_payment_card')
+                                    ->join('m_pay_detail','m_pay_detail.m_pay_detail_code','=','m_pay_card.m_pay_detail_code')
+                                    ->where('d_reg_order_code',$datas->d_reg_order_code)->get();
+                                @endphp
+                                @foreach ($payment as $pays)
+                                    <li class="ms-3">{{ $pays->m_pay_detail_name }} <br>{{ $pays->m_pay_card_name }} - ( {{ $pays->m_pay_card_number }} )</li>
+                                @endforeach
+                            </td>
                         </tr>
                     @endforeach
 
