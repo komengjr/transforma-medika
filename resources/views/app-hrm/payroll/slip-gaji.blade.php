@@ -106,74 +106,78 @@
     </div>
 
     <!-- Tabel Data Gaji -->
-    <div class="card p-4">
-        <h5 class="fw-bold mb-3">Daftar Gaji Karyawan</h5>
-        <div class="table-responsive">
-            <table class="table table-hover align-middle">
-                <thead>
-                    <tr>
-                        <th>No</th>
-                        <th>Nama Karyawan</th>
-                        <th>Jabatan</th>
-                        <th>Gaji Pokok</th>
-                        <th>Tunjangan</th>
-                        <th>Lembur</th>
-                        <th>Potongan</th>
-                        <th>Total Diterima</th>
-                        <th>Aksi</th>
-                    </tr>
-                </thead>
-                <tbody>
-                    <tr>
-                        <td>1</td>
-                        <td>Agus Raharjo</td>
-                        <td>HR Manager</td>
-                        <td>Rp 12.000.000</td>
-                        <td>Rp 2.000.000</td>
-                        <td>Rp 500.000</td>
-                        <td>Rp 300.000</td>
-                        <td><b>Rp 14.200.000</b></td>
-                        <td>
-                            <button class="btn btn-outline-primary btn-sm btn-action"><i class="bi bi-eye"></i>
-                                Lihat</button>
-                            <button class="btn btn-outline-success btn-sm btn-action"><i
-                                    class="bi bi-download"></i></button>
-                        </td>
-                    </tr>
-                    <tr>
-                        <td>2</td>
-                        <td>Rina Marlina</td>
-                        <td>Staf Finance</td>
-                        <td>Rp 7.000.000</td>
-                        <td>Rp 1.000.000</td>
-                        <td>Rp 300.000</td>
-                        <td>Rp 100.000</td>
-                        <td><b>Rp 8.200.000</b></td>
-                        <td>
-                            <button class="btn btn-outline-primary btn-sm btn-action"><i class="bi bi-eye"></i>
-                                Lihat</button>
-                            <button class="btn btn-outline-success btn-sm btn-action"><i
-                                    class="bi bi-download"></i></button>
-                        </td>
-                    </tr>
-                    <tr>
-                        <td>3</td>
-                        <td>Dewi Putri</td>
-                        <td>Marketing</td>
-                        <td>Rp 6.500.000</td>
-                        <td>Rp 800.000</td>
-                        <td>Rp 200.000</td>
-                        <td>Rp 150.000</td>
-                        <td><b>Rp 7.350.000</b></td>
-                        <td>
-                            <button class="btn btn-outline-primary btn-sm btn-action"><i class="bi bi-eye"></i>
-                                Lihat</button>
-                            <button class="btn btn-outline-success btn-sm btn-action"><i
-                                    class="bi bi-download"></i></button>
-                        </td>
-                    </tr>
-                </tbody>
-            </table>
+    <div class="card">
+        <div class="card-header bg-300">
+            <h5 class="fw-bold">Daftar Gaji Karyawan</h5>
+        </div>
+        <div class="card-body p-2">
+            <div class="table-responsive">
+                <table id="example" class="table table-bordered table-striped" style="width:100%">
+                    <thead class="bg-800 text-200 fs--2">
+                        <tr>
+                            <th>No</th>
+                            <th>Nama Karyawan</th>
+                            <th>Jabatan</th>
+                            <th>Gaji Pokok</th>
+                            <th>Tunjangan</th>
+                            <th>Lembur</th>
+                            <th>Potongan</th>
+                            <th>Total Diterima</th>
+                            <th>Aksi</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <tr>
+                            <td>1</td>
+                            <td>Agus Raharjo</td>
+                            <td>HR Manager</td>
+                            <td>Rp 12.000.000</td>
+                            <td>Rp 2.000.000</td>
+                            <td>Rp 500.000</td>
+                            <td>Rp 300.000</td>
+                            <td><b>Rp 14.200.000</b></td>
+                            <td>
+                                <button class="btn btn-outline-primary btn-sm btn-action"><i class="bi bi-eye"></i>
+                                    Lihat</button>
+                                <button class="btn btn-outline-success btn-sm btn-action"><i
+                                        class="bi bi-download"></i></button>
+                            </td>
+                        </tr>
+                        <tr>
+                            <td>2</td>
+                            <td>Rina Marlina</td>
+                            <td>Staf Finance</td>
+                            <td>Rp 7.000.000</td>
+                            <td>Rp 1.000.000</td>
+                            <td>Rp 300.000</td>
+                            <td>Rp 100.000</td>
+                            <td><b>Rp 8.200.000</b></td>
+                            <td>
+                                <button class="btn btn-outline-primary btn-sm btn-action"><i class="bi bi-eye"></i>
+                                    Lihat</button>
+                                <button class="btn btn-outline-success btn-sm btn-action"><i
+                                        class="bi bi-download"></i></button>
+                            </td>
+                        </tr>
+                        <tr>
+                            <td>3</td>
+                            <td>Dewi Putri</td>
+                            <td>Marketing</td>
+                            <td>Rp 6.500.000</td>
+                            <td>Rp 800.000</td>
+                            <td>Rp 200.000</td>
+                            <td>Rp 150.000</td>
+                            <td><b>Rp 7.350.000</b></td>
+                            <td>
+                                <button class="btn btn-outline-primary btn-sm btn-action"><i class="bi bi-eye"></i>
+                                    Lihat</button>
+                                <button class="btn btn-outline-success btn-sm btn-action"><i
+                                        class="bi bi-download"></i></button>
+                            </td>
+                        </tr>
+                    </tbody>
+                </table>
+            </div>
         </div>
     </div>
 
