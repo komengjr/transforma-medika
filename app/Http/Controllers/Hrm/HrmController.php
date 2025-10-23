@@ -112,7 +112,7 @@ class HrmController extends Controller
     public function hrm_data_kehadiran_cuti_izin($akses, $id)
     {
         if ($this->url_akses_sub($akses, $id) == true) {
-            return view('app-hrm.data-kehadiran.schedule', ['akses' => $akses, 'code' => $id]);
+            return view('app-hrm.data-kehadiran.cuti-dan-izin', ['akses' => $akses, 'code' => $id]);
         } else {
             return Redirect::to('dashboard/home');
         }

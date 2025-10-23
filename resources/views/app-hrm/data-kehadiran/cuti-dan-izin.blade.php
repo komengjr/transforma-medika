@@ -37,8 +37,8 @@
         <div class="card-header bg-warning">
             <div class="d-flex justify-content-between align-items-center">
                 <h3 class="fw-bold mb-0"><i class="bi bi-clock-history text-primary"></i></h3>
-                <button class="btn btn-primary btn-add" data-bs-toggle="modal" data-bs-target="#modal-lembur-xl">
-                    <i class="bi bi-plus-circle"></i> Ajukan Lembur
+                <button class="btn btn-primary btn-add" data-bs-toggle="modal" data-bs-target="#modal-cuti-xl">
+                    <i class="bi bi-plus-circle"></i> Ajukan Cuti / Izin
                 </button>
             </div>
         </div>
@@ -48,10 +48,11 @@
                     <thead>
                         <tr>
                             <th>No</th>
-                            <th>Tanggal</th>
-                            <th>Jam Mulai</th>
-                            <th>Jam Selesai</th>
-                            <th>Total Jam</th>
+                            <th>Tanggal Pengajuan</th>
+                            <th>Jenis</th>
+                            <th>Tanggal Mulai</th>
+                            <th>Tanggal Selesai</th>
+                            <th>Lama (Hari)</th>
                             <th>Keterangan</th>
                             <th>Status</th>
                         </tr>
@@ -59,30 +60,33 @@
                     <tbody>
                         <tr>
                             <td>1</td>
-                            <td>10 Okt 2025</td>
-                            <td>18:00</td>
-                            <td>21:00</td>
-                            <td><span class="fw-bold text-primary">3 Jam</span></td>
-                            <td>Menyelesaikan laporan bulanan</td>
+                            <td>01 Okt 2025</td>
+                            <td><span class="badge bg-primary">Cuti Tahunan</span></td>
+                            <td>05 Okt 2025</td>
+                            <td>07 Okt 2025</td>
+                            <td>3</td>
+                            <td>Liburan keluarga</td>
                             <td><span class="badge bg-success badge-status">Disetujui</span></td>
                         </tr>
                         <tr>
                             <td>2</td>
-                            <td>17 Okt 2025</td>
-                            <td>17:30</td>
-                            <td>20:00</td>
-                            <td><span class="fw-bold text-primary">2,5 Jam</span></td>
-                            <td>Perbaikan server internal</td>
+                            <td>15 Okt 2025</td>
+                            <td><span class="badge bg-info text-dark">Izin Sakit</span></td>
+                            <td>15 Okt 2025</td>
+                            <td>16 Okt 2025</td>
+                            <td>2</td>
+                            <td>Sakit demam</td>
                             <td><span class="badge bg-warning text-dark badge-status">Menunggu</span></td>
                         </tr>
                         <tr>
                             <td>3</td>
-                            <td>05 Okt 2025</td>
-                            <td>19:00</td>
-                            <td>22:00</td>
-                            <td><span class="fw-bold text-primary">3 Jam</span></td>
-                            <td>Persiapan meeting proyek</td>
-                            <td><span class="badge bg-secondary badge-status">Ditolak</span></td>
+                            <td>02 Sep 2025</td>
+                            <td><span class="badge bg-secondary">Cuti Pribadi</span></td>
+                            <td>03 Sep 2025</td>
+                            <td>03 Sep 2025</td>
+                            <td>1</td>
+                            <td>Urusan keluarga</td>
+                            <td><span class="badge bg-danger badge-status">Ditolak</span></td>
                         </tr>
                     </tbody>
                 </table>
@@ -108,7 +112,7 @@
 
 @endsection
 @section('base.js')
-    <div class="modal fade" id="modal-lembur-xl" data-bs-keyboard="false" data-bs-backdrop="static" tabindex="-1"
+    <div class="modal fade" id="modal-cuti-xl" data-bs-keyboard="false" data-bs-backdrop="static" tabindex="-1"
         aria-labelledby="staticBackdropLabel" aria-hidden="true">
         <div class="modal-dialog modal-dialog-centered modal-lg" role="document">
             <div class="modal-content border-0">
@@ -119,28 +123,35 @@
                 <div id="menu-pegawai-xl">
                     <div class="modal-body p-0">
                         <div class="bg-primary rounded-top-lg py-3 ps-4 pe-6">
-                            <h4 class="mb-1" id="staticBackdropLabel" style="color: white !important;">Ajukan Lembur</h4>
+                            <h4 class="mb-1" id="staticBackdropLabel" style="color: white !important;">Ajukan Cuti / Izin</h4>
                             <p class="fs--2 mb-0" style="color: white !important;">Support by <a
                                     class="link-600 fw-semi-bold" href="#!">Transforma</a></p>
                         </div>
                         <form class="p-4">
                             <div class="mb-3">
-                                <label class="form-label">Tanggal Lembur</label>
-                                <input type="date" class="form-control">
+                                <label class="form-label">Jenis Pengajuan</label>
+                                <select class="form-select">
+                                    <option value="">-- Pilih Jenis --</option>
+                                    <option value="Cuti Tahunan">Cuti Tahunan</option>
+                                    <option value="Cuti Pribadi">Cuti Pribadi</option>
+                                    <option value="Izin Sakit">Izin Sakit</option>
+                                    <option value="Izin Lainnya">Izin Lainnya</option>
+                                </select>
                             </div>
                             <div class="row">
                                 <div class="col-md-6 mb-3">
-                                    <label class="form-label">Jam Mulai</label>
-                                    <input type="time" class="form-control">
+                                    <label class="form-label">Tanggal Mulai</label>
+                                    <input type="date" class="form-control" id="tglMulai">
                                 </div>
                                 <div class="col-md-6 mb-3">
-                                    <label class="form-label">Jam Selesai</label>
-                                    <input type="time" class="form-control">
+                                    <label class="form-label">Tanggal Selesai</label>
+                                    <input type="date" class="form-control" id="tglSelesai">
                                 </div>
                             </div>
                             <div class="mb-3">
                                 <label class="form-label">Keterangan</label>
-                                <textarea class="form-control" rows="2" placeholder="Tuliskan alasan lembur..."></textarea>
+                                <textarea class="form-control" rows="2"
+                                    placeholder="Tuliskan alasan cuti atau izin..."></textarea>
                             </div>
                         </form>
                     </div>

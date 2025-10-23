@@ -3,30 +3,18 @@
     <link rel="stylesheet" href="https://cdn.datatables.net/2.2.2/css/dataTables.bootstrap5.css">
     <link rel="stylesheet" href="https://cdn.datatables.net/responsive/3.0.4/css/responsive.bootstrap5.css">
     <style>
-        .card {
-            border: none;
-            /* border-radius: 10px; */
-            box-shadow: 0 4px 10px rgba(0, 0, 0, 0.08);
-            transition: transform 0.2s;
+        .summary-card {
+            text-align: center;
+            padding: 1.5rem;
+            border-radius: 16px;
+            background: linear-gradient(135deg, #0d6efd, #4c9aff);
+            /* color: white; */
+            box-shadow: 0 3px 10px rgba(0, 0, 0, 0.15);
         }
 
-        .cardreader:hover {
-            transform: translateY(-5px);
-        }
-
-        .progress {
-            height: 10px;
-            border-radius: 10px;
-        }
-
-        .kpi-header {
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-        }
-
-        .badge-status {
-            font-size: 0.85rem;
+        .summary-card h3 {
+            font-weight: 700;
+            margin-bottom: 0;
         }
     </style>
 @endsection
@@ -55,122 +43,96 @@
             </div>
         </div>
     </div>
-    <div class="row g-3 mb-3 ">
-        <div class="col-md-3">
-            <div class="card summary-card p-3 cardreader">
-                <h6>Nama Pegawai</h6>
-                <h4>{{ Auth::user()->fullname }}</h4>
-            </div>
-        </div>
-        <div class="col-md-3">
-            <div class="card summary-card p-3 cardreader">
-                <h6>Total Gaji Bulan Ini</h6>
-                <h4 class="text-success">Rp 285.000.000</h4>
-            </div>
-        </div>
-        <div class="col-md-3">
-            <div class="card summary-card p-3 cardreader">
-                <h6>Periode Gaji</h6>
-                <h4>Oktober 2025</h4>
-            </div>
-        </div>
-        <div class="col-md-3">
-            <div class="card summary-card p-3 cardreader">
-                <h6>Status Pembayaran</h6>
-                <h4 class="text-primary">Selesai</h4>
-            </div>
-        </div>
+
+    <!-- Informasi Gaji Bulan Ini -->
+    <div class="summary-card mb-3">
+        <h5>Gaji Bersih Bulan Ini (Oktober 2025)</h5>
+        <h3 class="text-white">Rp 8.450.000</h3>
     </div>
 
-    <!-- Filter -->
-    <div class="card p-4 mb-3 ">
-        <div class="row g-3 align-items-end">
-            <div class="col-md-3">
-                <label class="form-label fw-semibold">Divisi</label>
-                <select class="form-select">
-                    <option>Semua Divisi</option>
-                    <option>Finance</option>
-                    <option>HRD</option>
-                    <option>Marketing</option>
-                    <option>Produksi</option>
-                </select>
-            </div>
-            <div class="col-md-3">
-                <label class="form-label fw-semibold">Periode</label>
-                <input type="month" class="form-control" value="2025-10">
-            </div>
-            <div class="col-md-2">
-                <button class="btn btn-primary w-100"><i class="bi bi-search"></i> Tampilkan</button>
-            </div>
-        </div>
-    </div>
-
-    <!-- Tabel Data Gaji -->
-    <div class="card py-3">
-        <!-- <h5 class="fw-bold mb-3">Daftar Gaji Karyawan</h5> -->
+    <!-- Detail Komponen Gaji -->
+    <div class="card p-4 mb-3">
+        <h5 class="fw-bold mb-3"><i class="bi bi-list-check text-primary"></i> Rincian Gaji</h5>
         <div class="table-responsive">
-            <table id="example" class="table table-bordered table-striped">
-                <thead class="bg-800 text-200 fs--2">
-                    <tr>
-                        <th>No</th>
-                        <th>Nama Karyawan</th>
-                        <th>Jabatan</th>
-                        <th>Gaji Pokok</th>
-                        <th>Tunjangan</th>
-                        <th>Lembur</th>
-                        <th>Potongan</th>
-                        <th>Total Diterima</th>
-                        <th>Aksi</th>
+            <table class="table align-middle table-bordered">
+                <thead>
+                    <tr class="text-center">
+                        <th>Komponen</th>
+                        <th>Keterangan</th>
+                        <th>Nominal (Rp)</th>
                     </tr>
                 </thead>
                 <tbody>
                     <tr>
-                        <td>1</td>
-                        <td>Agus Raharjo</td>
-                        <td>HR Manager</td>
-                        <td>Rp 12.000.000</td>
-                        <td>Rp 2.000.000</td>
-                        <td>Rp 500.000</td>
-                        <td>Rp 300.000</td>
-                        <td><b>Rp 14.200.000</b></td>
-                        <td>
-                            <button class="btn btn-outline-primary btn-sm btn-action"><i class="bi bi-eye"></i>
-                                Lihat</button>
-                            <button class="btn btn-outline-success btn-sm btn-action"><i
-                                    class="bi bi-download"></i></button>
-                        </td>
+                        <td>Gaji Pokok</td>
+                        <td>Gaji dasar karyawan tetap</td>
+                        <td class="text-end fw-bold">6.000.000</td>
                     </tr>
                     <tr>
-                        <td>2</td>
-                        <td>Rina Marlina</td>
-                        <td>Staf Finance</td>
-                        <td>Rp 7.000.000</td>
-                        <td>Rp 1.000.000</td>
-                        <td>Rp 300.000</td>
-                        <td>Rp 100.000</td>
-                        <td><b>Rp 8.200.000</b></td>
-                        <td>
-                            <button class="btn btn-outline-primary btn-sm btn-action"><i class="bi bi-eye"></i>
-                                Lihat</button>
-                            <button class="btn btn-outline-success btn-sm btn-action"><i
-                                    class="bi bi-download"></i></button>
-                        </td>
+                        <td>Tunjangan Transport</td>
+                        <td>Diberikan setiap bulan</td>
+                        <td class="text-end fw-bold">500.000</td>
                     </tr>
                     <tr>
-                        <td>3</td>
-                        <td>Dewi Putri</td>
-                        <td>Marketing</td>
-                        <td>Rp 6.500.000</td>
-                        <td>Rp 800.000</td>
-                        <td>Rp 200.000</td>
-                        <td>Rp 150.000</td>
-                        <td><b>Rp 7.350.000</b></td>
-                        <td>
-                            <button class="btn btn-outline-primary btn-sm btn-action"><i class="bi bi-eye"></i>
-                                Lihat</button>
-                            <button class="btn btn-outline-success btn-sm btn-action"><i
-                                    class="bi bi-download"></i></button>
-                        </td>
+                        <td>Tunjangan Makan</td>
+                        <td>Subsidi makan harian</td>
+                        <td class="text-end fw-bold">750.000</td>
+                    </tr>
+                    <tr>
+                        <td>Bonus Kinerja</td>
+                        <td>Bonus bulan Oktober</td>
+                        <td class="text-end fw-bold text-success">1.500.000</td>
+                    </tr>
+                    <tr>
+                        <td>Potongan BPJS</td>
+                        <td>Potongan iuran karyawan</td>
+                        <td class="text-end text-danger fw-bold">-150.000</td>
+                    </tr>
+                    <tr>
+                        <td>Potongan Pajak</td>
+                        <td>PPh 21</td>
+                        <td class="text-end text-danger fw-bold">-150.000</td>
+                    </tr>
+                    <tr class="table-primary fw-bold">
+                        <td colspan="2" class="text-center">Total Gaji Bersih</td>
+                        <td class="text-end">Rp 8.450.000</td>
+                    </tr>
+                </tbody>
+            </table>
+        </div>
+    </div>
+
+    <!-- Riwayat Gaji -->
+    <div class="card p-4">
+        <h5 class="fw-bold mb-3"><i class="bi bi-clock-history text-primary"></i> Riwayat Gaji Saya</h5>
+        <div class="table-responsive">
+            <table class="table align-middle table-bordered text-center">
+                <thead>
+                    <tr>
+                        <th>Bulan</th>
+                        <th>Tahun</th>
+                        <th>Gaji Bersih (Rp)</th>
+                        <th>Status Pembayaran</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr>
+                        <td>September</td>
+                        <td>2025</td>
+                        <td class="fw-bold text-success">8.300.000</td>
+                        <td><span class="badge bg-success">Dibayar</span></td>
+                    </tr>
+                    <tr>
+                        <td>Agustus</td>
+                        <td>2025</td>
+                        <td class="fw-bold text-success">8.250.000</td>
+                        <td><span class="badge bg-success">Dibayar</span></td>
+                    </tr>
+                    <tr>
+                        <td>Juli</td>
+                        <td>2025</td>
+                        <td class="fw-bold text-success">8.250.000</td>
+                        <td><span class="badge bg-success">Dibayar</span></td>
                     </tr>
                 </tbody>
             </table>
