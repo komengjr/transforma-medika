@@ -59,9 +59,7 @@
                     <span id="menu-order-cashier">
                         <div class="card-header bg-300 btn-reveal-trigger d-flex flex-between-center">
                             <h5 class="mb-0">Order</h5>
-                            <a class="btn btn-falcon-warning btn-sm btn-reveal" href="#"><span
-                                    class="fab fa-product-hunt"></span> Payment
-                            </a>
+
                         </div>
                     </span>
                 </div>

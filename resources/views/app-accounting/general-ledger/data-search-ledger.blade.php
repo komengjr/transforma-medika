@@ -129,9 +129,22 @@
                             </td>
                         </tr>
                     @endforeach
-
-
                 </tbody>
+                <tfoot>
+                    <tr>
+                        <th class="align-middle white-space-nowrap"></th>
+                        <th class="align-middle white-space-nowrap"></th>
+                        <th class="align-middle white-space-nowrap">Total</th>
+                        <th class="align-middle white-space-nowrap">@currency(0)</th>
+                        <th class="align-middle white-space-nowrap">@currency(0)</th>
+                        <th class="align-middle white-space-nowrap">@currency(0)</th>
+
+                        <th></th>
+                        <th class="align-middle white-space-nowrap"></th>
+                        <th></th>
+                        <th></th>
+                    </tr>
+                </tfoot>
             </table>
         </div>
     </div>
@@ -140,7 +153,7 @@
 <script>
     new DataTable('#data-ledger', {
         responsive: true,
-
+        "lengthMenu": [[28, 50, 25], [28, 50, 25]],
         layout: {
             topStart: {
                 buttons: [{

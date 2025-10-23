@@ -56,7 +56,7 @@ class HrmController extends Controller
             return Redirect::to('dashboard/home');
         }
     }
-    public function hrm_data_kehadiran_absensi($akses, $id)
+    public function hrm_data_kehadiran_rekap($akses, $id)
     {
         if ($this->url_akses_sub($akses, $id) == true) {
             return view('app-hrm.data-kehadiran.abesnsi', ['akses' => $akses, 'code' => $id]);
@@ -108,7 +108,7 @@ class HrmController extends Controller
             'jam_kerja' => $jam_kerja,
         ]);
     }
-    public function hrm_data_kehadiran_schedule($akses, $id)
+    public function hrm_data_kehadiran_cuti_izin($akses, $id)
     {
         if ($this->url_akses_sub($akses, $id) == true) {
             return view('app-hrm.data-kehadiran.schedule', ['akses' => $akses, 'code' => $id]);
@@ -132,7 +132,7 @@ class HrmController extends Controller
             return Redirect::to('dashboard/home');
         }
     }
-    public function payroll_slip_ipc($akses, $id)
+    public function payroll_pajak_bpjs($akses, $id)
     {
         if ($this->url_akses_sub($akses, $id) == true) {
             return view('app-hrm.payroll.slip-gaji', ['akses' => $akses, 'code' => $id]);

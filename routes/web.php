@@ -79,11 +79,11 @@ Route::prefix('console/')->group(function (): void {
 Route::prefix('{akses}/{id}')->group(function (): void {
     // HRM
     Route::get('dashboard/personal-data', [HrmController::class, 'personal_data'])->name('personal_data');
-    Route::get('data-kehadiran/absensi', [HrmController::class, 'hrm_data_kehadiran_absensi'])->name('hrm_data_kehadiran_absensi');
-    Route::get('data-kehadiran/schedule', [HrmController::class, 'hrm_data_kehadiran_schedule'])->name('hrm_data_kehadiran_schedule');
-    Route::get('payroll/slip-gaji', [HrmController::class, 'payroll_slip_gaji'])->name('payroll_slip_gaji');
-    Route::get('payroll/slip-thr', [HrmController::class, 'payroll_slip_thr'])->name('payroll_slip_thr');
-    Route::get('payroll/slip-ipc', [HrmController::class, 'payroll_slip_ipc'])->name('payroll_slip_ipc');
+    Route::get('data-kehadiran/rekap-kehadiran', [HrmController::class, 'hrm_data_kehadiran_rekap'])->name('hrm_data_kehadiran_rekap');
+    Route::get('data-kehadiran/cuti-dan-izin', [HrmController::class, 'hrm_data_kehadiran_cuti_izin'])->name('hrm_data_kehadiran_cuti_izin');
+    Route::get('payroll/data-gaji', [HrmController::class, 'payroll_slip_gaji'])->name('payroll_slip_gaji');
+    Route::get('payroll/slip-gaji', [HrmController::class, 'payroll_slip_thr'])->name('payroll_slip_thr');
+    Route::get('payroll/pajak-and-bpjs', [HrmController::class, 'payroll_pajak_bpjs'])->name('payroll_pajak_bpjs');
     Route::get('master-data/data-pegawai', [HrmController::class, 'master_data_pegawai'])->name('master_data_pegawai');
     Route::get('master-data/data-jabatan', [HrmController::class, 'master_data_jabatan'])->name('master_data_jabatan');
     // Route::get('{id}/dashboard', [dashboardController::class, 'dashboard_medica'])->name('dashboard_medica');

@@ -101,6 +101,8 @@
                                     <span class="badge bg-youtube">Proses Verifikasi</span>
                                 @elseif ($datas->d_reg_order_poli_status == 3)
                                     <span class="badge bg-primary">Selesai</span>
+                                @elseif ($datas->d_reg_order_poli_status == 4)
+                                    <span class="badge bg-dark">Terkirim</span>
                                 @endif
                             </td>
                             <td class="text-center">
