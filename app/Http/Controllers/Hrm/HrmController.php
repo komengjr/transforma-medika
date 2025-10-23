@@ -108,6 +108,7 @@ class HrmController extends Controller
             'jam_kerja' => $jam_kerja,
         ]);
     }
+    // CUTI dan IZIM
     public function hrm_data_kehadiran_cuti_izin($akses, $id)
     {
         if ($this->url_akses_sub($akses, $id) == true) {
@@ -116,6 +117,16 @@ class HrmController extends Controller
             return Redirect::to('dashboard/home');
         }
     }
+    // CUTI dan IZIM
+    public function hrm_data_kehadiran_lembur($akses, $id)
+    {
+        if ($this->url_akses_sub($akses, $id) == true) {
+            return view('app-hrm.data-kehadiran.data-lembur', ['akses' => $akses, 'code' => $id]);
+        } else {
+            return Redirect::to('dashboard/home');
+        }
+    }
+    // DATA GAJI
     public function payroll_data_gaji($akses, $id)
     {
         if ($this->url_akses_sub($akses, $id) == true) {
@@ -145,6 +156,15 @@ class HrmController extends Controller
     {
         if ($this->url_akses_sub($akses, $id) == true) {
             return view('app-hrm.manajemen.penilaian-kpi', ['akses' => $akses, 'code' => $id]);
+        } else {
+            return Redirect::to('dashboard/home');
+        }
+    }
+    // JADWAL PELATIHAN
+    public function pelatihan_pegawai_jadwal($akses, $id)
+    {
+        if ($this->url_akses_sub($akses, $id) == true) {
+            return view('app-hrm.manajemen.jadwal-pelatihan', ['akses' => $akses, 'code' => $id]);
         } else {
             return Redirect::to('dashboard/home');
         }

@@ -10,7 +10,7 @@
             transition: transform 0.2s;
         }
 
-        .card:hover {
+        .cardreader:hover {
             transform: translateY(-5px);
         }
 
@@ -57,19 +57,19 @@
     </div>
     <div class="row g-3 mb-3">
         <div class="col-md-4">
-            <div class="card p-3">
+            <div class="card p-3 cardreader">
                 <h6 class="text-muted mb-1">Total KPI</h6>
                 <h4>8 Target</h4>
             </div>
         </div>
         <div class="col-md-4">
-            <div class="card p-3">
+            <div class="card p-3 cardreader">
                 <h6 class="text-muted mb-1">Rata-rata Pencapaian</h6>
                 <h4 class="text-success">84%</h4>
             </div>
         </div>
         <div class="col-md-4">
-            <div class="card p-3">
+            <div class="card p-3 cardreader">
                 <h6 class="text-muted mb-1">Periode Penilaian</h6>
                 <h4>Januari - Juni 2025</h4>
             </div>

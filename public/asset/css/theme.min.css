@@ -7706,7 +7706,8 @@
      background-color: var(--falcon-card-bg);
      background-clip: border-box;
      border: 0px solid var(--falcon-card-border-color);
-     border-radius: .375rem
+     box-shadow: 0 4px 10px rgba(0, 0, 0, 0.08);
+     border-radius: 15px;
  }
 
  .card>hr {

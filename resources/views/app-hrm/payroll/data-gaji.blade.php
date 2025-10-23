@@ -106,11 +106,11 @@
     </div>
 
     <!-- Tabel Data Gaji -->
-    <div class="card p-4">
-        <h5 class="fw-bold mb-3">Daftar Gaji Karyawan</h5>
+    <div class="card py-3">
+        <!-- <h5 class="fw-bold mb-3">Daftar Gaji Karyawan</h5> -->
         <div class="table-responsive">
-            <table class="table table-hover align-middle">
-                <thead>
+            <table id="example" class="table table-bordered table-striped">
+                <thead class="bg-800 text-200 fs--2">
                     <tr>
                         <th>No</th>
                         <th>Nama Karyawan</th>

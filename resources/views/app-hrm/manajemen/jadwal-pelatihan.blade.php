@@ -2,36 +2,10 @@
 @section('base.css')
     <link rel="stylesheet" href="https://cdn.datatables.net/2.2.2/css/dataTables.bootstrap5.css">
     <link rel="stylesheet" href="https://cdn.datatables.net/responsive/3.0.4/css/responsive.bootstrap5.css">
-    <style>
-        .card {
-            border: none;
-            /* border-radius: 10px; */
-            box-shadow: 0 4px 10px rgba(0, 0, 0, 0.08);
-            transition: transform 0.2s;
-        }
 
-        .cardreader:hover {
-            transform: translateY(-5px);
-        }
-
-        .progress {
-            height: 10px;
-            border-radius: 10px;
-        }
-
-        .kpi-header {
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-        }
-
-        .badge-status {
-            font-size: 0.85rem;
-        }
-    </style>
 @endsection
 @section('content')
-    <div class="row mb-3">
+    <div class="row mb-3 ">
         <div class="col">
             <div class="card bg-200 shadow border border-primary bg-primary">
                 <div class="row gx-0 flex-between-center" style="color: white !important;">
@@ -48,7 +22,7 @@
                     </div>
                     <div class="col-xl-auto px-3 py-2">
                         <h6 class="text-white fs--1 mb-0">Menu : </h6>
-                        <h4 class="text-white fw-bold mb-0">Data <span class="text-white fw-medium">BPJS dan Pajak</span>
+                        <h4 class="text-white fw-bold mb-0">Jadwal <span class="text-white fw-medium">Pelatihan</span>
                         </h4>
                     </div>
                 </div>
@@ -58,87 +32,107 @@
     <div class="card p-4 mb-3 ">
         <div class="row g-3 align-items-end">
             <div class="col-md-3">
-                <input type="text" class="form-control" placeholder="Cari nama karyawan...">
+                <input type="text" class="form-control" placeholder="Cari nama pelatihan...">
             </div>
             <div class="col-md-3">
                 <select class="form-select">
-                    <option value="">Filter Jenis BPJS</option>
-                    <option>BPJS Kesehatan</option>
-                    <option>BPJS Ketenagakerjaan</option>
+                    <option value="">Pilih Departemen</option>
+                    <option>SDM</option>
+                    <option>Finance</option>
+                    <option>Marketing</option>
+                    <option>IT</option>
                 </select>
             </div>
             <div class="col-md-3">
-                <select class="form-select">
-                    <option value="">Periode</option>
-                    <option>Januari 2025</option>
-                    <option>Februari 2025</option>
-                    <option>Maret 2025</option>
-                </select>
+                <input type="month" class="form-control">
             </div>
             <div class="col-md-2">
-                <button class="btn btn-primary w-100"><i class="bi bi-search"></i> Tampilkan</button>
+                <button class="btn btn-primary"><i class="fas fa-search"></i> Cari</button>
             </div>
         </div>
     </div>
-    <div class="card p-4">
+
+    <!-- Data Table -->
+    <div class="card py-3">
         <div class="table-responsive">
-            <table class="table align-middle table-bordered text-center">
-                <thead>
+            <table id="example" class="table table-bordered table-striped">
+                <thead class="bg-800 text-200 fs--2">
                     <tr>
                         <th>No</th>
-                        <th>Nama Karyawan</th>
-                        <th>NIK</th>
-                        <th>Jenis BPJS</th>
-                        <th>Nomor BPJS</th>
-                        <th>Iuran Karyawan</th>
-                        <th>Iuran Perusahaan</th>
-                        <th>NPWP</th>
-                        <th>Pajak (PPH 21)</th>
-                        <th>Total Potongan</th>
+                        <th>Nama Pelatihan</th>
+                        <th>Departemen</th>
+                        <th>Tanggal Mulai</th>
+                        <th>Tanggal Selesai</th>
+                        <th>Instruktur</th>
+                        <th>Lokasi</th>
+                        <th>Status</th>
+                        <th>Aksi</th>
                     </tr>
                 </thead>
-                <tbody>
+                <tbody class="fs--1">
                     <tr>
                         <td>1</td>
-                        <td>Andi Setiawan</td>
-                        <td>EMP001</td>
-                        <td>BPJS Kesehatan</td>
-                        <td>000123456789</td>
-                        <td>Rp. 100.000</td>
-                        <td>Rp. 200.000</td>
-                        <td>09.123.456.7-801.000</td>
-                        <td>Rp. 350.000</td>
-                        <td><span class="fw-bold text-danger">Rp. 650.000</span></td>
+                        <td>Leadership Development</td>
+                        <td>SDM</td>
+                        <td>05 Nov 2025</td>
+                        <td>07 Nov 2025</td>
+                        <td>Drs. Hendra Pratama</td>
+                        <td>Ruang Meeting Lt. 3</td>
+                        <td><span class="badge bg-warning badge-status">Sedang Berlangsung</span></td>
+                        <td>
+                            <button class="btn btn-sm btn-outline-primary"><i class="fas fa-eye"></i></button>
+                            <!-- <button class="btn btn-sm btn-outline-success"><i class="fab fa-person-plus"></i></button> -->
+                        </td>
                     </tr>
                     <tr>
                         <td>2</td>
-                        <td>Budi Hartono</td>
-                        <td>EMP002</td>
-                        <td>BPJS Ketenagakerjaan</td>
-                        <td>000987654321</td>
-                        <td>Rp. 120.000</td>
-                        <td>Rp. 250.000</td>
-                        <td>09.234.567.8-801.000</td>
-                        <td>Rp. 400.000</td>
-                        <td><span class="fw-bold text-danger">Rp. 770.000</span></td>
+                        <td>Pelatihan Sistem ERP</td>
+                        <td>IT</td>
+                        <td>15 Nov 2025</td>
+                        <td>17 Nov 2025</td>
+                        <td>Ir. Agus Raharjo</td>
+                        <td>Lab Komputer</td>
+                        <td><span class="badge bg-success badge-status">Dijadwalkan</span></td>
+                        <td>
+                            <button class="btn btn-sm btn-outline-primary"><i class="fas fa-eye"></i></button>
+                        </td>
+                    </tr>
+                    <tr>
+                        <td>3</td>
+                        <td>Customer Service Excellence</td>
+                        <td>Marketing</td>
+                        <td>20 Okt 2025</td>
+                        <td>22 Okt 2025</td>
+                        <td>Rina Sari, S.Psi</td>
+                        <td>Hotel Horizon</td>
+                        <td><span class="badge bg-secondary badge-status">Selesai</span></td>
+                        <td>
+                            <button class="btn btn-sm btn-outline-primary"><i class="fas fa-eye"></i></button>
+                        </td>
                     </tr>
                 </tbody>
             </table>
         </div>
     </div>
 
-    <!-- Summary Section -->
-    <div class="row mt-3">
-        <div class="col-md-6">
+    <!-- Summary Cards -->
+    <div class="row mt-1 g-3">
+        <div class="col-md-4">
             <div class="card text-center p-3">
-                <h6>Total Iuran BPJS Bulan Ini</h6>
-                <h4 class="fw-bold text-primary">Rp. 1.370.000</h4>
+                <h6>Total Pelatihan Bulan Ini</h6>
+                <h4 class="fw-bold text-primary">12 Program</h4>
             </div>
         </div>
-        <div class="col-md-6">
+        <div class="col-md-4">
             <div class="card text-center p-3">
-                <h6>Total Pajak (PPH 21)</h6>
-                <h4 class="fw-bold text-danger">Rp. 750.000</h4>
+                <h6>Peserta Terdaftar</h6>
+                <h4 class="fw-bold text-success">86 Orang</h4>
+            </div>
+        </div>
+        <div class="col-md-4">
+            <div class="card text-center p-3">
+                <h6>Pelatihan Selesai</h6>
+                <h4 class="fw-bold text-secondary">7 Program</h4>
             </div>
         </div>
     </div>
