@@ -81,8 +81,8 @@ Route::prefix('{akses}/{id}')->group(function (): void {
     Route::get('dashboard/personal-data', [HrmController::class, 'personal_data'])->name('personal_data');
     Route::get('data-kehadiran/rekap-kehadiran', [HrmController::class, 'hrm_data_kehadiran_rekap'])->name('hrm_data_kehadiran_rekap');
     Route::get('data-kehadiran/cuti-dan-izin', [HrmController::class, 'hrm_data_kehadiran_cuti_izin'])->name('hrm_data_kehadiran_cuti_izin');
-    Route::get('payroll/data-gaji', [HrmController::class, 'payroll_slip_gaji'])->name('payroll_slip_gaji');
-    Route::get('payroll/slip-gaji', [HrmController::class, 'payroll_slip_thr'])->name('payroll_slip_thr');
+    Route::get('payroll/data-gaji', [HrmController::class, 'payroll_data_gaji'])->name('payroll_data_gaji');
+    Route::get('payroll/slip-gaji', [HrmController::class, 'payroll_slip_gaji'])->name('payroll_slip_gaji');
     Route::get('payroll/pajak-and-bpjs', [HrmController::class, 'payroll_pajak_bpjs'])->name('payroll_pajak_bpjs');
     Route::get('manajemen/kpi-dan-target', [HrmController::class, 'manajemen_kpi_target'])->name('manajemen_kpi_target');
     Route::get('master-data/data-pegawai', [HrmController::class, 'master_data_pegawai'])->name('master_data_pegawai');

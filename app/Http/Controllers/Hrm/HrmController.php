@@ -116,15 +116,15 @@ class HrmController extends Controller
             return Redirect::to('dashboard/home');
         }
     }
-    public function payroll_slip_gaji($akses, $id)
+    public function payroll_data_gaji($akses, $id)
     {
         if ($this->url_akses_sub($akses, $id) == true) {
-            return view('app-hrm.payroll.slip-gaji', ['akses' => $akses, 'code' => $id]);
+            return view('app-hrm.payroll.data-gaji', ['akses' => $akses, 'code' => $id]);
         } else {
             return Redirect::to('dashboard/home');
         }
     }
-    public function payroll_slip_thr($akses, $id)
+    public function payroll_slip_gaji($akses, $id)
     {
         if ($this->url_akses_sub($akses, $id) == true) {
             return view('app-hrm.payroll.slip-gaji', ['akses' => $akses, 'code' => $id]);
@@ -135,7 +135,7 @@ class HrmController extends Controller
     public function payroll_pajak_bpjs($akses, $id)
     {
         if ($this->url_akses_sub($akses, $id) == true) {
-            return view('app-hrm.payroll.slip-gaji', ['akses' => $akses, 'code' => $id]);
+            return view('app-hrm.payroll.bpjs-dan-pajak', ['akses' => $akses, 'code' => $id]);
         } else {
             return Redirect::to('dashboard/home');
         }
