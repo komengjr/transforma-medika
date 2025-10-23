@@ -48,7 +48,7 @@
                     </div>
                     <div class="col-xl-auto px-3 py-2">
                         <h6 class="text-white fs--1 mb-0">Menu : </h6>
-                        <h4 class="text-white fw-bold mb-0">Data <span class="text-white fw-medium">Gaji Pegawai</span>
+                        <h4 class="text-white fw-bold mb-0">Slip <span class="text-white fw-medium">Gaji Pegawai</span>
                         </h4>
                     </div>
                 </div>
