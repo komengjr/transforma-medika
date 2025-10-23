@@ -128,6 +128,7 @@ Route::prefix('{akses}/{id}')->group(function (): void {
     // FARMASI
     Route::get('manajemen-farmasi/data-obat', [FarmasiController::class, 'manajemen_farmasi_data_obat'])->name('manajemen_farmasi_data_obat');
     Route::get('manajemen-farmasi/obat-masuk-dan-keluar', [FarmasiController::class, 'manajemen_farmasi_obat_in_out'])->name('manajemen_farmasi_obat_in_out');
+    Route::get('manajemen-farmasi/stok-min-and-max', [FarmasiController::class, 'manajemen_farmasi_stock_min_max'])->name('manajemen_farmasi_stock_min_max');
 });
 // MEDICA HEALTH
 Route::prefix('{akses}/{id}/application')->group(function () {
@@ -498,6 +499,7 @@ Route::prefix('supplier/')->group(function (): void {
 Route::prefix('brodcast/')->group(function (): void {
     Route::post('menu-brodcast/brodcast-whatsapp/send', [BrodcastController::class, 'menu_brodcast_whatsapp_send'])->name('menu_brodcast_whatsapp_send');
     Route::post('menu-brodcast/brodcast-whatsapp/upload-file', [BrodcastController::class, 'menu_brodcast_whatsapp_upload_file'])->name('menu_brodcast_whatsapp_upload_file');
+    Route::post('menu-brodcast/brodcast-whatsapp/remove-file', [BrodcastController::class, 'menu_brodcast_whatsapp_remove_file'])->name('menu_brodcast_whatsapp_remove_file');
     Route::post('menu-brodcast/brodcast-management/add', [BrodcastController::class, 'menu_brodcast_management_add'])->name('menu_brodcast_management_add');
     Route::post('menu-brodcast/brodcast-management/save', [BrodcastController::class, 'menu_brodcast_management_save'])->name('menu_brodcast_management_save');
     Route::post('menu-brodcast/brodcast-management/add-peserta', [BrodcastController::class, 'menu_brodcast_management_add_peserta'])->name('menu_brodcast_management_add_peserta');

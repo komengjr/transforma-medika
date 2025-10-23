@@ -66,5 +66,15 @@ class FarmasiController extends Controller
             return Redirect::to('dashboard/home');
         }
     }
+    // DATA MASUK DAN KELUAR
+    public function manajemen_farmasi_stock_min_max($akses, $id)
+    {
+        if ($this->url_akses_sub($akses, $id) == true) {
+            $data = DB::table('farm_data_obat')->get();
+            return view('app-farmasi.manajemen.stox-min-max', ['data' => $data, 'akses' => $akses, 'code' => $id]);
+        } else {
+            return Redirect::to('dashboard/home');
+        }
+    }
 
 }

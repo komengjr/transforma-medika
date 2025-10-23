@@ -36,7 +36,7 @@
         <div class="card-header bg-primary">
             <div class="row align-items-center">
                 <div class="col">
-                    <h3 class="m-0"><span class="badge bg-primary m-0 p-0">Product In</span></h3>
+                    <h3 class="m-0"><span class="badge bg-primary m-0 p-0">Management Brodcast</span></h3>
                 </div>
                 <div class="col-auto">
                     <div class="btn-group" role="group">

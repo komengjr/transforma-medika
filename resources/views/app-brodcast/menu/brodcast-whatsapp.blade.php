@@ -60,12 +60,16 @@
             </div>
             <div class="bg-light px-card py-3">
                 <div class="d-inline-flex flex-column">
-                    <div class="border px-2 rounded-3 d-flex flex-between-center bg-white dark__bg-1000 my-1 fs--1">
+                    <div style="display: none !important; "
+                        class="border px-2 rounded-3 d-flex flex-between-center bg-white dark__bg-1000 my-1 fs--1"
+                        id="status-file-attachment">
                         <input id="link" type="text" name="link" class="form-control d-none">
                         <span class="fs-1 far fa-file-archive"></span>
-                        <span class="ms-2" id="link_name">file.example </span><a class="text-300 p-1 ms-6" href="#!"
-                            data-bs-toggle="tooltip" data-bs-placement="right" title="Detach">
-                            <span class="fas fa-times"></span></a>
+                        <span class="ms-2" id="link_name">file.example </span>
+                        <a class="text-300 p-1 ms-6" href="#!" data-bs-toggle="tooltip" data-bs-placement="right"
+                            id="button-clear-data" title="Detach">
+                            <span class="fas fa-times"></span>
+                        </a>
                     </div>
                 </div>
             </div>
@@ -76,8 +80,8 @@
                     <button class="btn btn-primary btn-sm px-5 me-2" type="button" id="button-send-messages">Send</button>
                 </div>
                 <input class="d-none" id="file-attachment" type="file" />
-                <label class="me-2 btn btn-outline-warning btn-sm mb-0 cursor-pointer" for="file-attachment"
-                    data-bs-toggle="tooltip" data-bs-placement="top" title="Attach files"><span class="fas fa-image fs-1"
+                <label class="me-2 btn btn-sm mb-0 cursor-pointer" for="file-attachment" data-bs-toggle="tooltip"
+                    data-bs-placement="top" title="Attach files"><span class="fas fa-image fs-1"
                         data-fa-transform="down-2"></span></label>
             </div>
             <div class="d-flex align-items-center">
@@ -145,6 +149,28 @@
                 });
             }
         });
+        $(document).on("click", "#button-clear-data", function (e) {
+            e.preventDefault();
+            var link = document.getElementById("link").value;
+            $('#menu-product-xl').html(
+                '<div class="spinner-border my-3" style="display: block; margin-left: auto; margin-right: auto;" role="status"><span class="visually-hidden">Loading...</span></div>'
+            );
+            $.ajax({
+                url: "{{ route('menu_brodcast_whatsapp_remove_file') }}",
+                type: "POST",
+                cache: false,
+                data: {
+                    "_token": "{{ csrf_token() }}",
+                    "link": link
+                },
+                dataType: 'html',
+            }).done(function (data) {
+                $('#menu-product-xl').html(data);
+                location.reload();
+            }).fail(function () {
+                $('#menu-product-xl').html('eror');
+            });
+        });
     </script>
     <script type="text/javascript">
         var browseFile = $('#file-attachment');
@@ -177,7 +203,8 @@
             $('#videoPreview').attr('src', response.path);
             $('#link').attr('value', response.filename);
             $('#link_name').html(response.filename);
-            $('.card-footer').show();
+            document.getElementById('status-file-attachment').style.display = 'block';
+            // $('#status-file-attachment').show();
             $('#browseFile').hide();
         });
 

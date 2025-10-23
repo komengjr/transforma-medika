@@ -92,6 +92,11 @@ class BrodcastController extends Controller
             'status' => true
         ];
     }
+    public function menu_brodcast_whatsapp_remove_file(Request $request)
+    {
+        Storage::delete('public/brodcast/data-send/' . auth::user()->access_cabang . '/' . $request->link);
+        return 'ok';
+    }
     public function menu_brodcast_whatsapp_send(Request $request)
     {
         if ($request->link == "") {
