@@ -140,6 +140,15 @@ class HrmController extends Controller
             return Redirect::to('dashboard/home');
         }
     }
+    // TARGET KPI
+    public function manajemen_kpi_target($akses, $id)
+    {
+        if ($this->url_akses_sub($akses, $id) == true) {
+            return view('app-hrm.manajemen.penilaian-kpi', ['akses' => $akses, 'code' => $id]);
+        } else {
+            return Redirect::to('dashboard/home');
+        }
+    }
     // MASTER PEGAWAI
     public function master_data_pegawai($akses, $id)
     {

@@ -89,6 +89,7 @@
             background: linear-gradient(0deg, rgba(34, 193, 195, 1) 0%, rgba(253, 187, 45, 1) 100%) !important;
             color: black !important;
             text-decoration: dotted !important;
+            transform: translateY(-5px);
         }
 
         .kaki {
@@ -117,6 +118,17 @@
             /* line-height: 55px; */
             height: 55px;
             width: 55px;
+        }
+
+        .card {
+            border: none;
+            border-radius: 15px;
+            box-shadow: 0 4px 10px rgba(0, 0, 0, 0.08);
+            transition: transform 0.2s;
+        }
+
+        .card:hover {
+
         }
     </style>
 </head>
@@ -207,14 +219,14 @@
                             </div>
                         </div>
                     </div>
-                    <div class="card overflow-hidden z-index-1">
+                    <div class="card overflow-hidden z-index-1 border border-primary">
                         <div class="card-header bg-primary py-2 pt-3">
                             <marquee class="p-0" behavior="" direction="">
                                 <h5 class="m-0" style="color: white;">Selamat Datang di Innoventra System Management,
                                     One For All Management</h5>
                             </marquee>
                         </div>
-                        <div class="card-body p-3 border border-primary">
+                        <div class="card-body p-3 ">
                             <div class="row light g-3">
                                 @if (Auth::user()->access_code == 'master')
                                     @php
