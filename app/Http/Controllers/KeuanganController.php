@@ -65,14 +65,26 @@ class KeuanganController extends Controller
         $data = DB::table('d_reg_order')->where('d_reg_order_code', $request->code)->first();
         // $payment = DB::table('d_reg_order_code')->where('')
         if ($data) {
+            $x = 0;
             $pasien = DB::table('d_reg_order')
                 ->join('master_patient', 'master_patient.master_patient_code', '=', 'd_reg_order.d_reg_order_rm')
                 ->where('d_reg_order.d_reg_order_code', $request->code)->first();
             $data = DB::table('d_reg_order_list')
                 ->join('t_layanan_cat', 't_layanan_cat.t_layanan_cat_code', '=', 'd_reg_order_list.t_layanan_cat_code')
                 ->where('d_reg_order_list.d_reg_order_code', $request->code)->get();
-            return view('application.keuangan.menu-cashier.detail-order', ['data' => $data, 'pasien' => $pasien, 'code' => $request->code]);
-            # code...
+            foreach ($data as $value) {
+                $payment = DB::table('d_reg_order_payment')->where('d_reg_order_code', $request->code)->where('d_reg_order_list_code', $value->d_reg_order_list_code)->first();
+                if ($payment) {
+                    $x = $x + 0;
+                } else {
+                    $x = $x + 1;
+                }
+            }
+            if ($x == 0) {
+                return 1;
+            } else {
+                return view('application.keuangan.menu-cashier.detail-order', ['data' => $data, 'pasien' => $pasien, 'code' => $request->code]);
+            }
         } else {
             return 0;
         }

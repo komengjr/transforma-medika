@@ -212,27 +212,6 @@
         });
     </script>
     <script>
-        $(document).on("click", "#button-proses-handling", function (e) {
-            e.preventDefault();
-            var code = $(this).data("code");
-            $('#menu-poliklinik').html(
-                '<div class="spinner-border my-3" style="display: block; margin-left: auto; margin-right: auto;" role="status"><span class="visually-hidden">Loading...</span></div>'
-            );
-            $.ajax({
-                url: "{{ route('data_registrasi_poli_handling') }}",
-                type: "POST",
-                cache: false,
-                data: {
-                    "_token": "{{ csrf_token() }}",
-                    "code": code
-                },
-                dataType: 'html',
-            }).done(function (data) {
-                $('#menu-poliklinik').html(data);
-            }).fail(function () {
-                $('#menu-poliklinik').html('eror');
-            });
-        });
         $(document).on("click", "#button-find-payment", function (e) {
             e.preventDefault();
             $('#menu-cashier-full').html(
@@ -269,7 +248,17 @@
                 },
                 dataType: 'html',
             }).done(function (data) {
-                $('#menu-order-cashier').html(data);
+                if (data == 1) {
+                    Swal.fire({
+                        icon: "warning",
+                        title: "Oops...",
+                        text: "Tidak Ada Pembayaran Lagi",
+                        footer: '<a href="#">Why do I have this issue?</a>'
+                    });
+                    $('#menu-order-cashier').html('');
+                } else {
+                    $('#menu-order-cashier').html(data);
+                }
             }).fail(function () {
                 $('#menu-order-cashier').html('eror');
             });
@@ -373,6 +362,13 @@
                             icon: "error",
                             title: "Oops...",
                             text: "Data Register Tidak ditemukan",
+                            footer: '<a href="#">Why do I have this issue?</a>'
+                        });
+                    } else if (data == 1){
+                        Swal.fire({
+                            icon: "warning",
+                            title: "Oops...",
+                            text: "Tidak Ada Pembayaran Lagi",
                             footer: '<a href="#">Why do I have this issue?</a>'
                         });
                     } else {
