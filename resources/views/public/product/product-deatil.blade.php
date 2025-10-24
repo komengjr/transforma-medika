@@ -15,16 +15,16 @@
                             role="img" aria-label="Gift">🎁</span>Become a pro</a>
                     <h2 class="text-white fw-light"><strong>Innoventra</strong>
                         <!-- <small>
-                                                                                                                        <span class="typed-text fw-bold"
-                                                                                                                            data-typed-text='["Human","Resource","Management","System"]'></span>
-                                                                                                                    </small> -->
+                                                                                                                                <span class="typed-text fw-bold"
+                                                                                                                                    data-typed-text='["Human","Resource","Management","System"]'></span>
+                                                                                                                            </small> -->
                         <br />Our Product
                     </h2>
 
                 </div>
                 <div class="col-xl-7 offset-xl-1">
                     <!-- <a class="img-landing-banner rounded" href="../index.html"><img class="img-fluid"
-                                                                                                                    src="{{ asset('img/ilus.png') }}" alt="" width="500" /></a> -->
+                                                                                                                            src="{{ asset('img/ilus.png') }}" alt="" width="500" /></a> -->
                 </div>
             </div>
         </div>
@@ -48,9 +48,9 @@
                 <div class="col-3 col-sm-auto my-1 my-sm-3 px-card"><img class="landing-cta-img" height="35"
                         src="{{ asset('asset/img/logos/b&w/10.png') }}" alt="" /></div>
                 <!-- <div class="col-3 col-sm-auto my-1 my-sm-3 px-card"><img class="landing-cta-img" height="40"
-                                                                                                                                                                src="{{ asset('asset/img/logos/b&w/9.png') }}" alt="" /></div>
-                                                                                                                                                        <div class="col-3 col-sm-auto my-1 my-sm-3 px-card"><img class="landing-cta-img" height="40"
-                                                                                                                                                                src="{{ asset('asset/img/logos/b&w/8.png') }}" alt="" /></div> -->
+                                                                                                                                                                        src="{{ asset('asset/img/logos/b&w/9.png') }}" alt="" /></div>
+                                                                                                                                                                <div class="col-3 col-sm-auto my-1 my-sm-3 px-card"><img class="landing-cta-img" height="40"
+                                                                                                                                                                        src="{{ asset('asset/img/logos/b&w/8.png') }}" alt="" /></div> -->
             </div>
         </div>
         <!-- end of .container-->
@@ -104,6 +104,12 @@
                             crossorigin="anonymous"></script>
                         <ins class="adsbygoogle" style="display:block; text-align:center;" data-ad-layout="in-article"
                             data-ad-format="fluid" data-ad-client="ca-pub-4154628728879232" data-ad-slot="8374738170"></ins>
+                        <script>
+                            (adsbygoogle = window.adsbygoogle || []).push({});
+                        </script>
+                        <script async src="https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js"></script>
+                        <ins class="adsbygoogle" style="display:block" data-ad-client="ca-pub-4154628728879232"
+                            data-ad-slot="9876543210" data-ad-format="auto" data-full-width-responsive="true"></ins>
                         <script>
                             (adsbygoogle = window.adsbygoogle || []).push({});
                         </script>

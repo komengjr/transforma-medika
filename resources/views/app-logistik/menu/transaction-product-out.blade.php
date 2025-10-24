@@ -30,46 +30,68 @@
             </div>
         </div>
     </div>
-    <div class="d-flex justify-content-between align-items-center mb-3">
-        <h3 class="fw-bold text-primary"></h3>
-        <button class="btn btn-success" data-bs-toggle="modal" data-bs-target="#modalTambah">
-            📦 Tambah Barang Keluar
-        </button>
+    <div class="card p-4 mb-3">
+        <h5 class="fw-bold text-primary mb-3"><i class="bi bi-clipboard2-data"></i> Informasi Divisi / User</h5>
+        <form class="row g-3">
+            <div class="col-md-3">
+                <label class="form-label">Tanggal Form Barang Keluar</label>
+                <input type="date" class="form-control" value="2025-10-23">
+            </div>
+            <div class="col-md-3">
+                <label class="form-label">Penerima Barang</label>
+                <input type="text" class="form-control" value="Agus Raharjo">
+            </div>
+            <div class="col-md-6">
+                <label class="form-label">Catatan</label>
+                <input type="text" class="form-control" placeholder="Keterangan tambahan...">
+            </div>
+            <div class="col-md-2">
+                <button type="button" class="btn btn-primary w-100" id="tambahBarang"><i class="bi bi-plus-circle"></i>
+                    Tambah</button>
+            </div>
+        </form>
     </div>
 
-    <div class="card p-3">
-        <div class="table-responsive">
-            <table id="tabelBarangKeluar" class="table table-striped table-bordered align-middle">
-                <thead class="table-primary fs--2">
-                    <tr>
-                        <th>No</th>
-                        <th>Tanggal Keluar</th>
-                        <th>Kode Barang</th>
-                        <th>Nama Barang</th>
-                        <th>Jumlah</th>
-                        <th>Penerima</th>
-                        <th>User/Petugas</th>
-                        <th>Keterangan</th>
-                        <th>Aksi</th>
-                    </tr>
-                </thead>
-                <tbody class="fs--2">
-                    <tr>
-                        <td>1</td>
-                        <td>2025-10-24</td>
-                        <td>BRG001</td>
-                        <td>Masker Medis</td>
-                        <td>50 Box</td>
-                        <td>Ruang Farmasi</td>
-                        <td>Admin Gudang</td>
-                        <td>Untuk kebutuhan harian</td>
-                        <td>
-                            <button class="btn btn-sm btn-warning me-1">Edit</button>
-                            <button class="btn btn-sm btn-danger">Hapus</button>
-                        </td>
-                    </tr>
-                </tbody>
-            </table>
+    <div class="card">
+        <div class="card-header bg-300">
+            <button class="btn btn-success btn-sm float-end" data-bs-toggle="modal" data-bs-target="#modalTambah">
+                📦 Tambah Barang Keluar
+            </button>
+        </div>
+        <div class="card-body">
+            <div class="table-responsive">
+                <table id="tabelBarangKeluar" class="table table-striped table-bordered align-middle border">
+                    <thead class="table-primary fs--2">
+                        <tr>
+                            <th>No</th>
+                            <th>Tanggal Keluar</th>
+                            <th>Kode Barang</th>
+                            <th>Nama Barang</th>
+                            <th>Jumlah</th>
+                            <th>Penerima</th>
+                            <th>User/Petugas</th>
+                            <th>Keterangan</th>
+                            <th>Aksi</th>
+                        </tr>
+                    </thead>
+                    <tbody class="fs--2">
+                        <tr>
+                            <td>1</td>
+                            <td>2025-10-24</td>
+                            <td>BRG001</td>
+                            <td>Masker Medis</td>
+                            <td>50 Box</td>
+                            <td>Ruang Farmasi</td>
+                            <td>Admin Gudang</td>
+                            <td>Untuk kebutuhan harian</td>
+                            <td>
+                                <button class="btn btn-sm btn-warning me-1">Edit</button>
+                                <button class="btn btn-sm btn-danger">Hapus</button>
+                            </td>
+                        </tr>
+                    </tbody>
+                </table>
+            </div>
         </div>
     </div>
 @endsection
@@ -198,7 +220,7 @@
                     user,
                     keterangan,
                     `<button class="btn btn-sm btn-warning me-1">Edit</button>
-                                     <button class="btn btn-sm btn-danger">Hapus</button>`
+                                                     <button class="btn btn-sm btn-danger">Hapus</button>`
                 ];
                 table.row.add(newRow).draw(false);
 
