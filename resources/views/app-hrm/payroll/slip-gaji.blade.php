@@ -55,32 +55,6 @@
             </div>
         </div>
     </div>
-    <div class="row g-3 mb-3 ">
-        <div class="col-md-3">
-            <div class="card summary-card p-3 cardreader">
-                <h6>Nama Pegawai</h6>
-                <h4>{{ Auth::user()->fullname }}</h4>
-            </div>
-        </div>
-        <div class="col-md-3">
-            <div class="card summary-card p-3 cardreader">
-                <h6>Total Gaji Bulan Ini</h6>
-                <h4 class="text-success">Rp 285.000.000</h4>
-            </div>
-        </div>
-        <div class="col-md-3">
-            <div class="card summary-card p-3 cardreader">
-                <h6>Periode Gaji</h6>
-                <h4>Oktober 2025</h4>
-            </div>
-        </div>
-        <div class="col-md-3">
-            <div class="card summary-card p-3 cardreader">
-                <h6>Status Pembayaran</h6>
-                <h4 class="text-primary">Selesai</h4>
-            </div>
-        </div>
-    </div>
 
     <!-- Filter -->
     <div class="card p-4 mb-3 ">
@@ -101,6 +75,32 @@
             </div>
             <div class="col-md-2">
                 <button class="btn btn-primary w-100"><i class="bi bi-search"></i> Tampilkan</button>
+            </div>
+        </div>
+    </div>
+    <div class="row g-3 mb-3 ">
+        <div class="col-md-3">
+            <div class="card summary-card p-3 cardreader">
+                <h6>Total Karyawan</h6>
+                <h4>45 Orang</h4>
+            </div>
+        </div>
+        <div class="col-md-3">
+            <div class="card summary-card p-3 cardreader">
+                <h6>Total Gaji Bulan Ini</h6>
+                <h4 class="text-success">Rp 285.000.000</h4>
+            </div>
+        </div>
+        <div class="col-md-3">
+            <div class="card summary-card p-3 cardreader">
+                <h6>Periode Gaji</h6>
+                <h4>Oktober 2025</h4>
+            </div>
+        </div>
+        <div class="col-md-3">
+            <div class="card summary-card p-3 cardreader">
+                <h6>Status Pembayaran</h6>
+                <h4 class="text-primary">Selesai</h4>
             </div>
         </div>
     </div>

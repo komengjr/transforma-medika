@@ -80,10 +80,10 @@
             </div>
         </div>
     </div>
-    <div class="card p-4">
+    <div class="card py-4">
         <div class="table-responsive">
-            <table class="table align-middle table-bordered text-center">
-                <thead>
+            <table id="example" class="table table-bordered table-striped" style="width:100%">
+                <thead class="bg-800 text-200 fs--2">
                     <tr>
                         <th>No</th>
                         <th>Nama Karyawan</th>

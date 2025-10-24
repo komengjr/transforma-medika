@@ -129,6 +129,10 @@ Route::prefix('{akses}/{id}')->group(function (): void {
     Route::get('master-brodcast/master-contact', [BrodcastController::class, 'master_brodcast_contact'])->name('master_brodcast_contact');
 
     // FARMASI
+    Route::get('penjualan/penjualan-non-resep', [FarmasiController::class, 'penjualan_non_resep'])->name('penjualan_non_resep');
+    Route::get('penjualan/penjualan-dengan-resep', [FarmasiController::class, 'penjualan_farmasi_resep'])->name('penjualan_farmasi_resep');
+    Route::get('penjualan/verifikasi-resep-dan-dosis', [FarmasiController::class, 'penjualan_verifikasi_dosis_resep'])->name('penjualan_verifikasi_dosis_resep');
+    Route::get('penjualan/cetak-nota-pembelian', [FarmasiController::class, 'penjualan_cetak_nota_farmmasi'])->name('penjualan_cetak_nota_farmmasi');
     Route::get('manajemen-farmasi/data-obat', [FarmasiController::class, 'manajemen_farmasi_data_obat'])->name('manajemen_farmasi_data_obat');
     Route::get('manajemen-farmasi/obat-masuk-dan-keluar', [FarmasiController::class, 'manajemen_farmasi_obat_in_out'])->name('manajemen_farmasi_obat_in_out');
     Route::get('manajemen-farmasi/stok-min-and-max', [FarmasiController::class, 'manajemen_farmasi_stock_min_max'])->name('manajemen_farmasi_stock_min_max');

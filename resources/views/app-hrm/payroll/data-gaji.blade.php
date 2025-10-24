@@ -103,10 +103,10 @@
     </div>
 
     <!-- Riwayat Gaji -->
-    <div class="card p-4">
-        <h5 class="fw-bold mb-3"><i class="bi bi-clock-history text-primary"></i> Riwayat Gaji Saya</h5>
-        <div class="table-responsive">
-            <table class="table align-middle table-bordered text-center">
+    <div class="card">
+        <h5 class="fw-bold my-3 px-4 py-2"><i class="bi bi-clock-history text-primary"></i> Riwayat Gaji Saya</h5>
+        <div class="table-responsive pb-3">
+            <table id="example" class="table table-bordered table-striped" style="width:100%">
                 <thead>
                     <tr>
                         <th>Bulan</th>

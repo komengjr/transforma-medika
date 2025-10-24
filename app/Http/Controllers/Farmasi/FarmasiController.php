@@ -46,6 +46,46 @@ class FarmasiController extends Controller
             return false;
         }
     }
+    // PENJUALAN NON RESEP
+    public function penjualan_non_resep($akses, $id)
+    {
+        if ($this->url_akses($akses, $id) == true) {
+            $data = DB::table('farm_data_obat')->get();
+            return view('app-farmasi.penjualan.penjualan-non-resep', ['data' => $data, 'akses' => $akses, 'code' => $id]);
+        } else {
+            return Redirect::to('dashboard/home');
+        }
+    }
+    // PENJUALAN NON RESEP
+    public function penjualan_farmasi_resep($akses, $id)
+    {
+        if ($this->url_akses($akses, $id) == true) {
+            $data = DB::table('farm_data_obat')->get();
+            return view('app-farmasi.penjualan.penjualan-resep', ['data' => $data, 'akses' => $akses, 'code' => $id]);
+        } else {
+            return Redirect::to('dashboard/home');
+        }
+    }
+    // PENJUALAN VERIFIKASI RESEP
+    public function penjualan_verifikasi_dosis_resep($akses, $id)
+    {
+        if ($this->url_akses($akses, $id) == true) {
+            $data = DB::table('farm_data_obat')->get();
+            return view('app-farmasi.penjualan.verifikasi-dosis-resep', ['data' => $data, 'akses' => $akses, 'code' => $id]);
+        } else {
+            return Redirect::to('dashboard/home');
+        }
+    }
+    // CETAK NOTA FARMASI
+    public function penjualan_cetak_nota_farmmasi($akses, $id)
+    {
+        if ($this->url_akses($akses, $id) == true) {
+            $data = DB::table('farm_data_obat')->get();
+            return view('app-farmasi.penjualan.percetakan-nota-farmasi', ['data' => $data, 'akses' => $akses, 'code' => $id]);
+        } else {
+            return Redirect::to('dashboard/home');
+        }
+    }
     // DATA OBAT
     public function manajemen_farmasi_data_obat($akses, $id)
     {
