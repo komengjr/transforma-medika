@@ -2,20 +2,7 @@
 @section('base.css')
     <link rel="stylesheet" href="https://cdn.datatables.net/2.2.2/css/dataTables.bootstrap5.css">
     <link rel="stylesheet" href="https://cdn.datatables.net/responsive/3.0.4/css/responsive.bootstrap5.css">
-    <style>
-        #button-pick-request {
-            cursor: pointer;
-        }
 
-        #button-pick-request:hover {
-            background: rgb(223, 217, 25);
-        }
-
-        #button-terima-order-barang-peminjaman:hover {
-            background: rgb(223, 217, 25);
-            cursor: pointer;
-        }
-    </style>
 @endsection
 @section('content')
     <div class="row mb-3 ">
@@ -43,49 +30,44 @@
             </div>
         </div>
     </div>
-    <div class="card mb-3">
-        <div class="card-header bg-primary">
-            <div class="row align-items-center">
-                <div class="col">
-                    <h3 class="m-0"><span class="badge bg-primary m-0 p-0">Product Out</span></h3>
-                </div>
-                <div class="col-auto">
-                    <div class="btn-group" role="group">
-                        <button class="btn btn-sm btn-falcon-primary dropdown-toggle" id="btnGroupVerticalDrop2"
-                            type="button" data-bs-toggle="dropdown" aria-haspopup="true" aria-expanded="false"><span
-                                class="fas fa-align-left me-1" data-fa-transform="shrink-3"></span>Menu</button>
-                        <div class="dropdown-menu" aria-labelledby="btnGroupVerticalDrop2">
-                            <button class="dropdown-item" data-bs-toggle="modal" data-bs-target="#modal-pr-xl"
-                                id="button-add-pr" data-code="123"><span class="far fa-edit"></span>
-                                Add Purchase Request</button>
-                            <div class="dropdown-divider"></div>
-                            <button class="dropdown-item" data-bs-toggle="modal" data-bs-target="#modal-cabang"
-                                id="button-data-barang-cabang" data-code="123"><span class="far fa-folder-open"></span>
-                                History</button>
-                        </div>
-                    </div>
-                </div>
-            </div>
-        </div>
-        <div class="card-body border-top p-3">
-            <table id="example" class="table table-striped" style="width:100%">
-                <thead class="bg-200 text-700">
+    <div class="d-flex justify-content-between align-items-center mb-3">
+        <h3 class="fw-bold text-primary"></h3>
+        <button class="btn btn-success" data-bs-toggle="modal" data-bs-target="#modalTambah">
+            📦 Tambah Barang Keluar
+        </button>
+    </div>
+
+    <div class="card p-3">
+        <div class="table-responsive">
+            <table id="tabelBarangKeluar" class="table table-striped table-bordered align-middle">
+                <thead class="table-primary fs--2">
                     <tr>
                         <th>No</th>
-                        <th>No Purchase Req</th>
-                        <th>Req Date</th>
-                        <th>Date Requaire</th>
-                        <th>Req By</th>
-                        <th>Approve By</th>
-                        <th>Status</th>
-                        <th>Action</th>
+                        <th>Tanggal Keluar</th>
+                        <th>Kode Barang</th>
+                        <th>Nama Barang</th>
+                        <th>Jumlah</th>
+                        <th>Penerima</th>
+                        <th>User/Petugas</th>
+                        <th>Keterangan</th>
+                        <th>Aksi</th>
                     </tr>
                 </thead>
-                <tbody>
-                    @php
-                        $no = 1;
-                    @endphp
-
+                <tbody class="fs--2">
+                    <tr>
+                        <td>1</td>
+                        <td>2025-10-24</td>
+                        <td>BRG001</td>
+                        <td>Masker Medis</td>
+                        <td>50 Box</td>
+                        <td>Ruang Farmasi</td>
+                        <td>Admin Gudang</td>
+                        <td>Untuk kebutuhan harian</td>
+                        <td>
+                            <button class="btn btn-sm btn-warning me-1">Edit</button>
+                            <button class="btn btn-sm btn-danger">Hapus</button>
+                        </td>
+                    </tr>
                 </tbody>
             </table>
         </div>
@@ -104,49 +86,130 @@
             </div>
         </div>
     </div>
-    <div class="modal fade" id="modal-pr-xl" data-bs-keyboard="false" data-bs-backdrop="static" tabindex="-1"
+    <div class="modal fade" id="modalTambah" data-bs-keyboard="false" data-bs-backdrop="static" tabindex="-1"
         aria-labelledby="staticBackdropLabel" aria-hidden="true">
-        <div class="modal-dialog modal-dialog-centered modal-xl" role="document">
+        <div class="modal-dialog modal-dialog-centered modal-lg" role="document">
             <div class="modal-content border-0">
                 <div class="position-absolute top-0 end-0 mt-3 me-3 z-index-1">
                     <button class="btn-close btn btn-sm btn-circle d-flex flex-center transition-base"
                         data-bs-dismiss="modal" aria-label="Close"></button>
                 </div>
-                <div id="menu-pr-xl"></div>
+                <div class="modal-body p-0">
+                    <div class="bg-primary rounded-top-lg py-3 ps-4 pe-6">
+                        <h4 class="mb-1" style="color: white;" id="staticBackdropLabel">Form Barang Keluar</h4>
+                        <p class="fs--2 mb-0" style="color: white;">Support by <a class="link-600 fw-semi-bold"
+                                href="#!">{{ Env('APP_LABEL')}}</a>
+                        </p>
+                    </div>
+                    <form id="formBarangKeluar" class="row p-3">
+                        <!-- Alert error -->
+                        <div id="alertError" class="alert alert-danger d-none"></div>
+
+                        <div class="col-md-6 mb-3">
+                            <label class="form-label">Tanggal Keluar</label>
+                            <input type="date" class="form-control" name="tanggal" required>
+                        </div>
+                        <div class="col-md-6  mb-3">
+                            <label class="form-label">Kode Barang</label>
+                            <input type="text" class="form-control" name="kode" placeholder="Contoh: BRG001" required
+                                minlength="3">
+                        </div>
+                        <div class="col-md-6 mb-3">
+                            <label class="form-label">Nama Barang</label>
+                            <input type="text" class="form-control" name="nama" required minlength="3">
+                        </div>
+                        <div class="col-md-6 mb-3">
+                            <label class="form-label">Jumlah</label>
+                            <input type="number" class="form-control" name="jumlah" min="1" required>
+                        </div>
+                        <div class="col-md-6  mb-3">
+                            <label class="form-label">Penerima</label>
+                            <input type="text" class="form-control" name="penerima" required>
+                        </div>
+                        <div class="col-md-6 mb-3">
+                            <label class="form-label">User/Petugas</label>
+                            <input type="text" class="form-control" name="user" placeholder="Nama Petugas" required>
+                        </div>
+                        <div class="col-md-12 mb-3">
+                            <label class="form-label">Keterangan</label>
+                            <textarea class="form-control" name="keterangan" rows="2"></textarea>
+                        </div>
+                        <div class="modal-footer">
+                            <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Batal</button>
+                            <button type="submit" class="btn btn-primary">Simpan</button>
+                        </div>
+                    </form>
+                </div>
             </div>
         </div>
     </div>
+
     <script src="https://cdn.datatables.net/2.2.2/js/dataTables.js"></script>
     <script src="https://cdn.datatables.net/2.2.2/js/dataTables.bootstrap5.js"></script>
     <script src="https://cdn.datatables.net/responsive/3.0.4/js/dataTables.responsive.js"></script>
     <script src="https://cdn.datatables.net/responsive/3.0.4/js/responsive.bootstrap5.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
     <script>
-        new DataTable('#example', {
-            responsive: true
-        });
-    </script>
-    <script>
-        $(document).on("click", "#button-add-pr", function (e) {
-            e.preventDefault();
-            $('#menu-pr-xl').html(
-                '<div class="spinner-border my-3" style="display: block; margin-left: auto; margin-right: auto;" role="status"><span class="visually-hidden">Loading...</span></div>'
-            );
-            $.ajax({
-                url: "{{ route('purchase_req_add') }}",
-                type: "POST",
-                cache: false,
-                data: {
-                    "_token": "{{ csrf_token() }}",
-                    "code": 0
-                },
-                dataType: 'html',
-            }).done(function (data) {
-                $('#menu-pr-xl').html(data);
-            }).fail(function () {
-                $('#menu-pr-xl').html('eror');
-            });
-        });
+        $(document).ready(function () {
+            const table = $('#tabelBarangKeluar').DataTable();
 
+            $('#formBarangKeluar').on('submit', function (e) {
+                e.preventDefault();
+                $('#alertError').addClass('d-none').text('');
+
+                const form = $(this)[0];
+                const data = $(this).serializeArray();
+
+                // Ambil nilai form
+                const tanggal = data[0].value.trim();
+                const kode = data[1].value.trim();
+                const nama = data[2].value.trim();
+                const jumlah = parseInt(data[3].value.trim());
+                const penerima = data[4].value.trim();
+                const user = data[5].value.trim();
+                const keterangan = data[6].value.trim();
+
+                // Validasi sederhana
+                if (!tanggal || !kode || !nama || !jumlah || !penerima || !user) {
+                    showError('Semua kolom wajib diisi.');
+                    return;
+                }
+                if (kode.length < 3) {
+                    showError('Kode barang minimal 3 karakter.');
+                    return;
+                }
+                if (nama.length < 3) {
+                    showError('Nama barang minimal 3 karakter.');
+                    return;
+                }
+                if (jumlah <= 0) {
+                    showError('Jumlah barang harus lebih dari 0.');
+                    return;
+                }
+
+                // Tambah data ke tabel
+                const newRow = [
+                    table.rows().count() + 1,
+                    tanggal,
+                    kode,
+                    nama,
+                    jumlah,
+                    penerima,
+                    user,
+                    keterangan,
+                    `<button class="btn btn-sm btn-warning me-1">Edit</button>
+                                     <button class="btn btn-sm btn-danger">Hapus</button>`
+                ];
+                table.row.add(newRow).draw(false);
+
+                // Reset form
+                form.reset();
+                $('#modalTambah').modal('hide');
+            });
+
+            function showError(message) {
+                $('#alertError').removeClass('d-none').text(message);
+            }
+        });
     </script>
 @endsection
