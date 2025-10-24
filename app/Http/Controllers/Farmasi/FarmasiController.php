@@ -96,6 +96,36 @@ class FarmasiController extends Controller
             return Redirect::to('dashboard/home');
         }
     }
+    // DATA PENERIMAAN BARANG PO
+    public function manajemen_farmasi_penerimaan_barang($akses, $id)
+    {
+        if ($this->url_akses_sub($akses, $id) == true) {
+            $data = DB::table('farm_data_obat')->get();
+            return view('app-farmasi.manajemen.penerimaan-barang', ['data' => $data, 'akses' => $akses, 'code' => $id]);
+        } else {
+            return Redirect::to('dashboard/home');
+        }
+    }
+    // PEMBUATAN FAKTUR
+    public function manajemen_farmasi_pembuatan_faktur($akses, $id)
+    {
+        if ($this->url_akses_sub($akses, $id) == true) {
+            $data = DB::table('farm_data_obat')->get();
+            return view('app-farmasi.manajemen.pembuatan-faktur', ['data' => $data, 'akses' => $akses, 'code' => $id]);
+        } else {
+            return Redirect::to('dashboard/home');
+        }
+    }
+    // RIWAYAT TRANSAKSI
+    public function manajemen_farmasi_riwayat_transaksi($akses, $id)
+    {
+        if ($this->url_akses_sub($akses, $id) == true) {
+            $data = DB::table('farm_data_obat')->get();
+            return view('app-farmasi.manajemen.riwayat-transaksi-po', ['data' => $data, 'akses' => $akses, 'code' => $id]);
+        } else {
+            return Redirect::to('dashboard/home');
+        }
+    }
     // DATA OBAT
     public function manajemen_farmasi_data_obat($akses, $id)
     {
@@ -122,6 +152,26 @@ class FarmasiController extends Controller
         if ($this->url_akses_sub($akses, $id) == true) {
             $data = DB::table('farm_data_obat')->get();
             return view('app-farmasi.manajemen.stox-min-max', ['data' => $data, 'akses' => $akses, 'code' => $id]);
+        } else {
+            return Redirect::to('dashboard/home');
+        }
+    }
+    // DATA SUPPLIER
+    public function manajemen_farmasi_data_supplier($akses, $id)
+    {
+        if ($this->url_akses_sub($akses, $id) == true) {
+            $data = DB::table('farm_data_obat')->get();
+            return view('app-farmasi.manajemen.master-data-supplier', ['data' => $data, 'akses' => $akses, 'code' => $id]);
+        } else {
+            return Redirect::to('dashboard/home');
+        }
+    }
+    // DATA SUPPLIER
+    public function manajemen_farmasi_data_pelanggan($akses, $id)
+    {
+        if ($this->url_akses_sub($akses, $id) == true) {
+            $data = DB::table('farm_data_obat')->get();
+            return view('app-farmasi.manajemen.master-data-pelanggan', ['data' => $data, 'akses' => $akses, 'code' => $id]);
         } else {
             return Redirect::to('dashboard/home');
         }

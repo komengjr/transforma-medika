@@ -135,9 +135,14 @@ Route::prefix('{akses}/{id}')->group(function (): void {
     Route::get('penjualan/verifikasi-resep-dan-dosis', [FarmasiController::class, 'penjualan_verifikasi_dosis_resep'])->name('penjualan_verifikasi_dosis_resep');
     Route::get('penjualan/cetak-nota-pembelian', [FarmasiController::class, 'penjualan_cetak_nota_farmmasi'])->name('penjualan_cetak_nota_farmmasi');
     Route::get('manajemen-farmasi/pembelian-obat', [FarmasiController::class, 'manajemen_farmasi_pembelian_obat'])->name('manajemen_farmasi_pembelian_obat');
+    Route::get('manajemen-farmasi/penerimaan-barang', [FarmasiController::class, 'manajemen_farmasi_penerimaan_barang'])->name('manajemen_farmasi_penerimaan_barang');
+    Route::get('manajemen-farmasi/pembuatan-faktur', [FarmasiController::class, 'manajemen_farmasi_pembuatan_faktur'])->name('manajemen_farmasi_pembuatan_faktur');
+    Route::get('manajemen-farmasi/riwayat-transaksi-pembelian', [FarmasiController::class, 'manajemen_farmasi_riwayat_transaksi'])->name('manajemen_farmasi_riwayat_transaksi');
     Route::get('manajemen-farmasi/data-obat', [FarmasiController::class, 'manajemen_farmasi_data_obat'])->name('manajemen_farmasi_data_obat');
     Route::get('manajemen-farmasi/obat-masuk-dan-keluar', [FarmasiController::class, 'manajemen_farmasi_obat_in_out'])->name('manajemen_farmasi_obat_in_out');
     Route::get('manajemen-farmasi/stok-min-and-max', [FarmasiController::class, 'manajemen_farmasi_stock_min_max'])->name('manajemen_farmasi_stock_min_max');
+    Route::get('manajemen-farmasi/data-supplier', [FarmasiController::class, 'manajemen_farmasi_data_supplier'])->name('manajemen_farmasi_data_supplier');
+    Route::get('manajemen-farmasi/data-pelanggan', [FarmasiController::class, 'manajemen_farmasi_data_pelanggan'])->name('manajemen_farmasi_data_pelanggan');
 });
 // MEDICA HEALTH
 Route::prefix('{akses}/{id}/application')->group(function () {
