@@ -86,6 +86,16 @@ class FarmasiController extends Controller
             return Redirect::to('dashboard/home');
         }
     }
+    // DATA PEMBELIAN PO
+    public function manajemen_farmasi_pembelian_obat($akses, $id)
+    {
+        if ($this->url_akses_sub($akses, $id) == true) {
+            $data = DB::table('farm_data_obat')->get();
+            return view('app-farmasi.manajemen.pembelian-purchase-order', ['data' => $data, 'akses' => $akses, 'code' => $id]);
+        } else {
+            return Redirect::to('dashboard/home');
+        }
+    }
     // DATA OBAT
     public function manajemen_farmasi_data_obat($akses, $id)
     {

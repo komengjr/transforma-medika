@@ -205,6 +205,15 @@ class LogistikController extends Controller
             return Redirect::to('dashboard/home');
         }
     }
+    // STOCKOPNAME
+    public function menu_logistik_stockopname($akses, $id)
+    {
+        if ($this->url_akses($akses, $id) == true) {
+            return view('app-logistik.menu.stockopname-logistik', ['akses' => $akses, 'code' => $id]);
+        } else {
+            return Redirect::to('dashboard/home');
+        }
+    }
     // MASTER ITEM
     public function master_logistik_item($akses, $id)
     {

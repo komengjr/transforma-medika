@@ -218,7 +218,7 @@ class HrmController extends Controller
     public function master_data_jabatan($akses, $id)
     {
         if ($this->url_akses($akses, $id) == true) {
-            return view('app-hrm.payroll.slip-gaji', ['akses' => $akses, 'code' => $id]);
+            return view('app-hrm.master-pegawai.data-jabatan', ['akses' => $akses, 'code' => $id]);
         } else {
             return Redirect::to('dashboard/home');
         }

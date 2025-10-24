@@ -95,7 +95,7 @@
     </div>
 
     <!-- Summary -->
-    <div class="row mt-2 g-3">
+    <div class="row mt-0 g-3">
         <div class="col-md-6">
             <div class="card text-center p-3">
                 <h6>Total Lembur Bulan Ini</h6>

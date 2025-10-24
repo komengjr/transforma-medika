@@ -3,17 +3,51 @@
     <link rel="stylesheet" href="https://cdn.datatables.net/2.2.2/css/dataTables.bootstrap5.css">
     <link rel="stylesheet" href="https://cdn.datatables.net/responsive/3.0.4/css/responsive.bootstrap5.css">
     <style>
-        #button-pick-request {
-            cursor: pointer;
+        .card-pegawai {
+            border: none;
+            border-radius: 16px;
+            box-shadow: 0 4px 10px rgba(0, 0, 0, 0.08);
+            transition: all 0.3s ease;
+            overflow: hidden;
         }
 
-        #button-pick-request:hover {
-            background: rgb(223, 217, 25);
+        .card-pegawai:hover {
+            transform: scale(1.03);
+            box-shadow: 0 6px 14px rgba(0, 0, 0, 0.12);
         }
 
-        #button-terima-order-barang-peminjaman:hover {
-            background: rgb(223, 217, 25);
-            cursor: pointer;
+        .card-img-top {
+            height: 180px;
+            object-fit: cover;
+        }
+
+        .filter-bar {
+            /* background-color: #fff; */
+            border-radius: 16px;
+            box-shadow: 0 4px 10px rgba(0, 0, 0, 0.05);
+            padding: 20px;
+            margin-bottom: 30px;
+        }
+
+        .search-input {
+            border-radius: 30px;
+            padding-left: 40px;
+        }
+
+        .search-icon {
+            position: absolute;
+            top: 9px;
+            left: 15px;
+            color: #6c757d;
+        }
+
+        .pagination {
+            justify-content: center;
+        }
+
+        .page-item.active .page-link {
+            background-color: #0d6efd;
+            border-color: #0d6efd;
         }
     </style>
 @endsection
@@ -41,61 +75,48 @@
             </div>
         </div>
     </div>
-    <div class="card mb-3">
-        <div class="card-header bg-primary">
-            <div class="row align-items-center">
-                <div class="col">
-                    <h3 class="m-0"><span class="badge bg-primary m-0 p-0">Data Pegawai</span></h3>
+    <div class="pegawait">
+        <div class="filter-bar mb-4 border border-primary">
+            <div class="row g-3 align-items-center">
+                <div class="col-md-4 position-relative">
+                    <i class="bi bi-search search-icon"></i>
+                    <input type="text" id="searchInput" class="form-control search-input"
+                        placeholder="Cari nama pegawai...">
                 </div>
-                <div class="col-auto">
-                    <div class="btn-group" role="group">
-                        <button class="btn btn-sm btn-falcon-primary dropdown-toggle" id="btnGroupVerticalDrop2"
-                            type="button" data-bs-toggle="dropdown" aria-haspopup="true" aria-expanded="false"><span
-                                class="fas fa-align-left me-1" data-fa-transform="shrink-3"></span>Menu</button>
-                        <div class="dropdown-menu" aria-labelledby="btnGroupVerticalDrop2">
-                            <button class="dropdown-item" data-bs-toggle="modal" data-bs-target="#modal-pegawai-xl"
-                                id="button-add-pegawai" data-code="123"><span class="far fa-edit"></span>
-                                Tambah Pegawai</button>
-                            <div class="dropdown-divider"></div>
-                            <button class="dropdown-item" data-bs-toggle="modal" data-bs-target="#modal-cabang"
-                                id="button-data-barang-cabang" data-code="123"><span class="far fa-folder-open"></span>
-                                History</button>
-                        </div>
-                    </div>
+                <div class="col-md-4">
+                    <select id="filterJabatan" class="form-select">
+                        <option value="">Filter Jabatan...</option>
+                        <option>Manager</option>
+                        <option>Staff HRD</option>
+                        <option>Kasir</option>
+                        <option>Apoteker</option>
+                        <option>Logistik</option>
+                        <option>IT Support</option>
+                    </select>
+                </div>
+                <div class="col-md-4">
+                    <select id="filterDivisi" class="form-select">
+                        <option value="">Filter Divisi...</option>
+                        <option>Keuangan</option>
+                        <option>Farmasi</option>
+                        <option>SDM</option>
+                        <option>Gudang</option>
+                        <option>IT</option>
+                    </select>
                 </div>
             </div>
         </div>
-        <div class="card-body border-top p-3">
-            <table id="example" class="table table-striped nowrap" style="width:100%">
-                <thead class="bg-200 text-700">
-                    <tr>
-                        <th>No</th>
-                        <th>Nama Pegawai</th>
-                        <th>NIK</th>
-                        <th>DOB</th>
-                        <th>Agama</th>
-                        <th>No HP</th>
-                        <th>Action</th>
-                    </tr>
-                </thead>
-                <tbody>
-                    @php
-                        $no = 1;
-                    @endphp
-                    @foreach ($data as $datas)
-                        <tr>
-                            <td>{{ $no++ }}</td>
-                            <td>{{ $datas->hrm_m_pegawai_name }}</td>
-                            <td>{{ $datas->hrm_m_pegawai_nik }}</td>
-                            <td>{{ $datas->hrm_master_pegawai_dob }}</td>
-                            <td>{{ $datas->hrm_m_pegawai_agama }}</td>
-                            <td>{{ $datas->hrm_m_pegawai_hp }}</td>
-                            <td><button class="btn btn-danger btn-sm">Edit</button></td>
-                        </tr>
-                    @endforeach
-                </tbody>
-            </table>
+
+        <!-- Grid Pegawai -->
+        <div class="row g-3" id="pegawaiContainer">
+            <!-- Pegawai cards generated here -->
         </div>
+
+        <!-- Pagination -->
+        <nav>
+            <ul class="pagination mt-4" id="pagination"></ul>
+        </nav>
+
     </div>
 @endsection
 @section('base.js')
@@ -123,54 +144,122 @@
         });
     </script>
     <script>
-        $(document).on("click", "#button-add-pegawai", function (e) {
-            e.preventDefault();
-            var code = $(this).data("code");
-            $('#menu-pegawai-xl').html(
-                '<div class="spinner-border my-3" style="display: block; margin-left: auto; margin-right: auto;" role="status"><span class="visually-hidden">Loading...</span></div>'
-            );
-            $.ajax({
-                url: "{{ route('master_data_pegawai_add') }}",
-                type: "POST",
-                cache: false,
-                data: {
-                    "_token": "{{ csrf_token() }}",
-                    "code": code
-                },
-                dataType: 'html',
-            }).done(function (data) {
-                $('#menu-pegawai-xl').html(data);
-            }).fail(function () {
-                $('#menu-pegawai-xl').html('eror');
+        // Data Pegawai (contoh)
+        const dataPegawai = [
+            { nama: "Agus Raharjo", jabatan: "Manager", divisi: "SDM", foto: "https://randomuser.me/api/portraits/men/32.jpg", kontak: "agus@perusahaan.com" },
+            { nama: "Rina Kartika", jabatan: "Apoteker", divisi: "Farmasi", foto: "https://randomuser.me/api/portraits/women/65.jpg", kontak: "rina@perusahaan.com" },
+            { nama: "Dedi Santoso", jabatan: "Kasir", divisi: "Keuangan", foto: "https://randomuser.me/api/portraits/men/54.jpg", kontak: "dedi@perusahaan.com" },
+            { nama: "Lina Putri", jabatan: "Staff HRD", divisi: "SDM", foto: "https://randomuser.me/api/portraits/women/60.jpg", kontak: "lina@perusahaan.com" },
+            { nama: "Rahmat Hidayat", jabatan: "Logistik", divisi: "Gudang", foto: "https://randomuser.me/api/portraits/men/75.jpg", kontak: "rahmat@perusahaan.com" },
+            { nama: "Ayu Nirmala", jabatan: "Staff HRD", divisi: "SDM", foto: "https://randomuser.me/api/portraits/women/71.jpg", kontak: "ayu@perusahaan.com" },
+            { nama: "Bayu Prasetyo", jabatan: "IT Support", divisi: "IT", foto: "https://randomuser.me/api/portraits/men/48.jpg", kontak: "bayu@perusahaan.com" },
+            { nama: "Sinta Aulia", jabatan: "Apoteker", divisi: "Farmasi", foto: "https://randomuser.me/api/portraits/women/77.jpg", kontak: "sinta@perusahaan.com" },
+            { nama: "Teguh Widodo", jabatan: "Logistik", divisi: "Gudang", foto: "https://randomuser.me/api/portraits/men/79.jpg", kontak: "teguh@perusahaan.com" },
+            { nama: "Robby Andika", jabatan: "Kasir", divisi: "Keuangan", foto: "https://randomuser.me/api/portraits/men/81.jpg", kontak: "robby@perusahaan.com" },
+            { nama: "Nita Puspita", jabatan: "Staff HRD", divisi: "SDM", foto: "https://randomuser.me/api/portraits/women/56.jpg", kontak: "nita@perusahaan.com" },
+        ];
+
+        const pegawait = document.getElementById("pegawaiContainer");
+        const pagination = document.getElementById("pagination");
+        const searchInput = document.getElementById("searchInput");
+        const filterJabatan = document.getElementById("filterJabatan");
+        const filterDivisi = document.getElementById("filterDivisi");
+
+        let currentPage = 1;
+        const itemsPerPage = 8;
+        let filteredPegawai = dataPegawai;
+
+        function renderPegawai(list) {
+            pegawait.innerHTML = "";
+            if (list.length === 0) {
+                pegawait.innerHTML = `<div class='text-center text-muted py-5'>Tidak ada pegawai ditemukan.</div>`;
+                pagination.innerHTML = "";
+                return;
+            }
+
+            const start = (currentPage - 1) * itemsPerPage;
+            const end = start + itemsPerPage;
+            const pageItems = list.slice(start, end);
+
+            pageItems.forEach(p => {
+                const card = `
+                          <div class="col-md-4 col-lg-3 mb-4">
+                            <div class="card card-pegawai text-center border border-primary">
+                              <img src="${p.foto}" class="card-img-top" alt="${p.nama}">
+                              <div class="card-body">
+                                <h5 class="card-title text-primary fw-bold">${p.nama}</h5>
+                                <p class="card-text mb-1">${p.jabatan}</p>
+                                <small class="text-muted">${p.divisi}</small>
+                                <hr>
+                                <a href="mailto:${p.kontak}" class="btn btn-outline-primary btn-sm rounded-pill">
+                                  <i class="bi bi-envelope"></i> Hubungi
+                                </a>
+                              </div>
+                            </div>
+                          </div>`;
+                pegawait.innerHTML += card;
             });
-        });
-        $(document).on("click", "#button-simpan-data-pegawai", function (e) {
-            e.preventDefault();
-            var data = $("#form-pegawai-baru").serialize();
-            $('#menu-add-data-pegawai').html(
-                '<div class="spinner-border my-3" style="display: block; margin-left: auto; margin-right: auto;" role="status"><span class="visually-hidden">Loading...</span></div>'
+
+            renderPagination(list);
+        }
+
+        function renderPagination(list) {
+            const totalPages = Math.ceil(list.length / itemsPerPage);
+            pagination.innerHTML = "";
+
+            if (totalPages <= 1) return;
+
+            const prevDisabled = currentPage === 1 ? "disabled" : "";
+            const nextDisabled = currentPage === totalPages ? "disabled" : "";
+
+            pagination.innerHTML += `
+                        <li class="page-item ${prevDisabled}">
+                          <a class="page-link" href="#" onclick="changePage(${currentPage - 1})">Sebelumnya</a>
+                        </li>
+                      `;
+
+            for (let i = 1; i <= totalPages; i++) {
+                const active = i === currentPage ? "active" : "";
+                pagination.innerHTML += `
+                          <li class="page-item ${active}">
+                            <a class="page-link" href="#" onclick="changePage(${i})">${i}</a>
+                          </li>`;
+            }
+
+            pagination.innerHTML += `
+                        <li class="page-item ${nextDisabled}">
+                          <a class="page-link" href="#" onclick="changePage(${currentPage + 1})">Berikutnya</a>
+                        </li>`;
+        }
+
+        function changePage(page) {
+            const totalPages = Math.ceil(filteredPegawai.length / itemsPerPage);
+            if (page < 1 || page > totalPages) return;
+            currentPage = page;
+            renderPegawai(filteredPegawai);
+        }
+
+        function filterPegawai() {
+            const cari = searchInput.value.toLowerCase();
+            const jab = filterJabatan.value;
+            const div = filterDivisi.value;
+
+            filteredPegawai = dataPegawai.filter(p =>
+                p.nama.toLowerCase().includes(cari) &&
+                (jab === "" || p.jabatan === jab) &&
+                (div === "" || p.divisi === div)
             );
-            $.ajax({
-                url: "{{ route('master_data_pegawai_save') }}",
-                type: "POST",
-                cache: false,
-                data: data,
-                dataType: 'html',
-            }).done(function (data) {
-                if (data == 0) {
-                    Swal.fire({
-                        icon: "error",
-                        title: "Oops...",
-                        text: "Ada Kesalahan Teknis Pada Pengisian!",
-                        footer: '<a href="#">Why do I have this issue?</a>'
-                    });
-                    $('#menu-add-data-pegawai').html('<button class="btn btn-success float-end" id="button-simpan-data-pegawai" data-code="">Simpan Data</button>');
-                } else {
-                    $('#menu-add-data-pegawai').html(data);
-                }
-            }).fail(function () {
-                $('#menu-add-data-pegawai').html('eror');
-            });
-        });
+
+            currentPage = 1;
+            renderPegawai(filteredPegawai);
+        }
+
+        // Event Listener
+        searchInput.addEventListener("keyup", filterPegawai);
+        filterJabatan.addEventListener("change", filterPegawai);
+        filterDivisi.addEventListener("change", filterPegawai);
+
+        // Render awal
+        renderPegawai(dataPegawai);
     </script>
 @endsection
