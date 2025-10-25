@@ -123,7 +123,9 @@ Route::prefix('{akses}/{id}')->group(function (): void {
     // LOGISTIK
     Route::get('transaction-product/product-in', [LogistikController::class, 'transaction_product_in'])->name('transaction_product_in');
     Route::get('transaction-product/product-out', [LogistikController::class, 'transaction_product_out'])->name('transaction_product_out');
+    Route::get('transaction-product/laporan-barang-keluar-dan-masuk', [LogistikController::class, 'transaction_product_in_and_out'])->name('transaction_product_in_and_out');
     Route::get('menu-logistik/stockopname', [LogistikController::class, 'menu_logistik_stockopname'])->name('menu_logistik_stockopname');
+    Route::get('menu-logistik/stok-inventori', [LogistikController::class, 'menu_logistik_stok_inventori'])->name('menu_logistik_stok_inventori');
     Route::get('master-logistik/master-item', [LogistikController::class, 'master_logistik_item'])->name('master_logistik_item');
     Route::get('master-logistik/master-product', [LogistikController::class, 'master_logistik_product'])->name('master_logistik_product');
 

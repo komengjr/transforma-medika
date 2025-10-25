@@ -44,69 +44,83 @@
         </div>
     </div>
     <div class="d-flex justify-content-between align-items-center mb-3">
-        <h3>🚚 Barang Masuk (GRN)</h3>
-        <button class="btn btn-primary" data-bs-toggle="modal" data-bs-target="#modalBarangMasuk">+ Tambah GRN</button>
+        <h3>📊 Laporan Barang Masuk & Keluar</h3>
     </div>
 
     <!-- Filter -->
     <div class="card p-3 mb-3">
-        <form class="row g-2">
+        <form class="row g-3">
             <div class="col-md-3">
                 <label class="form-label">Dari Tanggal</label>
-                <input type="date" class="form-control">
+                <input type="date" id="startDate" class="form-control">
             </div>
             <div class="col-md-3">
                 <label class="form-label">Sampai Tanggal</label>
-                <input type="date" class="form-control">
+                <input type="date" id="endDate" class="form-control">
             </div>
             <div class="col-md-3">
-                <label class="form-label">Supplier</label>
-                <select class="form-select">
-                    <option>Semua Supplier</option>
-                    <option>PT. Medika Utama</option>
-                    <option>CV. Sehat Selalu</option>
-                    <option>Apotek Sumber Rejeki</option>
+                <label class="form-label">Jenis Laporan</label>
+                <select id="jenisLaporan" class="form-select">
+                    <option value="semua">Semua</option>
+                    <option value="masuk">Barang Masuk</option>
+                    <option value="keluar">Barang Keluar</option>
                 </select>
             </div>
             <div class="col-md-3 d-flex align-items-end">
-                <button class="btn btn-success w-100">Tampilkan</button>
+                <button type="button" class="btn btn-success w-100" onclick="tampilkanLaporan()">Tampilkan Laporan</button>
             </div>
         </form>
     </div>
 
-    <!-- Data Tabel -->
+    <!-- Tabel -->
     <div class="card p-3">
-        <h6 class="mb-3">Riwayat Barang Masuk</h6>
-        <table class="table table-striped table-hover align-middle">
-            <thead class="table-dark">
-                <tr>
-                    <th>No</th>
-                    <th>Tanggal</th>
-                    <th>No. GRN</th>
-                    <th>Supplier</th>
-                    <th>Jumlah Item</th>
-                    <th>Total Qty</th>
-                    <th>Gudang</th>
-                    <th>Aksi</th>
-                </tr>
-            </thead>
-            <tbody>
-                <tr>
-                    <td>1</td>
-                    <td>2025-10-22</td>
-                    <td>GRN-001/10/2025</td>
-                    <td>PT. Medika Utama</td>
-                    <td>3</td>
-                    <td>560</td>
-                    <td>Gudang Utama</td>
-                    <td>
-                        <button class="btn btn-sm btn-info text-white">Detail</button>
-                        <button class="btn btn-sm btn-warning text-dark">Edit</button>
-                        <button class="btn btn-sm btn-danger">Hapus</button>
-                    </td>
-                </tr>
-            </tbody>
-        </table>
+        <div class="d-flex justify-content-between align-items-center mb-3">
+            <h6>Hasil Laporan</h6>
+            <div>
+                <button class="btn btn-danger btn-sm" onclick="exportPDF()">📄 Export PDF</button>
+                <button class="btn btn-success btn-sm" onclick="exportExcel()">📊 Export Excel</button>
+            </div>
+        </div>
+
+        <div class="table-responsive">
+            <table class="table table-striped table-hover align-middle" id="tabelLaporan">
+                <thead class="table-dark">
+                    <tr>
+                        <th>No</th>
+                        <th>Tanggal</th>
+                        <th>Jenis</th>
+                        <th>No. Dokumen</th>
+                        <th>Nama Barang</th>
+                        <th>Qty</th>
+                        <th>Satuan</th>
+                        <th>Unit/Supplier</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <!-- Data Dummy -->
+                    <tr>
+                        <td>1</td>
+                        <td>2025-10-22</td>
+                        <td>Masuk</td>
+                        <td>GRN-001/10/2025</td>
+                        <td>Masker Bedah</td>
+                        <td>200</td>
+                        <td>Box</td>
+                        <td>PT Medis Sehat</td>
+                    </tr>
+                    <tr>
+                        <td>2</td>
+                        <td>2025-10-24</td>
+                        <td>Keluar</td>
+                        <td>DO-002/10/2025</td>
+                        <td>Hand Sanitizer</td>
+                        <td>50</td>
+                        <td>Botol</td>
+                        <td>Unit IGD</td>
+                    </tr>
+                </tbody>
+            </table>
+        </div>
     </div>
 @endsection
 @section('base.js')
@@ -236,52 +250,40 @@
     <script src="https://cdn.datatables.net/responsive/3.0.4/js/responsive.bootstrap5.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
     <script>
-        // Generate nomor GRN otomatis
-        function generateGRN() {
-            const now = new Date();
-            const bulan = (now.getMonth() + 1).toString().padStart(2, '0');
-            const tahun = now.getFullYear();
-            const random = Math.floor(Math.random() * 900) + 100;
-            document.getElementById('noGRN').value = `GRN-${random}/${bulan}/${tahun}`;
-        }
-        document.getElementById('modalBarangMasuk').addEventListener('shown.bs.modal', generateGRN);
-
-        // Data supplier simulasi
-        const dataSupplier = {
-            "PT. Medika Utama": { alamat: "Jl. Merdeka No. 45, Jakarta", kontak: "021-555123" },
-            "CV. Sehat Selalu": { alamat: "Jl. Melati No. 9, Bandung", kontak: "022-765432" },
-            "Apotek Sumber Rejeki": { alamat: "Jl. Pahlawan No. 12, Lampung", kontak: "0721-334455" }
-        };
-
-        function isiSupplier() {
-            const nama = document.getElementById("supplierSelect").value;
-            if (nama && dataSupplier[nama]) {
-                document.getElementById("alamatSupplier").value = dataSupplier[nama].alamat;
-                document.getElementById("kontakSupplier").value = dataSupplier[nama].kontak;
-            } else {
-                document.getElementById("alamatSupplier").value = "";
-                document.getElementById("kontakSupplier").value = "";
-            }
+        function tampilkanLaporan() {
+            alert('Filter laporan berdasarkan periode & jenis sudah aktif. (Integrasi backend bisa ditambahkan)');
         }
 
-        // Tambah dan hapus baris barang
-        function tambahBaris() {
-            const table = document.getElementById("tabelBarang").querySelector("tbody");
-            const row = document.createElement("tr");
-            row.innerHTML = `
-            <td><input type="text" class="form-control" placeholder="Nama Barang" required></td>
-            <td><input type="text" class="form-control" placeholder="Kategori"></td>
-            <td><input type="number" class="form-control" min="1" required></td>
-            <td><input type="text" class="form-control" placeholder="Box / Pcs"></td>
-            <td><input type="text" class="form-control" placeholder="Batch No"></td>
-            <td><input type="date" class="form-control"></td>
-            <td><button type="button" class="btn btn-sm btn-danger" onclick="hapusBaris(this)">🗑</button></td>
-          `;
-            table.appendChild(row);
+        // Export ke Excel
+        function exportExcel() {
+            const table = document.getElementById("tabelLaporan");
+            const wb = XLSX.utils.table_to_book(table, { sheet: "Laporan" });
+            XLSX.writeFile(wb, "Laporan_Barang.xlsx");
         }
 
-        function hapusBaris(btn) {
-            btn.closest("tr").remove();
+        // Export ke PDF
+        async function exportPDF() {
+            const { jsPDF } = window.jspdf;
+            const doc = new jsPDF({ orientation: "landscape" });
+            doc.setFontSize(14);
+            doc.text("Laporan Barang Masuk & Keluar", 14, 15);
+
+            let rows = [];
+            document.querySelectorAll("#tabelLaporan tbody tr").forEach(tr => {
+                const cells = Array.from(tr.querySelectorAll("td")).map(td => td.textContent);
+                rows.push(cells);
+            });
+
+            let headers = [];
+            document.querySelectorAll("#tabelLaporan thead th").forEach(th => headers.push(th.textContent));
+
+            doc.autoTable({
+                head: [headers],
+                body: rows,
+                startY: 25,
+                styles: { fontSize: 9 },
+            });
+            doc.save("Laporan_Barang.pdf");
         }
     </script>
 

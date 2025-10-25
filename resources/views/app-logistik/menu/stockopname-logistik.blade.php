@@ -3,33 +3,16 @@
     <link rel="stylesheet" href="https://cdn.datatables.net/2.2.2/css/dataTables.bootstrap5.css">
     <link rel="stylesheet" href="https://cdn.datatables.net/responsive/3.0.4/css/responsive.bootstrap5.css">
     <style>
-        .table thead {
-            background-color: #0d6efd;
+        .table th {
+            background-color: #198754;
             color: white;
         }
 
-        .status-sesuai {
-            background-color: #d1e7dd;
-            color: #0f5132;
-            font-weight: 600;
+        canvas {
+            border: 1px solid #ccc;
             border-radius: 8px;
-            padding: 3px 8px;
-        }
-
-        .status-selisih {
-            background-color: #f8d7da;
-            color: #842029;
-            font-weight: 600;
-            border-radius: 8px;
-            padding: 3px 8px;
-        }
-
-        .summary-card {
-            background: linear-gradient(135deg, #0d6efd, #4b8cff);
-            color: white;
-            border-radius: 16px;
-            padding: 1.5rem;
-            text-align: center;
+            width: 100%;
+            height: 200px;
         }
     </style>
 @endsection
@@ -52,7 +35,7 @@
                     <div class="col-xl-auto px-3 py-2">
                         <h6 class="text-white fs--1 mb-0" style="color: white !important;">Menu : </h6>
                         <h4 class="text-white fw-bold mb-0" style="color: white !important;">Logistik<span
-                                class="text-white fw-medium" style="color: white !important;">Stock Opname</span>
+                                class="text-white fw-medium" style="color: white !important;"> Stock Opname</span>
                         </h4>
                     </div>
                 </div>
@@ -60,57 +43,98 @@
         </div>
     </div>
 
-    <!-- Informasi Stock Opname -->
+    <!-- Periode & User -->
     <div class="card p-4 mb-3">
-        <h5 class="fw-bold text-primary mb-3"><i class="bi bi-clipboard2-data"></i> Informasi Opname</h5>
-        <form class="row g-3">
-            <div class="col-md-3">
-                <label class="form-label">Tanggal Opname</label>
-                <input type="date" class="form-control" value="2025-10-23">
+        <h5 class="text-primary mb-3">Pilih Periode & Verifikasi User</h5>
+        <div class="row g-3 align-items-end">
+            <div class="col-md-4">
+                <label class="form-label">Bulan</label>
+                <select id="bulan" class="form-select">
+                    <option value="">Pilih Bulan...</option>
+                    <option>Januari</option>
+                    <option>Februari</option>
+                    <option>Maret</option>
+                    <option>April</option>
+                    <option>Mei</option>
+                    <option>Juni</option>
+                    <option>Juli</option>
+                    <option>Agustus</option>
+                    <option>September</option>
+                    <option>Oktober</option>
+                    <option>November</option>
+                    <option>Desember</option>
+                </select>
             </div>
             <div class="col-md-3">
-                <label class="form-label">Petugas</label>
-                <input type="text" class="form-control" value="Agus Raharjo">
+                <label class="form-label">Tahun</label>
+                <input type="number" id="tahun" class="form-control" value="2025">
             </div>
-            <div class="col-md-6">
-                <label class="form-label">Catatan</label>
-                <input type="text" class="form-control" placeholder="Keterangan tambahan...">
+            <div class="col-md-4">
+                <label class="form-label">User Verifikasi</label>
+                <input type="text" id="verifikator" class="form-control" placeholder="Nama Petugas Opname">
             </div>
-        </form>
+            <div class="col-md-1 d-grid">
+                <button class="btn btn-success" onclick="mulaiOpname()">Mulai</button>
+            </div>
+        </div>
     </div>
 
-    <!-- Input Barang -->
-    <div class="card p-4 mb-3">
-        <h5 class="fw-bold text-primary mb-3"><i class="bi bi-upc-scan"></i> Input Barang</h5>
-        <form id="formBarang" class="row g-3 align-items-end">
-            <div class="col-md-3">
-                <label class="form-label">Kode / Barcode</label>
-                <input type="text" class="form-control" id="kodeBarang" placeholder="Scan atau ketik kode...">
+    <!-- Bagian Opname Barang -->
+    <div id="opnameSection" style="display:none;">
+        <div class="card p-4 mb-3">
+            <h5 class="text-success mb-3"><i class="bi bi-search"></i> Pengecekan Stok per Barang</h5>
+            <div class="row g-3 align-items-end">
+                <div class="col-md-4">
+                    <label class="form-label">Kode / Nama Barang</label>
+                    <input type="text" id="cariBarang" class="form-control" placeholder="Contoh: BRG001">
+                </div>
+                <div class="col-md-4">
+                    <label class="form-label">Gudang</label>
+                    <select id="gudang" class="form-select">
+                        <option>Gudang Utama</option>
+                        <option>Gudang Farmasi</option>
+                        <option>Gudang Alkes</option>
+                    </select>
+                </div>
+                <div class="col-md-4 d-grid">
+                    <button class="btn btn-primary" onclick="cekStok()">Cek Stok</button>
+                </div>
             </div>
-            <div class="col-md-3">
-                <label class="form-label">Nama Barang</label>
-                <input type="text" class="form-control" id="namaBarang">
-            </div>
-            <div class="col-md-2">
-                <label class="form-label">Stok Sistem</label>
-                <input type="number" class="form-control" id="stokSistem" value="0" readonly>
-            </div>
-            <div class="col-md-2">
-                <label class="form-label">Stok Fisik</label>
-                <input type="number" class="form-control" id="stokFisik" value="0">
-            </div>
-            <div class="col-md-2">
-                <button type="button" class="btn btn-primary w-100" id="tambahBarang"><i class="bi bi-plus-circle"></i>
-                    Tambah</button>
-            </div>
-        </form>
-    </div>
+        </div>
 
-    <!-- Tabel Stock Opname -->
-    <div class="card p-4 mb-3">
-        <h5 class="fw-bold text-primary mb-3"><i class="bi bi-list-check"></i> Daftar Barang Opname</h5>
-        <div class="table-responsive">
-            <table class="table table-bordered text-center align-middle" id="tabelOpname">
+        <div class="card p-4 mb-3" id="hasilCek" style="display:none;">
+            <table class="table table-bordered">
+                <tbody>
+                    <tr>
+                        <th>Kode Barang</th>
+                        <td id="kodeBarang"></td>
+                    </tr>
+                    <tr>
+                        <th>Nama Barang</th>
+                        <td id="namaBarang"></td>
+                    </tr>
+                    <tr>
+                        <th>Stok Sistem</th>
+                        <td id="stokSistem"></td>
+                    </tr>
+                    <tr>
+                        <th>Stok Fisik</th>
+                        <td><input type="number" id="stokFisik" class="form-control w-25" oninput="hitungSelisih()"></td>
+                    </tr>
+                    <tr>
+                        <th>Selisih</th>
+                        <td id="selisih"></td>
+                    </tr>
+                </tbody>
+            </table>
+            <div class="text-end">
+                <button class="btn btn-success" onclick="simpanBarang()">Simpan Hasil Barang</button>
+            </div>
+        </div>
+
+        <div class="card p-4" id="rekapCard" style="display:none;">
+            <h5 class="text-primary mb-3"><i class="bi bi-clipboard-data"></i> Rekapitulasi Hasil Stock Opname</h5>
+            <table class="table table-bordered" id="rekapTable">
                 <thead>
                     <tr>
                         <th>No</th>
@@ -119,19 +143,50 @@
                         <th>Stok Sistem</th>
                         <th>Stok Fisik</th>
                         <th>Selisih</th>
-                        <th>Status</th>
-                        <th>Aksi</th>
                     </tr>
                 </thead>
                 <tbody></tbody>
             </table>
+            <div class="text-end mt-3">
+                <button class="btn btn-primary" onclick="selesaiOpname()"><i class="bi bi-check2-circle"></i> Selesai &
+                    Verifikasi</button>
+            </div>
         </div>
     </div>
 
-    <!-- Summary -->
-    <div class="summary-card">
-        <h5 class="mb-1"><i class="bi bi-graph-up-arrow"></i> Total Barang Diperiksa</h5>
-        <h2 id="totalBarang">0 Item</h2>
+    <!-- Riwayat Periode -->
+    <div class="card p-4 mt-3">
+        <h5 class="text-info mb-3"><i class="bi bi-clock-history"></i> Riwayat Hasil Stock Opname</h5>
+
+        <!-- Filter & Search -->
+        <div class="row g-3 mb-3">
+            <div class="col-md-4">
+                <input type="text" id="filterPeriode" class="form-control"
+                    placeholder="Cari periode... (contoh: Oktober 2025)">
+            </div>
+            <div class="col-md-4">
+                <input type="text" id="filterVerifikator" class="form-control" placeholder="Cari verifikator...">
+            </div>
+            <div class="col-md-3">
+                <input type="number" id="filterTahun" class="form-control" placeholder="Filter tahun... (misal: 2025)">
+            </div>
+            <div class="col-md-1 d-grid">
+                <button class="btn btn-secondary" onclick="resetFilter()">Reset</button>
+            </div>
+        </div>
+
+        <table class="table table-bordered" id="riwayatTable">
+            <thead>
+                <tr>
+                    <th>No</th>
+                    <th>Periode</th>
+                    <th>Verifikator</th>
+                    <th>Tanggal</th>
+                    <th>Aksi</th>
+                </tr>
+            </thead>
+            <tbody></tbody>
+        </table>
     </div>
 @endsection
 @section('base.js')
@@ -147,15 +202,22 @@
             </div>
         </div>
     </div>
-    <div class="modal fade" id="modal-pr-xl" data-bs-keyboard="false" data-bs-backdrop="static" tabindex="-1"
-        aria-labelledby="staticBackdropLabel" aria-hidden="true">
-        <div class="modal-dialog modal-dialog-centered modal-xl" role="document">
-            <div class="modal-content border-0">
-                <div class="position-absolute top-0 end-0 mt-3 me-3 z-index-1">
-                    <button class="btn-close btn btn-sm btn-circle d-flex flex-center transition-base"
-                        data-bs-dismiss="modal" aria-label="Close"></button>
+    <div class="modal fade" id="verifikasiModal" tabindex="-1" aria-hidden="true">
+        <div class="modal-dialog modal-lg">
+            <div class="modal-content">
+                <div class="modal-header bg-primary text-white">
+                    <h5 class="modal-title">Tanda Tangan Elektronik Verifikasi Akhir</h5>
+                    <button class="btn-close btn-close-white" data-bs-dismiss="modal"></button>
                 </div>
-                <div id="menu-pr-xl"></div>
+                <div class="modal-body">
+                    <p>Silakan tanda tangan untuk menyetujui hasil opname periode <span id="periodeVerif"></span>.</p>
+                    <canvas id="signature-pad"></canvas>
+                    <div class="text-end mt-3">
+                        <button class="btn btn-outline-secondary" onclick="clearSignature()">Hapus</button>
+                        <button class="btn btn-success" onclick="exportPDF()"><i class="bi bi-filetype-pdf"></i> Simpan &
+                            Export PDF</button>
+                    </div>
+                </div>
             </div>
         </div>
     </div>
@@ -164,65 +226,202 @@
     <script src="https://cdn.datatables.net/responsive/3.0.4/js/dataTables.responsive.js"></script>
     <script src="https://cdn.datatables.net/responsive/3.0.4/js/responsive.bootstrap5.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
     <script>
-        new DataTable('#example', {
-            responsive: true
-        });
-    </script>
-    <script>
-        let daftar = [];
-        const tabel = document.querySelector("#tabelOpname tbody");
-        const totalBarang = document.getElementById("totalBarang");
+        const dataStok = {
+            'BRG001': { nama: 'Masker Bedah', stok: 120 },
+            'BRG002': { nama: 'Sarung Tangan', stok: 85 },
+            'BRG003': { nama: 'Alkohol 70%', stok: 60 },
+            'BRG004': { nama: 'Infus Set', stok: 150 },
+            'BRG005': { nama: 'Kapas Steril', stok: 200 },
+        };
+        let rekapData = [];
+        let currentKode = '';
+        let periodeOpname = '';
+        let namaVerifikator = '';
+        let riwayat = JSON.parse(localStorage.getItem('riwayatOpname') || '[]');
 
-        // Tambah Barang ke Daftar
-        document.getElementById("tambahBarang").addEventListener("click", () => {
-            const kode = document.getElementById("kodeBarang").value.trim();
-            const nama = document.getElementById("namaBarang").value.trim();
-            const stokSistem = parseInt(document.getElementById("stokSistem").value) || 0;
-            const stokFisik = parseInt(document.getElementById("stokFisik").value) || 0;
-            const selisih = stokFisik - stokSistem;
+        function renderRiwayat(filter = {}) {
+            const tbody = document.querySelector('#riwayatTable tbody');
+            tbody.innerHTML = '';
+            let filtered = riwayat;
 
-            if (!kode || !nama) {
-                alert("Lengkapi data barang terlebih dahulu!");
-                return;
-            }
+            // filter data
+            if (filter.periode)
+                filtered = filtered.filter(r => r.periode.toLowerCase().includes(filter.periode.toLowerCase()));
+            if (filter.verifikator)
+                filtered = filtered.filter(r => r.verifikator.toLowerCase().includes(filter.verifikator.toLowerCase()));
+            if (filter.tahun)
+                filtered = filtered.filter(r => r.periode.includes(filter.tahun));
 
-            daftar.push({ kode, nama, stokSistem, stokFisik, selisih });
-            renderTable();
-            clearForm();
-        });
-
-        function renderTable() {
-            tabel.innerHTML = "";
-            daftar.forEach((item, index) => {
-                const status = item.selisih === 0 ?
-                    `<span class='status-sesuai'>Sesuai</span>` :
-                    `<span class='status-selisih'>Selisih</span>`;
-                tabel.innerHTML += `
-                  <tr>
-                    <td>${index + 1}</td>
-                    <td>${item.kode}</td>
-                    <td>${item.nama}</td>
-                    <td>${item.stokSistem}</td>
-                    <td>${item.stokFisik}</td>
-                    <td>${item.selisih}</td>
-                    <td>${status}</td>
-                    <td><button class="btn btn-danger btn-sm" onclick="hapusItem(${index})"><i class="bi bi-trash"></i></button></td>
-                  </tr>`;
+            filtered.forEach((r, i) => {
+                tbody.innerHTML += `
+              <tr>
+                <td>${i + 1}</td>
+                <td>${r.periode}</td>
+                <td>${r.verifikator}</td>
+                <td>${r.tanggal}</td>
+                <td>
+                  <button class="btn btn-sm btn-info" onclick='lihatRiwayat(${riwayat.indexOf(r)})'><i class="bi bi-eye"></i> Lihat</button>
+                  <button class="btn btn-sm btn-danger" onclick='hapusRiwayat(${riwayat.indexOf(r)})'><i class="bi bi-trash"></i></button>
+                </td>
+              </tr>`;
             });
-            totalBarang.innerText = `${daftar.length} Item`;
+        }
+        renderRiwayat();
+
+        // FILTER PENCARIAN
+        document.getElementById('filterPeriode').addEventListener('input', applyFilter);
+        document.getElementById('filterVerifikator').addEventListener('input', applyFilter);
+        document.getElementById('filterTahun').addEventListener('input', applyFilter);
+
+        function applyFilter() {
+            const filter = {
+                periode: document.getElementById('filterPeriode').value,
+                verifikator: document.getElementById('filterVerifikator').value,
+                tahun: document.getElementById('filterTahun').value,
+            };
+            renderRiwayat(filter);
         }
 
-        function hapusItem(i) {
-            daftar.splice(i, 1);
-            renderTable();
+        function resetFilter() {
+            document.getElementById('filterPeriode').value = '';
+            document.getElementById('filterVerifikator').value = '';
+            document.getElementById('filterTahun').value = '';
+            renderRiwayat();
         }
 
-        function clearForm() {
-            document.getElementById("kodeBarang").value = "";
-            document.getElementById("namaBarang").value = "";
-            document.getElementById("stokSistem").value = 0;
-            document.getElementById("stokFisik").value = 0;
+        function mulaiOpname() {
+            const bulan = document.getElementById('bulan').value;
+            const tahun = document.getElementById('tahun').value;
+            const verifikator = document.getElementById('verifikator').value.trim();
+            if (!bulan || !tahun || !verifikator) { alert('Lengkapi semua data!'); return; }
+            periodeOpname = `${bulan} ${tahun}`;
+            namaVerifikator = verifikator;
+            document.getElementById('opnameSection').style.display = 'block';
+            Swal.fire({
+                title: `Mulai Stock Opname periode ${periodeOpname}`,
+                icon: "success",
+                draggable: true
+            });
+        }
+
+        function cekStok() {
+            const kode = document.getElementById('cariBarang').value.trim().toUpperCase();
+            if (!dataStok[kode]) { alert('Barang tidak ditemukan!'); return; }
+            currentKode = kode;
+            const data = dataStok[kode];
+            document.getElementById('kodeBarang').textContent = kode;
+            document.getElementById('namaBarang').textContent = data.nama;
+            document.getElementById('stokSistem').textContent = data.stok;
+            document.getElementById('stokFisik').value = data.stok;
+            document.getElementById('selisih').textContent = '0';
+            document.getElementById('hasilCek').style.display = 'block';
+        }
+
+        function hitungSelisih() {
+            const sistem = parseInt(document.getElementById('stokSistem').textContent);
+            const fisik = parseInt(document.getElementById('stokFisik').value || 0);
+            const selisih = fisik - sistem;
+            const el = document.getElementById('selisih');
+            el.textContent = selisih;
+            el.style.color = selisih < 0 ? 'red' : selisih > 0 ? 'green' : 'black';
+        }
+
+        function simpanBarang() {
+            const kode = currentKode;
+            const nama = document.getElementById('namaBarang').textContent;
+            const sistem = document.getElementById('stokSistem').textContent;
+            const fisik = document.getElementById('stokFisik').value;
+            const selisih = document.getElementById('selisih').textContent;
+            rekapData.push({ kode, nama, sistem, fisik, selisih });
+            const tbody = document.querySelector('#rekapTable tbody');
+            tbody.innerHTML = '';
+            rekapData.forEach((r, i) => {
+                tbody.innerHTML += `<tr><td>${i + 1}</td><td>${r.kode}</td><td>${r.nama}</td><td>${r.sistem}</td><td>${r.fisik}</td><td>${r.selisih}</td></tr>`;
+            });
+            document.getElementById('rekapCard').style.display = 'block';
+            document.getElementById('hasilCek').style.display = 'none';
+            document.getElementById('cariBarang').value = '';
+        }
+
+        function selesaiOpname() {
+            if (rekapData.length === 0) { alert('Belum ada data opname!'); return; }
+            document.getElementById('periodeVerif').textContent = periodeOpname;
+            new bootstrap.Modal(document.getElementById('verifikasiModal')).show();
+        }
+
+        // Signature
+        const canvas = document.getElementById('signature-pad');
+        const ctx = canvas.getContext('2d');
+        let drawing = false;
+        canvas.addEventListener('mousedown', () => drawing = true);
+        canvas.addEventListener('mouseup', () => { drawing = false; ctx.beginPath(); });
+        canvas.addEventListener('mousemove', e => {
+            if (!drawing) return;
+            ctx.lineWidth = 2; ctx.lineCap = 'round'; ctx.strokeStyle = '#000';
+            ctx.lineTo(e.offsetX, e.offsetY); ctx.stroke(); ctx.beginPath(); ctx.moveTo(e.offsetX, e.offsetY);
+        });
+        function clearSignature() { ctx.clearRect(0, 0, canvas.width, canvas.height); }
+
+        function exportPDF() {
+            const { jsPDF } = window.jspdf;
+            const pdf = new jsPDF('p', 'mm', 'a4');
+            pdf.setFontSize(14);
+            pdf.text("Laporan Stock Opname", 70, 15);
+            pdf.setFontSize(11);
+            pdf.text("Periode: " + periodeOpname, 20, 25);
+            pdf.text("Verifikator: " + namaVerifikator, 20, 31);
+            pdf.text("Tanggal Cetak: " + new Date().toLocaleDateString(), 20, 37);
+
+            let y = 45;
+            pdf.text("No", 10, y); pdf.text("Kode", 25, y); pdf.text("Nama Barang", 50, y);
+            pdf.text("Sistem", 120, y); pdf.text("Fisik", 145, y); pdf.text("Selisih", 170, y);
+            y += 5;
+            rekapData.forEach((r, i) => {
+                pdf.text(String(i + 1), 10, y);
+                pdf.text(r.kode, 25, y);
+                pdf.text(r.nama, 50, y);
+                pdf.text(String(r.sistem), 120, y);
+                pdf.text(String(r.fisik), 145, y);
+                pdf.text(String(r.selisih), 170, y);
+                y += 6;
+            });
+
+            y += 10;
+            pdf.text("Tanda Tangan Verifikator:", 20, y);
+            const img = canvas.toDataURL('image/png');
+            pdf.addImage(img, 'PNG', 20, y + 5, 80, 40);
+            const pdfBlob = pdf.output('bloburl');
+
+            const newRecord = {
+                periode: periodeOpname,
+                verifikator: namaVerifikator,
+                tanggal: new Date().toLocaleString(),
+                data: rekapData,
+                signature: img,
+                pdf: pdfBlob
+            };
+            riwayat.push(newRecord);
+            localStorage.setItem('riwayatOpname', JSON.stringify(riwayat));
+            renderRiwayat();
+            pdf.save(`StockOpname_${periodeOpname.replace(' ', '_')}.pdf`);
+            alert('Hasil Stock Opname disimpan ke riwayat & file PDF!');
+            rekapData = [];
+            document.getElementById('rekapCard').style.display = 'none';
+        }
+
+        function lihatRiwayat(index) {
+            const r = riwayat[index];
+            window.open(r.pdf, '_blank');
+        }
+
+        function hapusRiwayat(i) {
+            if (confirm('Hapus riwayat ini?')) {
+                riwayat.splice(i, 1);
+                localStorage.setItem('riwayatOpname', JSON.stringify(riwayat));
+                renderRiwayat();
+            }
         }
     </script>
 @endsection

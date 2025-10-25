@@ -205,11 +205,30 @@ class LogistikController extends Controller
             return Redirect::to('dashboard/home');
         }
     }
+    // PRODUCT IN & OUT
+    public function transaction_product_in_and_out($akses, $id)
+    {
+        if ($this->url_akses_sub($akses, $id) == true) {
+            $data = DB::table('pem_pr_req')->orderBy('id_pem_pr_req', 'DESC')->get();
+            return view('app-logistik.menu.laporan-barang-masuk-keluar', ['akses' => $akses, 'code' => $id, 'data' => $data]);
+        } else {
+            return Redirect::to('dashboard/home');
+        }
+    }
     // STOCKOPNAME
     public function menu_logistik_stockopname($akses, $id)
     {
         if ($this->url_akses($akses, $id) == true) {
             return view('app-logistik.menu.stockopname-logistik', ['akses' => $akses, 'code' => $id]);
+        } else {
+            return Redirect::to('dashboard/home');
+        }
+    }
+    // STOK AND INVENTORI
+    public function menu_logistik_stok_inventori($akses, $id)
+    {
+        if ($this->url_akses($akses, $id) == true) {
+            return view('app-logistik.menu.stok-and-inevntori', ['akses' => $akses, 'code' => $id]);
         } else {
             return Redirect::to('dashboard/home');
         }

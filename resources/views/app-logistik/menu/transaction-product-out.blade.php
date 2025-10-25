@@ -22,77 +22,78 @@
                     </div>
                     <div class="col-xl-auto px-3 py-2">
                         <h6 class="text-white fs--1 mb-0" style="color: white !important;">Menu : </h6>
-                        <h4 class="text-white fw-bold mb-0" style="color: white !important;">Transaction <span
-                                class="text-white fw-medium" style="color: white !important;">Product Out</span>
+                        <h4 class="text-white fw-bold mb-0" style="color: white !important;">Transaksi <span
+                                class="text-white fw-medium" style="color: white !important;">Barang Keluar</span>
                         </h4>
                     </div>
                 </div>
             </div>
         </div>
     </div>
-    <div class="card p-4 mb-3">
-        <h5 class="fw-bold text-primary mb-3"><i class="bi bi-clipboard2-data"></i> Informasi Divisi / User</h5>
-        <form class="row g-3">
+    <div class="d-flex justify-content-between align-items-center mb-3">
+        <h3>📤 Barang Keluar (Delivery Order)</h3>
+        <button class="btn btn-primary" data-bs-toggle="modal" data-bs-target="#modalBarangKeluar">+ Tambah DO</button>
+    </div>
+
+    <!-- Filter -->
+    <div class="card p-3 mb-3">
+        <form class="row g-2">
             <div class="col-md-3">
-                <label class="form-label">Tanggal Form Barang Keluar</label>
-                <input type="date" class="form-control" value="2025-10-23">
+                <label class="form-label">Dari Tanggal</label>
+                <input type="date" class="form-control">
             </div>
             <div class="col-md-3">
-                <label class="form-label">Penerima Barang</label>
-                <input type="text" class="form-control" value="Agus Raharjo">
+                <label class="form-label">Sampai Tanggal</label>
+                <input type="date" class="form-control">
             </div>
-            <div class="col-md-6">
-                <label class="form-label">Catatan</label>
-                <input type="text" class="form-control" placeholder="Keterangan tambahan...">
+            <div class="col-md-3">
+                <label class="form-label">Unit Tujuan</label>
+                <select class="form-select">
+                    <option>Semua Unit</option>
+                    <option>Unit Farmasi</option>
+                    <option>Unit IGD</option>
+                    <option>Unit Radiologi</option>
+                </select>
             </div>
-            <div class="col-md-2">
-                <button type="button" class="btn btn-primary w-100" id="tambahBarang"><i class="bi bi-plus-circle"></i>
-                    Tambah</button>
+            <div class="col-md-3 d-flex align-items-end">
+                <button class="btn btn-success w-100">Tampilkan</button>
             </div>
         </form>
     </div>
 
-    <div class="card">
-        <div class="card-header bg-300">
-            <button class="btn btn-success btn-sm float-end" data-bs-toggle="modal" data-bs-target="#modalTambah">
-                📦 Tambah Barang Keluar
-            </button>
-        </div>
-        <div class="card-body">
-            <div class="table-responsive">
-                <table id="tabelBarangKeluar" class="table table-striped table-bordered align-middle border">
-                    <thead class="table-primary fs--2">
-                        <tr>
-                            <th>No</th>
-                            <th>Tanggal Keluar</th>
-                            <th>Kode Barang</th>
-                            <th>Nama Barang</th>
-                            <th>Jumlah</th>
-                            <th>Penerima</th>
-                            <th>User/Petugas</th>
-                            <th>Keterangan</th>
-                            <th>Aksi</th>
-                        </tr>
-                    </thead>
-                    <tbody class="fs--2">
-                        <tr>
-                            <td>1</td>
-                            <td>2025-10-24</td>
-                            <td>BRG001</td>
-                            <td>Masker Medis</td>
-                            <td>50 Box</td>
-                            <td>Ruang Farmasi</td>
-                            <td>Admin Gudang</td>
-                            <td>Untuk kebutuhan harian</td>
-                            <td>
-                                <button class="btn btn-sm btn-warning me-1">Edit</button>
-                                <button class="btn btn-sm btn-danger">Hapus</button>
-                            </td>
-                        </tr>
-                    </tbody>
-                </table>
-            </div>
-        </div>
+    <!-- Data Tabel -->
+    <div class="card p-3">
+        <h6 class="mb-3">Riwayat Barang Keluar</h6>
+        <table class="table table-striped table-hover align-middle">
+            <thead class="table-dark">
+                <tr>
+                    <th>No</th>
+                    <th>Tanggal</th>
+                    <th>No. DO</th>
+                    <th>Unit Tujuan</th>
+                    <th>Petugas</th>
+                    <th>Jumlah Item</th>
+                    <th>Total Qty</th>
+                    <th>Aksi</th>
+                </tr>
+            </thead>
+            <tbody>
+                <tr>
+                    <td>1</td>
+                    <td>2025-10-24</td>
+                    <td>DO-001/10/2025</td>
+                    <td>Unit IGD</td>
+                    <td>Agus Raharjo</td>
+                    <td>4</td>
+                    <td>150</td>
+                    <td>
+                        <button class="btn btn-sm btn-info text-white">Detail</button>
+                        <button class="btn btn-sm btn-warning text-dark">Edit</button>
+                        <button class="btn btn-sm btn-danger">Hapus</button>
+                    </td>
+                </tr>
+            </tbody>
+        </table>
     </div>
 @endsection
 @section('base.js')
@@ -108,59 +109,80 @@
             </div>
         </div>
     </div>
-    <div class="modal fade" id="modalTambah" data-bs-keyboard="false" data-bs-backdrop="static" tabindex="-1"
-        aria-labelledby="staticBackdropLabel" aria-hidden="true">
-        <div class="modal-dialog modal-dialog-centered modal-lg" role="document">
-            <div class="modal-content border-0">
-                <div class="position-absolute top-0 end-0 mt-3 me-3 z-index-1">
-                    <button class="btn-close btn btn-sm btn-circle d-flex flex-center transition-base"
-                        data-bs-dismiss="modal" aria-label="Close"></button>
+    <div class="modal fade" id="modalBarangKeluar" tabindex="-1">
+        <div class="modal-dialog modal-xl modal-dialog-centered">
+            <div class="modal-content">
+                <div class="modal-header bg-primary text-white">
+                    <h5 class="modal-title">Tambah Data Barang Keluar (DO)</h5>
+                    <button class="btn-close" data-bs-dismiss="modal"></button>
                 </div>
-                <div class="modal-body p-0">
-                    <div class="bg-primary rounded-top-lg py-3 ps-4 pe-6">
-                        <h4 class="mb-1" style="color: white;" id="staticBackdropLabel">Form Barang Keluar</h4>
-                        <p class="fs--2 mb-0" style="color: white;">Support by <a class="link-600 fw-semi-bold"
-                                href="#!">{{ Env('APP_LABEL')}}</a>
-                        </p>
-                    </div>
-                    <form id="formBarangKeluar" class="row p-3">
-                        <!-- Alert error -->
-                        <div id="alertError" class="alert alert-danger d-none"></div>
 
-                        <div class="col-md-6 mb-3">
-                            <label class="form-label">Tanggal Keluar</label>
-                            <input type="date" class="form-control" name="tanggal" required>
+                <div class="modal-body">
+                    <form id="formBarangKeluar" class="row g-3">
+
+                        <!-- Data Umum DO -->
+                        <div class="col-md-3">
+                            <label class="form-label">Tanggal</label>
+                            <input type="date" class="form-control" required>
                         </div>
-                        <div class="col-md-6  mb-3">
-                            <label class="form-label">Kode Barang</label>
-                            <input type="text" class="form-control" name="kode" placeholder="Contoh: BRG001" required
-                                minlength="3">
+                        <div class="col-md-3">
+                            <label class="form-label">No. Dokumen (DO)</label>
+                            <input type="text" class="form-control" id="noDO" readonly>
                         </div>
-                        <div class="col-md-6 mb-3">
-                            <label class="form-label">Nama Barang</label>
-                            <input type="text" class="form-control" name="nama" required minlength="3">
+                        <div class="col-md-3">
+                            <label class="form-label">Unit Tujuan</label>
+                            <select class="form-select" required>
+                                <option value="">-- Pilih Unit --</option>
+                                <option>Unit Farmasi</option>
+                                <option>Unit IGD</option>
+                                <option>Unit Radiologi</option>
+                                <option>Unit Rawat Inap</option>
+                            </select>
                         </div>
-                        <div class="col-md-6 mb-3">
-                            <label class="form-label">Jumlah</label>
-                            <input type="number" class="form-control" name="jumlah" min="1" required>
+                        <div class="col-md-3">
+                            <label class="form-label">Petugas</label>
+                            <input type="text" class="form-control" placeholder="Nama Petugas" required>
                         </div>
-                        <div class="col-md-6  mb-3">
-                            <label class="form-label">Penerima</label>
-                            <input type="text" class="form-control" name="penerima" required>
+
+                        <hr class="mt-4">
+
+                        <!-- Tabel Barang -->
+                        <h6>📦 Daftar Barang yang Dikeluarkan</h6>
+                        <div class="table-responsive">
+                            <table class="table table-bordered align-middle" id="tabelBarangKeluar">
+                                <thead class="table-light">
+                                    <tr>
+                                        <th>Nama Barang</th>
+                                        <th>Kategori</th>
+                                        <th>Qty</th>
+                                        <th>Satuan</th>
+                                        <th>Keterangan</th>
+                                        <th></th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    <tr>
+                                        <td><input type="text" class="form-control" placeholder="Nama Barang" required></td>
+                                        <td><input type="text" class="form-control" placeholder="Kategori"></td>
+                                        <td><input type="number" class="form-control" min="1" required></td>
+                                        <td><input type="text" class="form-control" placeholder="Box / Pcs"></td>
+                                        <td><input type="text" class="form-control" placeholder="Keterangan (opsional)">
+                                        </td>
+                                        <td><button type="button" class="btn btn-sm btn-danger"
+                                                onclick="hapusBaris(this)">🗑</button></td>
+                                    </tr>
+                                </tbody>
+                            </table>
                         </div>
-                        <div class="col-md-6 mb-3">
-                            <label class="form-label">User/Petugas</label>
-                            <input type="text" class="form-control" name="user" placeholder="Nama Petugas" required>
-                        </div>
-                        <div class="col-md-12 mb-3">
-                            <label class="form-label">Keterangan</label>
-                            <textarea class="form-control" name="keterangan" rows="2"></textarea>
-                        </div>
-                        <div class="modal-footer">
-                            <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Batal</button>
-                            <button type="submit" class="btn btn-primary">Simpan</button>
-                        </div>
+
+                        <button type="button" class="btn btn-outline-primary" onclick="tambahBaris()">+ Tambah
+                            Barang</button>
                     </form>
+                </div>
+
+                <div class="modal-footer">
+                    <button class="btn btn-secondary" data-bs-dismiss="modal">Batal</button>
+                    <button class="btn btn-success">Simpan DO</button>
                 </div>
             </div>
         </div>
@@ -172,66 +194,33 @@
     <script src="https://cdn.datatables.net/responsive/3.0.4/js/responsive.bootstrap5.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
     <script>
-        $(document).ready(function () {
-            const table = $('#tabelBarangKeluar').DataTable();
+        // Generate Nomor DO otomatis
+        function generateDO() {
+            const now = new Date();
+            const bulan = (now.getMonth() + 1).toString().padStart(2, '0');
+            const tahun = now.getFullYear();
+            const random = Math.floor(Math.random() * 900) + 100;
+            document.getElementById('noDO').value = `DO-${random}/${bulan}/${tahun}`;
+        }
+        document.getElementById('modalBarangKeluar').addEventListener('shown.bs.modal', generateDO);
 
-            $('#formBarangKeluar').on('submit', function (e) {
-                e.preventDefault();
-                $('#alertError').addClass('d-none').text('');
+        // Tambah dan hapus baris barang
+        function tambahBaris() {
+            const table = document.getElementById("tabelBarangKeluar").querySelector("tbody");
+            const row = document.createElement("tr");
+            row.innerHTML = `
+            <td><input type="text" class="form-control" placeholder="Nama Barang" required></td>
+            <td><input type="text" class="form-control" placeholder="Kategori"></td>
+            <td><input type="number" class="form-control" min="1" required></td>
+            <td><input type="text" class="form-control" placeholder="Box / Pcs"></td>
+            <td><input type="text" class="form-control" placeholder="Keterangan"></td>
+            <td><button type="button" class="btn btn-sm btn-danger" onclick="hapusBaris(this)">🗑</button></td>
+          `;
+            table.appendChild(row);
+        }
 
-                const form = $(this)[0];
-                const data = $(this).serializeArray();
-
-                // Ambil nilai form
-                const tanggal = data[0].value.trim();
-                const kode = data[1].value.trim();
-                const nama = data[2].value.trim();
-                const jumlah = parseInt(data[3].value.trim());
-                const penerima = data[4].value.trim();
-                const user = data[5].value.trim();
-                const keterangan = data[6].value.trim();
-
-                // Validasi sederhana
-                if (!tanggal || !kode || !nama || !jumlah || !penerima || !user) {
-                    showError('Semua kolom wajib diisi.');
-                    return;
-                }
-                if (kode.length < 3) {
-                    showError('Kode barang minimal 3 karakter.');
-                    return;
-                }
-                if (nama.length < 3) {
-                    showError('Nama barang minimal 3 karakter.');
-                    return;
-                }
-                if (jumlah <= 0) {
-                    showError('Jumlah barang harus lebih dari 0.');
-                    return;
-                }
-
-                // Tambah data ke tabel
-                const newRow = [
-                    table.rows().count() + 1,
-                    tanggal,
-                    kode,
-                    nama,
-                    jumlah,
-                    penerima,
-                    user,
-                    keterangan,
-                    `<button class="btn btn-sm btn-warning me-1">Edit</button>
-                                                     <button class="btn btn-sm btn-danger">Hapus</button>`
-                ];
-                table.row.add(newRow).draw(false);
-
-                // Reset form
-                form.reset();
-                $('#modalTambah').modal('hide');
-            });
-
-            function showError(message) {
-                $('#alertError').removeClass('d-none').text(message);
-            }
-        });
+        function hapusBaris(btn) {
+            btn.closest("tr").remove();
+        }
     </script>
 @endsection
