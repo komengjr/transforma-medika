@@ -105,6 +105,9 @@ Route::prefix('{akses}/{id}')->group(function (): void {
     Route::get('statement/profit-loss-statement', [AccountingController::class, 'statement_profit_loss'])->name('statement_profit_loss');
     Route::get('statement/balance-sheet', [AccountingController::class, 'statement_balance_sheet'])->name('statement_balance_sheet');
     Route::get('statement/capital-statement', [AccountingController::class, 'statement_capital_statement'])->name('statement_capital_statement');
+    Route::get('statement/cash-flow', [AccountingController::class, 'statement_cash_flow'])->name('statement_cash_flow');
+    Route::get('statement/notes-to-financial-statement', [AccountingController::class, 'statement_notes_to_financial'])->name('statement_notes_to_financial');
+    Route::get('statement/consolidated-financial-statement', [AccountingController::class, 'statement_consolidated_financial'])->name('statement_consolidated_financial');
     Route::get('master-accounting/master-coa', [AccountingController::class, 'master_accounting_coa'])->name('master_accounting_coa');
 
     // PEMBELIAN

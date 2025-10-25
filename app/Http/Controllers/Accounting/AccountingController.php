@@ -97,6 +97,33 @@ class AccountingController extends Controller
             return Redirect::to('dashboard/home');
         }
     }
+    // CASH FLOW
+    public function statement_cash_flow($akses, $id)
+    {
+        if ($this->url_akses($akses, $id) == true) {
+            return view('app-accounting.cash-flow', ['akses' => $akses, 'code' => $id]);
+        } else {
+            return Redirect::to('dashboard/home');
+        }
+    }
+    // CASH FLOW
+    public function statement_notes_to_financial($akses, $id)
+    {
+        if ($this->url_akses($akses, $id) == true) {
+            return view('app-accounting.notes-to-financial', ['akses' => $akses, 'code' => $id]);
+        } else {
+            return Redirect::to('dashboard/home');
+        }
+    }
+    // CONSOLIDATED
+    public function statement_consolidated_financial($akses, $id)
+    {
+        if ($this->url_akses($akses, $id) == true) {
+            return view('app-accounting.consolidated-financial', ['akses' => $akses, 'code' => $id]);
+        } else {
+            return Redirect::to('dashboard/home');
+        }
+    }
     // MASTER COA
     public function master_accounting_coa($akses, $id)
     {
