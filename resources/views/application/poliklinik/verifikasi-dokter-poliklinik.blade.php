@@ -3,6 +3,11 @@
     <link rel="stylesheet" href="https://cdn.datatables.net/2.2.2/css/dataTables.bootstrap5.css">
     <link rel="stylesheet" href="https://cdn.datatables.net/responsive/3.0.4/css/responsive.bootstrap5.css">
     <link href="{{ asset('vendors/choices/choices.min.css') }}" rel="stylesheet" />
+    <style>
+        #button-remove-pemeriksaan-poliklinik:hover {
+            cursor: pointer;
+        }
+    </style>
 @endsection
 @section('content')
     <div class="row mb-3">
@@ -109,9 +114,9 @@
                                             Verifikasi Pasien Poli</button>
                                         <div class="dropdown-divider"></div>
                                         <!-- <button class="dropdown-item" data-bs-toggle="modal" data-bs-target="#modal-cabang"
-                                                                                                                                                                                                            id="button-data-barang-cabang" data-code="123"><span
-                                                                                                                                                                                                                class="far fa-folder-open"></span>
-                                                                                                                                                                                                            History</button> -->
+                                                                                                                                                                                                                    id="button-data-barang-cabang" data-code="123"><span
+                                                                                                                                                                                                                        class="far fa-folder-open"></span>
+                                                                                                                                                                                                                    History</button> -->
                                     </div>
                                 </div>
                             </td>
@@ -221,6 +226,29 @@
                     $('#menu-pemeriksaan-poliklinik').html('eror');
                 });
             }
+        });
+        $(document).on("click", "#button-remove-pemeriksaan-poliklinik", function (e) {
+            e.preventDefault();
+            var id = $(this).data("id");
+            var code = $(this).data("code");
+            $('#menu-pemeriksaan-poliklinik').html(
+                '<div class="spinner-border my-3" style="display: block; margin-left: auto; margin-right: auto;" role="status"><span class="visually-hidden">Loading...</span></div>'
+            );
+            $.ajax({
+                url: "{{ route('verifikasi_poliklinik_dokter_remove_pemeriksaan') }}",
+                type: "POST",
+                cache: false,
+                data: {
+                    "_token": "{{ csrf_token() }}",
+                    "id": id,
+                    "code": code,
+                },
+                dataType: 'html',
+            }).done(function (data) {
+                $('#menu-pemeriksaan-poliklinik').html(data);
+            }).fail(function () {
+                $('#menu-pemeriksaan-poliklinik').html('eror');
+            });
         });
         $(document).on("click", "#button-verifikasi-pasien-poli", function (e) {
             e.preventDefault();

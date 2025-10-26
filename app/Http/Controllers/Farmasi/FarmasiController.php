@@ -136,6 +136,12 @@ class FarmasiController extends Controller
             return Redirect::to('dashboard/home');
         }
     }
+    public function manajemen_farmasi_data_obat_add(Request $requestq){
+        return view('app-farmasi.manajemen.master-obat.form-add');
+    }
+    public function manajemen_farmasi_data_obat_save(Request $request){
+        return view('app-farmasi.manajemen.master-obat.data-table-obat');
+    }
     // DATA MASUK DAN KELUAR
     public function manajemen_farmasi_obat_in_out($akses, $id)
     {

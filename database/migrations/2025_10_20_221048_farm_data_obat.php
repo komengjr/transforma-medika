@@ -20,12 +20,8 @@ class FarmDataObat extends Migration
             $table->string('farm_data_obat_cat');
             $table->string('farm_data_obat_jenis');
             $table->string('farm_data_obat_satuan');
-            $table->string('farm_data_obat_harga_beli');
-            $table->string('farm_data_obat_harga_jual');
             $table->string('farm_data_obat_stok');
             $table->string('farm_data_obat_stok_minimum');
-            $table->string('farm_data_obat_tanggal_kedaluwarsa');
-            $table->string('farm_data_obat_no_batch');
             $table->timestamps();
         });
     }

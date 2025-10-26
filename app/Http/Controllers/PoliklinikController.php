@@ -229,9 +229,6 @@ class PoliklinikController extends Controller
             return 'Berhasil Meenyimpan , Jika Pemeriksaan pada pasien sudah lengkap silahkan untuk melakukan skip / simpan data';
             # code...
         }
-
-        // return $data['15']['diagnosis'][0];
-        // return $data['15']['note'];
     }
     public function data_registrasi_poliklinik_reset_odontogram(Request $request)
     {
@@ -348,8 +345,17 @@ class PoliklinikController extends Controller
                 ->join('p_sales_data', 'p_sales_data.p_sales_data_code', '=', 'd_reg_order_poli_log.p_sales_data_code')
                 ->join('t_pemeriksaan_list', 't_pemeriksaan_list.t_pemeriksaan_list_code', '=', 'p_sales_data.t_pemeriksaan_list_code')
                 ->where('d_reg_order_code', $request->code)->get();
-            return view('application.poliklinik.verifikasi-poli.table.list-harga-pemeriksaan', ['list' => $list]);
+            return view('application.poliklinik.verifikasi-poli.table.list-harga-pemeriksaan', ['list' => $list, 'code' => $request->code]);
         }
+    }
+    public function verifikasi_poliklinik_dokter_remove_pemeriksaan(Request $request)
+    {
+        DB::table('d_reg_order_poli_log')->where('order_poli_log_code', $request->id)->delete();
+        $list = DB::table('d_reg_order_poli_log')
+            ->join('p_sales_data', 'p_sales_data.p_sales_data_code', '=', 'd_reg_order_poli_log.p_sales_data_code')
+            ->join('t_pemeriksaan_list', 't_pemeriksaan_list.t_pemeriksaan_list_code', '=', 'p_sales_data.t_pemeriksaan_list_code')
+            ->where('d_reg_order_code', $request->code)->get();
+        return view('application.poliklinik.verifikasi-poli.table.list-harga-pemeriksaan', ['list' => $list, 'code' => $request->code]);
     }
     public function verifikasi_poliklinik_dokter_save_verify(Request $request)
     {

@@ -275,7 +275,9 @@
                                         @endphp
                                         @foreach ($list as $lists)
                                             <tr class="border-bottom">
-                                                <th class="ps-0 pt-0">{{$lists->t_pemeriksaan_list_name}}
+                                                <th class="ps-0 pt-0"><i class="fas fa-trash text-danger"
+                                                        id="button-remove-pemeriksaan-poliklinik" data-id="{{$lists->order_poli_log_code}}" data-code="{{$code}}"></i>
+                                                    {{$lists->t_pemeriksaan_list_name}}
                                                     <div class="text-400 fw-normal fs--2">{{$lists->order_poli_log_code}}
                                                     </div>
                                                 </th>
