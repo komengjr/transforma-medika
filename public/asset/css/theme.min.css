@@ -4,6 +4,39 @@
      font-family: 'Roboto', sans-serif !important;
  }
 
+ .fade-out {
+     animation: fadeOut 0.4s ease forwards;
+ }
+
+ @keyframes fadeOut {
+     from {
+         opacity: 1;
+         transform: scale(1);
+     }
+
+     to {
+         opacity: 0;
+         transform: scale(0.8);
+     }
+ }
+
+ .modal-content {
+     border-radius: 20px;
+     animation: zoomIn 0.4s ease;
+ }
+
+ @keyframes zoomIn {
+     from {
+         transform: scale(0.8);
+         opacity: 0;
+     }
+
+     to {
+         transform: scale(1);
+         opacity: 1;
+     }
+ }
+
  :root {
      --falcon-blue: #2c7be5;
      --falcon-indigo: #727cf5;

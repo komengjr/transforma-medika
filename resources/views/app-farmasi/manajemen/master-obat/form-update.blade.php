@@ -8,14 +8,15 @@
     <div class="p-4 pb-3">
         <div class="row g-3">
             <div class="col-12">
-                <form class="row" id="form-input-obat">
+                <form class="row" id="form-update-obat">
                     @csrf
-
+                    <input type="text" name="code" id="" value="{{ $data->farm_data_obat_code }}" hidden>
                     <div class="col-md-7">
                         <label for="inputLastName1" class="form-label text-youtube">Nama Obat</label>
                         <div class="input-group"> <span class="input-group-text"><i
                                     class="fas fa-money-check"></i></span>
-                            <input type="text" name="name" class="form-control form-control-lg border-start-0 bg-white">
+                            <input type="text" name="name" class="form-control form-control-lg border-start-0 bg-white"
+                                value="{{ $data->farm_data_obat_name }}">
                         </div>
                     </div>
                     <div class="col-md-5">
@@ -23,7 +24,7 @@
                         <div class="input-group"> <span class="input-group-text"><i
                                     class="fas fa-money-check"></i></span>
                             <select name="kategori" class="form-control form-control-lg" id="">
-                                <option value=""></option>
+                                <option value="{{ $data->farm_data_obat_cat }}">{{ $data->farm_data_obat_cat }}</option>
                                 <option value="tablet">Tablet / Kaplet / Kapsul</option>
                                 <option value="sirup">Sirup / Suspensi</option>
                                 <option value="Injeksi">Injeksi</option>
@@ -38,7 +39,8 @@
                         <div class="input-group"> <span class="input-group-text"><i
                                     class="fas fa-money-check"></i></span>
                             <select name="satuan" class="form-control form-control-lg" id="">
-                                <option value=""></option>
+                                <option value="{{ $data->farm_data_obat_satuan }}">{{ $data->farm_data_obat_satuan }}
+                                </option>
                                 <option value="strip">Strip / Blister</option>
                                 <option value="box">Box / Kotak</option>
                             </select>
@@ -49,7 +51,8 @@
                         <div class="input-group"> <span class="input-group-text"><i
                                     class="fas fa-money-check"></i></span>
                             <select name="jenis" class="form-control form-control-lg" id="">
-                                <option value=""></option>
+                                <option value="{{ $data->farm_data_obat_jenis }}">{{ $data->farm_data_obat_jenis }}
+                                </option>
                                 <option value="Obat Analgesik">Obat Analgesik</option>
                                 <option value="Obat Antipiretik">Obat Antipiretik</option>
                                 <option value="Obat Antibiotik">Obat Antibiotik</option>
@@ -60,7 +63,9 @@
                         <label for="inputLastName1" class="form-label text-youtube">Stok Minimum</label>
                         <div class="input-group"> <span class="input-group-text"><i
                                     class="fas fa-money-check"></i></span>
-                            <input type="text" name="stok_min" class="form-control form-control-lg border-start-0 bg-white">
+                            <input type="text" name="stok_min"
+                                class="form-control form-control-lg border-start-0 bg-white"
+                                value="{{ $data->farm_data_obat_stok_minimum }}">
                         </div>
                     </div>
                 </form>
@@ -70,7 +75,7 @@
 </div>
 <div class="modal-footer px-4 bg-300">
     <span id="menu-add-data-obat">
-        <button class="btn btn-success float-end" id="button-simpan-data-obat">Simpan
+        <button class="btn btn-success float-end" id="button-save-update-data-obat">Update
             Data</button>
     </span>
 </div>

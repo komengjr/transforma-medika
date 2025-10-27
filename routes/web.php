@@ -519,6 +519,12 @@ Route::prefix('supplier/')->group(function (): void {
 Route::prefix('farmasi/')->group(function (): void {
     Route::post('manajemen-farmasi/data-obat/add', [FarmasiController::class, 'manajemen_farmasi_data_obat_add'])->name('manajemen_farmasi_data_obat_add');
     Route::post('manajemen-farmasi/data-obat/save', [FarmasiController::class, 'manajemen_farmasi_data_obat_save'])->name('manajemen_farmasi_data_obat_save');
+    Route::post('manajemen-farmasi/data-obat/update', [FarmasiController::class, 'manajemen_farmasi_data_obat_update'])->name('manajemen_farmasi_data_obat_update');
+    Route::post('manajemen-farmasi/data-obat/update-save', [FarmasiController::class, 'manajemen_farmasi_data_obat_update_save'])->name('manajemen_farmasi_data_obat_update_save');
+    Route::post('manajemen-farmasi/data-obat/add-batch', [FarmasiController::class, 'manajemen_farmasi_data_obat_add_batch'])->name('manajemen_farmasi_data_obat_add_batch');
+    Route::post('manajemen-farmasi/data-obat/save-batch', [FarmasiController::class, 'manajemen_farmasi_data_obat_save_batch'])->name('manajemen_farmasi_data_obat_save_batch');
+    Route::post('manajemen-farmasi/data-obat/batch-detail', [FarmasiController::class, 'manajemen_farmasi_data_obat_batch_detail'])->name('manajemen_farmasi_data_obat_batch_detail');
+    Route::post('manajemen-farmasi/data-obat/obat-detail', [FarmasiController::class, 'manajemen_farmasi_data_obat_obat_detail'])->name('manajemen_farmasi_data_obat_obat_detail');
 });
 // BRODCAST
 Route::prefix('brodcast/')->group(function (): void {

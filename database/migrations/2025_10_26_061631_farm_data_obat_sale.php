@@ -17,7 +17,7 @@ class FarmDataObatSale extends Migration
             $table->id('id_farm_data_obat_sale');
             $table->string('farm_data_obat_sale_code')->unique();
             $table->string('farm_data_obat_code');
-            $table->string('master_supplier_code');
+            $table->string('pem_grn_token_code');
             $table->integer('farm_data_obat_sale_buy');
             $table->integer('farm_data_obat_sale_sell');
             $table->date('farm_data_obat_sale_date');

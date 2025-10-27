@@ -10,10 +10,11 @@ use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Hash;
 use Illuminate\Support\Facades\Redirect;
 use Illuminate\Support\Str;
+use PhpParser\Node\Stmt\TryCatch;
 
 class FarmasiController extends Controller
 {
-     public function __construct()
+    public function __construct()
     {
         $this->middleware('auth');
     }
@@ -136,11 +137,82 @@ class FarmasiController extends Controller
             return Redirect::to('dashboard/home');
         }
     }
-    public function manajemen_farmasi_data_obat_add(Request $requestq){
+    public function manajemen_farmasi_data_obat_add(Request $requestq)
+    {
         return view('app-farmasi.manajemen.master-obat.form-add');
     }
-    public function manajemen_farmasi_data_obat_save(Request $request){
-        return view('app-farmasi.manajemen.master-obat.data-table-obat');
+    public function manajemen_farmasi_data_obat_save(Request $request)
+    {
+        try {
+            DB::table('farm_data_obat')->insert([
+                'farm_data_obat_code' => str::uuid(),
+                'farm_data_obat_name' => $request->name,
+                'farm_data_obat_cat' => $request->kategori,
+                'farm_data_obat_jenis' => $request->jenis,
+                'farm_data_obat_satuan' => $request->satuan,
+                'farm_data_obat_stok' => 0,
+                'farm_data_obat_stok_minimum' => $request->stok_min,
+                'created_at' => now()
+            ]);
+            $data = DB::table('farm_data_obat')->get();
+            return view('app-farmasi.manajemen.master-obat.data-table-obat', ['data' => $data]);
+        } catch (\Throwable $e) {
+            return 0;
+        }
+    }
+    public function manajemen_farmasi_data_obat_update(Request $request)
+    {
+        $data = DB::table('farm_data_obat')->where('farm_data_obat_code', $request->code)->first();
+        return view('app-farmasi.manajemen.master-obat.form-update', ['data' => $data]);
+    }
+    public function manajemen_farmasi_data_obat_update_save(Request $request)
+    {
+        try {
+            DB::table('farm_data_obat')->where('farm_data_obat_code', $request->code)->update([
+                'farm_data_obat_name' => $request->name,
+                'farm_data_obat_cat' => $request->kategori,
+                'farm_data_obat_jenis' => $request->jenis,
+                'farm_data_obat_satuan' => $request->satuan,
+                'farm_data_obat_stok' => 0,
+                'farm_data_obat_stok_minimum' => $request->stok_min,
+                'updated_at' => now()
+            ]);
+            $data = DB::table('farm_data_obat')->get();
+            return view('app-farmasi.manajemen.master-obat.data-table-obat', ['data' => $data]);
+        } catch (\Throwable $e) {
+            return 0;
+        }
+    }
+    public function manajemen_farmasi_data_obat_add_batch(Request $request)
+    {
+        return view('app-farmasi.manajemen.master-obat.form-add-batch', ['code' => $request->code]);
+    }
+    public function manajemen_farmasi_data_obat_save_batch(Request $request)
+    {
+        try {
+            DB::table('farm_data_obat_exp')->insert([
+                'farm_data_obat_exp_code' => str::uuid(),
+                'farm_data_obat_code' => $request->code,
+                'pem_grn_token_code' => $request->grn,
+                'data_obat_tanggal_masuk' => $request->masuk,
+                'data_obat_tanggal_exp' => $request->exp,
+                'data_obat_stok' => $request->stok,
+                'data_obat_rak' => $request->rak,
+                'created_at' => now()
+            ]);
+            $data = DB::table('farm_data_obat')->get();
+            return view('app-farmasi.manajemen.master-obat.data-table-obat', ['data' => $data]);
+        } catch (\Throwable $e) {
+            return 0;
+        }
+    }
+    public function manajemen_farmasi_data_obat_batch_detail(Request $request)
+    {
+        $data = DB::table('farm_data_obat_exp')->where('farm_data_obat_code', $request->code)->get();
+        return view('app-farmasi.manajemen.master-obat.form-batch-detail', ['data' => $data]);
+    }
+    public function manajemen_farmasi_data_obat_obat_detail(Request $request){
+        return 123;
     }
     // DATA MASUK DAN KELUAR
     public function manajemen_farmasi_obat_in_out($akses, $id)
