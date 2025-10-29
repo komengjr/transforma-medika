@@ -386,11 +386,22 @@
                 data: data,
                 dataType: 'html',
             }).done(function (data) {
-                Swal.fire({
-                    title: "Good job!",
-                    text: "Berhasil Melakukan Pembelian!",
-                    icon: "success"
+                const Toast = Swal.mixin({
+                    toast: true,
+                    position: "top-end",
+                    showConfirmButton: false,
+                    timer: 3000,
+                    timerProgressBar: true,
+                    didOpen: (toast) => {
+                        toast.onmouseenter = Swal.stopTimer;
+                        toast.onmouseleave = Swal.resumeTimer;
+                    }
                 });
+                Toast.fire({
+                    icon: "success",
+                    title: "Pembayaran Berhasil"
+                });
+                $('#tombol-non-resep').html('<button class="btn btn-primary btn-sm" onclick="location.reload()">Selesai</button>');
                 $('#menu-data-list-obat').html('<iframe src="data:application/pdf;base64, ' + data + '" style="width:100%; height:533px;" frameborder="0"></iframe>');
             }).fail(function () {
                 $('#menu-button-confrim').html('eror');

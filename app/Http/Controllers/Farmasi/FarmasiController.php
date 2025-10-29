@@ -123,15 +123,34 @@ class FarmasiController extends Controller
     public function penjualan_non_resep_payment_confrim(Request $request)
     {
         if ($request->method_payment == 'cod') {
-
+            $list = DB::table('farm_list_log')->join('farm_data_obat', 'farm_data_obat.farm_data_obat_code', '=', 'farm_list_log.farm_data_obat_code')
+                ->where('farm_list_log_reg', $request->no_reg)->get();
+            foreach ($list as $value) {
+                DB::table('farm_order_data_list')->insert([
+                    'farm_order_data_list_code' => str::uuid(),
+                    'farm_order_data_code' => $request->no_reg,
+                    'farm_data_obat_code' => $value->farm_data_obat_code,
+                    'farm_order_data_list_price' => $value->farm_list_log_harga,
+                    'farm_order_data_list_qty' => $value->farm_list_log_qty,
+                    'created_at' => now()
+                ]);
+            }
+            DB::table('farm_order_data')->insert([
+                'farm_order_data_code' => $request->no_reg,
+                'farm_order_data_date' => now(),
+                'farm_order_data_type' => 'NON RESEP',
+                'created_at' => now()
+            ]);
         } else {
             # code...
         }
+        $list = DB::table('farm_list_log')->join('farm_data_obat', 'farm_data_obat.farm_data_obat_code', '=', 'farm_list_log.farm_data_obat_code')
+            ->where('farm_list_log_reg', $request->no_reg)->get();
         $image = base64_encode(file_get_contents(public_path('img/logo.png')));
-        $pdf = \Barryvdh\DomPDF\Facade\Pdf::loadview('app-farmasi.penjualan.non-resep.report.report-invoice', compact('image'))->setPaper('A5', 'potrait')->setOptions([
-                    'isHtml5ParserEnabled' => true,
-                    'isRemoteEnabled' => true,
-                ]);
+        $pdf = \Barryvdh\DomPDF\Facade\Pdf::loadview('app-farmasi.penjualan.non-resep.report.report-invoice', [
+            'no_reg' => $request->no_reg,
+            'list' => $list
+        ], compact('image'))->setPaper('A6', 'potrait')->setOptions(['defaultFont' => 'Helvetica']);
         $pdf->output();
         $dompdf = $pdf->getDomPDF();
         $font = $dompdf->getFontMetrics()->get_font("helvetica", "bold");

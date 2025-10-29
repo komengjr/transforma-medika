@@ -6,16 +6,7 @@
     <!-- <link rel="stylesheet" href="style.css" media="all" /> -->
     <!-- <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin> -->
-    <link href="https://fonts.googleapis.com/css2?family=Roboto+Mono:ital,wght@0,100..700;1,100..700&display=swap"
-        rel="stylesheet">
-    <style>
-        * {
-            font-family: "Roboto Mono", monospace;
-            font-optical-sizing: auto;
-            font-weight: <weight>;
-            font-style: normal;
-        }
-    </style>
+
     <style>
         .clearfix:after {
             content: "";
@@ -117,14 +108,6 @@
             /* margin-bottom: 20px; */
         }
 
-        table th,
-        table td {
-            padding: 5px;
-            /* background: #EEEEEE; */
-            text-align: center;
-            /* border-bottom: 1px solid #000000; */
-        }
-
         table th {
             white-space: nowrap;
             font-weight: normal;
@@ -177,14 +160,14 @@
             /* padding: 10px 20px; */
             background: #FFFFFF;
             /* border-bottom: none; */
-            font-size: 0.7em;
+            /* font-size: 0.7em; */
             white-space: nowrap;
             /* border-top: 1px solid #AAAAAA; */
         }
 
         table tfoot tr:last-child td {
             color: #db3311;
-            font-size: 0.9em;
+            /* font-size: 0.9em; */
             border-top: 1px solid #db3311;
         }
 
@@ -228,13 +211,9 @@
 
 <body>
     <header class="clearfix">
-        <div id="logo">
-            <img src="data:image/png;base64, {{ $image }}">
-        </div>
         <div id="company">
-            <div style="margin-top: -20px; font-size: 9px;;">REG/001/POLI/20250201/PRIBADI</div><br>
-            <h2 class="name" style="margin-top: -20px;  color: #0087C3;font-size: 25px;font-weight: 800;">Innovenrta
-                Medic
+            <!-- <div style="margin-top: -20px; font-size: 9px;;">REG/001/POLI/20250201/PRIBADI</div><br> -->
+            <h2 class="name" style="margin-top: -20px;  color: #0087C3;font-size: 25px;font-weight: 800;">INNOVENTRA FARMA
             </h2>
             <div>Lorem, ipsum dolor sit amet thanks</div>
             <!-- <div>092 82733</div> -->
@@ -250,49 +229,82 @@
 
                 <table style="margin: 0px; padding: 0px; font-size: 0.8em; ">
                     <tr>
-                        <td style="padding: 1;">No Registrasi</td>
+                        <td style="padding: 1;">No Nota</td>
                         <td style="padding-top: 0;padding-bottom: 0px;">:</td>
-                        <td style="padding: 1;">123</td>
+                        <td style="padding: 1;">{{$no_reg}}</td>
+                    </tr>
+                    <tr>
+                        <td style="padding: 1;">Tanggal</td>
+                        <td style="padding-top: 0;padding-bottom: 0px;">:</td>
+                        <td style="padding: 1;">{{ date('d-m-Y H-i-s') }}</td>
                     </tr>
 
                 </table>
 
             </div>
             <div id="invoice">
-                <img src="data:image/png;base64,' . {{DNS1D::getBarcodePNG(213, 'C39', 1, 35)}} . '" alt="barcode" />
-                <div class="date" style="color: #0087C3">{{ date('d-m-Y H-i-s') }}</div><br>
+                <img src="data:image/png;base64,' . {{DNS1D::getBarcodePNG($no_reg, 'C39', 1, 35)}} . '"
+                    alt="barcode" />
+                <!-- <div class="date" style="color: #0087C3">{{ date('d-m-Y H-i-s') }}</div><br> -->
                 <!-- <span style="font-size: 1em">Form Registrasi Pasien</span> -->
                 {{-- <div class="date" style="color: red; font-size: 12px;">Print By : {{ Auth::user()->fullname }}
                 </div> --}}
-
             </div>
         </div>
-        <div class="details" id="kepala">
-            <strong style="margin: 0; padding: 0; margin-left: 4px;">Pemeriksaan Fisik</strong>
-            <table style="font-size: 8px;">
-                <tr>
-
+        <table>
+            <thead class="light">
+                <tr class="bg-primary">
+                    <th style="text-align: left;">Nama Obat</th>
+                    <!-- <th class="border-0 text-end">Harga Satuan</th>
+                    <th class="border-0 text-center">Quantity</th> -->
+                    <th style="text-align: right;">Amount</th>
                 </tr>
-            </table>
-        </div>
-        <table style="padding-top: 10px; font-size: 10px;">
-            <tr>
-                <td style="padding: 0; padding-right: 5px; vertical-align: top; width: 40%;">
-                    <div class="details" id="kepala">
-                        <strong style="margin: 0; padding: 0;">Diagnosa Pada Gigi</strong>
-                        <hr>
+            </thead>
+            <tbody>
+                @php
+                    $total = 0;
+                    $rand = mt_rand(1000, 9999);
+                    $no = 1;
+                @endphp
+                @foreach ($list as $lists)
+                    <tr style="padding: 1; margin: 0;">
+                        <td style="padding: 1; margin: 0;">
+                            {{ $lists->farm_data_obat_name}}
+                        </td>
+                        <!-- <td class="align-middle text-end">@currency($lists->farm_list_log_harga)</td>
+                                    <td class="align-middle text-center">{{ $lists->farm_list_log_qty }}</td> -->
+                        <td style="text-align: right;padding: 1;margin: 0;">
+                            @currency($lists->farm_list_log_harga * $lists->farm_list_log_qty)</td>
+                    </tr>
+                    @php
+                        $total = $total + ($lists->farm_list_log_harga * $lists->farm_list_log_qty);
+                    @endphp
+                @endforeach
 
-                    </div>
-                </td>
-                <td style="padding: 0; padding-left: 5px;vertical-align: top; width: 60%;">
-                    <div class="details" id="kepala">
-                        <strong style="margin: 0; padding: 0;">Diagnosa Odontogram</strong>
-                        <hr>
+            </tbody>
 
-                    </div>
-                </td>
-            </tr>
+            <tfoot style=" border-top: 1px solid #020101ff;">
+                <tr class="border-top border-top-2 fw-bolder text-900">
+                    <td class="text-900">Subtotal:</td>
+                    <td style="text-align: right;">@currency($total)</td>
+                </tr>
+                <tr>
+                    <td class="text-900">Tax 8%:</td>
+                    <td style="text-align: right;">@currency(0)</td>
+                </tr>
+                <tr class="border-top">
+                    <td class="text-900">Total:</td>
+                    <td style="text-align: right;">@currency($total)</td>
+                </tr>
+                <tr>
+                    <td>Amount Due:</td>
+                    <td style="text-align: right;">@currency($total)</td>
+                </tr>
+            </tfoot>
         </table>
+        <!-- <div class="details" id="kepala">
+        </div> -->
+
         {{-- <div id="thanks">Thank you!</div> --}}
         <div id="notices">
             <div class="notice">Notes: We really appreciate your business , please
