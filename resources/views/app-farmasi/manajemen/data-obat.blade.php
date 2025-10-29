@@ -68,7 +68,7 @@
             <button class="btn btn-modern" data-bs-toggle="modal" data-bs-target="#modal-obat" id="button-add-obat">+ Tambah
                 Obat</button>
         </div>
-        <div class="table-responsive" id="data-table-obat">
+        <div class="table-responsive pt-3" id="data-table-obat">
             <table id="example" class="table table-striped border" style="width:100%">
                 <thead class="bg-warning text-100">
                     <tr>
@@ -78,7 +78,7 @@
                         <th>Kategori</th>
                         <th>Jenis</th>
                         <th class="text-center">Stok Minimum</th>
-                        <th class="text-center">Batch</th>
+                        <th class="text-center">Batch & Harga</th>
                         <th>Aksi</th>
                     </tr>
                 </thead>
@@ -90,9 +90,9 @@
                         <tr>
                             <td data-label="Kode">{{$no++}}</td>
                             <td data-label="Nama">{{ $datas->farm_data_obat_name }}</td>
-                            <td data-label="Satuan">{{ $datas->farm_data_obat_satuan }}</td>
+                            <td data-label="Satuan">{{ $datas->farm_data_satuan_name }}</td>
                             <td data-label="Kategori">{{ $datas->farm_data_obat_cat }}</td>
-                            <td data-label="Pabrikan">{{ $datas->farm_data_obat_jenis }}</td>
+                            <td data-label="Pabrikan">{{ $datas->farm_data_jenis_name }}</td>
                             <td class="text-center">{{ $datas->farm_data_obat_stok_minimum }}</td>
                             <td class="text-center">
                                 @php
@@ -108,8 +108,8 @@
                                     data-bs-target="#modal-obat" id="button-add-batch-obat"
                                     data-code="{{ $datas->farm_data_obat_code }}"><i class="fab fa-ioxhost"></i></button>
                                 <button class="btn btn-sm btn-outline-danger" data-bs-toggle="modal"
-                                    data-bs-target="#modal-obat" id="button-detail-data-obat"
-                                    data-code="{{ $datas->farm_data_obat_code }}"><i class="fab fa-sistrix"></i></button>
+                                    data-bs-target="#modal-obat" id="button-sale-data-obat"
+                                    data-code="{{ $datas->farm_data_obat_code }}"><i class="fab fa-shopify"></i></button>
                             </td>
                         </tr>
                     @endforeach
@@ -138,7 +138,7 @@
     </div>
     <div class="modal fade" id="modal-obat" data-bs-keyboard="false" data-bs-backdrop="static" tabindex="-1"
         aria-labelledby="staticBackdropLabel" aria-hidden="false">
-        <div class="modal-dialog modal-dialog-centered modal-lg" role="document">
+        <div class="modal-dialog modal-dialog-centered modal-xl" role="document">
             <div class="modal-content border-0">
                 <div class="position-absolute top-0 end-0 mt-3 me-3 z-index-1">
                     <button class="btn-close btn btn-sm btn-circle d-flex flex-center transition-base"
@@ -447,14 +447,14 @@
             });
         });
 
-        $(document).on("click", "#button-detail-data-obat", function (e) {
+        $(document).on("click", "#button-sale-data-obat", function (e) {
             e.preventDefault();
             var code = $(this).data("code");
             $('#menu-obat').html(
                 '<div class="spinner-border my-3" style="display: block; margin-left: auto; margin-right: auto;" role="status"><span class="visually-hidden">Loading...</span></div>'
             );
             $.ajax({
-                url: "{{ route('manajemen_farmasi_data_obat_obat_detail') }}",
+                url: "{{ route('manajemen_farmasi_data_obat_obat_sale') }}",
                 type: "POST",
                 cache: false,
                 data: {
@@ -468,6 +468,57 @@
                 $('#menu-obat').html('eror');
             });
         });
+        $(document).on("click", "#button-save-data-sale-obat", function (e) {
+            e.preventDefault();
+            var data = $("#form-input-data-sale-obat").serialize();
+            $('#menu-add-data-sale-obat').html('<button class="btn btn-primary btn-sm" disabled>Proses..</button>');
+            $.ajax({
+                url: "{{ route('manajemen_farmasi_data_obat_obat_sale_add') }}",
+                type: "POST",
+                cache: false,
+                data: data,
+                dataType: 'html',
+            }).done(function (data) {
+                if (data == 0) {
+                    Swal.fire({
+                        icon: "error",
+                        title: "Oops...",
+                        text: "Something went wrong!",
+                        footer: '<a href="#">Why do I have this issue?</a>'
+                    });
+                    $('#menu-add-data-sale-obat').html('<button class="btn btn-primary btn-sm" id="button-save-data-sale-obat">Simpan</button>');
+                } else if(data == 1){
+                    Swal.fire({
+                        icon: "error",
+                        title: "Oops...",
+                        text: "Data Grn Sudah Ada!",
+                        footer: '<a href="#">Why do I have this issue?</a>'
+                    });
+                    $('#menu-add-data-sale-obat').html('<button class="btn btn-primary btn-sm" id="button-save-data-sale-obat">Simpan</button>');
+                } else {
+                    const Toast = Swal.mixin({
+                        toast: true,
+                        position: "top-end",
+                        showConfirmButton: false,
+                        timer: 3000,
+                        timerProgressBar: true,
+                        didOpen: (toast) => {
+                            toast.onmouseenter = Swal.stopTimer;
+                            toast.onmouseleave = Swal.resumeTimer;
+                        }
+                    });
+                    Toast.fire({
+                        icon: "success",
+                        title: "Berhasil Update Data"
+                    });
+                    $('#data-table-sale-obat').html(data);
+                    $('#menu-add-data-sale-obat').html('<button class="btn btn-primary btn-sm" id="button-save-data-sale-obat">Simpan</button>');
+                }
+                document.getElementById('grn').value = "";
+                document.getElementById('harga').value = "";
+            }).fail(function () {
+                $('#data-table-sale-obat').html('eror');
+            });
+        });
     </script>
-
 @endsection

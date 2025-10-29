@@ -7,7 +7,7 @@
             <th>Kategori</th>
             <th>Jenis</th>
             <th class="text-center">Stok Minimum</th>
-            <th class="text-center">Batch</th>
+            <th class="text-center">Batch & Harga</th>
             <th>Aksi</th>
         </tr>
     </thead>
@@ -37,8 +37,8 @@
                         id="button-add-batch-obat" data-code="{{ $datas->farm_data_obat_code }}"><i
                             class="fab fa-ioxhost"></i></button>
                     <button class="btn btn-sm btn-outline-danger" data-bs-toggle="modal" data-bs-target="#modal-obat"
-                        id="button-hapus-data-obat" data-code="{{ $datas->farm_data_obat_code }}"><i
-                            class="fab fa-sistrix"></i></button>
+                        id="button-sale-data-obat" data-code="{{ $datas->farm_data_obat_code }}"><i
+                            class="fab fa-shopify"></i></button>
                 </td>
             </tr>
         @endforeach

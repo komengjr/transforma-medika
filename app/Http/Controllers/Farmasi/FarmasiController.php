@@ -57,6 +57,92 @@ class FarmasiController extends Controller
             return Redirect::to('dashboard/home');
         }
     }
+    public function penjualan_non_resep_cari_data(Request $request)
+    {
+        try {
+            $data = DB::table('farm_data_obat')
+                ->join('farm_data_obat_sale', 'farm_data_obat_sale.farm_data_obat_code', '=', 'farm_data_obat.farm_data_obat_code')
+                ->where('farm_data_obat.farm_data_obat_code', $request->code)->first();
+            return $data->farm_data_obat_sale_sell;
+        } catch (\Throwable $e) {
+            return 0;
+        }
+    }
+    public function penjualan_non_resep_save_data(Request $request)
+    {
+        try {
+            $cek = DB::table('farm_list_log')->where('farm_list_log_reg', $request->no_reg)->where('farm_data_obat_code', $request->namaObat)->first();
+            if ($cek) {
+                DB::table('farm_list_log')->where('farm_list_log_reg', $request->no_reg)->where('farm_data_obat_code', $request->namaObat)->update([
+                    'farm_list_log_qty' => $request->jumlahObat + $cek->farm_list_log_qty,
+                ]);
+            } else {
+                DB::table('farm_list_log')->insert([
+                    'farm_list_log_code' => str::uuid(),
+                    'farm_list_log_reg' => $request->no_reg,
+                    'farm_data_obat_code' => $request->namaObat,
+                    'farm_list_log_qty' => $request->jumlahObat,
+                    'farm_list_log_harga' => $request->hargaObat,
+                    'created_at' => now()
+                ]);
+            }
+            $data = DB::table('farm_list_log')->join('farm_data_obat', 'farm_data_obat.farm_data_obat_code', '=', 'farm_list_log.farm_data_obat_code')
+                ->where('farm_list_log_reg', $request->no_reg)->get();
+            return view('app-farmasi.penjualan.non-resep.table-list-obat', ['data' => $data]);
+        } catch (\Throwable $e) {
+            return 0;
+        }
+    }
+    public function penjualan_non_resep_remove_data(Request $request)
+    {
+        DB::table('farm_list_log')->where('farm_list_log_code', $request->code)->delete();
+        $data = DB::table('farm_list_log')->join('farm_data_obat', 'farm_data_obat.farm_data_obat_code', '=', 'farm_list_log.farm_data_obat_code')
+            ->where('farm_list_log_reg', $request->no_reg)->get();
+        return view('app-farmasi.penjualan.non-resep.table-list-obat', ['data' => $data]);
+    }
+    public function penjualan_non_resep_show_data_list(Request $request)
+    {
+        $list = DB::table('farm_list_log')->join('farm_data_obat', 'farm_data_obat.farm_data_obat_code', '=', 'farm_list_log.farm_data_obat_code')
+            ->where('farm_list_log_reg', $request->code)->get();
+        return view('app-farmasi.penjualan.non-resep.form-data-list', ['code' => $request->code, 'list' => $list]);
+    }
+    public function penjualan_non_resep_payment_data_list(Request $request)
+    {
+        return view('app-farmasi.penjualan.non-resep.form-pembayaran');
+    }
+    public function penjualan_non_resep_payment_pilih(Request $request)
+    {
+        $total = DB::table('farm_list_log')->select(DB::raw('SUM(farm_list_log_harga * farm_list_log_qty) as total'))
+            ->where('farm_list_log_reg', $request->code)->first();
+        return view('app-farmasi.penjualan.non-resep.form-pembayaran-method', [
+            'key' => $request->key,
+            'total' => $total,
+            'code' => $request->code
+        ]);
+    }
+    public function penjualan_non_resep_payment_confrim(Request $request)
+    {
+        if ($request->method_payment == 'cod') {
+
+        } else {
+            # code...
+        }
+        $image = base64_encode(file_get_contents(public_path('img/logo.png')));
+        $pdf = \Barryvdh\DomPDF\Facade\Pdf::loadview('app-farmasi.penjualan.non-resep.report.report-invoice', compact('image'))->setPaper('A5', 'potrait')->setOptions([
+                    'isHtml5ParserEnabled' => true,
+                    'isRemoteEnabled' => true,
+                ]);
+        $pdf->output();
+        $dompdf = $pdf->getDomPDF();
+        $font = $dompdf->getFontMetrics()->get_font("helvetica", "bold");
+        $dompdf->get_canvas()->page_text(300, 820, "{PAGE_NUM} / {PAGE_COUNT}", $font, 10, array(0, 0, 0));
+        $canvas = $pdf->getDomPDF()->getCanvas();
+        $canvas->page_script('
+            // $pdf->set_opacity(.9);
+            $pdf->image("img/cover.png", 12, 12, 400, 575);
+            ');
+        return base64_encode($pdf->stream());
+    }
     // PENJUALAN NON RESEP
     public function penjualan_farmasi_resep($akses, $id)
     {
@@ -131,7 +217,10 @@ class FarmasiController extends Controller
     public function manajemen_farmasi_data_obat($akses, $id)
     {
         if ($this->url_akses_sub($akses, $id) == true) {
-            $data = DB::table('farm_data_obat')->get();
+            $data = DB::table('farm_data_obat')
+                ->join('farm_data_satuan', 'farm_data_satuan.farm_data_satuan_code', '=', 'farm_data_obat.farm_data_obat_satuan')
+                ->join('farm_data_jenis', 'farm_data_jenis.farm_data_jenis_code', '=', 'farm_data_obat.farm_data_obat_jenis')
+                ->get();
             return view('app-farmasi.manajemen.data-obat', ['data' => $data, 'akses' => $akses, 'code' => $id]);
         } else {
             return Redirect::to('dashboard/home');
@@ -185,7 +274,11 @@ class FarmasiController extends Controller
     }
     public function manajemen_farmasi_data_obat_add_batch(Request $request)
     {
-        return view('app-farmasi.manajemen.master-obat.form-add-batch', ['code' => $request->code]);
+        $grn = DB::table('pem_grn_token')->get();
+        return view('app-farmasi.manajemen.master-obat.form-add-batch', [
+            'code' => $request->code,
+            'grn' => $grn
+        ]);
     }
     public function manajemen_farmasi_data_obat_save_batch(Request $request)
     {
@@ -208,11 +301,49 @@ class FarmasiController extends Controller
     }
     public function manajemen_farmasi_data_obat_batch_detail(Request $request)
     {
-        $data = DB::table('farm_data_obat_exp')->where('farm_data_obat_code', $request->code)->get();
-        return view('app-farmasi.manajemen.master-obat.form-batch-detail', ['data' => $data]);
+        $data = DB::table('farm_data_obat_sale')
+            ->join('pem_grn_token', 'pem_grn_token.pem_grn_token_code', '=', 'farm_data_obat_sale.pem_grn_token_code')
+            ->where('farm_data_obat_code', $request->code)->get();
+        $obat = DB::table('farm_data_obat')->where('farm_data_obat_code', $request->code)->first();
+        return view('app-farmasi.manajemen.master-obat.form-batch-detail', ['data' => $data, 'obat' => $obat]);
     }
-    public function manajemen_farmasi_data_obat_obat_detail(Request $request){
-        return 123;
+    public function manajemen_farmasi_data_obat_obat_sale(Request $request)
+    {
+        $grn = DB::table('pem_grn_token')->get();
+        $data = DB::table('farm_data_obat_sale')
+            ->join('pem_grn_token', 'pem_grn_token.pem_grn_token_code', '=', 'farm_data_obat_sale.pem_grn_token_code')
+            ->where('farm_data_obat_code', $request->code)->get();
+        return view('app-farmasi.manajemen.master-obat.form-sale-data-obat', [
+            'data' => $data,
+            'code' => $request->code,
+            'grn' => $grn
+        ]);
+    }
+    public function manajemen_farmasi_data_obat_obat_sale_add(Request $request)
+    {
+        try {
+            $cek = DB::table('farm_data_obat_sale')->where('farm_data_obat_code', $request->code)->where('pem_grn_token_code', $request->grn)->first();
+            if ($cek) {
+                return 1;
+            } else {
+                DB::table('farm_data_obat_sale')->insert([
+                    'farm_data_obat_sale_code' => str::uuid(),
+                    'farm_data_obat_code' => $request->code,
+                    'pem_grn_token_code' => $request->grn,
+                    'farm_data_obat_sale_buy' => $request->harga,
+                    'farm_data_obat_sale_sell' => $request->harga,
+                    'farm_data_obat_sale_date' => now(),
+                    'farm_data_obat_sale_desc' => 'text',
+                    'created_at' => now()
+                ]);
+                $data = DB::table('farm_data_obat_sale')
+                    ->join('pem_grn_token', 'pem_grn_token.pem_grn_token_code', '=', 'farm_data_obat_sale.pem_grn_token_code')
+                    ->where('farm_data_obat_code', $request->code)->get();
+                return view('app-farmasi.manajemen.master-obat.data-table-sale-obat', ['data' => $data]);
+            }
+        } catch (\Throwable $e) {
+            return 0;
+        }
     }
     // DATA MASUK DAN KELUAR
     public function manajemen_farmasi_obat_in_out($akses, $id)

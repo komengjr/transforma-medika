@@ -5,6 +5,10 @@
                 href="#!">{{ Env('APP_LABEL')}}</a>
         </p>
     </div>
+    @php
+        $jenis = DB::table('farm_data_jenis')->get();
+        $satuan = DB::table('farm_data_satuan')->get();
+    @endphp
     <div class="p-4 pb-3">
         <div class="row g-3">
             <div class="col-12">
@@ -38,9 +42,10 @@
                         <div class="input-group"> <span class="input-group-text"><i
                                     class="fas fa-money-check"></i></span>
                             <select name="satuan" class="form-control form-control-lg" id="">
-                                <option value=""></option>
-                                <option value="strip">Strip / Blister</option>
-                                <option value="box">Box / Kotak</option>
+                                <option value="">Pilih Satuan</option>
+                                @foreach ($satuan as $sa)
+                                    <option value="{{$sa->farm_data_satuan_code}}">{{$sa->farm_data_satuan_name}}</option>
+                                @endforeach
                             </select>
                         </div>
                     </div>
@@ -49,10 +54,10 @@
                         <div class="input-group"> <span class="input-group-text"><i
                                     class="fas fa-money-check"></i></span>
                             <select name="jenis" class="form-control form-control-lg" id="">
-                                <option value=""></option>
-                                <option value="Obat Analgesik">Obat Analgesik</option>
-                                <option value="Obat Antipiretik">Obat Antipiretik</option>
-                                <option value="Obat Antibiotik">Obat Antibiotik</option>
+                                <option value=""><small>Pilih Jenis</small></option>
+                                @foreach ($jenis as $je)
+                                    <option value="{{$je->farm_data_jenis_code}}">{{$je->farm_data_jenis_name}}</option>
+                                @endforeach
                             </select>
                         </div>
                     </div>
@@ -60,7 +65,8 @@
                         <label for="inputLastName1" class="form-label text-youtube">Stok Minimum</label>
                         <div class="input-group"> <span class="input-group-text"><i
                                     class="fas fa-money-check"></i></span>
-                            <input type="text" name="stok_min" class="form-control form-control-lg border-start-0 bg-white">
+                            <input type="number" name="stok_min"
+                                class="form-control form-control-lg border-start-0 bg-white" value="0">
                         </div>
                     </div>
                 </form>

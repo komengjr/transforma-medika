@@ -1,6 +1,6 @@
 <div class="modal-body p-0">
     <div class="bg-warning rounded-top-lg py-3 ps-4 pe-6">
-        <h4 class="mb-1" style="color: white;" id="staticBackdropLabel">Form Add Obat</h4>
+        <h4 class="mb-1" style="color: white;" id="staticBackdropLabel">Form Update Data Obat</h4>
         <p class="fs--2 mb-0" style="color: white;">Support by <a class="link-600 fw-semi-bold"
                 href="#!">{{ Env('APP_LABEL')}}</a>
         </p>
