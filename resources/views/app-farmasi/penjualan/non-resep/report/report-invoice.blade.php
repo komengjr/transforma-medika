@@ -32,7 +32,7 @@
         }
 
         header {
-            padding: 10px 0;
+            /* padding: 10px 0; */
             margin-bottom: 20px;
             border-bottom: 1px solid #0b0909;
         }
@@ -123,7 +123,7 @@
             color: #db3311;
             font-size: 1.2em;
             font-weight: normal;
-            margin: 0 0 0.2em 0;
+            /* margin: 0 0 0.2em 0; */
         }
 
         table .no {
@@ -213,11 +213,11 @@
     <header class="clearfix">
         <div id="company">
             <!-- <div style="margin-top: -20px; font-size: 9px;;">REG/001/POLI/20250201/PRIBADI</div><br> -->
-            <h2 class="name" style="margin-top: -20px;  color: #0087C3;font-size: 25px;font-weight: 800;">INNOVENTRA FARMA
-            </h2>
-            <div>Lorem, ipsum dolor sit amet thanks</div>
+            <h3 class="name" style="  color: #0087C3;font-size: 25px;font-weight: 800;">INNOVENTRA
+                FARMA
+            </h3>
+            <!-- <p style="font-size: 8px;">Lorem, ipsum dolor sit amet thanks</p> -->
             <!-- <div>092 82733</div> -->
-        </div>
         </div>
     </header>
     <main>
@@ -255,8 +255,8 @@
             <thead class="light">
                 <tr class="bg-primary">
                     <th style="text-align: left;">Nama Obat</th>
-                    <!-- <th class="border-0 text-end">Harga Satuan</th>
-                    <th class="border-0 text-center">Quantity</th> -->
+                    <!-- <th class="border-0 text-end">Harga Satuan</th> -->
+                    <th class="border-0 text-center">Qty</th>
                     <th style="text-align: right;">Amount</th>
                 </tr>
             </thead>
@@ -271,8 +271,8 @@
                         <td style="padding: 1; margin: 0;">
                             {{ $lists->farm_data_obat_name}}
                         </td>
-                        <!-- <td class="align-middle text-end">@currency($lists->farm_list_log_harga)</td>
-                                    <td class="align-middle text-center">{{ $lists->farm_list_log_qty }}</td> -->
+                        <!-- <td class="align-middle text-end">@currency($lists->farm_list_log_harga)</td> -->
+                        <td style="text-align: center;">{{ $lists->farm_list_log_qty }}</td>
                         <td style="text-align: right;padding: 1;margin: 0;">
                             @currency($lists->farm_list_log_harga * $lists->farm_list_log_qty)</td>
                     </tr>
@@ -285,19 +285,19 @@
 
             <tfoot style=" border-top: 1px solid #020101ff;">
                 <tr class="border-top border-top-2 fw-bolder text-900">
-                    <td class="text-900">Subtotal:</td>
+                    <td colspan="2">Subtotal:</td>
                     <td style="text-align: right;">@currency($total)</td>
                 </tr>
                 <tr>
-                    <td class="text-900">Tax 8%:</td>
+                    <td colspan="2">Tax 8%:</td>
                     <td style="text-align: right;">@currency(0)</td>
                 </tr>
                 <tr class="border-top">
-                    <td class="text-900">Total:</td>
+                    <td colspan="2">Total:</td>
                     <td style="text-align: right;">@currency($total)</td>
                 </tr>
                 <tr>
-                    <td>Amount Due:</td>
+                    <td colspan="2">Amount Due:</td>
                     <td style="text-align: right;">@currency($total)</td>
                 </tr>
             </tfoot>

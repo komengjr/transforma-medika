@@ -126,21 +126,27 @@ class FarmasiController extends Controller
             $list = DB::table('farm_list_log')->join('farm_data_obat', 'farm_data_obat.farm_data_obat_code', '=', 'farm_list_log.farm_data_obat_code')
                 ->where('farm_list_log_reg', $request->no_reg)->get();
             foreach ($list as $value) {
-                DB::table('farm_order_data_list')->insert([
-                    'farm_order_data_list_code' => str::uuid(),
+                $cek = DB::table('farm_order_data_list')->where('farm_order_data_code', $request->no_reg)->where('farm_data_obat_code', $request->farm_data_obat_code)->first();
+                if (!$cek) {
+                    DB::table('farm_order_data_list')->insert([
+                        'farm_order_data_list_code' => str::uuid(),
+                        'farm_order_data_code' => $request->no_reg,
+                        'farm_data_obat_code' => $value->farm_data_obat_code,
+                        'farm_order_data_list_price' => $value->farm_list_log_harga,
+                        'farm_order_data_list_qty' => $value->farm_list_log_qty,
+                        'created_at' => now()
+                    ]);
+                }
+            }
+            $order = DB::table('farm_order_data')->where('farm_order_data_code', $request->no_reg)->first();
+            if (!$order) {
+                DB::table('farm_order_data')->insert([
                     'farm_order_data_code' => $request->no_reg,
-                    'farm_data_obat_code' => $value->farm_data_obat_code,
-                    'farm_order_data_list_price' => $value->farm_list_log_harga,
-                    'farm_order_data_list_qty' => $value->farm_list_log_qty,
+                    'farm_order_data_date' => now(),
+                    'farm_order_data_type' => 'NON RESEP',
                     'created_at' => now()
                 ]);
             }
-            DB::table('farm_order_data')->insert([
-                'farm_order_data_code' => $request->no_reg,
-                'farm_order_data_date' => now(),
-                'farm_order_data_type' => 'NON RESEP',
-                'created_at' => now()
-            ]);
         } else {
             # code...
         }
