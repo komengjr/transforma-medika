@@ -126,7 +126,7 @@ class FarmasiController extends Controller
             $list = DB::table('farm_list_log')->join('farm_data_obat', 'farm_data_obat.farm_data_obat_code', '=', 'farm_list_log.farm_data_obat_code')
                 ->where('farm_list_log_reg', $request->no_reg)->get();
             foreach ($list as $value) {
-                $cek = DB::table('farm_order_data_list')->where('farm_order_data_code', $request->no_reg)->where('farm_data_obat_code', $request->farm_data_obat_code)->first();
+                $cek = DB::table('farm_order_data_list')->where('farm_order_data_code', $request->no_reg)->where('farm_data_obat_code', $value->farm_data_obat_code)->first();
                 if (!$cek) {
                     DB::table('farm_order_data_list')->insert([
                         'farm_order_data_list_code' => str::uuid(),
@@ -172,11 +172,120 @@ class FarmasiController extends Controller
     public function penjualan_farmasi_resep($akses, $id)
     {
         if ($this->url_akses($akses, $id) == true) {
+            $doctor = DB::table('master_doctor')->get();
             $data = DB::table('farm_data_obat')->get();
-            return view('app-farmasi.penjualan.penjualan-resep', ['data' => $data, 'akses' => $akses, 'code' => $id]);
+            return view('app-farmasi.penjualan.penjualan-resep', [
+                'data' => $data,
+                'doctor' => $doctor,
+                'akses' => $akses,
+                'code' => $id
+            ]);
         } else {
             return Redirect::to('dashboard/home');
         }
+    }
+    public function penjualan_resep_cari_data(Request $request)
+    {
+        try {
+            $data = DB::table('farm_data_obat')
+                ->join('farm_data_obat_sale', 'farm_data_obat_sale.farm_data_obat_code', '=', 'farm_data_obat.farm_data_obat_code')
+                ->where('farm_data_obat.farm_data_obat_code', $request->code)->first();
+            return $data->farm_data_obat_sale_sell;
+        } catch (\Throwable $e) {
+            return 0;
+        }
+    }
+    public function penjualan_resep_show_data_list(Request $request)
+    {
+        $list = DB::table('farm_list_log')->join('farm_data_obat', 'farm_data_obat.farm_data_obat_code', '=', 'farm_list_log.farm_data_obat_code')
+            ->where('farm_list_log_reg', $request->code)->get();
+        return view('app-farmasi.penjualan.resep.form-data-list', [
+            'code' => $request->code,
+            'list' => $list,
+            "noResep" => $request->noResep,
+            "namaPasien" => $request->namaPasien,
+            "namaDokter" => $request->namaDokter,
+            "tglResep" => $request->tglResep,
+            "keteranganResep" => $request->keteranganResep,
+        ]);
+    }
+    public function penjualan_resep_payment_data_list(Request $request)
+    {
+        return view('app-farmasi.penjualan.resep.form-pembayaran');
+    }
+    public function penjualan_resep_payment_pilih(Request $request)
+    {
+        $total = DB::table('farm_list_log')->select(DB::raw('SUM(farm_list_log_harga * farm_list_log_qty) as total'))
+            ->where('farm_list_log_reg', $request->code)->first();
+        return view('app-farmasi.penjualan.resep.form-pembayaran-method', [
+            'key' => $request->key,
+            'total' => $total,
+            'code' => $request->code,
+            "noResep" => $request->noResep,
+            "namaPasien" => $request->namaPasien,
+            "namaDokter" => $request->namaDokter,
+            "tglResep" => $request->tglResep,
+            "keteranganResep" => $request->keteranganResep,
+        ]);
+    }
+    public function penjualan_resep_payment_confrim(Request $request)
+    {
+        if ($request->method_payment == 'cod') {
+            $list = DB::table('farm_list_log')->join('farm_data_obat', 'farm_data_obat.farm_data_obat_code', '=', 'farm_list_log.farm_data_obat_code')
+                ->where('farm_list_log_reg', $request->no_reg)->get();
+            foreach ($list as $value) {
+                $cek = DB::table('farm_order_data_list')->where('farm_order_data_code', $request->no_reg)->where('farm_data_obat_code', $value->farm_data_obat_code)->first();
+                if (!$cek) {
+                    DB::table('farm_order_data_list')->insert([
+                        'farm_order_data_list_code' => str::uuid(),
+                        'farm_order_data_code' => $request->no_reg,
+                        'farm_data_obat_code' => $value->farm_data_obat_code,
+                        'farm_order_data_list_price' => $value->farm_list_log_harga,
+                        'farm_order_data_list_qty' => $value->farm_list_log_qty,
+                        'created_at' => now()
+                    ]);
+                }
+            }
+            $order = DB::table('farm_order_data')->where('farm_order_data_code', $request->no_reg)->first();
+            if (!$order) {
+                DB::table('farm_order_data')->insert([
+                    'farm_order_data_code' => $request->no_reg,
+                    'farm_order_data_date' => now(),
+                    'farm_order_data_type' => 'RESEP',
+                    'created_at' => now()
+                ]);
+                DB::table('farm_order_data_pasien')->insert([
+                    'farm_order_data_pasien_code' => str::uuid(),
+                    'farm_order_data_code' => $request->no_reg,
+                    'farm_order_data_pasien_name' => $request->namaPasien,
+                    'farm_order_data_pasien_date' => $request->tglResep,
+                    'farm_order_data_pasien_no' => $request->noResep,
+                    'farm_order_data_pasien_doctor' => $request->namaDokter,
+                    'farm_order_data_pasien_desc' => $request->keteranganResep,
+                    'created_at' => now()
+
+                ]);
+            }
+        } else {
+            # code...
+        }
+        $list = DB::table('farm_list_log')->join('farm_data_obat', 'farm_data_obat.farm_data_obat_code', '=', 'farm_list_log.farm_data_obat_code')
+            ->where('farm_list_log_reg', $request->no_reg)->get();
+        $image = base64_encode(file_get_contents(public_path('img/logo.png')));
+        $pdf = \Barryvdh\DomPDF\Facade\Pdf::loadview('app-farmasi.penjualan.non-resep.report.report-invoice', [
+            'no_reg' => $request->no_reg,
+            'list' => $list
+        ], compact('image'))->setPaper('A6', 'potrait')->setOptions(['defaultFont' => 'Helvetica']);
+        $pdf->output();
+        $dompdf = $pdf->getDomPDF();
+        $font = $dompdf->getFontMetrics()->get_font("helvetica", "bold");
+        $dompdf->get_canvas()->page_text(300, 820, "{PAGE_NUM} / {PAGE_COUNT}", $font, 10, array(0, 0, 0));
+        $canvas = $pdf->getDomPDF()->getCanvas();
+        $canvas->page_script('
+            // $pdf->set_opacity(.9);
+            $pdf->image("img/cover.png", 12, 12, 400, 575);
+            ');
+        return base64_encode($pdf->stream());
     }
     // PENJUALAN VERIFIKASI RESEP
     public function penjualan_verifikasi_dosis_resep($akses, $id)
@@ -194,6 +303,16 @@ class FarmasiController extends Controller
         if ($this->url_akses($akses, $id) == true) {
             $data = DB::table('farm_data_obat')->get();
             return view('app-farmasi.penjualan.percetakan-nota-farmasi', ['data' => $data, 'akses' => $akses, 'code' => $id]);
+        } else {
+            return Redirect::to('dashboard/home');
+        }
+    }
+    // HISTORY PENJUALAN
+    public function penjualan_history_penjualan($akses, $id)
+    {
+        if ($this->url_akses($akses, $id) == true) {
+            $data = DB::table('farm_order_data')->get();
+            return view('app-farmasi.penjualan.history-penjualan', ['data' => $data, 'akses' => $akses, 'code' => $id]);
         } else {
             return Redirect::to('dashboard/home');
         }

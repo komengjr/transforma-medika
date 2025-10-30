@@ -1,6 +1,6 @@
 <div class="modal-body p-0">
-    <div class="bg-success rounded-top-lg py-3 ps-4 pe-6">
-        <h4 class="mb-1" style="color: white;" id="staticBackdropLabel">Form Order Non Resep</h4>
+    <div class="bg-primary rounded-top-lg py-3 ps-4 pe-6">
+        <h4 class="mb-1" style="color: white;" id="staticBackdropLabel">Form Order Dengan Resep</h4>
         <p class="fs--2 mb-0" style="color: white;">Support by <a class="link-600 fw-semi-bold" href="#!">Transforma</a>
         </p>
     </div>
@@ -13,7 +13,7 @@
         </div>
     @else
         <div class="p-2 pb-0" id="menu-add-data-pr-all">
-            <div class="card mb-2 border border-success">
+            <div class="card mb-2 border border-primary">
                 <div class="card-body">
                     <div class="row justify-content-between align-items-center">
                         <div class="col-md">
@@ -28,12 +28,12 @@
                     </div>
                 </div>
             </div>
-            <div class="card mb-3 border border-success" id="menu-data-list-obat">
+            <div class="card mb-3 border border-primary" id="menu-data-list-obat">
                 <div class="card-body">
-                    <div class="row align-items-center">
-                        <div class="col">
+                    <div class="row align-items-center mb-0">
+                        <div class="col ms-auto">
 
-                            <h5>FARMASI {{env('APP_NAME')}}</h5>
+                            <h5>{{env('APP_NAME')}} FARMA</h5>
                             <p class="fs--1">1954 Bloor Street West<br>Torronto ON, M6P 3K9<br>Canada</p>
 
                         </div>
@@ -42,9 +42,9 @@
                                 <table class="table table-sm table-borderless fs--1">
                                     <tbody>
                                         <!-- <tr>
-                                                    <th class="text-sm-end">Invoice No:</th>
-                                                    <td>{{$code}}</td>
-                                                </tr> -->
+                                                            <th class="text-sm-end">Invoice No:</th>
+                                                            <td>{{$code}}</td>
+                                                        </tr> -->
                                         <tr>
                                             <th class="text-sm-end">Order Number:</th>
                                             <td>{{$code}}</td>
@@ -54,15 +54,23 @@
                                             <td>2018-09-25</td>
                                         </tr>
                                         <tr>
-                                            <th class="text-sm-end">Payment Due:</th>
-                                            <td>Upon receipt</td>
+                                            <th class="text-sm-end">No Resep:</th>
+                                            <td>{{$noResep}}</td>
+                                        </tr>
+                                        <tr>
+                                            <th class="text-sm-end">Nama Pasien:</th>
+                                            <td>{{$namaPasien}}</td>
+                                        </tr>
+                                        <tr>
+                                            <th class="text-sm-end">Nama Dokter:</th>
+                                            <td>{{$namaDokter}}</td>
                                         </tr>
                                     </tbody>
                                 </table>
                             </div>
                         </div>
                     </div>
-                    <div class="table-responsive scrollbar mt-4 fs-1">
+                    <div class="table-responsive scrollbar mt-1 fs-1">
                         <table class="table table-striped border-bottom">
                             <thead class="light">
                                 <tr class="bg-primary text-white dark__bg-1000">

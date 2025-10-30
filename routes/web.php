@@ -139,6 +139,7 @@ Route::prefix('{akses}/{id}')->group(function (): void {
     Route::get('penjualan/penjualan-dengan-resep', [FarmasiController::class, 'penjualan_farmasi_resep'])->name('penjualan_farmasi_resep');
     Route::get('penjualan/verifikasi-resep-dan-dosis', [FarmasiController::class, 'penjualan_verifikasi_dosis_resep'])->name('penjualan_verifikasi_dosis_resep');
     Route::get('penjualan/cetak-nota-pembelian', [FarmasiController::class, 'penjualan_cetak_nota_farmmasi'])->name('penjualan_cetak_nota_farmmasi');
+    Route::get('penjualan/history-penjualan', [FarmasiController::class, 'penjualan_history_penjualan'])->name('penjualan_history_penjualan');
     Route::get('manajemen-farmasi/pembelian-obat', [FarmasiController::class, 'manajemen_farmasi_pembelian_obat'])->name('manajemen_farmasi_pembelian_obat');
     Route::get('manajemen-farmasi/penerimaan-barang', [FarmasiController::class, 'manajemen_farmasi_penerimaan_barang'])->name('manajemen_farmasi_penerimaan_barang');
     Route::get('manajemen-farmasi/pembuatan-faktur', [FarmasiController::class, 'manajemen_farmasi_pembuatan_faktur'])->name('manajemen_farmasi_pembuatan_faktur');
@@ -524,6 +525,11 @@ Route::prefix('farmasi/')->group(function (): void {
     Route::post('penjualan/penjualan-non-resep/payment-data-list', [FarmasiController::class, 'penjualan_non_resep_payment_data_list'])->name('penjualan_non_resep_payment_data_list');
     Route::post('penjualan/penjualan-non-resep/payment-pilih', [FarmasiController::class, 'penjualan_non_resep_payment_pilih'])->name('penjualan_non_resep_payment_pilih');
     Route::post('penjualan/penjualan-non-resep/payment-confrim', [FarmasiController::class, 'penjualan_non_resep_payment_confrim'])->name('penjualan_non_resep_payment_confrim');
+
+    Route::post('penjualan/penjualan-resep/show-data-list', [FarmasiController::class, 'penjualan_resep_show_data_list'])->name('penjualan_resep_show_data_list');
+    Route::post('penjualan/penjualan-resep/payment-data-list', [FarmasiController::class, 'penjualan_resep_payment_data_list'])->name('penjualan_resep_payment_data_list');
+    Route::post('penjualan/penjualan-resep/payment-pilih', [FarmasiController::class, 'penjualan_resep_payment_pilih'])->name('penjualan_resep_payment_pilih');
+    Route::post('penjualan/penjualan-resep/payment-confrim', [FarmasiController::class, 'penjualan_resep_payment_confrim'])->name('penjualan_resep_payment_confrim');
 
     Route::post('manajemen-farmasi/data-obat/add', [FarmasiController::class, 'manajemen_farmasi_data_obat_add'])->name('manajemen_farmasi_data_obat_add');
     Route::post('manajemen-farmasi/data-obat/save', [FarmasiController::class, 'manajemen_farmasi_data_obat_save'])->name('manajemen_farmasi_data_obat_save');

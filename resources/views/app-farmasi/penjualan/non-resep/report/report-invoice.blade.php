@@ -257,7 +257,7 @@
                     <th style="text-align: left;">Nama Obat</th>
                     <!-- <th class="border-0 text-end">Harga Satuan</th> -->
                     <th class="border-0 text-center">Qty</th>
-                    <th style="text-align: right;">Amount</th>
+                    <th style="text-align: right;">Total</th>
                 </tr>
             </thead>
             <tbody>
@@ -297,7 +297,7 @@
                     <td style="text-align: right;">@currency($total)</td>
                 </tr>
                 <tr>
-                    <td colspan="2">Amount Due:</td>
+                    <td colspan="2">Total Pembayaran:</td>
                     <td style="text-align: right;">@currency($total)</td>
                 </tr>
             </tfoot>

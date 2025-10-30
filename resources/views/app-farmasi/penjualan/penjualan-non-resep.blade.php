@@ -165,7 +165,6 @@
             </div>
         </div>
     </div>
-
 @endsection
 @section('base.js')
     <div class="modal fade" id="modal-penjualan-full" data-bs-keyboard="false" data-bs-backdrop="static" tabindex="-1"
@@ -401,7 +400,7 @@
                     icon: "success",
                     title: "Pembayaran Berhasil"
                 });
-                // $('#tombol-non-resep').html('<button class="btn btn-primary btn-sm" onclick="location.reload()">Selesai</button>');
+                $('#tombol-non-resep').html('<button class="btn btn-primary btn-sm" onclick="location.reload()">Selesai</button>');
                 $('#menu-data-list-obat').html('<iframe src="data:application/pdf;base64, ' + data + '" style="width:100%; height:533px;" frameborder="0"></iframe>');
             }).fail(function () {
                 $('#menu-button-confrim').html('eror');
