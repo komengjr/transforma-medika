@@ -531,6 +531,8 @@ Route::prefix('farmasi/')->group(function (): void {
     Route::post('penjualan/penjualan-resep/payment-pilih', [FarmasiController::class, 'penjualan_resep_payment_pilih'])->name('penjualan_resep_payment_pilih');
     Route::post('penjualan/penjualan-resep/payment-confrim', [FarmasiController::class, 'penjualan_resep_payment_confrim'])->name('penjualan_resep_payment_confrim');
 
+    Route::post('penjualan/history-penjualan/detail', [FarmasiController::class, 'penjualan_history_penjualan_detail'])->name('penjualan_history_penjualan_detail');
+
     Route::post('manajemen-farmasi/data-obat/add', [FarmasiController::class, 'manajemen_farmasi_data_obat_add'])->name('manajemen_farmasi_data_obat_add');
     Route::post('manajemen-farmasi/data-obat/save', [FarmasiController::class, 'manajemen_farmasi_data_obat_save'])->name('manajemen_farmasi_data_obat_save');
     Route::post('manajemen-farmasi/data-obat/update', [FarmasiController::class, 'manajemen_farmasi_data_obat_update'])->name('manajemen_farmasi_data_obat_update');

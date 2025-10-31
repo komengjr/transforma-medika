@@ -64,6 +64,7 @@
                         <th class="sort" data-sort="name">Type Order</th>
                         <th class="sort" data-sort="tgl">List Obat</th>
                         <th class="sort" data-sort="tgl">Total Pembayaran</th>
+                        <th>Status Pembayaran</th>
                         <th class="sort" data-sort="act">Action</th>
                     </tr>
                 </thead>
@@ -106,19 +107,16 @@
                                 @endforeach
                             </td>
                             <td class="text-end">@currency($total)</td>
+                            <td class="text-center"><span class="badge bg-warning">Pending</span></td>
                             <td class="text-center">
                                 <div class="btn-group" role="group">
                                     <button class="btn btn-sm btn-falcon-primary dropdown-toggle" id="btnGroupVerticalDrop2"
                                         type="button" data-bs-toggle="dropdown" aria-haspopup="true" aria-expanded="false"><span
                                             class="fas fa-align-left me-1" data-fa-transform="shrink-3"></span>Menu</button>
                                     <div class="dropdown-menu" aria-labelledby="btnGroupVerticalDrop2">
-                                        <!-- <button class="dropdown-item" data-bs-toggle="modal" data-bs-target="#modal-product-xl"
-                                                                    id="button-add-product" data-code="123"><span class="far fa-edit"></span>
-                                                                    Add New Obat</button>
-                                                                <div class="dropdown-divider"></div> -->
-                                        <button class="dropdown-item" data-bs-toggle="modal" data-bs-target="#modal-product-xl"
-                                            id="button-upload-data-product" data-code="123"><span class="fas fa-upload"></span>
-                                            Import Excel</button>
+
+                                        <button class="dropdown-item" data-bs-toggle="modal" data-bs-target="#modal-riwayat"
+                                            id="button-data-riwayat-penjualan" data-code="{{$datas->farm_order_data_code}}"><span class="fas fa-eye me-2"></span> Show Data</button>
                                     </div>
                                 </div>
                             </td>
@@ -130,7 +128,7 @@
     </div>
 @endsection
 @section('base.js')
-    <div class="modal fade" id="modal-poliklinik-full" data-bs-keyboard="false" data-bs-backdrop="static" tabindex="-1"
+    <div class="modal fade" id="modal-riwayat-full" data-bs-keyboard="false" data-bs-backdrop="static" tabindex="-1"
         aria-labelledby="staticBackdropLabel" aria-hidden="false">
         <div class="modal-dialog modal-dialog-centered" role="document" style="max-width: 95%;">
             <div class="modal-content border-0">
@@ -138,11 +136,11 @@
                     <button class="btn-close btn btn-sm btn-circle d-flex flex-center transition-base"
                         data-bs-dismiss="modal" aria-label="Close"></button>
                 </div>
-                <div id="menu-poliklinik-full"></div>
+                <div id="menu-riwayat-full"></div>
             </div>
         </div>
     </div>
-    <div class="modal fade" id="modal-poliklinik" data-bs-keyboard="false" data-bs-backdrop="static" tabindex="-1"
+    <div class="modal fade" id="modal-riwayat" data-bs-keyboard="false" data-bs-backdrop="static" tabindex="-1"
         aria-labelledby="staticBackdropLabel" aria-hidden="false">
         <div class="modal-dialog modal-dialog-centered modal-xl" role="document">
             <div class="modal-content border-0">
@@ -150,7 +148,7 @@
                     <button class="btn-close btn btn-sm btn-circle d-flex flex-center transition-base"
                         data-bs-dismiss="modal" aria-label="Close"></button>
                 </div>
-                <div id="menu-poliklinik"></div>
+                <div id="menu-riwayat"></div>
             </div>
         </div>
     </div>
@@ -165,5 +163,24 @@
             responsive: true
         });
     </script>
-
+    <script>
+        $(document).on("click", "#button-data-riwayat-penjualan", function (e) {
+            e.preventDefault();
+            var code = $(this).data("code");
+            $.ajax({
+                url: "{{ route('penjualan_history_penjualan_detail') }}",
+                type: "POST",
+                cache: false,
+                data: {
+                    "_token": "{{ csrf_token() }}",
+                    "code": code,
+                },
+                dataType: 'html',
+            }).done(function (data) {
+                $('#menu-riwayat').html(data);
+            }).fail(function () {
+                $('#menu-riwayat').html('eror');
+            });
+        });
+    </script>
 @endsection

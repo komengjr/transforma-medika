@@ -330,6 +330,18 @@
     <script src="{{ asset('vendors/choices/choices.min.js') }}"></script>
     <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
     <script>
+        window.addEventListener('load', () => {
+        const shouldCenter = localStorage.getItem('reloadToCenter');
+        if (shouldCenter === 'true') {
+            // Hitung posisi tengah dokumen
+            const centerPosition = (document.body.scrollHeight - window.innerHeight) / 2;
+            window.scrollTo({ top: centerPosition, behavior: 'smooth' });
+            // Hapus flag agar tidak terus menerus scroll ke tengah
+            localStorage.removeItem('reloadToCenter');
+        }
+        });
+    </script>
+    <script>
         function myFunction(data) {
             $('#modal-coa').modal('show');
             $.ajax({
@@ -418,6 +430,7 @@
                     $('#menu-add-data-coa').html('<button class="btn btn-success float-end" id="button-simpan-data-level-coa" data-code="">Simpan Data</button>');
                 } else {
                     $('#menu-add-data-coa').html(data);
+                    localStorage.setItem('reloadToCenter', 'true');
                     location.reload();
                 }
             }).fail(function () {

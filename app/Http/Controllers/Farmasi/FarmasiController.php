@@ -263,11 +263,10 @@ class FarmasiController extends Controller
                     'farm_order_data_pasien_doctor' => $request->namaDokter,
                     'farm_order_data_pasien_desc' => $request->keteranganResep,
                     'created_at' => now()
-
                 ]);
             }
         } else {
-            # code...
+
         }
         $list = DB::table('farm_list_log')->join('farm_data_obat', 'farm_data_obat.farm_data_obat_code', '=', 'farm_list_log.farm_data_obat_code')
             ->where('farm_list_log_reg', $request->no_reg)->get();
@@ -297,6 +296,7 @@ class FarmasiController extends Controller
             return Redirect::to('dashboard/home');
         }
     }
+
     // CETAK NOTA FARMASI
     public function penjualan_cetak_nota_farmmasi($akses, $id)
     {
@@ -316,6 +316,10 @@ class FarmasiController extends Controller
         } else {
             return Redirect::to('dashboard/home');
         }
+    }
+    public function penjualan_history_penjualan_detail(Request $request)
+    {
+        return view('app-farmasi.penjualan.history-penjualan.detail-history', ['code' => $request->code]);
     }
     // DATA PEMBELIAN PO
     public function manajemen_farmasi_pembelian_obat($akses, $id)

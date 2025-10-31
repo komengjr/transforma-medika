@@ -97,6 +97,27 @@
                 </tbody>
             </table>
         </div>
+        <div class="card">
+            <div id="nota">
+                <h2>Nota Pembelian</h2>
+                <p>Tanggal: <span id="tgl"></span></p>
+                <table border="1" cellspacing="0" cellpadding="6">
+                    <tr>
+                        <th>Item</th>
+                        <th>Qty</th>
+                        <th>Harga</th>
+                    </tr>
+                    <tr>
+                        <td>Paracetamol</td>
+                        <td>2</td>
+                        <td>Rp 20.000</td>
+                    </tr>
+                </table>
+            </div>
+
+            <button onclick="kirimCetak()">Kirim ke Printer</button>
+            <div id="status"></div>
+        </div>
     </div>
 @endsection
 @section('base.js')
@@ -121,6 +142,34 @@
         new DataTable('#example', {
             responsive: true
         });
+    </script>
+    <script>
+        document.getElementById('tgl').textContent = new Date().toLocaleString();
+
+        function kirimCetak() {
+            const html = `
+                <html><head><meta charset="utf-8">
+                <style>body{font-family:Arial;padding:20px}</style>
+                </head><body>${document.getElementById("nota").outerHTML}</body></html>
+              `;
+
+            document.getElementById('status').textContent = "Mengirim ke printer...";
+
+            fetch("http://localhost:3000/print", {
+                method: "POST",
+                headers: { "Content-Type": "application/json" },
+                body: JSON.stringify({ html }),
+            })
+                .then(r => r.json())
+                .then(j => {
+                    document.getElementById('status').textContent = j.ok
+                        ? "✅ Berhasil dikirim ke printer!"
+                        : "❌ Gagal: " + j.error;
+                })
+                .catch(e => {
+                    document.getElementById('status').textContent = "❌ Error: " + e.message;
+                });
+        }
     </script>
     <script>
         $(document).on("click", "#button-add-data-cabang", function (e) {
