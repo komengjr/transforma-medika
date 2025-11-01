@@ -153,11 +153,18 @@ class AccountingController extends Controller
     public function master_accounting_coa_save_level(Request $request)
     {
         try {
+            $get = DB::table('acc_master_coa_data')->where('acc_coa_data_code', $request->code)->first();
+            if (!$get) {
+                $get = DB::table('acc_master_coa')->where('acc_master_coa_code', $request->code)->first();
+                $no = $get->acc_master_coa_no;
+            } else {
+                $no = $get->acc_coa_data_no;
+            }
             $total = DB::table('acc_master_coa_data')->where('acc_master_coa_code', $request->code)->count();
             DB::table('acc_master_coa_data')->insert([
                 'acc_coa_data_code' => $request->code . str_pad($total + 1, 3, '0', STR_PAD_LEFT),
                 'acc_master_coa_code' => $request->code,
-                'acc_coa_data_no' => $request->nomor,
+                'acc_coa_data_no' => $no . '.' . ($total + 1),
                 'acc_coa_data_name' => $request->name,
                 'acc_coa_data_type' => 1,
                 'acc_coa_data_level' => $request->level,

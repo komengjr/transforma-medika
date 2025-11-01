@@ -13,7 +13,7 @@
                     <input type="text" name="level" id="" value="{{ $level }}" hidden>
                     <input type="text" name="code" id="" value="{{ $code }}" hidden>
                     <input type="text" name="nomor" id="" value="{{ $nomor }}" hidden>
-                    <h5><span class="badge bg-primary">Nomor : {{ $nomor }}</span></h5>
+                    <!-- <h5><span class="badge bg-primary">Nomor : {{ $nomor }}</span></h5> -->
                     <div class="col-md-6">
                         <label for="inputLastName1" class="form-label text-youtube">Account Name</label>
                         <div class="input-group"> <span class="input-group-text"><i
@@ -47,6 +47,8 @@
                 <thead class="bg-200">
                     <tr>
                         <th>No</th>
+                        <th>Master Account</th>
+                        <th>Sub Account</th>
                         <th>Nomor Account</th>
                         <th>Nama Account</th>
                         <th>Type Account</th>
@@ -59,6 +61,8 @@
                     @foreach ($data as $datas)
                         <tr>
                             <td>{{ $no++ }}</td>
+                            <td>{{ $datas->acc_coa_data_code }}</td>
+                            <td>{{ $datas->acc_master_coa_code }}</td>
                             <td>{{ $datas->acc_coa_data_no }}</td>
                             <td>{{ $datas->acc_coa_data_name }}</td>
                             <td>
