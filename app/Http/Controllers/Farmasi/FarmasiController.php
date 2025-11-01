@@ -102,9 +102,14 @@ class FarmasiController extends Controller
     }
     public function penjualan_non_resep_show_data_list(Request $request)
     {
-        $list = DB::table('farm_list_log')->join('farm_data_obat', 'farm_data_obat.farm_data_obat_code', '=', 'farm_list_log.farm_data_obat_code')
-            ->where('farm_list_log_reg', $request->code)->get();
-        return view('app-farmasi.penjualan.non-resep.form-data-list', ['code' => $request->code, 'list' => $list]);
+        $list = DB::table('farm_list_log')
+            ->join('farm_data_obat', 'farm_data_obat.farm_data_obat_code', '=', 'farm_list_log.farm_data_obat_code')
+            ->where('farm_list_log_reg', $request->code)
+            ->get();
+        return view('app-farmasi.penjualan.non-resep.form-data-list', [
+            'code' => $request->code,
+            'list' => $list
+        ]);
     }
     public function penjualan_non_resep_payment_data_list(Request $request)
     {

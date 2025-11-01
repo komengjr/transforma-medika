@@ -104,8 +104,8 @@
             <div class="col-md-4">
                 <label class="form-label">Nama Obat</label>
                 <!-- <input type="text" class="form-control" id="namaObat" placeholder="Ketik nama obat..."> -->
-                <select name="namaObat" class="form-select form-select-lg choices-single-company" id="namaObat">
-                    <option value="">Ketik nama obat...</option>
+                <select name="namaObat" class="form-select form-select-lg js-choice" id="namaObat">
+                    <option ></option>
                     @foreach ($data as $datas)
                         <option value="{{ $datas->farm_data_obat_code }}">{{ $datas->farm_data_obat_name }}</option>
                     @endforeach
@@ -124,9 +124,10 @@
                 <label class="form-label">Subtotal</label>
                 <input type="text" class="form-control" id="subtotalObat" readonly>
             </div>
-            <div class="col-md-2 text-center">
+            <div class="col-md-2 text-center" id="loading-button-tambah">
                 <button type="button" class="btn btn-success btn-action w-100" id="tambahBtn"><i
                         class="bi bi-plus-circle"></i> Tambah</button>
+
             </div>
         </form>
     </div>
@@ -205,9 +206,7 @@
         });
     </script>
 
-    <script>
-        new window.Choices(document.querySelector(".choices-single-company"));
-    </script>
+
     <script>
         function formatRupiah(angka) {
             return new Intl.NumberFormat('id-ID', {
@@ -217,7 +216,7 @@
             }).format(angka);
         }
         $('#namaObat').on("change", function () {
-            var dataid = document.getElementById("namaObat").value;
+            const dataid = document.getElementById("namaObat").value;
             if (dataid == "") {
                 Swal.fire({
                     icon: "error",
@@ -260,6 +259,11 @@
         $(document).on("click", "#tambahBtn", function (e) {
             e.preventDefault();
             var data = $("#formObat").serialize();
+            $('#loading-button-tambah').html(
+                '<button type="button" class="btn btn-success btn-action w-100" disabled><i class="bi bi-plus-circle"></i> Prosess...</button >'
+            );
+            const select = document.getElementById('namaObat');
+
             $.ajax({
                 url: "{{ route('penjualan_non_resep_save_data') }}",
                 type: "POST",
@@ -274,13 +278,19 @@
                         text: "APe Yang kau Pileh !",
                         footer: '<a href="#">Why do I have this issue?</a>'
                     });
+                    $('#loading-button-tambah').html(
+                        '<button type="button" class="btn btn-success btn-action w-100" id="tambahBtn"><i class="bi bi-plus-circle"></i> Tambah</button >'
+                    );
                 } else {
                     $('#table-list-harga').html(data);
                     document.getElementById("jumlahObat").value = "1";
                     document.getElementById("hargaObat").value = "";
                     document.getElementById("hargaObatx").value = "";
-                    document.getElementById("namaObat").value = "";
+                    select.value = "";
                     document.getElementById("subtotalObat").value = "";
+                    $('#loading-button-tambah').html(
+                        '<button type="button" class="btn btn-success btn-action w-100" id="tambahBtn"><i class="bi bi-plus-circle"></i> Tambah</button >'
+                    );
                 }
             }).fail(function () {
                 $('#table-list-harga').html('eror');

@@ -131,7 +131,7 @@ class BrodcastController extends Controller
                     $nomorhp = '+62' . substr($nomorhp, 1);
                 }
             }
-            $text = "Hi *Sahabat Klinik* \n" . $request->subject . "\n\n" . $request->text . "\n\nSupport By. Innoverta";
+            $text = "Halo " . $request->subject . "\n\n" . $request->text . "\n\nSupport By. *Innoventra*";
             DB::table('v_log_whatsapp')->insert([
                 'v_log_whatsapp_code' => str::uuid(),
                 'd_reg_order_list_code' => str::uuid(),
