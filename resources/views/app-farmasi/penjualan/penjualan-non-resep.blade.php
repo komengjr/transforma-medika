@@ -105,7 +105,7 @@
                 <label class="form-label">Nama Obat</label>
                 <!-- <input type="text" class="form-control" id="namaObat" placeholder="Ketik nama obat..."> -->
                 <select name="namaObat" class="form-select form-select-lg js-choice" id="namaObat">
-                    <option ></option>
+                    <option value="">Pilih Obat</option>
                     @foreach ($data as $datas)
                         <option value="{{ $datas->farm_data_obat_code }}">{{ $datas->farm_data_obat_name }}</option>
                     @endforeach

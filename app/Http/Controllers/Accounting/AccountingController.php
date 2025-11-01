@@ -142,10 +142,12 @@ class AccountingController extends Controller
     }
     public function master_accounting_coa_add_level(Request $request)
     {
+        $data = DB::table('acc_master_coa_data')->where('acc_master_coa_code', $request->code)->get();
         return view('app-accounting.master.form.form-add-level-coa', [
             'level' => $request->level,
             'code' => $request->code,
-            'nomor' => $request->nomor
+            'nomor' => $request->nomor,
+            'data' => $data
         ]);
     }
     public function master_accounting_coa_save_level(Request $request)
@@ -164,8 +166,8 @@ class AccountingController extends Controller
                 'created_at' => now()
             ]);
             $total = DB::table('acc_master_coa_data')->where('acc_coa_data_opt', 0)->count();
-            $data = DB::table('acc_master_coa')->get();
-            return 'berhasil Input';
+            $data = DB::table('acc_master_coa_data')->where('acc_master_coa_code', $request->code)->get();
+            return view('app-accounting.master.form.data-table-coa', ['data' => $data]);
         } catch (\Throwable $e) {
             return 0;
         }

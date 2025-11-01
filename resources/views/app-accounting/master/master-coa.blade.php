@@ -315,7 +315,7 @@
         <div class="modal-dialog modal-dialog-centered modal-lg" role="document">
             <div class="modal-content border-0">
                 <div class="position-absolute top-0 end-0 mt-3 me-3 z-index-1">
-                    <button class="btn-close btn btn-sm btn-circle d-flex flex-center transition-base"
+                    <button class="btn-close btn btn-sm btn-circle d-flex flex-center transition-base" onclick="location.reload()"
                         data-bs-dismiss="modal" aria-label="Close"></button>
                 </div>
                 <div id="menu-coa"></div>
@@ -429,9 +429,10 @@
                     });
                     $('#menu-add-data-coa').html('<button class="btn btn-success float-end" id="button-simpan-data-level-coa" data-code="">Simpan Data</button>');
                 } else {
-                    $('#menu-add-data-coa').html(data);
-                    localStorage.setItem('reloadToCenter', 'true');
-                    location.reload();
+                    document.getElementById('nama_account').value = "";
+                    document.getElementById('option_account').value = "";
+                    $('#data-table-accoaunt-coa').html(data);
+                    $('#menu-add-data-coa').html('<button class="btn btn-success float-end" id="button-simpan-data-level-coa" data-code="">Simpan Data</button>');
                 }
             }).fail(function () {
                 Swal.fire({
