@@ -43,7 +43,7 @@
             </div>
         </div>
         <div id="data-table-accoaunt-coa">
-            <table class="table table-bordered">
+            <table class="table table-bordered fs--2" id="data-account">
                 <thead class="bg-200">
                     <tr>
                         <th>No</th>
@@ -61,11 +61,11 @@
                     @foreach ($data as $datas)
                         <tr>
                             <td>{{ $no++ }}</td>
-                            <td>{{ $datas->acc_coa_data_code }}</td>
                             <td>{{ $datas->acc_master_coa_code }}</td>
+                            <td>{{ $datas->acc_coa_data_code }}</td>
                             <td>{{ $datas->acc_coa_data_no }}</td>
                             <td>{{ $datas->acc_coa_data_name }}</td>
-                            <td>
+                            <td class="text-center">
                                 @if ($datas->acc_coa_data_opt == 0)
                                     <span class="badge bg-warning">Single</span>
                                 @else
@@ -83,3 +83,10 @@
 <div class="modal-footer px-4 bg-300">
 
 </div>
+<script>
+    new DataTable('#data-account', {
+        responsive: true,
+        ordering: false,
+        "lengthMenu": [[5, 50, 25], [5, 50, 25]]
+    });
+</script>
