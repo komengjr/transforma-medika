@@ -60,10 +60,13 @@ class PelayananController extends Controller
     {
         if ($this->url_akses($akses, $id) == true) {
             $total = DB::table('d_reg_order')->where('d_reg_order_cabang', Auth::user()->access_cabang)->count();
+            $pending = DB::table('d_reg_order')->where('d_reg_order_cabang', Auth::user()->access_cabang)
+                ->where('d_reg_order_status', 0)->count();
             return view('application.pelayanan.registrasi-pasien', [
                 'akses' => $akses,
                 'code' => $id,
-                'total' => $total
+                'total' => $total,
+                'pending' => $pending,
             ]);
         } else {
             return Redirect::to('dashboard/home');
@@ -547,12 +550,83 @@ class PelayananController extends Controller
                 ->join('master_patient', 'master_patient.master_patient_code', '=', 'd_reg_order.d_reg_order_rm')
                 ->join('t_layanan_cat', 't_layanan_cat.t_layanan_cat_code', '=', 'd_reg_order.t_layanan_cat_code')
                 ->join('t_pasien_cat', 't_pasien_cat.t_pasien_cat_code', '=', 'd_reg_order.t_pasien_cat_code')
-                ->where('d_reg_order.d_reg_order_cabang', Auth::user()->access_cabang)
+                ->where('d_reg_order.d_reg_order_cabang', Auth::user()->access_cabang)->orderBy('id_d_reg_order', 'DESC')
                 ->get();
             return view('application.pelayanan.menu-verifikasi-data-registrasi', ['data' => $data, 'akses' => $akses, 'code' => $id]);
         } else {
             return Redirect::to('dashboard/home');
         }
+    }
+    public function menu_pelayanan_verifikasi_registrasi_data(Request $request)
+    {
+        $pasien = DB::table('d_reg_order')
+            ->join('master_patient', 'master_patient.master_patient_code', '=', 'd_reg_order.d_reg_order_rm')
+            ->where('d_reg_order.d_reg_order_code', $request->code)->first();
+        $data = DB::table('d_reg_order_list')
+            ->join('t_layanan_cat', 't_layanan_cat.t_layanan_cat_code', '=', 'd_reg_order_list.t_layanan_cat_code')
+            ->where('d_reg_order_list.d_reg_order_code', $request->code)->get();
+        return view('application.pelayanan.verifikasi-registrasi.form-verifikasi-data', [
+            'pasien' => $pasien,
+            'data' => $data
+        ]);
+    }
+    public function menu_pelayanan_verifikasi_registrasi_data_detail(Request $request)
+    {
+        $cek = DB::table('d_reg_order_list')
+            ->join('t_layanan_cat', 't_layanan_cat.t_layanan_cat_code', '=', 'd_reg_order_list.t_layanan_cat_code')
+            ->where('d_reg_order_list.d_reg_order_list_code', $request->code)->first();
+        if ($cek->t_layanan_cat_name == 'POLIKLINIK') {
+            $diagnosa = DB::table('diag_poli_fisik_umum_d')
+                ->join('diag_poli_fisik_umum', 'diag_poli_fisik_umum.diag_poli_fisik_umum_code', '=', 'diag_poli_fisik_umum_d.diag_poli_fisik_umum_code')
+                ->where('diag_poli_fisik_umum_d.d_reg_order_poli_code', $request->code)->get();
+            $odontogram = DB::table('diag_poli_gigi_odon')
+                ->where('d_reg_order_poli_code', $request->code)->get();
+            return view('application.pelayanan.verifikasi-registrasi.form-detail-poliklinik', [
+                'diagnosa' => $diagnosa,
+                'odontogram' => $odontogram
+            ]);
+        } elseif ($cek->t_layanan_cat_name == 'RADIOLOGI') {
+            return 'belum diset';
+        } else {
+            return 'belum ditemukan';
+        }
+
+    }
+    public function menu_pelayanan_verifikasi_pembatalan_registrasi(Request $request)
+    {
+        $total = 0;
+        $cek = DB::table('d_reg_order_list')
+            ->join('t_layanan_cat', 't_layanan_cat.t_layanan_cat_code', '=', 'd_reg_order_list.t_layanan_cat_code')
+            ->where('d_reg_order_code', $request->code)->get();
+        foreach ($cek as $value) {
+            if ($value->t_layanan_cat_name == 'POLIKLINIK') {
+                $count = DB::table('d_reg_order_poli_list')->where('d_reg_order_poli_code', $value->d_reg_order_list_code)->count();
+                $total = $total + $count;
+            } else {
+                # code...
+            }
+        }
+        if ($total == 0) {
+            DB::table('d_reg_order_reject')->insert([
+                'd_reg_order_reject_code' => str::uuid(),
+                'd_reg_order_code' => $request->code,
+                'd_reg_order_reject_user' => Auth::user()->userid,
+                'd_reg_order_reject_date' => now(),
+                'created_at' => now()
+            ]);
+            DB::table('d_reg_order')->where('d_reg_order_code', $request->code)->update([
+                'd_reg_order_status' => -1,
+                'updated_at' => now()
+            ]);
+            return 'Berhasil Reject';
+        } else {
+            return 'Data Tidak Bisa di batalkan Karna Sudah di Prsoes';
+        }
+
+    }
+    public function menu_pelayanan_verifikasi_registrasi_data_save(Request $request)
+    {
+        return 123;
     }
     // SUPERVISIOR PELAYANAN
     public function menu_pelayanan_supervisior($akses, $id)

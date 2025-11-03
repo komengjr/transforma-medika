@@ -316,7 +316,7 @@
 
     </div>
 </div>
-<!-- <div class="card mb-3">
+<div class="card mb-3">
     <div class="card-header bg-300">
         <h5 class="mb-0">Fasilitas Order</h5>
     </div>
@@ -332,7 +332,7 @@
         </div>
     </div>
 
-</div> -->
+</div>
 @php
     $ran = mt_rand(100, 999);
 @endphp

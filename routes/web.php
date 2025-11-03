@@ -214,7 +214,7 @@ Route::prefix('{akses}/{id}/application')->group(function () {
 
 });
 
-// MENU REGISTRASI
+// MENU PELAYANAN
 Route::prefix('application')->group(function () {
     Route::post('registrasi-pasien/add', [PelayananController::class, 'registrasi_pasien_add'])->name('registrasi_pasien_add');
     Route::post('registrasi-pasien/reader-passport-pasien', [PelayananController::class, 'registrasi_pasien_reader_passport'])->name('registrasi_pasien_reader_passport');
@@ -247,7 +247,11 @@ Route::prefix('application')->group(function () {
     Route::post('data-registrasi/history', [PelayananController::class, 'data_registrasi_history'])->name('data_registrasi_history');
     // SUPERVISIOR PELAYANAN
     Route::post('menu-pelayanan/menu-supervisior/find', [PelayananController::class, 'menu_pelayanan_supervisior_find'])->name('menu_pelayanan_supervisior_find');
-
+    // VERIFIKASI PENDAFTARAN
+    Route::post('menu-pelayanan/verifikasi-data-registrasi/verifikasi', [PelayananController::class, 'menu_pelayanan_verifikasi_registrasi_data'])->name('menu_pelayanan_verifikasi_registrasi_data');
+    Route::post('menu-pelayanan/verifikasi-data-registrasi/verifikasi-detail', [PelayananController::class, 'menu_pelayanan_verifikasi_registrasi_data_detail'])->name('menu_pelayanan_verifikasi_registrasi_data_detail');
+    Route::post('menu-pelayanan/verifikasi-data-registrasi/pembatalan-registrasi', [PelayananController::class, 'menu_pelayanan_verifikasi_pembatalan_registrasi'])->name('menu_pelayanan_verifikasi_pembatalan_registrasi');
+    Route::post('menu-pelayanan/verifikasi-data-registrasi/verifikasi-save', [PelayananController::class, 'menu_pelayanan_verifikasi_registrasi_data_save'])->name('menu_pelayanan_verifikasi_registrasi_data_save');
 });
 
 Route::prefix('master-data')->group(function () {
