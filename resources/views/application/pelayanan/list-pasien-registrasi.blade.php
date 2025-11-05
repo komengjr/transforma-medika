@@ -14,7 +14,8 @@
                         <img class="ms-3 mx-3 m-2" src="{{ asset('img/list-pasien.png') }}" alt="" width="50" />
                         <div>
                             <h6 class="text-info fs--1 mb-0 pt-2">Welcome to </h6>
-                            <h4 class="text-info fw-bold mb-1">{{ Env('APP_LABEL')}} <span class="text-primary fw-medium">Management
+                            <h4 class="text-info fw-bold mb-1">{{ Env('APP_LABEL')}} <span
+                                    class="text-primary fw-medium">Management
                                     System</span></h4>
                         </div>
                         <img class="ms-n4 d-none d-lg-block "
@@ -86,12 +87,13 @@
                 </div>
                 <div class="d-flex">
                     <input class="form-control datetimepicker" id="timepicker3" type="text" placeholder="d/m/y to d/m/y"
-                        data-options='{"mode":"range","dateFormat":"d/m/y","disableMobile":true,"locale":"en"}' />
+                        data-options='{"mode":"range","dateFormat":"Y-m-d","disableMobile":true,"locale":"en"}'
+                        onchange="search(this)" />
                 </div>
             </div>
         </div>
-        <div class="card-body border-top p-3">
-            <table id="example" class="table table-striped nowrap" style="width:100%">
+        <div class="card-body border-top p-3" id="hasil-pencarian-list">
+            <table id="example" class="table table-striped" style="width:100%">
                 <thead class="bg-200 text-700">
                     <tr>
                         <th>No</th>
@@ -144,7 +146,7 @@
                                             class="fas fa-align-left me-1" data-fa-transform="shrink-3"></span>Menu</button>
                                     <div class="dropdown-menu" aria-labelledby="btnGroupVerticalDrop2">
                                         <button class="dropdown-item" data-bs-toggle="modal" data-bs-target="#modal-registrasi"
-                                            id="button-data-history-pasien" data-code="{{$datas->d_reg_order_code}}"><span
+                                            id="button-data-history-pasien" data-code="{{$datas->d_reg_order_rm}}"><span
                                                 class="far fa-folder-open"></span>
                                             History</button>
                                     </div>
@@ -216,5 +218,38 @@
                 $('#menu-registrasi').html('eror');
             });
         });
+    </script>
+    <script>
+        function search(ele) {
+            const code = document.getElementById("timepicker3").value;
+            $("#hasil-pencarian-list").html(
+                '<div class="spinner-border my-3" style="display: block; margin-left: auto; margin-right: auto;" role="status"><span class="visually-hidden">Loading...</span></div>'
+            );
+            let tgl1 = code.substring(0, 10);
+            let tgl2 = code.substring(14, 24);
+            console.log(tgl1);
+            console.log(tgl2);
+            if (tgl2 == "") {
+
+            } else {
+                $.ajax({
+                    url: "{{ route('data_registrasi_find_data') }}",
+                    type: "POST",
+                    cache: false,
+                    data: {
+                        "_token": "{{ csrf_token() }}",
+                        "tgl1": tgl1,
+                        "tgl2": tgl2
+                    },
+                    dataType: 'html',
+                }).done(function (data) {
+                    $("#hasil-pencarian-list").html(data);
+                }).fail(function () {
+                    $("#hasil-pencarian-list").html(
+                        '<i class="fa fa-info-sign"></i> Something went wrong, Please try again...'
+                    );
+                });
+            }
+        };
     </script>
 @endsection

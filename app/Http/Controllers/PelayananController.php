@@ -60,13 +60,13 @@ class PelayananController extends Controller
     {
         if ($this->url_akses($akses, $id) == true) {
             $total = DB::table('d_reg_order')->where('d_reg_order_cabang', Auth::user()->access_cabang)->count();
-            $pending = DB::table('d_reg_order')->where('d_reg_order_cabang', Auth::user()->access_cabang)
-                ->where('d_reg_order_status', 0)->count();
+            $reject = DB::table('d_reg_order')->where('d_reg_order_cabang', Auth::user()->access_cabang)
+                ->where('d_reg_order_status', -1)->count();
             return view('application.pelayanan.registrasi-pasien', [
                 'akses' => $akses,
                 'code' => $id,
                 'total' => $total,
-                'pending' => $pending,
+                'reject' => $reject,
             ]);
         } else {
             return Redirect::to('dashboard/home');
@@ -540,7 +540,15 @@ class PelayananController extends Controller
     }
     public function data_registrasi_history(Request $request)
     {
-        return view('application.pelayanan.data-registrasi.form-data-registrasi-pasien');
+        $data = DB::table('d_reg_order')
+            ->join('t_layanan_cat', 't_layanan_cat.t_layanan_cat_code', '=', 'd_reg_order.t_layanan_cat_code')
+            ->where('d_reg_order.d_reg_order_rm', $request->code)->get();
+        return view('application.pelayanan.data-registrasi.form-data-registrasi-pasien', ['data' => $data]);
+    }
+    public function data_registrasi_find_data(Request $request)
+    {
+        $data = DB::select("CALL get_pasien(?,?)", [$request->tgl1, $request->tgl2]);
+        return view('application.pelayanan.list-pasien.data-table-list', ['data' => $data]);
     }
     // VERIFIKASI DATA REGISTRASI
     public function menu_pelayanan_verifikasi_registrasi($akses, $id)
@@ -665,5 +673,9 @@ class PelayananController extends Controller
         } catch (Exception $e) {
             return $e;
         }
+    }
+    public function menu_pelayanan_supervisior_detail_pasien(Request $request)
+    {
+        return view('application.pelayanan.menu-supervisior.detail-pasien');
     }
 }

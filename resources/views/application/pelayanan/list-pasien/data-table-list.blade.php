@@ -14,11 +14,11 @@
     <tbody class="fs--2">
         @php
             $no = 1;
-         @endphp
+        @endphp
         @foreach ($data as $datas)
             @php
                 $user = DB::table('user_mains')->select('fullname')->where('userid', $datas->d_reg_order_user)->first();
-             @endphp
+            @endphp
             <tr>
                 <td>{{ $no++ }}</td>
                 <td>
@@ -37,7 +37,7 @@
                         $layanan = DB::table('d_reg_order_list')->where('d_reg_order_code', $datas->d_reg_order_code)
                             ->join('t_layanan_cat', 't_layanan_cat.t_layanan_cat_code', '=', 'd_reg_order_list.t_layanan_cat_code')
                             ->get();
-                     @endphp
+                    @endphp
                     @foreach ($layanan as $layanans)
                         <li><strong>{{$layanans->d_reg_order_list_code }}</strong> <br> <span
                                 class="text-warning">{{$layanans->t_layanan_cat_name}}</span></li>
@@ -50,11 +50,10 @@
                             type="button" data-bs-toggle="dropdown" aria-haspopup="true" aria-expanded="false"><span
                                 class="fas fa-align-left me-1" data-fa-transform="shrink-3"></span>Menu</button>
                         <div class="dropdown-menu" aria-labelledby="btnGroupVerticalDrop2">
-                            <button class="dropdown-item" data-bs-toggle="modal" data-bs-target="#modal-supervisior"
-                                id="button-data-detail-Pasien" data-code="{{$datas->d_reg_order_code}}">
-                                <span class="fab fa-elementor"></span>
-                                Detail Pasien
-                            </button>
+                            <button class="dropdown-item" data-bs-toggle="modal" data-bs-target="#modal-registrasi"
+                                id="button-data-history-pasien" data-code="{{$datas->d_reg_order_rm}}"><span
+                                    class="far fa-folder-open"></span>
+                                History</button>
                         </div>
                     </div>
                 </td>
