@@ -53,7 +53,7 @@
         </div>
         <div class="card-body border-top p-3" id="hasil-pencarian-list">
             <table id="example" class="table table-striped" style="width:100%">
-                <thead class="bg-200 text-700">
+                <thead class="bg-300 fs--1">
                     <tr>
                         <th>No</th>
                         <th>No. Reg</th>
@@ -97,7 +97,7 @@
                                             class="text-warning">{{$layanans->t_layanan_cat_name}}</span></li>
                                 @endforeach
                             </td>
-                            <td>{{ $datas->d_reg_order_date }}</td>
+                            <td>{{ $datas->created_at }}</td>
                             <td>
                                 <div class="btn-group" role="group">
                                     <button class="btn btn-sm btn-falcon-primary dropdown-toggle" id="btnGroupVerticalDrop2"

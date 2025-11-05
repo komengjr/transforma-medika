@@ -62,11 +62,13 @@ class PelayananController extends Controller
             $total = DB::table('d_reg_order')->where('d_reg_order_cabang', Auth::user()->access_cabang)->count();
             $reject = DB::table('d_reg_order')->where('d_reg_order_cabang', Auth::user()->access_cabang)
                 ->where('d_reg_order_status', -1)->count();
+            $data = DB::select("CALL get_pasien_today(?)", [Auth::user()->access_cabang]);
             return view('application.pelayanan.registrasi-pasien', [
                 'akses' => $akses,
                 'code' => $id,
                 'total' => $total,
                 'reject' => $reject,
+                'data' => $data
             ]);
         } else {
             return Redirect::to('dashboard/home');
