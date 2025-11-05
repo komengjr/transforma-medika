@@ -86,7 +86,7 @@
                         </svg><!-- <span class="fas fa-print"></span> Font Awesome fontawesome.com --></button>
                 </div>
                 <div class="d-flex">
-                    <input class="form-control datetimepicker" id="timepicker3" type="text" placeholder="d/m/y to d/m/y"
+                    <input class="form-control datetimepicker" id="timepicker3" type="text" placeholder="Y-m-d to Y-m-d"
                         data-options='{"mode":"range","dateFormat":"Y-m-d","disableMobile":true,"locale":"en"}'
                         onchange="search(this)" />
                 </div>
@@ -227,8 +227,6 @@
             );
             let tgl1 = code.substring(0, 10);
             let tgl2 = code.substring(14, 24);
-            console.log(tgl1);
-            console.log(tgl2);
             if (tgl2 == "") {
 
             } else {
