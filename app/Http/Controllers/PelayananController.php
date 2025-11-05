@@ -527,12 +527,8 @@ class PelayananController extends Controller
     public function data_registrasi($akses, $id)
     {
         if ($this->url_akses($akses, $id) == true) {
-            $data = DB::table('d_reg_order')
-                ->join('master_patient', 'master_patient.master_patient_code', '=', 'd_reg_order.d_reg_order_rm')
-                ->join('t_layanan_cat', 't_layanan_cat.t_layanan_cat_code', '=', 'd_reg_order.t_layanan_cat_code')
-                ->join('t_pasien_cat', 't_pasien_cat.t_pasien_cat_code', '=', 'd_reg_order.t_pasien_cat_code')
-                ->where('d_reg_order.d_reg_order_cabang', Auth::user()->access_cabang)->orderBy('id_d_reg_order', 'DESC')
-                ->get();
+            $auth = Auth::user()->access_cabang;
+            $data = DB::select("CALL get_pasien_today(?)", [$auth]);
             return view('application.pelayanan.list-pasien-registrasi', ['data' => $data, 'akses' => $akses, 'code' => $id]);
         } else {
             return Redirect::to('dashboard/home');
@@ -552,7 +548,8 @@ class PelayananController extends Controller
     }
     public function data_registrasi_refresh_data(Request $request)
     {
-        $data = DB::select("CALL get_pasien_today()");
+        $auth = Auth::user()->access_cabang;
+        $data = DB::select("CALL get_pasien_today(?)", [$auth]);
         return view('application.pelayanan.list-pasien.data-table-list', ['data' => $data]);
     }
     // VERIFIKASI DATA REGISTRASI
