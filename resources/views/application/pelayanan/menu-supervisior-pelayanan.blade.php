@@ -43,7 +43,7 @@
             <div class="d-flex justify-content-between">
                 <div class="row g-3">
                     <div class="col-md-4">
-                        <select class="form-select js-choice" id="kategori_pasien" size="1" name="organizerSingle"
+                        <select class="form-select" id="kategori_pasien" size="1" name="organizerSingle"
                             data-options='{"removeItemButton":true,"placeholder":true}'>
                             <option value="">Pilih Kategori</option>
                             @foreach ($kategori as $cat)
@@ -52,7 +52,7 @@
                         </select>
                     </div>
                     <div class="col-md-4">
-                        <select class="form-select js-choice" id="layanan_pasien" size="1" name="organizerSingle"
+                        <select class="form-select" id="layanan_pasien" size="1" name="organizerSingle"
                             data-options='{"removeItemButton":true,"placeholder":true}'>
                             <option value="">Pilih Layanan</option>
                             <option value="all">All</option>

@@ -13,8 +13,8 @@
                         $no = $data->count();
                     @endphp
                     @foreach ($data as $datas)
-                        <div class="accordion-item">
-                            <h2 class="accordion-header" id="heading2">
+                        <div class="accordion-item bg-200">
+                            <h2 class="accordion-header" >
                                 <button class="accordion-button collapsed" type="button" data-bs-toggle="collapse"
                                     data-bs-target="#collapse{{$datas->id_d_reg_order}}" aria-expanded="true"
                                     aria-controls="collapse2">
