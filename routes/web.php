@@ -246,6 +246,7 @@ Route::prefix('application')->group(function () {
     // DATA REGISTRASI
     Route::post('data-registrasi/history', [PelayananController::class, 'data_registrasi_history'])->name('data_registrasi_history');
     Route::post('data-registrasi/find-date', [PelayananController::class, 'data_registrasi_find_data'])->name('data_registrasi_find_data');
+    Route::post('data-registrasi/refresh-data', [PelayananController::class, 'data_registrasi_refresh_data'])->name('data_registrasi_refresh_data');
     // SUPERVISIOR PELAYANAN
     Route::post('menu-pelayanan/menu-supervisior/find', [PelayananController::class, 'menu_pelayanan_supervisior_find'])->name('menu_pelayanan_supervisior_find');
     Route::post('menu-pelayanan/menu-supervisior/detail-pasien', [PelayananController::class, 'menu_pelayanan_supervisior_detail_pasien'])->name('menu_pelayanan_supervisior_detail_pasien');

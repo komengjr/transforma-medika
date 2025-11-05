@@ -550,6 +550,11 @@ class PelayananController extends Controller
         $data = DB::select("CALL get_pasien(?,?)", [$request->tgl1, $request->tgl2]);
         return view('application.pelayanan.list-pasien.data-table-list', ['data' => $data]);
     }
+    public function data_registrasi_refresh_data(Request $request)
+    {
+        $data = DB::select("CALL get_pasien_today()");
+        return view('application.pelayanan.list-pasien.data-table-list', ['data' => $data]);
+    }
     // VERIFIKASI DATA REGISTRASI
     public function menu_pelayanan_verifikasi_registrasi($akses, $id)
     {
