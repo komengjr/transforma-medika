@@ -125,7 +125,7 @@
 
         .brand-text {
             font-size: 1.3rem;
-            font-weight: 600;
+            /* font-weight: 600; */
             color: #2e64c2;
         }
 

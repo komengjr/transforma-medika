@@ -298,8 +298,7 @@
 
                         <li class="nav-item dropdown">
                             @guest
-                                <a class="nav-link text-warning" href="#!" data-bs-toggle="modal"
-                                    data-bs-target="#exampleModal"><span class="fab fa-keycdn"></span> Login</a>
+                                <a class="nav-link text-warning" href="{{route('login')}}" "><span class="fab fa-keycdn"></span> Login</a>
                             @else
                                 <a class="nav-link py-0 my-0" id="navbarDropdownUser" href="#" role="button"
                                     data-bs-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
