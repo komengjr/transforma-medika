@@ -232,14 +232,16 @@
     <!-- Lottie Animation Script -->
     <script>
         // Background animation (digital transformation theme)
-        lottie.loadAnimation({
-            container: document.getElementById('lottie-background'),
-            renderer: 'svg',
-            loop: true,
-            autoplay: true,
-            path: "{{asset('img/json/4.json')}}"
-            // animasi tema "Digital transformation / innovation background"
-        });
+        if (window.innerWidth >= 768) {
+            lottie.loadAnimation({
+                container: document.getElementById('lottie-background'),
+                renderer: 'svg',
+                loop: true,
+                autoplay: true,
+                path: "{{asset('img/json/4.json')}}"
+            });
+        }
+
 
         // Login Form Handler
         const form = document.getElementById('loginForm');
