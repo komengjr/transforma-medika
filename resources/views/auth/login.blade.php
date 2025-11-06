@@ -1,301 +1,284 @@
 <!DOCTYPE html>
-<html lang="en-US" dir="ltr">
+<html lang="id">
 
 <head>
-    <meta charset="utf-8">
-    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>Login | Innoventra by Transforma</title>
 
+    <!-- Bootstrap 5 -->
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet">
+    <!-- Bootstrap Icons -->
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.1/font/bootstrap-icons.css" rel="stylesheet">
+    <!-- Google Fonts -->
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;600&display=swap" rel="stylesheet">
+    <!-- Lottie -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/lottie-web/5.12.0/lottie.min.js"></script>
 
-    <!-- ===============================================-->
-    <!--    Document Title-->
-    <!-- ===============================================-->
-    <title>{{env('APP_LABEL')}} System Management | Login Page</title>
-
-
-    <!-- ===============================================-->
-    <!--    Favicons-->
-    <!-- ===============================================-->
-   <link rel="apple-touch-icon" sizes="180x180" href="{{ asset('img/favicon.png') }}">
-    <link rel="icon" type="image/png" sizes="32x32" href="{{ asset('img/favicon.png') }}">
-    <link rel="icon" type="image/png" sizes="16x16" href="{{ asset('img/favicon.png') }}">
-    <link rel="shortcut icon" type="image/x-icon" href="{{ asset('img/favicon.png') }}">
-    <link rel="manifest" href="{{ asset('asset/img/favicons/manifest.json') }}">
-    <meta name="msapplication-TileImage" content="{{ asset('img/favicon.png') }}">
-    <meta name="theme-color" content="#ffffff">
-    <script src="{{ asset('asset/js/config.js') }}"></script>
-    {{--
-    <script src="../../../vendors/overlayscrollbars/OverlayScrollbars.min.js"></script> --}}
-    <style>
-        @import url('https://fonts.googleapis.com/css2?family=Google+Sans+Code:ital,wght@0,300..800;1,300..800&display=swap');
-
-        * {
-            font-family: "Google Sans Code", monospace !important;
-            font-optical-sizing: auto;
-            font-weight: <weight>;
-            font-style: normal;
-        }
-    </style>
-
-    <!-- ===============================================-->
-    <!--    Stylesheets-->
-    <!-- ===============================================-->
-    {{--
-    <link rel="preconnect" href="https://fonts.gstatic.com"> --}}
-
-    <link href="{{ asset('vendors/overlayscrollbars/OverlayScrollbars.min.css') }}" rel="stylesheet">
-    <link href="{{ asset('asset/css/theme-rtl.min.css') }}" rel="stylesheet" id="style-rtl">
-    <link href="{{ asset('asset/css/theme.min.css') }}" rel="stylesheet" id="style-default">
-    <link href="{{ asset('asset/css/user-rtl.min.css') }}" rel="stylesheet" id="user-style-rtl">
-    <link href="{{ asset('asset/css/user.min.css') }}" rel="stylesheet" id="user-style-default">
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.7.1/jquery.min.js"
-        integrity="sha512-v2CJ7UaYy4JwqLDIrZUI/4hqeoQieOmAZNXBeQyjo21dadnwR+8ZaIJVT8EE2iyI61OV8e6M8PP2/4hpQINQ/g=="
-        crossorigin="anonymous" referrerpolicy="no-referrer"></script>
-    <link rel="stylesheet" href="{{ asset('asset/notifications/css/lobibox.min.css') }}" />
-    <script>
-        var isRTL = JSON.parse(localStorage.getItem('isRTL'));
-        if (isRTL) {
-            var linkDefault = document.getElementById('style-default');
-            var userLinkDefault = document.getElementById('user-style-default');
-            linkDefault.setAttribute('disabled', true);
-            userLinkDefault.setAttribute('disabled', true);
-            document.querySelector('html').setAttribute('dir', 'rtl');
-        } else {
-            var linkRTL = document.getElementById('style-rtl');
-            var userLinkRTL = document.getElementById('user-style-rtl');
-            linkRTL.setAttribute('disabled', true);
-            userLinkRTL.setAttribute('disabled', true);
-        }
-    </script>
     <style>
         body {
-            background: linear-gradient(90deg, rgba(74, 68, 176, 1) 0%, rgba(9, 9, 121, 1) 35%, rgba(0, 212, 255, 1) 100%);
-            background-size: 300% 300%;
-            animation: gradientMove 10s ease infinite;
             font-family: 'Poppins', sans-serif;
             height: 100vh;
             margin: 0;
-            /* display: flex; */
+            display: flex;
             align-items: center;
             justify-content: center;
-            /* overflow: hidden; */
+            background: linear-gradient(135deg, #e9f5ff, #ffffff);
+            overflow: hidden;
+            position: relative;
         }
 
-        .card {
+        /* Lottie Animation Container */
+        #lottie-background {
+            position: absolute;
+            inset: 0;
+            z-index: 0;
+            opacity: 0.5;
+            pointer-events: none;
+        }
 
-            box-shadow: 0 30px 45px rgba(0, 0, 0, 0.25);
+        /* Floating gradient shapes */
+        .gradient-shape {
+            position: absolute;
+            border-radius: 50%;
+            filter: blur(120px);
+            opacity: 0.5;
+            animation: float 10s ease-in-out infinite;
+        }
+
+        .gradient-shape.one {
+            width: 300px;
+            height: 300px;
+            background: #39c46a;
+            top: 10%;
+            left: 8%;
+            animation-delay: 0s;
+        }
+
+        .gradient-shape.two {
+            width: 400px;
+            height: 400px;
+            background: #2e64c2;
+            bottom: 5%;
+            right: 10%;
+            animation-delay: 3s;
+        }
+
+        @keyframes float {
+
+            0%,
+            100% {
+                transform: translateY(0);
+            }
+
+            50% {
+                transform: translateY(-25px);
+            }
+        }
+
+        /* Login Card */
+        .login-card {
+            position: relative;
+            z-index: 2;
+            background: rgba(255, 255, 255, 0.85);
+            backdrop-filter: blur(12px);
+            border-radius: 1.5rem;
+            box-shadow: 0 10px 35px rgba(0, 0, 0, 0.1);
+            max-width: 460px;
+            width: 100%;
+            padding: 2.5rem;
+            padding-top: 0.7rem;
+            margin: 1rem;
+            text-align: center;
+            animation: fadeInUp 1s ease forwards;
+        }
+
+        @keyframes fadeInUp {
+            0% {
+                opacity: 0;
+                transform: translateY(40px);
+            }
+
+            100% {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        .logo img {
+            width: 140px;
+            margin-bottom: 0;
+            animation: fadeIn 1.2s ease;
+        }
+
+        @keyframes fadeIn {
+            from {
+                opacity: 0;
+                transform: scale(0.9);
+            }
+
+            to {
+                opacity: 1;
+                transform: scale(1);
+            }
+        }
+
+        .brand-text {
+            font-size: 1.3rem;
+            font-weight: 600;
+            color: #2e64c2;
+        }
+
+        .subtitle {
+            color: #777;
+            font-size: 0.9rem;
+            margin-bottom: 1rem;
+        }
+
+        .form-control {
+            border-radius: 0.75rem;
+            padding: 0.75rem;
+            border-color: #d0d9e2;
+        }
+
+        .form-control:focus {
+            border-color: #39c46a;
+            box-shadow: 0 0 0 0.25rem rgba(57, 196, 106, 0.25);
+        }
+
+        .btn-primary {
+            background: linear-gradient(135deg, #2e64c2, #39c46a);
+            border: none;
+            border-radius: 0.75rem;
+            padding: 0.75rem;
+            font-weight: 600;
+            transition: all 0.3s ease;
+        }
+
+        .btn-primary:hover {
+            transform: scale(1.03);
+            filter: brightness(1.1);
+        }
+
+        .footer-text {
+            margin-top: 1.5rem;
+            font-size: 0.9rem;
+            color: #666;
+        }
+
+        .footer-text strong {
+            color: #2e64c2;
+        }
+
+        @media (max-width: 576px) {
+            .login-card {
+                padding: 2rem 1.5rem;
+            }
         }
     </style>
 </head>
 
 <body>
+    <!-- Gradient Shapes -->
+    <div class="gradient-shape one"></div>
+    <div class="gradient-shape two"></div>
 
-    <!-- ===============================================-->
-    <!--    Main Content-->
-    <!-- ===============================================-->
-    <main class="main" id="top">
-        <div class="container-fluid">
-            <div class="row min-vh-100 flex-center g-0">
-                <div class="col-lg-7 col-xxl-5 py-3 position-relative"><img class="bg-auth-circle-shape"
-                        src="../../../asset/img/icons/spot-illustrations/bg-shape.png" alt="" width="250"><img
-                        class="bg-auth-circle-shape-2" src="../../../asset/img/icons/spot-illustrations/shape-1.png"
-                        alt="" width="150">
-                    <div class="card overflow-hidden z-index-4">
-                        <div class="card-body p-0">
-                            <div class="row g-0 h-100">
-                                <div class="col-md-5 text-center bg-card-gradient">
-                                    <div class="position-relative p-4 pt-md-5 pb-md-7 light">
-                                        <div class="bg-holder bg-auth-card-shape"
-                                            style="background-image:url(../../../asset/img/icons/spot-illustrations/half-circle.png);">
-                                        </div>
-                                        <!--/.bg-holder-->
+    <!-- Lottie Animation -->
+    <div id="lottie-background"></div>
 
-                                        <div class="z-index-1 position-relative"><a
-                                                class="link-light mb-4 font-sans-serif fs-4 d-inline-block fw-bolder"
-                                                href="#">{{ env('APP_NAME') }} System</a>
-                                            <p class="opacity-75 text-white">With the power of Transforma, you can now
-                                                focus
-                                                only on functionaries for your digital products, while leaving the UI
-                                                design on us!</p>
-                                        </div>
-                                    </div>
-                                    <div class="mt-3 mb-4 mt-md-4 mb-md-5 light">
-                                        <p class="text-white">Tidak Mempunyai Akun ?<br><a
-                                                class="btn btn-outline-light mt-2 px-4"
-                                                href="{{ route('register') }}"><span class="far fa-address-card">
-                                                </span> Daftar Sekarang..</a>
-                                        </p>
-                                        <p class="mb-0 mt-4 mt-md-5 fs--1 fw-semi-bold text-white opacity-75">Read our
-                                            <a class="text-decoration-underline text-white" href="#!">terms</a> and
-                                            <a class="text-decoration-underline text-white" href="#!">conditions
-                                            </a>
-                                        </p>
-                                    </div>
-                                </div>
-                                <div class="col-md-7 d-flex flex-center">
-                                    <div class="p-4 p-md-5 flex-grow-1">
-                                        <div class="row flex-between-center">
-                                            <div class="col-auto">
-                                                <h3>Account Login</h3>
-                                            </div>
-                                        </div>
-                                        <!-- <form action="{{ route('login.post') }}" method="POST"> -->
+    <!-- Login Card -->
+    <div class="login-card">
 
-                                        <!-- @csrf -->
-                                        <div class="mb-3">
-                                            <label class="form-label" for="card-email">Username</label>
-                                            <input class="form-control" id="username" type="text" name="username"
-                                                required autofocus />
-                                            @if ($errors->has('username'))
-                                                <span class="text-danger">{{ $errors->first('username') }}</span>
-                                            @endif
-                                        </div>
-                                        <div class="mb-3">
-                                            <div class="d-flex justify-content-between">
-                                                <label class="form-label" for="card-password">Password</label>
-                                            </div>
-                                            <input class="form-control" id="password" type="password" name="password"
-                                                required />
-                                            @if ($errors->has('password'))
-                                                <span class="text-danger">{{ $errors->first('password') }}</span>
-                                            @endif
-                                        </div>
-                                        <span id="notifikasi-login" class="pb-0 mt-0"></span>
-                                        <div class="row flex-between-center">
-                                            <div class="col-auto">
-                                                <div class="form-check mb-0">
-                                                    <input class="form-check-input" type="checkbox" id="card-checkbox"
-                                                        checked="checked" />
-                                                    <label class="form-check-label mb-0" for="card-checkbox">Remember
-                                                        me</label>
-                                                </div>
-                                            </div>
-                                            <div class="col-auto"><a class="fs--1"
-                                                    href="{{route('forget_password')}}">Forgot
-                                                    Password?</a></div>
-                                        </div>
-                                        <div class="mb-3">
-                                            <button class="btn btn-primary d-block w-100 mt-3" type="button"
-                                                id="button-login-system" name="submit"><span
-                                                    class="fab fa-500px"></span> Log in</button>
-                                        </div>
-                                        <!-- </form> -->
-                                        <div class="position-relative mt-4">
-                                            <hr class="bg-300" />
-                                            <div class="divider-content-center">or log in with</div>
-                                        </div>
-                                        <div class="row g-2 mt-2">
-                                            <div class="col-sm-6"><a
-                                                    class="btn btn-outline-google-plus btn-sm d-block w-100"
-                                                    href="#"><span class="fab fa-google-plus-g me-2"
-                                                        data-fa-transform="grow-8"></span> google</a></div>
-                                            <div class="col-sm-6"><a
-                                                    class="btn btn-outline-facebook btn-sm d-block w-100" href="#"><span
-                                                        class="fab fa-facebook-square me-2"
-                                                        data-fa-transform="grow-8"></span> facebook</a></div>
-                                        </div>
-                                    </div>
-                                </div>
-                            </div>
-                        </div>
-                    </div>
-                </div>
-            </div>
+        <div class="logo">
+            <img src="https://innoventra.site/img/favicon.png" alt="Innoventra Logo">
         </div>
-    </main>
+        <div class="brand-text">Innoventra by <small class="text-success">Transforma</small></div>
+        <div class="subtitle">Masuk ke sistem</div>
 
-    <!-- ===============================================-->
-    <!--    End of Main Content-->
-    <!-- ===============================================-->
+        <form id="loginForm">
+            <div class="mb-3 text-start">
+                <label for="username" class="form-label fw-semibold">Username</label>
+                <input type="text" id="username" class="form-control" placeholder="Masukkan username Anda" required>
+            </div>
 
-    <!-- ===============================================-->
-    <!--    JavaScripts-->
-    <!-- ===============================================-->
-    <script src="{{ asset('vendors/popper/popper.min.js') }}"></script>
-    <script src="{{ asset('vendors/bootstrap/bootstrap.min.js') }}"></script>
-    <script src="{{ asset('vendors/anchorjs/anchor.min.js') }}"></script>
-    <script src="{{ asset('vendors/is/is.min.js') }}"></script>
-    <script src="{{ asset('vendors/fontawesome/all.min.js') }}"></script>
-    <script src="{{ asset('vendors/lodash/lodash.min.js') }}"></script>
-    {{--
-    <script src="https://polyfill.io/v3/polyfill.min.js?features=window.scroll"></script> --}}
-    <script src="{{ asset('vendors/list.js/list.min.js') }}"></script>
-    <script src="{{ asset('asset/js/theme.js') }}"></script>
-    <script src="{{ asset('asset/notifications/js/notifications.min.js') }}"></script>
-    <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
-    @if (session('success'))
-        <!-- <div class="toast hide notice shadow-none bg-transparent my-2" id="cookie-notice" role="alert"
-                                        data-options='{"autoShow":true,"showOnce":true,"cookieExpireTime":20}' data-autohide="false"
-                                        aria-live="assertive" aria-atomic="true" style="">
-                                        <div class="toast-body my-2 ms-1 md-2">
-                                            <div class="card border-2 border-secondary">
-                                                <div class="card-body ">
-                                                    <div class="d-flex">
-                                                        <div class="pe-3"><img src="{{ asset('asset/img/icons/alert.png') }}" width="40" alt="cookie" />
-                                                        </div>
-                                                        <div>
-                                                            <p>{{ session('success') }}</p>
-                                                            <button class="btn btn-sm btn-falcon-primary me-3" type="button" data-bs-dismiss="toast"
-                                                                aria-label="Close">Okay</button>
-                                                        </div>
-                                                    </div>
-                                                </div>
-                                            </div>
-                                        </div>
-                                    </div> -->
-        <script>
-            const Toast = Swal.mixin({
-                toast: true,
-                position: "top-end",
-                showConfirmButton: false,
-                timer: 3000,
-                timerProgressBar: true,
-                didOpen: (toast) => {
-                    toast.onmouseenter = Swal.stopTimer;
-                    toast.onmouseleave = Swal.resumeTimer;
-                }
-            });
-            Toast.fire({
-                icon: "warning",
-                title: "{{ session('success') }}"
-            });
-        </script>
-    @endif
+            <div class="mb-3 text-start">
+                <label for="password" class="form-label fw-semibold">Kata Sandi</label>
+                <input type="password" id="password" class="form-control" placeholder="Masukkan kata sandi" required>
+            </div>
+
+            <div class="d-flex justify-content-between align-items-center mb-4">
+                <div class="form-check">
+                    <input type="checkbox" class="form-check-input" id="rememberMe">
+                    <label for="rememberMe" class="form-check-label">Ingat saya</label>
+                </div>
+                <a href="#" class="text-decoration-none text-primary">Lupa Password?</a>
+            </div>
+
+            <button type="submit" class="btn btn-primary w-100">
+                <i class="bi bi-box-arrow-in-right me-2"></i>Masuk Sekarang
+            </button>
+        </form>
+        <span id="notifikasi-login" class="pb-0 mt-0"></span>
+        <div class="footer-text">
+            © 2025 <strong>Innoventra by Transforma</strong> — Mendorong Transformasi Digital.
+        </div>
+    </div>
+
+    <!-- Bootstrap JS -->
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.7.1/jquery.min.js"
+        integrity="sha512-v2CJ7UaYy4JwqLDIrZUI/4hqeoQieOmAZNXBeQyjo21dadnwR+8ZaIJVT8EE2iyI61OV8e6M8PP2/4hpQINQ/g=="
+        crossorigin="anonymous" referrerpolicy="no-referrer"></script>
+    <!-- Lottie Animation Script -->
     <script>
-        $(document).on("click", "#button-login-system", function (e) {
-            e.preventDefault();
-            var username = document.getElementById("username").value;
-            var password = document.getElementById("password").value;
-            $('#button-login-system').html(
-                '<div class="spinner-border my-0" style="display: block; margin-left: auto; margin-right: auto;" role="status"><span class="visually-hidden">Loading...</span></div>'
-            );
-            if (username == "" || password == "") {
-                Swal.fire({
-                    icon: "error",
-                    title: "Oops...",
-                    text: "Something went wrong!",
-                    footer: '<a href="#">Why do I have this issue?</a>'
-                });
-                $('#button-login-system').html('<span class="fab fa-500px"></span> Log in');
-            } else {
-                $.ajax({
-                    url: "{{ route('verifikasi_Login') }}",
-                    type: "POST",
-                    cache: false,
-                    data: {
-                        "_token": "{{ csrf_token() }}",
-                        "username": username,
-                        "password": password
-                    },
-                    dataType: 'html',
-                }).done(function (data) {
-                    $('#notifikasi-login').html(data);
-                    $('#button-login-system').html('<span class="fab fa-500px"></span> Log in');
-                }).fail(function () {
-                    console.log('error');
+        // Background animation (digital transformation theme)
+        lottie.loadAnimation({
+            container: document.getElementById('lottie-background'),
+            renderer: 'svg',
+            loop: true,
+            autoplay: true,
+            path: "{{asset('img/json/4.json')}}"
+            // animasi tema "Digital transformation / innovation background"
+        });
 
-                });
-            }
+        // Login Form Handler
+        const form = document.getElementById('loginForm');
+        form.addEventListener('submit', function (e) {
+            e.preventDefault();
+            const username = document.getElementById('username').value.trim();
+            const password = document.getElementById('password').value.trim();
+            const btn = form.querySelector('button');
+
+            btn.innerHTML = '<span class="spinner-border spinner-border-sm me-2"></span>Memeriksa...';
+            btn.disabled = true;
+            $.ajax({
+                url: "{{ route('verifikasi_Login') }}",
+                type: "POST",
+                cache: false,
+                data: {
+                    "_token": "{{ csrf_token() }}",
+                    "username": username,
+                    "password": password
+                },
+                dataType: 'html',
+            }).done(function (data) {
+                $('#notifikasi-login').html(data);
+                btn.innerHTML = '<i class="bi bi-box-arrow-in-right me-2"></i>Masuk Sekarang';
+                btn.disabled = false;
+            }).fail(function () {
+                btn.innerHTML = '<i class="bi bi-box-arrow-in-right me-2"></i>Masuk Sekarang';
+                btn.disabled = false;
+            });
+            // setTimeout(() => {
+            //     if (username === "admin" && password === "innoventra123") {
+            //         alert("Selamat datang di Innoventra, " + username + "!");
+            //         window.location.href = "dashboard.html";
+            //     } else {
+            //         alert("Username atau password salah!");
+            //         btn.innerHTML = '<i class="bi bi-box-arrow-in-right me-2"></i>Masuk Sekarang';
+            //         btn.disabled = false;
+            //     }
+            // }, 1000);
         });
     </script>
 </body>

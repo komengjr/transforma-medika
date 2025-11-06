@@ -126,7 +126,6 @@
                                     Registered <strong class="text-primary">{{ $datas->t_pasien_cat_name }}</strong> No Reg.
                                     <strong>{{ $datas->d_reg_order_code }}</strong></p>
                                 <span class="notification-time">{{ $datas->created_at }}</span>
-
                             </div>
                         </a>
                     @endforeach
