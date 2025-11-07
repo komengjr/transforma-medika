@@ -525,6 +525,12 @@ class PelayananController extends Controller
             ');
         return base64_encode($pdf->stream());
     }
+    public function registrasi_pasien_list_que(Request $request){
+        return view('application.pelayanan.antrian.list-antrian');
+    }
+    public function registrasi_pasien_choose_data_que(Request $request){
+        return 123;
+    }
     // DATA REGISTRASI
     public function data_registrasi($akses, $id)
     {

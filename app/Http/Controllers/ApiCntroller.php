@@ -21,4 +21,14 @@ class ApiCntroller extends Controller
             return response()->json($error, Response::HTTP_INTERNAL_SERVER_ERROR);
         }
     }
+    public function data_antrian()
+    {
+
+        $data_arr = array(
+            "loket1" => "A015",
+            "loket2" => "B004",
+            // "loket3" => "Z021"
+        );
+        return response()->json($data_arr);
+    }
 }

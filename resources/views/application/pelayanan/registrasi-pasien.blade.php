@@ -33,9 +33,9 @@
         <div class="col-lg-7">
             <div class="card bg-transparent-10 overflow-hidden border border-primary">
                 <div class="card-header position-relative">
-                    <div class="bg-holder d-none d-md-block bg-card z-index-1"
+                    <!-- <div class="bg-holder d-none d-md-block bg-card z-index-1"
                         style="background-image:url(../../img/pram.png);background-size:180px;background-position:right bottom;z-index:-1;">
-                    </div>
+                    </div> -->
                     <!--/.bg-holder-->
 
                     <div class="position-relative z-index-2">
@@ -82,8 +82,9 @@
                                     </div>
                                 </div>
                                 <div class="col-auto d-flex align-items-center">
-                                    <button class="btn btn-falcon-warning btn-sm"><span class="fab fa-squarespace"></span>
-                                        Pemeriksaan</button>
+                                    <button class="btn btn-falcon-warning btn-sm" data-bs-toggle="modal"
+                                        data-bs-target="#modal-registrasi-xl" id="button-call-antrian"><span class="fas fa-satellite-dish"></span>
+                                        Panggil Antrian</button>
                                 </div>
                             </div>
                         </li>
@@ -98,7 +99,7 @@
                                 </div>
                                 <div class="col-auto d-flex align-items-center">
                                     <button class="btn btn-falcon-danger btn-sm"><span class="fas fa-sign-out-alt"></span>
-                                        Close Registrasi</button>
+                                        Tutup Pendaftaran</button>
                                 </div>
                             </div>
                         </li>
@@ -124,7 +125,8 @@
                             <div class="notification-body">
                                 <p class="mb-1"><strong class="text-warning">{{$datas->master_patient_name}}</strong>
                                     Registered <strong class="text-primary">{{ $datas->t_pasien_cat_name }}</strong> No Reg.
-                                    <strong>{{ $datas->d_reg_order_code }}</strong></p>
+                                    <strong>{{ $datas->d_reg_order_code }}</strong>
+                                </p>
                                 <span class="notification-time">{{ $datas->created_at }}</span>
                             </div>
                         </a>
@@ -163,7 +165,7 @@
             </div>
         </div>
     </div>
-    <div class="modal fade" id="modal-company" data-bs-keyboard="false" data-bs-backdrop="static" tabindex="-1"
+    <div class="modal fade" id="modal-registrasi-xl" data-bs-keyboard="false" data-bs-backdrop="static" tabindex="-1"
         aria-labelledby="staticBackdropLabel" aria-hidden="false">
         <div class="modal-dialog modal-dialog-centered modal-xl" role="document">
             <div class="modal-content border-0">
@@ -171,7 +173,7 @@
                     <button class="btn-close btn btn-sm btn-circle d-flex flex-center transition-base"
                         data-bs-dismiss="modal" aria-label="Close"></button>
                 </div>
-                <div id="menu-company"></div>
+                <div id="menu-registrasi-xl"></div>
             </div>
         </div>
     </div>
@@ -181,6 +183,8 @@
     <script src="https://cdn.datatables.net/responsive/3.0.4/js/responsive.bootstrap5.js"></script>
     <script src="{{ asset('vendors/choices/choices.min.js') }}"></script>
     <script src="{{ asset('asset/js/swetalert.js') }}"></script>
+    <script src="https://cdn.socket.io/4.7.5/socket.io.min.js"></script>
+
     <script>
         new DataTable('#example', {
             responsive: true
@@ -613,6 +617,50 @@
                         icon: "error"
                     });
                 }
+            });
+        });
+    </script>
+    <script>
+        $(document).on("click", "#button-call-antrian", function (e) {
+            e.preventDefault();
+            // var code = $(this).data("code");
+            $('#menu-registrasi-xl').html(
+                '<div class="spinner-border my-3" style="display: block; margin-left: auto; margin-right: auto;" role="status"><span class="visually-hidden">Loading...</span></div>'
+            );
+            $.ajax({
+                url: "{{ route('registrasi_pasien_list_que') }}",
+                type: "POST",
+                cache: false,
+                data: {
+                    "_token": "{{ csrf_token() }}",
+                    "code": 1
+                },
+                dataType: 'html',
+            }).done(function (data) {
+                $('#menu-registrasi-xl').html(data);
+            }).fail(function () {
+                $('#menu-registrasi-xl').html('eror');
+            });
+        });
+        $(document).on("click", "#button-pilih-call-antrian", function (e) {
+            e.preventDefault();
+            // var code = $(this).data("code");
+            $('#menu-modal-antrian').html(
+                '<div class="spinner-border my-3" style="display: block; margin-left: auto; margin-right: auto;" role="status"><span class="visually-hidden">Loading...</span></div>'
+            );
+            $.ajax({
+                url: "{{ route('registrasi_pasien_choose_data_que') }}",
+                type: "POST",
+                cache: false,
+                data: {
+                    "_token": "{{ csrf_token() }}",
+                    "code": 1
+                },
+                dataType: 'html',
+            }).done(function (data) {
+                $('#menu-modal-antrian').html(data);
+            }).fail(function () {
+                $('#menu-modal-antrian').html('eror');
             });
         });
     </script>

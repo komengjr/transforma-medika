@@ -20,5 +20,6 @@ Route::middleware('auth:api')->get('/user', function (Request $request) {
 });
 Route::prefix('v1/')->group(function (): void {
     Route::get('data-product', [ApiCntroller::class, 'data_product'])->name('data_product');
+    Route::get('data-antrian', [ApiCntroller::class, 'data_antrian'])->name('data_antrian');
 
 });

@@ -216,6 +216,7 @@ Route::prefix('{akses}/{id}/application')->group(function () {
 
 // MENU PELAYANAN
 Route::prefix('application')->group(function () {
+    // PENDAFTARAAN SATU PINTU
     Route::post('registrasi-pasien/add', [PelayananController::class, 'registrasi_pasien_add'])->name('registrasi_pasien_add');
     Route::post('registrasi-pasien/reader-passport-pasien', [PelayananController::class, 'registrasi_pasien_reader_passport'])->name('registrasi_pasien_reader_passport');
     Route::post('registrasi-pasien/reader-passport-pasien/scan', [PelayananController::class, 'registrasi_pasien_reader_passport_scan'])->name('registrasi_pasien_reader_passport_scan');
@@ -243,6 +244,9 @@ Route::prefix('application')->group(function () {
     Route::post('registrasi-pasien/pilih-data-pasien/kebutuhan/fix-registrasi-rad', [PelayananController::class, 'registrasi_pasien_pilih_data_pasien_kebutuhan_fix_registrasi_rad'])->name('registrasi_pasien_pilih_data_pasien_kebutuhan_fix_registrasi_rad');
     Route::post('registrasi-pasien/pilih-data-pasien/end-proses', [PelayananController::class, 'registrasi_pasien_pilih_data_pasien_end_proses'])->name('registrasi_pasien_pilih_data_pasien_end_proses');
     Route::post('registrasi-pasien/pilih-data-pasien/preview-pdf', [PelayananController::class, 'registrasi_pasien_pilih_data_pasien_preview_pdf'])->name('registrasi_pasien_pilih_data_pasien_preview_pdf');
+    // ANTRIAN
+    Route::post('registrasi-pasien/list-que', [PelayananController::class, 'registrasi_pasien_list_que'])->name('registrasi_pasien_list_que');
+    Route::post('registrasi-pasien/choose-data-que', [PelayananController::class, 'registrasi_pasien_choose_data_que'])->name('registrasi_pasien_choose_data_que');
     // DATA REGISTRASI
     Route::post('data-registrasi/history', [PelayananController::class, 'data_registrasi_history'])->name('data_registrasi_history');
     Route::post('data-registrasi/find-date', [PelayananController::class, 'data_registrasi_find_data'])->name('data_registrasi_find_data');
@@ -608,4 +612,7 @@ Route::prefix('app/')->group(function (): void {
 });
 Route::prefix('pacs')->group(function (): void {
     Route::get('data/{id}', [PacsController::class, 'pacs_preview'])->name('pacs_preview');
+});
+Route::prefix('v1/display-antrian')->group(function (): void {
+    Route::get('data', [PacsController::class, 'pacs_antrian'])->name('pacs_antrian');
 });

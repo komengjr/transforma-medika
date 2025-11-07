@@ -560,7 +560,7 @@
             Swal.fire({
                 title: "Mohon Menunggu",
                 html: "I will Log out in <b></b> milliseconds.",
-                timer: 2000,
+                timer: 1000,
                 showCancelButton: true,
                 cancelButtonText: "No, Batal Logout!",
                 timerProgressBar: true,
