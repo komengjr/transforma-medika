@@ -27,7 +27,7 @@ class ApiCntroller extends Controller
         $data_arr = array(
             "loket1" => "A015",
             "loket2" => "B004",
-            // "loket3" => "Z021"
+            "loket3" => "Z021"
         );
         return response()->json($data_arr);
     }

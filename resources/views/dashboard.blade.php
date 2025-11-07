@@ -123,7 +123,7 @@
         .card {
             border: none;
             border-radius: 15px;
-            box-shadow: 0 4px 10px rgba(0, 0, 0, 0.08);
+            box-shadow: 0 10px 25px rgba(29, 28, 100, 0.49);
             transition: transform 0.2s;
         }
 

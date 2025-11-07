@@ -9,7 +9,7 @@
     <script src="https://unpkg.com/@lottiefiles/lottie-player@latest/dist/lottie-player.js"></script>
     <style>
         body {
-            background: linear-gradient(135deg, #1e1e2f, #283046);
+            background: linear-gradient(135deg, #252568ff, #283046);
             color: #fff;
             overflow: hidden;
             height: 100vh;
@@ -316,7 +316,7 @@
             return nomor.replace(/([A-Z])/g, ' $1 ');
         }
 
-        setInterval(fetchAntrian, 5000);
+        setInterval(fetchAntrian, 2000);
     </script>
 </body>
 

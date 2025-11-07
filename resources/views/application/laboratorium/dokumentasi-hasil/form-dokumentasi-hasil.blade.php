@@ -1,7 +1,7 @@
 <div class="card mb-3">
     <div class="card-header bg-300">
         <div class="d-flex justify-content-between">
-            <h5 class="mb-0">Report Dokumentasi Hasil {{ $code }}</h5>
+            <h5 class="mb-0">Report Dokumentasi Hasil</h5>
             @if ($data->d_reg_order_lab_status == 3)
                 <button class="btn btn-falcon-primary btn-sm" id="button-kirim-dokumentasi-hasil"
                     data-code="{{$code}}">Kirim</button>

@@ -17,9 +17,13 @@
                                     <div class="col-md-4 d-flex justify-content-center">
                                         <div class="avatar avatar-5lg shadow-sm justify-content-center">
                                             <div class="h-100 w-100 overflow-hidden ">
-                                                <img src="{{ asset($data->master_patient_profile) }}"
-                                                    class="img-thumbnail " alt="" id="videoPreview"
-                                                    data-dz-thumbnail="data-dz-thumbnail">
+                                               @if ($data->master_patient_profile == "")
+                                                    <img src="{{ asset('img/pasien.png') }}" class="img-thumbnail " alt="" id="videoPreview"
+                                                        data-dz-thumbnail="data-dz-thumbnail">
+                                                @else
+                                                    <img src="{{ Storage::url($data->master_patient_profile) }}" class="img-thumbnail " alt=""
+                                                        id="videoPreview" data-dz-thumbnail="data-dz-thumbnail">
+                                                @endif
                                             </div>
 
                                         </div>

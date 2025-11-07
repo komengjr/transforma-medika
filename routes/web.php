@@ -1,6 +1,7 @@
 <?php
 
 use App\Http\Controllers\Accounting\AccountingController;
+use App\Http\Controllers\AntrianController;
 use App\Http\Controllers\ApplicationController;
 use App\Http\Controllers\Auth\AuthController;
 use App\Http\Controllers\Brodcast\BrodcastController;
@@ -613,6 +614,7 @@ Route::prefix('app/')->group(function (): void {
 Route::prefix('pacs')->group(function (): void {
     Route::get('data/{id}', [PacsController::class, 'pacs_preview'])->name('pacs_preview');
 });
-Route::prefix('v1/display-antrian')->group(function (): void {
-    Route::get('data', [PacsController::class, 'pacs_antrian'])->name('pacs_antrian');
+Route::prefix('v1')->group(function (): void {
+    Route::get('display-antrian', [AntrianController::class, 'display_antrian'])->name('display_antrian');
+    Route::get('both-antrian', [AntrianController::class, 'both_antrian'])->name('both_antrian');
 });
