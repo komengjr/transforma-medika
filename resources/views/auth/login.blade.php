@@ -5,7 +5,7 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1">
     <title>Login | Innoventra by Transforma</title>
-
+    <link rel="icon" type="image/png" sizes="32x32" href="{{ asset('img/favicon.png') }}">
     <!-- Bootstrap 5 -->
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet">
     <!-- Bootstrap Icons -->
@@ -271,16 +271,6 @@
                 btn.innerHTML = '<i class="bi bi-box-arrow-in-right me-2"></i>Masuk Sekarang';
                 btn.disabled = false;
             });
-            // setTimeout(() => {
-            //     if (username === "admin" && password === "innoventra123") {
-            //         alert("Selamat datang di Innoventra, " + username + "!");
-            //         window.location.href = "dashboard.html";
-            //     } else {
-            //         alert("Username atau password salah!");
-            //         btn.innerHTML = '<i class="bi bi-box-arrow-in-right me-2"></i>Masuk Sekarang';
-            //         btn.disabled = false;
-            //     }
-            // }, 1000);
         });
     </script>
 </body>

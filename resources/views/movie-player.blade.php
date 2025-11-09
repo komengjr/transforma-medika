@@ -1,0 +1,261 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <title>{{ $movie->title }} | XXI Stream</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+
+    <!-- Fonts & Icons -->
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.css" rel="stylesheet">
+
+    <style>
+        body {
+            margin: 0;
+            background: #000;
+            color: #fff;
+            font-family: "Poppins", sans-serif;
+            overflow: hidden;
+        }
+
+        /* Layout utama video */
+        .player-container {
+            position: relative;
+            width: 100vw;
+            height: 100vh;
+            background: #000;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            overflow: hidden;
+        }
+
+        video {
+            width: 100%;
+            height: 100%;
+            object-fit: contain;
+            background: #000;
+        }
+
+        /* Overlay efek sinematik */
+        .overlay {
+            position: absolute;
+            inset: 0;
+            background: radial-gradient(circle at center, rgba(0, 0, 0, 0) 50%, rgba(0, 0, 0, 0.6) 100%);
+            pointer-events: none;
+        }
+
+        /* Kontrol bawah */
+        .controls {
+            position: absolute;
+            bottom: 40px;
+            width: 80%;
+            left: 50%;
+            transform: translateX(-50%);
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            background: rgba(0, 0, 0, 0.55);
+            border-radius: 50px;
+            padding: 10px 20px;
+            backdrop-filter: blur(6px);
+            border: 1px solid rgba(212, 175, 55, 0.3);
+            box-shadow: 0 0 15px rgba(212, 175, 55, 0.2);
+        }
+
+        .control-btns {
+            display: flex;
+            align-items: center;
+            gap: 1rem;
+        }
+
+        .controls button {
+            background: none;
+            border: none;
+            color: #d4af37;
+            font-size: 1.7rem;
+            cursor: pointer;
+            transition: 0.3s;
+        }
+
+        .controls button:hover {
+            color: #fff;
+            transform: scale(1.2);
+        }
+
+        .progress-container {
+            flex: 1;
+            height: 6px;
+            background: rgba(255, 255, 255, 0.2);
+            border-radius: 4px;
+            margin: 0 1rem;
+            position: relative;
+            cursor: pointer;
+        }
+
+        .progress-bar {
+            height: 100%;
+            background: linear-gradient(90deg, #d4af37, #f1e1a6);
+            width: 0%;
+            border-radius: 4px;
+        }
+
+        .time {
+            font-size: 0.9rem;
+            color: #ccc;
+            min-width: 75px;
+            text-align: right;
+        }
+
+        /* Tombol fullscreen */
+        .fullscreen {
+            position: absolute;
+            top: 20px;
+            right: 20px;
+            font-size: 1.4rem;
+            color: #d4af37;
+            background: rgba(0, 0, 0, 0.5);
+            padding: 8px 10px;
+            border-radius: 50%;
+            border: 1px solid rgba(212, 175, 55, 0.3);
+            cursor: pointer;
+            transition: 0.3s;
+        }
+
+        .fullscreen:hover {
+            color: #fff;
+            transform: scale(1.1);
+        }
+
+        /* Tirai */
+        .curtain {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 0%;
+            background: linear-gradient(135deg, #000, #111 50%, #000);
+            z-index: 999;
+            animation: none;
+        }
+
+        @keyframes curtainClose {
+            from {
+                height: 0%;
+            }
+
+            to {
+                height: 100%;
+            }
+        }
+    </style>
+</head>
+
+<body>
+
+    <div class="player-container">
+        <video id="movie" preload="metadata">
+            <source src="{{ asset('storage/videos/sample.mp4') }}" type="video/mp4">
+            <!-- <source src="{{ asset('storage/videos/' . $movie->file) }}" type="video/mp4"> -->
+        </video>
+        <div class="overlay"></div>
+
+        <!-- Fullscreen -->
+        <div class="fullscreen" id="fullscreenBtn">
+            <i class="bi bi-arrows-fullscreen"></i>
+        </div>
+
+        <!-- Kontrol -->
+        <div class="controls">
+            <div class="control-btns">
+                <button id="btnPrev"><i class="bi bi-skip-backward-fill"></i></button>
+                <button id="btnPlay"><i class="bi bi-play-circle-fill"></i></button>
+                <button id="btnPause" style="display:none;"><i class="bi bi-pause-circle-fill"></i></button>
+                <button id="btnNext"><i class="bi bi-skip-forward-fill"></i></button>
+            </div>
+
+            <div class="progress-container" id="progressContainer">
+                <div class="progress-bar" id="progressBar"></div>
+            </div>
+
+            <div class="time" id="timeText">00:00 / 00:00</div>
+        </div>
+    </div>
+
+    <div class="curtain" id="curtain"></div>
+
+    <script>
+        const video = document.getElementById('movie');
+        const btnPlay = document.getElementById('btnPlay');
+        const btnPause = document.getElementById('btnPause');
+        const btnPrev = document.getElementById('btnPrev');
+        const btnNext = document.getElementById('btnNext');
+        const progressBar = document.getElementById('progressBar');
+        const progressContainer = document.getElementById('progressContainer');
+        const timeText = document.getElementById('timeText');
+        const fullscreenBtn = document.getElementById('fullscreenBtn');
+        const curtain = document.getElementById('curtain');
+
+        // Format waktu
+        function formatTime(t) {
+            let m = Math.floor(t / 60);
+            let s = Math.floor(t % 60);
+            return `${m.toString().padStart(2, '0')}:${s.toString().padStart(2, '0')}`;
+        }
+
+        // Update progress
+        function updateProgress() {
+            if (!isNaN(video.duration)) {
+                const percent = (video.currentTime / video.duration) * 100;
+                progressBar.style.width = `${percent}%`;
+                timeText.textContent = `${formatTime(video.currentTime)} / ${formatTime(video.duration)}`;
+            }
+        }
+
+        video.addEventListener('timeupdate', updateProgress);
+        video.addEventListener('loadedmetadata', updateProgress);
+
+        // Play & Pause
+        btnPlay.onclick = () => {
+            video.play();
+            btnPlay.style.display = 'none';
+            btnPause.style.display = 'inline';
+        };
+        btnPause.onclick = () => {
+            video.pause();
+            btnPause.style.display = 'none';
+            btnPlay.style.display = 'inline';
+        };
+
+        // Skip 10 detik mundur & maju
+        btnPrev.onclick = () => {
+            if (!isNaN(video.duration)) video.currentTime = Math.max(0, video.currentTime - 10);
+        };
+        btnNext.onclick = () => {
+            if (!isNaN(video.duration)) video.currentTime = Math.min(video.duration, video.currentTime + 10);
+        };
+
+        // Klik progress bar
+        progressContainer.onclick = (e) => {
+            const rect = progressContainer.getBoundingClientRect();
+            const pos = (e.clientX - rect.left) / rect.width;
+            if (!isNaN(video.duration)) video.currentTime = pos * video.duration;
+        };
+
+        // Fullscreen toggle
+        fullscreenBtn.onclick = () => {
+            if (!document.fullscreenElement) document.documentElement.requestFullscreen();
+            else document.exitFullscreen();
+        };
+
+        // Tirai dan musik di akhir
+        video.onended = () => {
+            curtain.style.animation = 'curtainClose 2.5s forwards';
+            const music = new Audio('{{ asset("sound/tingtong.mp3") }}');
+            setTimeout(() => music.play(), 1800);
+        };
+    </script>
+
+</body>
+
+</html>

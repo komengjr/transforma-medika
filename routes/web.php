@@ -27,6 +27,7 @@ use App\Http\Controllers\RadiologiController;
 use App\Http\Controllers\Supplier\SupplierController;
 use App\Http\Controllers\UploadFileController;
 // use App\Http\Controllers\inventaris\PeminjamanController;
+use App\Http\Controllers\VideoStreamController;
 use Illuminate\Support\Facades\Route;
 use Illuminate\Support\Facades\Auth;
 
@@ -618,3 +619,10 @@ Route::prefix('v1')->group(function (): void {
     Route::get('display-antrian', [AntrianController::class, 'display_antrian'])->name('display_antrian');
     Route::get('both-antrian', [AntrianController::class, 'both_antrian'])->name('both_antrian');
 });
+Route::get('/video/sample.mp4', [VideoStreamController::class, 'stream']);
+Route::view('/video-player', 'video');
+
+use App\Http\Controllers\MovieController;
+Route::get('/movie', [MovieController::class, 'index'])->name('movies.index');
+Route::get('/movie/{movie}', [MovieController::class, 'show'])->name('movies.show');
+Route::get('/video/{filename}', [VideoStreamController::class, 'stream']);

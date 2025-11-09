@@ -123,145 +123,11 @@
                             </a>
 
                         </li>
-                        <li class="nav-item dropdown"><a class="nav-link dropdown-toggle" href="#" role="button"
-                                data-bs-toggle="dropdown" aria-haspopup="true" aria-expanded="false"
-                                id="moduless">Modules</a>
-                            <div class="dropdown-menu dropdown-menu-card border-0 mt-0" aria-labelledby="moduless">
-                                <div class="card navbar-card-components shadow-none dark__bg-1000">
-                                    <div class="card-body scrollbar max-h-dropdown"><img class="img-dropdown"
-                                            src="{{ asset('asset/img/icons/spot-illustrations/authentication-corner.png') }}"
-                                            width="130" alt="" />
-                                        <!-- <div class="row">
-                                            <div class="col-6 col-xxl-3">
-                                                <div class="nav flex-column">
-                                                    <p class="nav-link text-700 mb-0 fw-bold">Forms</p><a
-                                                        class="nav-link py-1 link-600 fw-medium"
-                                                        href="../modules/forms/basic/form-control.html">Form
-                                                        control</a><a class="nav-link py-1 link-600 fw-medium"
-                                                        href="../modules/forms/basic/input-group.html">Input group</a><a
-                                                        class="nav-link py-1 link-600 fw-medium"
-                                                        href="../modules/forms/basic/select.html">Select</a><a
-                                                        class="nav-link py-1 link-600 fw-medium"
-                                                        href="../modules/forms/basic/checks.html">Checks</a><a
-                                                        class="nav-link py-1 link-600 fw-medium"
-                                                        href="../modules/forms/basic/range.html">Range</a><a
-                                                        class="nav-link py-1 link-600 fw-medium"
-                                                        href="../modules/forms/basic/layout.html">Layout</a><a
-                                                        class="nav-link py-1 link-600 fw-medium"
-                                                        href="../modules/forms/advance/advance-select.html">Advance
-                                                        select</a><a class="nav-link py-1 link-600 fw-medium"
-                                                        href="../modules/forms/advance/date-picker.html">Date
-                                                        picker</a><a class="nav-link py-1 link-600 fw-medium"
-                                                        href="../modules/forms/advance/editor.html">Editor</a><a
-                                                        class="nav-link py-1 link-600 fw-medium"
-                                                        href="../modules/forms/advance/emoji-button.html">Emoji
-                                                        button</a><a class="nav-link py-1 link-600 fw-medium"
-                                                        href="../modules/forms/advance/file-uploader.html">File
-                                                        uploader</a><a class="nav-link py-1 link-600 fw-medium"
-                                                        href="../modules/forms/advance/rating.html">Rating</a><a
-                                                        class="nav-link py-1 link-600 fw-medium"
-                                                        href="../modules/forms/floating-labels.html">Floating
-                                                        labels</a><a class="nav-link py-1 link-600 fw-medium"
-                                                        href="../modules/forms/wizard.html">Wizard</a><a
-                                                        class="nav-link py-1 link-600 fw-medium"
-                                                        href="../modules/forms/validation.html">Validation</a>
-                                                </div>
-                                            </div>
-                                            <div class="col-6 col-xxl-3">
-                                                <div class="nav flex-column">
-                                                    <p class="nav-link text-700 mb-0 fw-bold">Tables</p><a
-                                                        class="nav-link py-1 link-600 fw-medium"
-                                                        href="../modules/tables/basic-tables.html">Basic tables</a><a
-                                                        class="nav-link py-1 link-600 fw-medium"
-                                                        href="../modules/tables/advance-tables.html">Advance
-                                                        tables</a><a class="nav-link py-1 link-600 fw-medium"
-                                                        href="../modules/tables/bulk-select.html">Bulk select</a>
-                                                    <p class="nav-link text-700 mb-0 fw-bold">Charts</p><a
-                                                        class="nav-link py-1 link-600 fw-medium"
-                                                        href="../modules/charts/chartjs.html">Chartjs</a>
-                                                    <p class="nav-link text-700 mb-0 fw-bold">ECharts</p><a
-                                                        class="nav-link py-1 link-600 fw-medium"
-                                                        href="../modules/charts/echarts/line-charts.html">Line
-                                                        charts</a><a class="nav-link py-1 link-600 fw-medium"
-                                                        href="../modules/charts/echarts/bar-charts.html">Bar
-                                                        charts</a><a class="nav-link py-1 link-600 fw-medium"
-                                                        href="../modules/charts/echarts/candlestick-charts.html">Candlestick
-                                                        charts</a><a class="nav-link py-1 link-600 fw-medium"
-                                                        href="../modules/charts/echarts/geo-map.html">Geo map</a><a
-                                                        class="nav-link py-1 link-600 fw-medium"
-                                                        href="../modules/charts/echarts/scatter-charts.html">Scatter
-                                                        charts</a><a class="nav-link py-1 link-600 fw-medium"
-                                                        href="../modules/charts/echarts/pie-charts.html">Pie
-                                                        charts</a><a class="nav-link py-1 link-600 fw-medium"
-                                                        href="../modules/charts/echarts/radar-charts.html">Radar
-                                                        charts</a><a class="nav-link py-1 link-600 fw-medium"
-                                                        href="../modules/charts/echarts/heatmap-charts.html">Heatmap
-                                                        charts</a><a class="nav-link py-1 link-600 fw-medium"
-                                                        href="../modules/charts/echarts/how-to-use.html">How to use</a>
-                                                </div>
-                                            </div>
-                                            <div class="col-6 col-xxl-3">
-                                                <div class="nav flex-column">
-                                                    <p class="nav-link text-700 mb-0 fw-bold">Utilities</p><a
-                                                        class="nav-link py-1 link-600 fw-medium"
-                                                        href="../modules/components/videos/plyr.html">Plyr</a><a
-                                                        class="nav-link py-1 link-600 fw-medium"
-                                                        href="../modules/utilities/borders.html">Borders</a><a
-                                                        class="nav-link py-1 link-600 fw-medium"
-                                                        href="../modules/utilities/clearfix.html">Clearfix</a><a
-                                                        class="nav-link py-1 link-600 fw-medium"
-                                                        href="../modules/utilities/colors.html">Colors</a><a
-                                                        class="nav-link py-1 link-600 fw-medium"
-                                                        href="../modules/utilities/colored-links.html">Colored
-                                                        links</a><a class="nav-link py-1 link-600 fw-medium"
-                                                        href="../modules/utilities/display.html">Display</a><a
-                                                        class="nav-link py-1 link-600 fw-medium"
-                                                        href="../modules/utilities/flex.html">Flex</a><a
-                                                        class="nav-link py-1 link-600 fw-medium"
-                                                        href="../modules/utilities/float.html">Float</a><a
-                                                        class="nav-link py-1 link-600 fw-medium"
-                                                        href="../modules/utilities/grid.html">Grid</a><a
-                                                        class="nav-link py-1 link-600 fw-medium"
-                                                        href="../modules/utilities/overlayscrollbars.html">Overlayscrollbars</a><a
-                                                        class="nav-link py-1 link-600 fw-medium"
-                                                        href="../modules/utilities/position.html">Position</a><a
-                                                        class="nav-link py-1 link-600 fw-medium"
-                                                        href="../modules/utilities/spacing.html">Spacing</a><a
-                                                        class="nav-link py-1 link-600 fw-medium"
-                                                        href="../modules/utilities/sizing.html">Sizing</a><a
-                                                        class="nav-link py-1 link-600 fw-medium"
-                                                        href="../modules/utilities/stretched-link.html">Stretched
-                                                        link</a><a class="nav-link py-1 link-600 fw-medium"
-                                                        href="../modules/utilities/text-truncation.html">Text
-                                                        truncation</a><a class="nav-link py-1 link-600 fw-medium"
-                                                        href="../modules/utilities/typography.html">Typography</a><a
-                                                        class="nav-link py-1 link-600 fw-medium"
-                                                        href="../modules/utilities/vertical-align.html">Vertical
-                                                        align</a>
-                                                </div>
-                                            </div>
-                                            <div class="col-6 col-xxl-3">
-                                                <div class="nav flex-column mt-xxl-4 pt-xxl-1">
-                                                    <p class="nav-link text-700 mb-0 fw-bold">Icons</p><a
-                                                        class="nav-link py-1 link-600 fw-medium"
-                                                        href="../modules/icons/font-awesome.html">Font awesome</a><a
-                                                        class="nav-link py-1 link-600 fw-medium"
-                                                        href="../modules/icons/bootstrap-icons.html">Bootstrap
-                                                        icons</a><a class="nav-link py-1 link-600 fw-medium"
-                                                        href="../modules/icons/feather.html">Feather</a><a
-                                                        class="nav-link py-1 link-600 fw-medium"
-                                                        href="../modules/icons/material-icons.html">Material icons</a>
-                                                    <p class="nav-link text-700 mb-0 fw-bold">Maps</p><a
-                                                        class="nav-link py-1 link-600 fw-medium"
-                                                        href="../modules/maps/google-map.html">Google map</a><a
-                                                        class="nav-link py-1 link-600 fw-medium"
-                                                        href="../modules/maps/leaflet-map.html">Leaflet map</a>
-                                                </div>
-                                            </div>
-                                        </div> -->
-                                    </div>
-                                </div>
-                            </div>
+                        <li class="nav-item dropdown">
+                            <a class="nav-link" href="{{route('movies.index')}}" role="button" aria-haspopup="true"
+                                aria-expanded="false" id="pagess">Movie
+                            </a>
+
                         </li>
                         <li class="nav-item dropdown"><a class="nav-link dropdown-toggle" href="#" role="button"
                                 data-bs-toggle="dropdown" aria-haspopup="true" aria-expanded="false"
@@ -298,7 +164,8 @@
 
                         <li class="nav-item dropdown">
                             @guest
-                                <a class="nav-link text-warning" href="{{route('login')}}" "><span class="fab fa-keycdn"></span> Login</a>
+                                <a class="nav-link text-warning" href="{{route('login')}}" "><span class=" fab
+                                    fa-keycdn"></span> Login</a>
                             @else
                                 <a class="nav-link py-0 my-0" id="navbarDropdownUser" href="#" role="button"
                                     data-bs-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
