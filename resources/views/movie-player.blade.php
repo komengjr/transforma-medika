@@ -3,10 +3,10 @@
 
 <head>
     <meta charset="UTF-8">
-    <title>{{ $movie->title }} | XXI Stream</title>
+    <title>{{ $movie->title }} | {{env('APP_LABEL')}} Stream</title>
     <meta name="viewport" content="width=device-width, initial-scale=1">
-
-    <!-- Fonts & Icons -->
+    <link rel="icon" type="image/png" sizes="32x32" href="{{ asset('img/favicon.png') }}">
+    <!-- Bootstrap Icons -->
     <link href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.css" rel="stylesheet">
 
     <style>
@@ -18,7 +18,6 @@
             overflow: hidden;
         }
 
-        /* Layout utama video */
         .player-container {
             position: relative;
             width: 100vw;
@@ -37,7 +36,6 @@
             background: #000;
         }
 
-        /* Overlay efek sinematik */
         .overlay {
             position: absolute;
             inset: 0;
@@ -45,7 +43,6 @@
             pointer-events: none;
         }
 
-        /* Kontrol bawah */
         .controls {
             position: absolute;
             bottom: 40px;
@@ -61,6 +58,7 @@
             backdrop-filter: blur(6px);
             border: 1px solid rgba(212, 175, 55, 0.3);
             box-shadow: 0 0 15px rgba(212, 175, 55, 0.2);
+            transition: opacity 0.4s ease, transform 0.4s ease;
         }
 
         .control-btns {
@@ -107,7 +105,6 @@
             text-align: right;
         }
 
-        /* Tombol fullscreen */
         .fullscreen {
             position: absolute;
             top: 20px;
@@ -120,6 +117,7 @@
             border: 1px solid rgba(212, 175, 55, 0.3);
             cursor: pointer;
             transition: 0.3s;
+            z-index: 20;
         }
 
         .fullscreen:hover {
@@ -127,7 +125,6 @@
             transform: scale(1.1);
         }
 
-        /* Tirai */
         .curtain {
             position: fixed;
             top: 0;
@@ -148,6 +145,13 @@
                 height: 100%;
             }
         }
+
+        /* Saat fullscreen, sembunyikan semua kontrol */
+        .hide-controls {
+            opacity: 0;
+            pointer-events: none;
+            transform: translateY(30px);
+        }
     </style>
 </head>
 
@@ -156,17 +160,16 @@
     <div class="player-container">
         <video id="movie" preload="metadata">
             <source src="{{ asset('storage/videos/sample.mp4') }}" type="video/mp4">
-            <!-- <source src="{{ asset('storage/videos/' . $movie->file) }}" type="video/mp4"> -->
         </video>
         <div class="overlay"></div>
 
-        <!-- Fullscreen -->
+        <!-- Tombol fullscreen -->
         <div class="fullscreen" id="fullscreenBtn">
             <i class="bi bi-arrows-fullscreen"></i>
         </div>
 
         <!-- Kontrol -->
-        <div class="controls">
+        <div class="controls" id="controls">
             <div class="control-btns">
                 <button id="btnPrev"><i class="bi bi-skip-backward-fill"></i></button>
                 <button id="btnPlay"><i class="bi bi-play-circle-fill"></i></button>
@@ -195,6 +198,7 @@
         const timeText = document.getElementById('timeText');
         const fullscreenBtn = document.getElementById('fullscreenBtn');
         const curtain = document.getElementById('curtain');
+        const controls = document.getElementById('controls');
 
         // Format waktu
         function formatTime(t) {
@@ -203,7 +207,7 @@
             return `${m.toString().padStart(2, '0')}:${s.toString().padStart(2, '0')}`;
         }
 
-        // Update progress
+        // Update progress bar
         function updateProgress() {
             if (!isNaN(video.duration)) {
                 const percent = (video.currentTime / video.duration) * 100;
@@ -227,7 +231,7 @@
             btnPlay.style.display = 'inline';
         };
 
-        // Skip 10 detik mundur & maju
+        // Skip mundur / maju
         btnPrev.onclick = () => {
             if (!isNaN(video.duration)) video.currentTime = Math.max(0, video.currentTime - 10);
         };
@@ -235,7 +239,7 @@
             if (!isNaN(video.duration)) video.currentTime = Math.min(video.duration, video.currentTime + 10);
         };
 
-        // Klik progress bar
+        // Klik progress bar untuk seek
         progressContainer.onclick = (e) => {
             const rect = progressContainer.getBoundingClientRect();
             const pos = (e.clientX - rect.left) / rect.width;
@@ -244,16 +248,42 @@
 
         // Fullscreen toggle
         fullscreenBtn.onclick = () => {
-            if (!document.fullscreenElement) document.documentElement.requestFullscreen();
-            else document.exitFullscreen();
+            if (!document.fullscreenElement) {
+                document.documentElement.requestFullscreen();
+            } else {
+                document.exitFullscreen();
+            }
         };
 
-        // Tirai dan musik di akhir
+        // Sembunyikan kontrol saat fullscreen
+        document.addEventListener('fullscreenchange', () => {
+            if (document.fullscreenElement) {
+                controls.classList.add('hide-controls');
+            } else {
+                controls.classList.remove('hide-controls');
+            }
+        });
+
+        // Tirai & musik di akhir
         video.onended = () => {
             curtain.style.animation = 'curtainClose 2.5s forwards';
             const music = new Audio('{{ asset("sound/tingtong.mp3") }}');
             setTimeout(() => music.play(), 1800);
         };
+
+        // 🎬 Keyboard controls
+        document.addEventListener('keydown', (e) => {
+            if (e.key === 'ArrowLeft') {
+                // Tombol kiri → mundur 10 detik
+                e.preventDefault();
+                if (!isNaN(video.duration)) video.currentTime = Math.max(0, video.currentTime - 10);
+            }
+            else if (e.key === 'ArrowRight') {
+                // Tombol kanan → maju 10 detik
+                e.preventDefault();
+                if (!isNaN(video.duration)) video.currentTime = Math.min(video.duration, video.currentTime + 10);
+            }
+        });
     </script>
 
 </body>

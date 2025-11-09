@@ -3,8 +3,9 @@
 
 <head>
     <meta charset="UTF-8">
-    <title>Box Office | XXI Stream</title>
+    <title>Box Office | {{env('APP_LABEL')}} Stream</title>
     <meta name="viewport" content="width=device-width, initial-scale=1">
+    <link rel="icon" type="image/png" sizes="32x32" href="{{ asset('img/favicon.png') }}">
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet">
     <link href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.css" rel="stylesheet">
 
@@ -166,7 +167,7 @@
 
     <!-- Navbar -->
     <nav class="navbar navbar-dark px-4">
-        <a class="navbar-brand" href="#">🎞 XXI Stream</a>
+        <a class="navbar-brand" href="#">🎞 {{env('APP_LABEL')}} Stream</a>
     </nav>
 
     <!-- Hero -->
