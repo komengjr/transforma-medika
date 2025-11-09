@@ -187,9 +187,9 @@
         <video id="movie" preload="metadata">
             <!-- <source src="{{ asset('video/' . $movie->id) }}" type="video/mp4"> -->
             @if ($movie->type_link == 'local')
-                <source src="{{ asset('video/' . $movie->id) }}" type="video/mp4">
+            <source src="{{ asset('video/' . $movie->id) }}" type="video/mp4">
             @else
-                <source src="{{$movie->video}}" type="video/mp4">
+            <source src="{{$movie->video}}" type="video/mp4">
             @endif
         </video>
         <div class="overlay"></div>
