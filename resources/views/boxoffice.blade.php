@@ -41,7 +41,7 @@
             position: relative;
             height: 75vh;
             background: linear-gradient(to bottom, rgba(0, 0, 0, 0.2), #0c0c0c),
-                url('https://image.tmdb.org/t/p/original/6Wdl9N6dL0Hi0T1qJLWSz6gMLbd.jpg') center/cover no-repeat;
+                url('https://media.istockphoto.com/id/185077766/photo/new-york-city-box-office.jpg?s=612x612&w=0&k=20&c=-kY5d-ObcSsyQhvOOzhXSLWO1RTPcGwTFKecHhuktIw=') center/cover no-repeat;
             display: flex;
             align-items: flex-end;
             padding: 4rem;
@@ -171,7 +171,7 @@
 
     <!-- Navbar -->
     <nav class="navbar navbar-dark px-4">
-        <a class="navbar-brand" href="#">🎞 {{env('APP_LABEL')}} Stream</a>
+        <a class="navbar-brand" href="#">🎞 {{env('APP_LABEL')}} Box Office</a>
     </nav>
 
     <!-- Hero -->
@@ -213,7 +213,7 @@
     </div>
 
     <footer>
-        {{env('APP_LABEL')}} Stream &copy; {{ date('Y') }} — Enjoy Cinema at Home 🍿
+        {{env('APP_LABEL')}} Box Office &copy; {{ date('Y') }} — Enjoy Cinema at Home 🍿
     </footer>
 
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
