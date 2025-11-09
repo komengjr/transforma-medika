@@ -619,7 +619,19 @@ Route::prefix('v1')->group(function (): void {
     Route::get('display-antrian', [AntrianController::class, 'display_antrian'])->name('display_antrian');
     Route::get('both-antrian', [AntrianController::class, 'both_antrian'])->name('both_antrian');
 });
-Route::get('/video/sample.mp4', [VideoStreamController::class, 'stream']);
+use Illuminate\Support\Facades\Storage;
+// Route::get('/video/{filename}', function ($filename) {
+//     $path = storage_path('app/private/videos/' . $filename);
+
+//     if (!file_exists($path)) {
+//         abort(404);
+//     }
+
+//     // Tambahkan autentikasi bila perlu
+//     // if (!auth()->check()) abort(403);
+
+//     return response()->file($path);
+// });
 Route::view('/video-player', 'video');
 
 use App\Http\Controllers\MovieController;

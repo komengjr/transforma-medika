@@ -159,7 +159,7 @@
 
     <div class="player-container">
         <video id="movie" preload="metadata">
-            <source src="{{ asset('storage/videos/sample.mp4') }}" type="video/mp4">
+            <source src="{{ asset('video/sample.mp4') }}" type="video/mp4">
         </video>
         <div class="overlay"></div>
 

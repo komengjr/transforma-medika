@@ -7,9 +7,9 @@ use Illuminate\Support\Facades\Storage;
 
 class VideoStreamController extends Controller
 {
-    public function stream( Request $request)
+    public function stream($filename, Request $request)
     {
-        $path = storage_path('app/public/videos/sample.mp4');
+        $path = storage_path('app/private/videos/' . $filename);
 
         if (!file_exists($path)) {
             abort(404, 'Video not found');
