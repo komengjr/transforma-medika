@@ -3,6 +3,8 @@
 
 <head>
     <meta charset="UTF-8">
+    <meta name="google-adsense-account" content="ca-pub-4154628728879232">
+
     <title>Box Office | {{env('APP_LABEL')}} Stream</title>
     <meta name="viewport" content="width=device-width, initial-scale=1">
     <link rel="icon" type="image/png" sizes="32x32" href="{{ asset('img/favicon.png') }}">
@@ -161,6 +163,8 @@
             font-size: 0.9rem;
         }
     </style>
+    <script async src="https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js?client=ca-pub-4154628728879232"
+        crossorigin="anonymous"></script>
 </head>
 
 <body>
@@ -209,7 +213,7 @@
     </div>
 
     <footer>
-        XXI Stream &copy; {{ date('Y') }} — Enjoy Cinema at Home 🍿
+        {{env('APP_LABEL')}} Stream &copy; {{ date('Y') }} — Enjoy Cinema at Home 🍿
     </footer>
 
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
