@@ -3,6 +3,7 @@
 
 <head>
     <meta charset="UTF-8">
+    <meta name="google-adsense-account" content="ca-pub-4154628728879232">
     <title>{{ $movie->title }} | {{ env('APP_LABEL') }} Stream XXI</title>
     <meta name="viewport" content="width=device-width, initial-scale=1">
     <link href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.css" rel="stylesheet">
@@ -237,6 +238,8 @@
             transform: translateY(30px);
         }
     </style>
+    <script async src="https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js?client=ca-pub-4154628728879232"
+        crossorigin="anonymous"></script>
 </head>
 
 <body>
