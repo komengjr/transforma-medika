@@ -179,8 +179,7 @@
         <div class="hero-content">
             <h1>Now Showing</h1>
             <p>Experience cinematic magic — watch top box office movies streaming exclusively here.</p>
-            <a href="{{ route('movies.show', 1) }}" class="btn btn-watch"><i class="bi bi-play-fill me-2"></i>Watch
-                Trailer</a>
+            <a href="#" onclick="window.open('https://www.youtube.com/@agusraharjo6591', '_blank').focus();" class="btn btn-watch"><i class="bi bi-play-fill me-2"></i>Subscribe Now</a>
         </div>
     </section>
 
