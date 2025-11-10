@@ -5,7 +5,7 @@
     <meta charset="UTF-8">
     <meta name="google-adsense-account" content="ca-pub-4154628728879232">
     <title>{{ $movie->title }} | {{ env('APP_LABEL') }} Stream XXI</title>
-    <link rel="icon" type="image/png" sizes="32x32" href="{{ asset('img/box-office.png') }}">
+    <link rel="icon" type="image/png" href="{{ asset('img/box-office.png') }}">
     <meta name="viewport" content="width=device-width, initial-scale=1">
     <link href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.css" rel="stylesheet">
 
