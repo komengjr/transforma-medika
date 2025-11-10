@@ -215,6 +215,45 @@
             color: #000;
             border-color: #d4af37;
         }
+
+        /* Search result dropdown */
+        .search-results {
+            position: absolute;
+            top: 40px;
+            left: 0;
+            width: 100%;
+            background-color: #111;
+            border: 1px solid rgba(212, 175, 55, 0.3);
+            border-radius: 10px;
+            max-height: 300px;
+            overflow-y: auto;
+            z-index: 200;
+            display: none;
+            box-shadow: 0 4px 15px rgba(0, 0, 0, 0.6);
+        }
+
+        .search-result-item {
+            padding: 10px 15px;
+            color: #f1f1f1;
+            cursor: pointer;
+            border-bottom: 1px solid rgba(255, 255, 255, 0.05);
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            transition: background 0.2s;
+        }
+
+        .search-result-item img {
+            width: 40px;
+            height: 55px;
+            object-fit: cover;
+            border-radius: 5px;
+        }
+
+        .search-result-item:hover {
+            background-color: rgba(212, 175, 55, 0.1);
+            color: #d4af37;
+        }
     </style>
 </head>
 
@@ -236,6 +275,7 @@
             <div class="search-box">
                 <input id="searchInput" type="text" placeholder="Search movies...">
                 <i class="bi bi-search"></i>
+                <div id="searchResults" class="search-results"></div>
             </div>
         </div>
     </nav>
@@ -292,16 +332,66 @@
 
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
 
+
     <script>
         const searchInput = document.getElementById('searchInput');
-        const movies = document.querySelectorAll('.movie-item');
+        const searchResults = document.getElementById('searchResults');
+
+        // Ambil data movie dari elemen HTML (dibuat dari Blade)
+        const movies = Array.from(document.querySelectorAll('.movie-item')).map(item => ({
+            id: item.getAttribute('href').split('/').pop(),
+            title: item.querySelector('.movie-title').innerText,
+            poster: item.querySelector('img').src,
+            description: item.querySelector('.movie-info').innerText
+        }));
+
+        // Ketika user mengetik
         searchInput.addEventListener('input', function () {
-            const term = this.value.toLowerCase();
-            movies.forEach(movie => {
-                movie.style.display = movie.dataset.title.includes(term) ? 'block' : 'none';
-            });
+            const term = this.value.toLowerCase().trim();
+            searchResults.innerHTML = '';
+
+            if (term === '') {
+                searchResults.style.display = 'none';
+                return;
+            }
+
+            // Filter hasil pencarian
+            const filtered = movies.filter(movie =>
+                movie.title.toLowerCase().includes(term)
+            );
+
+            if (filtered.length === 0) {
+                searchResults.innerHTML = '<div class="p-3 text-center text-muted">No results found</div>';
+            } else {
+                filtered.forEach(movie => {
+                    const item = document.createElement('div');
+                    item.classList.add('search-result-item');
+                    item.innerHTML = `
+                    <img src="${movie.poster}" alt="${movie.title}">
+                    <div>
+                        <div style="font-weight:600;color:#d4af37;">${movie.title}</div>
+                        <div style="font-size:0.8rem;color:#aaa;">${movie.description.substring(0, 50)}...</div>
+                    </div>
+                `;
+                    item.addEventListener('click', () => {
+                        window.location.href = '/movie/' + movie.id;
+                    });
+                    searchResults.appendChild(item);
+                });
+            }
+
+            searchResults.style.display = 'block';
+        });
+
+        // Tutup dropdown ketika klik di luar
+        document.addEventListener('click', (e) => {
+            if (!searchInput.contains(e.target) && !searchResults.contains(e.target)) {
+                searchResults.style.display = 'none';
+            }
         });
     </script>
+
+
 </body>
 
 </html>
