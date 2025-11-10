@@ -54,6 +54,15 @@ class PageController extends Controller
             'desc' => $desc
         ]);
     }
+    public function about(){
+        return view('public.about');
+    }
+    public function contact(){
+        return view('public.contact');
+    }
+    public function privacy_policy(){
+        return view('public.privacy-policy');
+    }
     public function changelog()
     {
         return view('public.changelog');

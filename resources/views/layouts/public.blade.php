@@ -129,6 +129,24 @@
                             </a>
 
                         </li>
+                        <li class="nav-item dropdown">
+                            <a class="nav-link" href="{{route('about')}}" role="button" aria-haspopup="true"
+                                aria-expanded="false" id="pagess">About
+                            </a>
+
+                        </li>
+                        <li class="nav-item dropdown">
+                            <a class="nav-link" href="{{route('contact')}}" role="button" aria-haspopup="true"
+                                aria-expanded="false" id="pagess">Contact
+                            </a>
+
+                        </li>
+                        <li class="nav-item dropdown">
+                            <a class="nav-link" href="{{route('privacy-policy')}}" role="button" aria-haspopup="true"
+                                aria-expanded="false" id="pagess">Privacy Policy
+                            </a>
+
+                        </li>
                         <li class="nav-item dropdown"><a class="nav-link dropdown-toggle" href="#" role="button"
                                 data-bs-toggle="dropdown" aria-haspopup="true" aria-expanded="false"
                                 id="documentations">Documentation</a>
