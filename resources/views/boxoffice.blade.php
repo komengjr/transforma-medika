@@ -3,9 +3,11 @@
 
 <head>
     <meta charset="UTF-8">
-    <meta name="google-adsense-account" content="ca-pub-4154628728879232">
     <title>Box Office | {{ env('APP_LABEL') }} Stream</title>
+    <meta name="google-adsense-account" content="ca-pub-4154628728879232">
     <meta name="viewport" content="width=device-width, initial-scale=1">
+    <script async src="https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js?client=ca-pub-4154628728879232"
+        crossorigin="anonymous"></script>
     <link rel="icon" type="image/png" href="{{ asset('img/box-office.png') }}">
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet">
     <link href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.css" rel="stylesheet">
@@ -255,8 +257,7 @@
             color: #d4af37;
         }
     </style>
-    <script async src="https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js?client=ca-pub-4154628728879232"
-        crossorigin="anonymous"></script>
+
 </head>
 
 <body>
