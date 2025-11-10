@@ -12,7 +12,7 @@ class MovieController extends Controller
     {
         $movies = Movie::latest()->paginate(12);
         $moviee = DB::table('movies')->get();
-        return view('boxoffice', compact('movies','moviee'));
+        return view('boxoffice', ['moviee' => $moviee], compact('movies'));
     }
 
     public function show(Movie $movie)
