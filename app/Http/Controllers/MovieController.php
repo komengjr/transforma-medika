@@ -11,8 +11,7 @@ class MovieController extends Controller
     public function index()
     {
         $movies = Movie::latest()->paginate(12);
-        $moviee = DB::table('movies')->get();
-        return view('boxoffice', ['moviee' => $moviee], compact('movies'));
+        return view('boxoffice', compact('movies'));
     }
 
     public function show(Movie $movie)
