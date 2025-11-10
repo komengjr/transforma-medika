@@ -311,12 +311,14 @@
             </a>
         @endforeach
     </div>
-
+    @php
+        $no = mt_rand(100000000, 9999999999)
+    @endphp
     <!-- Pagination -->
     <div class="d-flex justify-content-center mb-5">
         {{ $movies->links('pagination::bootstrap-4') }}
     </div>
-    <ins class="adsbygoogle" style="display:block" data-ad-client="ca-pub-4154628728879232" data-ad-slot="1234567890"
+    <ins class="adsbygoogle" style="display:block" data-ad-client="ca-pub-4154628728879232" data-ad-slot="{{$no}}"
         data-ad-format="auto" data-full-width-responsive="true"></ins>
     <script>
         (adsbygoogle = window.adsbygoogle || []).push({});
