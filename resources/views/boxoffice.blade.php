@@ -286,7 +286,8 @@
     <section class="hero">
         <div class="hero-content">
             <h1>Now Showing</h1>
-            <p>Make sure the connection and network are smooth because the quality of the film is Full HD and above..</p>
+            <p>Make sure the connection and network are smooth because the quality of the film is Full HD and above..
+            </p>
             <a href="#" onclick="window.open('https://saweria.co/agusraharjo', '_blank').focus();"
                 class="btn btn-watch">
                 <i class="bi bi-play-fill me-2"></i>Subscribe Now
@@ -296,6 +297,11 @@
 
     <!-- Now Showing -->
     <h3 class="section-title">Now Showing</h3>
+    <ins class="adsbygoogle" style="display:block" data-ad-client="ca-pub-4154628728879232" data-ad-slot="1234567890"
+        data-ad-format="auto" data-full-width-responsive="true"></ins>
+    <script>
+        (adsbygoogle = window.adsbygoogle || []).push({});
+    </script>
     <div class="movie-grid" id="movieGrid">
         @foreach($movies as $movie)
             <a href="{{ route('movies.show', $movie) }}" class="movie-card text-decoration-none movie-item"
