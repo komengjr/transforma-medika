@@ -367,25 +367,25 @@
             }
 
             // Filter hasil pencarian
-            const filtered = movies.filter(movie =>
-                movie.title.toLowerCase().includes(term)
+            const filtered = movies.filter(moviee =>
+                moviee.title.toLowerCase().includes(term)
             );
 
             if (filtered.length === 0) {
                 searchResults.innerHTML = '<div class="p-3 text-center text-muted">No results found</div>';
             } else {
-                filtered.forEach(movie => {
+                filtered.forEach(moviee => {
                     const item = document.createElement('div');
                     item.classList.add('search-result-item');
                     item.innerHTML = `
-                    <img src="${movie.poster}" alt="${movie.title}">
+                    <img src="${moviee.poster}" alt="${moviee.title}">
                     <div>
-                        <div style="font-weight:600;color:#d4af37;">${movie.title}</div>
-                        <div style="font-size:0.8rem;color:#aaa;">${movie.description.substring(0, 50)}...</div>
+                        <div style="font-weight:600;color:#d4af37;">${moviee.title}</div>
+                        <div style="font-size:0.8rem;color:#aaa;">${moviee.description.substring(0, 50)}...</div>
                     </div>
                 `;
                     item.addEventListener('click', () => {
-                        window.location.href = '/movie/' + movie.id;
+                        window.location.href = '/movie/' + moviee.id;
                     });
                     searchResults.appendChild(item);
                 });
