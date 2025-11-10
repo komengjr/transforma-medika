@@ -255,6 +255,8 @@
             color: #d4af37;
         }
     </style>
+    <script async src="https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js?client=ca-pub-4154628728879232"
+        crossorigin="anonymous"></script>
 </head>
 
 <body>
