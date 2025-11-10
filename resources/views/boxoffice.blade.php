@@ -173,7 +173,7 @@
 
     <!-- Pagination -->
     <div class="d-flex justify-content-center mb-5">
-        {{ $movies->links() }}
+        {{ $movies->links('pagination::bootstrap-4') }}
     </div>
 
     <!-- Coming Soon -->
