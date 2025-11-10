@@ -23,7 +23,7 @@
         .player-container {
             position: relative;
             width: 100%;
-            height: 80vh;
+            height: 100vh;
             background: #000;
             display: flex;
             justify-content: center;
@@ -332,7 +332,7 @@
     </div>
 
     <!-- 🪄 DETAIL FILM -->
-    <section class="movie-detail">
+    <section class="movie-detail" id="movie-detail">
         <div class="movie-poster">
             <img src="{{ $movie->poster ?? asset('img/default-poster.jpg') }}" alt="{{ $movie->title }}">
         </div>
@@ -366,6 +366,7 @@
         const controls = document.getElementById('controls');
         const loader = document.getElementById('loader');
         const centerPlay = document.getElementById('centerPlay');
+        const movie_detail = document.getElementById('movie-detail');
 
         const formatTime = (t) => {
             let m = Math.floor(t / 60);
@@ -405,6 +406,7 @@
             btnPlay.style.display = 'none';
             btnPause.style.display = 'inline';
             centerPlay.classList.add("hidden");
+
         };
         btnPause.onclick = () => {
             video.pause();
@@ -423,8 +425,11 @@
         };
 
         fullscreenBtn.onclick = () => {
-            if (!document.fullscreenElement) document.documentElement.requestFullscreen();
-            else document.exitFullscreen();
+            if (!document.fullscreenElement)
+                document.documentElement.requestFullscreen();
+            else
+                document.exitFullscreen();
+            // movie_detail.style.display = 'none';
         };
 
         document.addEventListener('fullscreenchange', () => {
