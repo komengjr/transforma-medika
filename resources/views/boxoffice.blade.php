@@ -80,7 +80,7 @@
             position: relative;
             height: 75vh;
             background: linear-gradient(to bottom, rgba(0, 0, 0, 0.2), #0c0c0c),
-                url('https://media.istockphoto.com/id/185077766/photo/new-york-city-box-office.jpg?s=612x612&w=0&k=20&c=-kY5d-ObcSsyQhvOOzhXSLWO1RTPcGwTFKecHhuktIw=') center/cover no-repeat;
+                url('https://wallpapers.com/images/featured/movie-9pvmdtvz4cb0xl37.jpg') center/cover no-repeat;
             display: flex;
             align-items: flex-end;
             padding: 4rem;
