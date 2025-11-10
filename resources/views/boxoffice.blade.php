@@ -80,7 +80,7 @@
             position: relative;
             height: 55vh;
             background: linear-gradient(to bottom, rgba(0, 0, 0, 0.2), #0c0c0c),
-                url('https://wallpapers.com/images/featured/movie-9pvmdtvz4cb0xl37.jpg') center/cover no-repeat;
+                url('https://c4.wallpaperflare.com/wallpaper/862/449/162/jack-reacher-star-wars-interstellar-movie-john-wick-wallpaper-preview.jpg') center/cover no-repeat;
             display: flex;
             align-items: flex-end;
             padding: 4rem;
