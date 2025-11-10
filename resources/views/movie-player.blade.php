@@ -10,19 +10,20 @@
     <script async src="https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js?client=ca-pub-4154628728879232"
         crossorigin="anonymous"></script>
     <link href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.css" rel="stylesheet">
+
     <style>
         body {
             margin: 0;
             background: #000;
             color: #fff;
             font-family: "Poppins", sans-serif;
-            overflow: hidden;
+            overflow-x: hidden;
         }
 
         .player-container {
             position: relative;
-            width: 100vw;
-            height: 100vh;
+            width: 100%;
+            height: 80vh;
             background: #000;
             display: flex;
             justify-content: center;
@@ -38,6 +39,60 @@
             transition: opacity 1s ease-in;
         }
 
+        /* === DETAIL FILM === */
+        .movie-detail {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 20px;
+            padding: 30px;
+            background: linear-gradient(180deg, #000 0%, #111 100%);
+            border-top: 2px solid gold;
+        }
+
+        .movie-poster {
+            flex: 0 0 250px;
+            border-radius: 10px;
+            overflow: hidden;
+            box-shadow: 0 0 25px rgba(255, 215, 0, 0.2);
+        }
+
+        .movie-poster img {
+            width: 100%;
+            height: 360px;
+            object-fit: cover;
+        }
+
+        .movie-info {
+            flex: 1;
+        }
+
+        .movie-info h1 {
+            font-size: 2rem;
+            color: gold;
+        }
+
+        .movie-info .meta {
+            color: #ccc;
+            font-size: 0.9rem;
+            margin: 8px 0;
+        }
+
+        .movie-info p {
+            font-size: 1rem;
+            line-height: 1.6;
+            color: #eee;
+        }
+
+        .badge {
+            background: gold;
+            color: #000;
+            padding: 5px 10px;
+            border-radius: 20px;
+            margin-right: 6px;
+            font-size: 0.85rem;
+        }
+
+        /* Style lainnya dari player kamu tetap sama */
         .overlay {
             position: absolute;
             inset: 0;
@@ -240,10 +295,10 @@
             transform: translateY(30px);
         }
     </style>
-
 </head>
 
 <body>
+    <!-- 🎬 PLAYER VIDEO -->
     <div class="player-container">
         <div class="loader" id="loader">
             <div class="ring"></div>
@@ -259,8 +314,6 @@
         </video>
 
         <div class="center-play" id="centerPlay" style="display: none;"><i class="bi bi-play-circle-fill"></i></div>
-        <!-- 🔥 tombol tengah -->
-
         <div class="overlay"></div>
         <div class="fullscreen" id="fullscreenBtn"><i class="bi bi-arrows-fullscreen"></i></div>
 
@@ -277,15 +330,27 @@
             <div class="time" id="timeText">00:00 / 00:00</div>
         </div>
     </div>
+
+    <!-- 🪄 DETAIL FILM -->
+    <section class="movie-detail">
+        <div class="movie-poster">
+            <img src="{{ $movie->poster ?? asset('img/default-poster.jpg') }}" alt="{{ $movie->title }}">
+        </div>
+        <div class="movie-info">
+            <h1>{{ $movie->title }}</h1>
+            <div class="meta">
+                <span class="badge">{{ $movie->genre ?? 'Action' }}</span>
+                <span><i class="bi bi-calendar-event"></i> {{ $movie->release_date ?? '2025' }}</span> |
+                <span><i class="bi bi-star-fill" style="color: gold;"></i> {{ $movie->rating ?? '8.5' }}/10</span>
+            </div>
+            <p>{{ $movie->description ?? 'Tidak ada deskripsi tersedia untuk film ini. Segera tonton dan nikmati tayangan terbaik hanya di Innoventra Stream XXI.' }}
+            </p>
+        </div>
+    </section>
+
     <div class="curtain" id="curtain"></div>
-    @php
-        $no = mt_rand(100000000, 9999999999)
-    @endphp
-    <ins class="adsbygoogle" style="display:block" data-ad-client="ca-pub-4154628728879232" data-ad-slot="{{$no}}"
-        data-ad-format="auto" data-full-width-responsive="true"></ins>
-    <script>
-        (adsbygoogle = window.adsbygoogle || []).push({});
-    </script>
+
+
 
     <script>
         const video = document.getElementById('movie');
