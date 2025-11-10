@@ -78,7 +78,7 @@
         .hero {
             margin-top: 65px;
             position: relative;
-            height: 75vh;
+            height: 55vh;
             background: linear-gradient(to bottom, rgba(0, 0, 0, 0.2), #0c0c0c),
                 url('https://wallpapers.com/images/featured/movie-9pvmdtvz4cb0xl37.jpg') center/cover no-repeat;
             display: flex;
@@ -286,7 +286,7 @@
     <section class="hero">
         <div class="hero-content">
             <h1>Now Showing</h1>
-            <p>Experience cinematic magic — watch top box office movies streaming exclusively here.</p>
+            <p>Make sure the connection and network are smooth because the quality of the film is Full HD and above..</p>
             <a href="#" onclick="window.open('https://saweria.co/agusraharjo', '_blank').focus();"
                 class="btn btn-watch">
                 <i class="bi bi-play-fill me-2"></i>Subscribe Now
@@ -315,7 +315,7 @@
     </div>
 
     <!-- Coming Soon -->
-    <h3 class="section-title">Coming Soon</h3>
+    <!-- <h3 class="section-title">Coming Soon</h3>
     <div class="movie-grid">
         @foreach($movies->shuffle()->take(4) as $movie)
             <div class="movie-card">
@@ -326,7 +326,7 @@
                 </div>
             </div>
         @endforeach
-    </div>
+    </div> -->
 
     <footer>
         {{ env('APP_LABEL') }} Box Office &copy; {{ date('Y') }} — Enjoy Cinema at Home 🍿
