@@ -80,7 +80,7 @@
             position: relative;
             height: 55vh;
             background: linear-gradient(to bottom, rgba(0, 0, 0, 0.2), #0c0c0c),
-                url('https://c4.wallpaperflare.com/wallpaper/862/449/162/jack-reacher-star-wars-interstellar-movie-john-wick-wallpaper-preview.jpg') center/cover no-repeat;
+                url('https://blogger.googleusercontent.com/img/b/R29vZ2xl/AVvXsEjnsjBOjhuWOht-gfnfj6YgCdjA4sxOukRErKC5gA0WcpLL6P24KJGkTPwF9SL_g9WmIp-BXV4ibRJuuUqRm3iScqA1vEUM3ixkgMr8JPn4vG7ZasljWw26g3_i5jFmf6VlV0cway5pSH6-/w0/avengers-endgame-movie-characters-uhdpaper.com-4K-52.jpg') center/cover no-repeat;
             display: flex;
             align-items: flex-end;
             padding: 4rem;
