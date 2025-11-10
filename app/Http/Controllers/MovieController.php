@@ -8,7 +8,7 @@ class MovieController extends Controller
 {
     public function index()
     {
-        $movies = Movie::latest()->get();
+        $movies = Movie::latest()->paginate(12);
         return view('boxoffice', compact('movies'));
     }
 
