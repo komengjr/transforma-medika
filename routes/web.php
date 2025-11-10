@@ -59,6 +59,7 @@ Route::controller(PageController::class)->group(function () {
     Route::get('/about', 'about')->name('about');
     Route::get('/contact', 'contact')->name('contact');
     Route::get('/privacy-policy', 'privacy_policy')->name('privacy-policy');
+    Route::get('/terms-of-service', 'terms_of_service')->name('terms-of-service');
     Route::get('/product/detail/{detail}', 'product_detail')->name('product_detail');
     Route::get('/changelog', 'changelog')->name('changelog');
 

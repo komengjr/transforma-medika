@@ -63,6 +63,9 @@ class PageController extends Controller
     public function privacy_policy(){
         return view('public.privacy-policy');
     }
+    public function terms_of_service(){
+        return view('public.terms_of_service');
+    }
     public function changelog()
     {
         return view('public.changelog');

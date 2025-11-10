@@ -147,7 +147,13 @@
                             </a>
 
                         </li>
-                        <li class="nav-item dropdown"><a class="nav-link dropdown-toggle" href="#" role="button"
+                        <li class="nav-item dropdown">
+                            <a class="nav-link" href="{{route('terms-of-service')}}" role="button" aria-haspopup="true"
+                                aria-expanded="false" id="pagess">Terms of Service
+                            </a>
+
+                        </li>
+                        <!-- <li class="nav-item dropdown"><a class="nav-link dropdown-toggle" href="#" role="button"
                                 data-bs-toggle="dropdown" aria-haspopup="true" aria-expanded="false"
                                 id="documentations">Documentation</a>
                             <div class="dropdown-menu dropdown-menu-card border-0 mt-0"
@@ -158,7 +164,7 @@
                                         href="{{route('changelog')}}">Changelog</a>
                                 </div>
                             </div>
-                        </li>
+                        </li> -->
                     </ul>
                     <ul class="navbar-nav ms-auto">
                         <li class="nav-item">
