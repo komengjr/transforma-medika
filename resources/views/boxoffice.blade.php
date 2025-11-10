@@ -297,11 +297,7 @@
 
     <!-- Now Showing -->
     <h3 class="section-title">Now Showing</h3>
-    <ins class="adsbygoogle" style="display:block" data-ad-client="ca-pub-4154628728879232" data-ad-slot="1234567890"
-        data-ad-format="auto" data-full-width-responsive="true"></ins>
-    <script>
-        (adsbygoogle = window.adsbygoogle || []).push({});
-    </script>
+
     <div class="movie-grid" id="movieGrid">
         @foreach($movies as $movie)
             <a href="{{ route('movies.show', $movie) }}" class="movie-card text-decoration-none movie-item"
@@ -319,7 +315,11 @@
     <div class="d-flex justify-content-center mb-5">
         {{ $movies->links('pagination::bootstrap-4') }}
     </div>
-
+    <ins class="adsbygoogle" style="display:block" data-ad-client="ca-pub-4154628728879232" data-ad-slot="1234567890"
+        data-ad-format="auto" data-full-width-responsive="true"></ins>
+    <script>
+        (adsbygoogle = window.adsbygoogle || []).push({});
+    </script>
     <!-- Coming Soon -->
     <!-- <h3 class="section-title">Coming Soon</h3>
     <div class="movie-grid">

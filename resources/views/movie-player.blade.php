@@ -277,12 +277,12 @@
             <div class="time" id="timeText">00:00 / 00:00</div>
         </div>
     </div>
+    <div class="curtain" id="curtain"></div>
     <ins class="adsbygoogle" style="display:block" data-ad-client="ca-pub-4154628728879232" data-ad-slot="1234567890"
         data-ad-format="auto" data-full-width-responsive="true"></ins>
     <script>
         (adsbygoogle = window.adsbygoogle || []).push({});
     </script>
-    <div class="curtain" id="curtain"></div>
 
     <script>
         const video = document.getElementById('movie');
