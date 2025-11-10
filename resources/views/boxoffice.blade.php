@@ -6,7 +6,7 @@
   <meta name="google-adsense-account" content="ca-pub-4154628728879232">
   <title>Box Office | {{ env('APP_LABEL') }} Stream</title>
   <meta name="viewport" content="width=device-width, initial-scale=1">
-  <link rel="icon" type="image/png" sizes="32x32" href="{{ asset('img/favicon.png') }}">
+  <link rel="icon" type="image/png" sizes="32x32" href="{{ asset('img/box-office.png') }}">
   <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet">
   <link href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.css" rel="stylesheet">
 
@@ -201,6 +201,8 @@
       }
     }
   </style>
+  <script async src="https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js?client=ca-pub-4154628728879232"
+        crossorigin="anonymous"></script>
 </head>
 
 <body>
