@@ -311,6 +311,10 @@
             @else
                 <source src="{{ $movie->video }}" type="video/mp4">
             @endif
+            @if (!empty($movie->subtitle))
+                <track label="Bahasa Indonesia" kind="subtitles" srclang="id"
+                    src="{{ asset('subtitles/' . $movie->subtitle) }}" default>
+            @endif
         </video>
 
         <div class="center-play" id="centerPlay" style="display: none;"><i class="bi bi-play-circle-fill"></i></div>
@@ -330,7 +334,7 @@
             <div class="time" id="timeText">00:00 / 00:00</div>
         </div>
     </div>
-
+    <button id="btnSub"><i class="bi bi-cc-square"></i></button>
     <!-- 🪄 DETAIL FILM -->
     <section class="movie-detail" id="movie-detail">
         <div class="movie-poster">
@@ -463,6 +467,20 @@
         setInterval(() => {
 
         }, 3000);
+    </script>
+    <script>
+        const btnSub = document.getElementById('btnSub');
+        const track = video.textTracks[0];
+
+        btnSub.onclick = () => {
+            if (track.mode === "showing") {
+                track.mode = "hidden";
+                btnSub.style.color = "#777";
+            } else {
+                track.mode = "showing";
+                btnSub.style.color = "gold";
+            }
+        };
     </script>
 </body>
 
