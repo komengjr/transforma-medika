@@ -50,9 +50,9 @@
                 <div class="col-3 col-sm-auto my-1 my-sm-3 px-card"><img class="landing-cta-img" height="35"
                         src="{{ asset('asset/img/logos/b&w/10.png') }}" alt="" /></div>
                 <!-- <div class="col-3 col-sm-auto my-1 my-sm-3 px-card"><img class="landing-cta-img" height="40"
-                                                                                src="{{ asset('asset/img/logos/b&w/9.png') }}" alt="" /></div>
-                                                                        <div class="col-3 col-sm-auto my-1 my-sm-3 px-card"><img class="landing-cta-img" height="40"
-                                                                                src="{{ asset('asset/img/logos/b&w/8.png') }}" alt="" /></div> -->
+                                                                                    src="{{ asset('asset/img/logos/b&w/9.png') }}" alt="" /></div>
+                                                                            <div class="col-3 col-sm-auto my-1 my-sm-3 px-card"><img class="landing-cta-img" height="40"
+                                                                                    src="{{ asset('asset/img/logos/b&w/8.png') }}" alt="" /></div> -->
             </div>
         </div>
         <!-- end of .container-->
@@ -218,26 +218,7 @@
 
     <!-- ============================================-->
     <!-- <section> begin ============================-->
-    <section class="light">
 
-        <div class="bg-holder overlay"
-            style="background-image:url(../asset/img/generic/bg-2.jpg);background-position: center top;">
-        </div>
-        <!--/.bg-holder-->
-
-        <div class="container">
-            <div class="row justify-content-center text-center">
-                <div class="col-lg-8">
-                    <p class="fs-3 fs-sm-4 text-white">Join our community of 20,000+ developers and content creators
-                        on their mission to build better sites and apps.</p>
-                    <button class="btn btn-outline-light border-2 rounded-pill btn-lg mt-4 fs-0 py-2" type="button">Start
-                        your webapp</button>
-                </div>
-            </div>
-        </div>
-        <!-- end of .container-->
-
-    </section>
     <!-- <section> close ============================-->
     <!-- ============================================-->
 

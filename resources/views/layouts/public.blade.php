@@ -300,7 +300,32 @@
 
 
         @yield('content')
+        <section class="light">
 
+            <div class="bg-holder overlay"
+                style="background-image:url(../asset/img/generic/bg-2.jpg);background-position: center top;">
+            </div>
+            <!--/.bg-holder-->
+
+            <div class="container">
+                <div class="row justify-content-center text-center">
+                    <div class="col-lg-8">
+                        <p class="fs-2 fs-sm-2 text-white">Innoventra tidak hanya membangun teknologi — kami membangun
+                            masa
+                            depan digital.
+                            Melalui riset berkelanjutan, kolaborasi dengan berbagai sektor, dan penerapan standar
+                            teknologi
+                            global, kami berkomitmen menjadi bagian dari perubahan positif menuju dunia yang lebih
+                            terhubung,
+                            efisien, dan inovatif.</p>
+                        <button class="btn btn-outline-light border-2 rounded-pill btn-lg mt-4 fs-0 py-2"
+                            type="button">Start with Us</button>
+                    </div>
+                </div>
+            </div>
+            <!-- end of .container-->
+
+        </section>
 
         <!-- ============================================-->
         <!-- <section> begin ============================-->
@@ -313,11 +338,10 @@
                 <div class="row">
                     <div class="col-lg-4">
                         <h5 class="text-uppercase text-white opacity-85 mb-3">Our Mission</h5>
-                        <p class="text-600">Innoventra enables front end developers to build custom streamlined user
-                            interfaces in a matter of hours, while it gives backend developers all the UI elements they
-                            need to develop their web app.And it's rich design can be easily integrated with backends
-                            whether your app is based on ruby on rails, laravel, express or any other server side
-                            system.</p>
+                        <p class="text-600">Innoventra adalah perusahaan pengembang solusi digital yang berfokus pada
+                            inovasi, efisiensi, dan transformasi teknologi. Terinspirasi dari dua kata — Innovation dan
+                            Venture — kami hadir sebagai wadah bagi ide-ide kreatif untuk tumbuh menjadi produk dan
+                            layanan yang berdampak nyata.</p>
                         <div class="icon-group mt-4"><a class="icon-item bg-white text-facebook" href="#!"><span
                                     class="fab fa-facebook-f"></span></a><a class="icon-item bg-white text-twitter"
                                 href="#!"><span class="fab fa-twitter"></span></a><a
@@ -331,26 +355,20 @@
                             <div class="col-6 col-md-3">
                                 <h5 class="text-uppercase text-white opacity-85 mb-3">Company</h5>
                                 <ul class="list-unstyled">
-                                    <li class="mb-1"><a class="link-600" href="#!">About</a></li>
-                                    <li class="mb-1"><a class="link-600" href="#!">Contact</a></li>
-                                    <li class="mb-1"><a class="link-600" href="#!">Careers</a></li>
-                                    <li class="mb-1"><a class="link-600" href="#!">Blog</a></li>
-                                    <li class="mb-1"><a class="link-600" href="#!">Terms</a></li>
-                                    <li class="mb-1"><a class="link-600" href="#!">Privacy</a></li>
+                                    <li class="mb-1"><a class="link-600" href="{{ route('about') }}">About</a></li>
+                                    <li class="mb-1"><a class="link-600" href="{{ route('contact') }}">Contact</a></li>
+                                    <li class="mb-1"><a class="link-600"
+                                            href="{{ route('privacy-policy') }}">Privacy</a></li>
+                                    <li class="mb-1"><a class="link-600" href="{{ route('terms-of-service') }}">Term</a>
+                                    </li>
                                     <li><a class="link-600" href="#!">Imprint</a></li>
                                 </ul>
                             </div>
                             <div class="col-6 col-md-3">
-                                <h5 class="text-uppercase text-white opacity-85 mb-3">Product</h5>
+                                <h5 class="text-uppercase text-white opacity-85 mb-3">Movies</h5>
                                 <ul class="list-unstyled">
-                                    <li class="mb-1"><a class="link-600" href="#!">Features</a></li>
-                                    <li class="mb-1"><a class="link-600" href="#!">Roadmap</a></li>
-                                    <li class="mb-1"><a class="link-600" href="#!">Changelog</a></li>
-                                    <li class="mb-1"><a class="link-600" href="#!">Pricing</a></li>
-                                    <li class="mb-1"><a class="link-600" href="#!">Docs</a></li>
-                                    <li class="mb-1"><a class="link-600" href="#!">System Status</a></li>
-                                    <li class="mb-1"><a class="link-600" href="#!">Agencies</a></li>
-                                    <li class="mb-1"><a class="link-600" href="#!">Enterprise</a></li>
+                                    <li class="mb-1"><a class="link-600" href="{{route('movies.index')}}">Watch Now</a>
+                                    </li>
                                 </ul>
                             </div>
                             <div class="col mt-5 mt-md-0">
