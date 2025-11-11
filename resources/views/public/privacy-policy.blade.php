@@ -22,16 +22,16 @@
                             role="img" aria-label="Gift">🎁</span>Become a pro</a>
                     <h2 class="text-white fw-light"><strong>Innoventra</strong>
                         <!-- <small>
-                                                                                            <span class="typed-text fw-bold"
-                                                                                                data-typed-text='["Human","Resource","Management","System"]'></span>
-                                                                                        </small> -->
+                                                                                                                                            <span class="typed-text fw-bold"
+                                                                                                                                                data-typed-text='["Human","Resource","Management","System"]'></span>
+                                                                                                                                        </small> -->
                         <br />Privacy Policy
                     </h2>
 
                 </div>
                 <div class="col-xl-7 offset-xl-1">
                     <!-- <a class="img-landing-banner rounded" href="../index.html"><img class="img-fluid"
-                                                                                        src="{{ asset('img/ilus.png') }}" alt="" width="500" /></a> -->
+                                                                                                                                        src="{{ asset('img/ilus.png') }}" alt="" width="500" /></a> -->
                 </div>
             </div>
         </div>
@@ -55,9 +55,9 @@
                 <div class="col-3 col-sm-auto my-1 my-sm-3 px-card"><img class="landing-cta-img" height="35"
                         src="{{ asset('asset/img/logos/b&w/10.png') }}" alt="" /></div>
                 <!-- <div class="col-3 col-sm-auto my-1 my-sm-3 px-card"><img class="landing-cta-img" height="40"
-                                                                                                                                    src="{{ asset('asset/img/logos/b&w/9.png') }}" alt="" /></div>
-                                                                                                                            <div class="col-3 col-sm-auto my-1 my-sm-3 px-card"><img class="landing-cta-img" height="40"
-                                                                                                                                    src="{{ asset('asset/img/logos/b&w/8.png') }}" alt="" /></div> -->
+                                                                                                                                                                                    src="{{ asset('asset/img/logos/b&w/9.png') }}" alt="" /></div>
+                                                                                                                                                                            <div class="col-3 col-sm-auto my-1 my-sm-3 px-card"><img class="landing-cta-img" height="40"
+                                                                                                                                                                                    src="{{ asset('asset/img/logos/b&w/8.png') }}" alt="" /></div> -->
             </div>
         </div>
         <!-- end of .container-->
@@ -69,43 +69,105 @@
     <!-- <section> begin ============================-->
 
     <section class="content">
-        <h1>Kebijakan Privasi</h1>
+        <h1>🛡️ Kebijakan Privasi — Innoventra</h1>
         <p>Terakhir diperbarui: 10 November 2025</p>
 
-        <p>Selamat datang di <strong>Innoventra Stream</strong>. Kami menghargai privasi Anda dan berkomitmen untuk
-            melindungi informasi pribadi yang Anda berikan saat menggunakan situs ini.</p>
+        <p>Selamat datang di Innoventra.
+            Kebijakan Privasi ini menjelaskan bagaimana kami mengumpulkan, menggunakan, dan melindungi informasi pribadi
+            yang Anda berikan saat menggunakan layanan kami, baik melalui situs web, aplikasi, maupun platform digital
+            lainnya yang dimiliki oleh Innoventra.</p>
+        <p>
+            Dengan menggunakan layanan kami, Anda dianggap telah membaca, memahami, dan menyetujui isi dari Kebijakan
+            Privasi ini.</p>
 
-        <h3>1. Informasi yang Kami Kumpulkan</h3>
-        <p>Kami dapat mengumpulkan informasi pribadi seperti nama, alamat email, atau data penggunaan (seperti halaman yang
-            dikunjungi) untuk meningkatkan pengalaman pengguna.</p>
+        <h3>📘 1. Informasi yang Kami Kumpulkan</h3>
+        <p>Kami dapat mengumpulkan beberapa jenis data pribadi untuk meningkatkan layanan kami, di antaranya:</p>
 
-        <h3>2. Penggunaan Informasi</h3>
-        <p>Informasi digunakan untuk:
+        <p>a. Informasi yang Anda Berikan Secara Langsung:
         <ul>
-            <li>Meningkatkan kualitas layanan.</li>
-            <li>Menampilkan iklan yang relevan melalui Google AdSense.</li>
-            <li>Menganalisis statistik pengunjung.</li>
+            <li>Nama lengkap</li>
+            <li>Alamat email</li>
+            <li>Nomor telepon</li>
+            <li>Nama perusahaan atau organisasi</li>
+            <li>Informasi akun atau login (jika berlaku)</li>
+            <li>Pesan, pertanyaan, atau permintaan yang Anda kirim melalui formulir kontak atau layanan pelanggan</li>
+        </ul>
+        </p>
+        <p>b. Informasi yang Dikumpulkan Secara Otomatis:
+        <ul>
+            <li>Alamat IP, tipe browser, dan sistem operasi</li>
+            <li>Data aktivitas saat mengakses situs (misalnya halaman yang dikunjungi, waktu kunjungan, atau klik)</li>
+            <li>Cookies dan teknologi pelacakan serupa untuk analisis dan personalisasi pengalaman pengguna</li>
         </ul>
         </p>
 
-        <h3>3. Cookie dan Teknologi Pelacakan</h3>
-        <p>Situs kami menggunakan cookie dari Google dan mitra pihak ketiga untuk menayangkan iklan berdasarkan kunjungan
-            pengguna sebelumnya. Anda dapat menonaktifkan cookie melalui pengaturan browser Anda.</p>
+        <h3>🔍 2. Penggunaan Informasi</h3>
+        <p>Informasi yang kami kumpulkan digunakan untuk:
+        <ul>
+            <li>Menyediakan dan mengelola layanan kami</li>
+            <li>Memproses permintaan, pertanyaan, dan dukungan pengguna</li>
+            <li>Meningkatkan kualitas layanan serta pengalaman pengguna</li>
+            <li>Mengirim pembaruan, promosi, atau informasi penting terkait layanan (dengan persetujuan Anda)</li>
+            <li>Melakukan analisis data dan riset internal untuk pengembangan fitur baru</li>
+            <li>Menjaga keamanan sistem dan mencegah aktivitas penipuan atau pelanggaran hukum</li>
+        </ul>
+        </p>
+        <h3>🧠 3. Penggunaan Cookie dan Teknologi Pelacakan</h3>
+        <p>Kami menggunakan cookies untuk:
+        <ul>
+            <li>Menyimpan preferensi pengguna</li>
+            <li>Menganalisis perilaku pengunjung untuk meningkatkan kinerja situs</li>
+            <li>Menampilkan konten dan iklan yang relevan</li>
+        </ul>
+        <p>Anda dapat menonaktifkan cookie melalui pengaturan browser, namun beberapa fitur situs mungkin tidak berfungsi
+            dengan optimal.</p>
+        </p>
 
-        <h3>4. Iklan Google AdSense</h3>
-        <p>Google menggunakan cookie DART untuk menayangkan iklan kepada pengguna berdasarkan kunjungan mereka ke situs kami
-            dan situs lainnya di internet. Pengguna dapat menonaktifkan penggunaan cookie DART dengan mengunjungi <a
-                href="https://policies.google.com/technologies/ads" target="_blank">Kebijakan Privasi Google</a>.</p>
+        <h3>🤝 4. Pembagian Informasi</h3>
+        <p>Kami tidak menjual atau menyewakan data pribadi Anda kepada pihak mana pun. Namun, kami dapat membagikan data
+            kepada pihak ketiga terpercaya hanya dalam kondisi berikut:
+        <ul>
+            <li>Untuk mendukung operasional (misalnya penyedia hosting, analitik, atau sistem pembayaran)</li>
+            <li>Jika diwajibkan oleh hukum, perintah pengadilan, atau lembaga pemerintah</li>
+            <li>Untuk melindungi hak, keselamatan, dan keamanan pengguna atau sistem kami</li>
+        </ul>
+        </p>
+        <p>Semua pihak ketiga yang bekerja sama dengan Innoventra terikat oleh perjanjian kerahasiaan dan wajib menjaga
+            keamanan data Anda.</p>
 
-        <h3>5. Keamanan Data</h3>
-        <p>Kami berupaya menjaga keamanan data Anda namun tidak ada metode transmisi data di internet yang 100% aman.</p>
+        <h3>🔐 5. Keamanan Data</h3>
+        <p>Kami menerapkan langkah-langkah keamanan teknis dan administratif untuk melindungi data pribadi Anda dari akses
+            tidak sah, kehilangan, atau penyalahgunaan.</p>
+        <p>Namun, tidak ada sistem yang benar-benar aman, dan Anda menyadari bahwa transmisi data melalui internet memiliki
+            risiko tertentu.</p>
 
-        <h3>6. Perubahan Kebijakan</h3>
-        <p>Kami dapat memperbarui kebijakan ini dari waktu ke waktu. Perubahan akan diumumkan di halaman ini dengan tanggal
-            pembaruan terbaru.</p>
+        <h3>🧾 6. Hak Pengguna</h3>
+        <p>Anda memiliki hak untuk:
+        <ul>
+            <li>Mengakses, memperbarui, atau menghapus data pribadi Anda</li>
+            <li>Menolak penggunaan data untuk keperluan pemasaran</li>
+            <li>Menarik kembali persetujuan penggunaan data (dalam batas hukum yang berlaku)</li>
+        </ul>
+        </p>
+        <p>Untuk menggunakan hak tersebut, Anda dapat menghubungi kami melalui informasi kontak di bawah.</p>
 
-        <p>Jika Anda memiliki pertanyaan tentang kebijakan privasi ini, silakan hubungi kami melalui halaman <a
-                href="/contact">Kontak</a>.</p>
+        <h3>🌐 7. Tautan ke Situs Lain</h3>
+        <p>Situs kami dapat berisi tautan ke situs pihak ketiga. Kami tidak bertanggung jawab atas kebijakan privasi atau
+            konten dari situs lain tersebut.</p>
+        <p>Kami menganjurkan Anda membaca kebijakan privasi masing-masing situs sebelum memberikan data pribadi.</p>
+
+        <h3>🧩 8. Perubahan Kebijakan Privasi</h3>
+        <p>Kami dapat memperbarui Kebijakan Privasi ini dari waktu ke waktu untuk menyesuaikan dengan perkembangan teknologi
+            dan hukum yang berlaku.</p>
+        <p>Perubahan akan diumumkan melalui halaman ini dengan tanggal pembaruan terbaru di bagian atas.</p>
+
+        <h3>📬 9. Kontak Kami</h3>
+        <p>Jika Anda memiliki pertanyaan, masukan, atau permintaan terkait Kebijakan Privasi ini, silakan hubungi kami di:
+        </p>
+        <ul>📧 Email: support@innoventra.site</ul>
+        <ul>🌐 Website: www.innoventra.site</ul>
+        <ul>🏢 Alamat Kantor: -</ul>
+
     </section>
 
 
