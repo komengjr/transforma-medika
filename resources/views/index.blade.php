@@ -50,9 +50,9 @@
                 <div class="col-3 col-sm-auto my-1 my-sm-3 px-card"><img class="landing-cta-img" height="35"
                         src="{{ asset('asset/img/logos/b&w/10.png') }}" alt="" /></div>
                 <!-- <div class="col-3 col-sm-auto my-1 my-sm-3 px-card"><img class="landing-cta-img" height="40"
-                                                                                    src="{{ asset('asset/img/logos/b&w/9.png') }}" alt="" /></div>
-                                                                            <div class="col-3 col-sm-auto my-1 my-sm-3 px-card"><img class="landing-cta-img" height="40"
-                                                                                    src="{{ asset('asset/img/logos/b&w/8.png') }}" alt="" /></div> -->
+                                                                                            src="{{ asset('asset/img/logos/b&w/9.png') }}" alt="" /></div>
+                                                                                    <div class="col-3 col-sm-auto my-1 my-sm-3 px-card"><img class="landing-cta-img" height="40"
+                                                                                            src="{{ asset('asset/img/logos/b&w/8.png') }}" alt="" /></div> -->
             </div>
         </div>
         <!-- end of .container-->
@@ -99,41 +99,7 @@
                     <p>Untuk mencapai visi tersebut, Innoventra berkomitmen menjalankan misi jangka pendek dan jangka
                         panjang yang terukur:</p>
                     <p>
-                        🔹 Jangka Pendek (0–1 Tahun)
 
-                        Membangun fondasi platform digital dan infrastruktur teknologi internal.
-
-                        Meluncurkan produk dan layanan inti (MVP / versi awal).
-
-                        Meningkatkan kualitas antarmuka dan pengalaman pengguna (UI/UX).
-
-                        Menjalin kerja sama strategis dengan mitra bisnis dan komunitas teknologi.
-
-                        Memperkuat brand awareness dan kepercayaan pengguna.
-
-                        🔹 Jangka Menengah (1–3 Tahun)
-
-                        Mengembangkan ekosistem layanan berbasis AI dan otomasi bisnis.
-
-                        Menyediakan solusi customizable untuk sektor korporasi dan UMKM.
-
-                        Meluncurkan dashboard analitik dan integrasi data lintas platform.
-
-                        Meningkatkan kehadiran di pasar nasional dan memperluas jaringan mitra.
-
-                        Menerapkan sistem keamanan data dan privasi berstandar internasional (ISO/GDPR compliant).
-
-                        🔹 Jangka Panjang (3–5 Tahun)
-
-                        Menjadi leader teknologi inovatif di Asia Tenggara.
-
-                        Menciptakan platform digital terpadu yang menghubungkan inovator, pengguna, dan pelaku bisnis.
-
-                        Mengembangkan produk berbasis AI, cloud, dan blockchain untuk otomasi lintas industri.
-
-                        Membangun pusat riset dan inovasi (Innoventra Labs).
-
-                        Mendorong kolaborasi global untuk menciptakan solusi berkelanjutan dan berdampak sosial.
                     </p>
                 </div>
             </div>
@@ -172,38 +138,57 @@
             <div class="row">
                 <div class="col">
                     <h1 class="fs-2 fs-sm-4 fs-md-5">Here's what's in it for you</h1>
-                    <p class="lead">Things you will get right out of the box with Innoventra.</p>
+                    <p class="lead">Untuk mencapai visi tersebut, Innoventra berkomitmen menjalankan misi jangka pendek dan
+                        jangka panjang yang terukur:</p>
                 </div>
             </div>
             <div class="row mt-6">
                 <div class="col-lg-4">
                     <div class="card card-span h-100">
-                        <div class="card-span-img"><span class="fab fa-sass fs-4 text-info"></span></div>
+                        <div class="card-span-img"><span class="fas fa-tags fs-4 text-info"></span></div>
                         <div class="card-body pt-6 pb-4">
-                            <h5 class="mb-2">Bootstrap 5.x</h5>
-                            <p>Build your webapp with the world's most popular front-end component library along
-                                with Innoventra's 32 sets of carefully designed elements.</p>
+                            <h5 class="mb-2">Jangka Pendek (0–1 Tahun)</h5>
+                            <ul>
+                                <li>Membangun fondasi platform digital dan infrastruktur teknologi internal.</li>
+                                <li>Meluncurkan produk dan layanan inti (MVP / versi awal).</li>
+                                <li>Meningkatkan kualitas antarmuka dan pengalaman pengguna (UI/UX).</li>
+                                <li>Menjalin kerja sama strategis dengan mitra bisnis dan komunitas teknologi.</li>
+                                <li>Memperkuat brand awareness dan kepercayaan pengguna.</li>
+                            </ul>
                         </div>
                     </div>
                 </div>
                 <div class="col-lg-4 mt-6 mt-lg-0">
                     <div class="card card-span h-100">
-                        <div class="card-span-img"><span class="fab fa-node-js fs-5 text-success"></span></div>
+                        <div class="card-span-img"><span class="fas fa-tasks fs-5 text-success"></span></div>
                         <div class="card-body pt-6 pb-4">
-                            <h5 class="mb-2">SCSS &amp; Javascript files</h5>
-                            <p>With your purchased copy of Innoventra, you will get all the uncompressed &
-                                documented
-                                SCSS and Javascript source code files.</p>
+                            <h5 class="mb-2">Jangka Menengah (1–3 Tahun)</h5>
+                            <ul>
+                                <li>Mengembangkan ekosistem layanan berbasis AI dan otomasi bisnis. </li>
+                                <li>Menyediakan solusi customizable untuk sektor korporasi dan UMKM.</li>
+                                <li>Meluncurkan dashboard analitik dan integrasi data lintas platform.</li>
+                                <li>Meningkatkan kehadiran di pasar nasional dan memperluas jaringan mitra.</li>
+                                <li>Menerapkan sistem keamanan data dan privasi berstandar internasional (ISO/GDPR compliant).</li>
+                            </ul>
+                            <p>
+
+                            </p>
                         </div>
                     </div>
                 </div>
                 <div class="col-lg-4 mt-6 mt-lg-0">
                     <div class="card card-span h-100">
-                        <div class="card-span-img"><span class="fab fa-gulp fs-6 text-danger"></span></div>
+                        <div class="card-span-img"><span class="fab fa-github-alt fs-6 text-danger"></span></div>
                         <div class="card-body pt-6 pb-4">
-                            <h5 class="mb-2">Gulp based workflow</h5>
-                            <p>All the painful or time-consuming tasks in your development workflow such as
-                                compiling the SCSS or transpiring the JS are automated.</p>
+                            <h5 class="mb-2">Jangka Panjang (3–5 Tahun)</h5>
+
+                            <ul>
+                                <li>Menjadi leader teknologi inovatif di Asia Tenggara.</li>
+                                <li>Menciptakan platform digital terpadu yang menghubungkan inovator, pengguna, dan pelaku bisnis.</li>
+                                <li>Mengembangkan produk berbasis AI, cloud, dan blockchain untuk otomasi lintas industri.</li>
+                                <li>Membangun pusat riset dan inovasi (Innoventra Labs).</li>
+                                <li>Mendorong kolaborasi global untuk menciptakan solusi berkelanjutan dan berdampak sosial.</li>
+                            </ul>
                         </div>
                     </div>
                 </div>
