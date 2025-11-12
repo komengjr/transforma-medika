@@ -82,11 +82,12 @@
         }
 
         .ads-box {
-            background-color: #212529;
+            background-color: #174878ff;
             text-align: center;
             padding: 10px;
             border-radius: 10px;
             margin-top: 15px;
+            height: 200px !important;
         }
 
         @media (max-width: 991px) {
@@ -102,6 +103,41 @@
             iframe,
             video {
                 height: 300px;
+            }
+        }
+
+        .saweria-button {
+            background-color: #00ffc3;
+            /* Warna khas Saweria */
+            color: #111;
+            /* Warna teks yang kontras */
+            padding: 15px 30px;
+            text-decoration: none;
+            border-radius: 10px;
+            font-weight: bold;
+            display: inline-block;
+            transition: all 0.3s ease;
+            /* Transisi halus untuk semua perubahan */
+            box-shadow: 0 4px 15px rgba(0, 255, 195, 0.4);
+        }
+
+        .saweria-button:hover {
+            transform: scale(1.05);
+            /* Membesar sedikit saat dihover */
+            background-color: #00e6b8;
+            /* Warna sedikit lebih gelap saat dihover */
+            /* Efek denyutan (pulse) */
+            animation: pulse 1s infinite alternate;
+        }
+
+        /* Keyframes untuk animasi denyutan */
+        @keyframes pulse {
+            0% {
+                box-shadow: 0 0 10px rgba(0, 255, 195, 0.4), 0 0 0 0 rgba(0, 255, 195, 0.4);
+            }
+
+            100% {
+                box-shadow: 0 0 15px rgba(0, 255, 195, 0.8), 0 0 15px 5px rgba(0, 255, 195, 0);
             }
         }
     </style>
@@ -148,9 +184,11 @@
             </div>
 
             <div class="ads-box mt-3">
-                <p>AdSense Area</p>
-                <ins class="adsbygoogle" style="display:block" data-ad-client="ca-pub-4154628728879232"
-                    data-ad-slot="1234567890" data-ad-format="auto"></ins>
+                <p><a href="#" onclick="window.open('https://saweria.co/agusraharjo', '_blank').focus();" class="saweria-button">
+                        Donasi di Saweria
+                    </a></p>
+                <ins class="adsbygoogle" data-ad-client="ca-pub-4154628728879232" data-ad-slot="1234567890"
+                    data-ad-format="auto"></ins>
             </div>
         </div>
     </div>
