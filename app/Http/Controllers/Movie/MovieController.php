@@ -55,20 +55,23 @@ class MovieController extends Controller
             return Redirect::to('dashboard/home');
         }
     }
-    public function master_data_movie_add(Request $request){
+    public function master_data_movie_add(Request $request)
+    {
         return view('app-movie.master-data.form.form-add-movie');
     }
-    public function master_data_movie_save(Request $request){
+    public function master_data_movie_save(Request $request)
+    {
         try {
             Movie::insert([
-                'title'=>$request->nama,
-                'description'=>$request->desc,
-                'poster'=>$request->poster,
-                'video'=>$request->video,
-                'type_link'=>$request->type,
-                'genre'=>$request->genre,
-                'release_date'=>$request->release_date,
-                'rating'=>$request->rating,
+                'title' => $request->nama,
+                'description' => $request->desc,
+                'poster' => $request->poster,
+                'video' => $request->video,
+                'type_link' => $request->type,
+                'genre' => $request->genre,
+                'release_date' => $request->release_date,
+                'rating' => $request->rating,
+                'created_at' => now()
             ]);
             return 1;
         } catch (\Throwable $e) {
