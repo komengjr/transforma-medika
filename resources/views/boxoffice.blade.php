@@ -271,7 +271,7 @@
         <div class="collapse navbar-collapse" id="navbarNav">
             <ul class="navbar-nav me-auto ms-3">
                 <li class="nav-item"><a class="nav-link active" href="{{ route('/') }}">Home</a></li>
-                <li class="nav-item"><a class="nav-link" href="#"></a></li>
+                <li class="nav-item"><a class="nav-link" href="#">Nonton Tv</a></li>
                 <li class="nav-item"><a class="nav-link" href="#">Coming Soon</a></li>
                 <li class="nav-item"><a class="nav-link" href="#">Categories</a></li>
             </ul>
