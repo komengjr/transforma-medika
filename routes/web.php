@@ -633,3 +633,10 @@ Route::get('/movie', [MovieController::class, 'index'])->name('movies.index');
 Route::get('/movie/{movie}', [MovieController::class, 'show'])->name('movies.show');
 Route::get('/video/{id}', [VideoStreamController::class, 'stream']);
 Route::get('/live-tv', [LiveTvController::class, 'index'])->name('live.tv');
+Route::get('/proxy-stream', function (Illuminate\Http\Request $request) {
+    $url = $request->query('url');
+    if (!$url) abort(400, 'URL required');
+    $stream = @file_get_contents($url);
+    if (!$stream) abort(403, 'Cannot access stream');
+    return response($stream)->header('Content-Type', 'application/vnd.apple.mpegurl');
+});

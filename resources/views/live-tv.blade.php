@@ -158,8 +158,27 @@
     </div>
 
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
-
+    <script src="https://cdn.jsdelivr.net/npm/hls.js@latest"></script>
     <script>
+        function playHLS(videoElement, src) {
+            if (Hls.isSupported()) {
+                const hls = new Hls({ debug: false });
+                hls.loadSource(src);
+                hls.attachMedia(videoElement);
+                hls.on(Hls.Events.ERROR, (event, data) => {
+                    console.error('HLS error:', data);
+                });
+            } else if (videoElement.canPlayType('application/vnd.apple.mpegurl')) {
+                videoElement.src = src;
+            } else {
+                alert('Browser tidak mendukung HLS');
+            }
+        }
+
+        document.addEventListener("DOMContentLoaded", () => {
+            const player = document.getElementById('tvPlayer');
+            playHLS(player, 'https://live-hls-abr-cdn.livepush.io/live/bigbuckbunnyclip/index.m3u8');
+        });
         const playerContainer = document.getElementById('playerContainer');
         const channels = document.querySelectorAll('.channel');
 
