@@ -80,9 +80,9 @@
         .hero {
             margin-top: 65px;
             position: relative;
-            height: 55vh;
+            height: 65vh;
             background: linear-gradient(to bottom, rgba(0, 0, 0, 0.2), #0c0c0c),
-                url('https://blogger.googleusercontent.com/img/b/R29vZ2xl/AVvXsEjnsjBOjhuWOht-gfnfj6YgCdjA4sxOukRErKC5gA0WcpLL6P24KJGkTPwF9SL_g9WmIp-BXV4ibRJuuUqRm3iScqA1vEUM3ixkgMr8JPn4vG7ZasljWw26g3_i5jFmf6VlV0cway5pSH6-/w0/avengers-endgame-movie-characters-uhdpaper.com-4K-52.jpg') center/cover no-repeat;
+                url("{{ asset('img/box.jpg') }}") center/cover no-repeat;
             display: flex;
             align-items: flex-end;
             padding: 4rem;
@@ -270,8 +270,8 @@
 
         <div class="collapse navbar-collapse" id="navbarNav">
             <ul class="navbar-nav me-auto ms-3">
-                <li class="nav-item"><a class="nav-link active" href="#">Home</a></li>
-                <li class="nav-item"><a class="nav-link" href="#">Now Showing</a></li>
+                <li class="nav-item"><a class="nav-link active" href="{{ route('/') }}">Home</a></li>
+                <li class="nav-item"><a class="nav-link" href="#"></a></li>
                 <li class="nav-item"><a class="nav-link" href="#">Coming Soon</a></li>
                 <li class="nav-item"><a class="nav-link" href="#">Categories</a></li>
             </ul>
@@ -286,7 +286,7 @@
     <!-- Hero -->
     <section class="hero">
         <div class="hero-content">
-            <h1>Now Showing</h1>
+            <h1>Welcome to Innoventra Box Office</h1>
             <p>Make sure the connection and network are smooth because the quality of the film is Full HD and above..
             </p>
             <a href="#" onclick="window.open('https://saweria.co/agusraharjo', '_blank').focus();"
