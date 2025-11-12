@@ -5,11 +5,12 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Live TV | {{ env('APP_LABEL') }}</title>
-    <meta name="google-adsense-account" content="ca-pub-XXXXXXXXXXXXXX">
+    <meta name="google-adsense-account" content="ca-pub-4154628728879232">
 
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet">
     <link href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.css" rel="stylesheet">
-
+    <script async src="https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js?client=ca-pub-4154628728879232"
+        crossorigin="anonymous"></script>
     <style>
         body {
             background-color: #0d1117;
@@ -148,7 +149,7 @@
 
             <div class="ads-box mt-3">
                 <p>AdSense Area</p>
-                <ins class="adsbygoogle" style="display:block" data-ad-client="ca-pub-XXXXXXXXXXXXXX"
+                <ins class="adsbygoogle" style="display:block" data-ad-client="ca-pub-4154628728879232"
                     data-ad-slot="1234567890" data-ad-format="auto"></ins>
             </div>
         </div>
