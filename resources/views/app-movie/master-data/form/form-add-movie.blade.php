@@ -21,8 +21,7 @@
                         <label for="inputLastName1" class="form-label text-youtube">Link Poster</label>
                         <div class="input-group"> <span class="input-group-text"><i
                                     class="fas fa-money-check"></i></span>
-                            <input type="text" name="poster" class="form-control form-control-lg border-start-0 bg-white"
-                                id="dengan-rupiah">
+                            <input type="text" name="poster" class="form-control form-control-lg border-start-0 bg-white" >
                         </div>
                     </div>
                      <div class="col-md-4">
