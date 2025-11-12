@@ -56,6 +56,7 @@ Route::controller(PageController::class)->group(function () {
     Route::get('/app-supplier', 'app_supplier')->name('public-supplier');
     Route::get('/app-brodcast', 'app_brodcast')->name('public-brodcast');
     Route::get('/app-farmasi', 'app_farmasi')->name('public-farmasi');
+    Route::get('/app-movie', 'app_movie')->name('public-movie');
     Route::get('/product', 'product')->name('product');
     Route::get('/about', 'about')->name('about');
     Route::get('/contact', 'contact')->name('contact');

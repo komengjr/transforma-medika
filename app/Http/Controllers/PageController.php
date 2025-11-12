@@ -40,6 +40,10 @@ class PageController extends Controller
     {
         return view('public.app-supplier');
     }
+    public function app_movie()
+    {
+        return view('public.app-movie');
+    }
     public function product()
     {
         $product = DB::table('log_m_product')->get();
