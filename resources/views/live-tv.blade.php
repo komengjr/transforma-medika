@@ -24,7 +24,7 @@
         }
 
         .tv-player {
-            flex: 2;
+            flex: 4;
             background-color: #000;
             border-radius: 15px;
             overflow: hidden;
@@ -35,7 +35,7 @@
         iframe,
         video {
             width: 100%;
-            height: 500px;
+            height: 600px;
             border: none;
             border-radius: 15px;
         }
@@ -46,7 +46,7 @@
             border-radius: 15px;
             padding: 15px;
             overflow-y: auto;
-            max-height: 500px;
+            max-height: 600px;
             box-shadow: inset 0 0 5px rgba(255, 255, 255, 0.1);
         }
 
