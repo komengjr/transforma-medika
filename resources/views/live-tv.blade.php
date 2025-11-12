@@ -126,10 +126,7 @@
                         allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
                         allowfullscreen></iframe>
                 @else
-                    <video id="tvPlayer" controls autoplay>
-                        <source src="{{ $first->stream_url_or_id }}" type="application/x-mpegURL">
-                        Browser kamu tidak mendukung pemutar video HLS.
-                    </video>
+                    <video id="tvPlayer" controls autoplay muted></video>
                 @endif
             </div>
         </div>
@@ -157,31 +154,32 @@
         </div>
     </div>
 
+    <!-- Scripts -->
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/hls.js@latest"></script>
+
     <script>
         function playHLS(videoElement, src) {
             if (Hls.isSupported()) {
                 const hls = new Hls({ debug: false });
                 hls.loadSource(src);
                 hls.attachMedia(videoElement);
+                hls.on(Hls.Events.MANIFEST_PARSED, () => videoElement.play());
                 hls.on(Hls.Events.ERROR, (event, data) => {
                     console.error('HLS error:', data);
                 });
             } else if (videoElement.canPlayType('application/vnd.apple.mpegurl')) {
                 videoElement.src = src;
+                videoElement.play();
             } else {
                 alert('Browser tidak mendukung HLS');
             }
         }
 
-        document.addEventListener("DOMContentLoaded", () => {
-            const player = document.getElementById('tvPlayer');
-            playHLS(player, 'https://live-hls-abr-cdn.livepush.io/live/bigbuckbunnyclip/index.m3u8');
-        });
         const playerContainer = document.getElementById('playerContainer');
         const channels = document.querySelectorAll('.channel');
 
+        // Klik channel
         channels.forEach(ch => {
             ch.addEventListener('click', () => {
                 channels.forEach(c => c.classList.remove('active'));
@@ -189,31 +187,46 @@
 
                 const type = ch.dataset.type;
                 const src = ch.dataset.src;
-
-                playerContainer.innerHTML = ''; // clear player
+                playerContainer.innerHTML = ''; // clear
 
                 if (type === 'youtube') {
                     playerContainer.innerHTML = `
-            <iframe width="100%" height="500"
-              src="https://www.youtube.com/embed/${src}?autoplay=1&mute=1"
-              allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
-              allowfullscreen></iframe>`;
+                        <iframe width="100%" height="500"
+                          src="https://www.youtube.com/embed/${src}?autoplay=1&mute=1"
+                          allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
+                          allowfullscreen></iframe>`;
                 } else {
-                    playerContainer.innerHTML = `
-            <video id="tvPlayer" controls autoplay>
-              <source src="${src}" type="application/x-mpegURL">
-              Browser kamu tidak mendukung pemutar video HLS.
-            </video>`;
+                    // Buat elemen video baru untuk HLS
+                    const video = document.createElement('video');
+                    video.id = 'tvPlayer';
+                    video.controls = true;
+                    video.autoplay = true;
+                    video.muted = true;
+                    video.style.width = '100%';
+                    video.style.borderRadius = '15px';
+                    playerContainer.appendChild(video);
+
+                    // Panggil HLS
+                    playHLS(video, src);
                 }
             });
         });
 
-        // Pencarian channel
+        // Search channel
         document.getElementById('searchChannel').addEventListener('input', (e) => {
             const term = e.target.value.toLowerCase();
             channels.forEach(ch => {
                 ch.style.display = ch.textContent.toLowerCase().includes(term) ? '' : 'none';
             });
+        });
+
+        // Inisialisasi channel pertama kalau HLS
+        document.addEventListener("DOMContentLoaded", () => {
+            const firstActive = document.querySelector('.channel.active');
+            if (firstActive && firstActive.dataset.type === 'hls') {
+                const video = document.getElementById('tvPlayer');
+                playHLS(video, firstActive.dataset.src);
+            }
         });
     </script>
 
