@@ -18,6 +18,7 @@ use App\Http\Controllers\Logsitik\LogistikController;
 use App\Http\Controllers\MasterController;
 use App\Http\Controllers\MasterDataController;
 use App\Http\Controllers\Medic\MasterMedController;
+use App\Http\Controllers\Movie\MovieController as MoviesController;
 use App\Http\Controllers\PacsController;
 use App\Http\Controllers\PageController;
 use App\Http\Controllers\PelayananController;
@@ -157,6 +158,9 @@ Route::prefix('{akses}/{id}')->group(function (): void {
     Route::get('manajemen-farmasi/stok-min-and-max', [FarmasiController::class, 'manajemen_farmasi_stock_min_max'])->name('manajemen_farmasi_stock_min_max');
     Route::get('manajemen-farmasi/data-supplier', [FarmasiController::class, 'manajemen_farmasi_data_supplier'])->name('manajemen_farmasi_data_supplier');
     Route::get('manajemen-farmasi/data-pelanggan', [FarmasiController::class, 'manajemen_farmasi_data_pelanggan'])->name('manajemen_farmasi_data_pelanggan');
+
+    // MOVIE
+    Route::get('master-data/data-movie', [MoviesController::class, 'master_data_movie'])->name('master_data_movie');
 });
 // MEDICA HEALTH
 Route::prefix('{akses}/{id}/application')->group(function () {
@@ -218,7 +222,7 @@ Route::prefix('{akses}/{id}/application')->group(function () {
     Route::get('master-penjualan/data-penjualan', [MasterDataController::class, 'master_penjualan_data'])->name('master_penjualan_data');
     Route::get('master-penjualan/kategori-penjualan', [MasterDataController::class, 'master_penjualan_kategori'])->name('master_penjualan_kategori');
 
-    // SUPPLIER
+
 
 });
 
@@ -626,8 +630,14 @@ Route::prefix('v1')->group(function (): void {
     Route::get('both-antrian', [AntrianController::class, 'both_antrian'])->name('both_antrian');
 });
 
+// MOVIE
+Route::prefix('movie/')->group(function (): void {
+    Route::post('master-data/data-movie/add', [MoviesController::class, 'master_data_movie_add'])->name('master_data_movie_add');
+    Route::post('master-data/data-movie/save', [MoviesController::class, 'master_data_movie_save'])->name('master_data_movie_save');
 
-Route::view('/video-player', 'video');
+});
+
+// Route::view('/video-player', 'video');
 
 use App\Http\Controllers\MovieController;
 Route::get('/movie', [MovieController::class, 'index'])->name('movies.index');
@@ -636,8 +646,10 @@ Route::get('/video/{id}', [VideoStreamController::class, 'stream']);
 Route::get('/live-tv', [LiveTvController::class, 'index'])->name('live.tv');
 Route::get('/proxy-stream', function (Illuminate\Http\Request $request) {
     $url = $request->query('url');
-    if (!$url) abort(400, 'URL required');
+    if (!$url)
+        abort(400, 'URL required');
     $stream = @file_get_contents($url);
-    if (!$stream) abort(403, 'Cannot access stream');
+    if (!$stream)
+        abort(403, 'Cannot access stream');
     return response($stream)->header('Content-Type', 'application/vnd.apple.mpegurl');
 });
