@@ -18,4 +18,8 @@ class MovieController extends Controller
     {
         return view('movie-player', compact('movie'));
     }
+    public function nonotn_tv()
+    {
+        return view('nonton-tv');
+    }
 }

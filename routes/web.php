@@ -13,6 +13,7 @@ use App\Http\Controllers\inventaris\MasterController as InventarisMasterControll
 use App\Http\Controllers\inventaris\PeminjamanController;
 use App\Http\Controllers\KeuanganController;
 use App\Http\Controllers\LaboratoriumController;
+use App\Http\Controllers\LiveTvController;
 use App\Http\Controllers\Logsitik\LogistikController;
 use App\Http\Controllers\MasterController;
 use App\Http\Controllers\MasterDataController;
@@ -631,3 +632,4 @@ use App\Http\Controllers\MovieController;
 Route::get('/movie', [MovieController::class, 'index'])->name('movies.index');
 Route::get('/movie/{movie}', [MovieController::class, 'show'])->name('movies.show');
 Route::get('/video/{id}', [VideoStreamController::class, 'stream']);
+Route::get('/live-tv', [LiveTvController::class, 'index'])->name('live.tv');

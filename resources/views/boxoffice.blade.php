@@ -386,7 +386,7 @@
                         <a class="nav-link active" href="{{ route('/') }}">Home</a>
                     </li>
                     <li class="nav-item">
-                        <a class="nav-link" href="#">Nonton Tv</a>
+                        <a class="nav-link" href="{{route('live.tv')}}">Nonton Tv</a>
                     </li>
                     <li class="nav-item">
                         <a class="nav-link" href="#">Coming Soon</a>
