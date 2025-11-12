@@ -256,29 +256,179 @@
             background-color: rgba(212, 175, 55, 0.1);
             color: #d4af37;
         }
+
+        /* 🌟 Animasi dropdown */
+        .dropdown-menu {
+            display: block;
+            opacity: 0;
+            visibility: hidden;
+            transform: translateY(10px);
+            transition: all 0.3s ease;
+        }
+
+        .dropdown-menu.show {
+            opacity: 1;
+            visibility: visible;
+            transform: translateY(0);
+        }
+
+        /* Hover efek item */
+        .dropdown-item {
+            transition: all 0.25s ease;
+        }
+
+        .dropdown-item:hover {
+            background-color: #198754;
+            color: #fff;
+            transform: translateX(5px);
+        }
+
+        /* 🌈 Search box */
+        .search-box {
+            position: relative;
+            width: 220px;
+        }
+
+        .search-box input {
+            border-radius: 30px;
+            padding-right: 35px;
+            transition: all 0.3s ease;
+        }
+
+        .search-box input:focus {
+            box-shadow: 0 0 10px rgba(25, 135, 84, 0.4);
+            border-color: #198754;
+        }
+
+        .bi-search {
+            cursor: pointer;
+            position: absolute;
+            top: 50%;
+            right: 10px;
+            transform: translateY(-50%);
+            color: #aaa;
+            transition: all 0.2s ease;
+        }
+
+        .bi-search:hover {
+            color: #198754;
+            transform: translateY(-50%) scale(1.1);
+        }
+
+        /* 🌙 Responsif untuk mobile */
+        @media (max-width: 991px) {
+            .navbar-nav {
+                text-align: center;
+            }
+
+            .search-box {
+                width: 100%;
+                margin-top: 10px;
+            }
+
+            /* 🌟 Dropdown auto fit layar */
+            .dropdown-menu {
+                background-color: #212529;
+                border: none;
+                max-height: calc(100vh - 180px);
+                overflow-y: auto;
+                margin-bottom: 10px;
+                scrollbar-width: thin;
+                display: none;
+                /* tertutup default */
+            }
+
+            .dropdown-menu.active {
+                display: block;
+                /* tampil ketika aktif */
+            }
+
+            .dropdown-item {
+                color: #ddd;
+            }
+
+            .dropdown-item:hover {
+                background-color: #198754;
+                color: #fff;
+                transform: none;
+            }
+
+            /* Scrollbar halus */
+            .dropdown-menu::-webkit-scrollbar {
+                width: 6px;
+            }
+
+            .dropdown-menu::-webkit-scrollbar-thumb {
+                background-color: #198754;
+                border-radius: 3px;
+            }
+
+            .dropdown-menu::-webkit-scrollbar-track {
+                background: transparent;
+            }
+        }
     </style>
 
 </head>
 
 <body>
     <!-- Navbar -->
-    <nav class="navbar navbar-expand-lg navbar-dark">
-        <a class="navbar-brand" href="#">🎬 {{ env('APP_LABEL') }} Movie</a>
-        <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav">
-            <span class="navbar-toggler-icon"></span>
-        </button>
+    <nav class="navbar navbar-expand-lg navbar-dark bg-dark shadow-lg">
+        <div class="container-fluid">
+            <a class="navbar-brand fw-bold" href="#">🎬 {{ env('APP_LABEL') }} Movie</a>
+            <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav">
+                <span class="navbar-toggler-icon"></span>
+            </button>
 
-        <div class="collapse navbar-collapse" id="navbarNav">
-            <ul class="navbar-nav me-auto ms-3">
-                <li class="nav-item"><a class="nav-link active" href="{{ route('/') }}">Home</a></li>
-                <li class="nav-item"><a class="nav-link" href="#">Nonton Tv</a></li>
-                <li class="nav-item"><a class="nav-link" href="#">Coming Soon</a></li>
-                <li class="nav-item"><a class="nav-link" href="#">Categories</a></li>
-            </ul>
-            <div class="search-box">
-                <input id="searchInput" type="text" placeholder="Search movies...">
-                <i class="bi bi-search"></i>
-                <div id="searchResults" class="search-results"></div>
+            <div class="collapse navbar-collapse" id="navbarNav">
+                <ul class="navbar-nav me-auto ms-3">
+                    <li class="nav-item">
+                        <a class="nav-link active" href="{{ route('/') }}">Home</a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link" href="#">Nonton Tv</a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link" href="#">Coming Soon</a>
+                    </li>
+
+                    <!-- Dropdown Genre -->
+                    <li class="nav-item dropdown dropdown-animate">
+                        <a class="nav-link dropdown-toggle" href="#" id="genreDropdown" role="button"
+                            data-bs-toggle="dropdown" aria-expanded="false">
+                            Genre
+                        </a>
+                        <ul class="dropdown-menu" aria-labelledby="genreDropdown">
+                            <li><a class="dropdown-item" href="#">Action</a></li>
+                            <li><a class="dropdown-item" href="#">Comedy</a></li>
+                            <li><a class="dropdown-item" href="#">Drama</a></li>
+                            <li><a class="dropdown-item" href="#">Horror</a></li>
+                            <li><a class="dropdown-item" href="#">Romance</a></li>
+                            <li><a class="dropdown-item" href="#">Sci-Fi</a></li>
+                            <li><a class="dropdown-item" href="#">Animation</a></li>
+                        </ul>
+                    </li>
+
+                    <!-- Dropdown Tahun -->
+                    <li class="nav-item dropdown dropdown-animate">
+                        <a class="nav-link dropdown-toggle" href="#" id="yearDropdown" role="button"
+                            data-bs-toggle="dropdown" aria-expanded="false">
+                            Tahun
+                        </a>
+                        <ul class="dropdown-menu" aria-labelledby="yearDropdown">
+                            @for ($year = date('Y'); $year >= 2024; $year--)
+                                <li><a class="dropdown-item" href="#">{{ $year }}</a></li>
+                            @endfor
+                        </ul>
+                    </li>
+                </ul>
+
+                <!-- Search Box -->
+                <div class="search-box position-relative">
+                    <input id="searchInput" class="form-control" type="text" placeholder="Search movies...">
+                    <i class="bi bi-search position-absolute top-50 end-0 translate-middle-y me-3 text-secondary"></i>
+                    <div id="searchResults" class="search-results"></div>
+                </div>
             </div>
         </div>
     </nav>
@@ -401,7 +551,38 @@
             }
         });
     </script>
+    <script>
+        function isMobile() {
+            return window.innerWidth <= 991;
+        }
 
+        document.querySelectorAll('.nav-item.dropdown').forEach(drop => {
+            const toggle = drop.querySelector('.dropdown-toggle');
+            const menu = drop.querySelector('.dropdown-menu');
+
+            toggle.addEventListener('click', (e) => {
+                if (isMobile()) {
+                    e.preventDefault();
+
+                    // Tutup semua dropdown lain
+                    document.querySelectorAll('.dropdown-menu.active').forEach(other => {
+                        if (other !== menu) other.classList.remove('active');
+                    });
+
+                    // Toggle aktif
+                    menu.classList.toggle('active');
+                }
+            });
+        });
+
+        // Jika resize ke desktop → reset semua state dropdown
+        window.addEventListener('resize', () => {
+            if (!isMobile()) {
+                document.querySelectorAll('.dropdown-menu').forEach(m => m.classList.remove('active'));
+            }
+        });
+
+    </script>
 
 </body>
 
