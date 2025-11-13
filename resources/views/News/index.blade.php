@@ -1613,7 +1613,7 @@
                     <div class="col-lg-3">
                         <a href="#" class="d-flex flex-column flex-wrap">
                             <p class="text-white mb-0 display-6">Newsers</p>
-                            <small class="text-light" style="letter-spacing: 11px; line-height: 0;">Newspaper</small>
+                            <small class="text-light" style="letter-spacing: 11px; line-height: 0;">Innoventra</small>
                         </a>
                     </div>
                     <div class="col-lg-9">
@@ -1631,9 +1631,9 @@
                 <div class="col-lg-6 col-xl-3">
                     <div class="footer-item-1">
                         <h4 class="mb-4 text-white">Get In Touch</h4>
-                        <p class="text-secondary line-h">Address: <span class="text-white">123 Streat, New York</span>
+                        <p class="text-secondary line-h">Address: <span class="text-white">Kubu Raya No 1029</span>
                         </p>
-                        <p class="text-secondary line-h">Email: <span class="text-white">Example@gmail.com</span></p>
+                        <p class="text-secondary line-h">Email: <span class="text-white">news@innoventra.site</span></p>
                         <p class="text-secondary line-h">Phone: <span class="text-white">+0123 4567 8910</span></p>
                         <div class="d-flex line-h">
                             <a class="btn btn-light me-2 btn-md-square rounded-circle" href=""><i
@@ -1759,7 +1759,7 @@
                     <!--/*** This template is free as long as you keep the below author’s credit link/attribution link/backlink. ***/-->
                     <!--/*** If you'd like to use the template without the below author’s credit link/attribution link/backlink, ***/-->
                     <!--/*** you can purchase the Credit Removal License from "https://htmlcodex.com/credit-removal". ***/-->
-                    Designed By <a class="border-bottom" href="https://htmlcodex.com">Website </a> Distributed By <a
+                    Designed By <a class="border-bottom" href="#">Website </a> Distributed By <a
                         href="https://innoventra.site">Innoventra</a>
                 </div>
             </div>
