@@ -66,8 +66,6 @@
                         </div>
                     </div>
                     <div class="top-link flex-lg-wrap">
-                        <i class="fas fa-calendar-alt text-white border-end border-secondary pe-2 me-2"> <span
-                                class="text-body">Tuesday, Sep 12, 2024</span></i>
                         <div class="d-flex icon">
                             <p class="mb-0 text-white me-2">Follow Us:</p>
                             <a href="" class="me-2"><i class="fab fa-facebook-f text-body link-hover"></i></a>
