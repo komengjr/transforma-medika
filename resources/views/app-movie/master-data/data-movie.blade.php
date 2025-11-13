@@ -191,5 +191,7 @@
                 $('#menu-add-data-movie').html('eror');
             });
         });
+
+
     </script>
 @endsection

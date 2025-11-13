@@ -124,6 +124,12 @@
 
                         </li>
                         <li class="nav-item dropdown">
+                            <a class="nav-link" href="{{route('news_index')}}" role="button" aria-haspopup="true"
+                                aria-expanded="false" id="pagess">News
+                            </a>
+
+                        </li>
+                        <li class="nav-item dropdown">
                             <a class="nav-link" href="{{route('movies.index')}}" role="button" aria-haspopup="true"
                                 aria-expanded="false" id="pagess">Movie
                             </a>

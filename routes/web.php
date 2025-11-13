@@ -640,6 +640,8 @@ Route::prefix('movie/')->group(function (): void {
 // Route::view('/video-player', 'video');
 
 use App\Http\Controllers\MovieController;
+use App\Http\Controllers\News\NewsController;
+
 Route::get('/movie', [MovieController::class, 'index'])->name('movies.index');
 Route::get('/movie/{movie}', [MovieController::class, 'show'])->name('movies.show');
 Route::get('/video/{id}', [VideoStreamController::class, 'stream']);
@@ -652,4 +654,11 @@ Route::get('/proxy-stream', function (Illuminate\Http\Request $request) {
     if (!$stream)
         abort(403, 'Cannot access stream');
     return response($stream)->header('Content-Type', 'application/vnd.apple.mpegurl');
+});
+
+Route::prefix('movies/')->group(function (): void {
+    Route::get('series', [MovieController::class, 'movies_series'])->name('movies_series');
+});
+Route::prefix('news/')->group(function (): void {
+    Route::get('index', [NewsController::class, 'news_index'])->name('news_index');
 });

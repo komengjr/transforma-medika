@@ -22,4 +22,7 @@ class MovieController extends Controller
     {
         return view('nonton-tv');
     }
+    public function movies_series(){
+        return view('series.movies-series');
+    }
 }
