@@ -661,4 +661,5 @@ Route::prefix('movies/')->group(function (): void {
 });
 Route::prefix('news/')->group(function (): void {
     Route::get('index', [NewsController::class, 'news_index'])->name('news_index');
+    Route::get('detail/{id}', [NewsController::class, 'news_detail'])->name('news_detail');
 });
