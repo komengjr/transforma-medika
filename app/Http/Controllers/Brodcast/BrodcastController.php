@@ -296,7 +296,7 @@ class BrodcastController extends Controller
                             $nomorhp = '+62' . substr($nomorhp, 1);
                         }
                     }
-                    $text = "Hi *" . $datas->b_event_peserta_name . "* \nSelamat Anda Terdaftar Sebagai Peserta Event : " . $event->b_event_name . " \nLokasi Event : " . $event->b_event_location . "\nRoom : " . $event->b_event_class . "\nTanggal & Jam: " . $event->b_event_date . "\nKode Booking : " . $datas->b_event_peserta_booking . "\n\nSupport By. *www.innoventra.site*";
+                    $text = "Hi *" . $datas->b_event_peserta_name . "* \nSelamat Anda Terdaftar Sebagai Peserta Event : " . $event->b_event_name . " \nLokasi Event : " . $event->b_event_location . "\nRoom : " . $event->b_event_class . "\nTanggal & Jam : " . $event->b_event_date . "\nKode Booking : " . $datas->b_event_peserta_booking . "\n\nSupport By. *www.innoventra.site*";
                     $qrcode = base64_encode(QrCode::format('png')
                         ->size(500)
                         ->errorCorrection('H')
