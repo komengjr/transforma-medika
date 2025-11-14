@@ -8,106 +8,34 @@
     <div class="container-fluid features mb-5">
         <div class="container py-5">
             <div class="row g-4">
-                <div class="col-md-6 col-lg-6 col-xl-3">
-                    <div class="row g-4 align-items-center features-item">
-                        <div class="col-4">
-                            <div class="rounded-circle position-relative">
-                                <div class="overflow-hidden rounded-circle">
-                                    <img src="img/features-sports-1.jpg"
-                                        class="img-zoomin img-fluid rounded-circle w-100" alt="">
+                @foreach ($cat as $cats)
+                    <div class="col-md-6 col-lg-6 col-xl-3">
+                        <div class="row g-4 align-items-center features-item">
+                            <div class="col-4">
+                                <div class="rounded-circle position-relative">
+                                    <div class="overflow-hidden rounded-circle">
+                                        <img src="https://cdn-icons-png.freepik.com/512/4588/4588164.png" class="img-zoomin img-fluid rounded-circle w-100"
+                                            alt="">
+                                    </div>
+                                    <span
+                                        class="rounded-circle border border-2 border-white bg-primary btn-sm-square text-white position-absolute"
+                                        style="top: 10%; right: -10px;">{{mt_rand(1,5)}}</span>
                                 </div>
-                                <span
-                                    class="rounded-circle border border-2 border-white bg-primary btn-sm-square text-white position-absolute"
-                                    style="top: 10%; right: -10px;">3</span>
                             </div>
-                        </div>
-                        <div class="col-8">
-                            <div class="features-content d-flex flex-column">
-                                <p class="text-uppercase mb-2">Sports</p>
-                                <a href="#" class="h6">
-                                    Get the best speak market, news.
-                                </a>
-                                <small class="text-body d-block"><i class="fas fa-calendar-alt me-1"></i> December 9,
-                                    2024</small>
+                            <div class="col-8">
+                                <div class="features-content d-flex flex-column">
+                                    <p class="text-uppercase mb-2">{{$cats->news_categori_name}}</p>
+                                    <a href="#" class="h6">
+                                        {{$cats->news_categori_desc}}
+                                    </a>
+                                    <small class="text-body d-block"><i class="fas fa-calendar-alt me-1"></i> December 9,
+                                        2025</small>
+                                </div>
                             </div>
                         </div>
                     </div>
-                </div>
-                <div class="col-md-6 col-lg-6 col-xl-3">
-                    <div class="row g-4 align-items-center features-item">
-                        <div class="col-4">
-                            <div class="rounded-circle position-relative">
-                                <div class="overflow-hidden rounded-circle">
-                                    <img src="img/features-technology.jpg"
-                                        class="img-zoomin img-fluid rounded-circle w-100" alt="">
-                                </div>
-                                <span
-                                    class="rounded-circle border border-2 border-white bg-primary btn-sm-square text-white position-absolute"
-                                    style="top: 10%; right: -10px;">3</span>
-                            </div>
-                        </div>
-                        <div class="col-8">
-                            <div class="features-content d-flex flex-column">
-                                <p class="text-uppercase mb-2">Technology</p>
-                                <a href="#" class="h6">
-                                    Get the best speak market, news.
-                                </a>
-                                <small class="text-body d-block"><i class="fas fa-calendar-alt me-1"></i> December 9,
-                                    2024</small>
-                            </div>
-                        </div>
-                    </div>
-                </div>
-                <div class="col-md-6 col-lg-6 col-xl-3">
-                    <div class="row g-4 align-items-center features-item">
-                        <div class="col-4">
-                            <div class="rounded-circle position-relative">
-                                <div class="overflow-hidden rounded-circle">
-                                    <img src="img/features-fashion.jpg"
-                                        class="img-zoomin img-fluid rounded-circle w-100" alt="">
-                                </div>
-                                <span
-                                    class="rounded-circle border border-2 border-white bg-primary btn-sm-square text-white position-absolute"
-                                    style="top: 10%; right: -10px;">3</span>
-                            </div>
-                        </div>
-                        <div class="col-8">
-                            <div class="features-content d-flex flex-column">
-                                <p class="text-uppercase mb-2">Fashion</p>
-                                <a href="#" class="h6">
-                                    Get the best speak market, news.
-                                </a>
-                                <small class="text-body d-block"><i class="fas fa-calendar-alt me-1"></i> December 9,
-                                    2024</small>
-                            </div>
-                        </div>
-                    </div>
-                </div>
-                <div class="col-md-6 col-lg-6 col-xl-3">
-                    <div class="row g-4 align-items-center features-item">
-                        <div class="col-4">
-                            <div class="rounded-circle position-relative">
-                                <div class="overflow-hidden rounded-circle">
-                                    <img src="img/features-life-style.jpg"
-                                        class="img-zoomin img-fluid rounded-circle w-100" alt="">
-                                </div>
-                                <span
-                                    class="rounded-circle border border-2 border-white bg-primary btn-sm-square text-white position-absolute"
-                                    style="top: 10%; right: -10px;">3</span>
-                            </div>
-                        </div>
-                        <div class="col-8">
-                            <div class="features-content d-flex flex-column">
-                                <p class="text-uppercase mb-2">Life Style</p>
-                                <a href="#" class="h6">
-                                    Get the best speak market, news.
-                                </a>
-                                <small class="text-body d-block"><i class="fas fa-calendar-alt me-1"></i> December 9,
-                                    2024</small>
-                            </div>
-                        </div>
-                    </div>
-                </div>
+                @endforeach
+
             </div>
         </div>
     </div>
@@ -120,7 +48,7 @@
             <div class="row g-4">
                 <div class="col-lg-7 col-xl-8 mt-0">
                     <div class="position-relative overflow-hidden rounded">
-                        <img src="img/news-1.jpg" class="img-fluid rounded img-zoomin w-100" alt="">
+                        <img src="https://cdn0-production-images-kly.akamaized.net/7gw6eih8U8VRU9OrdKK6nrCPwlA=/800x450/smart/filters:quality(75):strip_icc()/kly-media-production/medias/4808309/original/011550200_1713723473-000_34PX86Y.jpg" class="img-fluid rounded img-zoomin w-100" alt="">
                         <div class="d-flex justify-content-center px-4 position-absolute flex-wrap"
                             style="bottom: 10px; left: 0;">
                             <a href="#" class="text-white me-3 link-hover"><i class="fa fa-clock"></i> 06 minute
@@ -154,8 +82,8 @@
                                 <div class="d-flex flex-column">
                                     <a href="#" class="h3">Stoneman Clandestine Ukrainian claims successes against
                                         Russian.</a>
-                                    <p class="mb-0 fs-5"><i class="fa fa-clock"> 06 minute read</i> </p>
-                                    <p class="mb-0 fs-5"><i class="fa fa-eye"> 3.5k Views</i></p>
+                                    <p class="mb-0 fs-5"><i class="fa fa-clock"> {{mt_rand(1,60)}} minute read</i> </p>
+                                    <p class="mb-0 fs-5"><i class="fa fa-eye"> {{mt_rand(1,9)}}k Views</i></p>
                                 </div>
                             </div>
                         </div>
@@ -176,102 +104,26 @@
                                     <p class="fs-5 mb-0"><i class="fa fa-eye"> 3.5k Views</i></p>
                                 </div>
                             </div>
-                            <div class="col-12">
-                                <div class="row g-4 align-items-center">
-                                    <div class="col-5">
-                                        <div class="overflow-hidden rounded">
-                                            <img src="img/news-3.jpg" class="img-zoomin img-fluid rounded w-100" alt="">
+                            @foreach ($single as $singles)
+                                <div class="col-12">
+                                    <div class="row g-4 align-items-center">
+                                        <div class="col-5">
+                                            <div class="overflow-hidden rounded">
+                                                <img src="{{$singles->news_data_thumbnail}}"
+                                                    class="img-zoomin img-fluid rounded w-100" alt="">
+                                            </div>
                                         </div>
-                                    </div>
-                                    <div class="col-7">
-                                        <div class="features-content d-flex flex-column">
-                                            <a href="#" class="h6">Get the best speak market, news.</a>
-                                            <small><i class="fa fa-clock"> 06 minute read</i> </small>
-                                            <small><i class="fa fa-eye"> 3.5k Views</i></small>
-                                        </div>
-                                    </div>
-                                </div>
-                            </div>
-                            <div class="col-12">
-                                <div class="row g-4 align-items-center">
-                                    <div class="col-5">
-                                        <div class="overflow-hidden rounded">
-                                            <img src="img/news-4.jpg" class="img-zoomin img-fluid rounded w-100" alt="">
-                                        </div>
-                                    </div>
-                                    <div class="col-7">
-                                        <div class="features-content d-flex flex-column">
-                                            <a href="#" class="h6">Get the best speak market, news.</a>
-                                            <small><i class="fa fa-clock"> 06 minute read</i> </small>
-                                            <small><i class="fa fa-eye"> 3.5k Views</i></small>
+                                        <div class="col-7">
+                                            <div class="features-content d-flex flex-column">
+                                                <a href="#" class="h6">{{$singles->news_data_title}}</a>
+                                                <small><i class="fa fa-clock"> 06 minute read</i> </small>
+                                                <small><i class="fa fa-eye"> 3.5k Views</i></small>
+                                            </div>
                                         </div>
                                     </div>
                                 </div>
-                            </div>
-                            <div class="col-12">
-                                <div class="row g-4 align-items-center">
-                                    <div class="col-5">
-                                        <div class="overflow-hidden rounded">
-                                            <img src="img/news-5.jpg" class="img-zoomin img-fluid rounded w-100" alt="">
-                                        </div>
-                                    </div>
-                                    <div class="col-7">
-                                        <div class="features-content d-flex flex-column">
-                                            <a href="#" class="h6">Get the best speak market, news.</a>
-                                            <small><i class="fa fa-clock"> 06 minute read</i> </small>
-                                            <small><i class="fa fa-eye"> 3.5k Views</i></small>
-                                        </div>
-                                    </div>
-                                </div>
-                            </div>
-                            <div class="col-12">
-                                <div class="row g-4 align-items-center">
-                                    <div class="col-5">
-                                        <div class="overflow-hidden rounded">
-                                            <img src="img/news-6.jpg" class="img-zoomin img-fluid rounded w-100" alt="">
-                                        </div>
-                                    </div>
-                                    <div class="col-7">
-                                        <div class="features-content d-flex flex-column">
-                                            <a href="#" class="h6">Get the best speak market, news.</a>
-                                            <small><i class="fa fa-clock"> 06 minute read</i> </small>
-                                            <small><i class="fa fa-eye"> 3.5k Views</i></small>
-                                        </div>
-                                    </div>
-                                </div>
-                            </div>
-                            <div class="col-12">
-                                <div class="row g-4 align-items-center">
-                                    <div class="col-5">
-                                        <div class="overflow-hidden rounded">
-                                            <img src="img/news-7.jpg" class="img-zoomin img-fluid rounded w-100" alt="">
-                                        </div>
-                                    </div>
-                                    <div class="col-7">
-                                        <div class="features-content d-flex flex-column">
-                                            <a href="#" class="h6">Get the best speak market, news.</a>
-                                            <small><i class="fa fa-clock"> 06 minute read</i> </small>
-                                            <small><i class="fa fa-eye"> 3.5k Views</i></small>
-                                        </div>
-                                    </div>
-                                </div>
-                            </div>
-                            <div class="col-12">
-                                <div class="row g-4 align-items-center">
-                                    <div class="col-5">
-                                        <div class="overflow-hidden rounded">
-                                            <img src="img/news-7.jpg" class="img-zoomin img-fluid rounded w-100" alt="">
-                                        </div>
-                                    </div>
-                                    <div class="col-7">
-                                        <div class="features-content d-flex flex-column">
-                                            <a href="#" class="h6">Get the best speak market, news.</a>
-                                            <small><i class="fa fa-clock"> 06 minute read</i> </small>
-                                            <small><i class="fa fa-eye"> 3.5k Views</i></small>
-                                        </div>
-                                    </div>
-                                </div>
-                            </div>
+                            @endforeach
+
                         </div>
                     </div>
                 </div>
@@ -294,8 +146,7 @@
                         unknown printer took a galley
                     </p>
                     <div class="position-relative mx-auto">
-                        <input class="form-control w-100 py-3 rounded-pill" type="email"
-                            placeholder="Your Busines Email">
+                        <input class="form-control w-100 py-3 rounded-pill" type="email" placeholder="Your Busines Email">
                         <button type="submit"
                             class="btn btn-primary py-3 px-5 position-absolute rounded-pill text-white h-100"
                             style="top: 0; right: 0;">Subscribe Now</button>
@@ -399,7 +250,7 @@
 
 
     <!-- Most Populer News Start -->
-    <div class="container-fluid populer-news py-5">
+    <!-- <div class="container-fluid populer-news py-5">
         <div class="container py-5">
             <div class="tab-class mb-4">
                 <div class="row g-4">
@@ -414,26 +265,22 @@
                                     </a>
                                 </li>
                                 <li class="nav-item mb-3">
-                                    <a class="d-flex py-2 bg-light rounded-pill me-2" data-bs-toggle="pill"
-                                        href="#tab-2">
+                                    <a class="d-flex py-2 bg-light rounded-pill me-2" data-bs-toggle="pill" href="#tab-2">
                                         <span class="text-dark" style="width: 100px;">Magazine</span>
                                     </a>
                                 </li>
                                 <li class="nav-item mb-3">
-                                    <a class="d-flex py-2 bg-light rounded-pill me-2" data-bs-toggle="pill"
-                                        href="#tab-3">
+                                    <a class="d-flex py-2 bg-light rounded-pill me-2" data-bs-toggle="pill" href="#tab-3">
                                         <span class="text-dark" style="width: 100px;">Politics</span>
                                     </a>
                                 </li>
                                 <li class="nav-item mb-3">
-                                    <a class="d-flex py-2 bg-light rounded-pill me-2" data-bs-toggle="pill"
-                                        href="#tab-4">
+                                    <a class="d-flex py-2 bg-light rounded-pill me-2" data-bs-toggle="pill" href="#tab-4">
                                         <span class="text-dark" style="width: 100px;">Technology</span>
                                     </a>
                                 </li>
                                 <li class="nav-item mb-3">
-                                    <a class="d-flex py-2 bg-light rounded-pill me-2" data-bs-toggle="pill"
-                                        href="#tab-5">
+                                    <a class="d-flex py-2 bg-light rounded-pill me-2" data-bs-toggle="pill" href="#tab-5">
                                         <span class="text-dark" style="width: 100px;">Fashion</span>
                                     </a>
                                 </li>
@@ -459,8 +306,8 @@
                                                 minute read</a>
                                             <a href="#" class="text-dark link-hover me-3"><i class="fa fa-eye"></i> 3.5k
                                                 Views</a>
-                                            <a href="#" class="text-dark link-hover me-3"><i
-                                                    class="fa fa-comment-dots"></i> 05 Comment</a>
+                                            <a href="#" class="text-dark link-hover me-3"><i class="fa fa-comment-dots"></i>
+                                                05 Comment</a>
                                             <a href="#" class="text-dark link-hover"><i class="fa fa-arrow-up"></i> 1.5k
                                                 Share</a>
                                         </div>
@@ -593,8 +440,8 @@
                                                 minute read</a>
                                             <a href="#" class="text-dark link-hover me-3"><i class="fa fa-eye"></i> 3.5k
                                                 Views</a>
-                                            <a href="#" class="text-dark link-hover me-3"><i
-                                                    class="fa fa-comment-dots"></i> 05 Comment</a>
+                                            <a href="#" class="text-dark link-hover me-3"><i class="fa fa-comment-dots"></i>
+                                                05 Comment</a>
                                             <a href="#" class="text-dark link-hover"><i class="fa fa-arrow-up"></i> 1.5k
                                                 Share</a>
                                         </div>
@@ -723,8 +570,8 @@
                                                 minute read</a>
                                             <a href="#" class="text-dark link-hover me-3"><i class="fa fa-eye"></i> 3.5k
                                                 Views</a>
-                                            <a href="#" class="text-dark link-hover me-3"><i
-                                                    class="fa fa-comment-dots"></i> 05 Comment</a>
+                                            <a href="#" class="text-dark link-hover me-3"><i class="fa fa-comment-dots"></i>
+                                                05 Comment</a>
                                             <a href="#" class="text-dark link-hover"><i class="fa fa-arrow-up"></i> 1.5k
                                                 Share</a>
                                         </div>
@@ -853,8 +700,8 @@
                                                 minute read</a>
                                             <a href="#" class="text-dark link-hover me-3"><i class="fa fa-eye"></i> 3.5k
                                                 Views</a>
-                                            <a href="#" class="text-dark link-hover me-3"><i
-                                                    class="fa fa-comment-dots"></i> 05 Comment</a>
+                                            <a href="#" class="text-dark link-hover me-3"><i class="fa fa-comment-dots"></i>
+                                                05 Comment</a>
                                             <a href="#" class="text-dark link-hover"><i class="fa fa-arrow-up"></i> 1.5k
                                                 Share</a>
                                         </div>
@@ -983,8 +830,8 @@
                                                 minute read</a>
                                             <a href="#" class="text-dark link-hover me-3"><i class="fa fa-eye"></i> 3.5k
                                                 Views</a>
-                                            <a href="#" class="text-dark link-hover me-3"><i
-                                                    class="fa fa-comment-dots"></i> 05 Comment</a>
+                                            <a href="#" class="text-dark link-hover me-3"><i class="fa fa-comment-dots"></i>
+                                                05 Comment</a>
                                             <a href="#" class="text-dark link-hover"><i class="fa fa-arrow-up"></i> 1.5k
                                                 Share</a>
                                         </div>
@@ -1231,14 +1078,12 @@
                                             </a>
                                             <a href="#"
                                                 class="w-100 rounded btn btn-danger d-flex align-items-center p-3 mb-2">
-                                                <i
-                                                    class="fab fa-twitter btn btn-light btn-square rounded-circle me-3"></i>
+                                                <i class="fab fa-twitter btn btn-light btn-square rounded-circle me-3"></i>
                                                 <span class="text-white">21,798 Follower</span>
                                             </a>
                                             <a href="#"
                                                 class="w-100 rounded btn btn-warning d-flex align-items-center p-3 mb-2">
-                                                <i
-                                                    class="fab fa-youtube btn btn-light btn-square rounded-circle me-3"></i>
+                                                <i class="fab fa-youtube btn btn-light btn-square rounded-circle me-3"></i>
                                                 <span class="text-white">7,999 Subscriber</span>
                                             </a>
                                             <a href="#"
@@ -1254,8 +1099,7 @@
                                             </a>
                                             <a href="#"
                                                 class="w-100 rounded btn btn-warning d-flex align-items-center p-3 mb-4">
-                                                <i
-                                                    class="fab fa-dribbble btn btn-light btn-square rounded-circle me-3"></i>
+                                                <i class="fab fa-dribbble btn btn-light btn-square rounded-circle me-3"></i>
                                                 <span class="text-white">37,999 Subscriber</span>
                                             </a>
                                         </div>
@@ -1268,8 +1112,7 @@
                                                     <div class="rounded-circle position-relative">
                                                         <div class="overflow-hidden rounded-circle">
                                                             <img src="img/features-sports-1.jpg"
-                                                                class="img-zoomin img-fluid rounded-circle w-100"
-                                                                alt="">
+                                                                class="img-zoomin img-fluid rounded-circle w-100" alt="">
                                                         </div>
                                                         <span
                                                             class="rounded-circle border border-2 border-white bg-primary btn-sm-square text-white position-absolute"
@@ -1295,8 +1138,7 @@
                                                     <div class="rounded-circle position-relative">
                                                         <div class="overflow-hidden rounded-circle">
                                                             <img src="img/features-technology.jpg"
-                                                                class="img-zoomin img-fluid rounded-circle w-100"
-                                                                alt="">
+                                                                class="img-zoomin img-fluid rounded-circle w-100" alt="">
                                                         </div>
                                                         <span
                                                             class="rounded-circle border border-2 border-white bg-primary btn-sm-square text-white position-absolute"
@@ -1322,8 +1164,7 @@
                                                     <div class="rounded-circle position-relative">
                                                         <div class="overflow-hidden rounded-circle">
                                                             <img src="img/features-fashion.jpg"
-                                                                class="img-zoomin img-fluid rounded-circle w-100"
-                                                                alt="">
+                                                                class="img-zoomin img-fluid rounded-circle w-100" alt="">
                                                         </div>
                                                         <span
                                                             class="rounded-circle border border-2 border-white bg-primary btn-sm-square text-white position-absolute"
@@ -1349,8 +1190,7 @@
                                                     <div class="rounded-circle position-relative">
                                                         <div class="overflow-hidden rounded-circle">
                                                             <img src="img/features-life-style.jpg"
-                                                                class="img-zoomin img-fluid rounded-circle w-100"
-                                                                alt="">
+                                                                class="img-zoomin img-fluid rounded-circle w-100" alt="">
                                                         </div>
                                                         <span
                                                             class="rounded-circle border border-2 border-white bg-primary btn-sm-square text-white position-absolute"
@@ -1406,14 +1246,12 @@
                                                 </li>
                                                 <li class="nav-item mb-3">
                                                     <a class="d-flex py-2 bg-light rounded-pill me-2" href="#">
-                                                        <span class="text-dark link-hover"
-                                                            style="width: 90px;">Game</span>
+                                                        <span class="text-dark link-hover" style="width: 90px;">Game</span>
                                                     </a>
                                                 </li>
                                                 <li class="nav-item mb-3">
                                                     <a class="d-flex py-2 bg-light rounded-pill me-2" href="#">
-                                                        <span class="text-dark link-hover"
-                                                            style="width: 90px;">Movie</span>
+                                                        <span class="text-dark link-hover" style="width: 90px;">Movie</span>
                                                     </a>
                                                 </li>
                                                 <li class="nav-item mb-3">
@@ -1424,15 +1262,14 @@
                                                 </li>
                                                 <li class="nav-item mb-3">
                                                     <a class="d-flex py-2 bg-light rounded-pill me-2" href="#">
-                                                        <span class="text-dark link-hover"
-                                                            style="width: 90px;">World</span>
+                                                        <span class="text-dark link-hover" style="width: 90px;">World</span>
                                                     </a>
                                                 </li>
                                             </ul>
                                         </div>
                                         <div class="col-lg-12">
                                             <div class="position-relative banner-2">
-                                                <img src="img/banner-2.jpg" class="img-fluid w-100 rounded" alt="">
+                                                <img src="{{ asset('news/img/banner-2.jpg') }}" class="img-fluid w-100 rounded" alt="">
                                                 <div class="text-center banner-content-2">
                                                     <h6 class="mb-2">The Most Populer</h6>
                                                     <p class="text-white mb-2">News & Magazine WP Theme</p>
@@ -1448,7 +1285,7 @@
                 </div>
             </div>
         </div>
-    </div>
+    </div> -->
     <!-- Most Populer News End -->
 
 @endsection
