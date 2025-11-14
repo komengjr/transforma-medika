@@ -16,7 +16,7 @@ class NewsController extends Controller
         $data = NewsData::latest()->get();
         $cat = NewsCat::latest()->limit(4)->get();
         // dd($cat);
-        return view('News.index', compact('single', 'cat', 'data'));
+        return view('news.index', compact('single', 'cat', 'data'));
     }
     public function news_detail($id, Request $request)
     {
