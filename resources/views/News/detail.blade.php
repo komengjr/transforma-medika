@@ -5,7 +5,7 @@
     <div class="container-fluid py-5">
         <div class="container py-5">
             <ol class="breadcrumb justify-content-start mb-4">
-                <li class="breadcrumb-item"><a href="#">Home</a></li>
+                <li class="breadcrumb-item"><a href="#">Homes</a></li>
                 <li class="breadcrumb-item"><a href="#">Pages</a></li>
                 <li class="breadcrumb-item active text-dark">Single Page</li>
             </ol>
