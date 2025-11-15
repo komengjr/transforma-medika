@@ -48,7 +48,7 @@
             <div class="row g-4">
                 <div class="col-lg-7 col-xl-8 mt-0">
                     <div class="position-relative overflow-hidden rounded">
-                        <img src="https://cdn0-production-images-kly.akamaized.net/7gw6eih8U8VRU9OrdKK6nrCPwlA=/800x450/smart/filters:quality(75):strip_icc()/kly-media-production/medias/4808309/original/011550200_1713723473-000_34PX86Y.jpg"
+                        <img src="{{$randomRecord->news_data_thumbnail}}"
                             class="img-fluid rounded img-zoomin w-100" alt="">
                         <div class="d-flex justify-content-center px-4 position-absolute flex-wrap"
                             style="bottom: 10px; left: 0;">
@@ -61,8 +61,7 @@
                         </div>
                     </div>
                     <div class="border-bottom py-3">
-                        <a href="{{route('news_detail', ['id' => 1])}}" class="display-4 text-dark mb-0 link-hover">Berita
-                            Terkini Mancanegara</a>
+                        <a href="{{route('news_detail', ['id' => $randomRecord->news_data_slug])}}" class="display-4 text-dark mb-0 link-hover">{{$randomRecord->news_data_title}}</a>
                     </div>
                     <p class="mt-3 mb-4">Lorem Ipsum is simply dummy text of the printing and typesetting industry.
                         Lorem Ipsum has been the industry's standard dummy text ever since the 1500s, when an unknown

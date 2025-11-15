@@ -29,6 +29,9 @@
 
     <!-- Template Stylesheet -->
     <link href="{{ asset('news/css/style.css') }}" rel="stylesheet">
+    @php
+        $news = DB::table('news_categori')->get();
+    @endphp
 </head>
 
 <body>
@@ -106,8 +109,9 @@
                             <div class="nav-item dropdown">
                                 <a href="#" class="nav-link dropdown-toggle" data-bs-toggle="dropdown">Articel</a>
                                 <div class="dropdown-menu m-0 bg-secondary rounded-0">
-                                    <a href="#" class="dropdown-item">Sport</a>
-                                    <a href="#" class="dropdown-item">Romantic</a>
+                                    @foreach ($news as $new)
+                                        <a href="#" class="dropdown-item">{{$new->news_categori_name}}</a>
+                                    @endforeach
                                 </div>
                             </div>
                             <a href="{{ route('news_index') }}" class="nav-item nav-link">Contact Us</a>
@@ -209,8 +213,8 @@
                             <a href="#">
                                 <div class="d-flex align-items-center">
                                     <div class="rounded-circle border border-2 border-primary overflow-hidden">
-                                        <img src="{{ asset('news/img/footer-1.jpg') }}" class="img-zoomin img-fluid rounded-circle w-100"
-                                            alt="">
+                                        <img src="{{ asset('news/img/footer-1.jpg') }}"
+                                            class="img-zoomin img-fluid rounded-circle w-100" alt="">
                                     </div>
                                     <div class="d-flex flex-column ps-4">
                                         <p class="text-uppercase text-white mb-3">Life Style</p>
@@ -227,8 +231,8 @@
                             <a href="#">
                                 <div class="d-flex align-items-center">
                                     <div class="rounded-circle border border-2 border-primary overflow-hidden">
-                                        <img src="{{ asset('news/img/footer-2.jpg') }}" class="img-zoominimg-fluid rounded-circle w-100"
-                                            alt="">
+                                        <img src="{{ asset('news/img/footer-2.jpg') }}"
+                                            class="img-zoominimg-fluid rounded-circle w-100" alt="">
                                     </div>
                                     <div class="d-flex flex-column ps-4">
                                         <p class="text-uppercase text-white mb-3">Sports</p>
@@ -266,32 +270,38 @@
                         <div class="row g-2">
                             <div class="col-4">
                                 <div class="rounded overflow-hidden">
-                                    <img src="{{ asset('news/img/footer-1.jpg') }}" class="img-zoomin img-fluid rounded w-100" alt="">
+                                    <img src="{{ asset('news/img/footer-1.jpg') }}"
+                                        class="img-zoomin img-fluid rounded w-100" alt="">
                                 </div>
                             </div>
                             <div class="col-4">
                                 <div class="rounded overflow-hidden">
-                                    <img src="{{ asset('news/img/footer-2.jpg') }}" class="img-zoomin img-fluid rounded w-100" alt="">
+                                    <img src="{{ asset('news/img/footer-2.jpg') }}"
+                                        class="img-zoomin img-fluid rounded w-100" alt="">
                                 </div>
                             </div>
                             <div class="col-4">
                                 <div class="rounded overflow-hidden">
-                                    <img src="{{ asset('news/img/footer-3.jpg') }}" class="img-zoomin img-fluid rounded w-100" alt="">
+                                    <img src="{{ asset('news/img/footer-3.jpg') }}"
+                                        class="img-zoomin img-fluid rounded w-100" alt="">
                                 </div>
                             </div>
                             <div class="col-4">
                                 <div class="rounded overflow-hidden">
-                                    <img src="{{ asset('news/img/footer-4.jpg') }}" class="img-zoomin img-fluid rounded w-100" alt="">
+                                    <img src="{{ asset('news/img/footer-4.jpg') }}"
+                                        class="img-zoomin img-fluid rounded w-100" alt="">
                                 </div>
                             </div>
                             <div class="col-4">
                                 <div class="rounded overflow-hidden">
-                                    <img src="{{ asset('news/img/footer-5.jpg') }}" class="img-zoomin img-fluid rounded w-100" alt="">
+                                    <img src="{{ asset('news/img/footer-5.jpg') }}"
+                                        class="img-zoomin img-fluid rounded w-100" alt="">
                                 </div>
                             </div>
                             <div class="col-4">
                                 <div class="rounded overflow-hidden">
-                                    <img src="{{ asset('news/img/footer-6.jpg') }}" class="img-zoomin img-fluid rounded w-100" alt="">
+                                    <img src="{{ asset('news/img/footer-6.jpg') }}"
+                                        class="img-zoomin img-fluid rounded w-100" alt="">
                                 </div>
                             </div>
                         </div>

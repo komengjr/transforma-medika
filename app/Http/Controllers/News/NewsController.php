@@ -7,6 +7,7 @@ use App\Models\NewsCat;
 use App\Models\NewsData;
 use App\Models\NewsView;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\DB;
 
 class NewsController extends Controller
 {
@@ -15,14 +16,15 @@ class NewsController extends Controller
         $single = NewsData::latest()->paginate(5);
         $data = NewsData::latest()->get();
         $cat = NewsCat::latest()->limit(4)->get();
-        // dd($cat);
-        return view('news.index', compact('single', 'cat', 'data'));
+        $randomRecord = NewsData::inRandomOrder()->first();
+        return view('news.index', compact('single', 'cat', 'data','randomRecord'));
     }
     public function news_detail($id, Request $request)
     {
         $data = NewsData::where('news_data_slug', $id)->firstOrFail();
         $this->addView($data, $request);
-        return view('news.detail', compact('data'));
+        $coment = DB::table('news_comments')->where('news_data_code', $data->news_data_code)->get();
+        return view('news.detail', compact('data', 'coment'));
     }
     private function addView(NewsData $news, Request $request)
     {

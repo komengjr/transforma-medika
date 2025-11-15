@@ -104,56 +104,7 @@
                                     class="btn fab fa-linkedin-in link-hover btn btn-square rounded-circle border-primary text-dark"></i>
                             </div>
                         </div>
-                        <div class="tab-content">
-                            <div id="tab-1" class="tab-pane fade show active">
-                                <div class="row g-4 align-items-center">
-                                    <div class="col-3">
-                                        <img src="img/footer-4.jpg" class="img-fluid w-100 rounded" alt="">
-                                    </div>
-                                    <div class="col-9">
-                                        <h3>Amelia Alex</h3>
-                                        <p class="mb-0">Lorem Ipsum is simply dummy text of the printing and typesetting
-                                            industry. Lorem Ipsum has been the industry's standard dummy Lorem Ipsum has
-                                            been the industry's standard dummy type and scrambled it to make a type specimen
-                                            book. It has survived not only five centuries, but also the leap into electronic
-                                            but also the leap into electronic.
-                                        </p>
-                                    </div>
-                                </div>
-                            </div>
-                            <div id="tab-2" class="tab-pane fade show">
-                                <div class="row g-4 align-items-center">
-                                    <div class="col-3">
-                                        <img src="img/footer-5.jpg" class="img-fluid w-100 rounded" alt="">
-                                    </div>
-                                    <div class="col-9">
-                                        <h3>Amelia Alex</h3>
-                                        <p class="mb-0">Lorem Ipsum is simply dummy text of the printing and typesetting
-                                            industry. Lorem Ipsum has been the industry's standard dummy Lorem Ipsum has
-                                            been the industry's standard dummy type and scrambled it to make a type specimen
-                                            book. It has survived not only five centuries, but also the leap into electronic
-                                            but also the leap into electronic.
-                                        </p>
-                                    </div>
-                                </div>
-                            </div>
-                            <div id="tab-3" class="tab-pane fade show">
-                                <div class="row g-4 align-items-center">
-                                    <div class="col-3">
-                                        <img src="img/footer-6.jpg" class="img-fluid w-100 rounded" alt="">
-                                    </div>
-                                    <div class="col-9">
-                                        <h3>Amelia Alex</h3>
-                                        <p class="mb-0">Lorem Ipsum is simply dummy text of the printing and typesetting
-                                            industry. Lorem Ipsum has been the industry's standard dummy Lorem Ipsum has
-                                            been the industry's standard dummy type and scrambled it to make a type specimen
-                                            book. It has survived not only five centuries, but also the leap into electronic
-                                            but also the leap into electronic.
-                                        </p>
-                                    </div>
-                                </div>
-                            </div>
-                        </div>
+
                     </div>
                     <div class="bg-light rounded my-4 p-4">
                         <h4 class="mb-4">You Might Also Like</h4>
@@ -180,48 +131,26 @@
                     </div>
                     <div class="bg-light rounded p-4">
                         <h4 class="mb-4">Comments</h4>
-                        <div class="p-4 bg-white rounded mb-4">
-                            <div class="row g-4">
-                                <div class="col-3">
-                                    <img src="img/footer-4.jpg" class="img-fluid rounded-circle w-100" alt="">
-                                </div>
-                                <div class="col-9">
-                                    <div class="d-flex justify-content-between">
-                                        <h5>James Boreego</h5>
-                                        <a href="#" class="link-hover text-body fs-6"><i
-                                                class="fas fa-long-arrow-alt-right me-1"></i> Reply</a>
+                        @foreach ($coment as $comments)
+                            <div class="p-4 bg-white rounded mb-4">
+                                <div class="row g-4">
+                                    <div class="col-3">
+                                        <img src="https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcQTdmrjoiXGVFEcd1cX9Arb1itXTr2u8EKNpw&s" class="img-fluid rounded-circle w-100" alt="">
                                     </div>
-                                    <small class="text-body d-block mb-3"><i class="fas fa-calendar-alt me-1"></i> Dec 9,
-                                        2024</small>
-                                    <p class="mb-0">Lorem Ipsum is simply dummy text of the printing and typesetting
-                                        industry. Lorem Ipsum has been the industry's standard dummy Lorem Ipsum has been
-                                        the industry's standard dummy type and scrambled it to make a type specimen book. It
-                                        has survived not only five centuries, but also the leap into electronic
-                                    </p>
+                                    <div class="col-9">
+                                        <div class="d-flex justify-content-between">
+                                            <h5>{{$comments->news_comments_user_name}}</h5>
+                                            <a href="#" class="link-hover text-body fs-6"><i
+                                                    class="fas fa-long-arrow-alt-right me-1"></i> Reply</a>
+                                        </div>
+                                        <small class="text-body d-block mb-3"><i class="fas fa-calendar-alt me-1"></i>{{ $comments->created_at }}</small>
+                                        <p class="mb-0">
+                                            {{ $comments->news_comments_comment }}
+                                        </p>
+                                    </div>
                                 </div>
                             </div>
-                        </div>
-                        <div class="p-4 bg-white rounded mb-0">
-                            <div class="row g-4">
-                                <div class="col-3">
-                                    <img src="img/footer-4.jpg" class="img-fluid rounded-circle w-100" alt="">
-                                </div>
-                                <div class="col-9">
-                                    <div class="d-flex justify-content-between">
-                                        <h5>James Boreego</h5>
-                                        <a href="#" class="link-hover text-body fs-6"><i
-                                                class="fas fa-long-arrow-alt-right me-1"></i> Reply</a>
-                                    </div>
-                                    <small class="text-body d-block mb-3"><i class="fas fa-calendar-alt me-1"></i> Dec 9,
-                                        2024</small>
-                                    <p class="mb-0">Lorem Ipsum is simply dummy text of the printing and typesetting
-                                        industry. Lorem Ipsum has been the industry's standard dummy Lorem Ipsum has been
-                                        the industry's standard dummy type and scrambled it to make a type specimen book. It
-                                        has survived not only five centuries, but also the leap into electronic
-                                    </p>
-                                </div>
-                            </div>
-                        </div>
+                        @endforeach
                     </div>
                     <div class="bg-light rounded p-4 my-4">
                         <h4 class="mb-4">Leave A Comment</h4>
