@@ -51,7 +51,7 @@
                     </p>
                     -
                     <div class="d-flex">
-                        <div class="me-2">
+                        <!-- <div class="me-2">
                             <span class="fas fa-check-circle mb-3 fs-5"> Lorem Ipsum is simply dummy text of</span>
                             <span class="fas fa-check-circle mb-3 fs-5"> Lorem Ipsum is simply dummy text of</span>
                             <span class="fas fa-check-circle mb-3 fs-5"> Lorem Ipsum is simply dummy text of</span>
@@ -60,14 +60,15 @@
                             <span class="fas fa-check-circle mb-3 fs-5"> Lorem Ipsum is simply dummy text of</span>
                             <span class="fas fa-check-circle mb-3 fs-5"> Lorem Ipsum is simply dummy text of</span>
                             <span class="fas fa-check-circle mb-3 fs-5"> Lorem Ipsum is simply dummy text of</span>
-                        </div>
+                        </div> -->
                     </div>
-                    <p class="my-4">Lorem Ipsum is simply dummy text of the printing and typesetting industry. Lorem Ipsum
+                    <p class="my-4">
+                        <!-- Lorem Ipsum is simply dummy text of the printing and typesetting industry. Lorem Ipsum
                         has been the industry's standard dummy Lorem Ipsum has been the industry's standard dummy type and
                         scrambled it to make a type specimen book. It has survived not only five centuries, but also the
                         leap into electronic
                         Lorem Ipsum is simply dummy text of the printing and typesetting industry. Lorem Ipsum has been ther
-                        took It has survived not only five centuries, but also the leap into electronic
+                        took It has survived not only five centuries, but also the leap into electronic -->
                     </p>
                     <div class="tab-class">
                         <div class="d-flex justify-content-between border-bottom mb-4">
