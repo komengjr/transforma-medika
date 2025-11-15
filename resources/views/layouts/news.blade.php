@@ -26,7 +26,9 @@
 
     <!-- Customized Bootstrap Stylesheet -->
     <link href="{{ asset('news/css/bootstrap.min.css') }}" rel="stylesheet">
-
+    <meta name="google-adsense-account" content="ca-pub-4154628728879232">
+    <script async src="https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js?client=ca-pub-4154628728879232"
+        crossorigin="anonymous"></script>
     <!-- Template Stylesheet -->
     <link href="{{ asset('news/css/style.css') }}" rel="stylesheet">
     @php
