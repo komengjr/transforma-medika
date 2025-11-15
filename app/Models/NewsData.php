@@ -9,4 +9,5 @@ class NewsData extends Model
 {
     protected $table = 'news_data';
 
+
 }

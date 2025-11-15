@@ -25,7 +25,8 @@ class NewsController extends Controller
         $this->addView($data, $request);
         $coment = DB::table('news_comments')->where('news_data_code', $data->news_data_code)->get();
         $randomRecord = NewsData::inRandomOrder()->join('news_categori','news_categori.news_categori_code','=','news_data.news_categori_code')->limit(4)->get();
-        return view('news.detail', compact('data', 'coment', 'randomRecord'));
+        $views = DB::table('news_view')->where('news_data_code', $data->news_data_code)->count();
+        return view('news.detail', compact('data', 'coment', 'randomRecord','views'));
     }
     private function addView(NewsData $news, Request $request)
     {
