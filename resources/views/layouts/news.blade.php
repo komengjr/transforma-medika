@@ -120,7 +120,7 @@
                         </div>
                         <div class="d-flex flex-nowrap border-top pt-3 pt-xl-0">
                             <div class="d-flex">
-                                <img src="{{ asset('img/weather-icon.png') }}" class="img-fluid w-100 me-2" alt="">
+                                <img src="{{ asset('news/img/weather-icon.png') }}" class="img-fluid w-100 me-2" alt="">
                                 <div class="d-flex align-items-center">
                                     <strong class="fs-3 text-secondary">31°C</strong>
                                     <div class="d-flex flex-column ms-2" style="width: 150px;">

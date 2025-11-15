@@ -17,14 +17,15 @@ class NewsController extends Controller
         $data = NewsData::latest()->get();
         $cat = NewsCat::latest()->limit(4)->get();
         $randomRecord = NewsData::inRandomOrder()->first();
-        return view('news.index', compact('single', 'cat', 'data','randomRecord'));
+        return view('news.index', compact('single', 'cat', 'data', 'randomRecord'));
     }
     public function news_detail($id, Request $request)
     {
         $data = NewsData::where('news_data_slug', $id)->firstOrFail();
         $this->addView($data, $request);
         $coment = DB::table('news_comments')->where('news_data_code', $data->news_data_code)->get();
-        return view('news.detail', compact('data', 'coment'));
+        $randomRecord = NewsData::inRandomOrder()->join('news_categori','news_categori.news_categori_code','=','news_data.news_categori_code')->limit(4)->get();
+        return view('news.detail', compact('data', 'coment', 'randomRecord'));
     }
     private function addView(NewsData $news, Request $request)
     {
