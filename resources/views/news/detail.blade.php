@@ -28,7 +28,9 @@
                         <a href="#" class="text-dark link-hover"><i class="fa fa-arrow-up"></i> 1.5k Share</a>
                     </div>
                     <p class="my-4">
-                        {{ $data->news_data_content }}
+                        @php
+                            echo $data->news_data_content;
+                        @endphp
                     </p>
 
                     <div class="bg-light p-4 mb-4 rounded border-start border-3 border-primary">
@@ -49,7 +51,9 @@
                         </div>
                     </div>
                     <p class="my-4">
-                        {{ $data->news_data_content }}
+                        @php
+                            echo $data->news_data_content;
+                        @endphp
                     </p>
                     -
                     <div class="d-flex">
