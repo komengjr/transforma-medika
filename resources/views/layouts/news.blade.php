@@ -252,18 +252,10 @@
                 <div class="col-lg-6 col-xl-3">
                     <div class="d-flex flex-column text-start footer-item-3">
                         <h4 class="mb-4 text-white">Categories</h4>
-                        <a class="btn-link text-white" href=""><i class="fas fa-angle-right text-white me-2"></i>
-                            Sports</a>
-                        <a class="btn-link text-white" href=""><i class="fas fa-angle-right text-white me-2"></i>
-                            Magazine</a>
-                        <a class="btn-link text-white" href=""><i class="fas fa-angle-right text-white me-2"></i>
-                            Lifestyle</a>
-                        <a class="btn-link text-white" href=""><i class="fas fa-angle-right text-white me-2"></i>
-                            Politician</a>
-                        <a class="btn-link text-white" href=""><i class="fas fa-angle-right text-white me-2"></i>
-                            Technology</a>
-                        <a class="btn-link text-white" href=""><i class="fas fa-angle-right text-white me-2"></i>
-                            Intertainment</a>
+                        @foreach ($news as $new)
+                            <a class="btn-link text-white" href=""><i class="fas fa-angle-right text-white me-2"></i>
+                                {{$new->news_categori_name}}</a>
+                        @endforeach
                     </div>
                 </div>
                 <div class="col-lg-6 col-xl-3">

@@ -54,23 +54,23 @@
                     -
                     <div class="d-flex">
                         <!-- <div class="me-2">
-                                                <span class="fas fa-check-circle mb-3 fs-5"> Lorem Ipsum is simply dummy text of</span>
-                                                <span class="fas fa-check-circle mb-3 fs-5"> Lorem Ipsum is simply dummy text of</span>
-                                                <span class="fas fa-check-circle mb-3 fs-5"> Lorem Ipsum is simply dummy text of</span>
-                                            </div>
-                                            <div class="ms-2">
-                                                <span class="fas fa-check-circle mb-3 fs-5"> Lorem Ipsum is simply dummy text of</span>
-                                                <span class="fas fa-check-circle mb-3 fs-5"> Lorem Ipsum is simply dummy text of</span>
-                                                <span class="fas fa-check-circle mb-3 fs-5"> Lorem Ipsum is simply dummy text of</span>
-                                            </div> -->
+                                                    <span class="fas fa-check-circle mb-3 fs-5"> Lorem Ipsum is simply dummy text of</span>
+                                                    <span class="fas fa-check-circle mb-3 fs-5"> Lorem Ipsum is simply dummy text of</span>
+                                                    <span class="fas fa-check-circle mb-3 fs-5"> Lorem Ipsum is simply dummy text of</span>
+                                                </div>
+                                                <div class="ms-2">
+                                                    <span class="fas fa-check-circle mb-3 fs-5"> Lorem Ipsum is simply dummy text of</span>
+                                                    <span class="fas fa-check-circle mb-3 fs-5"> Lorem Ipsum is simply dummy text of</span>
+                                                    <span class="fas fa-check-circle mb-3 fs-5"> Lorem Ipsum is simply dummy text of</span>
+                                                </div> -->
                     </div>
                     <p class="my-4">
                         <!-- Lorem Ipsum is simply dummy text of the printing and typesetting industry. Lorem Ipsum
-                                            has been the industry's standard dummy Lorem Ipsum has been the industry's standard dummy type and
-                                            scrambled it to make a type specimen book. It has survived not only five centuries, but also the
-                                            leap into electronic
-                                            Lorem Ipsum is simply dummy text of the printing and typesetting industry. Lorem Ipsum has been ther
-                                            took It has survived not only five centuries, but also the leap into electronic -->
+                                                has been the industry's standard dummy Lorem Ipsum has been the industry's standard dummy type and
+                                                scrambled it to make a type specimen book. It has survived not only five centuries, but also the
+                                                leap into electronic
+                                                Lorem Ipsum is simply dummy text of the printing and typesetting industry. Lorem Ipsum has been ther
+                                                took It has survived not only five centuries, but also the leap into electronic -->
                     </p>
                     <div class="tab-class">
                         <div class="d-flex justify-content-between border-bottom mb-4">
@@ -188,6 +188,43 @@
                                     <span id="search-icon-1" class="btn btn-primary input-group-text p-3"><i
                                             class="fa fa-search text-white"></i></span>
                                 </div>
+                                <h4 class="my-4">Popular News</h4>
+                                <div class="row g-4">
+                                    @foreach ($randomRecord as $row)
+                                        <div class="col-12">
+                                            <div class="row g-4 align-items-center features-item">
+                                                <div class="col-4">
+                                                    <div class="position-relative">
+                                                        <div class="overflow-hidden">
+                                                            <img src="{{ $row->news_data_thumbnail }}"
+                                                                class="img-zoomin img-fluid w-100" alt="">
+                                                        </div>
+                                                        <span
+                                                            class="rounded-circle border border-2 border-white bg-primary btn-sm-square text-white position-absolute"
+                                                            style="top: 10%; right: -10px;">3</span>
+                                                    </div>
+                                                </div>
+                                                <div class="col-8">
+                                                    <div class="features-content d-flex flex-column">
+                                                        <p class="text-uppercase mb-2">{{$row->news_categori_name}}</p>
+                                                        <a href="{{route('news_detail', ['id' => $row->news_data_slug])}}"
+                                                            class="h6">
+                                                            {{ $row->news_data_title }}
+                                                        </a>
+                                                        <small class="text-body d-block"><i
+                                                                class="fas fa-calendar-alt me-1"></i> December 9, 2024</small>
+                                                    </div>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    @endforeach
+                                    <div class="col-lg-12">
+                                        <a href="#"
+                                            class="link-hover btn border border-primary rounded-pill text-dark w-100 py-3 mb-4">View
+                                            More</a>
+                                    </div>
+
+                                </div>
                                 <h4 class="mb-4">Popular Categories</h4>
                                 <div class="row g-2">
                                     <div class="col-12">
@@ -260,100 +297,7 @@
                                         </a>
                                     </div>
                                 </div>
-                                <h4 class="my-4">Popular News</h4>
-                                <div class="row g-4">
-                                    @foreach ($randomRecord as $row)
-                                        <div class="col-12">
-                                            <div class="row g-4 align-items-center features-item">
-                                                <div class="col-4">
-                                                    <div class="position-relative">
-                                                        <div class="overflow-hidden">
-                                                            <img src="{{ $row->news_data_thumbnail }}"
-                                                                class="img-zoomin img-fluid w-100" alt="">
-                                                        </div>
-                                                        <span
-                                                            class="rounded-circle border border-2 border-white bg-primary btn-sm-square text-white position-absolute"
-                                                            style="top: 10%; right: -10px;">3</span>
-                                                    </div>
-                                                </div>
-                                                <div class="col-8">
-                                                    <div class="features-content d-flex flex-column">
-                                                        <p class="text-uppercase mb-2">{{$row->news_categori_name}}</p>
-                                                        <a href="{{route('news_detail', ['id' => $row->news_data_slug])}}"
-                                                            class="h6">
-                                                            {{ $row->news_data_title }}
-                                                        </a>
-                                                        <small class="text-body d-block"><i
-                                                                class="fas fa-calendar-alt me-1"></i> December 9, 2024</small>
-                                                    </div>
-                                                </div>
-                                            </div>
-                                        </div>
-                                    @endforeach
-                                    <div class="col-lg-12">
-                                        <a href="#"
-                                            class="link-hover btn border border-primary rounded-pill text-dark w-100 py-3 mb-4">View
-                                            More</a>
-                                    </div>
-                                    <div class="col-lg-12">
-                                        <div class="border-bottom my-3 pb-3">
-                                            <h4 class="mb-0">Trending Tags</h4>
-                                        </div>
-                                        <ul class="nav nav-pills d-inline-flex text-center mb-4">
-                                            <li class="nav-item mb-3">
-                                                <a class="d-flex py-2 bg-light rounded-pill me-2" href="#">
-                                                    <span class="text-dark link-hover" style="width: 90px;">Lifestyle</span>
-                                                </a>
-                                            </li>
-                                            <li class="nav-item mb-3">
-                                                <a class="d-flex py-2 bg-light rounded-pill me-2" href="#">
-                                                    <span class="text-dark link-hover" style="width: 90px;">Sports</span>
-                                                </a>
-                                            </li>
-                                            <li class="nav-item mb-3">
-                                                <a class="d-flex py-2 bg-light rounded-pill me-2" href="#">
-                                                    <span class="text-dark link-hover" style="width: 90px;">Politics</span>
-                                                </a>
-                                            </li>
-                                            <li class="nav-item mb-3">
-                                                <a class="d-flex py-2 bg-light rounded-pill me-2" href="#">
-                                                    <span class="text-dark link-hover" style="width: 90px;">Magazine</span>
-                                                </a>
-                                            </li>
-                                            <li class="nav-item mb-3">
-                                                <a class="d-flex py-2 bg-light rounded-pill me-2" href="#">
-                                                    <span class="text-dark link-hover" style="width: 90px;">Game</span>
-                                                </a>
-                                            </li>
-                                            <li class="nav-item mb-3">
-                                                <a class="d-flex py-2 bg-light rounded-pill me-2" href="#">
-                                                    <span class="text-dark link-hover" style="width: 90px;">Movie</span>
-                                                </a>
-                                            </li>
-                                            <li class="nav-item mb-3">
-                                                <a class="d-flex py-2 bg-light rounded-pill me-2" href="#">
-                                                    <span class="text-dark link-hover" style="width: 90px;">Travel</span>
-                                                </a>
-                                            </li>
-                                            <li class="nav-item mb-3">
-                                                <a class="d-flex py-2 bg-light rounded-pill me-2" href="#">
-                                                    <span class="text-dark link-hover" style="width: 90px;">World</span>
-                                                </a>
-                                            </li>
-                                        </ul>
-                                    </div>
-                                    <div class="col-lg-12">
-                                        <div class="position-relative banner-2">
-                                            <img src="{{ asset('news/img/banner-2.jpg') }}" class="img-fluid w-100 rounded"
-                                                alt="">
-                                            <div class="text-center banner-content-2">
-                                                <h6 class="mb-2">The Most Populer</h6>
-                                                <p class="text-white mb-2">News & Magazine WP Theme</p>
-                                                <a href="#" class="btn btn-primary text-white px-4">Shop Now</a>
-                                            </div>
-                                        </div>
-                                    </div>
-                                </div>
+
                             </div>
                         </div>
                     </div>
