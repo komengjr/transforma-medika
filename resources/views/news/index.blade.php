@@ -80,7 +80,7 @@
                 <div class="bg-light rounded p-4 pt-0">
                     <div class="row g-4">
                         <div class="col-12">
-                            <iframe src="https://www.facebook.com/plugins/page.php?href=https%3A%2F%2Fweb.facebook.com%2Finnoventra&tabs=timeline&width=1000&height=500&small_header=false&adapt_container_width=false&hide_cover=false&show_facepile=false&appId=366376087526068" width="350" height="400" style="border:none;overflow:hidden" scrolling="no" frameborder="0" allowfullscreen="true" allow="autoplay; clipboard-write; encrypted-media; picture-in-picture; web-share"></iframe>
+                            <iframe src="https://www.facebook.com/plugins/page.php?href=https%3A%2F%2Fweb.facebook.com%2Finnoventra&tabs=timeline&width=380&height=500&small_header=false&adapt_container_width=true&hide_cover=false&show_facepile=true&appId=366376087526068" width="380" height="500" style="border:none;overflow:hidden" scrolling="no" frameborder="0" allowfullscreen="true" allow="autoplay; clipboard-write; encrypted-media; picture-in-picture; web-share"></iframe>
                         </div>
 
                         @foreach ($single as $singles)
