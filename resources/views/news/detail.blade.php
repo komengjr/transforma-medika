@@ -1,4 +1,4 @@
-@extends('layouts.news')
+@extends('layouts.news-detail')
 @section('content')
 
     <!-- Single Product Start -->
