@@ -227,7 +227,7 @@
 
                                             <h5 class="fs-md-2 text-warning mb-0 d-flex align-items-center mb-3">
                                                 <!-- $1199.5
-                                                                        <del class="ms-2 fs--1 text-500">$2399 </del> -->
+                                                                                <del class="ms-2 fs--1 text-500">$2399 </del> -->
                                             </h5>
                                             <p class="fs--1 mb-1">
                                                 by {{$datas->news_data_author}}
@@ -246,9 +246,10 @@
                                             <span class="ms-1">( {{ $view }} Comment )</span>
                                         </div>
                                         <div>
-                                            <a class="btn btn-sm btn-falcon-default me-2" href="#!" data-bs-toggle="tooltip"
-                                                data-bs-placement="top" title="" data-bs-original-title="Add to Wish List"
-                                                aria-label="Add to Wish List">
+                                            <a class="btn btn-sm btn-falcon-default me-2"
+                                                href="{{route('news_detail', ['id' => $datas->news_data_slug])}}"
+                                                data-bs-toggle="tooltip" data-bs-placement="top" title=""
+                                                data-bs-original-title="Add to Wish List" aria-label="Lihat Berita">
                                                 <span class="fas fa-external-link-alt"></span> Show
                                             </a>
 
