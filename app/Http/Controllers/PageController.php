@@ -10,7 +10,7 @@ class PageController extends Controller
 {
     public function fisrt()
     {
-        $data = NewsData::latest()->get();
+        $data = NewsData::latest()->limit(9)->get();
         return view('index',compact('data'));
     }
     public function app_hrm()
