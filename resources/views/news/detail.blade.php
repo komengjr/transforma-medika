@@ -111,24 +111,11 @@
                 <div class="bg-light rounded my-4 p-4">
                     <h4 class="mb-4">You Might Also Like</h4>
                     <div class="row g-4">
-                        <div class="col-lg-6">
-                            <div class="d-flex align-items-center p-3 bg-white rounded">
-                                <img src="{{ asset('news/img/chatGPT.jpg') }}" class="img-fluid rounded" alt="">
-                                <div class="ms-3">
-                                    <a href="#" class="h5 mb-2">Lorem Ipsum is simply dummy text of the printing</a>
-                                    <p class="text-dark mt-3 mb-0 me-3"><i class="fa fa-clock"></i> 06 minute read</p>
-                                </div>
-                            </div>
-                        </div>
-                        <div class="col-lg-6">
-                            <div class="d-flex align-items-center p-3 bg-white rounded">
-                                <img src="{{ asset('news/img/chatGPT-1.jpg') }}" class="img-fluid rounded" alt="">
-                                <div class="ms-3">
-                                    <a href="#" class="h5 mb-2">Lorem Ipsum is simply dummy text of the printing</a>
-                                    <p class="text-dark mt-3 mb-0 me-3"><i class="fa fa-clock"></i> 06 minute read</p>
-                                </div>
-                            </div>
-                        </div>
+                        <ins class="adsbygoogle" style="display:block" data-ad-client="ca-pub-4154628728879232" data-ad-slot="1234567890"
+                            data-ad-format="auto" data-full-width-responsive="true"></ins>
+                        <script>
+                            (adsbygoogle = window.adsbygoogle || []).push({});
+                        </script>
                     </div>
                 </div>
                 <div class="bg-light rounded p-4">
