@@ -63,10 +63,10 @@
                     <div class="border-bottom py-3">
                         <a href="{{route('news_detail', ['id' => $randomRecord->news_data_slug])}}" class="display-4 text-dark mb-0 link-hover">{{$randomRecord->news_data_title}}</a>
                     </div>
-                    <p class="mt-3 mb-4">Lorem Ipsum is simply dummy text of the printing and typesetting industry.
-                        Lorem Ipsum has been the industry's standard dummy text ever since the 1500s, when an unknown
-                        printer took a galley standard dummy text ever since the 1500s, when an unknown printer took a
-                        galley...
+                    <p class="mt-3 mb-4">
+                        @php
+                            echo $randomRecord->news_data_content;
+                        @endphp
                     </p>
                     <div class="bg-light p-4 rounded">
                         <div class="news-2">
@@ -115,7 +115,7 @@
                                         </div>
                                         <div class="col-7">
                                             <div class="features-content d-flex flex-column">
-                                                <a href="#" class="h6">{{$singles->news_data_title}}</a>
+                                                <a href="{{route('news_detail', ['id' => $singles->news_data_slug])}}" class="h6">{{$singles->news_data_title}}</a>
                                                 <small><i class="fa fa-clock"> 06 minute read</i> </small>
                                                 <small><i class="fa fa-eye"> 3.5k Views</i></small>
                                             </div>
