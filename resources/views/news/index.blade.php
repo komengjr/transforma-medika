@@ -4,194 +4,173 @@
 
 
 
-    <!-- Features Start -->
-    <div class="container-fluid features mb-5">
-        <div class="container py-5">
-            <div class="row g-4">
-                @foreach ($cat as $cats)
-                    <div class="col-md-6 col-lg-6 col-xl-3">
-                        <div class="row g-4 align-items-center features-item">
-                            <div class="col-4">
-                                <div class="rounded-circle position-relative">
-                                    <div class="overflow-hidden rounded-circle">
-                                        <img src="https://cdn-icons-png.freepik.com/512/4588/4588164.png"
-                                            class="img-zoomin img-fluid rounded-circle w-100" alt="">
-                                    </div>
-                                    <span
-                                        class="rounded-circle border border-2 border-white bg-primary btn-sm-square text-white position-absolute"
-                                        style="top: 10%; right: -10px;">{{mt_rand(1, 5)}}</span>
-                                </div>
+<!-- Features Start -->
+<div class="container-fluid features mb-5">
+    <div class="container py-5">
+        <div class="row g-4">
+            @foreach ($cat as $cats)
+            <div class="col-md-6 col-lg-6 col-xl-3">
+                <div class="row g-4 align-items-center features-item">
+                    <div class="col-4">
+                        <div class="rounded-circle position-relative">
+                            <div class="overflow-hidden rounded-circle">
+                                <img src="https://cdn-icons-png.freepik.com/512/4588/4588164.png"
+                                    class="img-zoomin img-fluid rounded-circle w-100" alt="">
                             </div>
-                            <div class="col-8">
-                                <div class="features-content d-flex flex-column">
-                                    <p class="text-uppercase mb-2">{{$cats->news_categori_name}}</p>
-                                    <a href="#" class="h6">
-                                        {{$cats->news_categori_desc}}
-                                    </a>
-                                    <small class="text-body d-block"><i class="fas fa-calendar-alt me-1"></i> December 9,
-                                        2025</small>
-                                </div>
-                            </div>
+                            <span
+                                class="rounded-circle border border-2 border-white bg-primary btn-sm-square text-white position-absolute"
+                                style="top: 10%; right: -10px;">{{mt_rand(1, 5)}}</span>
                         </div>
                     </div>
-                @endforeach
-
-            </div>
-        </div>
-    </div>
-    <!-- Features End -->
-
-
-    <!-- Main Post Section Start -->
-    <div class="container-fluid py-5">
-        <div class="container py-5">
-            <div class="row g-4">
-                <div class="col-lg-7 col-xl-8 mt-0">
-                    <div class="position-relative overflow-hidden rounded">
-                        <img src="{{$randomRecord->news_data_thumbnail}}"
-                            class="img-fluid rounded img-zoomin w-100" alt="">
-                        <div class="d-flex justify-content-center px-4 position-absolute flex-wrap"
-                            style="bottom: 10px; left: 0;">
-                            <a href="#" class="text-white me-3 link-hover"><i class="fa fa-clock"></i> 06 minute
-                                read</a>
-                            <a href="#" class="text-white me-3 link-hover"><i class="fa fa-eye"></i> 3.5k Views</a>
-                            <a href="#" class="text-white me-3 link-hover"><i class="fa fa-comment-dots"></i> 05
-                                Comment</a>
-                            <a href="#" class="text-white link-hover"><i class="fa fa-arrow-up"></i> 1.5k Share</a>
-                        </div>
-                    </div>
-                    <div class="border-bottom py-3">
-                        <a href="{{route('news_detail', ['id' => $randomRecord->news_data_slug])}}" class="display-4 text-dark mb-0 link-hover">{{$randomRecord->news_data_title}}</a>
-                    </div>
-                    <p class="mt-3 mb-4">
-                        @php
-                            echo $randomRecord->news_data_content;
-                        @endphp
-                    </p>
-                    <div class="bg-light p-4 rounded">
-                        <div class="news-2">
-                            <h3 class="mb-4">Top Story</h3>
-                        </div>
-                        <div class="row g-4 align-items-center">
-                            <div class="col-md-6">
-                                <div class="rounded overflow-hidden">
-                                    <img src="img/news-2.jpg" class="img-fluid rounded img-zoomin w-100" alt="">
-                                </div>
-                            </div>
-                            <div class="col-md-6">
-                                <div class="d-flex flex-column">
-                                    <a href="#" class="h3">Stoneman Clandestine Ukrainian claims successes against
-                                        Russian.</a>
-                                    <p class="mb-0 fs-5"><i class="fa fa-clock"> {{mt_rand(1, 60)}} minute read</i> </p>
-                                    <p class="mb-0 fs-5"><i class="fa fa-eye"> {{mt_rand(1, 9)}}k Views</i></p>
-                                </div>
-                            </div>
+                    <div class="col-8">
+                        <div class="features-content d-flex flex-column">
+                            <p class="text-uppercase mb-2">{{$cats->news_categori_name}}</p>
+                            <a href="#" class="h6">
+                                {{$cats->news_categori_desc}}
+                            </a>
+                            <small class="text-body d-block"><i class="fas fa-calendar-alt me-1"></i> December 9,
+                                2025</small>
                         </div>
                     </div>
                 </div>
-                <div class="col-lg-5 col-xl-4">
-                    <div class="bg-light rounded p-4 pt-0">
-                        <div class="row g-4">
-                            <div class="col-12">
-                                <div class="rounded overflow-hidden">
-                                    <img src="img/news-3.jpg" class="img-fluid rounded img-zoomin w-100" alt="">
-                                </div>
-                            </div>
-                            <div class="col-12">
-                                <div class="d-flex flex-column">
-                                    <a href="#" class="h4 mb-2">Get the best speak market, news.</a>
-                                    <p class="fs-5 mb-0"><i class="fa fa-clock"> 06 minute read</i> </p>
-                                    <p class="fs-5 mb-0"><i class="fa fa-eye"> 3.5k Views</i></p>
-                                </div>
-                            </div>
-                            @foreach ($single as $singles)
-                                <div class="col-12">
-                                    <div class="row g-4 align-items-center">
-                                        <div class="col-5">
-                                            <div class="overflow-hidden rounded">
-                                                <img src="{{$singles->news_data_thumbnail}}"
-                                                    class="img-zoomin img-fluid rounded w-100" alt="">
-                                            </div>
-                                        </div>
-                                        <div class="col-7">
-                                            <div class="features-content d-flex flex-column">
-                                                <a href="{{route('news_detail', ['id' => $singles->news_data_slug])}}" class="h6">{{$singles->news_data_title}}</a>
-                                                <small><i class="fa fa-clock"> 06 minute read</i> </small>
-                                                <small><i class="fa fa-eye"> 3.5k Views</i></small>
-                                            </div>
-                                        </div>
+            </div>
+            @endforeach
+
+        </div>
+    </div>
+</div>
+<!-- Features End -->
+
+
+<!-- Main Post Section Start -->
+<div class="container-fluid py-5">
+    <div class="container py-5">
+        <div class="row g-4">
+            <div class="col-lg-7 col-xl-8 mt-0">
+                <div class="position-relative overflow-hidden rounded">
+                    <img src="{{$randomRecord->news_data_thumbnail}}"
+                        class="img-fluid rounded img-zoomin w-100" alt="">
+                    <div class="d-flex justify-content-center px-4 position-absolute flex-wrap"
+                        style="bottom: 10px; left: 0;">
+                        <a href="#" class="text-white me-3 link-hover"><i class="fa fa-clock"></i> 06 minute
+                            read</a>
+                        <a href="#" class="text-white me-3 link-hover"><i class="fa fa-eye"></i> 3.5k Views</a>
+                        <a href="#" class="text-white me-3 link-hover"><i class="fa fa-comment-dots"></i> 05
+                            Comment</a>
+                        <a href="#" class="text-white link-hover"><i class="fa fa-arrow-up"></i> 1.5k Share</a>
+                    </div>
+                </div>
+                <div class="border-bottom py-3">
+                    <a href="{{route('news_detail', ['id' => $randomRecord->news_data_slug])}}" class="display-4 text-dark mb-0 link-hover">{{$randomRecord->news_data_title}}</a>
+                </div>
+                <p class="mt-3 mb-4">
+                    @php
+                    echo $randomRecord->news_data_content;
+                    @endphp
+                </p>
+                <div class="bg-light p-4 rounded">
+                    <ins class="adsbygoogle" style="display:block" data-ad-client="ca-pub-4154628728879232" data-ad-slot="1234567890"
+                        data-ad-format="auto" data-full-width-responsive="true"></ins>
+                    <script>
+                        (adsbygoogle = window.adsbygoogle || []).push({});
+                    </script>
+                </div>
+            </div>
+            <div class="col-lg-5 col-xl-4">
+                <div class="bg-light rounded p-4 pt-0">
+                    <div class="row g-4">
+                        <div class="col-12">
+                            <iframe src="https://www.facebook.com/plugins/page.php?href=https%3A%2F%2Fweb.facebook.com%2Finnoventra&tabs=timeline&width=1000&height=500&small_header=false&adapt_container_width=false&hide_cover=false&show_facepile=false&appId=366376087526068" width="350" height="400" style="border:none;overflow:hidden" scrolling="no" frameborder="0" allowfullscreen="true" allow="autoplay; clipboard-write; encrypted-media; picture-in-picture; web-share"></iframe>
+                        </div>
+
+                        @foreach ($single as $singles)
+                        <div class="col-12">
+                            <div class="row g-4 align-items-center">
+                                <div class="col-5">
+                                    <div class="overflow-hidden rounded">
+                                        <img src="{{$singles->news_data_thumbnail}}"
+                                            class="img-zoomin img-fluid rounded w-100" alt="">
                                     </div>
                                 </div>
-                            @endforeach
-
-                        </div>
-                    </div>
-                </div>
-            </div>
-        </div>
-    </div>
-    <!-- Main Post Section End -->
-
-
-    <!-- Banner Start -->
-    <div class="container-fluid py-5 my-5"
-        style="background: linear-gradient(rgba(202, 203, 185, 1), rgba(202, 203, 185, 1));">
-        <div class="container">
-            <div class="row g-4 align-items-center">
-                <div class="col-lg-7">
-                    <h1 class="mb-4 text-primary">Newsers</h1>
-                    <h1 class="mb-4">Get Every Weekly Updates</h1>
-                    <p class="text-dark mb-4 pb-2">Lorem Ipsum is simply dummy text of the printing and typesetting
-                        industry. Lorem Ipsum has been the industry's standard dummy text ever since the 1500s, when an
-                        unknown printer took a galley
-                    </p>
-                    <div class="position-relative mx-auto">
-                        <input class="form-control w-100 py-3 rounded-pill" type="email" placeholder="Your Busines Email">
-                        <button type="submit"
-                            class="btn btn-primary py-3 px-5 position-absolute rounded-pill text-white h-100"
-                            style="top: 0; right: 0;">Subscribe Now</button>
-                    </div>
-                </div>
-                <div class="col-lg-5">
-                    <div class="rounded">
-                        <img src="img/banner-img.jpg" class="img-fluid rounded w-100 rounded" alt="">
-                    </div>
-                </div>
-            </div>
-        </div>
-    </div>
-    <!-- Banner End -->
-
-
-    <!-- Latest News Start -->
-    <div class="container-fluid latest-news py-5">
-        <div class="container py-5">
-            <h2 class="mb-4">Latest News</h2>
-            <div class="latest-news-carousel owl-carousel">
-                @foreach ($data as $datas)
-                    <div class="latest-news-item">
-                        <div class="bg-light rounded">
-                            <div class="rounded-top overflow-hidden">
-                                <img src="{{$datas->news_data_thumbnail}}" class="img-zoomin img-fluid rounded-top w-100"
-                                    alt="">
-                            </div>
-                            <div class="d-flex flex-column p-4">
-                                <a href="{{route('news_detail', ['id' => $datas->news_data_slug])}}"
-                                    class="h4">{{$datas->news_data_title}}</a>
-                                <div class="d-flex justify-content-between">
-                                    <a href="#" class="small text-body link-hover">by {{$datas->news_data_author}}</a>
-                                    <small class="text-body d-block"><i class="fas fa-calendar-alt me-1"></i> Dec 9,
-                                        2024</small>
+                                <div class="col-7">
+                                    <div class="features-content d-flex flex-column">
+                                        <a href="{{route('news_detail', ['id' => $singles->news_data_slug])}}" class="h6">{{$singles->news_data_title}}</a>
+                                        <small><i class="fa fa-clock"> 06 minute read</i> </small>
+                                        <small><i class="fa fa-eye"> 3.5k Views</i></small>
+                                    </div>
                                 </div>
                             </div>
                         </div>
+                        @endforeach
+
                     </div>
-
-                @endforeach
-
+                </div>
             </div>
         </div>
     </div>
-    <!-- Latest News End -->
+</div>
+<!-- Main Post Section End -->
+
+
+<!-- Banner Start -->
+<div class="container-fluid py-5 my-5"
+    style="background: linear-gradient(rgba(202, 203, 185, 1), rgba(202, 203, 185, 1));">
+    <div class="container">
+        <div class="row g-4 align-items-center">
+            <div class="col-lg-7">
+                <h1 class="mb-4 text-primary">Newsers</h1>
+                <h1 class="mb-4">Get Every Weekly Updates</h1>
+                <p class="text-dark mb-4 pb-2">Lorem Ipsum is simply dummy text of the printing and typesetting
+                    industry. Lorem Ipsum has been the industry's standard dummy text ever since the 1500s, when an
+                    unknown printer took a galley
+                </p>
+                <div class="position-relative mx-auto">
+                    <input class="form-control w-100 py-3 rounded-pill" type="email" placeholder="Your Busines Email">
+                    <button type="submit"
+                        class="btn btn-primary py-3 px-5 position-absolute rounded-pill text-white h-100"
+                        style="top: 0; right: 0;">Subscribe Now</button>
+                </div>
+            </div>
+            <div class="col-lg-5">
+                <div class="rounded">
+                    <img src="img/banner-img.jpg" class="img-fluid rounded w-100 rounded" alt="">
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+<!-- Banner End -->
+
+
+<!-- Latest News Start -->
+<div class="container-fluid latest-news py-5">
+    <div class="container py-5">
+        <h2 class="mb-4">Latest News</h2>
+        <div class="latest-news-carousel owl-carousel">
+            @foreach ($data as $datas)
+            <div class="latest-news-item">
+                <div class="bg-light rounded">
+                    <div class="rounded-top overflow-hidden">
+                        <img src="{{$datas->news_data_thumbnail}}" class="img-zoomin img-fluid rounded-top w-100"
+                            alt="">
+                    </div>
+                    <div class="d-flex flex-column p-4">
+                        <a href="{{route('news_detail', ['id' => $datas->news_data_slug])}}"
+                            class="h4">{{$datas->news_data_title}}</a>
+                        <div class="d-flex justify-content-between">
+                            <a href="#" class="small text-body link-hover">by {{$datas->news_data_author}}</a>
+                            <small class="text-body d-block"><i class="fas fa-calendar-alt me-1"></i> Dec 9,
+                                2024</small>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            @endforeach
+
+        </div>
+    </div>
+</div>
+<!-- Latest News End -->
 
 @endsection
