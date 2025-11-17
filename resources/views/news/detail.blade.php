@@ -50,12 +50,7 @@
                             </div>
                         </div>
                     </div>
-                    <p class="my-4">
-                        @php
-                            echo $data->news_data_content;
-                        @endphp
-                    </p>
-                    -
+
                     <div class="d-flex">
                         <!-- <div class="me-2">
                                                     <span class="fas fa-check-circle mb-3 fs-5"> Lorem Ipsum is simply dummy text of</span>
