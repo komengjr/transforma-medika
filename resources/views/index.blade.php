@@ -246,14 +246,14 @@
                                     @php
                                     $view = DB::table('news_view')->where('news_data_code', $datas->news_data_code)->count();
                                     @endphp
-                                    <span class="far fa-comment-alt"></span>
-                                    <span class="ms-1">( {{ $view }} Comment )</span>
+                                    <span class="far fa-eye"></span>
+                                    <span class="ms-1"> {{ $view }} View </span>
                                 </div>
                                 <div>
                                     <a class="btn btn-sm btn-falcon-default me-2"
                                         href="{{route('news_detail', ['id' => $datas->news_data_slug])}}"
                                         data-bs-toggle="tooltip" data-bs-placement="top" title=""
-                                        data-bs-original-title="Add to Wish List" aria-label="Lihat Berita">
+                                        data-bs-original-title="Lihat Berita" aria-label="Lihat Berita">
                                         <span class="fas fa-external-link-alt"></span> Show
                                     </a>
                                 </div>
