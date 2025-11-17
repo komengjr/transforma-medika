@@ -75,7 +75,7 @@
                             <a href="https://web.facebook.com/innoventra" class="me-2"><i class="fab fa-facebook-f text-body link-hover"></i></a>
                             <a href="" class="me-2"><i class="fab fa-twitter text-body link-hover"></i></a>
                             <a href="" class="me-2"><i class="fab fa-instagram text-body link-hover"></i></a>
-                            <a href="" class="me-2"><i class="fab fa-youtube text-body link-hover"></i></a>
+                            <a href="https://www.youtube.com/@agusraharjo6591" class="me-2"><i class="fab fa-youtube text-body link-hover"></i></a>
                             <a href="" class="me-2"><i class="fab fa-linkedin-in text-body link-hover"></i></a>
                             <a href="" class="me-2"><i class="fab fa-skype text-body link-hover"></i></a>
                             <a href="" class=""><i class="fab fa-pinterest-p text-body link-hover"></i></a>
