@@ -19,6 +19,7 @@ use App\Http\Controllers\MasterController;
 use App\Http\Controllers\MasterDataController;
 use App\Http\Controllers\Medic\MasterMedController;
 use App\Http\Controllers\Movie\MovieController as MoviesController;
+use App\Http\Controllers\News\NewsAdminController;
 use App\Http\Controllers\PacsController;
 use App\Http\Controllers\PageController;
 use App\Http\Controllers\PelayananController;
@@ -161,6 +162,8 @@ Route::prefix('{akses}/{id}')->group(function (): void {
 
     // MOVIE
     Route::get('master-data/data-movie', [MoviesController::class, 'master_data_movie'])->name('master_data_movie');
+    // NEWS
+    Route::get('menu_news/add', [NewsAdminController::class, 'menu_news_add'])->name('menu_news_add');
 });
 // MEDICA HEALTH
 Route::prefix('{akses}/{id}/application')->group(function () {
@@ -634,7 +637,10 @@ Route::prefix('v1')->group(function (): void {
 Route::prefix('movie/')->group(function (): void {
     Route::post('master-data/data-movie/add', [MoviesController::class, 'master_data_movie_add'])->name('master_data_movie_add');
     Route::post('master-data/data-movie/save', [MoviesController::class, 'master_data_movie_save'])->name('master_data_movie_save');
-
+});
+// NEWS
+Route::prefix('news/')->group(function (): void {
+    Route::post('menu_news/save', [NewsAdminController::class, 'menu_news_save'])->name('menu_news_save');
 });
 
 // Route::view('/video-player', 'video');
