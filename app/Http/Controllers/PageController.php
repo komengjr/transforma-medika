@@ -2,6 +2,7 @@
 
 namespace App\Http\Controllers;
 
+use App\Models\NewsData;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
 
@@ -9,8 +10,8 @@ class PageController extends Controller
 {
     public function fisrt()
     {
-
-        return view('index');
+        $data = NewsData::latest()->get();
+        return view('index',compact('data'));
     }
     public function app_hrm()
     {
