@@ -60,12 +60,11 @@
                         </div>
                         <div class="overflow-hidden" style="width: 735px;">
                             <div id="note" class="ps-2">
-                                <img src="{{ asset('news/img/features-fashion.jpg') }}"
+                                <img src="{{ asset('img/news.png') }}"
                                     class="img-fluid rounded-circle border border-3 border-primary me-2"
                                     style="width: 30px; height: 30px;" alt="">
                                 <a href="#">
-                                    <p class="text-white mb-0 link-hover">Newsan unknown printer took a galley of type
-                                        andscrambled Newsan.</p>
+                                    <p class="text-white mb-0 link-hover">Selamat Datang di News Innoventra.</p>
                                 </a>
                             </div>
                         </div>
