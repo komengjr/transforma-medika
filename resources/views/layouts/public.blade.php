@@ -14,8 +14,8 @@
     <!-- ===============================================-->
     <title>Innoventra | Dashboard &amp; Welcome</title>
     @php
-        $app = DB::table('z_menu_super')->get();
-        $menu = DB::table('z_menu')->get();
+    $app = DB::table('z_menu_super')->get();
+    $menu = DB::table('z_menu')->get();
     @endphp
 
     <!-- ===============================================-->
@@ -46,6 +46,25 @@
         integrity="sha512-v2CJ7UaYy4JwqLDIrZUI/4hqeoQieOmAZNXBeQyjo21dadnwR+8ZaIJVT8EE2iyI61OV8e6M8PP2/4hpQINQ/g=="
         crossorigin="anonymous" referrerpolicy="no-referrer"></script>
     <link href="https://fonts.googleapis.com/css2?family=Saira+Stencil+One&display=swap" rel="stylesheet">
+    <script async src="https://fundingchoicesmessages.google.com/i/pub-4154628728879232?ers=1"></script>
+    <script>
+        (function() {
+            function signalGooglefcPresent() {
+                if (!window.frames['googlefcPresent']) {
+                    if (document.body) {
+                        const iframe = document.createElement('iframe');
+                        iframe.style = 'width: 0; height: 0; border: none; z-index: -1000; left: -1000px; top: -1000px;';
+                        iframe.style.display = 'none';
+                        iframe.name = 'googlefcPresent';
+                        document.body.appendChild(iframe);
+                    } else {
+                        setTimeout(signalGooglefcPresent, 0);
+                    }
+                }
+            }
+            signalGooglefcPresent();
+        })();
+    </script>
     <script>
         var isRTL = JSON.parse(localStorage.getItem('isRTL'));
         if (isRTL) {
@@ -103,11 +122,11 @@
                                             <div class="col-12">
                                                 <div class="nav flex-column">
                                                     @foreach ($app as $apps)
-                                                        <a class="dropdown-item link-600 fw-medium text-700 my-1 fw-bold"
-                                                            href="{{route($apps->menu_public_link)}}"> <span
-                                                                class="fas fa-pager text-primary me-3"></span>
-                                                            {{$apps->menu_super_name}}
-                                                        </a>
+                                                    <a class="dropdown-item link-600 fw-medium text-700 my-1 fw-bold"
+                                                        href="{{route($apps->menu_public_link)}}"> <span
+                                                            class="fas fa-pager text-primary me-3"></span>
+                                                        {{$apps->menu_super_name}}
+                                                    </a>
                                                     @endforeach
                                                 </div>
                                             </div>
@@ -194,42 +213,42 @@
 
                         <li class="nav-item dropdown">
                             @guest
-                                <a class="nav-link text-warning" href="{{route('login')}}" "><span class=" fab
-                                    fa-keycdn"></span> Login</a>
+                            <a class="nav-link text-warning" href="{{route('login')}}" "><span class=" fab
+                                fa-keycdn"></span> Login</a>
                             @else
-                                <a class="nav-link py-0 my-0" id="navbarDropdownUser" href="#" role="button"
-                                    data-bs-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
-                                    <div class="avatar avatar-xl">
-                                        <img class="rounded-circle" src="{{ asset('img/my.jpg') }}" alt="" />
+                            <a class="nav-link py-0 my-0" id="navbarDropdownUser" href="#" role="button"
+                                data-bs-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+                                <div class="avatar avatar-xl">
+                                    <img class="rounded-circle" src="{{ asset('img/my.jpg') }}" alt="" />
 
-                                    </div>
-                                </a>
-                                <div class="dropdown-menu dropdown-menu-end py-0" aria-labelledby="navbarDropdownUser">
-                                    <div class="bg-white dark__bg-1000 rounded-2 py-2">
-                                        {{-- <a class="dropdown-item fw-bold text-warning" href="#!"><span
-                                                class="fas fa-crown me-1"></span><span>Go Pro</span></a> --}}
-                                        <a class="dropdown-item text-primary text-center">{{ Auth::user()->fullname }}</a>
-                                        <div class="dropdown-divider"></div>
-                                        <a class="dropdown-item text-warning" href="#!" id="button-setup-notification"
-                                            data-bs-toggle="modal" data-bs-target="#modal-template-sm"><span
-                                                class="fas fa-user-cog"></span> Set Notification</a>
-                                        <a class="dropdown-item text-info" href="#" id="button-setup-profil"
-                                            data-bs-toggle="modal" data-bs-target="#modal-template-xl"><span
-                                                class="fas fa-user-cog"></span>
-                                            Profile &amp;
-                                            account</a>
-                                        <a class="dropdown-item text-primary" href="{{route('dashboard.home')}}"><span
-                                                class="fas fa-chalkboard-teacher"></span> Homepage</a>
-                                        @if (Auth::user()->access_code == 'master')
-                                            <a class="dropdown-item text-danger" href="{{route('master_dashboard')}}"><span
-                                                    class="fas fa-user-cog"></span> Master Page</a>
-                                        @endif
-                                        <div class="dropdown-divider"></div>
-                                        {{-- <a class="dropdown-item" href="#">Settings</a> --}}
-                                        <a class="dropdown-item" href="{{ route('logout') }}"><span
-                                                class="fab fa-keycdn"></span> Logout</a>
-                                    </div>
                                 </div>
+                            </a>
+                            <div class="dropdown-menu dropdown-menu-end py-0" aria-labelledby="navbarDropdownUser">
+                                <div class="bg-white dark__bg-1000 rounded-2 py-2">
+                                    {{-- <a class="dropdown-item fw-bold text-warning" href="#!"><span
+                                                class="fas fa-crown me-1"></span><span>Go Pro</span></a> --}}
+                                    <a class="dropdown-item text-primary text-center">{{ Auth::user()->fullname }}</a>
+                                    <div class="dropdown-divider"></div>
+                                    <a class="dropdown-item text-warning" href="#!" id="button-setup-notification"
+                                        data-bs-toggle="modal" data-bs-target="#modal-template-sm"><span
+                                            class="fas fa-user-cog"></span> Set Notification</a>
+                                    <a class="dropdown-item text-info" href="#" id="button-setup-profil"
+                                        data-bs-toggle="modal" data-bs-target="#modal-template-xl"><span
+                                            class="fas fa-user-cog"></span>
+                                        Profile &amp;
+                                        account</a>
+                                    <a class="dropdown-item text-primary" href="{{route('dashboard.home')}}"><span
+                                            class="fas fa-chalkboard-teacher"></span> Homepage</a>
+                                    @if (Auth::user()->access_code == 'master')
+                                    <a class="dropdown-item text-danger" href="{{route('master_dashboard')}}"><span
+                                            class="fas fa-user-cog"></span> Master Page</a>
+                                    @endif
+                                    <div class="dropdown-divider"></div>
+                                    {{-- <a class="dropdown-item" href="#">Settings</a> --}}
+                                    <a class="dropdown-item" href="{{ route('logout') }}"><span
+                                            class="fab fa-keycdn"></span> Logout</a>
+                                </div>
+                            </div>
                             @endguest
                         </li>
                     </ul>
@@ -256,7 +275,7 @@
                                 <input class="form-control" id="username" type="text" name="username" required
                                     autofocus />
                                 @if ($errors->has('username'))
-                                    <span class="text-danger">{{ $errors->first('username') }}</span>
+                                <span class="text-danger">{{ $errors->first('username') }}</span>
                                 @endif
                             </div>
                             <div class="mb-3">
@@ -265,7 +284,7 @@
                                 </div>
                                 <input class="form-control" id="password" type="password" name="password" required />
                                 @if ($errors->has('password'))
-                                    <span class="text-danger">{{ $errors->first('password') }}</span>
+                                <span class="text-danger">{{ $errors->first('password') }}</span>
                                 @endif
                             </div>
                             <span id="notifikasi-login" class="pb-0 mt-0"></span>
@@ -467,19 +486,19 @@
         var input = document.getElementById("password");
         var input2 = document.getElementById("username");
         var button = document.getElementById("button-login-system");
-        input.addEventListener("keypress", function (event) {
+        input.addEventListener("keypress", function(event) {
             if (event.key === "Enter") {
                 event.preventDefault(); // Mencegah perilaku default (seperti mengirim form)
                 button.click(); // Memicu klik pada tombol
             }
         });
-        input2.addEventListener("keypress", function (event) {
+        input2.addEventListener("keypress", function(event) {
             if (event.key === "Enter") {
                 event.preventDefault(); // Mencegah perilaku default (seperti mengirim form)
                 button.click(); // Memicu klik pada tombol
             }
         });
-        $(document).on("click", "#button-login-system", function (e) {
+        $(document).on("click", "#button-login-system", function(e) {
             e.preventDefault();
             var username = document.getElementById("username").value;
             var password = document.getElementById("password").value;
@@ -505,10 +524,10 @@
                         "password": password
                     },
                     dataType: 'html',
-                }).done(function (data) {
+                }).done(function(data) {
                     $('#notifikasi-login').html(data);
                     $('#button-login-system').html('<span class="fab fa-500px"></span> Log in');
-                }).fail(function () {
+                }).fail(function() {
                     console.log('error');
 
                 });

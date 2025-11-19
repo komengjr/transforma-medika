@@ -29,10 +29,28 @@
     <meta name="google-adsense-account" content="ca-pub-4154628728879232">
     <script async src="https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js?client=ca-pub-4154628728879232"
         crossorigin="anonymous"></script>
+    <script>
+        (function() {
+            function signalGooglefcPresent() {
+                if (!window.frames['googlefcPresent']) {
+                    if (document.body) {
+                        const iframe = document.createElement('iframe');
+                        iframe.style = 'width: 0; height: 0; border: none; z-index: -1000; left: -1000px; top: -1000px;';
+                        iframe.style.display = 'none';
+                        iframe.name = 'googlefcPresent';
+                        document.body.appendChild(iframe);
+                    } else {
+                        setTimeout(signalGooglefcPresent, 0);
+                    }
+                }
+            }
+            signalGooglefcPresent();
+        })();
+    </script>
     <!-- Template Stylesheet -->
     <link href="{{ asset('news/css/style.css') }}" rel="stylesheet">
     @php
-        $news = DB::table('news_categori')->get();
+    $news = DB::table('news_categori')->get();
     @endphp
 </head>
 
@@ -111,7 +129,7 @@
                                 <a href="#" class="nav-link dropdown-toggle" data-bs-toggle="dropdown">Articel</a>
                                 <div class="dropdown-menu m-0 bg-secondary rounded-0">
                                     @foreach ($news as $new)
-                                        <a href="#" class="dropdown-item">{{$new->news_categori_name}}</a>
+                                    <a href="#" class="dropdown-item">{{$new->news_categori_name}}</a>
                                     @endforeach
                                 </div>
                             </div>
@@ -252,8 +270,8 @@
                     <div class="d-flex flex-column text-start footer-item-3">
                         <h4 class="mb-4 text-white">Categories</h4>
                         @foreach ($news as $new)
-                            <a class="btn-link text-white" href=""><i class="fas fa-angle-right text-white me-2"></i>
-                                {{$new->news_categori_name}}</a>
+                        <a class="btn-link text-white" href=""><i class="fas fa-angle-right text-white me-2"></i>
+                            {{$new->news_categori_name}}</a>
                         @endforeach
                     </div>
                 </div>
