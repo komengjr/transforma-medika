@@ -98,7 +98,8 @@
                                         @endphp
                                     </p>
                                     <p class="fs--1 mb-1 text-primary">
-                                        by {{$datas->news_data_author}}
+                                        Create By. {{$datas->news_data_author}} <br>
+                                        {{ $datas->news_data_published_at }}
                                     </p>
                                 </div>
                             </div>
