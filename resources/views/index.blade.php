@@ -10,8 +10,8 @@
 
     <div class="container">
         <div class="row flex-center pt-8 pt-lg-8 pb-lg-9 pb-xl-0">
-            <div class="col-md-11 col-lg-8 col-xl-4 pb-7 pb-xl-9 text-center text-xl-start"><a
-                    class="btn btn-outline-danger mb-4 fs--1 border-2 rounded-pill" href="#!"><span class="me-2"
+            <div class="col-md-11 col-lg-8 col-xl-4 pb-7 pb-xl-9 text-center text-xl-start">
+                <a class="btn btn-outline-danger mb-4 fs--1 border-2 rounded-pill" href="#!" onclick="window.open('https://saweria.co/agusraharjo', '_blank').focus();"><span class="me-2"
                         role="img" aria-label="Gift">🎁</span>Become a pro</a>
                 <h2 class="text-white fw-light"><strong>Innoventra</strong> <small> <span class="typed-text fw-bold"
                             data-typed-text='["System","Movie","Product","Blog"]'></span></small><br />
@@ -94,7 +94,7 @@
                                     </h5>
                                     <p class="fs--1 mb-1 text-start">
                                         @php
-                                            echo Str::limit($datas->news_data_content, 120);
+                                        echo Str::limit($datas->news_data_content, 120);
                                         @endphp
                                     </p>
                                     <p class="fs--1 mb-1 text-primary">
