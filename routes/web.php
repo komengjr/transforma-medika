@@ -6,6 +6,7 @@ use App\Http\Controllers\ApplicationController;
 use App\Http\Controllers\Auth\AuthController;
 use App\Http\Controllers\Brodcast\BrodcastController;
 use App\Http\Controllers\dashboardController;
+use App\Http\Controllers\Event\EventController;
 use App\Http\Controllers\Farmasi\FarmasiController;
 use App\Http\Controllers\Hrm\HrmController;
 use App\Http\Controllers\inventaris\MasterBarangController;
@@ -164,6 +165,8 @@ Route::prefix('{akses}/{id}')->group(function (): void {
     Route::get('master-data/data-movie', [MoviesController::class, 'master_data_movie'])->name('master_data_movie');
     // NEWS
     Route::get('menu_news/add', [NewsAdminController::class, 'menu_news_add'])->name('menu_news_add');
+    // NEWS
+    Route::get('menu-event/create-event', [EventController::class, 'menu_event_create'])->name('menu_event_create');
 });
 // MEDICA HEALTH
 Route::prefix('{akses}/{id}/application')->group(function () {
@@ -641,6 +644,10 @@ Route::prefix('movie/')->group(function (): void {
 // NEWS
 Route::prefix('news/')->group(function (): void {
     Route::post('menu_news/save', [NewsAdminController::class, 'menu_news_save'])->name('menu_news_save');
+});
+// NEWS
+Route::prefix('event/')->group(function (): void {
+    Route::post('menu-event/create-event/save', [EventController::class, 'menu_event_create_save'])->name('menu_event_create_save');
 });
 
 // Route::view('/video-player', 'video');
