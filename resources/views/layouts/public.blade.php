@@ -65,6 +65,9 @@
             signalGooglefcPresent();
         })();
     </script>
+    <script async custom-element="amp-auto-ads"
+        src="https://cdn.ampproject.org/v0/amp-auto-ads-0.1.js">
+    </script>
     <script>
         var isRTL = JSON.parse(localStorage.getItem('isRTL'));
         if (isRTL) {
@@ -346,6 +349,9 @@
                         <button class="btn btn-outline-light border-2 rounded-pill btn-lg mt-4 fs-0 py-2"
                             type="button">Start with Us</button>
                     </div>
+                    <amp-auto-ads type="adsense"
+                        data-ad-client="ca-pub-4154628728879232">
+                    </amp-auto-ads>
                 </div>
             </div>
             <!-- end of .container-->

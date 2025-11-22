@@ -116,6 +116,9 @@
                         <script>
                             (adsbygoogle = window.adsbygoogle || []).push({});
                         </script>
+                        <amp-auto-ads type="adsense"
+                            data-ad-client="ca-pub-4154628728879232">
+                        </amp-auto-ads>
                     </div>
                 </div>
                 <div class="bg-light rounded p-4">
