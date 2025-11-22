@@ -18,7 +18,7 @@
                     <img src="{{ $data->news_data_thumbnail }}" class="img-zoomin img-fluid rounded w-100" alt="">
                     <div class="position-absolute text-white px-4 py-2 bg-primary rounded"
                         style="top: 20px; right: 20px;">
-                        Busimess
+                        News
                     </div>
                 </div>
                 <div class="d-flex justify-content-between">
@@ -145,20 +145,22 @@
                 </div>
                 <div class="bg-light rounded p-4 my-4">
                     <h4 class="mb-4">Leave A Comment</h4>
-                    <form action="#">
+                    <form action="{{route('news_coment')}}" method="post">
+                        @csrf
                         <div class="row g-4">
                             <div class="col-lg-6">
-                                <input type="text" class="form-control py-3" placeholder="Full Name">
+                                <input type="text" class="form-control py-3" name="name" placeholder="Full Name" required>
+                                <input type="text" name="news_code" value="{{ $data->news_data_code }}" hidden>
                             </div>
                             <div class="col-lg-6">
-                                <input type="email" class="form-control py-3" placeholder="Email Address">
+                                <input type="email" class="form-control py-3" name="email" placeholder="Email Address" required>
                             </div>
                             <div class="col-12">
-                                <textarea class="form-control" name="textarea" id="" cols="30" rows="7"
-                                    placeholder="Write Your Comment Here"></textarea>
+                                <textarea class="form-control" name="coment" id="" cols="30" rows="7"
+                                    placeholder="Write Your Comment Here" required></textarea>
                             </div>
                             <div class="col-12">
-                                <button class="form-control btn btn-primary py-3" type="button">Submit Now</button>
+                                <button class="form-control btn btn-primary py-3" type="submit">Submit Now</button>
                             </div>
                         </div>
                     </form>

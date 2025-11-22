@@ -69,44 +69,42 @@ client.on("ready", () => {
                     connection.query(
                         "select * from message where status = '0' LIMIT 1",
                         (err, result) => {
-                            if (err) console.error(err);
+                            if (err) {
+                                setTimeout(connectDB, 30000);
+                            } else {
+                                result.forEach((message) => {
+                                    const code = `${message.pesan}`;
+                                    const number = `${message.number}`;
+                                    const text = `${code}`;
+                                    const chatid =
+                                        number.substring(1) + "@c.us";
 
-                            result.forEach((message) => {
-                                const code = `${message.pesan}`;
-                                const number = `${message.number}`;
-                                const text = `${code}`;
-                                const chatid = number.substring(1) + "@c.us";
+                                    connection.query(
+                                        "update message set status = '1' where id = " +
+                                            message.id +
+                                            " LIMIT 1",
+                                        function (err) {
+                                            if (err)
+                                                console.log(
+                                                    "Ada Kesalahan Penggiriman"
+                                                );
+                                            client.sendMessage(chatid, text);
 
-                                connection.query(
-                                    "update message set status = '1' where id = " +
-                                        message.id +
-                                        " LIMIT 1",
-                                    function (err) {
-                                        if (err)
+                                            console.log(`${message.pesan}`);
                                             console.log(
-                                                "Ada Kesalahan Penggiriman"
+                                                "sukses kirim pesan ke " +
+                                                    chatid
                                             );
-                                        client.sendMessage(chatid, text);
-
-                                        console.log(`${message.pesan}`);
-                                        console.log(
-                                            "sukses kirim pesan ke " + chatid
-                                        );
-                                    }
-                                );
-                            });
+                                        }
+                                    );
+                                });
+                            }
                         }
                     );
-                    // connection.query(
-                    //   "select * from message where status = '0' LIMIT 1",
-                    //   function (err, result) {
-                    //     if (err) throw err;
-                    //   }
-                    // );
                 }
             });
         } catch (err) {
-            console.error("Database error:", err);
+            setTimeout(connectDB, 30000);
         }
     }
     setInterval(intervalfunction, 10000);

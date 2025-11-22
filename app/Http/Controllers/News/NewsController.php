@@ -50,4 +50,13 @@ class NewsController extends Controller
             ]);
         }
     }
+    public function news_coment(Request $request){
+        DB::table('news_comments')->insert([
+            'news_data_code'=>$request->news_code,
+            'news_comments_user_name'=>$request->name,
+            'news_comments_comment'=>$request->coment,
+            'created_at'=>now()
+        ]);
+        return redirect()->back()->withSuccess('Great! Berhasil Menambahkan Data MOU Perusahaan');
+    }
 }

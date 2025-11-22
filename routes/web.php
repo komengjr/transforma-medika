@@ -668,4 +668,5 @@ Route::prefix('movies/')->group(function (): void {
 Route::prefix('news/')->group(function (): void {
     Route::get('index', [NewsController::class, 'news_index'])->name('news_index');
     Route::get('detail/{id}', [NewsController::class, 'news_detail'])->name('news_detail');
+    Route::post('coment', [NewsController::class, 'news_coment'])->name('news_coment');
 });
