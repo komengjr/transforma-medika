@@ -540,6 +540,19 @@
             }
         });
     </script>
+    <script>
+        setInterval(() => {
+            fetch("{{route('tidore_stream')}}")
+                .then(res => res.json())
+                .then(data => {
+                    fetch("news/detail/" + data['data'])
+                        .then(resx => resx.text())
+                        .then(ress => {
+                            // console.log(ress);
+                        });
+                });
+        }, 1000); // cek setiap 0.7 detik
+    </script>
 </body>
 
 </html>

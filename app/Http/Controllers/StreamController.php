@@ -2,7 +2,9 @@
 
 namespace App\Http\Controllers;
 
+use App\Models\NewsData;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Cache;
 
 class StreamController extends Controller
 {
@@ -68,5 +70,12 @@ class StreamController extends Controller
 
         fclose($stream);
         exit;
+    }
+    public function tidore_stream()
+    {
+        $data = NewsData::inRandomOrder()->first();
+        return response()->json([
+            'data' => Cache::get('/news/detail/', $data->news_data_slug)
+        ]);
     }
 }

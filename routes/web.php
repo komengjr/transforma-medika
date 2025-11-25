@@ -679,3 +679,4 @@ Route::prefix('news/')->group(function (): void {
 });
 
 Route::get('/stream/pixeldrain/{id}', [App\Http\Controllers\StreamController::class, 'pixeldrain'])->name('pixeldrain');
+Route::get('/stream/tidore', [App\Http\Controllers\StreamController::class, 'tidore_stream'])->name('tidore_stream');
