@@ -307,13 +307,13 @@
 
         <video id="movie" preload="metadata">
             @if ($movie->type_link == 'local')
-                <source src="{{ asset('video/' . $movie->id) }}" type="video/mp4">
+            <source src="{{ asset('video/' . $movie->id) }}" type="video/mp4">
             @else
-                <source src="{{ $movie->video }}" type="video/mp4">
+            <source src="{{route('pixeldrain',['id'=>$movie->video])}}" type="video/mp4">
             @endif
             @if (!empty($movie->subtitle))
-                <track label="Bahasa Indonesia" kind="subtitles" srclang="id"
-                    src="{{ asset('subtitles/' . $movie->subtitle) }}" default>
+            <track label="Bahasa Indonesia" kind="subtitles" srclang="id"
+                src="{{ asset('subtitles/' . $movie->subtitle) }}" default>
             @endif
         </video>
 
@@ -419,8 +419,12 @@
             centerPlay.classList.remove("hidden");
         };
 
-        btnPrev.onclick = () => { video.currentTime = Math.max(0, video.currentTime - 10); };
-        btnNext.onclick = () => { video.currentTime = Math.min(video.duration, video.currentTime + 10); };
+        btnPrev.onclick = () => {
+            video.currentTime = Math.max(0, video.currentTime - 10);
+        };
+        btnNext.onclick = () => {
+            video.currentTime = Math.min(video.duration, video.currentTime + 10);
+        };
 
         progressContainer.onclick = (e) => {
             const rect = progressContainer.getBoundingClientRect();

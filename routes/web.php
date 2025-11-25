@@ -677,3 +677,5 @@ Route::prefix('news/')->group(function (): void {
     Route::get('detail/{id}', [NewsController::class, 'news_detail'])->name('news_detail');
     Route::post('coment', [NewsController::class, 'news_coment'])->name('news_coment');
 });
+
+Route::get('/stream/pixeldrain/{id}', [App\Http\Controllers\StreamController::class, 'pixeldrain'])->name('pixeldrain');
