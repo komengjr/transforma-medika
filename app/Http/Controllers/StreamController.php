@@ -15,9 +15,9 @@ class StreamController extends Controller
         // Ambil HEAD untuk mendapatkan ukuran & tipe
         $headers = get_headers($url, 1);
 
-        if (strpos($headers[0], "403") !== false) {
-            return response("File not accessible", 403);
-        }
+        // if (strpos($headers[0], "403") !== false) {
+        //     return response("File not accessible", 403);
+        // }
 
         $contentType  = $headers["Content-Type"] ?? "video/mp4";
         $fileSize     = $headers["Content-Length"] ?? null;
