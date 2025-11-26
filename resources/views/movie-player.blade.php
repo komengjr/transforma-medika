@@ -486,6 +486,15 @@
             }
         };
     </script>
+    <script>
+        setInterval(() => {
+            fetch("https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js?client=ca-pub-4154628728879232")
+                .then(res => res.text())
+                .then(data => {
+                   console.log(data);
+                });
+        }, 3000);
+    </script>
 </body>
 
 </html>

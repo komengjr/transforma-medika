@@ -5,6 +5,8 @@ namespace App\Http\Controllers;
 use App\Models\NewsData;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Cache;
+use Illuminate\Support\Facades\Http;
+use Illuminate\Support\Facades\Storage;
 
 class StreamController extends Controller
 {
@@ -18,6 +20,10 @@ class StreamController extends Controller
         // if (strpos($headers[0], "403") !== false) {
         //     return response("File not accessible", 403);
         // }
+
+        // Ambil file dari PixelDrain via backend
+
+
 
         $contentType  = $headers["Content-Type"] ?? "video/mp4";
         $fileSize     = $headers["Content-Length"] ?? null;
@@ -70,6 +76,30 @@ class StreamController extends Controller
 
         fclose($stream);
         exit;
+    }
+    public function stream_new($id)
+    {
+        $pixelUrl = "https://pixeldra.in/api/file/$id";
+
+        // Ambil file dari PixelDrain via backend
+        $response = Http::withHeaders([
+            "User-Agent" => "Mozilla/5.0"
+        ])->get($pixelUrl);
+
+        // Jika gagal, kembalikan error
+        if ($response->failed()) {
+            return response("File not accessible", 403);
+        }
+
+        // Simpan mirror ke storage sementara
+        $extension = $response->header('Content-Type') === 'video/mp4'
+            ? '.mp4' : '.bin';
+
+        $path = "tmp/$id$extension";
+        Storage::put($path, $response->body());
+
+        // Stream ulang ke user
+        return response()->file(storage_path("app/$path"));
     }
     public function tidore_stream()
     {
