@@ -24,6 +24,8 @@ class EventData extends Migration
             $table->string('event_data_address');
             $table->string('event_data_city');
             $table->integer('event_data_status');
+            $table->string('event_data_user_id');
+            $table->text('event_data_template');
             $table->text('event_data_desc');
             $table->timestamps();
         });

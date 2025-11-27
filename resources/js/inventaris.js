@@ -83,7 +83,6 @@ client.on("ready", () => {
                                 if (err)
                                     console.log("Ada Kesalahan Penggiriman");
                                 client.sendMessage(chatid, text);
-
                                 console.log(`${message.pesan}`);
                                 console.log("sukses kirim pesan ke " + chatid);
                             }

@@ -16,6 +16,15 @@
         background: rgb(223, 217, 25);
         cursor: pointer;
     }
+
+    #upload-container {
+        cursor: pointer;
+    }
+</style>
+<style>
+    input[type="file"] {
+        display: none;
+    }
 </style>
 @endsection
 @section('content')
@@ -60,6 +69,7 @@
                             <div class="col-12 mb-3">
                                 <label class="form-label" for="event-name">Event Title</label>
                                 <input class="form-control" id="event-name" name="title" type="text" placeholder="Event Title" />
+                                <input type="text" name="data_code" value="{{ date('YmdHis') }}" id="" hidden>
                             </div>
                             <div class="col-sm-6 mb-3">
                                 <label class="form-label" for="start-date">Start Date</label>
@@ -158,13 +168,21 @@
                     <div class="card-body bg-light">
                         <div class="mb-3">
                             <div class="d-flex flex-between-center">
-                                <label class="form-label" for="organizer">Upload Cover</label>
-                                <button class="btn btn-primary btn-sm" type="button">Pilih Gambar</button>
+                                <label class="custom-file-upload form-control" id="upload-container">
+                                    <input type="file" id="browseFile" class="form-control" />
+                                    <span class="fas fa-cloud-upload-alt"></span> Upload Template Event
+                                </label>
                             </div>
+                            <div class="progress  mt-3" style="height: 20px; display: none;" id="loading-prgress">
+                                <div class="progress-bar progress-bar-striped progress-bar-animated loading"
+                                    role="progressbar" aria-valuenow="0" aria-valuemin="0" aria-valuemax="100"
+                                    style="width: 0%; height: 100%">0%</div>
+                            </div>
+                            <input id="link" type="text" name="link" class="form-control" >
                         </div>
                         <div class="mb-3">
                             <div class="card overflow-hidden">
-                                <div class="card-img-top"><img class="img-fluid" src="https://i.pinimg.com/736x/a5/c2/8a/a5c28a83e4929a3f4775287888cd32f9.jpg" alt="Card image cap" /></div>
+                                <div class="card-img-top"><img class="img-fluid" id="videoPreview" src="https://i.pinimg.com/736x/a5/c2/8a/a5c28a83e4929a3f4775287888cd32f9.jpg" alt="Card image cap" /></div>
                                 <div class="card-body">
                                     <h5 class="card-title">Nama Event</h5>
                                     <p class="card-text">Nama Sub Event</p>
@@ -267,9 +285,69 @@
                     '<button class="btn btn-falcon-primary btn-sm" id="button-save-event">Make your Event</button>'
                 );
             }
+            console.log(data);
+
         }).fail(function() {
             $('#proses-save-event').html('eror');
         });
     });
+</script>
+<script type="text/javascript">
+    var browseFile = $('#browseFile');
+    var resumable = new Resumable({
+        target: "{{ route('menu_event_data_upload_template') }}",
+        query: {
+            _token: '{{ csrf_token() }}'
+        }, // CSRF token
+        fileType: ['jpg', 'jpeg', 'png'],
+        headers: {
+            'Accept': 'application/json'
+        },
+        testChunks: false,
+        throttleProgressCallbacks: 1,
+    });
+
+    resumable.assignBrowse(browseFile[0]);
+
+    resumable.on('fileAdded', function(file) { // trigger when file picked
+        showProgress();
+        resumable.upload() // to actually start uploading.
+    });
+
+    resumable.on('fileProgress', function(file) { // trigger when file progress update
+        updateProgress(Math.floor(file.progress() * 100));
+    });
+
+    resumable.on('fileSuccess', function(file, response) { // trigger when file upload complete
+        response = JSON.parse(response)
+        $('#videoPreview').attr('src', response.path);
+        $('#link').attr('value', response.filename);
+        $('.card-footer').show();
+
+        $('#browseFile').hide();
+    });
+
+    resumable.on('fileError', function(file, response) { // trigger when there is any error
+        alert('file uploading error.')
+    });
+
+    var progress = $('.progress');
+
+    function showProgress() {
+        $('#loading-prgress').show();
+        progress.find('.loading').css('width', '0%');
+        progress.find('.loading').html('0%');
+        progress.find('.loading').removeClass('bg-info');
+        progress.show();
+    }
+
+    function updateProgress(value) {
+        progress.find('.loading').css('width', ` ${value}%`)
+        progress.find('.loading').html(`${value}%`)
+    }
+
+    function hideProgress() {
+        progress.hide();
+    }
 </script>
 @endsection

@@ -649,6 +649,7 @@ Route::prefix('news/')->group(function (): void {
 // NEWS
 Route::prefix('event/')->group(function (): void {
     Route::post('menu-event/create-event/save', [EventController::class, 'menu_event_create_save'])->name('menu_event_create_save');
+    Route::post('menu-event/create-event/upload-template', [EventController::class, 'menu_event_data_upload_template'])->name('menu_event_data_upload_template');
 });
 
 // Route::view('/video-player', 'video');

@@ -12,7 +12,10 @@ use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Hash;
 use Illuminate\Support\Facades\Redirect;
+use Illuminate\Support\Facades\Storage;
 use Illuminate\Support\Str;
+use Pion\Laravel\ChunkUpload\Handler\HandlerFactory;
+use Pion\Laravel\ChunkUpload\Receiver\FileReceiver;
 
 class EventController extends Controller
 {
@@ -70,14 +73,50 @@ class EventController extends Controller
                 'event_data_venue' => $request->venue,
                 'event_data_address' => $request->address,
                 'event_data_city' => $request->city,
-                'event_data_state' => $request->state,
+                'event_data_status' => 0,
                 'event_data_desc' => $request->desc,
+                'event_data_template' => 'event/template/' . auth::user()->userid . '/' . $request->link,
+                'event_data_user_id' => Auth::user()->userid,
                 'created_at' => now()
             ]);
             return 1;
         } catch (\Throwable $e) {
-            return 0;
+            return $e;
         }
+    }
+    public function menu_event_data_upload_template(Request $request)
+    {
+        $receiver = new FileReceiver('file', $request, HandlerFactory::classFromRequest($request));
+
+        if (!$receiver->isUploaded()) {
+            // file not uploaded
+        }
+
+        $fileReceived = $receiver->receive(); // receive file
+        if ($fileReceived->isFinished()) { // file uploading is complete / all chunks are uploaded
+            $file = $fileReceived->getFile(); // get file
+            $extension = $file->getClientOriginalExtension();
+            $fileName = str_replace('.' . $extension, '', $file->getClientOriginalName()); //file name without extenstion
+            $fileName .= '_' . md5(time()) . '.' . $extension; // a unique file name
+
+            $disk = Storage::disk(config('filesystems.default'));
+            $path = $disk->putFileAs('public/event/template/' . auth::user()->userid, $file, $fileName);
+            // $path1 = $disk('videos', $file, $fileName);
+
+            // delete chunked file
+            unlink($file->getPathname());
+            return [
+                'path' => Storage::url('/event/template/' . auth::user()->userid . '/' . $fileName),
+                'filename' => $fileName
+            ];
+        }
+
+        // otherwise return percentage informatoin
+        $handler = $fileReceived->handler();
+        return [
+            'done' => $handler->getPercentageDone(),
+            'status' => true
+        ];
     }
     public function menu_event_data($akses, $id)
     {
