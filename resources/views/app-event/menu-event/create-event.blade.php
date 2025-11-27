@@ -2,6 +2,7 @@
 @section('base.css')
 <link rel="stylesheet" href="https://cdn.datatables.net/2.2.2/css/dataTables.bootstrap5.css">
 <link rel="stylesheet" href="https://cdn.datatables.net/responsive/3.0.4/css/responsive.bootstrap5.css">
+<link href="{{ asset('vendors/flatpickr/flatpickr.min.css') }}" rel="stylesheet" />
 <style>
     #button-pick-request {
         cursor: pointer;
@@ -58,40 +59,40 @@
                         <div class="row gx-2">
                             <div class="col-12 mb-3">
                                 <label class="form-label" for="event-name">Event Title</label>
-                                <input class="form-control" id="event-name" type="text" placeholder="Event Title" />
+                                <input class="form-control" id="event-name" name="title" type="text" placeholder="Event Title" />
                             </div>
                             <div class="col-sm-6 mb-3">
                                 <label class="form-label" for="start-date">Start Date</label>
-                                <input class="form-control datetimepicker" id="start-date" type="text" placeholder="d/m/y" data-options='{"dateFormat":"d/m/y","disableMobile":true}' />
+                                <input class="form-control datetimepicker" name="start_date" id="datetimepicker" type="text" placeholder="d/m/y H:i" data-options='{"enableTime":true,"dateFormat":"d/m/y H:i","disableMobile":true}' />
                             </div>
                             <div class="col-sm-6 mb-3">
                                 <label class="form-label" for="end-date">End Date</label>
-                                <input class="form-control datetimepicker" id="end-date" type="text" placeholder="d/m/y" data-options='{"dateFormat":"d/m/y","disableMobile":true}' />
+                                <input class="form-control datetimepicker" name="end_date" id="datetimepicker" type="text" placeholder="d/m/y H:i" data-options='{"enableTime":true,"dateFormat":"d/m/y H:i","disableMobile":true}' />
                             </div>
                             <div class="col-sm-6 mb-3">
                                 <label class="form-label" for="event-venue">Venue</label>
-                                <input class="form-control" id="event-venue" type="text" placeholder="Venue" />
+                                <input class="form-control" name="venue" id="event-venue" type="text" placeholder="Venue" />
                                 <button class="btn btn-link btn-sm btn p-0" type="button">Online Event</button>
                             </div>
                             <div class="col-sm-6 mb-3">
                                 <label class="form-label" for="event-address">Address</label>
-                                <input class="form-control" id="event-address" type="text" placeholder="Address" />
+                                <input class="form-control" name="address" id="event-address" type="text" placeholder="Address" />
                             </div>
                             <div class="col-sm-4 mb-3">
                                 <label class="form-label" for="event-city">City</label>
-                                <input class="form-control" id="event-city" type="text" placeholder="City" />
+                                <input class="form-control" name="city" id="event-city" type="text" placeholder="City" />
                             </div>
                             <div class="col-sm-4 mb-3">
                                 <label class="form-label" for="event-state">State</label>
-                                <input class="form-control" id="event-state" type="text" placeholder="State" />
+                                <input class="form-control" name="state" id="event-state" type="text" placeholder="State" />
                             </div>
                             <div class="col-sm-4 mb-3">
                                 <label class="form-label" for="event-country">Country</label>
-                                <input class="form-control" id="event-country" type="text" placeholder="Country" />
+                                <input class="form-control" name="country" id="event-country" type="text" placeholder="Country" />
                             </div>
                             <div class="col-12">
                                 <label class="form-label" for="event-description">Description</label>
-                                <textarea class="form-control" id="event-description" rows="6"></textarea>
+                                <textarea class="form-control" name="desc" id="event-description" rows="6"></textarea>
                             </div>
                         </div>
                     </form>
@@ -163,7 +164,7 @@
                         </div>
                         <div class="mb-3">
                             <div class="card overflow-hidden">
-                                <div class="card-img-top"><img class="img-fluid" src="{{ asset('event/ex.jpg') }}" alt="Card image cap" /></div>
+                                <div class="card-img-top"><img class="img-fluid" src="https://i.pinimg.com/736x/a5/c2/8a/a5c28a83e4929a3f4775287888cd32f9.jpg" alt="Card image cap" /></div>
                                 <div class="card-body">
                                     <h5 class="card-title">Nama Event</h5>
                                     <p class="card-text">Nama Sub Event</p>
@@ -227,7 +228,7 @@
 <script src="https://cdn.datatables.net/2.2.2/js/dataTables.bootstrap5.js"></script>
 <script src="https://cdn.datatables.net/responsive/3.0.4/js/dataTables.responsive.js"></script>
 <script src="https://cdn.datatables.net/responsive/3.0.4/js/responsive.bootstrap5.js"></script>
-<script src="{{ asset('vendors/tinymce/tinymce.min.js') }}"></script>
+<script src="{{ asset('asset/js/flatpickr.js') }}"></script>
 <script>
     new DataTable('#example', {
         responsive: true

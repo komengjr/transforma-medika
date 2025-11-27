@@ -3,6 +3,7 @@
 namespace App\Http\Controllers\Event;
 
 use App\Http\Controllers\Controller;
+use App\Models\Event\EventModel;
 use App\Models\Movie;
 use App\Models\NewsCat;
 use App\Models\NewsData;
@@ -57,7 +58,21 @@ class EventController extends Controller
             return Redirect::to('dashboard/home');
         }
     }
-    public function menu_event_create_save(Request $request){
+    public function menu_event_create_save(Request $request)
+    {
+        EventModel::insert([
+            'event_data_code' => 'EVENT' . date('Ymdhis'),
+            'event_data_tittle' => $request->title,
+            'event_data_start_date' => $request->start_date,
+            'event_data_end_date' => $request->end_date,
+            'event_data_reg_deadline' => $request->end_date,
+            'event_data_venue' => $request->venue,
+            'event_data_address' => $request->address,
+            'event_data_city' => $request->city,
+            'event_data_state' => $request->state,
+            'event_data_desc' => $request->desc,
+            'created_at' => now()
+        ]);
         return 123;
     }
 }
