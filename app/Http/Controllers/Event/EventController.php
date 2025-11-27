@@ -63,6 +63,11 @@ class EventController extends Controller
     }
     public function menu_event_create_save(Request $request)
     {
+        if ($request->link_cover == '') {
+            $cover = null;
+        } else {
+            $cover = 'event/cover/' . auth::user()->userid . '/' . $request->link_cover;
+        }
         try {
             EventModel::insert([
                 'event_data_code' => 'EVENT' . date('Ymdhis'),
@@ -75,6 +80,7 @@ class EventController extends Controller
                 'event_data_city' => $request->city,
                 'event_data_status' => 0,
                 'event_data_desc' => $request->desc,
+                'event_data_cover' => $cover,
                 'event_data_template' => 'event/template/' . auth::user()->userid . '/' . $request->link,
                 'event_data_user_id' => Auth::user()->userid,
                 'created_at' => now()
@@ -107,6 +113,40 @@ class EventController extends Controller
             unlink($file->getPathname());
             return [
                 'path' => Storage::url('/event/template/' . auth::user()->userid . '/' . $fileName),
+                'filename' => $fileName
+            ];
+        }
+
+        // otherwise return percentage informatoin
+        $handler = $fileReceived->handler();
+        return [
+            'done' => $handler->getPercentageDone(),
+            'status' => true
+        ];
+    }
+    public function menu_event_data_upload_cover(Request $request)
+    {
+        $receiver = new FileReceiver('file', $request, HandlerFactory::classFromRequest($request));
+
+        if (!$receiver->isUploaded()) {
+            // file not uploaded
+        }
+
+        $fileReceived = $receiver->receive(); // receive file
+        if ($fileReceived->isFinished()) { // file uploading is complete / all chunks are uploaded
+            $file = $fileReceived->getFile(); // get file
+            $extension = $file->getClientOriginalExtension();
+            $fileName = str_replace('.' . $extension, '', $file->getClientOriginalName()); //file name without extenstion
+            $fileName .= '_' . md5(time()) . '.' . $extension; // a unique file name
+
+            $disk = Storage::disk(config('filesystems.default'));
+            $path = $disk->putFileAs('public/event/cover/' . auth::user()->userid, $file, $fileName);
+            // $path1 = $disk('videos', $file, $fileName);
+
+            // delete chunked file
+            unlink($file->getPathname());
+            return [
+                'path' => Storage::url('/event/cover/' . auth::user()->userid . '/' . $fileName),
                 'filename' => $fileName
             ];
         }

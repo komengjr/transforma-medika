@@ -51,7 +51,12 @@
         </div>
     </div>
 </div>
-<div class="card cover-image mb-3"><img class="card-img-top" src="{{ asset('asset/img/generic/13.jpg') }}" alt="" />
+<div class="progress_cover" style="height: 20px; display: none;">
+    <div class="progress-bar progress-bar-striped progress-bar-animated loadings"
+        role="progressbar" aria-valuenow="0" aria-valuemin="0" aria-valuemax="100"
+        style="width: 0%; height: 100%">0%</div>
+</div>
+<div class="card cover-image mb-3"><img class="card-img-top" id="card-img-top" src="{{ asset('asset/img/generic/13.jpg') }}" alt="" />
     <input class="d-none" id="upload-cover-image" type="file" />
     <label class="cover-image-file-input" for="upload-cover-image"><span class="fas fa-camera me-2"></span><span>Change cover photo</span></label>
 </div>
@@ -178,7 +183,8 @@
                                     role="progressbar" aria-valuenow="0" aria-valuemin="0" aria-valuemax="100"
                                     style="width: 0%; height: 100%">0%</div>
                             </div>
-                            <input id="link" type="text" name="link" class="form-control" >
+                            <input id="link" type="text" name="link" class="form-control" hidden>
+                            <input id="link_cover" type="text" name="link_cover" class="form-control" hidden>
                         </div>
                         <div class="mb-3">
                             <div class="card overflow-hidden">
@@ -191,7 +197,7 @@
                             </div>
                         </div>
 
-                        <div class="mb-3">
+                        <!-- <div class="mb-3">
                             <div class="d-flex justify-content-between align-items-center">
                                 <label class="mb-0" for="event-tags">Tags</label>
                                 <button class="btn btn-link btn-sm pe-0" type="button">Add New</button>
@@ -220,7 +226,7 @@
                         <div class="form-check custom-checkbox mb-0">
                             <input class="form-check-input" id="customRadio6" type="checkbox" />
                             <label class="form-label mb-0" for="customRadio6">Show the number of remaining tickets. </label>
-                        </div>
+                        </div> -->
                     </div>
                 </div>
             </div>
@@ -310,12 +316,12 @@
     resumable.assignBrowse(browseFile[0]);
 
     resumable.on('fileAdded', function(file) { // trigger when file picked
-        showProgress();
+        showProgres();
         resumable.upload() // to actually start uploading.
     });
 
     resumable.on('fileProgress', function(file) { // trigger when file progress update
-        updateProgress(Math.floor(file.progress() * 100));
+        updateProgres(Math.floor(file.progress() * 100));
     });
 
     resumable.on('fileSuccess', function(file, response) { // trigger when file upload complete
@@ -331,23 +337,77 @@
         alert('file uploading error.')
     });
 
-    var progress = $('.progress');
+    var progress = $('#loading-prgress');
 
-    function showProgress() {
-        $('#loading-prgress').show();
+    function showProgres() {
         progress.find('.loading').css('width', '0%');
         progress.find('.loading').html('0%');
         progress.find('.loading').removeClass('bg-info');
         progress.show();
     }
 
-    function updateProgress(value) {
+    function updateProgres(value) {
         progress.find('.loading').css('width', ` ${value}%`)
         progress.find('.loading').html(`${value}%`)
     }
 
-    function hideProgress() {
+    function hideProgres() {
         progress.hide();
+    }
+</script>
+<script type="text/javascript">
+    var CoverFile = $('#upload-cover-image');
+    var resumableCover = new Resumable({
+        target: "{{ route('menu_event_data_upload_cover') }}",
+        query: {
+            _token: '{{ csrf_token() }}'
+        }, // CSRF token
+        fileType: ['jpg', 'jpeg', 'png'],
+        headers: {
+            'Accept': 'application/json'
+        },
+        testChunks: false,
+        throttleProgressCallbacks: 1,
+    });
+
+    resumableCover.assignBrowse(CoverFile[0]);
+
+    resumableCover.on('fileAdded', function(file) { // trigger when file picked
+        showProgress();
+        resumableCover.upload() // to actually start uploading.
+    });
+
+    resumableCover.on('fileProgress', function(file) { // trigger when file progress update
+        updateProgress(Math.floor(file.progress() * 100));
+    });
+
+    resumableCover.on('fileSuccess', function(file, response) { // trigger when file upload complete
+        response = JSON.parse(response)
+        $('#card-img-top').attr('src', response.path);
+        $('#link_cover').attr('value', response.filename);
+        $('#upload-cover-image').hide();
+    });
+
+    resumableCover.on('fileError', function(file, response) { // trigger when there is any error
+        alert('file uploading error.')
+    });
+
+    var progress_cover = $('.progress_cover');
+
+    function showProgress() {
+        progress_cover.find('.loadings').css('width', '0%');
+        progress_cover.find('.loadings').html('0%');
+        progress_cover.find('.loadings').removeClass('bg-info');
+        progress_cover.show();
+    }
+
+    function updateProgress(value) {
+        progress_cover.find('.loadings').css('width', ` ${value}%`)
+        progress_cover.find('.loadings').html(`${value}%`)
+    }
+
+    function hideProgress() {
+        progress_cover.hide();
     }
 </script>
 @endsection

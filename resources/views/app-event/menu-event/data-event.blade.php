@@ -49,8 +49,8 @@
                             Add Event Brodcast</button>
                         <div class="dropdown-divider"></div>
                         <button class="dropdown-item" data-bs-toggle="modal" data-bs-target="#modal-cabang"
-                            id="button-add-as" data-code="123"><span class="far fa-folder-open"></span>
-                            History</button>
+                            id="button-add-123" data-code="123"><span class="far fa-folder-open"></span>
+                            Add Sub Event</button>
                     </div>
                 </div>
             </div>
@@ -61,11 +61,12 @@
             <thead class="bg-200 text-700">
                 <tr>
                     <th>No</th>
+                    <th>Gambar Event</th>
                     <th>Nama Event</th>
                     <th>Lokasi Event</th>
                     <th>Mulai Event</th>
                     <th>Berakhir Event</th>
-                    <th>Kota</th>
+                    <th>Sub Event</th>
                     <th>Status</th>
                     <th>Action</th>
                 </tr>
@@ -75,16 +76,40 @@
                 $no = 1;
                 @endphp
                 @foreach ($data as $datas)
-                    <tr>
-                        <td>{{ $no++ }}</td>
-                        <td>{{ $datas->event_data_tittle }}</td>
-                        <td>{{ $datas->event_data_venue }}</td>
-                        <td>{{ $datas->event_data_start_date }}</td>
-                        <td>{{ $datas->event_data_end_date }}</td>
-                        <td>{{ $datas->event_data_city }}</td>
-                        <td>0</td>
-                        <td></td>
-                    </tr>
+                <tr>
+                    <td>{{ $no++ }}</td>
+                    <td>
+                        @if ($datas->event_data_template == '')
+                        <img src="{{ asset('no_pict.png') }}" alt="lightbox" class="img-thumbnail"
+                            id="videoPreview" width="70" height="70">
+                        @else
+                        <img src="{{ Storage::url($datas->event_data_template) }}" alt=""
+                            width="80" />
+                        @endif
+                    </td>
+                    <td>{{ $datas->event_data_tittle }}</td>
+                    <td>{{ $datas->event_data_venue }}</td>
+                    <td>{{ $datas->event_data_start_date }}</td>
+                    <td>{{ $datas->event_data_end_date }}</td>
+                    <td></td>
+                    <td>0</td>
+                    <td>
+                        <div class="btn-group" role="group">
+                            <button class="btn btn-sm btn-falcon-primary dropdown-toggle" id="btnGroupVerticalDrop2"
+                                type="button" data-bs-toggle="dropdown" aria-haspopup="true" aria-expanded="false"><span
+                                    class="fas fa-align-left me-1" data-fa-transform="shrink-3"></span>Option</button>
+                            <div class="dropdown-menu" aria-labelledby="btnGroupVerticalDrop2">
+                                <button class="dropdown-item" data-bs-toggle="modal" data-bs-target="#modal-brodcast"
+                                    id="button-add-event" data-code="123"><span class="far fa-edit"></span>
+                                    Detail Event</button>
+                                <div class="dropdown-divider"></div>
+                                <button class="dropdown-item" data-bs-toggle="modal" data-bs-target="#modal-event"
+                                    id="button-add-sub-event" data-code="{{$datas->event_data_code}}"><span class="fas fa-calendar-plus"></span>
+                                    Add Sub Event</button>
+                            </div>
+                        </div>
+                    </td>
+                </tr>
                 @endforeach
             </tbody>
         </table>
@@ -92,7 +117,7 @@
 </div>
 @endsection
 @section('base.js')
-<div class="modal fade" id="modal-brodcast" data-bs-keyboard="false" data-bs-backdrop="static" tabindex="-1"
+<div class="modal fade" id="modal-event" data-bs-keyboard="false" data-bs-backdrop="static" tabindex="-1"
     aria-labelledby="staticBackdropLabel" aria-hidden="true">
     <div class="modal-dialog modal-dialog-centered modal-xl" role="document">
         <div class="modal-content border-0">
@@ -100,7 +125,7 @@
                 <button class="btn-close btn btn-sm btn-circle d-flex flex-center transition-base"
                     data-bs-dismiss="modal" aria-label="Close"></button>
             </div>
-            <div id="menu-brodcast"></div>
+            <div id="menu-event"></div>
         </div>
     </div>
 </div>
@@ -138,6 +163,5 @@
             $('#menu-brodcast').html('eror');
         });
     });
-
 </script>
 @endsection
