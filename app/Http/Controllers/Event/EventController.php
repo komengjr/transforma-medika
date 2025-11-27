@@ -60,19 +60,32 @@ class EventController extends Controller
     }
     public function menu_event_create_save(Request $request)
     {
-        EventModel::insert([
-            'event_data_code' => 'EVENT' . date('Ymdhis'),
-            'event_data_tittle' => $request->title,
-            'event_data_start_date' => $request->start_date,
-            'event_data_end_date' => $request->end_date,
-            'event_data_reg_deadline' => $request->end_date,
-            'event_data_venue' => $request->venue,
-            'event_data_address' => $request->address,
-            'event_data_city' => $request->city,
-            'event_data_state' => $request->state,
-            'event_data_desc' => $request->desc,
-            'created_at' => now()
-        ]);
-        return 123;
+        try {
+            EventModel::insert([
+                'event_data_code' => 'EVENT' . date('Ymdhis'),
+                'event_data_tittle' => $request->title,
+                'event_data_start_date' => $request->start_date,
+                'event_data_end_date' => $request->end_date,
+                'event_data_reg_deadline' => $request->end_date,
+                'event_data_venue' => $request->venue,
+                'event_data_address' => $request->address,
+                'event_data_city' => $request->city,
+                'event_data_state' => $request->state,
+                'event_data_desc' => $request->desc,
+                'created_at' => now()
+            ]);
+            return 1;
+        } catch (\Throwable $e) {
+            return 0;
+        }
+    }
+    public function menu_event_data($akses, $id)
+    {
+        if ($this->url_akses($akses, $id) == true) {
+            $data = EventModel::latest()->get();
+            return view('app-event.menu-event.data-event', ['akses' => $akses, 'code' => $id, 'data' => $data]);
+        } else {
+            return Redirect::to('dashboard/home');
+        }
     }
 }

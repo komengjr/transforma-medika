@@ -216,8 +216,7 @@
                 <h5 class="mb-2 mb-md-0">Nice Job! You're almost done</h5>
             </div>
             <div class="col-auto" id="proses-save-event">
-                <button class="btn btn-falcon-default btn-sm me-2">Save</button>
-                <button class="btn btn-falcon-primary btn-sm" id="button-save-event">Make your event live </button>
+                <button class="btn btn-falcon-primary btn-sm" id="button-save-event">Make your Event</button>
             </div>
         </div>
     </div>
@@ -229,6 +228,8 @@
 <script src="https://cdn.datatables.net/responsive/3.0.4/js/dataTables.responsive.js"></script>
 <script src="https://cdn.datatables.net/responsive/3.0.4/js/responsive.bootstrap5.js"></script>
 <script src="{{ asset('asset/js/flatpickr.js') }}"></script>
+<script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+
 <script>
     new DataTable('#example', {
         responsive: true
@@ -248,7 +249,24 @@
             data: data,
             dataType: 'html',
         }).done(function(data) {
-            $('#proses-save-event').html(data);
+            if (data == 1) {
+                Swal.fire({
+                    title: "Simpan Data Berhasil!",
+                    icon: "success",
+                    draggable: true
+                });
+                location.reload();
+            } else {
+                Swal.fire({
+                    icon: "error",
+                    title: "Oops...",
+                    text: "Something went wrong!",
+                    footer: '<a href="#">Why do I have this issue?</a>'
+                });
+                $('#proses-save-event').html(
+                    '<button class="btn btn-falcon-primary btn-sm" id="button-save-event">Make your Event</button>'
+                );
+            }
         }).fail(function() {
             $('#proses-save-event').html('eror');
         });

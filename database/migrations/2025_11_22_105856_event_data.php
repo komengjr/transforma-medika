@@ -23,7 +23,7 @@ class EventData extends Migration
             $table->string('event_data_venue');
             $table->string('event_data_address');
             $table->string('event_data_city');
-            $table->string('event_data_state');
+            $table->integer('event_data_status');
             $table->text('event_data_desc');
             $table->timestamps();
         });

@@ -167,6 +167,7 @@ Route::prefix('{akses}/{id}')->group(function (): void {
     Route::get('menu_news/add', [NewsAdminController::class, 'menu_news_add'])->name('menu_news_add');
     // NEWS
     Route::get('menu-event/create-event', [EventController::class, 'menu_event_create'])->name('menu_event_create');
+    Route::get('menu-event/data-event', [EventController::class, 'menu_event_data'])->name('menu_event_data');
 });
 // MEDICA HEALTH
 Route::prefix('{akses}/{id}/application')->group(function () {
