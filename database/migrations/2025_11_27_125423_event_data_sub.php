@@ -17,6 +17,9 @@ class EventDataSub extends Migration
             $table->id('id_event_data_sub');
             $table->string('event_data_sub_code')->unique();
             $table->string('event_data_code');
+            $table->string('event_data_sub_name');
+            $table->dateTime('event_data_sub_start');
+            $table->dateTime('event_data_sub_end');
             $table->timestamps();
         });
     }

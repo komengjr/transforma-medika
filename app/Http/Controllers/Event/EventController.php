@@ -4,6 +4,7 @@ namespace App\Http\Controllers\Event;
 
 use App\Http\Controllers\Controller;
 use App\Models\Event\EventModel;
+use App\Models\Event\SubEventModel;
 use App\Models\Movie;
 use App\Models\NewsCat;
 use App\Models\NewsData;
@@ -70,7 +71,7 @@ class EventController extends Controller
         }
         try {
             EventModel::insert([
-                'event_data_code' => 'EVENT' . date('Ymdhis'),
+                'event_data_code' => 'EVENT' . $request->data_code,
                 'event_data_tittle' => $request->title,
                 'event_data_start_date' => $request->start_date,
                 'event_data_end_date' => $request->end_date,
@@ -166,5 +167,33 @@ class EventController extends Controller
         } else {
             return Redirect::to('dashboard/home');
         }
+    }
+    public function menu_event_data_add_sub_event(Request $request)
+    {
+        return view('app-event.menu-event.data-event.form-add-sub-event', ['code' => $request->code]);
+    }
+    public function menu_event_data_save_sub_event(Request $request)
+    {
+        try {
+            $total = SubEventModel::where('event_data_code', $request->data_code)->count();
+            $total = $total + 1;
+            SubEventModel::insert([
+                'event_data_sub_code' => $request->data_code . '' . str_pad($total, 3, '0', STR_PAD_LEFT),
+                'event_data_code' => $request->data_code,
+                'event_data_sub_name' => $request->name,
+                'event_data_sub_start' => $request->start,
+                'event_data_sub_end' => $request->end,
+                'created_at' => now()
+            ]);
+            return 1;
+        } catch (\Throwable $th) {
+            return 0;
+        }
+    }
+    public function menu_event_data_detail_event(Request $request)
+    {
+        $data = EventModel::where('event_data_code', $request->code)->first();
+        $sub_event = SubEventModel::where('event_data_code', $request->code)->get();
+        return view('app-event.menu-event.data-event.form-detail-event', ['code' => $request->code], compact('data', 'sub_event'));
     }
 }

@@ -79,11 +79,11 @@
                 <tr>
                     <td>{{ $no++ }}</td>
                     <td>
-                        @if ($datas->event_data_template == '')
-                        <img src="{{ asset('no_pict.png') }}" alt="lightbox" class="img-thumbnail"
+                        @if ($datas->event_data_cover == '')
+                        <img src="{{ asset('img/cover.png') }}" alt="lightbox" class="img-thumbnail"
                             id="videoPreview" width="70" height="70">
                         @else
-                        <img src="{{ Storage::url($datas->event_data_template) }}" alt=""
+                        <img src="{{ Storage::url($datas->event_data_cover) }}" alt=""
                             width="80" />
                         @endif
                     </td>
@@ -91,7 +91,14 @@
                     <td>{{ $datas->event_data_venue }}</td>
                     <td>{{ $datas->event_data_start_date }}</td>
                     <td>{{ $datas->event_data_end_date }}</td>
-                    <td></td>
+                    <td>
+                        @php
+                        $sub = App\Models\Event\SubEventModel::where('event_data_code',$datas->event_data_code)->get();
+                        @endphp
+                        @foreach ($sub as $subs)
+                            <li class="ms-3">{{ $subs->event_data_sub_name }}</li>
+                        @endforeach
+                    </td>
                     <td>0</td>
                     <td>
                         <div class="btn-group" role="group">
@@ -99,9 +106,16 @@
                                 type="button" data-bs-toggle="dropdown" aria-haspopup="true" aria-expanded="false"><span
                                     class="fas fa-align-left me-1" data-fa-transform="shrink-3"></span>Option</button>
                             <div class="dropdown-menu" aria-labelledby="btnGroupVerticalDrop2">
+                                <button class="dropdown-item" data-bs-toggle="modal" data-bs-target="#modal-event-full"
+                                    id="button-detail-event" data-code="{{$datas->event_data_code}}"><span class="far fa-edit"></span>
+                                    Setup Event</button>
                                 <button class="dropdown-item" data-bs-toggle="modal" data-bs-target="#modal-brodcast"
-                                    id="button-add-event" data-code="123"><span class="far fa-edit"></span>
-                                    Detail Event</button>
+                                    id="button-add-event" data-code="{{$datas->event_data_code}}"><span class="fas fa-book-reader"></span>
+                                    Peserta Event</button>
+                                <div class="dropdown-divider"></div>
+                                <button class="dropdown-item" data-bs-toggle="modal" data-bs-target="#modal-event"
+                                    id="button-form-registrasi-peserta" data-code="{{$datas->event_data_code}}"><span class="fab fa-wpforms"></span>
+                                    Form Registrasi Peserta</button>
                                 <div class="dropdown-divider"></div>
                                 <button class="dropdown-item" data-bs-toggle="modal" data-bs-target="#modal-event"
                                     id="button-add-sub-event" data-code="{{$datas->event_data_code}}"><span class="fas fa-calendar-plus"></span>
@@ -129,6 +143,18 @@
         </div>
     </div>
 </div>
+<div class="modal fade" id="modal-event-full" data-bs-keyboard="false" data-bs-backdrop="static" tabindex="-1"
+    aria-labelledby="staticBackdropLabel" aria-hidden="true">
+    <div class="modal-dialog modal-dialog-centered" role="document" style="max-width: 95%;">
+        <div class="modal-content border-0">
+            <div class="position-absolute top-0 end-0 mt-3 me-3 z-index-1">
+                <button class="btn-close btn btn-sm btn-circle d-flex flex-center transition-base"
+                    data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <div id="menu-event-full"></div>
+        </div>
+    </div>
+</div>
 <script src="https://cdn.datatables.net/2.2.2/js/dataTables.js"></script>
 <script src="https://cdn.datatables.net/2.2.2/js/dataTables.bootstrap5.js"></script>
 <script src="https://cdn.datatables.net/responsive/3.0.4/js/dataTables.responsive.js"></script>
@@ -143,24 +169,75 @@
     });
 </script>
 <script>
-    $(document).on("click", "#button-add-event", function(e) {
+    $(document).on("click", "#button-detail-event", function(e) {
         e.preventDefault();
-        $('#menu-brodcast').html(
+        var code = $(this).data("code");
+        $('#menu-event-full').html(
             '<div class="spinner-border my-3" style="display: block; margin-left: auto; margin-right: auto;" role="status"><span class="visually-hidden">Loading...</span></div>'
         );
         $.ajax({
-            url: "{{ route('menu_brodcast_management_add') }}",
+            url: "{{ route('menu_event_data_detail_event') }}",
             type: "POST",
             cache: false,
             data: {
                 "_token": "{{ csrf_token() }}",
-                "code": 0
+                "code": code
             },
             dataType: 'html',
         }).done(function(data) {
-            $('#menu-brodcast').html(data);
+            $('#menu-event-full').html(data);
         }).fail(function() {
-            $('#menu-brodcast').html('eror');
+            $('#menu-event-full').html('eror');
+        });
+    });
+    $(document).on("click", "#button-add-sub-event", function(e) {
+        e.preventDefault();
+        var code = $(this).data("code");
+        $('#menu-event').html(
+            '<div class="spinner-border my-3" style="display: block; margin-left: auto; margin-right: auto;" role="status"><span class="visually-hidden">Loading...</span></div>'
+        );
+        $.ajax({
+            url: "{{ route('menu_event_data_add_sub_event') }}",
+            type: "POST",
+            cache: false,
+            data: {
+                "_token": "{{ csrf_token() }}",
+                "code": code
+            },
+            dataType: 'html',
+        }).done(function(data) {
+            $('#menu-event').html(data);
+        }).fail(function() {
+            $('#menu-event').html('eror');
+        });
+    });
+    $(document).on("click", "#button-simpan-data-sub-event", function(e) {
+        e.preventDefault();
+        var data = $("#form-input-sub-event").serialize();
+        $('#menu-add-data-sub-event').html(
+            '<div class="spinner-border my-3" style="display: block; margin-left: auto; margin-right: auto;" role="status"><span class="visually-hidden">Loading...</span></div>'
+        );
+        $.ajax({
+            url: "{{ route('menu_event_data_save_sub_event') }}",
+            type: "POST",
+            cache: false,
+            data: data,
+            dataType: 'html',
+        }).done(function(data) {
+            if (data == 0) {
+                Swal.fire({
+                    icon: "error",
+                    title: "Oops...",
+                    text: "Tolong lah Isi dengan Bener!",
+                    footer: '<a href="#">Why do I have this issue?</a>'
+                });
+                $('#menu-add-data-sub-event').html('<button class="btn btn-success float-end" id="button-simpan-data-sub-event" data-code="">Simpan Data</button>');
+            } else {
+                $('#menu-add-data-sub-event').html(data);
+                location.reload();
+            }
+        }).fail(function() {
+            $('#menu-add-data-sub-event').html('eror');
         });
     });
 </script>
