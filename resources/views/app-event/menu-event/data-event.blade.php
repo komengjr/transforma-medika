@@ -190,6 +190,27 @@
             $('#menu-event-full').html('eror');
         });
     });
+    $(document).on("click", "#button-add-type-peserta", function(e) {
+        e.preventDefault();
+        var code = $(this).data("code");
+        $('#menu-type-peserta').html(
+            '<div class="spinner-border my-3" style="display: block; margin-left: auto; margin-right: auto;" role="status"><span class="visually-hidden">Loading...</span></div>'
+        );
+        $.ajax({
+            url: "{{ route('menu_event_data_detail_event_add_type') }}",
+            type: "POST",
+            cache: false,
+            data: {
+                "_token": "{{ csrf_token() }}",
+                "code": code
+            },
+            dataType: 'html',
+        }).done(function(data) {
+            $('#menu-type-peserta').html(data);
+        }).fail(function() {
+            $('#menu-type-peserta').html('eror');
+        });
+    });
     $(document).on("click", "#button-add-sub-event", function(e) {
         e.preventDefault();
         var code = $(this).data("code");
@@ -240,5 +261,6 @@
             $('#menu-add-data-sub-event').html('eror');
         });
     });
+
 </script>
 @endsection
