@@ -49,7 +49,6 @@
     <style>
         .card-opacity {
             background-color: rgba(255, 255, 255, 0.95);
-            /* 0.1 – 1 */
             border: none;
         }
     </style>

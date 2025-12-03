@@ -96,7 +96,7 @@
                         $sub = App\Models\Event\SubEventModel::where('event_data_code',$datas->event_data_code)->get();
                         @endphp
                         @foreach ($sub as $subs)
-                            <li class="ms-3">{{ $subs->event_data_sub_name }}</li>
+                        <li class="ms-3">{{ $subs->event_data_sub_name }}</li>
                         @endforeach
                     </td>
                     <td>0</td>
@@ -232,6 +232,7 @@
             $('#menu-event').html('eror');
         });
     });
+
     $(document).on("click", "#button-simpan-data-sub-event", function(e) {
         e.preventDefault();
         var data = $("#form-input-sub-event").serialize();
@@ -261,6 +262,26 @@
             $('#menu-add-data-sub-event').html('eror');
         });
     });
-
+    $(document).on("click", "#button-form-registrasi-peserta", function(e) {
+        e.preventDefault();
+        var code = $(this).data("code");
+        $('#menu-event').html(
+            '<div class="spinner-border my-3" style="display: block; margin-left: auto; margin-right: auto;" role="status"><span class="visually-hidden">Loading...</span></div>'
+        );
+        $.ajax({
+            url: "{{ route('menu_event_data_form_registrasi_event') }}",
+            type: "POST",
+            cache: false,
+            data: {
+                "_token": "{{ csrf_token() }}",
+                "code": code
+            },
+            dataType: 'html',
+        }).done(function(data) {
+            $('#menu-event').html(data);
+        }).fail(function() {
+            $('#menu-event').html('eror');
+        });
+    });
 </script>
 @endsection

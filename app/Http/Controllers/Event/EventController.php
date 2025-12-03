@@ -17,6 +17,7 @@ use Illuminate\Support\Facades\Storage;
 use Illuminate\Support\Str;
 use Pion\Laravel\ChunkUpload\Handler\HandlerFactory;
 use Pion\Laravel\ChunkUpload\Receiver\FileReceiver;
+use Svg\Tag\Rect;
 
 class EventController extends Controller
 {
@@ -196,10 +197,17 @@ class EventController extends Controller
         $sub_event = SubEventModel::where('event_data_code', $request->code)->get();
         return view('app-event.menu-event.data-event.form-detail-event', ['code' => $request->code], compact('data', 'sub_event'));
     }
-    public function menu_event_data_detail_event_add_type(Request $request){
+    public function menu_event_data_detail_event_add_type(Request $request)
+    {
         return view('app-event.menu-event.data-event.form-add-type-peserta');
     }
-    public function menu_event_data_detail_event_save_class(Request $request){
+    public function menu_event_data_detail_event_save_class(Request $request)
+    {
         return view('app-event.menu-event.data-event.data-table-event-class');
+    }
+    public function menu_event_data_form_registrasi_event(Request $request)
+    {
+        $data = EventModel::where('event_data_code', $request->code)->first();
+        return view('app-event.menu-event.data-event.form-registrasi-event', compact('data'));
     }
 }

@@ -2,6 +2,8 @@
 
 namespace App\Http\Controllers;
 
+use App\Models\NewsData;
+use Illuminate\Support\Facades\Cache;
 use Facade\FlareClient\Http\Response;
 use Illuminate\Database\QueryException;
 use Illuminate\Http\Request;
@@ -30,5 +32,12 @@ class ApiCntroller extends Controller
             "loket3" => "Z021"
         );
         return response()->json($data_arr);
+    }
+    public function data_stream_api()
+    {
+        $data = NewsData::inRandomOrder()->first();
+        return response()->json([
+            'data' => Cache::get('/news/detail/', $data->news_data_slug)
+        ]);
     }
 }
