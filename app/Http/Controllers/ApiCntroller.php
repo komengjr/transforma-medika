@@ -41,7 +41,7 @@ class ApiCntroller extends Controller
         $today = date('Y-m-d');
 
         // Cek apakah sudah pernah view hari ini
-        $existing = ads_ip::where([
+        $existing = \App\Models\ads_ip::where([
             'news_view_user_ip' => $ip,
             'news_view_date' => $today,
         ])->first();
@@ -54,8 +54,9 @@ class ApiCntroller extends Controller
             ]);
         }
 
+        $data = NewsData::inRandomOrder()->first();
         return response()->json([
-            'data' => Cache::get($ip)
+            'data' => Cache::get('/', $ip)
         ]);
     }
 }
