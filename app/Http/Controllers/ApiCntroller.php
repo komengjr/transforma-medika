@@ -2,6 +2,7 @@
 
 namespace App\Http\Controllers;
 
+use App\Models\ads_ip;
 use App\Models\NewsData;
 use Illuminate\Support\Facades\Cache;
 use Facade\FlareClient\Http\Response;
@@ -33,11 +34,28 @@ class ApiCntroller extends Controller
         );
         return response()->json($data_arr);
     }
-    public function data_stream_api()
+    public function data_stream_api(Request $request)
     {
-        $data = NewsData::inRandomOrder()->first();
+        $ip = $request->ip();
+        $agent = $request->header('User-Agent');
+        $today = date('Y-m-d');
+
+        // Cek apakah sudah pernah view hari ini
+        $existing = ads_ip::where([
+            'news_view_user_ip' => $ip,
+            'news_view_date' => $today,
+        ])->first();
+
+        if (!$existing) {
+            ads_ip::create([
+                'news_view_user_ip' => $ip,
+                'news_view_user_agent' => $agent,
+                'news_view_date' => $today,
+            ]);
+        }
+
         return response()->json([
-            'data' => Cache::get('/news/detail/', $data->news_data_slug)
+            'data' => Cache::get($ip)
         ]);
     }
 }
