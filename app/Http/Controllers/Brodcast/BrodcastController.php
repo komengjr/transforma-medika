@@ -215,6 +215,7 @@ class BrodcastController extends Controller
                 'b_event_name' => $request->name,
                 'b_event_location' => $request->location,
                 'b_event_class' => $request->class,
+                'b_event_text' => $request->desc,
                 'b_event_date' => $request->date,
                 'b_event_status' => 1,
                 'created_at' => now()
@@ -296,7 +297,7 @@ class BrodcastController extends Controller
                             $nomorhp = '+62' . substr($nomorhp, 1);
                         }
                     }
-                    $text = "Hi *" . $datas->b_event_peserta_name . "* \nSelamat Anda Terdaftar Sebagai Peserta Event : " . $event->b_event_name . " \nLokasi Event : " . $event->b_event_location . "\nRoom : " . $event->b_event_class . "\nTanggal & Jam : " . $event->b_event_date . "\nKode Booking : " . $datas->b_event_peserta_booking . "\n\nSupport By. *www.innoventra.site*";
+                    $text = "Hi *" . $datas->b_event_peserta_name . "* \nSelamat Anda Terdaftar Sebagai Peserta Event : " . $event->b_event_name . " \nLokasi Event : " . $event->b_event_location . "\nRoom : " . $event->b_event_class . "\nTanggal & Jam : " . $event->b_event_date . "\nKode Booking : " . $datas->b_event_peserta_booking . "\n" . $event->b_event_text . "\nSupport By. *www.innoventra.site*";
                     $qrcode = base64_encode(QrCode::format('png')
                         ->size(500)
                         ->errorCorrection('H')
@@ -320,7 +321,6 @@ class BrodcastController extends Controller
                     ]);
                 }
             }
-
         }
         $data = DB::table('b_event_peserta')->where('b_event_code', $request->code)->get();
         return view('app-brodcast.menu.table.table-peserta-event', ['data' => $data]);

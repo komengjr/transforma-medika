@@ -38,6 +38,13 @@
                                 id="dengan-rupiah">
                         </div>
                     </div>
+                    <div class="col-12">
+                        <label for="inputLastName1" class="form-label text-youtube">Descrpition</label>
+                        <div class="input-group"> <span class="input-group-text"><i
+                                    class="fas fa-money-check"></i></span>
+                            <textarea name="desc" class="form-control"  id=""></textarea>
+                        </div>
+                    </div>
 
                 </form>
             </div>
