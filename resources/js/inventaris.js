@@ -11,21 +11,8 @@ const client = new Client({
 client.on("qr", (qr) => {
     qrcode.generate(qr, { small: true });
 });
-client.on("message", (msg) => {
-    if (msg.body == "!ping") {
-        msg.reply("pong");
-    }
-});
-client.on("authenticated", () => {
-    console.log("Authenticated!");
-});
-client.on("auth_failure", (msg) => {
-    console.error("Authentication failure", msg);
-});
-client.on("disconnected", (reason) => {
-    console.log("Client was disconnected", reason);
-    client.destroy();
-});
+
+
 
 function connectDB() {
     connection = mysql.createConnection({
@@ -95,4 +82,14 @@ client.on("ready", () => {
     setInterval(intervalfunction, 10000);
 });
 connectDB();
+client.on("authenticated", () => {
+    console.log("Authenticated!");
+});
+client.on("auth_failure", (msg) => {
+    console.error("Authentication failure", msg);
+});
+client.on("disconnected", (reason) => {
+    console.log("Client was disconnected", reason);
+    client.destroy();
+});
 client.initialize();

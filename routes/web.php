@@ -67,7 +67,6 @@ Route::controller(PageController::class)->group(function () {
     Route::get('/terms-of-service', 'terms_of_service')->name('terms-of-service');
     Route::get('/product/detail/{detail}', 'product_detail')->name('product_detail');
     Route::get('/changelog', 'changelog')->name('changelog');
-
 });
 
 Route::get('log-eror', [\Rap2hpoutre\LaravelLogViewer\LogViewerController::class, 'index']);
@@ -100,6 +99,10 @@ Route::prefix('{akses}/{id}')->group(function (): void {
     Route::get('pelatihan-pegawai/jadwal-pelatihan', [HrmController::class, 'pelatihan_pegawai_jadwal'])->name('pelatihan_pegawai_jadwal');
     Route::get('master-data/data-pegawai', [HrmController::class, 'master_data_pegawai'])->name('master_data_pegawai');
     Route::get('master-data/data-jabatan', [HrmController::class, 'master_data_jabatan'])->name('master_data_jabatan');
+    Route::get('master-data/data-departemen', [HrmController::class, 'master_data_departemen'])->name('master_data_departemen');
+    Route::get('master-kpi/master-kpi', [HrmController::class, 'master_data_kpi'])->name('master_data_kpi');
+    Route::get('master-kpi/master-kpi-pegawai', [HrmController::class, 'master_data_kpi_pegawai'])->name('master_data_kpi_pegawai');
+    Route::get('master-kpi/master-kpi-rekap', [HrmController::class, 'master_data_kpi_rekap'])->name('master_data_kpi_rekap');
     // Route::get('{id}/dashboard', [dashboardController::class, 'dashboard_medica'])->name('dashboard_medica');
     // INVENTARIS
     Route::get('menu-peminjaman/data-peminjaman', [PeminjamanController::class, 'menu_data_peminjaman'])->name('menu_data_peminjaman');
@@ -228,9 +231,6 @@ Route::prefix('{akses}/{id}/application')->group(function () {
     // MASTER PENJUALAN
     Route::get('master-penjualan/data-penjualan', [MasterDataController::class, 'master_penjualan_data'])->name('master_penjualan_data');
     Route::get('master-penjualan/kategori-penjualan', [MasterDataController::class, 'master_penjualan_kategori'])->name('master_penjualan_kategori');
-
-
-
 });
 
 // MENU PELAYANAN
@@ -492,8 +492,15 @@ Route::prefix('accounting/')->group(function (): void {
 Route::prefix('hrm/')->group(function (): void {
     Route::post('data-kehadiran/absensi/search', [HrmController::class, 'data_kehadiran_search'])->name('data_kehadiran_search');
 
+    Route::get('master-data/data-pegawai/data', [HrmController::class, 'master_data_pegawai_data'])->name('master_data_pegawai_data');
     Route::post('master-data/data-pegawai/add', [HrmController::class, 'master_data_pegawai_add'])->name('master_data_pegawai_add');
     Route::post('master-data/data-pegawai/save', [HrmController::class, 'master_data_pegawai_save'])->name('master_data_pegawai_save');
+    Route::post('master-data/data-pegawai/update', [HrmController::class, 'master_data_pegawai_update'])->name('master_data_pegawai_update');
+    Route::post('master-data/data-pegawai/detail', [HrmController::class, 'master_data_pegawai_detail'])->name('master_data_pegawai_detail');
+    Route::post('master-data/data-pegawai/upload_profile', [HrmController::class, 'master_data_pegawai_upload_profile'])->name('master_data_pegawai_upload_profile');
+
+    Route::post('master-kpi/master-kpi/add', [HrmController::class, 'master_data_kpi_add'])->name('master_data_kpi_add');
+    Route::post('master-kpi/master-kpi/save', [HrmController::class, 'master_data_kpi_save'])->name('master_data_kpi_save');
 });
 
 // PEMBELIAN
@@ -546,50 +553,8 @@ Route::prefix('supplier/')->group(function (): void {
     Route::post('master-supplier/data-supplier/add', [SupplierController::class, 'master_data_supplier_add'])->name('master_data_supplier_add');
     Route::post('master-supplier/data-supplier/save', [SupplierController::class, 'master_data_supplier_save'])->name('master_data_supplier_save');
 });
-// FARMASI
-Route::prefix('farmasi/')->group(function (): void {
-    Route::post('penjualan/penjualan-non-resep/cari-data', [FarmasiController::class, 'penjualan_non_resep_cari_data'])->name('penjualan_non_resep_cari_data');
-    Route::post('penjualan/penjualan-non-resep/save-data', [FarmasiController::class, 'penjualan_non_resep_save_data'])->name('penjualan_non_resep_save_data');
-    Route::post('penjualan/penjualan-non-resep/remove-data', [FarmasiController::class, 'penjualan_non_resep_remove_data'])->name('penjualan_non_resep_remove_data');
-    Route::post('penjualan/penjualan-non-resep/show-data-list', [FarmasiController::class, 'penjualan_non_resep_show_data_list'])->name('penjualan_non_resep_show_data_list');
-    Route::post('penjualan/penjualan-non-resep/payment-data-list', [FarmasiController::class, 'penjualan_non_resep_payment_data_list'])->name('penjualan_non_resep_payment_data_list');
-    Route::post('penjualan/penjualan-non-resep/payment-pilih', [FarmasiController::class, 'penjualan_non_resep_payment_pilih'])->name('penjualan_non_resep_payment_pilih');
-    Route::post('penjualan/penjualan-non-resep/payment-confrim', [FarmasiController::class, 'penjualan_non_resep_payment_confrim'])->name('penjualan_non_resep_payment_confrim');
 
-    Route::post('penjualan/penjualan-resep/show-data-list', [FarmasiController::class, 'penjualan_resep_show_data_list'])->name('penjualan_resep_show_data_list');
-    Route::post('penjualan/penjualan-resep/payment-data-list', [FarmasiController::class, 'penjualan_resep_payment_data_list'])->name('penjualan_resep_payment_data_list');
-    Route::post('penjualan/penjualan-resep/payment-pilih', [FarmasiController::class, 'penjualan_resep_payment_pilih'])->name('penjualan_resep_payment_pilih');
-    Route::post('penjualan/penjualan-resep/payment-confrim', [FarmasiController::class, 'penjualan_resep_payment_confrim'])->name('penjualan_resep_payment_confrim');
 
-    Route::post('penjualan/history-penjualan/detail', [FarmasiController::class, 'penjualan_history_penjualan_detail'])->name('penjualan_history_penjualan_detail');
-
-    Route::post('manajemen-farmasi/data-obat/add', [FarmasiController::class, 'manajemen_farmasi_data_obat_add'])->name('manajemen_farmasi_data_obat_add');
-    Route::post('manajemen-farmasi/data-obat/save', [FarmasiController::class, 'manajemen_farmasi_data_obat_save'])->name('manajemen_farmasi_data_obat_save');
-    Route::post('manajemen-farmasi/data-obat/update', [FarmasiController::class, 'manajemen_farmasi_data_obat_update'])->name('manajemen_farmasi_data_obat_update');
-    Route::post('manajemen-farmasi/data-obat/update-save', [FarmasiController::class, 'manajemen_farmasi_data_obat_update_save'])->name('manajemen_farmasi_data_obat_update_save');
-    Route::post('manajemen-farmasi/data-obat/add-batch', [FarmasiController::class, 'manajemen_farmasi_data_obat_add_batch'])->name('manajemen_farmasi_data_obat_add_batch');
-    Route::post('manajemen-farmasi/data-obat/save-batch', [FarmasiController::class, 'manajemen_farmasi_data_obat_save_batch'])->name('manajemen_farmasi_data_obat_save_batch');
-    Route::post('manajemen-farmasi/data-obat/batch-detail', [FarmasiController::class, 'manajemen_farmasi_data_obat_batch_detail'])->name('manajemen_farmasi_data_obat_batch_detail');
-    Route::post('manajemen-farmasi/data-obat/obat-sale', [FarmasiController::class, 'manajemen_farmasi_data_obat_obat_sale'])->name('manajemen_farmasi_data_obat_obat_sale');
-    Route::post('manajemen-farmasi/data-obat/obat-sale-add', [FarmasiController::class, 'manajemen_farmasi_data_obat_obat_sale_add'])->name('manajemen_farmasi_data_obat_obat_sale_add');
-});
-// BRODCAST
-Route::prefix('brodcast/')->group(function (): void {
-    Route::post('menu-brodcast/brodcast-whatsapp/send', [BrodcastController::class, 'menu_brodcast_whatsapp_send'])->name('menu_brodcast_whatsapp_send');
-    Route::post('menu-brodcast/brodcast-whatsapp/upload-file', [BrodcastController::class, 'menu_brodcast_whatsapp_upload_file'])->name('menu_brodcast_whatsapp_upload_file');
-    Route::post('menu-brodcast/brodcast-whatsapp/remove-file', [BrodcastController::class, 'menu_brodcast_whatsapp_remove_file'])->name('menu_brodcast_whatsapp_remove_file');
-    Route::post('menu-brodcast/brodcast-management/add', [BrodcastController::class, 'menu_brodcast_management_add'])->name('menu_brodcast_management_add');
-    Route::post('menu-brodcast/brodcast-management/save', [BrodcastController::class, 'menu_brodcast_management_save'])->name('menu_brodcast_management_save');
-    Route::post('menu-brodcast/brodcast-management/add-peserta', [BrodcastController::class, 'menu_brodcast_management_add_peserta'])->name('menu_brodcast_management_add_peserta');
-    Route::post('menu-brodcast/brodcast-management/save-peserta', [BrodcastController::class, 'menu_brodcast_management_save_peserta'])->name('menu_brodcast_management_save_peserta');
-    Route::post('menu-brodcast/brodcast-management/brodcast-whatsapp', [BrodcastController::class, 'menu_brodcast_management_brodcast_whatsapp'])->name('menu_brodcast_management_brodcast_whatsapp');
-    Route::post('menu-brodcast/brodcast-management/brodcast-whatsapp-send', [BrodcastController::class, 'menu_brodcast_management_brodcast_whatsapp_send'])->name('menu_brodcast_management_brodcast_whatsapp_send');
-    Route::post('menu-brodcast/brodcast-management/export-excel', [BrodcastController::class, 'menu_brodcast_management_export_excel'])->name('menu_brodcast_management_export_excel');
-    Route::post('menu-brodcast/brodcast-management/export-excel-start', [BrodcastController::class, 'menu_brodcast_management_export_excel_start'])->name('menu_brodcast_management_export_excel_start');
-
-    Route::post('master-brodcast/master-contact/add', [BrodcastController::class, 'master_brodcast_contact_add'])->name('master_brodcast_contact_add');
-    Route::post('master-brodcast/master-contact/save', [BrodcastController::class, 'master_brodcast_contact_save'])->name('master_brodcast_contact_save');
-});
 
 // LOGISTIK
 Route::prefix('logistik/')->group(function (): void {
@@ -619,6 +584,18 @@ Route::prefix('logistik/')->group(function (): void {
     Route::post('master-logistik/master-product/save-deskripsi-product', [LogistikController::class, 'master_logistik_save_desc_product'])->name('master_logistik_save_desc_product');
 });
 
+// EVENT
+Route::prefix('event/')->group(function (): void {
+    Route::post('menu-event/create-event/save', [EventController::class, 'menu_event_create_save'])->name('menu_event_create_save');
+    Route::post('menu-event/create-event/upload-template', [EventController::class, 'menu_event_data_upload_template'])->name('menu_event_data_upload_template');
+    Route::post('menu-event/create-event/upload-cover', [EventController::class, 'menu_event_data_upload_cover'])->name('menu_event_data_upload_cover');
+    Route::post('menu-event/data-event/add-sub-event', [EventController::class, 'menu_event_data_add_sub_event'])->name('menu_event_data_add_sub_event');
+    Route::post('menu-event/data-event/save-sub-event', [EventController::class, 'menu_event_data_save_sub_event'])->name('menu_event_data_save_sub_event');
+    Route::post('menu-event/data-event/detail-event', [EventController::class, 'menu_event_data_detail_event'])->name('menu_event_data_detail_event');
+    Route::post('menu-event/data-event/detail-event/add-type', [EventController::class, 'menu_event_data_detail_event_add_type'])->name('menu_event_data_detail_event_add_type');
+    Route::post('menu-event/data-event/detail-event/save-class', [EventController::class, 'menu_event_data_detail_event_save_class'])->name('menu_event_data_detail_event_save_class');
+    Route::post('menu-event/data-event/form-registrasi-event', [EventController::class, 'menu_event_data_form_registrasi_event'])->name('menu_event_data_form_registrasi_event');
+});
 
 Route::prefix('app/')->group(function (): void {
     Route::get('supplier/r_token/{id}/{token}', [PublicController::class, 'app_supp_token'])->name('app_supp_token');
@@ -646,18 +623,7 @@ Route::prefix('movie/')->group(function (): void {
 Route::prefix('news/')->group(function (): void {
     Route::post('menu_news/save', [NewsAdminController::class, 'menu_news_save'])->name('menu_news_save');
 });
-// NEWS
-Route::prefix('event/')->group(function (): void {
-    Route::post('menu-event/create-event/save', [EventController::class, 'menu_event_create_save'])->name('menu_event_create_save');
-    Route::post('menu-event/create-event/upload-template', [EventController::class, 'menu_event_data_upload_template'])->name('menu_event_data_upload_template');
-    Route::post('menu-event/create-event/upload-cover', [EventController::class, 'menu_event_data_upload_cover'])->name('menu_event_data_upload_cover');
-    Route::post('menu-event/data-event/add-sub-event', [EventController::class, 'menu_event_data_add_sub_event'])->name('menu_event_data_add_sub_event');
-    Route::post('menu-event/data-event/save-sub-event', [EventController::class, 'menu_event_data_save_sub_event'])->name('menu_event_data_save_sub_event');
-    Route::post('menu-event/data-event/detail-event', [EventController::class, 'menu_event_data_detail_event'])->name('menu_event_data_detail_event');
-    Route::post('menu-event/data-event/detail-event/add-type', [EventController::class, 'menu_event_data_detail_event_add_type'])->name('menu_event_data_detail_event_add_type');
-    Route::post('menu-event/data-event/detail-event/save-class', [EventController::class, 'menu_event_data_detail_event_save_class'])->name('menu_event_data_detail_event_save_class');
-    Route::post('menu-event/data-event/form-registrasi-event', [EventController::class, 'menu_event_data_form_registrasi_event'])->name('menu_event_data_form_registrasi_event');
-});
+
 
 // Route::view('/video-player', 'video');
 
@@ -690,5 +656,7 @@ Route::get('/mirror/{id}', [App\Http\Controllers\StreamController::class, 'strea
 Route::get('/stream/pixeldrain/{id}', [App\Http\Controllers\StreamController::class, 'pixeldrain'])->name('pixeldrain');
 Route::get('/stream/tidore', [App\Http\Controllers\StreamController::class, 'tidore_stream'])->name('tidore_stream');
 
-
 Route::get('/event/register/{id}/{code}', [App\Http\Controllers\Event\RegisterController::class, 'event_registrasi'])->name('event_registrasi');
+
+
+include 'farmasi.php';

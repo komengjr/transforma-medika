@@ -24,3 +24,7 @@ Route::prefix('v1/')->group(function (): void {
     Route::get('stream', [ApiCntroller::class, 'data_stream_api'])->name('data_stream_api');
     Route::get('stream/{id}', [ApiCntroller::class, 'data_stream_id'])->name('data_stream_id');
 });
+Route::prefix('v2/')->group(function (): void {
+    Route::get('getway/whatsapp', [ApiCntroller::class, 'getway_whatsapp'])->name('getway_whatsapp');
+    Route::post('getway/whatsapp-update', [ApiCntroller::class, 'getway_whatsapp_update'])->name('getway_whatsapp_update');
+});
