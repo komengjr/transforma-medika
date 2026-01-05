@@ -660,3 +660,4 @@ Route::get('/event/register/{id}/{code}', [App\Http\Controllers\Event\RegisterCo
 
 
 include 'farmasi.php';
+include 'brodcast.php';
