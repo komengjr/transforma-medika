@@ -19,4 +19,6 @@ Route::prefix('brodcast/')->group(function (): void {
 
     Route::post('master-brodcast/master-contact/add', [BrodcastController::class, 'master_brodcast_contact_add'])->name('master_brodcast_contact_add');
     Route::post('master-brodcast/master-contact/save', [BrodcastController::class, 'master_brodcast_contact_save'])->name('master_brodcast_contact_save');
+    Route::post('master-brodcast/master-contact/import', [BrodcastController::class, 'master_brodcast_contact_import'])->name('master_brodcast_contact_import');
+    Route::post('master-brodcast/master-contact/import-save', [BrodcastController::class, 'master_brodcast_contact_import_save'])->name('master_brodcast_contact_import_save');
 });

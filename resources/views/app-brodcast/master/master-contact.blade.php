@@ -48,9 +48,9 @@
                                 id="button-add-contact" data-code="123"><span class="far fa-edit"></span>
                                 Add Contact</button>
                             <div class="dropdown-divider"></div>
-                            <button class="dropdown-item" data-bs-toggle="modal" data-bs-target="#modal-cabang"
-                                id="button-add-as" data-code="123"><span class="far fa-folder-open"></span>
-                                History</button>
+                            <button class="dropdown-item" data-bs-toggle="modal" data-bs-target="#modal-brodcast"
+                                id="button-import-data-excel" data-code="123"><span class="fas fa-file-import"></span>
+                                Import Data Excel</button>
                         </div>
                     </div>
                 </div>
@@ -121,6 +121,26 @@
             );
             $.ajax({
                 url: "{{ route('master_brodcast_contact_add') }}",
+                type: "POST",
+                cache: false,
+                data: {
+                    "_token": "{{ csrf_token() }}",
+                    "code": 0
+                },
+                dataType: 'html',
+            }).done(function (data) {
+                $('#menu-brodcast').html(data);
+            }).fail(function () {
+                $('#menu-brodcast').html('eror');
+            });
+        });
+        $(document).on("click", "#button-import-data-excel", function (e) {
+            e.preventDefault();
+            $('#menu-brodcast').html(
+                '<div class="spinner-border my-3" style="display: block; margin-left: auto; margin-right: auto;" role="status"><span class="visually-hidden">Loading...</span></div>'
+            );
+            $.ajax({
+                url: "{{ route('master_brodcast_contact_import') }}",
                 type: "POST",
                 cache: false,
                 data: {

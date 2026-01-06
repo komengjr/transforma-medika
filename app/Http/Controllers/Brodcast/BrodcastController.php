@@ -3,6 +3,7 @@
 namespace App\Http\Controllers\Brodcast;
 
 use App\Http\Controllers\Controller;
+use App\Imports\Brodcast\ContactImport;
 use App\Imports\PesertaEventImport;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
@@ -364,6 +365,25 @@ class BrodcastController extends Controller
             return 123;
         } catch (\Throwable $e) {
             return 0;
+        }
+    }
+    public function master_brodcast_contact_import(Request $request)
+    {
+        return view('app-brodcast.master.form.form-import-excel');
+    }
+    public function master_brodcast_contact_import_save(Request $request)
+    {
+        if (!$request->hasFile('file')) {
+            return response()->json(['error' => 'File tidak ditemukan'], 400);
+        }
+        try {
+            Excel::import(new ContactImport, $request->file('file'));
+            return 'berhasil';
+        } catch (\Exception $e) {
+            return response()->json([
+                'error' => true,
+                'message' => $e->getMessage()
+            ], 500);
         }
     }
 }
