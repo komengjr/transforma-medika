@@ -26,5 +26,6 @@ Route::prefix('v1/')->group(function (): void {
 });
 Route::prefix('v2/')->group(function (): void {
     Route::get('getway/whatsapp', [ApiCntroller::class, 'getway_whatsapp'])->name('getway_whatsapp');
+    Route::get('getway/whatsapp-update/{code}', [ApiCntroller::class, 'getway_whatsapp_status'])->name('getway_whatsapp_status');
     Route::post('getway/whatsapp-update', [ApiCntroller::class, 'getway_whatsapp_update'])->name('getway_whatsapp_update');
 });

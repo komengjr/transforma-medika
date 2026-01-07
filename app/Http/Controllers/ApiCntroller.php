@@ -64,6 +64,13 @@ class ApiCntroller extends Controller
         $data = DB::table('v_log_whatsapp')->where('v_log_whatsapp_status', 0)->first();
         return response()->json($data);
     }
+    public function getway_whatsapp_status($code)
+    {
+        DB::table('v_log_whatsapp')->where('v_log_whatsapp_code', $code)->update([
+            'v_log_whatsapp_status' => 1
+        ]);
+        return response()->json('Berhasil Kirim');
+    }
     public function getway_whatsapp_update(Request $request)
     {
         DB::table('v_log_whatsapp')->where('v_log_whatsapp_code', $request->code)->update([
