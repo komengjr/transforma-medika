@@ -335,6 +335,16 @@ class BrodcastController extends Controller
         Excel::import(new PesertaEventImport($request->code, 454), request()->file('file'));
         return redirect()->back()->withSuccess('Great! Berhasil Menambahkan Data Perusahaan');
     }
+    // HISTORY WHATSAPP
+    public function menu_brodcast_history_whatsapp($akses, $id)
+    {
+        if ($this->url_akses($akses, $id) == true) {
+            $data = DB::table('v_log_whatsapp')->get();
+            return view('app-brodcast.menu.history-whatsapp', ['akses' => $akses, 'code' => $id, 'data' => $data]);
+        } else {
+            return Redirect::to('dashboard/home');
+        }
+    }
     // BRODCAST MASTER CONTACT
     public function master_brodcast_contact($akses, $id)
     {

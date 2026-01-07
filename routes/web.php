@@ -146,6 +146,7 @@ Route::prefix('{akses}/{id}')->group(function (): void {
     // BRODCAST
     Route::get('menu-brodcast/brodcast-whatsapp', [BrodcastController::class, 'menu_brodcast_whatsapp'])->name('menu_brodcast_whatsapp');
     Route::get('menu-brodcast/brodcast-management', [BrodcastController::class, 'menu_brodcast_management'])->name('menu_brodcast_management');
+    Route::get('menu-brodcast/history-whatsapp', [BrodcastController::class, 'menu_brodcast_history_whatsapp'])->name('menu_brodcast_history_whatsapp');
     Route::get('master-brodcast/master-contact', [BrodcastController::class, 'master_brodcast_contact'])->name('master_brodcast_contact');
 
     // FARMASI
