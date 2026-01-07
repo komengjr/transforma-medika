@@ -5,6 +5,9 @@ namespace App\Providers;
 use Illuminate\Support\ServiceProvider;
 use Illuminate\Support\Facades\Blade;
 use Illuminate\Support\Carbon;
+use Illuminate\Cache\RateLimiting\Limit;
+use Illuminate\Support\Facades\RateLimiter;
+
 class AppServiceProvider extends ServiceProvider
 {
     /**
@@ -29,5 +32,8 @@ class AppServiceProvider extends ServiceProvider
         config(['app.locale' => 'id']);
         Carbon::setLocale('id');
         date_default_timezone_set('Asia/Jakarta');
+        RateLimiter::for('api', function ($request) {
+            return Limit::perMinute(500)->by(optional($request->user())->id ?: $request->ip());
+        });
     }
 }
