@@ -145,6 +145,7 @@ class BrodcastController extends Controller
                 'v_log_whatsapp_status' => 0,
                 'v_log_whatsapp_date' => now(),
                 'v_log_whatsapp_pass' => mt_rand(10000, 90000),
+                'v_log_whatsapp_user' => Auth::user()->userid,
                 'created_at' => now()
             ]);
         } elseif ($request->tipe_pengiriman == 'all') {
@@ -187,6 +188,7 @@ class BrodcastController extends Controller
                     'v_log_whatsapp_status' => 0,
                     'v_log_whatsapp_date' => now(),
                     'v_log_whatsapp_pass' => mt_rand(10000, 90000),
+                    'v_log_whatsapp_user' => Auth::user()->userid,
                     'created_at' => now()
                 ]);
             }
@@ -263,8 +265,6 @@ class BrodcastController extends Controller
     }
     public function menu_brodcast_management_brodcast_whatsapp_send(Request $request)
     {
-
-
         $data = DB::table('b_event_peserta')->where('b_event_code', $request->code)->get();
         $event = DB::table('b_event')->where('b_event_code', $request->code)->first();
         foreach ($data as $datas) {
@@ -395,5 +395,18 @@ class BrodcastController extends Controller
                 'message' => $e->getMessage()
             ], 500);
         }
+    }
+    // KONFIGURASI WHATSAPP
+    public function master_brodcast_configure_whatsapp($akses, $id)
+    {
+        if ($this->url_akses($akses, $id) == true) {
+            $data = DB::table('v_log_whatsapp')->where('v_log_whatsapp_user', Auth::user()->userid)->get();
+            return view('app-brodcast.master.configure-whatsapp', ['akses' => $akses, 'code' => $id, 'data' => $data]);
+        } else {
+            return Redirect::to('dashboard/home');
+        }
+    }
+    public function master_brodcast_configure_whatsapp_buy_kuota(Request $request){
+        return view('app-brodcast.master.form.form-add-kuota-whatsapp');
     }
 }
