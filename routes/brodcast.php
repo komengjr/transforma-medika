@@ -23,4 +23,5 @@ Route::prefix('brodcast/')->group(function (): void {
     Route::post('master-brodcast/master-contact/import-save', [BrodcastController::class, 'master_brodcast_contact_import_save'])->name('master_brodcast_contact_import_save');
     Route::post('master-brodcast/configure-whatsapp/buy-kuota', [BrodcastController::class, 'master_brodcast_configure_whatsapp_buy_kuota'])->name('master_brodcast_configure_whatsapp_buy_kuota');
     Route::post('master-brodcast/configure-whatsapp/get-token-payment', [BrodcastController::class, 'master_brodcast_configure_whatsapp_token_payment'])->name('master_brodcast_configure_whatsapp_token_payment');
+    Route::post('master-brodcast/configure-whatsapp/confrim-token-payment', [BrodcastController::class, 'master_brodcast_configure_whatsapp_confrim_payment'])->name('master_brodcast_configure_whatsapp_confrim_payment');
 });

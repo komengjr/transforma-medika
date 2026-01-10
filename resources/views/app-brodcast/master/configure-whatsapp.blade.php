@@ -219,7 +219,36 @@
             },
             dataType: 'html',
         }).done(function(data) {
-            $('#menu-payment-force').html(data);
+            snap.pay(data, {
+                onSuccess: function(result) {
+                    alert("payment success!");
+                    $.ajax({
+                        url: "{{ route('master_brodcast_configure_whatsapp_confrim_payment') }}",
+                        type: "POST",
+                        cache: false,
+                        data: {
+                            "_token": "{{ csrf_token() }}",
+                            "id": id,
+                        },
+                        dataType: 'html',
+                    }).done(function(data) {
+                        location.reload();
+                    })
+                },
+                onPending: function(result) {
+                    alert("wating your payment!");
+                    console.log(result);
+                    location.reload();
+                },
+                onError: function(result) {
+                    alert("payment failed!");
+                    console.log(result);
+                },
+                onClose: function() {
+                    alert('you closed the popup without finishing the payment');
+                    location.reload();
+                }
+            });
         }).fail(function() {
             $('#menu-payment-force').html('eror');
         });

@@ -431,6 +431,10 @@ class BrodcastController extends Controller
         ];
 
         $snapToken = Snap::getSnapToken($params);
-        return view('app-brodcast.master.form.form-payment', compact('snapToken'));
+        // return view('app-brodcast.master.form.form-payment', compact('snapToken'));
+        return $snapToken;
+    }
+    public function master_brodcast_configure_whatsapp_confrim_payment(Request $request){
+        return 123;
     }
 }
