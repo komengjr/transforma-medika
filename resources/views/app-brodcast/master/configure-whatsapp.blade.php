@@ -4,6 +4,8 @@
 <link rel="stylesheet" href="https://cdn.datatables.net/responsive/3.0.4/css/responsive.bootstrap5.css">
 <link href="{{ asset('vendors/flatpickr/flatpickr.min.css') }}" rel="stylesheet" />
 <link href="{{ asset('vendors/choices/choices.min.css') }}" rel="stylesheet" />
+<script src="https://app.sandbox.midtrans.com/snap/snap.js" data-client-key="{{ config('midtrans.client_key') }}"></script>
+
 @endsection
 @section('content')
 <div class="card mb-3">
@@ -174,6 +176,8 @@
 <script src="{{ asset('vendors/choices/choices.min.js') }}"></script>
 <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
 <script src="{{ asset('vendors/tinymce/tinymce.min.js') }}"></script>
+
+
 <script>
     new DataTable('#example', {
         responsive: true
@@ -198,6 +202,26 @@
             $('#menu-brodcast').html(data);
         }).fail(function() {
             $('#menu-brodcast').html('eror');
+        });
+    });
+    $(document).on("click", "#pay-button-force", function(e) {
+        e.preventDefault();
+        $('#menu-payment-force').html(
+            '<div class="spinner-border my-3" style="display: block; margin-left: auto; margin-right: auto;" role="status"><span class="visually-hidden">Loading...</span></div>'
+        );
+        $.ajax({
+            url: "{{ route('master_brodcast_configure_whatsapp_token_payment') }}",
+            type: "POST",
+            cache: false,
+            data: {
+                "_token": "{{ csrf_token() }}",
+                "code": 0
+            },
+            dataType: 'html',
+        }).done(function(data) {
+            $('#menu-payment-force').html(data);
+        }).fail(function() {
+            $('#menu-payment-force').html('eror');
         });
     });
 </script>

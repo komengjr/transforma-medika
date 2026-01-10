@@ -18,6 +18,8 @@ use Pion\Laravel\ChunkUpload\Handler\HandlerFactory;
 use Pion\Laravel\ChunkUpload\Receiver\FileReceiver;
 use SimpleSoftwareIO\QrCode\Facades\QrCode;
 use Svg\Tag\Rect;
+use Midtrans\Config;
+use Midtrans\Snap;
 
 class BrodcastController extends Controller
 {
@@ -132,7 +134,7 @@ class BrodcastController extends Controller
                     $nomorhp = '+62' . substr($nomorhp, 1);
                 }
             }
-            $text = "Halo " . $request->subject . "\n\n" . $request->text . "\n\nSupport By. *Innoventra*";
+            $text = "Halo " . $request->subject . "\n\n" . $request->text . "\n\nˢᵘᵖᵖᵒʳᵗ ᴮʸ.ᴵⁿⁿᵒᵛᵉⁿᵗʳᵃ";
             DB::table('v_log_whatsapp')->insert([
                 'v_log_whatsapp_code' => str::uuid(),
                 'd_reg_order_list_code' => str::uuid(),
@@ -175,7 +177,7 @@ class BrodcastController extends Controller
                         $nomorhp = '+62' . substr($nomorhp, 1);
                     }
                 }
-                $text = "Halo *Bapak / Ibu* \n" . $request->subject . "\n\n" . $request->text . "\n\nSupport By. Innoventra";
+                $text = "Halo *Bapak / Ibu* \n" . $request->subject . "\n\n" . $request->text . "\n\nˢᵘᵖᵖᵒʳᵗ ᴮʸ.ᴵⁿⁿᵒᵛᵉⁿᵗʳᵃ";
                 DB::table('v_log_whatsapp')->insert([
                     'v_log_whatsapp_code' => str::uuid(),
                     'd_reg_order_list_code' => str::uuid(),
@@ -298,7 +300,7 @@ class BrodcastController extends Controller
                             $nomorhp = '+62' . substr($nomorhp, 1);
                         }
                     }
-                    $text = "Hi *" . $datas->b_event_peserta_name . "* \nSelamat Anda Terdaftar Sebagai Peserta Event : " . $event->b_event_name . " \nLokasi Event : " . $event->b_event_location . "\nRoom : " . $event->b_event_class . "\nTanggal & Jam : " . $event->b_event_date . "\nKode Booking : " . $datas->b_event_peserta_booking . "\n" . $event->b_event_text . "\nSupport By. *www.innoventra.site*";
+                    $text = "Hi *" . $datas->b_event_peserta_name . "* \nSelamat Anda Terdaftar Sebagai Peserta Event : " . $event->b_event_name . " \nLokasi Event : " . $event->b_event_location . "\nRoom : " . $event->b_event_class . "\nTanggal & Jam : " . $event->b_event_date . "\nKode Booking : " . $datas->b_event_peserta_booking . "\n" . $event->b_event_text . "\nˢᵘᵖᵖᵒʳᵗ ᴮʸ.ᴵⁿⁿᵒᵛᵉⁿᵗʳᵃ";
                     $qrcode = base64_encode(QrCode::format('png')
                         ->size(500)
                         ->errorCorrection('H')
@@ -406,7 +408,29 @@ class BrodcastController extends Controller
             return Redirect::to('dashboard/home');
         }
     }
-    public function master_brodcast_configure_whatsapp_buy_kuota(Request $request){
+    public function master_brodcast_configure_whatsapp_buy_kuota(Request $request)
+    {
         return view('app-brodcast.master.form.form-add-kuota-whatsapp');
+    }
+    public function master_brodcast_configure_whatsapp_token_payment()
+    {
+        Config::$serverKey = config('midtrans.server_key');
+        Config::$isProduction = config('midtrans.is_production');
+        Config::$isSanitized = config('midtrans.is_sanitized');
+        Config::$is3ds = config('midtrans.is_3ds');
+
+        $params = [
+            'transaction_details' => [
+                'order_id' => rand(),
+                'gross_amount' => 100000,
+            ],
+            'customer_details' => [
+                'first_name' => 'Agus',
+                'email' => 'agus@example.com',
+            ],
+        ];
+
+        $snapToken = Snap::getSnapToken($params);
+        return view('app-brodcast.master.form.form-payment', compact('snapToken'));
     }
 }

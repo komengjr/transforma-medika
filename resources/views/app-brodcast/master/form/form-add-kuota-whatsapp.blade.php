@@ -159,13 +159,13 @@
                                             </g>
                                         </svg><!-- <span class="fas fa-check text-primary" data-fa-transform="shrink-2"> </span> Font Awesome fontawesome.com --> Custom Fields</li>
                                 </ul>
-                                <button class="btn btn-primary d-block w-100" type="button">Purchase Now</button>
+                                <button class="btn btn-primary d-block w-100" type="button" id="pay-button-force">Purchase Now</button>
                             </div>
                         </div>
                     </div>
                 </div>
             </div>
-            <div class="col-12 text-center">
+            <div class="col-12 text-center" id="menu-payment-force">
                 <h5 class="mt-5">Looking for personal or small team task management?</h5>
                 <p class="fs-1">Try the <a href="#">basic version</a> of Innoventra</p>
             </div>
@@ -178,3 +178,4 @@
             Data</button>
     </span> -->
 </div>
+
