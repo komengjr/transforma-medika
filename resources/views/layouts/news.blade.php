@@ -55,6 +55,7 @@
     @php
     $news = DB::table('news_categori')->get();
     @endphp
+    <script src="https://pl28477430.effectivegatecpm.com/23/15/db/2315db9d7b447827149b268382ffded1.js"></script>
 </head>
 
 <body>
