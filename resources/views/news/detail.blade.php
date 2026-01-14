@@ -111,14 +111,7 @@
                 <div class="bg-light rounded my-4 p-4">
                     <h4 class="mb-4">You Might Also Like</h4>
                     <div class="row g-4">
-                        <ins class="adsbygoogle" style="display:block" data-ad-client="ca-pub-4154628728879232" data-ad-slot="1234567890"
-                            data-ad-format="auto" data-full-width-responsive="true"></ins>
-                        <script>
-                            (adsbygoogle = window.adsbygoogle || []).push({});
-                        </script>
-                        <amp-auto-ads type="adsense"
-                            data-ad-client="ca-pub-4154628728879232">
-                        </amp-auto-ads>
+                        <div id="container-9e62d0b600c98b440d232ec7ac20c420"></div>
                     </div>
                 </div>
                 <div class="bg-light rounded p-4">
