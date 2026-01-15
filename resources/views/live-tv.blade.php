@@ -141,6 +141,8 @@
             }
         }
     </style>
+    <script src="https://pl28477430.effectivegatecpm.com/23/15/db/2315db9d7b447827149b268382ffded1.js"></script>
+    <script async="async" data-cfasync="false" src="https://pl28477838.effectivegatecpm.com/9e62d0b600c98b440d232ec7ac20c420/invoke.js"></script>
 </head>
 
 <body>
@@ -192,7 +194,7 @@
             </div>
         </div>
     </div>
-
+    <div id="container-9e62d0b600c98b440d232ec7ac20c420"></div>
     <!-- Scripts -->
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/hls.js@latest"></script>
