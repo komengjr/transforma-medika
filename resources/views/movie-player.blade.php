@@ -295,6 +295,8 @@
             transform: translateY(30px);
         }
     </style>
+    <script src="https://pl28477430.effectivegatecpm.com/23/15/db/2315db9d7b447827149b268382ffded1.js"></script>
+    <script async="async" data-cfasync="false" src="https://pl28477838.effectivegatecpm.com/9e62d0b600c98b440d232ec7ac20c420/invoke.js"></script>
 </head>
 
 <body>
@@ -349,7 +351,9 @@
             </div>
             <p>{{ $movie->description ?? 'Tidak ada deskripsi tersedia untuk film ini. Segera tonton dan nikmati tayangan terbaik hanya di Innoventra Stream XXI.' }}
             </p>
+            <div id="container-9e62d0b600c98b440d232ec7ac20c420"></div>
         </div>
+
     </section>
 
     <div class="curtain" id="curtain"></div>
@@ -491,7 +495,7 @@
             fetch("https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js?client=ca-pub-4154628728879232")
                 .then(res => res.text())
                 .then(data => {
-                   console.log(data);
+                    console.log(data);
                 });
         }, 3000);
     </script>

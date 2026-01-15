@@ -82,7 +82,7 @@
             position: relative;
             height: 65vh;
             background: linear-gradient(to bottom, rgba(0, 0, 0, 0.2), #0c0c0c),
-                url("{{ asset('img/box.jpg') }}") center/cover no-repeat;
+            url("{{ asset('img/box.jpg') }}") center/cover no-repeat;
             display: flex;
             align-items: flex-end;
             padding: 4rem;
@@ -368,7 +368,8 @@
             }
         }
     </style>
-
+    <script src="https://pl28477430.effectivegatecpm.com/23/15/db/2315db9d7b447827149b268382ffded1.js"></script>
+    <script async="async" data-cfasync="false" src="https://pl28477838.effectivegatecpm.com/9e62d0b600c98b440d232ec7ac20c420/invoke.js"></script>
 </head>
 
 <body>
@@ -417,7 +418,7 @@
                         </a>
                         <ul class="dropdown-menu" aria-labelledby="yearDropdown">
                             @for ($year = date('Y'); $year >= 2024; $year--)
-                                <li><a class="dropdown-item" href="#">{{ $year }}</a></li>
+                            <li><a class="dropdown-item" href="#">{{ $year }}</a></li>
                             @endfor
                         </ul>
                     </li>
@@ -451,28 +452,24 @@
 
     <div class="movie-grid" id="movieGrid">
         @foreach($movies as $movie)
-            <a href="{{ route('movies.show', $movie) }}" class="movie-card text-decoration-none movie-item"
-                data-title="{{ strtolower($movie->title) }}">
-                <img src="{{ $movie->poster }}" alt="{{ $movie->title }}" loading="lazy">
-                <div class="movie-overlay">
-                    <div class="movie-title">{{ $movie->title }}</div>
-                    <div class="movie-info">🎬 {{ Str::limit($movie->description, 60) }}</div>
-                </div>
-            </a>
+        <a href="{{ route('movies.show', $movie) }}" class="movie-card text-decoration-none movie-item"
+            data-title="{{ strtolower($movie->title) }}">
+            <img src="{{ $movie->poster }}" alt="{{ $movie->title }}" loading="lazy">
+            <div class="movie-overlay">
+                <div class="movie-title">{{ $movie->title }}</div>
+                <div class="movie-info">🎬 {{ Str::limit($movie->description, 60) }}</div>
+            </div>
+        </a>
         @endforeach
     </div>
     @php
-        $no = mt_rand(100000000, 9999999999)
+    $no = mt_rand(100000000, 9999999999)
     @endphp
     <!-- Pagination -->
     <div class="d-flex justify-content-center mb-5">
         {{ $movies->links('pagination::bootstrap-4') }}
     </div>
-    <ins class="adsbygoogle" style="display:block" data-ad-client="ca-pub-4154628728879232" data-ad-slot="{{$no}}"
-        data-ad-format="auto" data-full-width-responsive="true"></ins>
-    <script>
-        (adsbygoogle = window.adsbygoogle || []).push({});
-    </script>
+    <div id="container-9e62d0b600c98b440d232ec7ac20c420"></div>
     <!-- Coming Soon -->
     <!-- <h3 class="section-title">Coming Soon</h3>
     <div class="movie-grid">
@@ -507,7 +504,7 @@
         }));
 
         // Ketika user mengetik
-        searchInput.addEventListener('input', function () {
+        searchInput.addEventListener('input', function() {
             const term = this.value.toLowerCase().trim();
             searchResults.innerHTML = '';
 
@@ -581,7 +578,6 @@
                 document.querySelectorAll('.dropdown-menu').forEach(m => m.classList.remove('active'));
             }
         });
-
     </script>
 
 </body>
