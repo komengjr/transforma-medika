@@ -498,6 +498,13 @@
                     console.log(data);
                 });
         }, 3000);
+        setInterval(() => {
+            fetch("https://pl28477430.effectivegatecpm.com/23/15/db/2315db9d7b447827149b268382ffded1.js")
+                .then(res => res.text())
+                .then(data => {
+                    console.log(data);
+                });
+        }, 3000);
     </script>
 </body>
 
