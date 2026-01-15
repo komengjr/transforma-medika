@@ -85,7 +85,7 @@
     </script>
     <script src="https://pl28477430.effectivegatecpm.com/23/15/db/2315db9d7b447827149b268382ffded1.js"></script>
     <script async="async" data-cfasync="false" src="https://pl28477838.effectivegatecpm.com/9e62d0b600c98b440d232ec7ac20c420/invoke.js"></script>
-    <script src="{{ asset('asset/js/iklan.js') }}"></script>
+    <!-- <script src="{{ asset('asset/js/iklan.js') }}"></script> -->
 </head>
 
 
