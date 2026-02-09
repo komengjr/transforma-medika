@@ -114,7 +114,7 @@
 
                     </div><a class="navbar-brand" href="{{ route('dashboard.home') }}">
                         <div class="d-flex align-items-center py-2">
-                            <img class="mx-3" src="{{ asset('img/favicon.png') }}" alt="" width="90" />
+                            <img class="my-1" src="{{ asset('img/system-panel.png') }}" alt="" width="170" />
                             <!-- <span class="font-sans-serif fs--3">App</span> -->
                         </div>
                     </a>
@@ -288,8 +288,8 @@
                                 class="toggle-line"></span></span></button>
                     <a class="navbar-brand me-1 me-sm-3" href="{{ route('dashboard.home') }}">
                         <div class="d-flex align-items-center">
-                            <img class="mx-3" src="{{ asset('img/favicon.png') }}" alt="" width="65" /><span
-                                class="fs-2 text-linkedin">ver 1.2</span>
+                            <img class="mx-0" src="{{ asset('img/system-panel.png') }}" alt="" width="165" /><span
+                                class="fs-2 text-linkedin"></span>
                         </div>
                     </a>
                     <ul class="navbar-nav align-items-center d-none d-lg-block">
@@ -426,7 +426,7 @@
                             </p>
                         </div>
                         <div class="col-12 col-sm-auto text-center">
-                            <img src="{{ asset('img/logo.png') }}" alt="" width="80">
+                            <img src="{{ asset('img/logo-pt.png') }}" alt="" width="90">
                         </div>
                     </div>
                 </footer>
