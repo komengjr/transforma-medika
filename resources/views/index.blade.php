@@ -55,85 +55,7 @@
     <!-- end of .container-->
 
 </section>
-<!-- <section> close ============================-->
-<!-- ============================================-->
 
-<section class="bg-300 text-center">
-    <div class="container">
-        <div class="row">
-            <div class="col">
-                <h1 class="fs-2 fs-sm-4 fs-md-5">Berita Untuk Anda</h1>
-                <p class="lead">Untuk mencapai visi tersebut, Innoventra Mempunyai Fitur Berita Terkini:</p>
-            </div>
-        </div>
-        <div class="card mb-3">
-            <div class="card-body">
-                <div class="row">
-                    @foreach ($data as $datas)
-                    <div class="mb-4 col-md-6 col-lg-4">
-                        <div class="border rounded-1 h-100 d-flex flex-column justify-content-between pb-3">
-                            <div class="overflow-hidden">
-                                <div class="position-relative rounded-top overflow-hidden">
-                                    <a class="d-block"
-                                        href="{{route('news_detail', ['id' => $datas->news_data_slug])}}"><img
-                                            class="img-fluid rounded-top" src="{{$datas->news_data_thumbnail}}"
-                                            alt=""></a><span
-                                        class="badge rounded-pill bg-success position-absolute mt-2 me-2 z-index-2 top-0 end-0">News</span>
-                                </div>
-                                <div class="p-3">
-                                    <h5 class="fs-0">
-                                        <a class="text-dark"
-                                            href="{{route('news_detail', ['id' => $datas->news_data_slug])}}">
-                                            {{$datas->news_data_title}}
-                                        </a>
-                                    </h5>
-
-                                    <h5 class="fs-md-2 text-warning mb-0 d-flex align-items-center mb-3">
-                                        <!-- $1199.5
-                                                                                <del class="ms-2 fs--1 text-500">$2399 </del> -->
-                                    </h5>
-                                    <p class="fs--1 mb-1 text-start">
-                                        @php
-                                        echo Str::limit($datas->news_data_content, 120);
-                                        @endphp
-                                    </p>
-                                    <p class="fs--1 mb-1 text-primary">
-                                        Create By. {{$datas->news_data_author}} <br>
-                                        {{ $datas->news_data_published_at }}
-                                    </p>
-                                </div>
-                            </div>
-                            <div class="d-flex flex-between-center px-3">
-                                <div class="text-warning">
-                                    @php
-                                    $view = DB::table('news_view')->where('news_data_code', $datas->news_data_code)->count();
-                                    @endphp
-                                    <span class="far fa-eye"></span>
-                                    <span class="ms-1"> {{ $view }} View </span>
-                                </div>
-                                <div>
-                                    <a class="btn btn-sm btn-falcon-default me-2"
-                                        href="{{route('news_detail', ['id' => $datas->news_data_slug])}}"
-                                        data-bs-toggle="tooltip" data-bs-placement="top" title=""
-                                        data-bs-original-title="Lihat Berita" aria-label="Lihat Berita">
-                                        <span class="fas fa-external-link-alt"></span> Baca Selengkapnya
-                                    </a>
-                                </div>
-                            </div>
-                        </div>
-                    </div>
-                    @endforeach
-
-                </div>
-            </div>
-            <div class="card-footer bg-light d-flex justify-content-center">
-
-            </div>
-        </div>
-    </div>
-    <!-- end of .container-->
-
-</section>
 
 
 <!-- ============================================-->
@@ -275,6 +197,84 @@
 <!-- <section> close ============================-->
 <!-- ============================================-->
 
+<!-- <section> close ============================-->
+<!-- ============================================-->
 
+<section class="bg-300 text-center">
+    <div class="container">
+        <div class="row">
+            <div class="col">
+                <h1 class="fs-2 fs-sm-4 fs-md-5">Berita Untuk Anda</h1>
+                <p class="lead">Untuk mencapai visi tersebut, Innoventra Mempunyai Fitur Berita Terkini:</p>
+            </div>
+        </div>
+        <div class="card mb-3">
+            <div class="card-body">
+                <div class="row">
+                    @foreach ($data as $datas)
+                    <div class="mb-4 col-md-6 col-lg-4">
+                        <div class="border rounded-1 h-100 d-flex flex-column justify-content-between pb-3">
+                            <div class="overflow-hidden">
+                                <div class="position-relative rounded-top overflow-hidden">
+                                    <a class="d-block"
+                                        href="{{route('news_detail', ['id' => $datas->news_data_slug])}}"><img
+                                            class="img-fluid rounded-top" src="{{$datas->news_data_thumbnail}}"
+                                            alt=""></a><span
+                                        class="badge rounded-pill bg-success position-absolute mt-2 me-2 z-index-2 top-0 end-0">News</span>
+                                </div>
+                                <div class="p-3">
+                                    <h5 class="fs-0">
+                                        <a class="text-dark"
+                                            href="{{route('news_detail', ['id' => $datas->news_data_slug])}}">
+                                            {{$datas->news_data_title}}
+                                        </a>
+                                    </h5>
+
+                                    <h5 class="fs-md-2 text-warning mb-0 d-flex align-items-center mb-3">
+                                        <!-- $1199.5
+                                                                                <del class="ms-2 fs--1 text-500">$2399 </del> -->
+                                    </h5>
+                                    <p class="fs--1 mb-1 text-start">
+                                        @php
+                                        echo Str::limit($datas->news_data_content, 120);
+                                        @endphp
+                                    </p>
+                                    <p class="fs--1 mb-1 text-primary">
+                                        Create By. {{$datas->news_data_author}} <br>
+                                        {{ $datas->news_data_published_at }}
+                                    </p>
+                                </div>
+                            </div>
+                            <div class="d-flex flex-between-center px-3">
+                                <div class="text-warning">
+                                    @php
+                                    $view = DB::table('news_view')->where('news_data_code', $datas->news_data_code)->count();
+                                    @endphp
+                                    <span class="far fa-eye"></span>
+                                    <span class="ms-1"> {{ $view }} View </span>
+                                </div>
+                                <div>
+                                    <a class="btn btn-sm btn-falcon-default me-2"
+                                        href="{{route('news_detail', ['id' => $datas->news_data_slug])}}"
+                                        data-bs-toggle="tooltip" data-bs-placement="top" title=""
+                                        data-bs-original-title="Lihat Berita" aria-label="Lihat Berita">
+                                        <span class="fas fa-external-link-alt"></span> Baca Selengkapnya
+                                    </a>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    @endforeach
+
+                </div>
+            </div>
+            <div class="card-footer bg-light d-flex justify-content-center">
+
+            </div>
+        </div>
+    </div>
+    <!-- end of .container-->
+
+</section>
 
 @endsection

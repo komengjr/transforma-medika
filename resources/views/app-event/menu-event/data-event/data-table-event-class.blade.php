@@ -5,27 +5,28 @@
             <th>Room</th>
             <th>Price</th>
             <th>Kuota</th>
-            <th>#</th>
+            <th>-</th>
         </tr>
     </thead>
     <tbody>
+        @foreach ($data as $datas)
         <tr>
             <td>
-                22
+                {{$datas->event_data_sub_class_name}}
             </td>
             <td>
-                22
+                {{$datas->event_data_sub_class_room}}
             </td>
             <td class="text-center align-middle">
-                222
+                {{$datas->event_data_sub_class_price}}
             </td>
             <td class="text-center align-middle">
-                123
+                {{$datas->event_data_sub_class_kuota}}
             </td>
             <td class="text-center">
                 <span class="fas fa-trash text-danger"></span>
             </td>
         </tr>
-
+        @endforeach
     </tbody>
 </table>

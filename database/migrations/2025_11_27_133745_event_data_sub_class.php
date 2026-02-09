@@ -20,6 +20,7 @@ class EventDataSubClass extends Migration
             $table->string('event_data_sub_class_name');
             $table->string('event_data_sub_class_room');
             $table->integer('event_data_sub_class_price');
+            $table->string('event_data_sub_class_type');
             $table->integer('event_data_sub_class_kuota');
             $table->integer('event_data_sub_class_status');
             $table->timestamps();

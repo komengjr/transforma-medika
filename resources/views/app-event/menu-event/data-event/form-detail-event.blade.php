@@ -48,7 +48,7 @@
                                         <td>{{ $sub_events->event_data_sub_start }}</td>
                                         <td>{{ $sub_events->event_data_sub_end }}</td>
                                         <td></td>
-                                        <td><button class="btn btn-warning btn-sm" type="button" id="button-add-type-peserta" data-code="{{ $sub_events->event_data_sub_code }}">Add Class</button></td>
+                                        <td><button class="btn btn-warning btn-sm" type="button" id="button-add-type-peserta" data-code="{{ $sub_events->event_data_sub_code }}">Add Class & Session</button></td>
                                     </tr>
                                     @endforeach
                                 </tbody>

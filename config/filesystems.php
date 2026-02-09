@@ -78,7 +78,30 @@ return [
             'url' => env('AWS_URL'),
             'endpoint' => env('AWS_ENDPOINT'),
         ],
+        'sftp' => [
+            'driver' => 'sftp',
+            'host' => env('SFTP_HOST'),
+            'username' => env('SFTP_USERNAME'),
+            'password' => env('SFTP_PASSWORD'),
+            'port' => env('SFTP_PORT', 22),
+            'root' => env('SFTP_ROOT', ''),
+            'timeout' => 30,
+            // Aktifkan jika menggunakan SSH Key
+            // 'privateKey' => env('SFTP_PRIVATE_KEY'),
+            // 'passphrase' => env('SFTP_PASSPHRASE'),
+        ],
+        'ftp' => [
+            'driver'   => 'ftp',
+            'host'     => env('FTP_HOST'),
+            'username' => env('FTP_USERNAME'),
+            'password' => env('FTP_PASSWORD'),
 
+            'port'     => 21,
+            'root'     => '/home',
+            'passive'  => true,
+            'ssl'      => false,
+            'timeout'  => 30,
+        ],
     ],
 
     /*

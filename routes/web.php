@@ -8,6 +8,7 @@ use App\Http\Controllers\Brodcast\BrodcastController;
 use App\Http\Controllers\dashboardController;
 use App\Http\Controllers\Event\EventController;
 use App\Http\Controllers\Farmasi\FarmasiController;
+use App\Http\Controllers\FileUploadController;
 use App\Http\Controllers\Hrm\HrmController;
 use App\Http\Controllers\inventaris\MasterBarangController;
 use App\Http\Controllers\inventaris\MasterController as InventarisMasterController;
@@ -596,7 +597,10 @@ Route::prefix('event/')->group(function (): void {
     Route::post('menu-event/data-event/detail-event', [EventController::class, 'menu_event_data_detail_event'])->name('menu_event_data_detail_event');
     Route::post('menu-event/data-event/detail-event/add-type', [EventController::class, 'menu_event_data_detail_event_add_type'])->name('menu_event_data_detail_event_add_type');
     Route::post('menu-event/data-event/detail-event/save-class', [EventController::class, 'menu_event_data_detail_event_save_class'])->name('menu_event_data_detail_event_save_class');
+    Route::post('menu-event/data-event/detail-event/save-session', [EventController::class, 'menu_event_data_detail_event_save_session'])->name('menu_event_data_detail_event_save_session');
     Route::post('menu-event/data-event/form-registrasi-event', [EventController::class, 'menu_event_data_form_registrasi_event'])->name('menu_event_data_form_registrasi_event');
+    Route::post('menu-event/data-event/form-registrasi-event/detail-sub-event', [EventController::class, 'menu_event_data_form_registrasi_event_detail_sub_event'])->name('menu_event_data_form_registrasi_event_detail_sub_event');
+    Route::post('menu-event/data-event/form-registrasi-event/detail-sub-event/add-peserta', [EventController::class, 'menu_event_data_form_registrasi_event_detail_sub_event_add_peserta'])->name('menu_event_data_form_registrasi_event_detail_sub_event_add_peserta');
 });
 
 Route::prefix('app/')->group(function (): void {
@@ -631,6 +635,7 @@ Route::prefix('news/')->group(function (): void {
 
 use App\Http\Controllers\MovieController;
 use App\Http\Controllers\News\NewsController;
+use Illuminate\Support\Facades\Storage;
 
 Route::get('/movie', [MovieController::class, 'index'])->name('movies.index');
 Route::get('/movie/{movie}', [MovieController::class, 'show'])->name('movies.show');
@@ -663,3 +668,17 @@ Route::get('/event/register/{id}/{code}', [App\Http\Controllers\Event\RegisterCo
 
 include 'farmasi.php';
 include 'brodcast.php';
+
+Route::post('/upload-sftp', [FileUploadController::class, 'uploadFile'])->name('upload.sftp');
+Route::post('/upload-ftp', [FileUploadController::class, 'uploadFileftp'])->name('upload.ftp');
+Route::get('/uploads', function () {
+    return view('upload');
+});
+Route::get('/test-ftp', function () {
+    try {
+        Storage::disk('ftp')->files('/');
+        dd('FTP CONNECTED');
+    } catch (\Exception $e) {
+        dd($e->getMessage());
+    }
+});

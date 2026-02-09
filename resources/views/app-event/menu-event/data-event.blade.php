@@ -113,7 +113,7 @@
                                     id="button-add-event" data-code="{{$datas->event_data_code}}"><span class="fas fa-book-reader"></span>
                                     Peserta Event</button>
                                 <div class="dropdown-divider"></div>
-                                <button class="dropdown-item" data-bs-toggle="modal" data-bs-target="#modal-event"
+                                <button class="dropdown-item" data-bs-toggle="modal" data-bs-target="#modal-event-full"
                                     id="button-form-registrasi-peserta" data-code="{{$datas->event_data_code}}"><span class="fab fa-wpforms"></span>
                                     Form Registrasi Peserta</button>
                                 <div class="dropdown-divider"></div>
@@ -265,7 +265,7 @@
     $(document).on("click", "#button-form-registrasi-peserta", function(e) {
         e.preventDefault();
         var code = $(this).data("code");
-        $('#menu-event').html(
+        $('#menu-event-full').html(
             '<div class="spinner-border my-3" style="display: block; margin-left: auto; margin-right: auto;" role="status"><span class="visually-hidden">Loading...</span></div>'
         );
         $.ajax({
@@ -278,9 +278,123 @@
             },
             dataType: 'html',
         }).done(function(data) {
-            $('#menu-event').html(data);
+            $('#menu-event-full').html(data);
         }).fail(function() {
-            $('#menu-event').html('eror');
+            $('#menu-event-full').html('eror');
+        });
+    });
+    $(document).on("click", "#button-add-event-class", function(e) {
+        e.preventDefault();
+        var data = $("#form-sub-event-class").serialize();
+        $('#button-save-event-detail').html(
+            '<div class="spinner-border my-3" style="display: block; margin-left: auto; margin-right: auto;" role="status"><span class="visually-hidden">Loading...</span></div>'
+        );
+        $.ajax({
+            url: "{{ route('menu_event_data_detail_event_save_class') }}",
+            type: "POST",
+            cache: false,
+            data: data,
+            dataType: 'html',
+        }).done(function(data) {
+            if (data == 0) {
+                Swal.fire({
+                    icon: "error",
+                    title: "Oops...",
+                    text: "Tolong lah Isi dengan Bener!",
+                    footer: '<a href="#">Why do I have this issue?</a>'
+                });
+                $('#button-save-event-detail').html(
+                    '<button class="btn btn-falcon-default btn-sm mt-2" type="button" id="button-add-event-class"> <span class="fas fa-plus"></span> Add </button>'
+                );
+            } else {
+                $('#data-table-event-class').html(data);
+                document.getElementById('nama_class').value = "";
+                document.getElementById('nama_room').value = "";
+                document.getElementById('class_price').value = "";
+                $('#button-save-event-detail').html(
+                    '<button class="btn btn-falcon-default btn-sm mt-2" type="button" id="button-add-event-class"> <span class="fas fa-plus"></span> Add </button>'
+                );
+            }
+        }).fail(function() {
+            $('#data-table-event-class').html('eror');
+        });
+    });
+    $(document).on("click", "#button-add-event-session", function(e) {
+        e.preventDefault();
+        var data = $("#form-sub-event-session").serialize();
+        $('#button-save-event-session').html(
+            '<div class="spinner-border my-3" style="display: block; margin-left: auto; margin-right: auto;" role="status"><span class="visually-hidden">Loading...</span></div>'
+        );
+        $.ajax({
+            url: "{{ route('menu_event_data_detail_event_save_session') }}",
+            type: "POST",
+            cache: false,
+            data: data,
+            dataType: 'html',
+        }).done(function(data) {
+            if (data == 0) {
+                Swal.fire({
+                    icon: "error",
+                    title: "Oops...",
+                    text: "Tolong lah Isi dengan Bener!",
+                    footer: '<a href="#">Why do I have this issue?</a>'
+                });
+                $('#button-save-event-session').html(
+                    '<button class="btn btn-falcon-default btn-sm mt-2" type="button" id="button-add-event-session"> <span class="fas fa-plus"></span> Add </button>'
+                );
+            } else {
+                $('#data-table-event-session').html(data);
+                document.getElementById('nama_session').value = "";
+                $('#button-save-event-session').html(
+                    '<button class="btn btn-falcon-default btn-sm mt-2" type="button" id="button-add-event-session"> <span class="fas fa-plus"></span> Add </button>'
+                );
+            }
+        }).fail(function() {
+            $('#data-table-event-session').html('eror');
+        });
+    });
+</script>
+<script>
+    $(document).on("click", "#button-detail-sub-event", function(e) {
+        e.preventDefault();
+        var code = $(this).data("code");
+        $('#menu-detail-seub-event').html(
+            '<div class="spinner-border my-3" style="display: block; margin-left: auto; margin-right: auto;" role="status"><span class="visually-hidden">Loading...</span></div>'
+        );
+        $.ajax({
+            url: "{{ route('menu_event_data_form_registrasi_event_detail_sub_event') }}",
+            type: "POST",
+            cache: false,
+            data: {
+                "_token": "{{ csrf_token() }}",
+                "code": code
+            },
+            dataType: 'html',
+        }).done(function(data) {
+            $('#menu-detail-seub-event').html(data);
+        }).fail(function() {
+            $('#menu-detail-seub-event').html('eror');
+        });
+    });
+    $(document).on("click", "#button-add-peserta-event", function(e) {
+        e.preventDefault();
+        var code = $(this).data("code");
+        $('#show-data-event-all').html(
+            '<div class="spinner-border my-3" style="display: block; margin-left: auto; margin-right: auto;" role="status"><span class="visually-hidden">Loading...</span></div>'
+        );
+        $.ajax({
+            url: "{{ route('menu_event_data_form_registrasi_event_detail_sub_event_add_peserta') }}",
+            type: "POST",
+            cache: false,
+            data: {
+                "_token": "{{ csrf_token() }}",
+                "code": code
+            },
+            dataType: 'html',
+        }).done(function(data) {
+            $('#show-data-event-all').html(data);
+        }).fail(function() {
+            $('#show-data-event-all').html('eror');
         });
     });
 </script>

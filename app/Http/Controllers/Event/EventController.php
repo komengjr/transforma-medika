@@ -199,15 +199,57 @@ class EventController extends Controller
     }
     public function menu_event_data_detail_event_add_type(Request $request)
     {
-        return view('app-event.menu-event.data-event.form-add-type-peserta');
+        $data = DB::table('event_data_sub_class')->where('event_data_sub_code', $request->code)->get();
+        $session = DB::table('event_data_sub_session')->where('event_data_sub_code', $request->code)->get();
+        return view('app-event.menu-event.data-event.form-add-type-peserta', ['code' => $request->code], compact('data', 'session'));
     }
     public function menu_event_data_detail_event_save_class(Request $request)
     {
-        return view('app-event.menu-event.data-event.data-table-event-class');
+        try {
+            DB::table('event_data_sub_class')->insert([
+                'event_data_sub_class_code' => Str::uuid(),
+                'event_data_sub_code' => $request->code_event,
+                'event_data_sub_class_name' => $request->nama_class,
+                'event_data_sub_class_room' => $request->nama_room,
+                'event_data_sub_class_price' => $request->class_price,
+                'event_data_sub_class_type' => $request->class_type,
+                'event_data_sub_class_kuota' => 0,
+                'event_data_sub_class_status' => 1,
+                'created_at' => now(),
+            ]);
+            $data = DB::table('event_data_sub_class')->where('event_data_sub_code', $request->code_event)->get();
+            return view('app-event.menu-event.data-event.data-table-event-class', compact('data'));
+        } catch (\Throwable $e) {
+            return 0;
+        }
+    }
+    public function menu_event_data_detail_event_save_session(Request $request)
+    {
+        try {
+            DB::table('event_data_sub_session')->insert([
+                'event_data_sub_session_code' => Str::uuid(),
+                'event_data_sub_code' => $request->code_event,
+                'event_data_sub_session_name' => $request->nama_session,
+            ]);
+            $data = DB::table('event_data_sub_session')->where('event_data_sub_code', $request->code_event)->get();
+            return view('app-event.menu-event.data-event.data-table-event-session', compact('data'));
+        } catch (\Throwable $e) {
+            return 0;
+        }
     }
     public function menu_event_data_form_registrasi_event(Request $request)
     {
         $data = EventModel::where('event_data_code', $request->code)->first();
-        return view('app-event.menu-event.data-event.form-registrasi-event', compact('data'));
+        $event_sub = DB::table('event_data_sub')->where('event_data_code', $request->code)->get();
+        return view('app-event.menu-event.data-event.form-registrasi-event', compact('data', 'event_sub'));
+    }
+    public function menu_event_data_form_registrasi_event_detail_sub_event(Request $request)
+    {
+        $data = DB::table('event_data_sub_class')->where('event_data_sub_code', $request->code)->get();
+        $session = DB::table('event_data_sub_session')->where('event_data_sub_code', $request->code)->get();
+        return view('app-event.menu-event.data-event.data-table-sub-event-detail', compact('data', 'session'));
+    }
+    public function menu_event_data_form_registrasi_event_detail_sub_event_add_peserta(Request $request){
+        return view('app-event.menu-event.data-event.form-event.form-sub-event-add-peserta');
     }
 }
