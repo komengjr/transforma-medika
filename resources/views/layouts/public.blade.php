@@ -452,8 +452,8 @@
                     <div class="row justify-content-between fs--1">
                         <div class="col-12 col-sm-auto text-center">
                             <p class="mb-0 text-600 opacity-85">Thank you for creating with Innoventra <span
-                                    class="d-none d-sm-inline-block">| </span><br class="d-sm-none" /> 2025 &copy; <a
-                                    class="text-white opacity-85" href="https://Innoventra.site">Innoventra</a></p>
+                                    class="d-none d-sm-inline-block">| </span><br class="d-sm-none" /> 2026 &copy; <a
+                                    class="text-white opacity-85" href="https://Innoventra.site">PT. INNOVENTRA SOLUSI DIGITAL</a></p>
                         </div>
                         <div class="col-12 col-sm-auto text-center">
                             <p class="mb-0 text-600 opacity-85">v3.4.0</p>
