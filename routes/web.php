@@ -493,6 +493,8 @@ Route::prefix('accounting/')->group(function (): void {
 
 // HUMAN RESOURCE
 Route::prefix('hrm/')->group(function (): void {
+    Route::post('dashboard/personal-data/update-desc', [HrmController::class, 'personal_data_update_desc'])->name('personal_data_update_desc');
+
     Route::post('data-kehadiran/absensi/search', [HrmController::class, 'data_kehadiran_search'])->name('data_kehadiran_search');
 
     Route::get('master-data/data-pegawai/data', [HrmController::class, 'master_data_pegawai_data'])->name('master_data_pegawai_data');

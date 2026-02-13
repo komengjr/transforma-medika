@@ -59,6 +59,9 @@ class HrmController extends Controller
             return Redirect::to('dashboard/home');
         }
     }
+    public function personal_data_update_desc(Request $request){
+        return view('app-hrm.dashboard.form.form-update-desc');
+    }
     public function hrm_data_kehadiran_rekap($akses, $id)
     {
         if ($this->url_akses_sub($akses, $id) == true) {
