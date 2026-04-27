@@ -14,6 +14,7 @@ use App\Http\Controllers\inventaris\MasterBarangController;
 use App\Http\Controllers\inventaris\MasterController as InventarisMasterController;
 use App\Http\Controllers\inventaris\PeminjamanController;
 use App\Http\Controllers\KeuanganController;
+use App\Http\Controllers\Koperasi\KoperasiController;
 use App\Http\Controllers\LaboratoriumController;
 use App\Http\Controllers\LiveTvController;
 use App\Http\Controllers\Logsitik\LogistikController;
@@ -174,6 +175,16 @@ Route::prefix('{akses}/{id}')->group(function (): void {
     // NEWS
     Route::get('menu-event/create-event', [EventController::class, 'menu_event_create'])->name('menu_event_create');
     Route::get('menu-event/data-event', [EventController::class, 'menu_event_data'])->name('menu_event_data');
+
+    // KOPERASI
+    Route::get('menu-koperasi/registrasi-peserta', [KoperasiController::class, 'menu_koperasi_registrasi_peserta'])->name('menu_koperasi_registrasi_peserta');
+    Route::get('menu-peminjaman/peminjaman-uang', [KoperasiController::class, 'menu_peminjaman_uang'])->name('menu_peminjaman_uang');
+    Route::get('menu-peminjaman/peminjaman-barang', [KoperasiController::class, 'menu_peminjaman_barang'])->name('menu_peminjaman_barang');
+    Route::get('master-koperasi/peserta-koperasi', [KoperasiController::class, 'master_koperasi_peserta'])->name('master_koperasi_peserta');
+    Route::get('master-koperasi/cabang-koperasi', [KoperasiController::class, 'master_koperasi_cabang'])->name('master_koperasi_cabang');
+    Route::get('master-koperasi/divisi-koperasi', [KoperasiController::class, 'master_koperasi_divisi'])->name('master_koperasi_divisi');
+    Route::get('master-koperasi/klasifikasi-simpanan-pokok', [KoperasiController::class, 'master_koperasi_simpanan_pokok'])->name('master_koperasi_simpanan_pokok');
+    Route::get('master-koperasi/klasifikasi-simpanan-wajib', [KoperasiController::class, 'master_koperasi_simpanan_wajib'])->name('master_koperasi_simpanan_wajib');
 });
 // MEDICA HEALTH
 Route::prefix('{akses}/{id}/application')->group(function () {
@@ -670,6 +681,7 @@ Route::get('/event/register/{id}/{code}', [App\Http\Controllers\Event\RegisterCo
 
 include 'farmasi.php';
 include 'brodcast.php';
+include 'koperasi.php';
 
 Route::post('/upload-sftp', [FileUploadController::class, 'uploadFile'])->name('upload.sftp');
 Route::post('/upload-ftp', [FileUploadController::class, 'uploadFileftp'])->name('upload.ftp');

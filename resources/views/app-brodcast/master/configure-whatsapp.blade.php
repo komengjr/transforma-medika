@@ -4,7 +4,7 @@
 <link rel="stylesheet" href="https://cdn.datatables.net/responsive/3.0.4/css/responsive.bootstrap5.css">
 <link href="{{ asset('vendors/flatpickr/flatpickr.min.css') }}" rel="stylesheet" />
 <link href="{{ asset('vendors/choices/choices.min.css') }}" rel="stylesheet" />
-<script src="https://app.midtrans.com/snap/snap.js" data-client-key="{{ config('midtrans.client_key') }}"></script>
+<script src="{{ ENV('MIDTRANS_JS_LINK') }}" data-client-key="{{ config('midtrans.client_key') }}"></script>
 
 @endsection
 @section('content')
