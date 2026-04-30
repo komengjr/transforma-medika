@@ -17,6 +17,11 @@ class KoperasiProsesPeminjamanUang extends Migration
             $table->id('id_kop_proses_penyimpanan_uang');
             $table->string('kop_proses_penyimpanan_uang_code')->unique();
             $table->string('kop_master_peserta_code');
+            $table->integer('kop_proses_penyimpanan_uang_nominal');
+            $table->date('kop_proses_penyimpanan_uang_tgl');
+            $table->integer('kop_proses_penyimpanan_uang_tenor');
+            $table->integer('kop_proses_penyimpanan_uang_bunga');
+            $table->string('kop_proses_penyimpanan_uang_status');
             $table->timestamps();
         });
     }
