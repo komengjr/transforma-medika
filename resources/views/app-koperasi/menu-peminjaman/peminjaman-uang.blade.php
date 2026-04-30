@@ -110,4 +110,63 @@
     });
 </script>
 
+<script>
+    $(document).on("click", "#button-proses-pengajuan-peminjaman", function(e) {
+        e.preventDefault();
+        const swalWithBootstrapButtons = Swal.mixin({
+            customClass: {
+                confirmButton: "btn btn-success",
+                cancelButton: "btn btn-danger"
+            },
+            buttonsStyling: true
+        });
+        swalWithBootstrapButtons.fire({
+            title: "Apakah Kamu yakin >?",
+            text: "Kamu Yakin Untuk Proses Data ini ?",
+            icon: "success",
+            showCancelButton: true,
+            confirmButtonText: "Yes, Setuju",
+            cancelButtonText: "No, Batal",
+            reverseButtons: true
+        }).then((result) => {
+            if (result.isConfirmed) {
+                var data = $("#form-pengajuan-peminjaman-uang").serialize();
+                $('#loading-button-proses').html(
+                    '<div class="spinner-border my-3" style="display: block; margin-left: auto; margin-right: auto;" role="status"><span class="visually-hidden">Loading...</span></div>'
+                );
+                $.ajax({
+                    url: "{{ route('menu_peminjaman_uang_proses_pengajuan') }}",
+                    type: "POST",
+                    cache: false,
+                    data: data,
+                    dataType: 'html',
+                }).done(function(data) {
+                    swalWithBootstrapButtons.fire({
+                        title: "Sukses!",
+                        text: "Your file has been Sukses.",
+                        icon: "success"
+                    });
+                    location.reload();
+                }).fail(function() {
+                    swalWithBootstrapButtons.fire({
+                        title: "Cancelled",
+                        text: "Gagal Menyimpan",
+                        icon: "error"
+                    });
+                });
+
+
+            } else if (result.dismiss === Swal.DismissReason.cancel) {
+                swalWithBootstrapButtons.fire({
+                    title: "Cancelled",
+                    text: "Gagal Menyimpan",
+                    icon: "error"
+                });
+
+            }
+        });
+
+
+    });
+</script>
 @endsection

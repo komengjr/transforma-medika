@@ -5,13 +5,19 @@ namespace App\Http\Controllers;
 use App\Models\NewsData;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
-
+use Illuminate\Support\Facades\Auth;
 class PageController extends Controller
 {
     public function fisrt()
     {
-        $data = NewsData::latest()->limit(9)->get();
-        return view('index',compact('data'));
+        // $data = NewsData::latest()->limit(9)->get();
+        // return view('index',compact('data'));
+
+        if (Auth::check()) {
+            return Redirect('dashboard/home');
+        } else {
+            return view('auth.login');
+        }
     }
     public function app_hrm()
     {
@@ -59,16 +65,20 @@ class PageController extends Controller
             'desc' => $desc
         ]);
     }
-    public function about(){
+    public function about()
+    {
         return view('public.about');
     }
-    public function contact(){
+    public function contact()
+    {
         return view('public.contact');
     }
-    public function privacy_policy(){
+    public function privacy_policy()
+    {
         return view('public.privacy-policy');
     }
-    public function terms_of_service(){
+    public function terms_of_service()
+    {
         return view('public.terms_of_service');
     }
     public function changelog()

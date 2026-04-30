@@ -140,6 +140,9 @@ class KoperasiController extends Controller
             ->where('kop_master_peserta.kop_master_peserta_code', $request->code)->first();
         return view('app-koperasi.menu-peminjaman.peminjaman-uang.form-peminjaman-uang', ['data' => $data]);
     }
+    public function menu_peminjaman_uang_proses_pengajuan(Request $request){
+        return 123;
+    }
     // MENU PEMINJAMAN BARANG
     public function menu_peminjaman_barang($akses, $id)
     {

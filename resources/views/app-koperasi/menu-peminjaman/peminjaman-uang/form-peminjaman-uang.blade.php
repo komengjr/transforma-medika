@@ -122,7 +122,8 @@
         </form>
     </div>
 </div>
-<div class="row g-3 mb-3">
+<form class="row g-3 mb-3" id="form-pengajuan-peminjaman-uang" method="POST">
+    @csrf
     <div class="col-lg-8">
         <div class="card h-100">
             <div class="card-header bg-300">
@@ -195,12 +196,14 @@
                 </select>
                 <hr>
 
-                <button class="btn btn-primary d-block w-100" type="submit">Pengajuan Peminjaman</button>
+                <div id="loading-button-proses">
+                    <button class="btn btn-primary d-block w-100" type="button" id="button-proses-pengajuan-peminjaman">Pengajuan Peminjaman</button>
+                </div>
                 <div class="text-center mt-2"><small class="d-inline-block">By continuing, you are agreeing to our subscriber <a href="#!">terms</a> and will be charged at the end of the trial. </small></div>
             </div>
         </div>
     </div>
-</div>
+</form>
 <script>
     function formatRupiah(angka, prefix) {
         let number_string = angka.replace(/[^,\d]/g, '').toString(),
