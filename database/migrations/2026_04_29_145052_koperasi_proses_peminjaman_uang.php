@@ -21,6 +21,10 @@ class KoperasiProsesPeminjamanUang extends Migration
             $table->date('kop_proses_uang_tgl');
             $table->integer('kop_proses_uang_tenor');
             $table->integer('kop_proses_uang_bunga');
+            $table->integer('kop_proses_uang_admin');
+            $table->string('kop_proses_uang_kacab');
+            $table->string('kop_proses_uang_ketua');
+            $table->string('kop_proses_uang_user');
             $table->string('kop_proses_uang_status');
             $table->timestamps();
         });

@@ -8,28 +8,53 @@
 @endsection
 @section('content')
 
-
-<div class="card mb-3 border border-success">
-    <div class="bg-holder d-none d-lg-block bg-card" style="background-image:url(../../../asset/img/icons/spot-illustrations/corner-4.png);">
-    </div>
-    <!--/.bg-holder-->
-
-    <div class="card-body position-relative">
-        <div class="row">
-            <div class="col-lg-8">
-                <h3>Pengajuan Peminjaman Uang</h3>
-                <p class="mt-2">Lorem ipsum dolor sit amet consectetur adipisicing elit. Odio vitae quae beatae, omnis asperiores molestiae provident ducimus, labore explicabo ratione quas laudantium, libero tempore voluptates dolores. Autem est saepe soluta.</p>
-                <button class="btn btn-primary btn-sm" type="button" id="button-cari-data-peserta" data-bs-toggle="modal" data-bs-target="#modal-peminjaman-full"><span class="fas fa-user-shield"></span> Cari Data</button>
+<div class="row mb-3">
+    <div class="col">
+        <div class="card bg-200 shadow border border-success">
+            <div class="row gx-0 flex-between-center">
+                <div class="col-sm-auto d-flex align-items-center border-bottom">
+                    <img class="ms-3 mx-3" src="{{ asset('img/koperasi.png') }}" alt="" width="60" />
+                    <div>
+                        <h6 class="text-success fs--1 mb-0 pt-2">Welcome to </h6>
+                        <h4 class="text-success fw-bold mb-1">{{ Env('APP_LABEL')}} <span
+                                class="text-success fw-medium">Management
+                                System</span></h4>
+                    </div>
+                    <img class="ms-n4 d-none d-lg-block "
+                        src="{{ asset('asset/img/illustrations/crm-line-chart.png') }}" alt="" width="150" />
+                </div>
+                <div class="col-xl-auto px-3 py-2">
+                    <h6 class="text-success fs--1 mb-0">Menu : </h6>
+                    <h4 class="text-success fw-bold mb-0">Peminjaman <span class="text-success fw-medium">Barang</span>
+                    </h4>
+                </div>
             </div>
         </div>
     </div>
 </div>
-<div id="menu-form-peminjaman-uang"></div>
 
+<div class="card mb-3">
+    <div class="card-header bg-primary">
+        <div class="d-flex justify-content-between">
+            <div>
+
+
+            </div>
+            <div class="d-flex">
+                <input class="form-control datetimepicker" id="timepicker3" type="text" placeholder="Y-m-d to Y-m-d"
+                    data-options='{"mode":"range","dateFormat":"Y-m-d","disableMobile":true,"locale":"en"}'
+                    onchange="search(this)" />
+            </div>
+        </div>
+    </div>
+    <div class="card-body border-top p-3" id="hasil-pencarian-list">
+
+    </div>
+</div>
 
 @endsection
 @section('base.js')
-<div class="modal fade" id="modal-peminjaman-full" data-bs-keyboard="false" data-bs-backdrop="static" tabindex="-1"
+<div class="modal fade" id="modal-koperasi-full" data-bs-keyboard="false" data-bs-backdrop="static" tabindex="-1"
     aria-labelledby="staticBackdropLabel" aria-hidden="false">
     <div class="modal-dialog modal-dialog-centered" role="document" style="max-width: 95%;">
         <div class="modal-content border-0">
@@ -37,11 +62,11 @@
                 <button class="btn-close btn btn-sm btn-circle d-flex flex-center transition-base"
                     data-bs-dismiss="modal" aria-label="Close"></button>
             </div>
-            <div id="menu-peminjaman-full"></div>
+            <div id="menu-koperasi-full"></div>
         </div>
     </div>
 </div>
-<div class="modal fade" id="modal-peminjaman" data-bs-keyboard="false" data-bs-backdrop="static" tabindex="-1"
+<div class="modal fade" id="modal-koperasi" data-bs-keyboard="false" data-bs-backdrop="static" tabindex="-1"
     aria-labelledby="staticBackdropLabel" aria-hidden="false">
     <div class="modal-dialog modal-dialog-centered modal-xl" role="document">
         <div class="modal-content border-0">
@@ -49,7 +74,7 @@
                 <button class="btn-close btn btn-sm btn-circle d-flex flex-center transition-base"
                     data-bs-dismiss="modal" aria-label="Close"></button>
             </div>
-            <div id="menu-peminjaman"></div>
+            <div id="menu-koperasi"></div>
         </div>
     </div>
 </div>
@@ -67,34 +92,14 @@
     });
 </script>
 <script>
-    $(document).on("click", "#button-cari-data-peserta", function(e) {
-        e.preventDefault();
-        $('#menu-peminjaman-full').html(
-            '<div class="spinner-border my-3" style="display: block; margin-left: auto; margin-right: auto;" role="status"><span class="visually-hidden">Loading...</span></div>'
-        );
-        $.ajax({
-            url: "{{ route('menu_peminjaman_uang_cari_peserta') }}",
-            type: "POST",
-            cache: false,
-            data: {
-                "_token": "{{ csrf_token() }}",
-                "code": "{{Auth::user()->userid}}"
-            },
-            dataType: 'html',
-        }).done(function(data) {
-            $('#menu-peminjaman-full').html(data);
-        }).fail(function() {
-            $('#menu-peminjaman-full').html('eror');
-        });
-    });
-    $(document).on("click", "#button-pilih-data-peserta", function(e) {
+    $(document).on("click", "#button-proses-data-pengajuan", function(e) {
         e.preventDefault();
         var code = $(this).data("code");
-        $('#menu-form-peminjaman-uang').html(
+        $('#menu-koperasi').html(
             '<div class="spinner-border my-3" style="display: block; margin-left: auto; margin-right: auto;" role="status"><span class="visually-hidden">Loading...</span></div>'
         );
         $.ajax({
-            url: "{{ route('menu_peminjaman_uang_pilih_peserta') }}",
+            url: "{{ route('menu_peminjaman_list_proses_pengajuan') }}",
             type: "POST",
             cache: false,
             data: {
@@ -103,9 +108,51 @@
             },
             dataType: 'html',
         }).done(function(data) {
-            $('#menu-form-peminjaman-uang').html(data);
+            $('#menu-koperasi').html(data);
         }).fail(function() {
-            $('#menu-form-peminjaman-uang').html('eror');
+            $('#menu-koperasi').html('eror');
+        });
+    });
+    $(document).on("click", "#button-kirim-verifikasi-pengajuan", function(e) {
+        e.preventDefault();
+        var code = $(this).data("code");
+        $('#loading-button-kirim').html(
+            '<button class="btn btn-falcon-primary btn-sm" type="button" disabled=""><span class="spinner-border spinner-border-sm" role="status" aria-hidden="true"></span>Loading...</button>'
+        );
+        $.ajax({
+            url: "{{ route('menu_peminjaman_list_proses_pengajuan_send_verif') }}",
+            type: "POST",
+            cache: false,
+            data: {
+                "_token": "{{ csrf_token() }}",
+                "code": code
+            },
+            dataType: 'html',
+        }).done(function(data) {
+            $('#loading-button-kirim').html(data);
+        }).fail(function() {
+            $('#loading-button-kirim').html('eror');
+        });
+    });
+    $(document).on("click", "#button-cetak-pengajuain-peminjaman", function(e) {
+        e.preventDefault();
+        var code = $(this).data("code");
+        $('#menu-koperasi').html(
+            '<div class="spinner-border my-3" style="display: block; margin-left: auto; margin-right: auto;" role="status"><span class="visually-hidden">Loading...</span></div>'
+        );
+        $.ajax({
+            url: "{{ route('menu_peminjaman_list_cetak_pengajuan') }}",
+            type: "POST",
+            cache: false,
+            data: {
+                "_token": "{{ csrf_token() }}",
+                "code": code
+            },
+            dataType: 'html',
+        }).done(function(data) {
+            $('#menu-koperasi').html(data);
+        }).fail(function() {
+            $('#menu-koperasi').html('eror');
         });
     });
 </script>

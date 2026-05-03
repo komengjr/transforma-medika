@@ -44,14 +44,44 @@
             </div>
             <h5><span class="badge bg-primary">Bunga Angsuran</span></h5>
             <div class="col-md-6">
-                <label for="inputLastName1" class="form-label">Berapa %</label>
+                <label for="inputLastName1" class="form-label">Bunga Bulanan</label>
                 <div class="input-group"> <span class="input-group-text"><i class="far fa-dot-circle"></i></span>
                     <input type="text" name="bunga_angsuran" class="form-control form-control-lg border-start-0"
                         id="bunga_angsuran" value="{{ $setup->kop_setup_cabang_koperasi_bunga }}">
                 </div>
             </div>
-
-
+            <div class="col-md-6">
+                <label for="inputLastName1" class="form-label">Biaya Admin</label>
+                <div class="input-group"> <span class="input-group-text"><i class="far fa-dot-circle"></i></span>
+                    <input type="text" name="bunga_admin" class="form-control form-control-lg border-start-0"
+                        id="bunga_admin" value="{{ $setup->kop_setup_cabang_koperasi_admin }}">
+                </div>
+            </div>
+            <h5><span class="badge bg-primary">Metode Verifikasi</span></h5>
+            <div class="col-md-6">
+                <label class="form-check-label align-top" for="customCheck1">Whatsapp</label>
+                <select name="metode_whatsapp" id="" class="form-control form-control-lg">
+                    @if ($setup->kop_setup_cabang_koperasi_wa == '0')
+                    <option value="0">Tidak</option>
+                    <option value="1">Ya</option>
+                    @else
+                    <option value="1">Ya</option>
+                    <option value="0">Tidak</option>
+                    @endif
+                </select>
+            </div>
+            <div class="col-md-6">
+                <label class="form-check-label align-top" for="customCheck2">Email</label>
+                <select name="metode_email" id="" class="form-control form-control-lg">
+                    @if ($setup->kop_setup_cabang_koperasi_email == '0')
+                    <option value="0">Tidak</option>
+                    <option value="1">Ya</option>
+                    @else
+                    <option value="1">Ya</option>
+                    <option value="0">Tidak</option>
+                    @endif
+                </select>
+            </div>
         </form>
         @else
         <form class="row g-3 pb-3" id="form-add-setup-baru" method="POST">
@@ -89,13 +119,34 @@
             </div>
             <h5><span class="badge bg-primary">Bunga Angsuran</span></h5>
             <div class="col-md-6">
-                <label for="inputLastName1" class="form-label">Berapa %</label>
+                <label for="inputLastName1" class="form-label">Bunga Bulanan</label>
                 <div class="input-group"> <span class="input-group-text"><i class="far fa-dot-circle"></i></span>
                     <input type="text" name="bunga_angsuran" class="form-control form-control-lg border-start-0"
                         id="bunga_angsuran" placeholder="Ex. 089XXXXXXX">
                 </div>
             </div>
-
+            <div class="col-md-6">
+                <label for="inputLastName1" class="form-label">Biaya Admin</label>
+                <div class="input-group"> <span class="input-group-text"><i class="far fa-dot-circle"></i></span>
+                    <input type="text" name="bunga_admin" class="form-control form-control-lg border-start-0"
+                        id="bunga_admin" placeholder="Ex. 089XXXXXXX">
+                </div>
+            </div>
+            <h6 class="fs-0">Metode Verifikasi :</h6>
+            <div class="col-md-6">
+                <label class="form-check-label align-top" for="customCheck1">Whatsapp</label>
+                <select name="metode_whatsapp" id="" class="form-control form-control-lg">
+                    <option value="0">Tidak</option>
+                    <option value="1">Ya</option>
+                </select>
+            </div>
+            <div class="col-md-6">
+                <label class="form-check-label align-top" for="customCheck2">Email</label>
+                <select name="metode_email" id="" class="form-control form-control-lg">
+                    <option value="0">Tidak</option>
+                    <option value="1">Ya</option>
+                </select>
+            </div>
 
         </form>
         @endif

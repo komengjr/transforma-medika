@@ -178,8 +178,13 @@ Route::prefix('{akses}/{id}')->group(function (): void {
 
     // KOPERASI
     Route::get('menu-koperasi/registrasi-peserta', [KoperasiController::class, 'menu_koperasi_registrasi_peserta'])->name('menu_koperasi_registrasi_peserta');
+    Route::get('menu-koperasi/arisan-koperasi', [KoperasiController::class, 'menu_koperasi_arisan'])->name('menu_koperasi_arisan');
+    Route::get('menu-koperasi/voucher-koperasi', [KoperasiController::class, 'menu_koperasi_vocher'])->name('menu_koperasi_vocher');
     Route::get('menu-peminjaman/peminjaman-uang', [KoperasiController::class, 'menu_peminjaman_uang'])->name('menu_peminjaman_uang');
     Route::get('menu-peminjaman/peminjaman-barang', [KoperasiController::class, 'menu_peminjaman_barang'])->name('menu_peminjaman_barang');
+    Route::get('menu-peminjaman/list-peminjaman', [KoperasiController::class, 'menu_peminjaman_list'])->name('menu_peminjaman_list');
+    Route::get('akutansi-koperasi/jurnal-otomatis', [KoperasiController::class, 'akutansi_koperasi_jurnal_otomatis'])->name('akutansi_koperasi_jurnal_otomatis');
+    Route::get('akutansi-koperasi/jurnal-manual', [KoperasiController::class, 'akutansi_koperasi_jurnal_manual'])->name('akutansi_koperasi_jurnal_manual');
     Route::get('master-koperasi/peserta-koperasi', [KoperasiController::class, 'master_koperasi_peserta'])->name('master_koperasi_peserta');
     Route::get('master-koperasi/cabang-koperasi', [KoperasiController::class, 'master_koperasi_cabang'])->name('master_koperasi_cabang');
     Route::get('master-koperasi/divisi-koperasi', [KoperasiController::class, 'master_koperasi_divisi'])->name('master_koperasi_divisi');

@@ -7,6 +7,7 @@
 
 @endsection
 @section('content')
+
 <div class="row mb-3">
     <div class="col">
         <div class="card bg-200 shadow border border-success">
@@ -24,7 +25,7 @@
                 </div>
                 <div class="col-xl-auto px-3 py-2">
                     <h6 class="text-success fs--1 mb-0">Menu : </h6>
-                    <h4 class="text-success fw-bold mb-0">Master <span class="text-success fw-medium">Cabang Koperasi</span>
+                    <h4 class="text-success fw-bold mb-0">Peminjaman <span class="text-success fw-medium">List Data</span>
                     </h4>
                 </div>
             </div>
@@ -36,13 +37,7 @@
     <div class="card-header bg-primary">
         <div class="d-flex justify-content-between">
             <div>
-                <a class="btn btn-falcon-default btn-sm" href="#" data-bs-toggle="modal" data-bs-target="#modal-koperasi" id="button-add-data-divisi">
-                    <span class="fas fa-plus"></span>
-                </a>
-                <span class="mx-1 mx-sm-2 text-300">|</span>
-                <button class="btn btn-falcon-default btn-sm" type="button" data-bs-toggle="tooltip"
-                    data-bs-placement="top" title="" data-bs-original-title="Archive" aria-label="Archive"><span
-                        class="fas fa-print"></span></button>
+
 
             </div>
             <div class="d-flex">
@@ -57,11 +52,14 @@
             <thead class="bg-300 fs--1">
                 <tr>
                     <th>No</th>
-                    <th>Kode Cabang</th>
-                    <th>Nama Cabang</th>
-                    <th>Kota</th>
-                    <th>User Verifikasi</th>
-                    <th>Setup Peminjaman</th>
+                    <th>Nama Peserta</th>
+                    <th>Tanggal Peminjaman</th>
+                    <th>Nominal Peminjaman</th>
+                    <th>Bunga</th>
+                    <th>Tenor Peminjaman</th>
+                    <th>Kepala Cabang</th>
+                    <th>Ketua Koperasi</th>
+                    <th>Status Peminjaman</th>
                     <th>Action</th>
                 </tr>
             </thead>
@@ -72,60 +70,36 @@
                 @foreach ($data as $datas)
                 <tr>
                     <td>{{ $no++ }}</td>
-                    <td>{{ $datas->kop_master_cabang_code }}</td>
-                    <td>{{ $datas->kop_master_cabang_name }}</td>
-                    <td>{{ $datas->kop_master_cabang_city }}</td>
+                    <td>{{ $datas->kop_master_peserta_name }} <br>{{ $datas->kop_master_peserta_nip }} <br>{{ $datas->kop_master_peserta_nik }}</td>
+                    <td>{{ $datas->kop_proses_uang_tgl }}</td>
+                    <td>@currency($datas->kop_proses_uang_nominal)</td>
+                    <td>{{ $datas->kop_proses_uang_bunga }} %</td>
+                    <td>{{ $datas->kop_proses_uang_tenor }} Bulan</td>
                     <td>
                         @php
-                        $user = DB::table('kop_user_verifikasi')->where('kop_user_verifikasi_cabang',$datas->kop_master_cabang_code)->get();
+                        $kacab = DB::table('kop_user_verifikasi')->where('kop_user_verifikasi_code',$datas->kop_proses_uang_kacab)->first();
                         @endphp
-                        @foreach ($user as $users)
-                        <li>
-                            {{ $users->kop_user_verifikasi_name }} -
-                            @if ($users->kop_user_verifikasi_job == '0')
-                            Kepala Cabang
-                            @else
-                            Ketua Koperasi
-                            @endif
-                        </li>
-                        @endforeach
+                        @if ($kacab)
+                        {{ $kacab->kop_user_verifikasi_name }}
+                        @endif
                     </td>
                     <td>
                         @php
-                        $setup = DB::table('kop_setup_cabang_koperasi')->where('kop_setup_cabang_koperasi_cabang',$datas->kop_master_cabang_code)->first();
+                        $ketua = DB::table('kop_user_verifikasi')->where('kop_user_verifikasi_code',$datas->kop_proses_uang_ketua)->first();
                         @endphp
-                        @if ($setup)
-                        <strong>Jumlah Pinjaman</strong>
-                        <ul>
-                            <li>Barang Max : @currency($setup->kop_setup_cabang_koperasi_jp_brg)</li>
-                            <li>Uang Max : @currency($setup->kop_setup_cabang_koperasi_jp_uang)</li>
-                        </ul>
-                        <strong>Yang Akan dibayar Selama :</strong>
-                        <ul>
-                            <li>Barang Max : {{ $setup->kop_setup_cabang_koperasi_tenor_brg }} kali</li>
-                            <li>Uang Max : {{ $setup->kop_setup_cabang_koperasi_tenor_uang }} kali</li>
-                        </ul>
-                        <strong>Angsuran Bunga : {{ $setup->kop_setup_cabang_koperasi_bunga }} %</strong> <br>
-                        <strong>Biaya Admin : {{ $setup->kop_setup_cabang_koperasi_admin }} %</strong><br>
-                        <strong>Metode Verifikasi :</strong>
-                        <ul>
-                            <li>
-                                Whatsapp :
-                                @if ($setup->kop_setup_cabang_koperasi_wa == '0')
-                                TIDAK
-                                @else
-                                YA
-                                @endif
-                            </li>
-                            <li>
-                                Email :
-                                @if ($setup->kop_setup_cabang_koperasi_email == '0')
-                                TIDAK
-                                @else
-                                YA
-                                @endif
-                            </li>
-                        </ul>
+                        @if ($ketua)
+                        {{ $ketua->kop_user_verifikasi_name }}
+                        @endif
+                    </td>
+                    <td>
+                        @if ($datas->kop_proses_uang_status == '0')
+                        <span class="badge bg-info">Peminjaman Baru</span>
+                        @elseif ($datas->kop_proses_uang_status == '1')
+                        <span class="badge bg-warning">Peminjaman diproses</span>
+                        @elseif ($datas->kop_proses_uang_status == '2')
+                        <span class="badge bg-warning">Peminjaman Berjalan</span>
+                        @elseif ($datas->kop_proses_uang_status == '3')
+                        <span class="badge bg-warning">Peminjaman Lunas</span>
                         @endif
                     </td>
                     <td>
@@ -135,15 +109,14 @@
                                     class="fas fa-align-left me-1" data-fa-transform="shrink-3"></span>Menu</button>
                             <div class="dropdown-menu" aria-labelledby="btnGroupVerticalDrop2">
                                 <button class="dropdown-item" data-bs-toggle="modal" data-bs-target="#modal-koperasi"
-                                    id="button-data-history-pasien" data-code="{{$datas->kop_master_cabang_code}}">
-                                    Update Data Cabang</button>
+                                    id="button-proses-data-pengajuan" data-code="{{$datas->kop_proses_uang_code}}"><span
+                                        class="far fa-folder-open"></span>
+                                    Proses Pengajuan Peminjaman</button>
                                 <div class="dropdown-divider"></div>
                                 <button class="dropdown-item" data-bs-toggle="modal" data-bs-target="#modal-koperasi"
-                                    id="button-add-data-verifikasi" data-code="{{$datas->kop_master_cabang_code}}">
-                                    Tambah User Verifikasi Cabang</button>
-                                <button class="dropdown-item" data-bs-toggle="modal" data-bs-target="#modal-koperasi"
-                                    id="button-update-data-setup" data-code="{{$datas->kop_master_cabang_code}}">
-                                    Setup Peminjaman</button>
+                                    id="button-cetak-pengajuain-peminjaman" data-code="{{$datas->kop_proses_uang_code}}"><span
+                                        class="fas fa-print"></span>
+                                    Cetak Pengajuan Peminjaman</button>
                             </div>
                         </div>
                     </td>
@@ -156,7 +129,7 @@
 
 @endsection
 @section('base.js')
-<div class="modal fade" id="modal-penjualan-full" data-bs-keyboard="false" data-bs-backdrop="static" tabindex="-1"
+<div class="modal fade" id="modal-koperasi-full" data-bs-keyboard="false" data-bs-backdrop="static" tabindex="-1"
     aria-labelledby="staticBackdropLabel" aria-hidden="false">
     <div class="modal-dialog modal-dialog-centered" role="document" style="max-width: 95%;">
         <div class="modal-content border-0">
@@ -164,7 +137,7 @@
                 <button class="btn-close btn btn-sm btn-circle d-flex flex-center transition-base"
                     data-bs-dismiss="modal" aria-label="Close"></button>
             </div>
-            <div id="menu-poliklinik-full"></div>
+            <div id="menu-koperasi-full"></div>
         </div>
     </div>
 </div>
@@ -194,14 +167,14 @@
     });
 </script>
 <script>
-    $(document).on("click", "#button-add-data-verifikasi", function(e) {
+    $(document).on("click", "#button-proses-data-pengajuan", function(e) {
         e.preventDefault();
         var code = $(this).data("code");
         $('#menu-koperasi').html(
             '<div class="spinner-border my-3" style="display: block; margin-left: auto; margin-right: auto;" role="status"><span class="visually-hidden">Loading...</span></div>'
         );
         $.ajax({
-            url: "{{ route('master_koperasi_cabang_add_verifikasi') }}",
+            url: "{{ route('menu_peminjaman_list_proses_pengajuan') }}",
             type: "POST",
             cache: false,
             data: {
@@ -215,43 +188,35 @@
             $('#menu-koperasi').html('eror');
         });
     });
-    $(document).on("click", "#button-simpan-data-verifikasi", function(e) {
+    $(document).on("click", "#button-kirim-verifikasi-pengajuan", function(e) {
         e.preventDefault();
-        var data = $("#form-add-verifikasi-baru").serialize();
-        $('#menu-add-data-verifikasi').html(
-            '<div class="spinner-border my-3" style="display: block; margin-left: auto; margin-right: auto;" role="status"><span class="visually-hidden">Loading...</span></div>'
+        var code = $(this).data("code");
+        $('#loading-button-kirim').html(
+            '<button class="btn btn-falcon-primary btn-sm" type="button" disabled=""><span class="spinner-border spinner-border-sm" role="status" aria-hidden="true"></span>Loading...</button>'
         );
         $.ajax({
-            url: "{{ route('master_koperasi_cabang_save_data_verifikasi') }}",
+            url: "{{ route('menu_peminjaman_list_proses_pengajuan_send_verif') }}",
             type: "POST",
             cache: false,
-            data: data,
+            data: {
+                "_token": "{{ csrf_token() }}",
+                "code": code
+            },
             dataType: 'html',
         }).done(function(data) {
-            if (data == 0) {
-                Swal.fire({
-                    icon: "error",
-                    title: "Oops...",
-                    text: "Something went wrong!",
-                    footer: '<a href="#">Why do I have this issue?</a>'
-                });
-                $('#menu-add-data-verifikasi').html('<button class="btn btn-success float-end" id="button-simpan-data-verifikasi" data-code="">Simpan Data</button>');
-            } else {
-                $('#menu-add-data-verifikasi').html(data);
-                location.reload();
-            }
+            $('#loading-button-kirim').html(data);
         }).fail(function() {
-            $('#menu-add-data-verifikasi').html('eror');
+            $('#loading-button-kirim').html('eror');
         });
     });
-    $(document).on("click", "#button-update-data-setup", function(e) {
+    $(document).on("click", "#button-cetak-pengajuain-peminjaman", function(e) {
         e.preventDefault();
         var code = $(this).data("code");
         $('#menu-koperasi').html(
             '<div class="spinner-border my-3" style="display: block; margin-left: auto; margin-right: auto;" role="status"><span class="visually-hidden">Loading...</span></div>'
         );
         $.ajax({
-            url: "{{ route('master_koperasi_cabang_update_data_setup') }}",
+            url: "{{ route('menu_peminjaman_list_cetak_pengajuan') }}",
             type: "POST",
             cache: false,
             data: {
@@ -263,39 +228,78 @@
             $('#menu-koperasi').html(data);
         }).fail(function() {
             $('#menu-koperasi').html('eror');
-        });
-    });
-    $(document).on("click", "#button-simpan-data-setup", function(e) {
-        e.preventDefault();
-        var data = $("#form-add-setup-baru").serialize();
-        console.log(data);
-
-        $('#menu-add-data-setup').html(
-            '<div class="spinner-border my-3" style="display: block; margin-left: auto; margin-right: auto;" role="status"><span class="visually-hidden">Loading...</span></div>'
-        );
-        $.ajax({
-            url: "{{ route('master_koperasi_cabang_save_data_setup') }}",
-            type: "POST",
-            cache: false,
-            data: data,
-            dataType: 'html',
-        }).done(function(data) {
-            if (data == 0) {
-                Swal.fire({
-                    icon: "error",
-                    title: "Oops...",
-                    text: "Something went wrong!",
-                    footer: '<a href="#">Why do I have this issue?</a>'
-                });
-                $('#menu-add-data-setup').html('<button class="btn btn-success float-end" id="button-simpan-data-setup" data-code="">Simpan Data</button>');
-            } else {
-                $('#menu-add-data-setup').html(data);
-                location.reload();
-            }
-        }).fail(function() {
-            $('#menu-add-data-setup').html('eror');
         });
     });
 </script>
 
+<script>
+    $(document).on("click", "#button-proses-pengajuan-peminjaman", function(e) {
+        e.preventDefault();
+        const swalWithBootstrapButtons = Swal.mixin({
+            customClass: {
+                confirmButton: "btn btn-success",
+                cancelButton: "btn btn-danger"
+            },
+            buttonsStyling: true
+        });
+        swalWithBootstrapButtons.fire({
+            title: "Apakah Kamu yakin >?",
+            text: "Kamu Yakin Untuk Proses Data ini ?",
+            icon: "success",
+            showCancelButton: true,
+            confirmButtonText: "Yes, Setuju",
+            cancelButtonText: "No, Batal",
+            reverseButtons: true
+        }).then((result) => {
+            if (result.isConfirmed) {
+                var data = $("#form-pengajuan-peminjaman-uang").serialize();
+                $('#loading-button-proses').html(
+                    '<div class="spinner-border my-3" style="display: block; margin-left: auto; margin-right: auto;" role="status"><span class="visually-hidden">Loading...</span></div>'
+                );
+                $.ajax({
+                    url: "{{ route('menu_peminjaman_uang_proses_pengajuan') }}",
+                    type: "POST",
+                    cache: false,
+                    data: data,
+                    dataType: 'html',
+                }).done(function(data) {
+                    if (data == 1) {
+                        swalWithBootstrapButtons.fire({
+                            title: "Sukses!",
+                            text: "Your file has been Sukses.",
+                            icon: "success"
+                        });
+                        location.reload();
+                    } else {
+                        swalWithBootstrapButtons.fire({
+                            title: "Cancelled",
+                            text: "Gagal Menyimpan",
+                            icon: "error"
+                        });
+                        $('#loading-button-proses').html(
+                            '<button class="btn btn-primary d-block w-100" type="button" id="button-proses-pengajuan-peminjaman">Pengajuan Peminjaman</button>'
+                        );
+                    }
+                }).fail(function() {
+                    swalWithBootstrapButtons.fire({
+                        title: "Cancelled",
+                        text: "Gagal Menyimpan",
+                        icon: "error"
+                    });
+                });
+
+
+            } else if (result.dismiss === Swal.DismissReason.cancel) {
+                swalWithBootstrapButtons.fire({
+                    title: "Cancelled",
+                    text: "Gagal Menyimpan",
+                    icon: "error"
+                });
+
+            }
+        });
+
+
+    });
+</script>
 @endsection

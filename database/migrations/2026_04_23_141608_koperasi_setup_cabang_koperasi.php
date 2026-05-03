@@ -21,6 +21,9 @@ class KoperasiSetupCabangKoperasi extends Migration
             $table->integer('kop_setup_cabang_koperasi_tenor_brg');
             $table->integer('kop_setup_cabang_koperasi_tenor_uang');
             $table->integer('kop_setup_cabang_koperasi_bunga');
+            $table->integer('kop_setup_cabang_koperasi_admin');
+            $table->integer('kop_setup_cabang_koperasi_wa');
+            $table->integer('kop_setup_cabang_koperasi_email');
             $table->integer('kop_setup_cabang_koperasi_status');
             $table->string('kop_setup_cabang_koperasi_cabang');
             $table->timestamps();

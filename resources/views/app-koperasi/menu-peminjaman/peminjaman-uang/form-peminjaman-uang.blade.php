@@ -132,45 +132,51 @@
             <div class="card-body bg-light">
 
                 <p class="fs--1 mb-2"><span class="badge bg-primary">Pinjaman Baru</span></p>
-                <div class="row gx-3 mb-3">
-                    <div class="col">
-                        <label class="form-label ls text-uppercase text-600 fw-semi-bold mb-0 fs--1" for="cardNumber">Nominal Peminjaman <strong class="text-danger">Maksimal Peminjaman @currency($data->kop_setup_cabang_koperasi_jp_uang)</strong></label>
-                        <input class="form-control" id="plafon" placeholder="Contoh: 10000000" oninput="handleInput(this)" type="text">
-                    </div>
-                    <!-- <div class="col">
-                        <label class="form-label ls text-uppercase text-600 fw-semi-bold mb-0 fs--1" for="cardName">Lama Pinjaman</label>
-                        <select class="form-select mb-3" aria-label="Default select example">
-                            <option selected="">Monthly Plan</option>
-                            <option value="1">Annual Plan</option>
-                        </select>
-                    </div> -->
-                </div>
+
                 <div class="row gx-3">
-                    <div class="col-6 col-sm-5">
-                        <label class="form-label ls text-uppercase text-600 fw-semi-bold mb-0 fs--1" for="inputCountry">Tanggal Peminjaman</label>
-                        <input class="form-control" id="zipCode" placeholder="1234" type="date">
+                    <div class="col-7">
+                        <label class="form-label ls text-uppercase text-600 fw-semi-bold mb-0 fs--1" for="cardNumber">Nominal Peminjaman <strong class="text-danger">Maksimal Peminjaman @currency($data->kop_setup_cabang_koperasi_jp_uang)</strong></label>
+                        <input class="form-control" name="nominal_pinjam" id="plafon" placeholder="Contoh: 10000000" oninput="handleInput(this)" type="text">
+                        <input type="text" name="peserta_koperasi" id="peserta_koperasi" value="{{ $data->kop_master_peserta_code }}" hidden>
                     </div>
-                    <div class="col-6 col-sm-5">
+                    <div class="col-5 col-sm-5">
+                        <label class="form-label ls text-uppercase text-600 fw-semi-bold mb-0 fs--1" for="inputCountry">Tanggal Peminjaman</label>
+                        <input class="form-control" name="tgl_pinjam" id="tgl_pinjam" placeholder="1234" type="date">
+                    </div>
+                    <div class="col-6 col-sm-6">
                         <label class="form-label ls text-uppercase text-600 fw-semi-bold mb-0 fs--1" for="inputCountry">Lama Peminjaman</label>
-                        <select class="form-select mb-3" id="tenor" placeholder="Contoh: 12" onclick="hitungOtomatis()">
+                        <select class="form-select mb-3" name="tenor" id="tenor" placeholder="Contoh: 12" onclick="hitungOtomatis()">
                             <option value="">Pilih Bulan</option>
                             @for ($i = $data->kop_setup_cabang_koperasi_tenor_uang ; $i > 0 ; $i--)
                             <option value="{{ $i }}">{{ $i }} Bulan</option>
                             @endfor
                         </select>
                     </div>
-                    <div class="col-6 col-sm-2">
-                        <label class="form-label ls text-uppercase text-600 fw-semi-bold mb-0 fs--1" for="expDate">Bunga</label>
-                        <input class="form-control" type="number" id="bunga" oninput="hitungOtomatis()" value="{{ $data->kop_setup_cabang_koperasi_bunga }}" readonly>
+                    <div class="col-6 col-sm-3">
+                        <label class="form-label ls text-uppercase text-600 fw-semi-bold mb-0 fs--1" for="expDate">Bunga / Bulan %</label>
+                        <input class="form-control" type="number" name="bunga_pinjam" id="bunga" oninput="hitungOtomatis()" value="{{ $data->kop_setup_cabang_koperasi_bunga }}" readonly>
                     </div>
-                    <div class="col-6 col-sm-6">
+                    <div class="col-6 col-sm-3">
+                        <label class="form-label ls text-uppercase text-600 fw-semi-bold mb-0 fs--1" for="expDate">Biaya Admin %</label>
+                        <input class="form-control" type="number" name="biaya_admin" id="bunga_pinjam" oninput="hitungOtomatis()" value="{{ $data->kop_setup_cabang_koperasi_admin }}" readonly>
+                    </div>
+                    <div class="col-6 col-sm-4">
                         <label class="form-label ls text-uppercase text-600 fw-semi-bold mb-0 fs--1" for="zipCode">Angsuran Pokok (Bulan 1)</label>
-                        <input class="form-control" id="hasilPokok" placeholder="@currency(100000)" type="text">
+                        <input class="form-control" id="hasilPokok" placeholder="@currency(100000)" type="text" readonly>
+                    </div>
+                    <div class="col-6 col-sm-4">
+                        <label class="form-label ls text-uppercase text-600 fw-semi-bold mb-0 fs--1" for="zipCode">Biaya Admin</label>
+                        <input class="form-control" id="BiayaAdmin" placeholder="@currency(100000)" type="text" readonly>
                     </div>
 
-                    <div class="col-6 col-sm-6">
+                    <div class="col-6 col-sm-4">
                         <label class="form-label ls text-uppercase text-600 fw-semi-bold mb-0 fs--1" for="expDate">Total Angsuran Per Bulan</label>
                         <input class="form-control" id="hasilTotal" readonly placeholder="Rp 0" style="font-weight: bold; color: #27ae60;">
+                    </div>
+
+                    <div class="col-12 col-sm-12">
+                        <label class="form-label ls text-uppercase text-600 fw-semi-bold mb-0 fs--1" for="expDate">Jumlah Total Angsuran</label>
+                        <input class="form-control" id="hasilTotalAngsuran" readonly placeholder="Rp 0" style="font-weight: bold; color: #27ae60;">
                     </div>
 
                 </div>
@@ -187,12 +193,18 @@
             <div class="card-body bg-light">
                 <label for="">Kepala Cabang</label>
                 <select name="kepala_cabang" id="kepala_cabang" class="form-select">
-                    <option value=""></option>
+                    <option value="">Pilih Kepala Cabang</option>
+                    @foreach ($kcb as $kacab)
+                    <option value="{{ $kacab->kop_user_verifikasi_code }}">{{ $kacab->kop_user_verifikasi_name }}</option>
+                    @endforeach
                 </select>
 
                 <label for="">Ketua Koperasi</label>
-                <select name="" id="" class="form-select">
-                    <option value=""></option>
+                <select name="ketua_koperasi" id="ketua_koperasi" class="form-select">
+                    <option value="">Pilih Ketua Koperasi</option>
+                    @foreach ($mgr as $mgrs)
+                    <option value="{{ $mgrs->kop_user_verifikasi_code }}">{{ $mgrs->kop_user_verifikasi_name }}</option>
+                    @endforeach
                 </select>
                 <hr>
 
@@ -222,7 +234,7 @@
     function handleInput(e) {
         e.value = formatRupiah(e.value, 'Rp ');
         const nilai = document.getElementById('plafon').value.replace(/[^0-9]/g, '');
-        if (nilai >= {{ $data -> kop_setup_cabang_koperasi_jp_uang }}) {
+        if (nilai >= {{$data->kop_setup_cabang_koperasi_jp_uang}}) {
             document.getElementById('plafon').value = "";
             Swal.fire({
                 icon: "error",
@@ -239,24 +251,38 @@
         const P = parseFloat(plafonRaw);
         const n = parseFloat(document.getElementById('tenor').value);
         const bungaTahun = parseFloat(document.getElementById('bunga').value);
-        const r = (bungaTahun / 100) / n; // Bunga per bulan
+        const bungaAdmin = parseFloat(document.getElementById('bunga_pinjam').value);
+        const r = (bungaTahun / 100) / 12; // Bunga per bulan
 
         if (P > 0 && n > 0 && bungaTahun > 0) {
             // 1. Hitung Total Angsuran (Anuitas)
-            const totalAngsuran = P * (r / (1 - Math.pow(1 + r, -n)));
+            // const totalAngsuran = P * (r / (1 - Math.pow(1 + r, -n)));
+            const totalAngsuran = (P * (bungaTahun / 100) * (n/12))/n;
+
 
             // 2. Hitung Bunga Bulan Pertama
-            const bungaBulanPertama = P * r;
+            const bungaBulanPertama = (P * (bungaTahun / 100)) / 12;
 
             // 3. Hitung Angsuran Pokok Bulan Pertama (Total - Bunga)
             const pokokBulanPertama = P / n;
 
+            // 4. Hitung Biaya Admin
+            const BiayaAdmins = (bungaAdmin / 100) * P;
+            //
+            const TotalAngsuran = totalAngsuran + pokokBulanPertama;
+            // 4. Hitung Total
+            const hasilTotalAngsuran = ( TotalAngsuran * n ) + BiayaAdmins;
+
             // Tampilkan Hasil
-            document.getElementById('hasilTotal').value = formatRupiah(Math.round(totalAngsuran).toString(), 'Rp ');
+            document.getElementById('hasilTotal').value = formatRupiah(Math.round(TotalAngsuran).toString(), 'Rp ');
             document.getElementById('hasilPokok').value = formatRupiah(Math.round(pokokBulanPertama).toString(), 'Rp ');
+            document.getElementById('BiayaAdmin').value = formatRupiah(Math.round(BiayaAdmins).toString(), 'Rp ');
+            document.getElementById('hasilTotalAngsuran').value = formatRupiah(Math.round(hasilTotalAngsuran).toString(), 'Rp ');
         } else {
             document.getElementById('hasilTotal').value = "";
             document.getElementById('hasilPokok').value = "";
+            document.getElementById('BiayaAdmin').value = "";
+            document.getElementById('hasilTotalAngsuran').value = "";
         }
     }
 </script>
