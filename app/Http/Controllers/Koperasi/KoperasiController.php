@@ -128,27 +128,103 @@ class KoperasiController extends Controller
     public function menu_koperasi_arisan($akses, $id)
     {
         if ($this->url_akses($akses, $id) == true) {
-            $cabang = DB::table('kop_master_cabang')->get();
-            $divisi = DB::table('kop_master_div_bag')->join('kop_master_divisi', 'kop_master_divisi.kop_master_divisi_code', '=', 'kop_master_div_bag.kop_master_divisi_code')->get();
-            $pokok = DB::table('kop_simpanan_pokok')->get();
-            $wajib = DB::table('kop_simpanan_wajib')->get();
-            return view('app-koperasi.menu-arisan-koperasi', compact('cabang', 'divisi', 'pokok', 'wajib'), ['akses' => $akses, 'code' => $id]);
+            $data = DB::table('kop_arisan_group')->where('kop_arisan_group_cabang', Auth::user()->access_cabang)->get();
+            return view('app-koperasi.menu-arisan-koperasi', compact('data'), ['akses' => $akses, 'code' => $id]);
         } else {
             return Redirect::to('dashboard/home');
+        }
+    }
+    public function menu_koperasi_arisan_add_group(Request $request)
+    {
+        return view('app-koperasi.menu-arisan.form-add-group');
+    }
+    public function menu_koperasi_arisan_save_group(Request $request)
+    {
+        try {
+            DB::table('kop_arisan_group')->insert([
+                'kop_arisan_group_code' => str::uuid(),
+                'kop_arisan_group_name' => $request->nama_group,
+                'kop_arisan_group_date_start' => $request->tgl_mulai,
+                'kop_arisan_group_date_end' => $request->tgl_selesai,
+                'kop_arisan_group_nominal' => $request->nominal,
+                'kop_arisan_group_bunga' => $request->bunga,
+                'kop_arisan_group_cabang' => Auth::user()->access_cabang,
+                'kop_arisan_group_status' => 1,
+                'created_at' => now(),
+            ]);
+            return 1;
+        } catch (\Throwable $e) {
+            return 0;
+        }
+    }
+    public function menu_koperasi_arisan_add_group_peserta(Request $request)
+    {
+        $data = DB::table('kop_master_peserta')->where('kop_master_peserta_cabang', Auth::user()->access_cabang)->get();
+        return view('app-koperasi.menu-arisan.form-add-peserta', compact('data'), ['code' => $request->code]);
+    }
+    public function menu_koperasi_arisan_save_group_peserta(Request $request)
+    {
+        try {
+            DB::table('kop_arisan_group_user')->insert([
+                'kop_arisan_group_user_code' => str::uuid(),
+                'kop_arisan_group_code' => $request->id,
+                'kop_master_peserta_code' => $request->code,
+                'created_at' => now()
+            ]);
+            return 'Berhasil';
+        } catch (\Throwable $e) {
+            return 'Gagal';
         }
     }
     // MENU VOCHER KOPERASI
     public function menu_koperasi_vocher($akses, $id)
     {
         if ($this->url_akses($akses, $id) == true) {
-            $cabang = DB::table('kop_master_cabang')->get();
-            $divisi = DB::table('kop_master_div_bag')->join('kop_master_divisi', 'kop_master_divisi.kop_master_divisi_code', '=', 'kop_master_div_bag.kop_master_divisi_code')->get();
-            $pokok = DB::table('kop_simpanan_pokok')->get();
-            $wajib = DB::table('kop_simpanan_wajib')->get();
-            return view('app-koperasi.menu-vocher-koperasi', compact('cabang', 'divisi', 'pokok', 'wajib'), ['akses' => $akses, 'code' => $id]);
+            $data = DB::table('kop_vocher_data')
+                ->join('kop_master_peserta', 'kop_master_peserta.kop_master_peserta_code', '=', 'kop_vocher_data.kop_master_peserta_code')
+                ->join('kop_user_verifikasi', 'kop_user_verifikasi.kop_user_verifikasi_code', '=', 'kop_vocher_data.kop_vocher_data_ketua')
+                ->where('kop_vocher_data_cabang', Auth::user()->access_cabang)->get();
+            return view('app-koperasi.menu-vocher-koperasi', compact('data'), ['akses' => $akses, 'code' => $id]);
         } else {
             return Redirect::to('dashboard/home');
         }
+    }
+    public function menu_koperasi_vocher_add(Request $request)
+    {
+        $cat = DB::table('kop_vocher_cat')->get();
+        $anggota = DB::table('kop_master_peserta')->where('kop_master_peserta_cabang', Auth::user()->access_cabang)->get();
+        $verif = DB::table('kop_user_verifikasi')->where('kop_user_verifikasi_cabang', Auth::user()->access_cabang)->get();
+        return view('app-koperasi.menu-vocher.form-add-vocher', compact('cat', 'anggota', 'verif'));
+    }
+    public function menu_koperasi_vocher_save(Request $request)
+    {
+        try {
+            DB::table('kop_vocher_data')->insert([
+                'kop_vocher_data_code' => str::uuid(),
+                'kop_vocher_data_token' => str::uuid(),
+                'kop_master_peserta_code' => $request->anggota,
+                'kop_vocher_cat_code' => $request->kategori,
+                'kop_vocher_data_nominal' => $request->nominal,
+                'kop_vocher_data_number_id' => $request->nomor_id,
+                'kop_vocher_data_ketua' => $request->verif,
+                'kop_vocher_data_date_start' => $request->tanggal_vocher,
+                'kop_vocher_data_date_end' => $request->tanggal_vocher,
+                'kop_vocher_data_cabang' => Auth::user()->access_cabang,
+                'kop_vocher_data_status' => 0,
+                'created_at' => now(),
+            ]);
+            return 1;
+        } catch (\Throwable $e) {
+            return 0;
+        }
+    }
+    public function menu_koperasi_vocher_proses(Request $request)
+    {
+        return view('app-koperasi.menu-vocher.form-proses-vocher');
+    }
+    public function menu_koperasi_vocher_proses_save(Request $request)
+    {
+        return 1;
     }
     // MENU PEMINJAMAN UANG
     public function menu_peminjaman_uang($akses, $id)
@@ -357,6 +433,25 @@ class KoperasiController extends Controller
             return view('app-koperasi.master-koperasi.master-cabang', ['data' => $data, 'akses' => $akses, 'code' => $id]);
         } else {
             return Redirect::to('dashboard/home');
+        }
+    }
+    public function master_koperasi_cabang_add_cabang(Request $request)
+    {
+        return view('app-koperasi.master-koperasi.master-cabang.form-add-cabang');
+    }
+    public function master_koperasi_cabang_save_cabang(Request $request)
+    {
+        try {
+            DB::table('kop_master_cabang')->insert([
+                'kop_master_cabang_code' => $request->code_cabang,
+                'kop_master_cabang_name' => $request->nama_cabang,
+                'kop_master_cabang_city' => $request->kota_cabang,
+                'kop_master_cabang_alamat' => $request->alamat_cabang,
+                'created_at' => now(),
+            ]);
+            return 1;
+        } catch (\Throwable $e) {
+            return 0;
         }
     }
     public function master_koperasi_cabang_add_verifikasi(Request $request)
