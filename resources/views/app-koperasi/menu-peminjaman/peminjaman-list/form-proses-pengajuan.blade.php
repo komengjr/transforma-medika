@@ -10,14 +10,14 @@
                 <div class="row flex-between-end">
                     <div class="col-auto align-self-center">
                         <h5 class="mb-0" data-anchor="data-anchor" id="horizontal-form-label-sizing">Data Pengajuan Peminjaman Uang<a class="anchorjs-link " aria-label="Anchor" data-anchorjs-icon="#" href="#horizontal-form-label-sizing" style="padding-left: 0.375em;"></a></h5>
-                        <p class="mb-0 mt-2 mb-0">Be sure to use <code>.col-form-label-sm</code> or <code>.col-form-label-lg</code> to your <code>&lt;label&gt;</code>s or <code>&lt;legend&gt;</code>s to correctly follow the size of <code>.form-control-lg</code> and <code>.form-control-sm</code>.</p>
+                        <p class="mb-0 mt-2 mb-0">Lorem ipsum dolor sit, amet consectetur adipisicing elit. Eveniet doloribus minima fugit ullam asperiores laudantium ad dicta accusantium eius, perferendis repellat nulla commodi. Laudantium odio assumenda voluptas fugit eos! Nihil.</p>
                     </div>
                     <div class="col-auto ms-auto">
 
                     </div>
                 </div>
             </div>
-            <div class="card-body">
+            <div class="card-body" >
                 <div class="row align-items-center">
                     <div class="col">
                         <h6 class="text-500">Report to</h6>
@@ -85,7 +85,7 @@
                                 @php
                                 $total = $total + ( $pokok + $suku_bunga );
                                 @endphp
-                            @endfor
+                                @endfor
                         </tbody>
                     </table>
                 </div>
@@ -139,7 +139,23 @@
                                         {{ $kacab->kop_user_verifikasi_email }}<br>
                                         {{ $kacab->kop_user_verifikasi_whatsapp }}
                                         <span class="d-block mb-0 pt-2">
+                                            @php
+                                            $kcb = DB::table('kop_proses_verif')
+                                            ->where('kop_proses_uang_code',$data->kop_proses_uang_code)
+                                            ->where('kop_proses_verif_user',$data->kop_proses_uang_kacab)->first();
+                                            @endphp
+                                            @if ($kcb)
+                                            @if ($kcb->kop_proses_verif_status == '0')
+                                            <span class="badge bg-warning">Menunggu di verifikasi</span>
+                                            @elseif ($kcb->kop_proses_verif_status == '1')
+                                            <span class="badge bg-primary">Sudah di verifikasi</span>
+                                            @else
                                             <span class="badge bg-danger">Belum di verifikasi</span>
+                                            @endif
+                                            @else
+                                            <span class="badge bg-danger">Belum di verifikasi</span>
+                                            @endif
+
                                         </span>
                                     </span>
                                 </span>
@@ -154,13 +170,29 @@
                             <div class="form-check mb-0 custom-radio">
                                 <!-- <input class="form-check-input" id="address-2" type="radio" name="clientName"> -->
                                 <label class="form-check-label mb-0 fw-bold d-block" for="address-1">
-                                    Kepala Cabang
+                                    Ketua Koperasi
                                     <span class="radio-select-content">
                                         <span> {{ $kacab->kop_user_verifikasi_name }},<br>
                                             {{ $kacab->kop_user_verifikasi_email }}<br>
                                             {{ $kacab->kop_user_verifikasi_whatsapp }}
                                             <span class="d-block mb-0 pt-2">
+                                                @php
+                                                $ketua = DB::table('kop_proses_verif')
+                                                ->where('kop_proses_uang_code',$data->kop_proses_uang_code)
+                                                ->where('kop_proses_verif_user',$data->kop_proses_uang_ketua)->first();
+                                                @endphp
+                                                @if ($ketua)
+                                                @if ($ketua->kop_proses_verif_status == '0')
+                                                <span class="badge bg-warning">Menunggu di verifikasi</span>
+                                                @elseif ($ketua->kop_proses_verif_status == '1')
+                                                <span class="badge bg-primary">Sudah di verifikasi</span>
+                                                @else
                                                 <span class="badge bg-danger">Belum di verifikasi</span>
+                                                @endif
+                                                @else
+                                                <span class="badge bg-danger">Belum di verifikasi</span>
+                                                @endif
+
                                             </span>
                                         </span>
                                     </span>
@@ -175,7 +207,7 @@
 </div>
 <div class="modal-footer px-4 bg-300">
     <span id="menu-add-data-verifikasi">
-        <button class="btn btn-success float-end" id="button-simpan-data-verifikasi" data-code="">Simpan
+        <button class="btn btn-success float-end" id="button-simpan-data-verifikasi" data-code="{{ $data->kop_proses_uang_code }}">Simpan
             Data</button>
     </span>
 </div>

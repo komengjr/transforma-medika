@@ -16,6 +16,7 @@ class AccMasterCoa extends Migration
         Schema::create('acc_master_coa', function (Blueprint $table) {
             $table->id('id_acc_master_coa');
             $table->string('acc_master_coa_code')->unique();
+            $table->integer('acc_master_coa_no');
             $table->string('acc_master_coa_name');
             $table->string('acc_master_coa_type');
             $table->string('acc_master_coa_status');

@@ -15,6 +15,7 @@ use App\Http\Controllers\inventaris\MasterController as InventarisMasterControll
 use App\Http\Controllers\inventaris\PeminjamanController;
 use App\Http\Controllers\KeuanganController;
 use App\Http\Controllers\Koperasi\KoperasiController;
+use App\Http\Controllers\Koperasi\PublicKoperasiController;
 use App\Http\Controllers\LaboratoriumController;
 use App\Http\Controllers\LiveTvController;
 use App\Http\Controllers\Logsitik\LogistikController;
@@ -183,6 +184,12 @@ Route::prefix('{akses}/{id}')->group(function (): void {
     Route::get('menu-peminjaman/peminjaman-uang', [KoperasiController::class, 'menu_peminjaman_uang'])->name('menu_peminjaman_uang');
     Route::get('menu-peminjaman/peminjaman-barang', [KoperasiController::class, 'menu_peminjaman_barang'])->name('menu_peminjaman_barang');
     Route::get('menu-peminjaman/list-peminjaman', [KoperasiController::class, 'menu_peminjaman_list'])->name('menu_peminjaman_list');
+    Route::get('laporan-koperasi/laporan-tagihan', [KoperasiController::class, 'laporan_koperasi_tagihan'])->name('laporan_koperasi_tagihan');
+    Route::get('laporan-koperasi/laporan-mutasi-bank', [KoperasiController::class, 'laporan_koperasi_mutasi_bank'])->name('laporan_koperasi_mutasi_bank');
+    Route::get('laporan-koperasi/laporan-rugi-laba', [KoperasiController::class, 'laporan_koperasi_rugi_laba'])->name('laporan_koperasi_rugi_laba');
+    Route::get('laporan-koperasi/laporan-neraca', [KoperasiController::class, 'laporan_koperasi_neraca'])->name('laporan_koperasi_neraca');
+    Route::get('laporan-koperasi/laporan-pembagian-laba', [KoperasiController::class, 'laporan_koperasi_pembagian_laba'])->name('laporan_koperasi_pembagian_laba');
+    Route::get('laporan-koperasi/laporan-pembagian-shu', [KoperasiController::class, 'laporan_koperasi_pembagian_shu'])->name('laporan_koperasi_pembagian_shu');
     Route::get('akutansi-koperasi/jurnal-otomatis', [KoperasiController::class, 'akutansi_koperasi_jurnal_otomatis'])->name('akutansi_koperasi_jurnal_otomatis');
     Route::get('akutansi-koperasi/jurnal-manual', [KoperasiController::class, 'akutansi_koperasi_jurnal_manual'])->name('akutansi_koperasi_jurnal_manual');
     Route::get('master-koperasi/peserta-koperasi', [KoperasiController::class, 'master_koperasi_peserta'])->name('master_koperasi_peserta');
@@ -190,6 +197,8 @@ Route::prefix('{akses}/{id}')->group(function (): void {
     Route::get('master-koperasi/divisi-koperasi', [KoperasiController::class, 'master_koperasi_divisi'])->name('master_koperasi_divisi');
     Route::get('master-koperasi/klasifikasi-simpanan-pokok', [KoperasiController::class, 'master_koperasi_simpanan_pokok'])->name('master_koperasi_simpanan_pokok');
     Route::get('master-koperasi/klasifikasi-simpanan-wajib', [KoperasiController::class, 'master_koperasi_simpanan_wajib'])->name('master_koperasi_simpanan_wajib');
+    Route::get('master-koperasi/data-bank', [KoperasiController::class, 'master_koperasi_data_bank'])->name('master_koperasi_data_bank');
+    Route::get('master-koperasi/data-coa', [KoperasiController::class, 'master_koperasi_data_coa'])->name('master_koperasi_data_coa');
 });
 // MEDICA HEALTH
 Route::prefix('{akses}/{id}/application')->group(function () {
@@ -633,9 +642,10 @@ Route::prefix('app/')->group(function (): void {
 Route::prefix('pacs')->group(function (): void {
     Route::get('data/{id}', [PacsController::class, 'pacs_preview'])->name('pacs_preview');
 });
-Route::prefix('v1')->group(function (): void {
+Route::prefix('v3')->group(function (): void {
     Route::get('display-antrian', [AntrianController::class, 'display_antrian'])->name('display_antrian');
     Route::get('both-antrian', [AntrianController::class, 'both_antrian'])->name('both_antrian');
+    Route::get('data-vocher/{code}', [PublicKoperasiController::class, 'data_vocher'])->name('data_vocher_koperasi');
 });
 
 // MOVIE

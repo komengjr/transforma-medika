@@ -86,9 +86,15 @@
                                     $no = 1;
                                     @endphp
                                     @foreach ($peserta as $pes)
-                                    <li>
-                                        <span>{{ $no++ }}. {{ $pes->kop_master_peserta_name }}</span>
-                                    </li>
+                                    @php
+                                    $elemnisai = DB::table('kop_arisan_tagihan_peserta')->where('kop_arisan_group_user_code',$pes->kop_arisan_group_user_code)->first();
+                                    @endphp
+                                    @if ($elemnisai)
+                                    <span class="badge bg-danger fs--2 my-1">{{ $no++ }}. <del>{{ $pes->kop_master_peserta_name }}</del></span>
+                                    @else
+                                    <span class="badge bg-primary fs--2 my-1">{{ $no++ }}. {{ $pes->kop_master_peserta_name }}</span>
+                                    @endif
+
                                     @endforeach
                                 </ul>
                             </div>
@@ -108,12 +114,17 @@
                                     </div>
                                 </div>
                                 <div class="mt-2">
+                                    @if ($datas->kop_arisan_group_status == 0)
                                     <a class="btn btn-sm btn-warning d-lg-block mt-lg-2" href="#!" id="button-add-peserta-group-arisan" data-bs-toggle="modal" data-bs-target="#modal-koperasi" data-code="{{ $datas->kop_arisan_group_code }}">
                                         <span class="fas fa-user-shield"></span>
                                         <span class="ms-2 d-none d-md-inline-block">Tambah Peserta</span>
                                     </a>
-                                    <a class="btn btn-sm btn-primary d-lg-block mt-lg-2" href="#!"><span class="fas fa-shield-virus"></span> <span class="ms-2 d-none d-md-inline-block">Simpan & Jalankan Proses</span></a>
-                                    <a class="btn btn-sm btn-dark d-lg-block mt-lg-2" href="#!"><span class="fas fa-share-square"></span> <span class="ms-2 d-none d-md-inline-block">Proses Bulanan</span></a>
+                                    <a class="btn btn-sm btn-primary d-lg-block mt-lg-2" href="#!" id="button-generate-proses-arisan" data-code="{{ $datas->kop_arisan_group_code }}"><span class="fas fa-shield-virus"></span> <span class="ms-2 d-none d-md-inline-block">Simpan & Jalankan Proses</span></a>
+
+                                    @elseif ($datas->kop_arisan_group_status == 1)
+                                    <a class="btn btn-sm btn-info d-lg-block mt-lg-2" href="#!" id="button-data-periode-arisan" data-bs-toggle="modal" data-bs-target="#modal-koperasi" data-code="{{ $datas->kop_arisan_group_code }}"><span class="fas fa-project-diagram"></span> <span class="ms-2 d-none d-md-inline-block">Periode Bulanan</span></a>
+                                    <a class="btn btn-sm btn-dark d-lg-block mt-lg-2" href="#!" id="button-proses-data-group-arisan" data-bs-toggle="modal" data-bs-target="#modal-koperasi-full" data-code="{{ $datas->kop_arisan_group_code }}"><span class="fas fa-spinner"></span> <span class="ms-2 d-none d-md-inline-block">Proses Spin</span></a>
+                                    @endif
                                 </div>
                             </div>
                         </div>
@@ -129,7 +140,7 @@
 </div>
 @endsection
 @section('base.js')
-<div class="modal fade" id="modal-penjualan-full" data-bs-keyboard="false" data-bs-backdrop="static" tabindex="-1"
+<div class="modal fade" id="modal-koperasi-full" data-bs-keyboard="false" data-bs-backdrop="static" tabindex="-1"
     aria-labelledby="staticBackdropLabel" aria-hidden="false">
     <div class="modal-dialog modal-dialog-centered" role="document" style="max-width: 95%;">
         <div class="modal-content border-0">
@@ -137,7 +148,7 @@
                 <button class="btn-close btn btn-sm btn-circle d-flex flex-center transition-base"
                     data-bs-dismiss="modal" aria-label="Close"></button>
             </div>
-            <div id="menu-poliklinik-full"></div>
+            <div id="menu-koperasi-full"></div>
         </div>
     </div>
 </div>
@@ -261,6 +272,183 @@
             $('#menu-loading-peserta-koperasi').html('eror');
         });
     });
+    $(document).on("click", "#button-data-periode-arisan", function(e) {
+        e.preventDefault();
+        var code = $(this).data("code");
+        $('#menu-koperasi').html(
+            '<div class="spinner-border my-3" style="display: block; margin-left: auto; margin-right: auto;" role="status"><span class="visually-hidden">Loading...</span></div>'
+        );
+        $.ajax({
+            url: "{{ route('menu_koperasi_arisan_periode_group_arisan') }}",
+            type: "POST",
+            cache: false,
+            data: {
+                "_token": "{{ csrf_token() }}",
+                "code": code,
+            },
+            dataType: 'html',
+        }).done(function(data) {
+            $('#menu-koperasi').html(data);
+        }).fail(function() {
+            $('#menu-koperasi').html('eror');
+        });
+    });
+    $(document).on("click", "#button-proses-data-group-arisan", function(e) {
+        e.preventDefault();
+        var code = $(this).data("code");
+        $('#menu-koperasi-full').html(
+            '<div class="spinner-border my-3" style="display: block; margin-left: auto; margin-right: auto;" role="status"><span class="visually-hidden">Loading...</span></div>'
+        );
+        $.ajax({
+            url: "{{ route('menu_koperasi_arisan_proses_group_arisan') }}",
+            type: "POST",
+            cache: false,
+            data: {
+                "_token": "{{ csrf_token() }}",
+                "code": code,
+            },
+            dataType: 'html',
+        }).done(function(data) {
+            $('#menu-koperasi-full').html(data);
+        }).fail(function() {
+            $('#menu-koperasi-full').html('eror');
+        });
+    });
 </script>
+<script>
+    $(document).on("click", "#button-generate-proses-arisan", function(e) {
+        e.preventDefault();
+        const swalWithBootstrapButtons = Swal.mixin({
+            customClass: {
+                confirmButton: "btn btn-success",
+                cancelButton: "btn btn-danger"
+            },
+            buttonsStyling: true
+        });
+        swalWithBootstrapButtons.fire({
+            title: "Apakah Kamu yakin ?",
+            text: "Kamu Yakin Untuk Proses Data ini ?",
+            icon: "success",
+            showCancelButton: true,
+            confirmButtonText: "Yes, Setuju",
+            cancelButtonText: "No, Batal",
+            reverseButtons: true
+        }).then((result) => {
+            if (result.isConfirmed) {
+                var code = $(this).data("code");
+                $('#loading-button-proses').html(
+                    '<div class="spinner-border my-3" style="display: block; margin-left: auto; margin-right: auto;" role="status"><span class="visually-hidden">Loading...</span></div>'
+                );
+                $.ajax({
+                    url: "{{ route('menu_koperasi_arisan_generate_proses_arisan') }}",
+                    type: "POST",
+                    cache: false,
+                    data: {
+                        "_token": "{{ csrf_token() }}",
+                        "code": code
+                    },
+                    dataType: 'html',
+                }).done(function(data) {
+                    if (data == 1) {
+                        swalWithBootstrapButtons.fire({
+                            title: "Sukses!",
+                            text: "Your file has been Sukses.",
+                            icon: "success"
+                        });
+                        Swal.fire('Berhasil!', 'Proses Arisah Berhasil di jalankan', 'success').then(() => {
+                            location.reload();
+                        });
+                    } else {
+                        swalWithBootstrapButtons.fire({
+                            title: "Cancelled",
+                            text: "Gagal Menyimpan",
+                            icon: "error"
+                        });
+                        $('#loading-button-proses').html(
+                            '<button class="btn btn-primary d-block w-100" type="button" id="button-proses-pengajuan-peminjaman">Pengajuan Peminjaman</button>'
+                        );
+                    }
+                }).fail(function() {
+                    swalWithBootstrapButtons.fire({
+                        title: "Cancelled",
+                        text: "Gagal Menyimpan",
+                        icon: "error"
+                    });
+                });
+            } else if (result.dismiss === Swal.DismissReason.cancel) {
+                swalWithBootstrapButtons.fire({
+                    title: "Cancelled",
+                    text: "Gagal Menyimpan",
+                    icon: "error"
+                });
+            }
+        });
+    });
+    $(document).on("click", "#button-proses-pembuatan-token-arisan", function(e) {
+        e.preventDefault();
+        const swalWithBootstrapButtons = Swal.mixin({
+            customClass: {
+                confirmButton: "btn btn-success",
+                cancelButton: "btn btn-danger"
+            },
+            buttonsStyling: true
+        });
+        swalWithBootstrapButtons.fire({
+            title: "Apakah Kamu yakin ?",
+            text: "Kamu Yakin Untuk Proses Data ini ?",
+            icon: "success",
+            showCancelButton: true,
+            confirmButtonText: "Yes, Setuju",
+            cancelButtonText: "No, Batal",
+            reverseButtons: true
+        }).then((result) => {
+            if (result.isConfirmed) {
+                var code = $(this).data("code");
+                var id = $(this).data("id");
+                $('#menu-periode-arisan').html(
+                    '<div class="spinner-border my-3" style="display: block; margin-left: auto; margin-right: auto;" role="status"><span class="visually-hidden">Loading...</span></div>'
+                );
+                $.ajax({
+                    url: "{{ route('menu_koperasi_arisan_periode_group_arisan_create_token') }}",
+                    type: "POST",
+                    cache: false,
+                    data: {
+                        "_token": "{{ csrf_token() }}",
+                        "code": code,
+                        "id": id
+                    },
+                    dataType: 'html',
+                }).done(function(data) {
+                    if (data == 1) {
+                        swalWithBootstrapButtons.fire({
+                            title: "Sukses!",
+                            text: "Your file has been Sukses.",
+                            icon: "success"
+                        });
+                        Swal.fire('Berhasil!', 'Proses Arisah Berhasil di jalankan', 'success').then(() => {
+                            location.reload();
+                        });
+                    } else {
+                        Swal.fire('Gagal!', 'Proses Arisan Gagal di buat', 'error').then(() => {
+                            location.reload();
+                        });
 
+                    }
+                }).fail(function() {
+                    swalWithBootstrapButtons.fire({
+                        title: "Cancelled",
+                        text: "Gagal Menyimpan",
+                        icon: "error"
+                    });
+                });
+            } else if (result.dismiss === Swal.DismissReason.cancel) {
+                swalWithBootstrapButtons.fire({
+                    title: "Cancelled",
+                    text: "Gagal Menyimpan",
+                    icon: "error"
+                });
+            }
+        });
+    });
+</script>
 @endsection

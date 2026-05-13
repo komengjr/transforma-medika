@@ -13,7 +13,7 @@ class KoperasiProsesPeminjamanUang extends Migration
      */
     public function up()
     {
-        Schema::create('kop_proses_penyimpanan_uang', function (Blueprint $table) {
+        Schema::create('kop_proses_peminjaman_uang', function (Blueprint $table) {
             $table->id('id_kop_proses_uang');
             $table->string('kop_proses_uang_code')->unique();
             $table->string('kop_master_peserta_code');

@@ -97,9 +97,9 @@
                         @elseif ($datas->kop_proses_uang_status == '1')
                         <span class="badge bg-warning">Peminjaman diproses</span>
                         @elseif ($datas->kop_proses_uang_status == '2')
-                        <span class="badge bg-warning">Peminjaman Berjalan</span>
+                        <span class="badge bg-success">Peminjaman Lunas</span>
                         @elseif ($datas->kop_proses_uang_status == '3')
-                        <span class="badge bg-warning">Peminjaman Lunas</span>
+                        <span class="badge bg-primary">Peminjaman Lunas</span>
                         @endif
                     </td>
                     <td>
@@ -108,15 +108,22 @@
                                 type="button" data-bs-toggle="dropdown" aria-haspopup="true" aria-expanded="false"><span
                                     class="fas fa-align-left me-1" data-fa-transform="shrink-3"></span>Menu</button>
                             <div class="dropdown-menu" aria-labelledby="btnGroupVerticalDrop2">
-                                <button class="dropdown-item" data-bs-toggle="modal" data-bs-target="#modal-koperasi"
+                                @if ($datas->kop_proses_uang_status == '0')
+                                <button class="dropdown-item text-primary" data-bs-toggle="modal" data-bs-target="#modal-koperasi"
                                     id="button-proses-data-pengajuan" data-code="{{$datas->kop_proses_uang_code}}"><span
                                         class="far fa-folder-open"></span>
                                     Proses Pengajuan Peminjaman</button>
-                                <div class="dropdown-divider"></div>
+                                @elseif ($datas->kop_proses_uang_status == '1')
+                                <button class="dropdown-item text-warning" data-bs-toggle="modal" data-bs-target="#modal-koperasi"
+                                    id="button-cek-status-kontrak" data-code="{{$datas->kop_proses_uang_code}}"><span
+                                        class="fab fa-leanpub"></span>
+                                    Cek Status Kontrak</button>
+                                @elseif ($datas->kop_proses_uang_status == '2')
                                 <button class="dropdown-item" data-bs-toggle="modal" data-bs-target="#modal-koperasi"
                                     id="button-cetak-pengajuain-peminjaman" data-code="{{$datas->kop_proses_uang_code}}"><span
                                         class="fas fa-print"></span>
                                     Cetak Pengajuan Peminjaman</button>
+                                @endif
                             </div>
                         </div>
                     </td>
@@ -205,6 +212,7 @@
             dataType: 'html',
         }).done(function(data) {
             $('#loading-button-kirim').html(data);
+            location.reload();
         }).fail(function() {
             $('#loading-button-kirim').html('eror');
         });
@@ -230,10 +238,77 @@
             $('#menu-koperasi').html('eror');
         });
     });
+    $(document).on("click", "#button-cek-status-kontrak", function(e) {
+        e.preventDefault();
+        var code = $(this).data("code");
+        $('#menu-koperasi').html(
+            '<div class="spinner-border my-3" style="display: block; margin-left: auto; margin-right: auto;" role="status"><span class="visually-hidden">Loading...</span></div>'
+        );
+        $.ajax({
+            url: "{{ route('menu_peminjaman_list_cek_kontrak') }}",
+            type: "POST",
+            cache: false,
+            data: {
+                "_token": "{{ csrf_token() }}",
+                "code": code
+            },
+            dataType: 'html',
+        }).done(function(data) {
+            $('#menu-koperasi').html(data);
+        }).fail(function() {
+            $('#menu-koperasi').html('eror');
+        });
+    });
+    $(document).on("click", "#button-proses-pembayaran-bulanan", function(e) {
+        e.preventDefault();
+        var code = $(this).data("code");
+        $('#menu-status-kontrak').html(
+            '<div class="spinner-border my-3" style="display: block; margin-left: auto; margin-right: auto;" role="status"><span class="visually-hidden">Loading...</span></div>'
+        );
+        $.ajax({
+            url: "{{ route('menu_peminjaman_list_cek_kontrak_payment') }}",
+            type: "POST",
+            cache: false,
+            data: {
+                "_token": "{{ csrf_token() }}",
+                "code": code
+            },
+            dataType: 'html',
+        }).done(function(data) {
+            $('#menu-status-kontrak').html(data);
+        }).fail(function() {
+            $('#menu-status-kontrak').html('eror');
+        });
+    });
+    $(document).on("click", "#button-fix-payment-kontrak-bulanan", function(e) {
+        e.preventDefault();
+        var code = $(this).data("code");
+        $('#menu-status-kontrak').html(
+            '<div class="spinner-border my-3" style="display: block; margin-left: auto; margin-right: auto;" role="status"><span class="visually-hidden">Loading...</span></div>'
+        );
+        $.ajax({
+            url: "{{ route('menu_peminjaman_list_cek_kontrak_payment_fix') }}",
+            type: "POST",
+            cache: false,
+            data: {
+                "_token": "{{ csrf_token() }}",
+                "code": code
+            },
+            dataType: 'html',
+        }).done(function(data) {
+            setTimeout(() => {
+                Swal.fire('Berhasil!', 'Pembayaran Berhasil dilakukan', 'success').then(() => {
+                    location.reload();
+                });
+            }, 1000);
+        }).fail(function() {
+            $('#menu-status-kontrak').html('eror');
+        });
+    });
 </script>
 
 <script>
-    $(document).on("click", "#button-proses-pengajuan-peminjaman", function(e) {
+    $(document).on("click", "#button-simpan-data-verifikasi", function(e) {
         e.preventDefault();
         const swalWithBootstrapButtons = Swal.mixin({
             customClass: {
@@ -252,15 +327,18 @@
             reverseButtons: true
         }).then((result) => {
             if (result.isConfirmed) {
-                var data = $("#form-pengajuan-peminjaman-uang").serialize();
+                var code = $(this).data("code");
                 $('#loading-button-proses').html(
                     '<div class="spinner-border my-3" style="display: block; margin-left: auto; margin-right: auto;" role="status"><span class="visually-hidden">Loading...</span></div>'
                 );
                 $.ajax({
-                    url: "{{ route('menu_peminjaman_uang_proses_pengajuan') }}",
+                    url: "{{ route('menu_peminjaman_list_proses_pengajuan_save_verif') }}",
                     type: "POST",
                     cache: false,
-                    data: data,
+                    data: {
+                        "_token": "{{ csrf_token() }}",
+                        "code": code
+                    },
                     dataType: 'html',
                 }).done(function(data) {
                     if (data == 1) {
@@ -287,19 +365,81 @@
                         icon: "error"
                     });
                 });
-
-
             } else if (result.dismiss === Swal.DismissReason.cancel) {
                 swalWithBootstrapButtons.fire({
                     title: "Cancelled",
                     text: "Gagal Menyimpan",
                     icon: "error"
                 });
-
             }
         });
+    });
 
-
+    $(document).on("click", "#button-penyelesaian-data-kontrak", function(e) {
+        e.preventDefault();
+        const swalWithBootstrapButtons = Swal.mixin({
+            customClass: {
+                confirmButton: "btn btn-success",
+                cancelButton: "btn btn-danger"
+            },
+            buttonsStyling: true
+        });
+        swalWithBootstrapButtons.fire({
+            title: "Apakah Kamu yakin >?",
+            text: "Kamu Yakin Untuk Proses Data ini ?",
+            icon: "success",
+            showCancelButton: true,
+            confirmButtonText: "Yes, Setuju",
+            cancelButtonText: "No, Batal",
+            reverseButtons: true
+        }).then((result) => {
+            if (result.isConfirmed) {
+                var code = $(this).data("code");
+                $('#loading-button-proses').html(
+                    '<div class="spinner-border my-3" style="display: block; margin-left: auto; margin-right: auto;" role="status"><span class="visually-hidden">Loading...</span></div>'
+                );
+                $.ajax({
+                    url: "{{ route('menu_peminjaman_list_cek_kontrak_penyelesaian_kontrak') }}",
+                    type: "POST",
+                    cache: false,
+                    data: {
+                        "_token": "{{ csrf_token() }}",
+                        "code": code
+                    },
+                    dataType: 'html',
+                }).done(function(data) {
+                    if (data == 1) {
+                        swalWithBootstrapButtons.fire({
+                            title: "Sukses!",
+                            text: "Your file has been Sukses.",
+                            icon: "success"
+                        });
+                        location.reload();
+                    } else {
+                        swalWithBootstrapButtons.fire({
+                            title: "Cancelled",
+                            text: "Gagal Menyimpan",
+                            icon: "error"
+                        });
+                        $('#loading-button-proses').html(
+                            '<button class="btn btn-primary d-block w-100" type="button" id="button-proses-pengajuan-peminjaman">Pengajuan Peminjaman</button>'
+                        );
+                    }
+                }).fail(function() {
+                    swalWithBootstrapButtons.fire({
+                        title: "Cancelled",
+                        text: "Gagal Menyimpan",
+                        icon: "error"
+                    });
+                });
+            } else if (result.dismiss === Swal.DismissReason.cancel) {
+                swalWithBootstrapButtons.fire({
+                    title: "Cancelled",
+                    text: "Gagal Menyimpan",
+                    icon: "error"
+                });
+            }
+        });
     });
 </script>
 @endsection

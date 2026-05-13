@@ -10,6 +10,7 @@ use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Hash;
 use Illuminate\Support\Facades\Redirect;
 use Illuminate\Support\Str;
+use PhpOffice\PhpSpreadsheet\Style\NumberFormat\Wizard\Currency;
 use PhpParser\Node\Stmt\TryCatch;
 
 class KoperasiController extends Controller
@@ -65,18 +66,22 @@ class KoperasiController extends Controller
         try {
             $setup = DB::table('kop_setup_cabang_koperasi')->where('kop_setup_cabang_koperasi_cabang', $request->cabang)->first();
             if ($setup->kop_setup_cabang_koperasi_wa == '0' || $setup->kop_setup_cabang_koperasi_email == '0') {
-
                 $status = 0;
             } elseif ($setup->kop_setup_cabang_koperasi_wa == '0') {
-
                 $status = 0;
             } elseif ($setup->kop_setup_cabang_koperasi_email == '0') {
-
                 $status = 0;
             } else {
                 $status = 1;
             }
             $code = str::uuid();
+            DB::table('kop_master_peserta_job')->insert([
+                'kop_master_peserta_job_code' => str::uuid(),
+                'kop_master_peserta_code' => $code,
+                'kop_master_div_bag_code' => $request->divisi,
+                'kop_master_peserta_job_status' => 1,
+                'created_at' => now()
+            ]);
             DB::table('kop_master_peserta')->insert([
                 'kop_master_peserta_code' => $code,
                 'kop_master_peserta_nik' => $request->nik,
@@ -112,13 +117,7 @@ class KoperasiController extends Controller
                 'kop_peserta_sim_jib_status' => '1',
                 'created_at' => now()
             ]);
-            DB::table('kop_master_peserta_job')->insert([
-                'kop_master_peserta_job_code' => str::uuid(),
-                'kop_master_peserta_code' => $code,
-                'kop_master_div_bag_code' => $request->divisi,
-                'kop_master_peserta_job_status' => 1,
-                'created_at' => now()
-            ]);
+
             return 1;
         } catch (\Throwable $e) {
             return 0;
@@ -149,7 +148,7 @@ class KoperasiController extends Controller
                 'kop_arisan_group_nominal' => $request->nominal,
                 'kop_arisan_group_bunga' => $request->bunga,
                 'kop_arisan_group_cabang' => Auth::user()->access_cabang,
-                'kop_arisan_group_status' => 1,
+                'kop_arisan_group_status' => 0,
                 'created_at' => now(),
             ]);
             return 1;
@@ -174,6 +173,118 @@ class KoperasiController extends Controller
             return 'Berhasil';
         } catch (\Throwable $e) {
             return 'Gagal';
+        }
+    }
+    public function menu_koperasi_arisan_generate_proses_arisan(Request $request)
+    {
+        try {
+            $total_peserta = DB::table('kop_arisan_group_user')->where('kop_arisan_group_code', $request->code)->count();
+            $data = DB::table('kop_arisan_group')->where('kop_arisan_group_code', $request->code)->first();
+            $date1 = Carbon::parse($data->kop_arisan_group_date_start);
+            $date2 = Carbon::parse($data->kop_arisan_group_date_end);
+            $diffInMonths = $date1->diffInMonths($date2);
+            $bunga = ($data->kop_arisan_group_bunga / 100) * ($data->kop_arisan_group_nominal * $total_peserta);
+            for ($i = 0; $i <= $diffInMonths; $i++) {
+                $date = date('Y-m-d', strtotime('+' . $i . ' month', strtotime($data->kop_arisan_group_date_start)));
+                $cek = DB::table('kop_arisan_tagihan')->where('kop_arisan_group_code', $request->code)->where('kop_arisan_tagihan_date', $date)->first();
+                if (!$cek) {
+                    DB::table('kop_arisan_tagihan')->insert([
+                        'kop_arisan_tagihan_code' => str::uuid(),
+                        'kop_arisan_group_code' => $request->code,
+                        'kop_arisan_tagihan_date' => $date,
+                        'kop_arisan_tagihan_pokok' => ($data->kop_arisan_group_nominal * $total_peserta) - $bunga,
+                        'kop_arisan_tagihan_bunga' => $bunga,
+                        'kop_arisan_tagihan_nominal' => $data->kop_arisan_group_nominal * $total_peserta,
+                        'kop_arisan_tagihan_kuota' => $total_peserta / $diffInMonths,
+                        'kop_arisan_tagihan_status' => 0,
+                        'created_at' => now()
+                    ]);
+                }
+            }
+            DB::table('kop_arisan_group')->where('kop_arisan_group_code', $request->code)->update([
+                'kop_arisan_group_status' => 1,
+                'updated_at' => now()
+            ]);
+            return 1;
+        } catch (\Throwable $e) {
+            return 0;
+        }
+    }
+    public function menu_koperasi_arisan_periode_group_arisan(Request $request)
+    {
+        $data = DB::table('kop_arisan_tagihan')->where('kop_arisan_group_code', $request->code)->get();
+        return view('app-koperasi.menu-arisan.form-periode-arisan', compact('data'));
+    }
+    public function menu_koperasi_arisan_periode_group_arisan_create_token(Request $request)
+    {
+        $status = DB::table('kop_arisan_tagihan')->where('kop_arisan_group_code', $request->id)->where('kop_arisan_tagihan_status', 1)->first();
+        if ($status) {
+            return 0;
+        } else {
+            DB::table('kop_arisan_tagihan')->where('kop_arisan_tagihan_code', $request->code)->update([
+                'kop_arisan_tagihan_status' => 1,
+                'updated_at' => now()
+            ]);
+            return 1;
+        }
+    }
+    public function menu_koperasi_arisan_proses_group_arisan(Request $request)
+    {
+        $peserta = DB::table('kop_arisan_group_user')
+            ->join('kop_master_peserta', 'kop_master_peserta.kop_master_peserta_code', '=', 'kop_arisan_group_user.kop_master_peserta_code')
+            ->where('kop_arisan_group_code', $request->code)->whereNotExists(function ($query) {
+                $query->select(DB::raw(1))
+                    ->from('kop_arisan_tagihan_peserta')
+                    ->join('kop_arisan_tagihan', 'kop_arisan_tagihan.kop_arisan_tagihan_code', '=', 'kop_arisan_tagihan_peserta.kop_arisan_tagihan_code')
+                    ->whereRaw('kop_arisan_tagihan_peserta.kop_arisan_group_user_code = kop_arisan_group_user.kop_arisan_group_user_code');
+            })->get();
+        $arisan = DB::table('kop_arisan_tagihan')->where('kop_arisan_group_code', $request->code)->where('kop_arisan_tagihan_status', 1)->first();
+        $terpilih = DB::table('kop_arisan_tagihan')
+            ->join('kop_arisan_tagihan_peserta', 'kop_arisan_tagihan_peserta.kop_arisan_tagihan_code', '=', 'kop_arisan_tagihan.kop_arisan_tagihan_code')
+            ->join('kop_arisan_group_user', 'kop_arisan_group_user.kop_arisan_group_user_code', '=', 'kop_arisan_tagihan_peserta.kop_arisan_group_user_code')
+            ->join('kop_master_peserta', 'kop_master_peserta.kop_master_peserta_code', '=', 'kop_arisan_group_user.kop_master_peserta_code')
+            ->where('kop_arisan_group_user.kop_arisan_group_code', $request->code)->get();
+        if ($arisan) {
+            return view('app-koperasi.menu-arisan.form-proses-group-arisan', compact('peserta', 'terpilih'), ['code' => $request->code, 'arisan' => $arisan]);
+        } else {
+            return '<div class="alert alert-danger" role="alert">
+            <h4 class="alert-heading fw-semi-bold">Eror!</h4>
+            <p>Pastikan Periode Arisan nYa sudah aktif.</p>
+            <hr />
+            <p class="mb-0">Silahkan Ke Periode Bulanan Untuk Mengaktifkan periodenya.</p>
+            </div>';
+        }
+    }
+    public function menu_koperasi_arisan_proses_group_arisan_spin(Request $request)
+    {
+        $kuota = DB::table('kop_arisan_tagihan')
+            ->where('kop_arisan_tagihan_code', $request->data_arisan)->first();
+        $data = DB::table('kop_arisan_tagihan_peserta')
+            ->join('kop_arisan_tagihan', 'kop_arisan_tagihan.kop_arisan_tagihan_code', '=', 'kop_arisan_tagihan_peserta.kop_arisan_tagihan_code')
+            ->where('kop_arisan_tagihan_peserta.kop_arisan_tagihan_code', $request->data_arisan)->count();
+        if ($kuota->kop_arisan_tagihan_kuota == $data) {
+            return 0;
+            # code...
+        } else {
+            DB::table('kop_arisan_tagihan_peserta')->insert([
+                'id_kop_tagihan_peserta_code' => str::uuid(),
+                'kop_arisan_tagihan_code' => $request->data_arisan,
+                'kop_arisan_group_user_code' => $request->data_peserta,
+                'kop_tagihan_peserta_nominal' => $kuota->kop_arisan_tagihan_pokok / $kuota->kop_arisan_tagihan_kuota,
+                'kop_tagihan_peserta_status' => 0,
+                'created_at' => now()
+            ]);
+            $data1 = DB::table('kop_arisan_tagihan_peserta')
+                ->join('kop_arisan_tagihan', 'kop_arisan_tagihan.kop_arisan_tagihan_code', '=', 'kop_arisan_tagihan_peserta.kop_arisan_tagihan_code')
+                ->where('kop_arisan_tagihan_peserta.kop_arisan_tagihan_code', $request->data_arisan)->count();
+            if ($kuota->kop_arisan_tagihan_kuota == $data1) {
+                DB::table('kop_arisan_tagihan')->where('kop_arisan_tagihan_code', $request->data_arisan)->update([
+                    'kop_arisan_tagihan_status' => 2,
+                    'kop_arisan_tagihan_terpilih' => 'tidak jadi',
+                    'updated_at' => now()
+                ]);
+            }
+            return 1;
         }
     }
     // MENU VOCHER KOPERASI
@@ -220,7 +331,73 @@ class KoperasiController extends Controller
     }
     public function menu_koperasi_vocher_proses(Request $request)
     {
-        return view('app-koperasi.menu-vocher.form-proses-vocher');
+        $data = DB::table('kop_vocher_data')->where('kop_vocher_data_code', $request->code)->first();
+        return view('app-koperasi.menu-vocher.form-proses-vocher', ['data' => $data]);
+    }
+    public function menu_koperasi_vocher_proses_send_token(Request $request)
+    {
+        $data = DB::table('kop_vocher_data')
+            ->join('kop_user_verifikasi', 'kop_user_verifikasi.kop_user_verifikasi_cabang', '=', 'kop_vocher_data.kop_vocher_data_cabang')
+            ->join('kop_master_peserta', 'kop_master_peserta.kop_master_peserta_code', '=', 'kop_vocher_data.kop_master_peserta_code')
+            ->where('kop_user_verifikasi_job', 1)
+            ->where('kop_user_verifikasi_status', 1)
+            ->where('kop_vocher_data_code', $request->data_vocher)->first();
+        if ($data) {
+            $nomorhp = $data->kop_user_verifikasi_whatsapp;
+            //Terlebih dahulu kita trim dl
+            $nomorhp = trim($nomorhp);
+            //bersihkan dari karakter yang tidak perlu
+            $nomorhp = strip_tags($nomorhp);
+            // Berishkan dari spasi
+            $nomorhp = str_replace(" ", "", $nomorhp);
+            // Berishkan dari -
+            $nomorhp = str_replace("-", "", $nomorhp);
+            // bersihkan dari bentuk seperti  (022) 66677788
+            $nomorhp = str_replace("(", "", $nomorhp);
+            // bersihkan dari format yang ada titik seperti 0811.222.333.4
+            $nomorhp = str_replace(".", "", $nomorhp);
+
+            if (!preg_match('/[^+0-9]/', trim($nomorhp))) {
+                // cek apakah no hp karakter 1-3 adalah +62
+                if (substr(trim($nomorhp), 0, 3) == '+62') {
+                    $nomorhp = trim($nomorhp);
+                }
+                // cek apakah no hp karakter 1 adalah 0
+                elseif (substr($nomorhp, 0, 1) == '0') {
+                    $nomorhp = '+62' . substr($nomorhp, 1);
+                }
+            }
+            $text = "Halo " . $data->kop_user_verifikasi_name . "\n\nDengan Nomor Vocher : " . $data->kop_vocher_data_code .
+                "\nAda Pengeluaran Vocher Sebagai Berikut\nNama :" . $data->kop_master_peserta_name . "\nNominal Vocher : Rp." . number_format($data->kop_vocher_data_nominal, 0, ',', '.') . "\nLogIT System Notifikasi";
+            $cek = DB::table('kop_sender_wa')->where('kop_sender_wa_code_token', $data->kop_vocher_data_token)->first();
+            if ($cek) {
+                DB::table('kop_sender_wa')->where('kop_sender_wa_code_token', $data->kop_vocher_data_token)->update([
+                    'kop_sender_wa_code_status' => 0,
+                    'kop_sender_wa_code_user' => Auth::user()->userid,
+                    'updated_at' => now()
+                ]);
+            } else {
+                # code...
+                DB::table('kop_sender_wa')->insert([
+                    'kop_sender_wa_code' => str::uuid(),
+                    'kop_sender_wa_code_token' => $data->kop_vocher_data_token,
+                    'kop_sender_wa_code_number' => $nomorhp,
+                    'kop_sender_wa_code_name' => $data->kop_master_peserta_name,
+                    'kop_sender_wa_code_filename' => 'nofile',
+                    'kop_sender_wa_code_text' => $text,
+                    'kop_sender_wa_code_file' => 'N',
+                    'kop_sender_wa_code_picture' => 0,
+                    'kop_sender_wa_code_status' => 0,
+                    'kop_sender_wa_code_date' => now(),
+                    'kop_sender_wa_code_pass' => 'admin',
+                    'kop_sender_wa_code_user' => Auth::user()->userid,
+                    'created_at' => now()
+                ]);
+            }
+            return 1;
+        } else {
+            return 0;
+        }
     }
     public function menu_koperasi_vocher_proses_save(Request $request)
     {
@@ -265,7 +442,7 @@ class KoperasiController extends Controller
     {
         try {
             $integer = preg_replace('/[^0-9]/', '', $request->nominal_pinjam);
-            DB::table('kop_proses_penyimpanan_uang')->insert([
+            DB::table('kop_proses_peminjaman_uang')->insert([
                 'kop_proses_uang_code' => str::uuid(),
                 'kop_master_peserta_code' => $request->peserta_koperasi,
                 'kop_proses_uang_nominal' => $integer,
@@ -299,8 +476,8 @@ class KoperasiController extends Controller
     public function menu_peminjaman_list($akses, $id)
     {
         if ($this->url_akses_sub($akses, $id) == true) {
-            $data = DB::table('kop_proses_penyimpanan_uang')
-                ->join('kop_master_peserta', 'kop_master_peserta.kop_master_peserta_code', '=', 'kop_proses_penyimpanan_uang.kop_master_peserta_code')
+            $data = DB::table('kop_proses_peminjaman_uang')
+                ->join('kop_master_peserta', 'kop_master_peserta.kop_master_peserta_code', '=', 'kop_proses_peminjaman_uang.kop_master_peserta_code')
                 ->get();
             return view('app-koperasi.menu-peminjaman.peminjaman-list-data', ['data' => $data, 'akses' => $akses, 'code' => $id]);
         } else {
@@ -310,13 +487,97 @@ class KoperasiController extends Controller
     public function menu_peminjaman_list_proses_pengajuan(Request $request)
     {
         $data = DB::table('kop_master_peserta')
-            ->join('kop_proses_penyimpanan_uang', 'kop_proses_penyimpanan_uang.kop_master_peserta_code', '=', 'kop_master_peserta.kop_master_peserta_code')
+            ->join('kop_proses_peminjaman_uang', 'kop_proses_peminjaman_uang.kop_master_peserta_code', '=', 'kop_master_peserta.kop_master_peserta_code')
             ->where('kop_proses_uang_code', $request->code)->first();
         return view('app-koperasi.menu-peminjaman.peminjaman-list.form-proses-pengajuan', ['code' => $request->code, 'data' => $data]);
     }
     public function menu_peminjaman_list_proses_pengajuan_send_verif(Request $request)
     {
-        return 123;
+        try {
+            $data = DB::table('kop_proses_peminjaman_uang')->where('kop_proses_uang_code', $request->code)->first();
+            $kcb = DB::table('kop_proses_verif')->where('kop_proses_uang_code', $request->code)->where('kop_proses_verif_user', $data->kop_proses_uang_kacab)->first();
+            if ($kcb) {
+            } else {
+                DB::table('kop_proses_verif')->insert([
+                    'kop_proses_verif_code' => str::uuid(),
+                    'kop_proses_uang_code' => $request->code,
+                    'kop_proses_verif_user' => $data->kop_proses_uang_kacab,
+                    'kop_proses_verif_status' => 0,
+                    'created_at' => now()
+                ]);
+            }
+            $ketua = DB::table('kop_proses_verif')->where('kop_proses_uang_code', $request->code)->where('kop_proses_verif_user', $data->kop_proses_uang_ketua)->first();
+            if ($ketua) {
+            } else {
+                DB::table('kop_proses_verif')->insert([
+                    'kop_proses_verif_code' => str::uuid(),
+                    'kop_proses_uang_code' => $request->code,
+                    'kop_proses_verif_user' => $data->kop_proses_uang_ketua,
+                    'kop_proses_verif_status' => 0,
+                    'created_at' => now()
+                ]);
+            }
+            return 'Berhasil Kirim';
+        } catch (\Throwable $e) {
+            return 0;
+        }
+    }
+    public function menu_peminjaman_list_proses_pengajuan_save_verif(Request $request)
+    {
+        try {
+            $data = DB::table('kop_proses_peminjaman_uang')->where('kop_proses_uang_code', $request->code)->first();
+            $pokok = $data->kop_proses_uang_nominal / $data->kop_proses_uang_tenor;
+            $suku_bunga = ($data->kop_proses_uang_nominal * ($data->kop_proses_uang_bunga / 100) * ($data->kop_proses_uang_tenor / 12)) / $data->kop_proses_uang_tenor;
+            $ttd = 0;
+            $kcb = DB::table('kop_proses_verif')
+                ->where('kop_proses_uang_code', $request->code)
+                ->where('kop_proses_verif_user', $data->kop_proses_uang_kacab)
+                ->where('kop_proses_verif_status', 1)
+                ->first();
+            if ($kcb) {
+                $ttd = $ttd + 1;
+            }
+            $ketua = DB::table('kop_proses_verif')
+                ->where('kop_proses_uang_code', $request->code)
+                ->where('kop_proses_verif_user', $data->kop_proses_uang_ketua)
+                ->where('kop_proses_verif_status', 1)
+                ->first();
+            if ($ketua) {
+                $ttd = $ttd + 1;
+            }
+            if ($ttd == 2) {
+                for ($i = 1; $i <= $data->kop_proses_uang_tenor; $i++) {
+                    $token = DB::table('kop_log_peminjaman_uang')
+                        ->where('kop_proses_uang_code', $request->code)
+                        ->where('kop_log_peminjaman_uang_tenor', $i)
+                        ->first();
+                    if (!$token) {
+                        DB::table('kop_log_peminjaman_uang')->insert([
+                            'kop_log_peminjaman_uang_code' => str::uuid(),
+                            'kop_proses_uang_code' => $request->code,
+                            'kop_log_peminjaman_uang_tenor' => $i,
+                            'kop_log_peminjaman_uang_pokok' => $pokok,
+                            'kop_log_peminjaman_uang_bunga' => $suku_bunga,
+                            'kop_log_peminjaman_uang_nominal' => $pokok + $suku_bunga,
+                            'kop_log_peminjaman_uang_date' => date('Y-m-d', strtotime('+' . $i . ' month', strtotime($data->kop_proses_uang_tgl))),
+                            'kop_log_peminjaman_uang_cat' => 'pinjaman_uang',
+                            'kop_log_peminjaman_uang_token' => str::uuid(),
+                            'kop_log_peminjaman_uang_status' => 0,
+                            'created_at' => now()
+                        ]);
+                    }
+                }
+                DB::table('kop_proses_peminjaman_uang')->where('kop_proses_uang_code', $request->code)->update([
+                    'kop_proses_uang_status' => 1,
+                    'updated_at' => now(),
+                ]);
+                return 1;
+            } else {
+                return 'Pastikan Sudah di Sign';
+            }
+        } catch (\Throwable $e) {
+            return 0;
+        }
     }
     public function menu_peminjaman_list_cetak_pengajuan(Request $request)
     {
@@ -325,7 +586,7 @@ class KoperasiController extends Controller
     public function menu_peminjaman_list_cetak_pengajuan_report(Request $request)
     {
         $data = DB::table('kop_master_peserta')
-            ->join('kop_proses_penyimpanan_uang', 'kop_proses_penyimpanan_uang.kop_master_peserta_code', '=', 'kop_master_peserta.kop_master_peserta_code')
+            ->join('kop_proses_peminjaman_uang', 'kop_proses_peminjaman_uang.kop_master_peserta_code', '=', 'kop_master_peserta.kop_master_peserta_code')
             ->where('kop_proses_uang_code', $request->code)->first();
         $image = base64_encode(file_get_contents(public_path('img/logo.png')));
         $pdf = \Barryvdh\DomPDF\Facade\Pdf::loadview('app-koperasi.menu-peminjaman.peminjaman-list.report.report-pengajuan-peminjaman', compact('image', 'data'), [
@@ -347,6 +608,104 @@ class KoperasiController extends Controller
             $pdf->image("img/cover.png", 12, 12, 575, 823);
             ');
         return base64_encode($pdf->stream());
+    }
+    public function menu_peminjaman_list_cek_kontrak(Request $request)
+    {
+        $data = DB::table('kop_master_peserta')
+            ->join('kop_proses_peminjaman_uang', 'kop_proses_peminjaman_uang.kop_master_peserta_code', '=', 'kop_master_peserta.kop_master_peserta_code')
+            ->where('kop_proses_uang_code', $request->code)->first();
+        return view('app-koperasi.menu-peminjaman.peminjaman-list.form-kontrak', ['code' => $request->code, 'data' => $data]);
+    }
+    public function menu_peminjaman_list_cek_kontrak_payment(Request $request)
+    {
+        $data = DB::table('kop_log_peminjaman_uang')->where('kop_log_peminjaman_uang_code', $request->code)->first();
+        return view('app-koperasi.menu-peminjaman.peminjaman-list.form-payment-kontrak', ['data' => $data]);
+    }
+    public function menu_peminjaman_list_cek_kontrak_payment_fix(Request $request)
+    {
+        DB::table('kop_log_peminjaman_uang')->where('kop_log_peminjaman_uang_code', $request->code)->update([
+            'kop_log_peminjaman_uang_status' => 1,
+            'updated_at' => now(),
+        ]);
+        return 'Berhasil Payment';
+    }
+    public function menu_peminjaman_list_cek_kontrak_penyelesaian_kontrak(Request $request)
+    {
+        $data = DB::table('kop_proses_peminjaman_uang')->where('kop_proses_uang_code', $request->code)->first();
+        $log = DB::table('kop_log_peminjaman_uang')->where('kop_proses_uang_code', $request->code)->where('kop_log_peminjaman_uang_status', 1)->count();
+        if ($data->kop_proses_uang_tenor == $log) {
+            DB::table('kop_proses_peminjaman_uang')->where('kop_proses_uang_code', $request->code)->update([
+                'kop_proses_uang_status' => 2,
+                'updated_at' => now()
+            ]);
+            return 1;
+        } else {
+            return 0;
+        }
+    }
+    // LAPORAN TAGIHAN
+    public function laporan_koperasi_tagihan($akses, $id)
+    {
+        if ($this->url_akses($akses, $id) == true) {
+
+            return view('app-koperasi.laporan-tagihan', ['akses' => $akses, 'code' => $id]);
+        } else {
+            return Redirect::to('dashboard/home');
+        }
+    }
+    public function laporan_koperasi_tagihan_find(Request $request)
+    {
+        return view('app-koperasi.laporan-tagihan.data-tagihan-koperasi');
+    }
+    // LAPORAN MUTASI BANK
+    public function laporan_koperasi_mutasi_bank($akses, $id)
+    {
+        if ($this->url_akses($akses, $id) == true) {
+
+            return view('app-koperasi.laporan-mutasi-bank', ['akses' => $akses, 'code' => $id]);
+        } else {
+            return Redirect::to('dashboard/home');
+        }
+    }
+    // LAPORAN RUGI LABA
+    public function laporan_koperasi_rugi_laba($akses, $id)
+    {
+        if ($this->url_akses($akses, $id) == true) {
+
+            return view('app-koperasi.laporan-rugi-laba', ['akses' => $akses, 'code' => $id]);
+        } else {
+            return Redirect::to('dashboard/home');
+        }
+    }
+    // LAPORAN NERACA
+    public function laporan_koperasi_neraca($akses, $id)
+    {
+        if ($this->url_akses($akses, $id) == true) {
+
+            return view('app-koperasi.laporan-neraca', ['akses' => $akses, 'code' => $id]);
+        } else {
+            return Redirect::to('dashboard/home');
+        }
+    }
+    // LAPORAN PEMBAGIAN LABA
+    public function laporan_koperasi_pembagian_laba($akses, $id)
+    {
+        if ($this->url_akses($akses, $id) == true) {
+
+            return view('app-koperasi.laporan-pembagian-laba', ['akses' => $akses, 'code' => $id]);
+        } else {
+            return Redirect::to('dashboard/home');
+        }
+    }
+    // LAPORAN PEMBAGIAN SHU
+    public function laporan_koperasi_pembagian_shu($akses, $id)
+    {
+        if ($this->url_akses($akses, $id) == true) {
+
+            return view('app-koperasi.laporan-pembagian-shu', ['akses' => $akses, 'code' => $id]);
+        } else {
+            return Redirect::to('dashboard/home');
+        }
     }
     // AKUTANSI JURNAL OTOMATIS
     public function akutansi_koperasi_jurnal_otomatis($akses, $id)
@@ -621,5 +980,55 @@ class KoperasiController extends Controller
         } catch (\Throwable $e) {
             return 0;
         }
+    }
+    // MASTER DATA BANK
+    public function master_koperasi_data_bank($akses, $id)
+    {
+        if ($this->url_akses($akses, $id) == true) {
+            $data = DB::table('kop_master_bank')->get();
+            return view('app-koperasi.master-koperasi.master-bank', ['data' => $data, 'akses' => $akses, 'code' => $id]);
+        } else {
+            return Redirect::to('dashboard/home');
+        }
+    }
+    public function master_koperasi_data_bank_add(Request $request)
+    {
+        return view('app-koperasi.master-koperasi.master-bank.form-add');
+    }
+    public function master_koperasi_data_bank_save(Request $request)
+    {
+        try {
+            DB::table('kop_master_bank')->insert([
+                'kop_master_bank_code' => str::uuid(),
+                'kop_master_bank_id' => $request->kode_bank,
+                'kop_master_bank_name' => $request->nama_bank,
+                'kop_master_bank_number' => $request->no_bank,
+                'created_at' => now()
+            ]);
+            return 1;
+        } catch (\Throwable $e) {
+            return 0;
+        }
+    }
+    // MASTER DATA COA
+    public function master_koperasi_data_coa($akses, $id)
+    {
+        if ($this->url_akses($akses, $id) == true) {
+            $total = DB::table('kop_master_coa_data')->where('kop_coa_data_opt', 0)->count();
+            $data = DB::table('kop_master_coa')->get();
+            return view('app-koperasi.master-koperasi.master-coa', ['total' => $total, 'data' => $data, 'akses' => $akses, 'code' => $id]);
+        } else {
+            return Redirect::to('dashboard/home');
+        }
+    }
+    public function master_koperasi_data_coa_add_level(Request $request)
+    {
+        $data = DB::table('acc_master_coa_data')->where('acc_master_coa_code', $request->code)->get();
+        return view('app-koperasi.master-koperasi.master-coa.form-add-level', [
+            'level' => $request->level,
+            'code' => $request->code,
+            'nomor' => $request->nomor,
+            'data' => $data
+        ]);
     }
 }

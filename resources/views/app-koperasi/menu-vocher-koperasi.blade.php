@@ -219,11 +219,43 @@
             $('#menu-koperasi').html('eror');
         });
     });
-    $(document).on("click", "#button-verifikasi-proses-data-vocher", function(e) {
+    $(document).on("click", "#button-send-token-verifikasi-vocher", function(e) {
+        e.preventDefault();
+        var data = $("#form-proses-vocher-baru").serialize();
+        $('#menu-proses-token-vocher').html(
+            '<button class="btn btn-primary mt-3 px-5" type="button" disabled="">Loading...</button>'
+        );
+        $.ajax({
+            url: "{{ route('menu_koperasi_vocher_proses_send_token') }}",
+            type: "POST",
+            cache: false,
+            data: data,
+            dataType: 'html',
+        }).done(function(data) {
+            if (data == 0) {
+                Swal.fire({
+                    icon: "error",
+                    title: "Oops...",
+                    text: "Something went wrong!",
+                    footer: '<a href="#">Why do I have this issue?</a>'
+                });
+                $('#menu-proses-token-vocher').html('<button class="btn btn-success float-end" id="button-send-token-verifikasi-vocher" data-code="">Confirm &amp; Prosess</button>');
+            } else {
+                setTimeout(() => {
+                    Swal.fire('Berhasil!', 'Proses Vocher Berhasil di jalankan', 'success').then(() => {
+                        location.reload();
+                    });
+                }, 1000);
+            }
+        }).fail(function() {
+            $('#menu-proses-token-vocher').html('eror');
+        });
+    });
+    $(document).on("click", "#button-payment-data-vocher", function(e) {
         e.preventDefault();
         var data = $("#form-proses-vocher-baru").serialize();
         $('#menu-proses-data-vocher').html(
-            '<div class="spinner-border my-3" style="display: block; margin-left: auto; margin-right: auto;" role="status"><span class="visually-hidden">Loading...</span></div>'
+            '<button class="btn btn-primary mt-3 px-5" type="button" disabled="">Loading...</button>'
         );
         $.ajax({
             url: "{{ route('menu_koperasi_vocher_proses_save') }}",
@@ -239,10 +271,13 @@
                     text: "Something went wrong!",
                     footer: '<a href="#">Why do I have this issue?</a>'
                 });
-                $('#menu-proses-data-vocher').html('<button class="btn btn-success float-end" id="button-verifikasi-proses-data-vocher" data-code="">Proses Data</button>');
+                $('#menu-proses-data-vocher').html('<button class="btn btn-success float-end" id="button-payment-data-vocher" data-code="">Confirm &amp; Prosess</button>');
             } else {
-                $('#menu-proses-data-vocher').html(data);
-                location.reload();
+                setTimeout(() => {
+                    Swal.fire('Berhasil!', 'Proses Vocher Berhasil di jalankan', 'success').then(() => {
+                        location.reload();
+                    });
+                }, 1000);
             }
         }).fail(function() {
             $('#menu-proses-data-vocher').html('eror');
