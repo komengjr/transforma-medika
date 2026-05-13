@@ -646,6 +646,7 @@ Route::prefix('v3')->group(function (): void {
     Route::get('display-antrian', [AntrianController::class, 'display_antrian'])->name('display_antrian');
     Route::get('both-antrian', [AntrianController::class, 'both_antrian'])->name('both_antrian');
     Route::get('data-vocher/{code}', [PublicKoperasiController::class, 'data_vocher'])->name('data_vocher_koperasi');
+    Route::post('data-vocher-save/sign', [PublicKoperasiController::class, 'data_vocher_save_sign'])->name('data_vocher_save_sign');
 });
 
 // MOVIE

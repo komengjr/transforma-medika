@@ -18,13 +18,37 @@ class PublicKoperasiController extends Controller
             ->where('kop_vocher_data.kop_vocher_data_code', $code)->first();
 
         if ($data) {
-            $ketua = DB::table('kop_user_verifikasi')->where('kop_user_verifikasi_cabang',$data->kop_master_cabang_code)
-            ->where('kop_user_verifikasi_job', 1)
-            ->where('kop_user_verifikasi_status', 1)->first();
-            return view('app-koperasi.public.form-sign-vocher',compact('data','ketua'));
-            # code...
+            if ($data->kop_vocher_data_status == '0') {
+
+                $ketua = DB::table('kop_user_verifikasi')->where('kop_user_verifikasi_cabang', $data->kop_master_cabang_code)
+                    ->where('kop_user_verifikasi_job', 1)
+                    ->where('kop_user_verifikasi_status', 1)->first();
+                return view('app-koperasi.public.form-sign-vocher', compact('data', 'ketua'));
+            } else {
+                return redirect()->route('login');
+            }
         } else {
-            return 'tidak ada data';
+            return redirect()->route('login');
+        }
+    }
+    public function data_vocher_save_sign(Request $request)
+    {
+        $data = DB::table('kop_vocher_data_verif')->where('vocher_data_code', $request->code)->first();
+        if ($data) {
+            return 0;
+        } else {
+            DB::table('kop_vocher_data_verif')->insert([
+                'kop_vocher_data_verif_code' => str::uuid(),
+                'vocher_data_code' => $request->code,
+                'kop_vocher_data_verif_sign' => $request->sign,
+                'kop_vocher_data_verif_date' => now(),
+                'created_at' => now()
+            ]);
+            DB::table('kop_vocher_data')->where('kop_vocher_data_code', $request->code)->update([
+                'kop_vocher_data_status' => 1,
+                'updated_at' => now()
+            ]);
+            return 1;
         }
     }
 }

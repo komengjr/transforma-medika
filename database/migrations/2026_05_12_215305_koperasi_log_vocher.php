@@ -14,7 +14,13 @@ class KoperasiLogVocher extends Migration
     public function up()
     {
         Schema::create('kop_log_vocher', function (Blueprint $table) {
-            $table->id();
+            $table->id('id_kop_log_vocher');
+            $table->string('kop_log_vocher_code')->unique();
+            $table->string('kop_vocher_data_code');
+            $table->string('kop_log_vocher_pokok');
+            $table->string('kop_log_vocher_bunga');
+            $table->string('kop_log_vocher_nominal');
+            $table->string('kop_log_vocher_date');
             $table->timestamps();
         });
     }

@@ -212,6 +212,7 @@
                 </div>
 
                 <div class="button-group">
+                    <input type="text" name="vocher_code" id="vocher_code" value="{{ $data->kop_vocher_data_code }}" hidden>
                     <button class="btn-clear" onclick="clearCanvas()">Ulangi</button>
                     <button class="btn-save" onclick="saveData()">Simpan Data</button>
                 </div>
@@ -227,6 +228,8 @@
             <textarea id="base64-output" readonly></textarea>
         </div>
     </div>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.7.1/jquery.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
 
     <script>
         const canvas = document.getElementById('signature-pad');
@@ -287,40 +290,101 @@
         }
 
         function saveData() {
-            const nama = document.getElementById('input-nama').value;
-            const nominal = document.getElementById('input-nominal').value;
-            const kebutuhan = document.getElementById('input-kebutuhan').value;
-
-            // Validasi Form
-            if (!nama || !nominal || !kebutuhan) {
-                alert("Mohon lengkapi Nama, Nominal, dan Kebutuhan!");
-                return;
-            }
-
-            // Validasi Tanda Tangan
-            const blank = document.createElement('canvas');
-            blank.width = canvas.width;
-            blank.height = canvas.height;
-            if (canvas.toDataURL() === blank.toDataURL()) {
-                alert("Silakan tanda tangan terlebih dahulu!");
-                return;
-            }
-
-            const base64String = canvas.toDataURL('image/png');
-
-            // Tampilkan Hasil
-            document.getElementById('data-summary').innerHTML = `
-                <b>Nama:</b> ${nama}<br>
-                <b>Nominal:</b> ${nominal}<br>
-                <b>Kebutuhan:</b> ${kebutuhan}
-            `;
-            document.getElementById('base64-output').value = base64String;
-            document.getElementById('result-area').style.display = 'block';
-
-            // Scroll otomatis ke hasil
-            document.getElementById('result-area').scrollIntoView({
-                behavior: 'smooth'
+            const swalWithBootstrapButtons = Swal.mixin({
+                customClass: {
+                    confirmButton: "btn btn-success",
+                    cancelButton: "btn btn-danger"
+                },
+                buttonsStyling: true
             });
+            swalWithBootstrapButtons.fire({
+                title: "Persetujuan Signeture?",
+                text: "Yakin Untuk Melakukan Penyimpanan Sign!",
+                icon: "warning",
+                showCancelButton: true,
+                confirmButtonText: "Yes,Setuju",
+                cancelButtonText: "No, Batal!",
+                reverseButtons: true
+            }).then((result) => {
+                if (result.isConfirmed) {
+
+                    const nama = document.getElementById('input-nama').value;
+                    const nominal = document.getElementById('input-nominal').value;
+                    const kebutuhan = document.getElementById('input-kebutuhan').value;
+                    const vocher = document.getElementById('vocher_code').value;
+
+                    // Validasi Form
+                    if (!nama || !nominal || !kebutuhan) {
+                        Swal.fire({
+                            icon: "error",
+                            title: "Oops...",
+                            text: "Pastikan Persetujuan Sudah Terisi!",
+                            footer: "<a href=\"#\">Why do I have this issue?</a>"
+                        });
+                        return;
+                    }
+
+                    // Validasi Tanda Tangan
+                    const blank = document.createElement('canvas');
+                    blank.width = canvas.width;
+                    blank.height = canvas.height;
+                    if (canvas.toDataURL() === blank.toDataURL()) {
+                        Swal.fire({
+                            icon: "error",
+                            title: "Oops...",
+                            text: "Pastikan Tanda Tangan Sudah Terisi!",
+                            footer: "<a href=\"#\">Why do I have this issue?</a>"
+                        });
+                        return;
+                    }
+
+                    const base64String = canvas.toDataURL('image/png');
+
+                    // Tampilkan Hasil
+                    document.getElementById('data-summary').innerHTML = `
+                    <b>Nama:</b> ${nama}<br>
+                    <b>Nominal:</b> ${nominal}<br>
+                    <b>Persetujuan :</b> ${kebutuhan}`;
+                    document.getElementById('base64-output').value = base64String;
+                    document.getElementById('result-area').style.display = 'block';
+                    $.ajax({
+                        url: "{{ route('data_vocher_save_sign') }}",
+                        type: "POST",
+                        cache: false,
+                        data: {
+                            "_token": "{{ csrf_token() }}",
+                            "code": vocher,
+                            "sign": base64String,
+                        },
+                        dataType: 'html',
+                    }).done(function(data) {
+                        if (data == 1) {
+                            Swal.fire('Berhasil!', 'Tanda Tangan telah dibuat.', 'success').then(() => {
+                                location.reload();
+                            });
+                        } else {
+                            Swal.fire('Gagal!', 'Tanda Tangan Gagal dibuat.', 'error').then(() => {
+                                location.reload();
+                            });
+                        }
+                    }).fail(function() {
+                        Swal.fire('Gagal!', 'Tanda Tangan Gagal dibuat.', 'error').then(() => {
+                            location.reload();
+                        });
+                    });
+                    // Scroll otomatis ke hasil
+                    document.getElementById('result-area').scrollIntoView({
+                        behavior: 'smooth'
+                    });
+                } else if (result.dismiss === Swal.DismissReason.cancel) {
+                    swalWithBootstrapButtons.fire({
+                        title: "Cancelled",
+                        text: "Your imaginary file is safe :)",
+                        icon: "error"
+                    });
+                }
+            });
+
         }
     </script>
 </body>
