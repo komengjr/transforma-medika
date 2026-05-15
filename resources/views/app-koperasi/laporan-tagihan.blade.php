@@ -40,22 +40,21 @@
                 <form class="row g-1 needs-validation " novalidate="">
                     <div class="col-md-3 position-relative">
                         <label for="" class="my-0 text-warning">Kategori</label>
-                        <select class="form-select js-choice" id="data_company" size="1" name="organizerSingle"
+                        <select class="form-select js-choice" id="data_cat" size="1" name="organizerSingle"
                             style="font-size: 9px !important;"
                             data-options='{"removeItemButton":true,"placeholder":true}'>
                             <option value=""><small>Pilih Kategori</small></option>
-                            <option value="1"><small>Pendapatan</small></option>
-                            <option value="1"><small>Pengeluaran</small></option>
-
+                            <option value="1"><small>All</small></option>
                         </select>
                     </div>
                     <div class="col-md-3 position-relative">
                         <label for="" class="my-0 text-warning">Pilih Cabang</label>
-                        <select class="form-select js-choice" id="data_financial" size="1" name="organizerSingle"
+                        <select class="form-select js-choice" id="data_cabang" size="1" name="organizerSingle"
                             data-options='{"removeItemButton":true,"placeholder":true}'>
                             <option value=""><small>Pilih</small></option>
-                            <option value="pribadi"><small>Pasien Pribadi</small></option>
-                            <option value="perusahaan"><small>Pasien Perusahaan</small></option>
+                            @foreach ($cabang as $cabs)
+                            <option value="{{ $cabs->kop_master_cabang_code }}"><small>{{ $cabs->kop_master_cabang_name }}</small></option>
+                            @endforeach
                         </select>
                     </div>
                     <div class="col-md-3 position-relative">
@@ -102,8 +101,8 @@
 <script>
     $(document).on("click", "#button-search-data", function(e) {
         e.preventDefault();
-        var company = document.getElementById("data_company").value;
-        var financial = document.getElementById("data_financial").value;
+        var cat = document.getElementById("data_cat").value;
+        var cabang = document.getElementById("data_cabang").value;
         var date = document.getElementById("data_date").value;
         $('#menu-general-ledger').html(
             '<div class="spinner-border my-3" style="display: block; margin-left: auto; margin-right: auto;" role="status"><span class="visually-hidden">Loading...</span></div>'
@@ -123,8 +122,9 @@
                 cache: false,
                 data: {
                     "_token": "{{ csrf_token() }}",
-                    "company": company,
-                    "financial": financial
+                    "cat": cat,
+                    "cabang": cabang,
+                    'date': date
                 },
                 dataType: 'html',
             }).done(function(data) {

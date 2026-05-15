@@ -16,7 +16,7 @@ class KoperasiVocherDataVerif extends Migration
         Schema::create('kop_vocher_data_verif', function (Blueprint $table) {
              $table->id('id_kop_vocher_data_verif');
             $table->string('kop_vocher_data_verif_code');
-            $table->string('vocher_data_code');
+            $table->string('kop_vocher_data_code');
             $table->longText('kop_vocher_data_verif_sign');
             $table->dateTime('kop_vocher_data_verif_date');
             $table->timestamps();

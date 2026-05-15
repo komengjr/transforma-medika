@@ -22,7 +22,7 @@
                 <label for="inputLastName1" class="form-label">Kategori Vocher</label>
                 <div class="input-group"> <span class="input-group-text"><i class="fas fa-map-marked-alt"></i></span>
                     <select name="kategori" class="form-control form-control-lg" id="">
-                        <option value="">Pilih Anggota</option>
+                        <option value="">Pilih Kategori</option>
                         @foreach ($cat as $cats)
                         <option value="{{ $cats->kop_vocher_cat_code }}">{{ $cats->kop_vocher_cat_name }}</option>
                         @endforeach

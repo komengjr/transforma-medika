@@ -33,13 +33,13 @@ class PublicKoperasiController extends Controller
     }
     public function data_vocher_save_sign(Request $request)
     {
-        $data = DB::table('kop_vocher_data_verif')->where('vocher_data_code', $request->code)->first();
+        $data = DB::table('kop_vocher_data_verif')->where('kop_vocher_data_code', $request->code)->first();
         if ($data) {
             return 0;
         } else {
             DB::table('kop_vocher_data_verif')->insert([
                 'kop_vocher_data_verif_code' => str::uuid(),
-                'vocher_data_code' => $request->code,
+                'kop_vocher_data_code' => $request->code,
                 'kop_vocher_data_verif_sign' => $request->sign,
                 'kop_vocher_data_verif_date' => now(),
                 'created_at' => now()

@@ -35,6 +35,15 @@ Route::prefix('koperasi/')->group(function (): void {
     Route::post('menu-koperasi/voucher-koperasi/proses-data-vocher', [KoperasiController::class, 'menu_koperasi_vocher_proses'])->name('menu_koperasi_vocher_proses');
     Route::post('menu-koperasi/voucher-koperasi/proses-data-vocher/send-token', [KoperasiController::class, 'menu_koperasi_vocher_proses_send_token'])->name('menu_koperasi_vocher_proses_send_token');
     Route::post('menu-koperasi/voucher-koperasi/proses-data-vocher/save-data', [KoperasiController::class, 'menu_koperasi_vocher_proses_save'])->name('menu_koperasi_vocher_proses_save');
+    Route::post('menu-koperasi/voucher-koperasi/pelunasan-data-vocher', [KoperasiController::class, 'menu_koperasi_vocher_pelunasan'])->name('menu_koperasi_vocher_pelunasan');
+    Route::post('menu-koperasi/voucher-koperasi/pelunasan-data-vocher/payment', [KoperasiController::class, 'menu_koperasi_vocher_pelunasan_payment'])->name('menu_koperasi_vocher_pelunasan_payment');
+
+    Route::post('menu-koperasi/iuran-koperasi/add-data', [KoperasiController::class, 'menu_koperasi_iuran_add'])->name('menu_koperasi_iuran_add');
+    Route::post('menu-koperasi/iuran-koperasi/save-data', [KoperasiController::class, 'menu_koperasi_iuran_save'])->name('menu_koperasi_iuran_save');
+    Route::post('menu-koperasi/iuran-koperasi/proses-data', [KoperasiController::class, 'menu_koperasi_iuran_proses'])->name('menu_koperasi_iuran_proses');
+    Route::post('menu-koperasi/iuran-koperasi/proses-create-data', [KoperasiController::class, 'menu_koperasi_iuran_proses_create'])->name('menu_koperasi_iuran_proses_create');
+    Route::post('menu-koperasi/iuran-koperasi/proses-data-peserta', [KoperasiController::class, 'menu_koperasi_iuran_proses_peserta'])->name('menu_koperasi_iuran_proses_peserta');
+    Route::post('menu-koperasi/iuran-koperasi/proses-data-peserta/payment', [KoperasiController::class, 'menu_koperasi_iuran_proses_peserta_payment'])->name('menu_koperasi_iuran_proses_peserta_payment');
 
     Route::post('laporan-koperasi/laporan-tagihan/find-data', [KoperasiController::class, 'laporan_koperasi_tagihan_find'])->name('laporan_koperasi_tagihan_find');
 
