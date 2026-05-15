@@ -367,8 +367,9 @@ class KoperasiController extends Controller
                     $nomorhp = '+62' . substr($nomorhp, 1);
                 }
             }
+            $link = route('data_vocher_koperasi', ['code' => $data->kop_vocher_data_code]);
             $text = "Halo " . $data->kop_user_verifikasi_name . "\n\nDengan Nomor Vocher : " . $data->kop_vocher_data_code .
-                "\nAda Pengeluaran Vocher Sebagai Berikut\nNama :" . $data->kop_master_peserta_name . "\nNominal Vocher : Rp." . number_format($data->kop_vocher_data_nominal, 0, ',', '.') . "\nLogIT System Notifikasi";
+                "\nAda Pengeluaran Vocher Sebagai Berikut\nNama :" . $data->kop_master_peserta_name . "\nNominal Vocher : Rp." . number_format($data->kop_vocher_data_nominal, 0, ',', '.') . "\nSilahkan Untuk Sign Di bawah ini:\n" . $link . "\n\nLogIT System Notifikasi";
             $cek = DB::table('kop_sender_wa')->where('kop_sender_wa_code_token', $data->kop_vocher_data_token)->first();
             if ($cek) {
                 DB::table('kop_sender_wa')->where('kop_sender_wa_code_token', $data->kop_vocher_data_token)->update([
