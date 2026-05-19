@@ -40,9 +40,8 @@
                     <span class="fas fa-plus"></span>
                 </a>
                 <span class="mx-1 mx-sm-2 text-300">|</span>
-                <button class="btn btn-falcon-default btn-sm" type="button" data-bs-toggle="tooltip"
-                    data-bs-placement="top" title="" data-bs-original-title="Archive" aria-label="Archive"><span
-                        class="fas fa-print"></span></button>
+                <button class="btn btn-falcon-default btn-sm" type="button" data-bs-toggle="modal" data-bs-target="#modal-koperasi" id="button-import-data-peserta"><span
+                        class="fas fa-file-import"></span></button>
 
             </div>
             <div class="d-flex">
@@ -165,6 +164,26 @@
         );
         $.ajax({
             url: "{{ route('master_koperasi_peserta_add') }}",
+            type: "POST",
+            cache: false,
+            data: {
+                "_token": "{{ csrf_token() }}",
+                "code": "{{Auth::user()->userid}}"
+            },
+            dataType: 'html',
+        }).done(function(data) {
+            $('#menu-koperasi').html(data);
+        }).fail(function() {
+            $('#menu-koperasi').html('eror');
+        });
+    });
+    $(document).on("click", "#button-import-data-peserta", function(e) {
+        e.preventDefault();
+        $('#menu-koperasi').html(
+            '<div class="spinner-border my-3" style="display: block; margin-left: auto; margin-right: auto;" role="status"><span class="visually-hidden">Loading...</span></div>'
+        );
+        $.ajax({
+            url: "{{ route('master_koperasi_peserta_import') }}",
             type: "POST",
             cache: false,
             data: {

@@ -13,7 +13,7 @@
                 <div class="col-md-12">
                     <label for="">File Import</label>
                     <input type="file" name="file" id="file" class="form-control" required>
-                    <input type="text" name="code" value="{{ $code }}" id="">
+                    <input type="text" name="code" value="{{ $code }}" id="" hidden>
                 </div>
             </div>
         </div>

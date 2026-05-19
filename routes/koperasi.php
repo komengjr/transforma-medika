@@ -47,8 +47,13 @@ Route::prefix('koperasi/')->group(function (): void {
 
     Route::post('laporan-koperasi/laporan-tagihan/find-data', [KoperasiController::class, 'laporan_koperasi_tagihan_find'])->name('laporan_koperasi_tagihan_find');
 
+    Route::post('laporan-koperasi/laporan-mutasi-bank/add-data', [KoperasiController::class, 'laporan_koperasi_mutasi_bank_add'])->name('laporan_koperasi_mutasi_bank_add');
+    Route::post('laporan-koperasi/laporan-mutasi-bank/save-data', [KoperasiController::class, 'laporan_koperasi_mutasi_bank_save'])->name('laporan_koperasi_mutasi_bank_save');
+
     Route::post('master-koperasi/peserta-koperasi/add-peserta', [KoperasiController::class, 'master_koperasi_peserta_add'])->name('master_koperasi_peserta_add');
     Route::post('master-koperasi/peserta-koperasi/save-peserta', [KoperasiController::class, 'master_koperasi_peserta_save'])->name('master_koperasi_peserta_save');
+    Route::post('master-koperasi/peserta-koperasi/import-peserta', [KoperasiController::class, 'master_koperasi_peserta_import'])->name('master_koperasi_peserta_import');
+    Route::post('master-koperasi/peserta-koperasi/import-peserta-save', [KoperasiController::class, 'master_koperasi_peserta_import_save'])->name('master_koperasi_peserta_import_save');
 
     Route::post('master-koperasi/cabang-koperasi/add-cabang', [KoperasiController::class, 'master_koperasi_cabang_add_cabang'])->name('master_koperasi_cabang_add_cabang');
     Route::post('master-koperasi/cabang-koperasi/save-cabang', [KoperasiController::class, 'master_koperasi_cabang_save_cabang'])->name('master_koperasi_cabang_save_cabang');

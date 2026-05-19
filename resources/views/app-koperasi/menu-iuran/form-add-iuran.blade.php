@@ -36,7 +36,7 @@
                 <label for="inputLastName1" class="form-label">Keuntungan Koperasi</label>
                 <div class="input-group"> <span class="input-group-text"><i class="fas fa-map-marked-alt"></i></span>
                     <input type="text" name="keuntungan" class="form-control form-control-lg border-start-0"
-                        id="keuntungan" placeholder="Ex. @currency(10000000)">
+                        id="keuntungan" placeholder="Ex. 20 %">
                 </div>
             </div>
 

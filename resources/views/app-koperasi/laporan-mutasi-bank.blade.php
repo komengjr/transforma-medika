@@ -38,7 +38,9 @@
     <div class="card-header bg-primary">
         <div class="row flex-between-center">
             <div class="col-4 col-sm-auto d-flex align-items-center pe-0">
-                <h5 class="fs-0 mb-0 text-nowrap py-2 py-xl-0">-</h5>
+                <a class="btn btn-falcon-default btn-sm" href="#" data-bs-toggle="modal" data-bs-target="#modal-koperasi" id="button-add-data-mutasi">
+                    <span class="fas fa-plus me-2"></span> Buat Mutasi
+                </a>
             </div>
             <div class="col-8 col-sm-auto text-end ps-2">
                 <div class="d-none" id="table-customers-actions">
@@ -68,39 +70,50 @@
                 <thead class="bg-200 text-900 fs--1">
                     <tr>
                         <th class="align-middle white-space-nowrap">No</th>
+                        <th class="align-middle white-space-nowrap">Tanggal</th>
                         <th class="align-middle white-space-nowrap">Nama Bank</th>
                         <th class="align-middle white-space-nowrap">Keterangan</th>
-                        <th class="align-middle white-space-nowrap">Debit ( IDR )</th>
-                        <th class="align-middle white-space-nowrap">Credit ( IDR )</th>
-                        <th class="align-middle white-space-nowrap">Total ( IDR )</th>
+                        <th class="text-end white-space-nowrap">Debit ( IDR )</th>
+                        <th class="text-end white-space-nowrap">Credit ( IDR )</th>
+                        <th class="text-end white-space-nowrap">Saldo ( IDR )</th>
                     </tr>
                 </thead>
                 <tbody class="list fs--2">
                     @php
                     $no = 1;
                     @endphp
-
-                </tbody>
-                <tfoot>
+                    @foreach ($data as $datas)
                     <tr>
-                        <th class="align-middle white-space-nowrap"></th>
-                        <th class="align-middle white-space-nowrap"></th>
-                        <th class="align-middle white-space-nowrap">Total</th>
-                        <th class="align-middle white-space-nowrap">@currency(0)</th>
-                        <th class="align-middle white-space-nowrap">@currency(0)</th>
-                        <th class="align-middle white-space-nowrap">@currency(0)</th>
+                        <td>{{ $no++ }}</td>
+                        <td>{{ $datas->kop_mutasi_bank_date }}</td>
+                        <td>{{ $datas->kop_master_bank_name }}</td>
+                        <td>{{ $datas->kop_mutasi_bank_desc }}</td>
+                        <td class="text-end">@currency($datas->kop_mutasi_bank_debit)</td>
+                        <td class="text-end">@currency($datas->kop_mutasi_bank_kredit)</td>
+                        <td class="text-end">@currency($datas->kop_mutasi_bank_total)</td>
                     </tr>
-                </tfoot>
+                    @endforeach
+                </tbody>
+
             </table>
         </div>
     </div>
 </div>
 
-
-
-
 @endsection
 @section('base.js')
+<div class="modal fade" id="modal-koperasi" data-bs-keyboard="false" data-bs-backdrop="static" tabindex="-1"
+    aria-labelledby="staticBackdropLabel" aria-hidden="false">
+    <div class="modal-dialog modal-dialog-centered modal-xl" role="document">
+        <div class="modal-content border-0">
+            <div class="position-absolute top-0 end-0 mt-3 me-3 z-index-1">
+                <button class="btn-close btn btn-sm btn-circle d-flex flex-center transition-base"
+                    data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <div id="menu-koperasi"></div>
+        </div>
+    </div>
+</div>
 <script src="https://cdn.datatables.net/2.2.2/js/dataTables.js"></script>
 <script src="https://cdn.datatables.net/2.2.2/js/dataTables.bootstrap5.js"></script>
 <script src="https://cdn.datatables.net/responsive/3.0.4/js/dataTables.responsive.js"></script>
@@ -116,41 +129,55 @@
 <script src="{{ asset('vendors/choices/choices.min.js') }}"></script>
 <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
 <script>
-    $(document).on("click", "#button-search-data", function(e) {
+    $(document).on("click", "#button-add-data-mutasi", function(e) {
         e.preventDefault();
-        var company = document.getElementById("data_company").value;
-        var financial = document.getElementById("data_financial").value;
-        var date = document.getElementById("data_date").value;
-        $('#menu-general-ledger').html(
+        $('#menu-koperasi').html(
             '<div class="spinner-border my-3" style="display: block; margin-left: auto; margin-right: auto;" role="status"><span class="visually-hidden">Loading...</span></div>'
         );
-        if (date == "") {
-            Swal.fire({
-                icon: "error",
-                title: "Oops...",
-                text: "Something went wrong!",
-                footer: '<a href="#">Why do I have this issue?</a>'
-            });
-            $('#menu-general-ledger').html('');
-        } else {
-            $.ajax({
-                url: "{{ route('laporan_koperasi_tagihan_find') }}",
-                type: "POST",
-                cache: false,
-                data: {
-                    "_token": "{{ csrf_token() }}",
-                    "company": company,
-                    "financial": financial
-                },
-                dataType: 'html',
-            }).done(function(data) {
-                $('#menu-general-ledger').html(data);
-                // $('#button-login-system').html('<span class="fab fa-500px"></span> Log in');
-            }).fail(function() {
-                console.log('error');
-
-            });
-        }
+        $.ajax({
+            url: "{{ route('laporan_koperasi_mutasi_bank_add') }}",
+            type: "POST",
+            cache: false,
+            data: {
+                "_token": "{{ csrf_token() }}",
+                "code": 123
+            },
+            dataType: 'html',
+        }).done(function(data) {
+            $('#menu-koperasi').html(data);
+        }).fail(function() {
+            $('#menu-koperasi').html('eror');
+        });
+    });
+    $(document).on("click", "#button-simpan-data-mutasi", function(e) {
+        e.preventDefault();
+        var data = $("#form-add-mutasi-baru").serialize();
+        $('#menu-add-data-mutasi').html(
+            '<div class="spinner-border my-0" style="display: block; margin-left: auto; margin-right: auto;" role="status"><span class="visually-hidden">Loading...</span></div>'
+        );
+        $.ajax({
+            url: "{{ route('laporan_koperasi_mutasi_bank_save') }}",
+            type: "POST",
+            cache: false,
+            data: data,
+            dataType: 'html',
+        }).done(function(data) {
+            if (data == 0) {
+                Swal.fire({
+                    icon: "error",
+                    title: "Oops...",
+                    text: "Something went wrong!",
+                    footer: '<a href="#">Why do I have this issue?</a>'
+                });
+                $('#menu-add-data-mutasi').html('<button class="btn btn-success float-end" id="button-simpan-data-mutasi" data-code="">Simpan Data</button>');
+            } else {
+                Swal.fire('Berhasil!', 'Data Tagihan Berhasil di Buat', 'success').then(() => {
+                    location.reload();
+                });
+            }
+        }).fail(function() {
+            $('#menu-add-data-mutasi').html('eror');
+        });
     });
 </script>
 <script>
