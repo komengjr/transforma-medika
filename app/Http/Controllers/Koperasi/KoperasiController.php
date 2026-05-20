@@ -510,6 +510,7 @@ class KoperasiController extends Controller
     {
         $data = DB::table('kop_master_peserta')
             ->join('kop_tagihan_bulan', 'kop_tagihan_bulan.kop_tagihan_bulan_cabang', '=', 'kop_master_peserta.kop_master_peserta_cabang')
+            ->where('kop_master_peserta.kop_master_peserta_status', 1)
             ->where('kop_tagihan_bulan_code', $request->code)->get();
         return view('app-koperasi.menu-iuran.form-proses-iuran', compact('data'), ['code' => $request->code]);
     }
@@ -517,6 +518,7 @@ class KoperasiController extends Controller
     {
         $data = DB::table('kop_master_peserta')
             ->join('kop_tagihan_bulan', 'kop_tagihan_bulan.kop_tagihan_bulan_cabang', '=', 'kop_master_peserta.kop_master_peserta_cabang')
+            ->where('kop_master_peserta.kop_master_peserta_status', 1)
             ->where('kop_tagihan_bulan_code', $request->code)->get();
         foreach ($data as $datas) {
             $cek = DB::table('kop_tagihan_bulan_peserta')->where('kop_tagihan_bulan_code', $request->code)->where('kop_master_peserta_code', $datas->kop_master_peserta_code)->first();
@@ -543,7 +545,6 @@ class KoperasiController extends Controller
     {
         $data = DB::table('kop_tagihan_bulan_peserta')
             ->join('kop_master_peserta', 'kop_master_peserta.kop_master_peserta_code', '=', 'kop_tagihan_bulan_peserta.kop_master_peserta_code')
-            ->join('kop_tagihan_bulan', 'kop_tagihan_bulan.kop_tagihan_bulan_cabang', '=', 'kop_master_peserta.kop_master_peserta_cabang')
             ->where('kop_tagihan_bulan_peserta.kop_tagihan_bulan_code', $request->code)->get();
         return view('app-koperasi.menu-iuran.form-generate-tagihan', compact('data'), ['code' => $request->code]);
     }
@@ -574,6 +575,69 @@ class KoperasiController extends Controller
         ]);
         return 1;
     }
+    // MENU SIMPANAN SUKARELA
+    public function menu_koperasi_sukarela($akses, $id)
+    {
+        if ($this->url_akses($akses, $id) == true) {
+            $data = DB::table('kop_simpanan_sukarela')
+                ->join('kop_master_peserta', 'kop_master_peserta.kop_master_peserta_code', '=', 'kop_simpanan_sukarela.kop_master_peserta_code')
+                ->get();
+            return view('app-koperasi.menu-simpanan-sukarela', compact('data'), ['akses' => $akses, 'code' => $id]);
+        } else {
+            return Redirect::to('dashboard/home');
+        }
+    }
+    public function menu_koperasi_sukarela_add(Request $request)
+    {
+        $peserta = DB::table('kop_master_peserta')->get();
+        return view('app-koperasi.menu-simpanan-sukarela.form-add-simpanan-sukarela', compact('peserta'));
+    }
+    public function menu_koperasi_sukarela_save(Request $request)
+    {
+        try {
+            DB::table('kop_simpanan_sukarela')->insert([
+                'kop_simpanan_sukarela_code' => str::uuid(),
+                'kop_master_peserta_code' => $request->anggota,
+                'kop_tagihan_bulan_peserta_pokok' => $request->nominal - (($request->bunga / 100) * $request->nominal),
+                'kop_tagihan_bulan_peserta_bunga' => $request->bunga,
+                'kop_tagihan_bulan_peserta_nominal' => $request->nominal,
+                'kop_simpanan_sukarela_date' => $request->tanggal_simpan,
+                'kop_simpanan_sukarela_status' => 0,
+                'created_at' => now()
+            ]);
+            return 1;
+        } catch (\Throwable $e) {
+            return 0;
+        }
+    }
+    public function menu_koperasi_sukarela_proses(Request $request)
+    {
+        $data = DB::table('kop_simpanan_sukarela')->where('kop_simpanan_sukarela_code', $request->code)->first();
+        return view('app-koperasi.menu-simpanan-sukarela.form-proses-simpanan-sukarela', compact('data'));
+    }
+    public function menu_koperasi_sukarela_proses_save(Request $request)
+    {
+        $data = DB::table('kop_simpanan_sukarela')->where('kop_simpanan_sukarela_code', $request->code)->first();
+        try {
+            DB::table('kop_log_simpanan_sukarela')->insert([
+                'kop_log_simpanan_sukarela_code' => str::uuid(),
+                'kop_simpanan_sukarela_code' => $data->kop_simpanan_sukarela_code,
+                'kop_log_simpanan_sukarela_pokok' => $data->kop_tagihan_bulan_peserta_pokok,
+                'kop_log_simpanan_sukarela_bunga' => $data->kop_tagihan_bulan_peserta_bunga,
+                'kop_log_simpanan_sukarela_nominal' => $data->kop_tagihan_bulan_peserta_nominal,
+                'kop_log_simpanan_sukarela_date' => $data->kop_simpanan_sukarela_date,
+                'kop_log_simpanan_sukarela_status' => 0,
+                'created_at' => now()
+            ]);
+            DB::table('kop_simpanan_sukarela')->where('kop_simpanan_sukarela_code', $request->code)->update([
+                'kop_simpanan_sukarela_status' => 1,
+                'updated_at' => now(),
+            ]);
+            return 1;
+        } catch (\Throwable $e) {
+            return 0;
+        }
+    }
     // MENU PEMINJAMAN UANG
     public function menu_peminjaman_uang($akses, $id)
     {
@@ -589,6 +653,7 @@ class KoperasiController extends Controller
         $data = DB::table('kop_master_peserta')
             ->join('kop_master_cabang', 'kop_master_cabang.kop_master_cabang_code', '=', 'kop_master_peserta.kop_master_peserta_cabang')
             ->join('kop_setup_cabang_koperasi', 'kop_setup_cabang_koperasi.kop_setup_cabang_koperasi_cabang', '=', 'kop_master_peserta.kop_master_peserta_cabang')
+            ->where('kop_master_peserta.kop_master_peserta_status', 1)
             ->get();
         return view('app-koperasi.menu-peminjaman.peminjaman-uang.form-cari-data', compact('data'));
     }
@@ -597,9 +662,6 @@ class KoperasiController extends Controller
         $data = DB::table('kop_master_peserta')
             ->join('kop_master_cabang', 'kop_master_cabang.kop_master_cabang_code', '=', 'kop_master_peserta.kop_master_peserta_cabang')
             ->join('kop_setup_cabang_koperasi', 'kop_setup_cabang_koperasi.kop_setup_cabang_koperasi_cabang', '=', 'kop_master_peserta.kop_master_peserta_cabang')
-            ->join('kop_master_peserta_job', 'kop_master_peserta_job.kop_master_peserta_code', '=', 'kop_master_peserta.kop_master_peserta_code')
-            ->join('kop_master_div_bag', 'kop_master_div_bag.kop_master_div_bag_code', '=', 'kop_master_peserta_job.kop_master_div_bag_code')
-            ->join('kop_master_divisi', 'kop_master_divisi.kop_master_divisi_code', '=', 'kop_master_div_bag.kop_master_divisi_code')
             ->where('kop_master_peserta.kop_master_peserta_code', $request->code)->first();
         $kcb = DB::table('kop_user_verifikasi')
             ->where('kop_user_verifikasi_cabang', $data->kop_master_peserta_cabang)

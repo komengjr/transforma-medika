@@ -100,18 +100,7 @@
                     <input type="email" name="email" class="form-control form-control-lg border-start-2" value="{{ $data->kop_master_cabang_name }}" readonly>
                 </div>
             </div>
-            <div class="col-md-8">
-                <label for="inputLastName1" class="form-label">Pilih Divisi / Departemen</label>
-                <div class="input-group"> <span class="input-group-text"><i class="fas fa-mail-bulk"></i></span>
-                    <input type="email" name="email" class="form-control form-control-lg border-start-2" value="{{ $data->kop_master_divisi_name }} - {{ $data->kop_master_div_bag_name }}" readonly>
-                </div>
-            </div>
-            <div class="col-md-4">
-                <label for="inputLastName2" class="form-label">Tanggal Masuk Kerja</label>
-                <div class="input-group"> <span class="input-group-text"><i class="fas fa-calendar"></i></span>
-                    <input type="date" name="tgl_masuk" class="form-control form-control-lg border-start-2" value="{{ $data->kop_master_peserta_tgl_kerja }}" readonly>
-                </div>
-            </div>
+
 
             <div class="col-12">
                 <label for="inputAddress3" class="form-label">Deskripsi Alamat</label>

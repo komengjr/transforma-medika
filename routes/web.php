@@ -182,6 +182,7 @@ Route::prefix('{akses}/{id}')->group(function (): void {
     Route::get('menu-koperasi/arisan-koperasi', [KoperasiController::class, 'menu_koperasi_arisan'])->name('menu_koperasi_arisan');
     Route::get('menu-koperasi/voucher-koperasi', [KoperasiController::class, 'menu_koperasi_vocher'])->name('menu_koperasi_vocher');
     Route::get('menu-koperasi/iuran-koperasi', [KoperasiController::class, 'menu_koperasi_iuran'])->name('menu_koperasi_iuran');
+    Route::get('menu-koperasi/simpanan-sukarela', [KoperasiController::class, 'menu_koperasi_sukarela'])->name('menu_koperasi_sukarela');
     Route::get('menu-peminjaman/peminjaman-uang', [KoperasiController::class, 'menu_peminjaman_uang'])->name('menu_peminjaman_uang');
     Route::get('menu-peminjaman/peminjaman-barang', [KoperasiController::class, 'menu_peminjaman_barang'])->name('menu_peminjaman_barang');
     Route::get('menu-peminjaman/list-peminjaman', [KoperasiController::class, 'menu_peminjaman_list'])->name('menu_peminjaman_list');

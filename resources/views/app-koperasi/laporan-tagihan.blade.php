@@ -26,7 +26,7 @@
                 <div class="col-xl-auto px-3 py-2">
                     <h6 class="text-white fs--1 mb-0" style="color: white !important;">Menu : </h6>
                     <h4 class="text-white fw-bold mb-0" style="color: white !important;">Laporan <span
-                            class="text-white fw-medium" style="color: white !important;">Tagihan</span>
+                            class="text-white fw-medium" style="color: white !important;">Transaksi</span>
                     </h4>
                 </div>
             </div>

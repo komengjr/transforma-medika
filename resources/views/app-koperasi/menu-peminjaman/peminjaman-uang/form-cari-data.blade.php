@@ -51,7 +51,7 @@
                         @endif
                     </td>
                     <td>
-                        <button class="btn btn-falcon-warning rounded-pill me-1 mb-1" type="button" id="button-pilih-data-peserta" data-code="{{ $datas->kop_master_peserta_code }}" data-bs-dismiss="modal">
+                        <button class="btn btn-falcon-warning rounded-pill me-1 mb-1 btn-sm" type="button" id="button-pilih-data-peserta" data-code="{{ $datas->kop_master_peserta_code }}" data-bs-dismiss="modal">
                             Pilih Peserta
                         </button>
                     </td>

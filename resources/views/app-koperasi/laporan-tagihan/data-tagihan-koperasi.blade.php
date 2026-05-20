@@ -39,7 +39,9 @@
                         <th class="align-middle white-space-nowrap">No</th>
                         <th class="align-middle white-space-nowrap">Name</th>
                         <th class="align-middle white-space-nowrap">Cabang</th>
-                        <th class="text-end white-space-nowrap">Simpanan Pokok ( IDR )</th>
+                        <th class="text-end white-space-nowrap">Simpanan Pokok</th>
+                        <th class="text-end white-space-nowrap">Simpanan Wajib</th>
+                        <th class="text-end white-space-nowrap">Simpanan Sukarela</th>
                         <th class="text-end white-space-nowrap">Peminjaman Uang</th>
                         <th class="align-middle white-space-nowrap">Peminjaman Barang</th>
                         <th class="align-middle white-space-nowrap">Fren</th>
@@ -52,13 +54,25 @@
                 <tbody class="list fs--2">
                     @php
                     $no = 1;
+                    $total_pokok = 0;
+                    $total_wajib = 0;
+                    $total_sukarela = 0;
                     @endphp
                     @foreach ($peserta as $pes)
                     @php
+
                     $pokok = DB::table('kop_peserta_sim_pok')
                     ->join('kop_simpanan_pokok','kop_simpanan_pokok.kop_simpanan_pokok_code','=','kop_peserta_sim_pok.kop_simpanan_pokok_code')
                     ->where('kop_master_peserta_code',$pes->kop_master_peserta_code)
                     ->sum('kop_simpanan_pokok.kop_simpanan_pokok_nominal');
+                    $wajib = DB::table('kop_log_tagihan_bulan')
+                    ->join('kop_tagihan_bulan_peserta','kop_tagihan_bulan_peserta.kop_tagihan_bulan_peserta_code','=','kop_log_tagihan_bulan.kop_tagihan_bulan_peserta_code')
+                    ->where('kop_master_peserta_code',$pes->kop_master_peserta_code)
+                    ->sum('kop_log_tagihan_bulan.kop_log_tagihan_bulan_nominal');
+                    $sukarela = DB::table('kop_log_simpanan_sukarela')
+                    ->join('kop_simpanan_sukarela','kop_simpanan_sukarela.kop_simpanan_sukarela_code','=','kop_log_simpanan_sukarela.kop_simpanan_sukarela_code')
+                    ->where('kop_master_peserta_code',$pes->kop_master_peserta_code)
+                    ->sum('kop_log_simpanan_sukarela.kop_log_simpanan_sukarela_nominal');
                     $vocher = DB::table('kop_log_vocher')
                     ->join('kop_vocher_data','kop_vocher_data.kop_vocher_data_code','=','kop_log_vocher.kop_vocher_data_code')
                     ->where('kop_master_peserta_code',$pes->kop_master_peserta_code)
@@ -68,13 +82,18 @@
                     ->where('kop_master_peserta_code',$pes->kop_master_peserta_code)
                     ->sum('kop_log_peminjaman_uang_nominal');
 
-                    $total = $pokok + $vocher + $pem_uang;
+                    $total = $pokok + $wajib + $vocher + $pem_uang + $sukarela;
+                    $total_pokok = $total_pokok + $pokok;
+                    $total_wajib = $total_wajib + $wajib;
+                    $total_sukarela = $total_sukarela + $sukarela;
                     @endphp
                     <tr>
                         <td>{{ $no++ }}</td>
                         <td>{{ $pes->kop_master_peserta_name }}</td>
                         <td>{{ $pes->kop_master_peserta_cabang }}</td>
                         <td class="text-end">@currency($pokok)</td>
+                        <td class="text-end">@currency($wajib)</td>
+                        <td class="text-end">@currency($sukarela)</td>
                         <td class="text-end">@currency($pem_uang)</td>
                         <td class="text-end">@currency(0)</td>
                         <td class="text-end">@currency(0)</td>
@@ -90,7 +109,9 @@
                         <th class="align-middle white-space-nowrap"></th>
                         <th class="align-middle white-space-nowrap"></th>
                         <th class="align-middle white-space-nowrap">Total</th>
-                        <th class="text-end white-space-nowrap">@currency(0)</th>
+                        <th class="text-end white-space-nowrap">@currency($total_pokok)</th>
+                        <th class="text-end white-space-nowrap">@currency($total_wajib)</th>
+                        <th class="text-end white-space-nowrap">@currency($total_sukarela)</th>
                         <th class="text-end white-space-nowrap">@currency(0)</th>
                         <th class="text-end white-space-nowrap">@currency(0)</th>
                         <th class="text-end white-space-nowrap">@currency(0)</th>
@@ -108,8 +129,8 @@
     new DataTable('#data-ledger', {
         responsive: true,
         "lengthMenu": [
-            [28, 50, 25],
-            [28, 50, 25]
+            [100, 50, 25],
+            [100, 50, 25]
         ],
         layout: {
             topStart: {
