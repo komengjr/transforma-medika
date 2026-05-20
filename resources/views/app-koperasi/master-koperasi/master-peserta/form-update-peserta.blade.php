@@ -27,7 +27,7 @@
                         <div class="input-group"> <span class="input-group-text"><i
                                     class="fas fa-user-friends"></i></span>
                             <input type="text" name="nama_lengkap" class="form-control form-control-lg border-start-0"
-                                id="nama_lengkap" placeholder="Ex. Jhon Doe">
+                                id="nama_lengkap" value="{{ $data->kop_master_peserta_name }}">
                         </div>
                     </div>
                     <div class="col-md-6">
@@ -45,8 +45,7 @@
                         <label for="inputLastName1" class="form-label text-youtube">NIK</label>
                         <div class="input-group"> <span class="input-group-text"><i
                                     class="fas fa-money-check"></i></span>
-                            <input type="text" name="nik" class="form-control form-control-lg border-start-0" id="nik"
-                                placeholder="*12 Digit">
+                            <input type="text" name="nik" class="form-control form-control-lg border-start-0" id="nik" value="{{ $data->kop_master_peserta_nik }}">
                         </div>
                     </div>
                     <div class="col-md-6">
@@ -54,7 +53,7 @@
                         <div class="input-group"> <span class="input-group-text"><i
                                     class="fas fa-money-check"></i></span>
                             <input type="text" name="nip" class="form-control form-control-lg border-start-0" id="nik"
-                                placeholder="*12 Digit">
+                                value="{{ $data->kop_master_peserta_nip }}">
                         </div>
                     </div>
                 </div>
@@ -63,14 +62,14 @@
                 <label for="inputLastName1" class="form-label text-youtube">Tanggal Lahir</label>
                 <div class="input-group"> <span class="input-group-text"><i class="fas fa-calendar-day"></i></span>
                     <input type="date" name="tgl_lahir" class="form-control form-control-lg border-start-0" id="tgl_lahir"
-                        placeholder="Nama Lengkap">
+                        value="{{ $data->kop_master_peserta_tgl_lahir }}">
                 </div>
             </div>
             <div class="col-md-4">
                 <label for="inputLastName1" class="form-label">Tempat Lahir</label>
                 <div class="input-group"> <span class="input-group-text"><i class="fas fa-map-marked-alt"></i></span>
                     <input type="text" name="tempat_lahir" class="form-control form-control-lg border-start-0"
-                        id="inputLastName1" placeholder="Ex. Pontianak">
+                        id="inputLastName1" value="{{ $data->kop_master_peserta_tempat_lahir }}">
                 </div>
             </div>
             <div class="col-md-4">
@@ -90,41 +89,37 @@
                 <label for="inputLastName2" class="form-label text-youtube">No Handphone</label>
                 <div class="input-group"> <span class="input-group-text"><i class="fas fa-phone-square-alt"></i></span>
                     <input type="text" name="no_hp" class="form-control form-control-lg border-start-0" id="no_hp"
-                        placeholder="Ex. 08982839182xxx">
+                        value="{{ $data->kop_master_peserta_no_hp }}">
                 </div>
             </div>
             <div class="col-md-4">
                 <label for="inputLastName2" class="form-label">Email</label>
                 <div class="input-group"> <span class="input-group-text"><i class="fas fa-mail-bulk"></i></span>
-                    <input type="email" name="email" class="form-control form-control-lg border-start-0" id="inputLastName2" placeholder="Ex. Contoh@gmail.com">
+                    <input type="email" name="email" class="form-control form-control-lg border-start-0" id="inputLastName2" value="{{ $data->kop_master_peserta_email }}">
                 </div>
             </div>
             <div class="col-md-4">
-                <label for="inputLastName1" class="form-label text-youtube">Pilih Cabang</label>
+                <label for="inputLastName1" class="form-label text-youtube">Cabang</label>
                 <div class="input-group"> <span class="input-group-text"><i class="fas fa-map-marker-alt"></i></span>
                     <select name="cabang" id="" class="form-control form-control-lg single-select">
                         <option value="">Pilih Cabang</option>
-                        @foreach ($cabang as $cab)
-                        <option value="{{ $cab->kop_master_cabang_code }}">{{ $cab->kop_master_cabang_name }}</option>
-                        @endforeach
+
                     </select>
                 </div>
             </div>
             <div class="col-md-4">
-                <label for="inputLastName1" class="form-label text-youtube">Pilih Divisi /  Departemen</label>
+                <label for="inputLastName1" class="form-label text-youtube">Pilih Divisi / Departemen</label>
                 <div class="input-group"> <span class="input-group-text"><i class="fas fa-map-marker-alt"></i></span>
                     <select name="divisi" id="" class="form-control form-control-lg single-select">
                         <option value="">Pilih</option>
-                        @foreach ($divisi as $div)
-                        <option value="{{ $div->kop_master_div_bag_code }}">{{ $div->kop_master_divisi_name }} - {{  $div->kop_master_div_bag_name }}</option>
-                        @endforeach
+
                     </select>
                 </div>
             </div>
             <div class="col-md-4">
                 <label for="inputLastName2" class="form-label">Tanggal Masuk Kerja</label>
                 <div class="input-group"> <span class="input-group-text"><i class="fas fa-mail-bulk"></i></span>
-                    <input type="date" name="tgl_masuk" class="form-control form-control-lg border-start-0" >
+                    <input type="date" name="tgl_masuk" class="form-control form-control-lg border-start-0">
                 </div>
             </div>
             <div class="col-md-4">
@@ -136,7 +131,7 @@
             <div class="col-12">
                 <label for="inputAddress3" class="form-label text-youtube">Deskripsi Alamat</label>
                 <textarea class="form-control" name="alamat" id="inputAddress3" placeholder="Enter Address"
-                    rows="3"></textarea>
+                    rows="3">{{ $data->kop_master_peserta_alamat }}</textarea>
             </div>
             <input id="link" type="text" name="link" class="form-control" hidden>
         </form>
@@ -144,58 +139,7 @@
 </div>
 <div class="modal-footer px-4 bg-300">
     <span id="menu-add-data-peserta">
-        <button class="btn btn-success float-end" id="button-simpan-data-peserta" data-code="">Simpan
+        <button class="btn btn-success float-end" id="button-update-save-data-peserta" data-code="">Update
             Data</button>
     </span>
 </div>
-<script type="text/javascript">
-    var browseFile = $('#profile-image');
-    var resumable = new Resumable({
-        target: "{{ route('master_data_pegawai_upload_profile') }}",
-        query: {
-            _token: '{{ csrf_token() }}'
-        }, // CSRF token
-        fileType: ['jpg', 'png'],
-        headers: {
-            'Accept': 'application/json'
-        },
-        testChunks: false,
-        throttleProgressCallbacks: 1,
-    });
-    resumable.assignBrowse(browseFile);
-    resumable.on('fileAdded', function(file) { // trigger wn file picked
-        showProgress();
-        resumable.upload() // to actually start uploading.
-    });
-    resumable.on('fileProgress', function(file) { // trigger when file progress update
-        updateProgress(Math.floor(file.progress() * 100));
-    });
-    resumable.on('fileSuccess', function(file, response) { // trigger when file upload complete
-        response = JSON.parse(response)
-        $('#videoPreview').show();
-        $('#videoPreview').attr('src', response.path);
-        $('#link').attr('value', response.filename);
-        $('.card-footer').show();
-        $('#browseFile').hide();
-    });
-    resumable.on('fileError', function(file, response) { // trigger when there is any error
-        alert('file uploading error.')
-    });
-    var progress = $('.progress');
-
-    function showProgress() {
-        progress.find('.loading').css('width', '0%');
-        progress.find('.loading').html('0%');
-        progress.find('.loading').removeClass('bg-info');
-        progress.show();
-    }
-
-    function updateProgress(value) {
-        progress.find('.loading').css('width', ` ${value}%`)
-        progress.find('.loading').html(`${value}%`)
-    }
-
-    function hideProgress() {
-        progress.hide();
-    }
-</script>

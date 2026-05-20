@@ -59,6 +59,8 @@ Route::prefix('koperasi/')->group(function (): void {
     Route::post('master-koperasi/peserta-koperasi/save-peserta', [KoperasiController::class, 'master_koperasi_peserta_save'])->name('master_koperasi_peserta_save');
     Route::post('master-koperasi/peserta-koperasi/import-peserta', [KoperasiController::class, 'master_koperasi_peserta_import'])->name('master_koperasi_peserta_import');
     Route::post('master-koperasi/peserta-koperasi/import-peserta-save', [KoperasiController::class, 'master_koperasi_peserta_import_save'])->name('master_koperasi_peserta_import_save');
+    Route::post('master-koperasi/peserta-koperasi/update-data-peserta', [KoperasiController::class, 'master_koperasi_peserta_update'])->name('master_koperasi_peserta_update');
+    Route::post('master-koperasi/peserta-koperasi/update-data-peserta-save', [KoperasiController::class, 'master_koperasi_peserta_update_save'])->name('master_koperasi_peserta_update_save');
 
     Route::post('master-koperasi/cabang-koperasi/add-cabang', [KoperasiController::class, 'master_koperasi_cabang_add_cabang'])->name('master_koperasi_cabang_add_cabang');
     Route::post('master-koperasi/cabang-koperasi/save-cabang', [KoperasiController::class, 'master_koperasi_cabang_save_cabang'])->name('master_koperasi_cabang_save_cabang');

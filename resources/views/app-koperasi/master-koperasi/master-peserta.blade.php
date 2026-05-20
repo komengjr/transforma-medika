@@ -104,9 +104,9 @@
                                     class="fas fa-align-left me-1" data-fa-transform="shrink-3"></span>Menu</button>
                             <div class="dropdown-menu" aria-labelledby="btnGroupVerticalDrop2">
                                 <button class="dropdown-item" data-bs-toggle="modal" data-bs-target="#modal-koperasi"
-                                    id="button-add-data-bagian" data-code="{{$datas->kop_master_peserta_code}}"><span
+                                    id="button-update-data-peserta" data-code="{{$datas->kop_master_peserta_code}}"><span
                                         class="far fa-folder-open"></span>
-                                    Tambah Data Bagian</button>
+                                    Perubahan Data Anggota</button>
                             </div>
                         </div>
                     </td>
@@ -221,6 +221,58 @@
             } else {
                 $('#menu-add-data-peserta').html(data);
                 location.reload();
+            }
+        }).fail(function() {
+            $('#menu-add-data-peserta').html('eror');
+        });
+    });
+
+    $(document).on("click", "#button-update-data-peserta", function(e) {
+        e.preventDefault();
+        var code = $(this).data("code");
+        $('#menu-koperasi').html(
+            '<div class="spinner-border my-3" style="display: block; margin-left: auto; margin-right: auto;" role="status"><span class="visually-hidden">Loading...</span></div>'
+        );
+        $.ajax({
+            url: "{{ route('master_koperasi_peserta_update') }}",
+            type: "POST",
+            cache: false,
+            data: {
+                "_token": "{{ csrf_token() }}",
+                "code": code
+            },
+            dataType: 'html',
+        }).done(function(data) {
+            $('#menu-koperasi').html(data);
+        }).fail(function() {
+            $('#menu-koperasi').html('eror');
+        });
+    });
+    $(document).on("click", "#button-update-save-data-peserta", function(e) {
+        e.preventDefault();
+        var data = $("#form-peserta-baru").serialize();
+        $('#menu-add-data-peserta').html(
+            '<div class="spinner-border my-3" style="display: block; margin-left: auto; margin-right: auto;" role="status"><span class="visually-hidden">Loading...</span></div>'
+        );
+        $.ajax({
+            url: "{{ route('master_koperasi_peserta_update_save') }}",
+            type: "POST",
+            cache: false,
+            data: data,
+            dataType: 'html',
+        }).done(function(data) {
+            if (data == 0) {
+                Swal.fire({
+                    icon: "error",
+                    title: "Oops...",
+                    text: "Something went wrong!",
+                    footer: '<a href="#">Why do I have this issue?</a>'
+                });
+                $('#menu-add-data-peserta').html('<button class="btn btn-success float-end" id="button-update-save-data-peserta" data-code="">Update Data</button>');
+            } else {
+                Swal.fire('Berhasil!', 'Data Berhasil di Update', 'success').then(() => {
+                    location.reload();
+                });
             }
         }).fail(function() {
             $('#menu-add-data-peserta').html('eror');

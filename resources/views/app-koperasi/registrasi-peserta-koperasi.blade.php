@@ -175,7 +175,7 @@
                             rows="3"></textarea>
                     </div>
                     <input id="link" type="text" name="link" class="form-control" hidden>
-                    <div class="col-md-4">
+                    <div class="col-md-6">
                         <label class="form-label" for="event-type">Pilih Simpanan Pokok</label>
                         <div class="input-group"> <span class="input-group-text"><i class="far fa-file-archive"></i></span>
                             <select name="simpanan_pokok" id="" class="form-control form-control-lg single-select">
@@ -186,7 +186,7 @@
                             </select>
                         </div>
                     </div>
-                    <div class="col-md-4">
+                    <div class="col-md-6">
                         <label class="form-label" for="event-type">Pilih Simpanan Wajib</label>
                         <div class="input-group"> <span class="input-group-text"><i class="far fa-file-archive"></i></span>
                             <select name="simpanan_wajib" id="" class="form-control form-control-lg single-select">
@@ -194,14 +194,6 @@
                                 @foreach ($wajib as $jib)
                                     <option value="{{ $jib->kop_simpanan_wajib_code }}">{{ $jib->kop_simpanan_wajib_name }}, @currency($jib->kop_simpanan_wajib_nominal)</option>
                                 @endforeach
-                            </select>
-                        </div>
-                    </div>
-                    <div class="col-md-4">
-                        <label class="form-label" for="event-type">Pilih Simpanan Sukarela</label>
-                        <div class="input-group"> <span class="input-group-text"><i class="far fa-file-archive"></i></span>
-                            <select name="simpanan_sukarela" id="simpanan_sukarela" class="form-control form-control-lg single-select">
-                                <option value="">Pilih</option>
                             </select>
                         </div>
                     </div>

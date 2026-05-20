@@ -66,17 +66,8 @@ class KoperasiController extends Controller
     public function menu_koperasi_registrasi_peserta_add(Request $request)
     {
         try {
-            $setup = DB::table('kop_setup_cabang_koperasi')->where('kop_setup_cabang_koperasi_cabang', $request->cabang)->first();
-            if ($setup->kop_setup_cabang_koperasi_wa == '0' || $setup->kop_setup_cabang_koperasi_email == '0') {
-                $status = 0;
-            } elseif ($setup->kop_setup_cabang_koperasi_wa == '0') {
-                $status = 0;
-            } elseif ($setup->kop_setup_cabang_koperasi_email == '0') {
-                $status = 0;
-            } else {
-                $status = 1;
-            }
-            $code = str::uuid();
+            $total = DB::table('kop_master_peserta')->count();
+            $code = 'P' . str_pad($total + 1, 10, '0', STR_PAD_LEFT);
             DB::table('kop_master_peserta_job')->insert([
                 'kop_master_peserta_job_code' => str::uuid(),
                 'kop_master_peserta_code' => $code,
@@ -100,7 +91,7 @@ class KoperasiController extends Controller
                 'kop_master_peserta_tgl_kerja' => $request->tgl_masuk,
                 'kop_master_peserta_tgl_anggota' => now(),
                 'kop_master_peserta_photo' => "",
-                'kop_master_peserta_status' => $status,
+                'kop_master_peserta_status' => 1,
                 'created_at' => now()
             ]);
             DB::table('kop_peserta_sim_pok')->insert([
@@ -160,7 +151,7 @@ class KoperasiController extends Controller
     }
     public function menu_koperasi_arisan_add_group_peserta(Request $request)
     {
-        $data = DB::table('kop_master_peserta')->where('kop_master_peserta_cabang', Auth::user()->access_cabang)->get();
+        $data = DB::table('kop_master_peserta')->get();
         return view('app-koperasi.menu-arisan.form-add-peserta', compact('data'), ['code' => $request->code]);
     }
     public function menu_koperasi_arisan_save_group_peserta(Request $request)
@@ -1145,6 +1136,15 @@ class KoperasiController extends Controller
     {
         Excel::import(new PesertaImport($request->code, $request->pokok, $request->wajib), request()->file('file'));
         return redirect()->back()->withSuccess('Great! Berhasil Menambahkan Data Perusahaan');
+    }
+    public function master_koperasi_peserta_update(Request $request)
+    {
+        $data = DB::table('kop_master_peserta')->where('kop_master_peserta_code', $request->code)->first();
+        return view('app-koperasi.master-koperasi.master-peserta.form-update-peserta', compact('data'));
+    }
+    public function master_koperasi_peserta_update_save(Request $request)
+    {
+        return 0;
     }
     // MASTER CABANG KOPERASI
     public function master_koperasi_cabang($akses, $id)
