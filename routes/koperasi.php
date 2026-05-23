@@ -10,9 +10,15 @@ Route::prefix('koperasi/')->group(function (): void {
     Route::post('menu-peminjaman/peminjaman-uang/pilih-data-peserta', [KoperasiController::class, 'menu_peminjaman_uang_pilih_peserta'])->name('menu_peminjaman_uang_pilih_peserta');
     Route::post('menu-peminjaman/peminjaman-uang/proses-pengajuan-peminjaman', [KoperasiController::class, 'menu_peminjaman_uang_proses_pengajuan'])->name('menu_peminjaman_uang_proses_pengajuan');
 
+    Route::post('menu-peminjaman/peminjaman-barang/cari-data-peserta', [KoperasiController::class, 'menu_peminjaman_barang_cari_peserta'])->name('menu_peminjaman_barang_cari_peserta');
+    Route::post('menu-peminjaman/peminjaman-barang/pilih-data-peserta', [KoperasiController::class, 'menu_peminjaman_barang_pilih_peserta'])->name('menu_peminjaman_barang_pilih_peserta');
+    Route::post('menu-peminjaman/peminjaman-barang/proses-pengajuan-peminjaman', [KoperasiController::class, 'menu_peminjaman_barang_proses_pengajuan'])->name('menu_peminjaman_barang_proses_pengajuan');
+
     Route::post('menu-peminjaman/list-peminjaman/proses-pengajuan-peminjaman-uang', [KoperasiController::class, 'menu_peminjaman_list_proses_pengajuan'])->name('menu_peminjaman_list_proses_pengajuan');
     Route::post('menu-peminjaman/list-peminjaman/proses-pengajuan-peminjaman-uang/send-verifikasi', [KoperasiController::class, 'menu_peminjaman_list_proses_pengajuan_send_verif'])->name('menu_peminjaman_list_proses_pengajuan_send_verif');
     Route::post('menu-peminjaman/list-peminjaman/proses-pengajuan-peminjaman-uang/save-verifikasi', [KoperasiController::class, 'menu_peminjaman_list_proses_pengajuan_save_verif'])->name('menu_peminjaman_list_proses_pengajuan_save_verif');
+    Route::post('menu-peminjaman/list-peminjaman/cetak-slip-pengajuan-peminjaman-uang', [KoperasiController::class, 'menu_peminjaman_list_cetak_slip_pengajuan'])->name('menu_peminjaman_list_cetak_slip_pengajuan');
+    Route::post('menu-peminjaman/list-peminjaman/cetak-slip-pengajuan-peminjaman-uang/report', [KoperasiController::class, 'menu_peminjaman_list_cetak_slip_pengajuan_report'])->name('menu_peminjaman_list_cetak_slip_pengajuan_report');
     Route::post('menu-peminjaman/list-peminjaman/cetak-pengajuan-peminjaman-uang', [KoperasiController::class, 'menu_peminjaman_list_cetak_pengajuan'])->name('menu_peminjaman_list_cetak_pengajuan');
     Route::post('menu-peminjaman/list-peminjaman/cetak-pengajuan-peminjaman-uang/report', [KoperasiController::class, 'menu_peminjaman_list_cetak_pengajuan_report'])->name('menu_peminjaman_list_cetak_pengajuan_report');
     Route::post('menu-peminjaman/list-peminjaman/cek-status-kontrak', [KoperasiController::class, 'menu_peminjaman_list_cek_kontrak'])->name('menu_peminjaman_list_cek_kontrak');

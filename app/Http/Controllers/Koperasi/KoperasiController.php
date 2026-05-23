@@ -676,6 +676,7 @@ class KoperasiController extends Controller
                 'kop_proses_uang_admin' => $request->biaya_admin,
                 'kop_proses_uang_kacab' => $request->kepala_cabang,
                 'kop_proses_uang_ketua' => $request->ketua_koperasi,
+                'kop_proses_uang_keperluan' => $request->keperluan,
                 'kop_proses_uang_user' => Auth::user()->userid,
                 'kop_proses_uang_status' => 0,
                 'created_at' => now()
@@ -694,6 +695,54 @@ class KoperasiController extends Controller
             return view('app-koperasi.menu-peminjaman.peminjaman-barang', ['data' => $data, 'akses' => $akses, 'code' => $id]);
         } else {
             return Redirect::to('dashboard/home');
+        }
+    }
+    public function menu_peminjaman_barang_cari_peserta(Request $request)
+    {
+        $data = DB::table('kop_master_peserta')
+            ->join('kop_master_cabang', 'kop_master_cabang.kop_master_cabang_code', '=', 'kop_master_peserta.kop_master_peserta_cabang')
+            ->join('kop_setup_cabang_koperasi', 'kop_setup_cabang_koperasi.kop_setup_cabang_koperasi_cabang', '=', 'kop_master_peserta.kop_master_peserta_cabang')
+            ->where('kop_master_peserta.kop_master_peserta_status', 1)
+            ->get();
+        return view('app-koperasi.menu-peminjaman.peminjaman-barang.form-cari-data', compact('data'));
+    }
+    public function menu_peminjaman_barang_pilih_peserta(Request $request)
+    {
+        $data = DB::table('kop_master_peserta')
+            ->join('kop_master_cabang', 'kop_master_cabang.kop_master_cabang_code', '=', 'kop_master_peserta.kop_master_peserta_cabang')
+            ->join('kop_setup_cabang_koperasi', 'kop_setup_cabang_koperasi.kop_setup_cabang_koperasi_cabang', '=', 'kop_master_peserta.kop_master_peserta_cabang')
+            ->where('kop_master_peserta.kop_master_peserta_code', $request->code)->first();
+        $kcb = DB::table('kop_user_verifikasi')
+            ->where('kop_user_verifikasi_cabang', $data->kop_master_peserta_cabang)
+            ->where('kop_user_verifikasi_job', 0)->get();
+        $mgr = DB::table('kop_user_verifikasi')
+            ->where('kop_user_verifikasi_cabang', $data->kop_master_peserta_cabang)
+            ->where('kop_user_verifikasi_job', 1)->get();
+        return view('app-koperasi.menu-peminjaman.peminjaman-barang.form-peminjaman-barang', ['data' => $data, 'kcb' => $kcb, 'mgr' => $mgr]);
+    }
+    public function menu_peminjaman_barang_proses_pengajuan(Request $request)
+    {
+        try {
+            $integer = preg_replace('/[^0-9]/', '', $request->nominal_pinjam);
+            DB::table('kop_proses_peminjaman_brg')->insert([
+                'kop_proses_brg_code' => str::uuid(),
+                'kop_master_peserta_code' => $request->peserta_koperasi,
+                'kop_proses_brg_nominal' => $integer,
+                'kop_proses_brg_tgl' => $request->tgl_pinjam,
+                'kop_proses_brg_tenor' => $request->tenor,
+                'kop_proses_brg_bunga' => $request->bunga_pinjam,
+                'kop_proses_brg_admin' => $request->biaya_admin,
+                'kop_proses_brg_kacab' => $request->kepala_cabang,
+                'kop_proses_brg_ketua' => $request->ketua_koperasi,
+                'kop_proses_brg_keperluan' => $request->keperluan,
+                'kop_proses_brg_file' => '123',
+                'kop_proses_brg_user' => Auth::user()->userid,
+                'kop_proses_brg_status' => 0,
+                'created_at' => now()
+            ]);
+            return 1;
+        } catch (\Throwable $e) {
+            return 0;
         }
     }
     // MENU LIST PEMINJAMAN
@@ -894,6 +943,36 @@ class KoperasiController extends Controller
             return 0;
         }
     }
+    public function menu_peminjaman_list_cetak_slip_pengajuan(Request $request)
+    {
+        return view('app-koperasi.menu-peminjaman.peminjaman-list.form-report-slip', ['code' => $request->code]);
+    }
+    public function menu_peminjaman_list_cetak_slip_pengajuan_report(Request $request)
+    {
+        $data = DB::table('kop_master_peserta')
+            ->join('kop_proses_peminjaman_uang', 'kop_proses_peminjaman_uang.kop_master_peserta_code', '=', 'kop_master_peserta.kop_master_peserta_code')
+            ->where('kop_proses_uang_code', $request->code)->first();
+        $image = base64_encode(file_get_contents(public_path('img/logo.png')));
+        $pdf = \Barryvdh\DomPDF\Facade\Pdf::loadview('app-koperasi.menu-peminjaman.peminjaman-list.report.report-slip-peminjaman-uang', compact('image', 'data'), [
+            'code' => $request->code
+        ])->setPaper('A4', 'landscape')->setOptions([
+            'isHtml5ParserEnabled' => true,
+            'isRemoteEnabled' => true,
+        ]);
+        $pdf->output();
+        $dompdf = $pdf->getDomPDF();
+        $font = $dompdf->getFontMetrics()->get_font("helvetica", "bold");
+        $font1 = $dompdf->getFontMetrics()->get_font("helvetica", "normal");
+        $dompdf->get_canvas()->page_text(300, 560, "{PAGE_NUM} / {PAGE_COUNT}", $font, 10, array(0, 0, 0));
+        // $dompdf->get_canvas()->page_text(34, 390, "Note. Slip elektronik Ini Simpan Sebagai Bukti", $font1, 10, array(0, 5, 1));
+        $dompdf->get_canvas()->page_text(350, 560, "Print by. " . Auth::user()->fullname, $font1, 10, array(0, 0, 0));
+        $canvas = $pdf->getDomPDF()->getCanvas();
+        $canvas->page_script('
+            // $pdf->set_opacity(.9);
+            $pdf->image("img/cover.png", 12, 12, 875, 823);
+            ');
+        return base64_encode($pdf->stream());
+    }
     public function menu_peminjaman_list_cetak_pengajuan(Request $request)
     {
         return view('app-koperasi.menu-peminjaman.peminjaman-list.form-report-data-pengajuan', ['code' => $request->code]);
@@ -956,6 +1035,18 @@ class KoperasiController extends Controller
             return 1;
         } else {
             return 0;
+        }
+    }
+    // MENU LIST PEMINJAMAN BARANG
+    public function menu_peminjaman_list_barang($akses, $id)
+    {
+        if ($this->url_akses_sub($akses, $id) == true) {
+            $data = DB::table('kop_proses_peminjaman_brg')
+                ->join('kop_master_peserta', 'kop_master_peserta.kop_master_peserta_code', '=', 'kop_proses_peminjaman_brg.kop_master_peserta_code')
+                ->get();
+            return view('app-koperasi.menu-peminjaman.peminjaman-list-barang', ['data' => $data, 'akses' => $akses, 'code' => $id]);
+        } else {
+            return Redirect::to('dashboard/home');
         }
     }
     // LAPORAN TAGIHAN

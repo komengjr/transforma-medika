@@ -25,7 +25,7 @@
                 </div>
                 <div class="col-xl-auto px-3 py-2">
                     <h6 class="text-success fs--1 mb-0">Menu : </h6>
-                    <h4 class="text-success fw-bold mb-0">Peminjaman <span class="text-success fw-medium">List Data</span>
+                    <h4 class="text-success fw-bold mb-0">Peminjaman <span class="text-success fw-medium">List Barang</span>
                     </h4>
                 </div>
             </div>
@@ -71,13 +71,13 @@
                 <tr>
                     <td>{{ $no++ }}</td>
                     <td>{{ $datas->kop_master_peserta_name }} <br>{{ $datas->kop_master_peserta_nip }} <br>{{ $datas->kop_master_peserta_nik }}</td>
-                    <td>{{ $datas->kop_proses_uang_tgl }}</td>
-                    <td>@currency($datas->kop_proses_uang_nominal)</td>
-                    <td>{{ $datas->kop_proses_uang_bunga }} %</td>
-                    <td>{{ $datas->kop_proses_uang_tenor }} Bulan</td>
+                    <td>{{ $datas->kop_proses_brg_tgl }}</td>
+                    <td>@currency($datas->kop_proses_brg_nominal)</td>
+                    <td>{{ $datas->kop_proses_brg_bunga }} %</td>
+                    <td>{{ $datas->kop_proses_brg_tenor }} Bulan</td>
                     <td>
                         @php
-                        $kacab = DB::table('kop_user_verifikasi')->where('kop_user_verifikasi_code',$datas->kop_proses_uang_kacab)->first();
+                        $kacab = DB::table('kop_user_verifikasi')->where('kop_user_verifikasi_code',$datas->kop_proses_brg_kacab)->first();
                         @endphp
                         @if ($kacab)
                         {{ $kacab->kop_user_verifikasi_name }}
@@ -85,20 +85,20 @@
                     </td>
                     <td>
                         @php
-                        $ketua = DB::table('kop_user_verifikasi')->where('kop_user_verifikasi_code',$datas->kop_proses_uang_ketua)->first();
+                        $ketua = DB::table('kop_user_verifikasi')->where('kop_user_verifikasi_code',$datas->kop_proses_brg_ketua)->first();
                         @endphp
                         @if ($ketua)
                         {{ $ketua->kop_user_verifikasi_name }}
                         @endif
                     </td>
                     <td>
-                        @if ($datas->kop_proses_uang_status == '0')
+                        @if ($datas->kop_proses_brg_status == '0')
                         <span class="badge bg-info">Peminjaman Baru</span>
-                        @elseif ($datas->kop_proses_uang_status == '1')
+                        @elseif ($datas->kop_proses_brg_status == '1')
                         <span class="badge bg-warning">Peminjaman diproses</span>
-                        @elseif ($datas->kop_proses_uang_status == '2')
+                        @elseif ($datas->kop_proses_brg_status == '2')
                         <span class="badge bg-success">Peminjaman Lunas</span>
-                        @elseif ($datas->kop_proses_uang_status == '3')
+                        @elseif ($datas->kop_proses_brg_status == '3')
                         <span class="badge bg-primary">Peminjaman Lunas</span>
                         @endif
                     </td>
@@ -108,23 +108,23 @@
                                 type="button" data-bs-toggle="dropdown" aria-haspopup="true" aria-expanded="false"><span
                                     class="fas fa-align-left me-1" data-fa-transform="shrink-3"></span>Menu</button>
                             <div class="dropdown-menu" aria-labelledby="btnGroupVerticalDrop2">
-                                @if ($datas->kop_proses_uang_status == '0')
+                                @if ($datas->kop_proses_brg_status == '0')
                                 <button class="dropdown-item text-primary" data-bs-toggle="modal" data-bs-target="#modal-koperasi"
-                                    id="button-proses-data-pengajuan" data-code="{{$datas->kop_proses_uang_code}}"><span
+                                    id="button-proses-data-pengajuan" data-code="{{$datas->kop_proses_brg_code}}"><span
                                         class="far fa-folder-open"></span>
                                     Proses Pengajuan Peminjaman</button>
-                                @elseif ($datas->kop_proses_uang_status == '1')
+                                @elseif ($datas->kop_proses_brg_status == '1')
                                 <button class="dropdown-item text-warning" data-bs-toggle="modal" data-bs-target="#modal-koperasi"
-                                    id="button-cek-status-kontrak" data-code="{{$datas->kop_proses_uang_code}}"><span
+                                    id="button-cek-status-kontrak" data-code="{{$datas->kop_proses_brg_code}}"><span
                                         class="fab fa-leanpub"></span>
                                     Cek Status Kontrak</button>
                                 <button class="dropdown-item text-primary" data-bs-toggle="modal" data-bs-target="#modal-koperasi"
-                                    id="button-cetak-slip-peminjaman" data-code="{{$datas->kop_proses_uang_code}}"><span
+                                    id="button-cetak-slip-peminjaman" data-code="{{$datas->kop_proses_brg_code}}"><span
                                         class="fas fa-print"></span>
                                     Cetak Slip Peminjaman</button>
-                                @elseif ($datas->kop_proses_uang_status == '2')
+                                @elseif ($datas->kop_proses_brg_status == '2')
                                 <button class="dropdown-item" data-bs-toggle="modal" data-bs-target="#modal-koperasi"
-                                    id="button-cetak-pengajuain-peminjaman" data-code="{{$datas->kop_proses_uang_code}}"><span
+                                    id="button-cetak-pengajuain-peminjaman" data-code="{{$datas->kop_proses_brg_code}}"><span
                                         class="fas fa-print"></span>
                                     Cetak Pengajuan Peminjaman</button>
                                 @endif

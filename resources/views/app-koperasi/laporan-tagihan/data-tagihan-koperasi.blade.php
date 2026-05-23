@@ -57,6 +57,7 @@
                     $total_pokok = 0;
                     $total_wajib = 0;
                     $total_sukarela = 0;
+                    $total_all = 0;
                     @endphp
                     @foreach ($peserta as $pes)
                     @php
@@ -86,6 +87,7 @@
                     $total_pokok = $total_pokok + $pokok;
                     $total_wajib = $total_wajib + $wajib;
                     $total_sukarela = $total_sukarela + $sukarela;
+                    $total_all = $total_all + $total;
                     @endphp
                     <tr>
                         <td>{{ $no++ }}</td>
@@ -117,7 +119,7 @@
                         <th class="text-end white-space-nowrap">@currency(0)</th>
                         <th class="text-end white-space-nowrap">@currency(0)</th>
                         <th class="text-end white-space-nowrap">@currency(0)</th>
-                        <th class="text-end white-space-nowrap">@currency(0)</th>
+                        <th class="text-end white-space-nowrap">@currency($total_all)</th>
                     </tr>
                 </tfoot>
             </table>

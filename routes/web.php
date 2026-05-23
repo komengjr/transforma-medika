@@ -186,6 +186,7 @@ Route::prefix('{akses}/{id}')->group(function (): void {
     Route::get('menu-peminjaman/peminjaman-uang', [KoperasiController::class, 'menu_peminjaman_uang'])->name('menu_peminjaman_uang');
     Route::get('menu-peminjaman/peminjaman-barang', [KoperasiController::class, 'menu_peminjaman_barang'])->name('menu_peminjaman_barang');
     Route::get('menu-peminjaman/list-peminjaman', [KoperasiController::class, 'menu_peminjaman_list'])->name('menu_peminjaman_list');
+    Route::get('menu-peminjaman/list-peminjaman-barang', [KoperasiController::class, 'menu_peminjaman_list_barang'])->name('menu_peminjaman_list');
     Route::get('laporan-koperasi/laporan-tagihan', [KoperasiController::class, 'laporan_koperasi_tagihan'])->name('laporan_koperasi_tagihan');
     Route::get('laporan-koperasi/laporan-mutasi-bank', [KoperasiController::class, 'laporan_koperasi_mutasi_bank'])->name('laporan_koperasi_mutasi_bank');
     Route::get('laporan-koperasi/laporan-rugi-laba', [KoperasiController::class, 'laporan_koperasi_rugi_laba'])->name('laporan_koperasi_rugi_laba');

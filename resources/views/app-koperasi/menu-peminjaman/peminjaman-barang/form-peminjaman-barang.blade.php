@@ -2,7 +2,7 @@
     <div class="card-header bg-300">
         <div class="row flex-between-end">
             <div class="col-auto align-self-center">
-                <h5 class="mb-0" data-anchor="data-anchor" id="form-grid-layout">Form Peminjaman Uang Koperasi<a class="anchorjs-link " aria-label="Anchor" data-anchorjs-icon="#" href="#form-grid-layout" style="padding-left: 0.375em;"></a></h5>
+                <h5 class="mb-0" data-anchor="data-anchor" id="form-grid-layout">Form Peminjaman Barang Koperasi<a class="anchorjs-link " aria-label="Anchor" data-anchorjs-icon="#" href="#form-grid-layout" style="padding-left: 0.375em;"></a></h5>
                 <p class="mb-0 mt-2 mb-0">More complex layouts can also be created with the grid system.</p>
             </div>
             <div class="col-auto ms-auto">
@@ -123,12 +123,16 @@
                 <p class="fs--1 mb-2"><span class="badge bg-primary">Pinjaman Baru</span></p>
 
                 <div class="row gx-3">
-                    <div class="col-12">
-                        <label for="inputAddress3" class="form-label">Keperluan Peminjaman</label>
+                    <div class="col-7">
+                        <label for="inputAddress3" class="form-label">Keperluan Peminjaman / Deskripsi Barang</label>
                         <textarea class="form-control" name="keperluan" id="inputAddress3" rows="3" required></textarea>
                     </div>
+                    <div class="col-5">
+                        <label for="inputAddress3" class="form-label">Upload file Pendukung</label>
+                        <input type="file" class="form-control" name="" id="">
+                    </div>
                     <div class="col-7">
-                        <label class="form-label ls text-uppercase text-600 fw-semi-bold mb-0 fs--1" for="cardNumber">Nominal Peminjaman <strong class="text-danger">Maksimal Peminjaman @currency($data->kop_setup_cabang_koperasi_jp_uang)</strong></label>
+                        <label class="form-label ls text-uppercase text-600 fw-semi-bold mb-0 fs--1" for="cardNumber">Nominal Peminjaman <strong class="text-danger">Maksimal Peminjaman @currency($data->kop_setup_cabang_koperasi_jp_brg)</strong></label>
                         <input class="form-control" name="nominal_pinjam" id="plafon" placeholder="Contoh: 10000000" oninput="handleInput(this)" type="text">
                         <input type="text" name="peserta_koperasi" id="peserta_koperasi" value="{{ $data->kop_master_peserta_code }}" hidden>
                     </div>
@@ -230,7 +234,7 @@
     function handleInput(e) {
         e.value = formatRupiah(e.value, 'Rp ');
         const nilai = document.getElementById('plafon').value.replace(/[^0-9]/g, '');
-        if (nilai >= <?php echo $data->kop_setup_cabang_koperasi_jp_uang ?>) {
+        if (nilai >= <?php echo $data->kop_setup_cabang_koperasi_jp_brg ?>) {
             document.getElementById('plafon').value = "";
             Swal.fire({
                 icon: "error",
