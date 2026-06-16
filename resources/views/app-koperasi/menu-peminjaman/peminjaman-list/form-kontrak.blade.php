@@ -71,7 +71,7 @@
                             $total = 0 ;
                             $paid = 0;
                             $pokok = $data->kop_proses_uang_nominal/$data->kop_proses_uang_tenor ;
-                            $suku_bunga = ($data->kop_proses_uang_nominal * ($data->kop_proses_uang_bunga / 100) * ($data->kop_proses_uang_tenor/12))/$data->kop_proses_uang_tenor;
+                            $suku_bunga = ($data->kop_proses_uang_nominal * ($data->kop_proses_uang_bunga / 100))/$data->kop_proses_uang_tenor;
                             $admin = ($data->kop_proses_uang_admin / 100) * $data->kop_proses_uang_nominal;
                             @endphp
                             @for ($i = 1 ; $i <= $data->kop_proses_uang_tenor ; $i++)

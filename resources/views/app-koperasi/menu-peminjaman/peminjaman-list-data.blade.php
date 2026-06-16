@@ -100,6 +100,8 @@
                         <span class="badge bg-success">Peminjaman Lunas</span>
                         @elseif ($datas->kop_proses_uang_status == '3')
                         <span class="badge bg-primary">Peminjaman Lunas</span>
+                        @elseif ($datas->kop_proses_uang_status == '-1')
+                        <span class="badge bg-danger">Peminjaman Di Batalkan</span>
                         @endif
                     </td>
                     <td>

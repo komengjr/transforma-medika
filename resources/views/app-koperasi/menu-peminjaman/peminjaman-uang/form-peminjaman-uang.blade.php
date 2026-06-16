@@ -253,7 +253,8 @@
         if (P > 0 && n > 0 && bungaTahun > 0) {
             // 1. Hitung Total Angsuran (Anuitas)
             // const totalAngsuran = P * (r / (1 - Math.pow(1 + r, -n)));
-            const totalAngsuran = (P * (bungaTahun / 100) * (n / 12)) / n;
+            // const totalAngsuran = (P * (bungaTahun / 100) * (n / 12)) / n;
+            const totalAngsuran = (P * (bungaTahun / 100) / n) ;
 
 
             // 2. Hitung Bunga Bulan Pertama

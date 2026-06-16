@@ -183,6 +183,7 @@
             <div class="input-group">
                 <label>Nama Lengkap</label>
                 <input type="text" id="input-nama" value="{{ $data->kop_master_peserta_name }}" readonly>
+                <input type="text" id="data-code" value="{{ $data->kop_proses_uang_code }}" hidden>
             </div>
 
             <div class="input-group">
@@ -312,6 +313,7 @@
                     const nominal = document.getElementById('input-nominal').value;
                     const kebutuhan = document.getElementById('input-kebutuhan').value;
                     const vocher = document.getElementById('vocher_code').value;
+                    const proses_code = document.getElementById('data-code').value;
 
                     // Validasi Form
                     if (!nama || !nominal || !kebutuhan) {
@@ -354,6 +356,8 @@
                         data: {
                             "_token": "{{ csrf_token() }}",
                             "code": vocher,
+                            "persetujuan": kebutuhan,
+                            "proses": proses_code,
                             "sign": base64String,
                         },
                         dataType: 'html',
