@@ -4,6 +4,8 @@ namespace App\Http\Controllers\Koperasi;
 
 use App\Http\Controllers\Controller;
 use App\Imports\Koperasi\PesertaImport;
+use App\Models\Koperasi\Cabang;
+use App\Models\Koperasi\Tagihan;
 use Carbon\Carbon;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
@@ -629,6 +631,60 @@ class KoperasiController extends Controller
             return 0;
         }
     }
+    // MENU TAGIHAN KOPERASI
+    public function menu_koperasi_tagihan_koperasi(Request $request, $akses, $id)
+    {
+        if ($this->url_akses($akses, $id) == true) {
+            // Ambil semua daftar cabang untuk isi dropdown filter
+            $list_cabang = Cabang::all();
+
+            return view('app-koperasi.menu-tagihan-koperasi', compact('list_cabang'), ['akses' => $akses, 'code' => $id]);
+        } else {
+            return Redirect::to('dashboard/home');
+        }
+    }
+    public function menu_koperasi_tagihan_koperasi_load(Request $request)
+    {
+        $query = Tagihan::with(['peserta.cabang']);
+
+        // Filter Tanggal
+        if ($request->filled('start_date') && $request->filled('end_date')) {
+            $query->whereBetween('kop_req_tagihan_date', [$request->start_date, $request->end_date]);
+        }
+
+        // Filter Cabang
+        if ($request->filled('cabang_id') && $request->cabang_id !== 'semua') {
+            $query->whereHas('peserta', function ($q) use ($request) {
+                $q->where('kop_master_peserta_cabang', $request->cabang_id);
+            });
+        }
+
+        $all_tagihan = $query->get();
+
+        // Mengembalikan data terkelompok dalam format JSON
+        return response()->json([
+            'bulanan' => [
+                'total' => $all_tagihan->where('kop_req_tagihan_type', 'bulanan')->sum('kop_req_tagihan_nominal'),
+                'data'  => $all_tagihan->where('kop_req_tagihan_type', 'bulanan')->values()
+            ],
+            'voucher' => [
+                'total' => $all_tagihan->where('kop_req_tagihan_type', 'voucher')->sum('kop_req_tagihan_nominal'),
+                'data'  => $all_tagihan->where('kop_req_tagihan_type', 'voucher')->values()
+            ],
+            'peminjaman_uang' => [
+                'total' => $all_tagihan->where('kop_req_tagihan_type', 'peminjaman')->sum('kop_req_tagihan_nominal'),
+                'data'  => $all_tagihan->where('kop_req_tagihan_type', 'peminjaman')->values()
+            ],
+            'peminjaman_barang' => [
+                'total' => $all_tagihan->where('kop_req_tagihan_type', 'peminjaman')->sum('kop_req_tagihan_nominal'),
+                'data'  => $all_tagihan->where('kop_req_tagihan_type', 'peminjaman')->values()
+            ],
+            'lain' => [
+                'total' => $all_tagihan->where('kop_req_tagihan_type', 'lain-lain')->sum('kop_req_tagihan_nominal'),
+                'data'  => $all_tagihan->where('kop_req_tagihan_type', 'lain-lain')->values()
+            ],
+        ]);
+    }
     // MENU PEMINJAMAN UANG
     public function menu_peminjaman_uang($akses, $id)
     {
@@ -768,8 +824,6 @@ class KoperasiController extends Controller
     {
         try {
             $data = DB::table('kop_proses_peminjaman_uang')->where('kop_proses_uang_code', $request->code)->first();
-
-
 
             // DATA KETUA
             $ketua = DB::table('kop_proses_verif')->where('kop_proses_uang_code', $request->code)->where('kop_proses_verif_user', $data->kop_proses_uang_ketua)->first();

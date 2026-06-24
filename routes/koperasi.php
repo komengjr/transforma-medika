@@ -56,6 +56,8 @@ Route::prefix('koperasi/')->group(function (): void {
     Route::post('menu-koperasi/simpanan-sukarela/proses-data', [KoperasiController::class, 'menu_koperasi_sukarela_proses'])->name('menu_koperasi_sukarela_proses');
     Route::post('menu-koperasi/simpanan-sukarela/proses-save-data', [KoperasiController::class, 'menu_koperasi_sukarela_proses_save'])->name('menu_koperasi_sukarela_proses_save');
 
+    Route::get('menu-koperasi/tagihan-koperasi/load', [KoperasiController::class, 'menu_koperasi_tagihan_koperasi_load'])->name('menu_koperasi_tagihan_koperasi_load');
+
     Route::post('laporan-koperasi/laporan-tagihan/find-data', [KoperasiController::class, 'laporan_koperasi_tagihan_find'])->name('laporan_koperasi_tagihan_find');
 
     Route::post('laporan-koperasi/laporan-mutasi-bank/add-data', [KoperasiController::class, 'laporan_koperasi_mutasi_bank_add'])->name('laporan_koperasi_mutasi_bank_add');
