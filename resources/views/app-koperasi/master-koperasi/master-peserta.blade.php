@@ -75,7 +75,14 @@
                     <td>{{ $datas->kop_master_peserta_name }}</td>
                     <td>{{ $datas->kop_master_peserta_nik }} / {{ $datas->kop_master_peserta_nip }}</td>
                     <td>{{ $datas->kop_master_peserta_tempat_lahir }}, {{ $datas->kop_master_peserta_tgl_lahir }}</td>
-                    <td>{{ $datas->kop_master_peserta_cabang }}</td>
+                    <td>
+                        @php
+                        $cabang = DB::table('kop_master_cabang')->where('kop_master_cabang_code',$datas->kop_master_peserta_cabang)->first();
+                        @endphp
+                        @if ($cabang)
+                            {{ $cabang->kop_master_cabang_name }}
+                        @endif
+                    </td>
                     <td>
                         @php
                         $divisi = DB::table('kop_master_peserta_job')
