@@ -1092,7 +1092,7 @@ class KoperasiController extends Controller
         ];
         $set = DB::table('kop_fin_master_coa_set')
             ->where('fin_master_coa_set_cabang', $data->kop_master_peserta_cabang)
-            ->where('fin_master_coa_set_code', '=', 'angsuran_pinjaman_uang')->first();
+            ->where('fin_master_coa_set_type', '=', 'angsuran_pinjaman_uang')->first();
         if ($request->akun == "") {
             $akun = $set->fin_master_coa_set_debit;
         } else {
