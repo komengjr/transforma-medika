@@ -243,35 +243,6 @@
             $('#menu-add-data-cabang').html('eror');
         });
     });
-    $(document).on("click", "#button-simpan-data-verifikasi", function(e) {
-        e.preventDefault();
-        var data = $("#form-add-verifikasi-baru").serialize();
-        $('#menu-add-data-verifikasi').html(
-            '<div class="spinner-border my-3" style="display: block; margin-left: auto; margin-right: auto;" role="status"><span class="visually-hidden">Loading...</span></div>'
-        );
-        $.ajax({
-            url: "{{ route('master_koperasi_cabang_save_data_verifikasi') }}",
-            type: "POST",
-            cache: false,
-            data: data,
-            dataType: 'html',
-        }).done(function(data) {
-            if (data == 0) {
-                Swal.fire({
-                    icon: "error",
-                    title: "Oops...",
-                    text: "Something went wrong!",
-                    footer: '<a href="#">Why do I have this issue?</a>'
-                });
-                $('#menu-add-data-verifikasi').html('<button class="btn btn-success float-end" id="button-simpan-data-verifikasi" data-code="">Simpan Data</button>');
-            } else {
-                $('#menu-add-data-verifikasi').html(data);
-                location.reload();
-            }
-        }).fail(function() {
-            $('#menu-add-data-verifikasi').html('eror');
-        });
-    });
     $(document).on("click", "#button-add-data-verifikasi", function(e) {
         e.preventDefault();
         var code = $(this).data("code");
