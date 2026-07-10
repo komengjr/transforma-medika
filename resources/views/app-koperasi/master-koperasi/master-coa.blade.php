@@ -36,9 +36,10 @@
     <div class="card-header bg-primary">
         <div class="row align-items-center">
             <div class="col">
-                <h3 class="m-0"><span class="badge bg-primary m-0 p-0">Chart Of kopount : {{ $total }} kopounts</span></h3>
+                <h3 class="m-0"><span class="badge bg-primary m-0 p-0">Chart Of Accounts : {{ $total }} Accounts</span></h3>
             </div>
             <div class="col-auto">
+                <button class="btn btn-dark btn-sm" data-bs-toggle="modal" data-bs-target="#modal-coa-xl" id="button-sinkronisasi-data-coa">Sinkronisasi COA</button>
             </div>
         </div>
     </div>
@@ -322,6 +323,18 @@
         </div>
     </div>
 </div>
+<div class="modal fade" id="modal-coa-xl" data-bs-keyboard="false" data-bs-backdrop="static" tabindex="-1"
+    aria-labelledby="staticBackdropLabel" aria-hidden="true">
+    <div class="modal-dialog modal-dialog-centered modal-xl" role="document">
+        <div class="modal-content border-0">
+            <div class="position-absolute top-0 end-0 mt-3 me-3 z-index-1">
+                <button class="btn-close btn btn-sm btn-circle d-flex flex-center transition-base"
+                    data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <div id="menu-coa-xl"></div>
+        </div>
+    </div>
+</div>
 <script src="https://cdn.datatables.net/2.2.2/js/dataTables.js"></script>
 <script src="https://cdn.datatables.net/2.2.2/js/dataTables.bootstrap5.js"></script>
 <script src="https://cdn.datatables.net/responsive/3.0.4/js/dataTables.responsive.js"></script>
@@ -416,7 +429,7 @@
             '<div class="spinner-border my-3" style="display: block; margin-left: auto; margin-right: auto;" role="status"><span class="visually-hidden">Loading...</span></div>'
         );
         $.ajax({
-            url: "{{ route('master_accounting_coa_save_level') }}",
+            url: "{{ route('master_koperasi_data_coa_save_level') }}",
             type: "POST",
             cache: false,
             data: data,
@@ -431,9 +444,9 @@
                 });
                 $('#menu-add-data-coa').html('<button class="btn btn-success float-end" id="button-simpan-data-level-coa" data-code="">Simpan Data</button>');
             } else {
-                document.getElementById('nama_kopount').value = "";
-                document.getElementById('option_kopount').value = "";
-                $('#data-table-kopoaunt-coa').html(data);
+                document.getElementById('nama_account').value = "";
+                document.getElementById('option_account').value = "";
+                $('#data-table-accoaunt-coa').html(data);
                 $('#menu-add-data-coa').html('<button class="btn btn-success float-end" id="button-simpan-data-level-coa" data-code="">Simpan Data</button>');
             }
         }).fail(function() {
@@ -479,6 +492,44 @@
                 footer: '<a href="#">Why do I have this issue?</a>'
             });
             $('#menu-add-data-coa').html('<button class="btn btn-success float-end" id="button-simpan-data-level-coa" data-code="">Simpan Data</button>');
+        });
+    });
+</script>
+
+<script>
+    $(document).on("click", "#button-sinkronisasi-data-coa", function(e) {
+        e.preventDefault();
+        $.ajax({
+            url: "{{ route('master_koperasi_data_coa_sinskronisasi') }}",
+            type: "POST",
+            cache: false,
+            data: {
+                "_token": "{{ csrf_token() }}",
+                "nomor": 123,
+            },
+            dataType: 'html',
+        }).done(function(data) {
+            $('#menu-coa-xl').html(data);
+        }).fail(function() {
+            $('#menu-coa-xl').html('eror');
+        });
+    });
+    $(document).on("click", "#button-proses-sinkrosnisasi-data-coa", function(e) {
+        e.preventDefault();
+        $.ajax({
+            url: "{{ route('master_koperasi_data_coa_sinskronisasi_proses') }}",
+            type: "POST",
+            cache: false,
+            data: {
+                "_token": "{{ csrf_token() }}",
+                "nomor": 1,
+            },
+            dataType: 'html',
+        }).done(function(data) {
+            location.reload();
+            // $('#menu-coa-xl').html(data);
+        }).fail(function() {
+            $('#menu-coa-xl').html('eror');
         });
     });
 </script>

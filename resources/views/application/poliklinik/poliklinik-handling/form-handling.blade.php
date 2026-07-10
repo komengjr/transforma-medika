@@ -84,11 +84,11 @@
                     <div class="avatar avatar-5lg shadow-sm justify-content-center">
                         <div class="h-100 w-100 overflow-hidden ">
                             @if ($data->master_patient_profile == "")
-                                <img src="{{ asset('img/pasien.png') }}" class="img-thumbnail " alt="" id="videoPreview"
-                                    data-dz-thumbnail="data-dz-thumbnail">
+                            <img src="{{ asset('img/pasien.png') }}" class="img-thumbnail " alt="" id="videoPreview"
+                                data-dz-thumbnail="data-dz-thumbnail">
                             @else
-                                <img src="{{ Storage::url($data->master_patient_profile) }}" class="img-thumbnail " alt=""
-                                    id="videoPreview" data-dz-thumbnail="data-dz-thumbnail">
+                            <img src="{{ Storage::url($data->master_patient_profile) }}" class="img-thumbnail " alt=""
+                                id="videoPreview" data-dz-thumbnail="data-dz-thumbnail">
                             @endif
                         </div>
 
@@ -219,7 +219,7 @@
                 class="fas fa-plus fs--2 me-1" data-fa-transform="up-1"></span>Add Diagnosa</button>
         <div id="menu-diagnosa-umum">
             @php
-                $umum = DB::table('diag_poli_gigi_umum')->where('d_reg_order_poli_code', $data->d_reg_order_poli_code)->get();
+            $umum = DB::table('diag_poli_gigi_umum')->where('d_reg_order_poli_code', $data->d_reg_order_poli_code)->get();
             @endphp
             <div class="table-responsive scrollbar pt-3">
                 <table class="table border" border="1">
@@ -232,20 +232,20 @@
                     </thead>
                     <tbody>
                         @foreach ($umum as $umums)
-                            <tr>
-                                <td>{{ $umums->diag_poli_gigi_umum_name }}</td>
-                                <td>{{ $umums->diag_poli_gigi_umum_desc }}</td>
-                                <td class="text-end">
-                                    <div>
-                                        <button class="btn p-0" type="button" data-bs-toggle="tooltip"
-                                            data-bs-placement="top" title="Edit"><span
-                                                class="text-500 fas fa-edit"></span></button>
-                                        <button class="btn p-0 ms-2" type="button" data-bs-toggle="tooltip"
-                                            data-bs-placement="top" title="Delete"><span
-                                                class="text-500 fas fa-trash-alt"></span></button>
-                                    </div>
-                                </td>
-                            </tr>
+                        <tr>
+                            <td>{{ $umums->diag_poli_gigi_umum_name }}</td>
+                            <td>{{ $umums->diag_poli_gigi_umum_desc }}</td>
+                            <td class="text-end">
+                                <div>
+                                    <button class="btn p-0" type="button" data-bs-toggle="tooltip"
+                                        data-bs-placement="top" title="Edit"><span
+                                            class="text-500 fas fa-edit"></span></button>
+                                    <button class="btn p-0 ms-2" type="button" data-bs-toggle="tooltip"
+                                        data-bs-placement="top" title="Delete"><span
+                                            class="text-500 fas fa-trash-alt"></span></button>
+                                </div>
+                            </td>
+                        </tr>
                         @endforeach
 
                     </tbody>
@@ -254,6 +254,10 @@
         </div>
     </div>
 </div>
+@php
+$ran = mt_rand(100, 999);
+@endphp
+@if ($poli->t_layanan_data_name == "POLI GIGI")
 <div class="card mb-3">
     <div class="card-header bg-300">
         <div class="row gx-0 flex-between-center">
@@ -316,26 +320,7 @@
 
     </div>
 </div>
-<div class="card mb-3">
-    <div class="card-header bg-300">
-        <h5 class="mb-0">Fasilitas Order</h5>
-    </div>
-    <div class="card-body bg-light">
-        @foreach ($layanan as $lay)
-            <button class="btn btn-falcon-warning btn-sm me-2" type="button" id="button-order-layanan-dokter"
-                data-code="{{$lay->t_layanan_cat_code}}" data-reg="{{$code}}"><span class="fab fa-squarespace"></span>
-                {{ $lay->t_layanan_cat_name }}</button>
-        @endforeach
-        <hr />
-        <div id="menu-order-layanan-dokter">
-
-        </div>
-    </div>
-
-</div>
-@php
-    $ran = mt_rand(100, 999);
-@endphp
+<!-- SCRIPT NYA -->
 <script>
     var upperNums = [18, 17, 16, 15, 14, 13, 12, 11, 21, 22, 23, 24, 25, 26, 27, 28];
     var lowerNums = [48, 47, 46, 45, 44, 43, 42, 41, 31, 32, 33, 34, 35, 36, 37, 38];
@@ -360,6 +345,7 @@
         t.onclick = () => openModal(num);
         return t;
     }
+
     function buildOdontogram() {
         var uj = document.getElementById("upperJaw");
         var lj = document.getElementById("lowerJaw");
@@ -383,7 +369,10 @@
           <label class="form-check-label" for="d${i}">${d}</label>
         </div>
       `).join("");
-        var existing = data[num] || { diagnosis: [], note: "" };
+        var existing = data[num] || {
+            diagnosis: [],
+            note: ""
+        };
         [...diagList.querySelectorAll("input")].forEach(i => {
             if (existing.diagnosis.includes(i.value)) i.checked = true;
         });
@@ -394,7 +383,10 @@
     document.getElementById("saveBtn").onclick = () => {
         var selected = [...diagList.querySelectorAll("input:checked")].map(i => i.value);
         var note = noteField.value.trim();
-        data[currentTooth<?php echo $ran ?>] = { diagnosis: selected, note };
+        data[currentTooth<?php echo $ran ?>] = {
+            diagnosis: selected,
+            note
+        };
         updateToothDisplay(currentTooth<?php echo $ran ?>);
         modal.hide();
     };
@@ -425,9 +417,14 @@
     imp.onclick = () => {
         try {
             var obj = JSON.parse(text.value);
-            for (var k in obj) { data[k] = obj[k]; updateToothDisplay(k); }
+            for (var k in obj) {
+                data[k] = obj[k];
+                updateToothDisplay(k);
+            }
             alert("Data diimpor!");
-        } catch (e) { alert("Format JSON salah."); }
+        } catch (e) {
+            alert("Format JSON salah.");
+        }
     };
     reset.onclick = () => {
         if (confirm("Yakin ingin reset semua data?")) {
@@ -447,14 +444,14 @@
                     "id": id
                 },
                 dataType: 'html',
-            }).done(function (data) {
+            }).done(function(data) {
                 text.value = "";
-            }).fail(function () {
+            }).fail(function() {
                 alert('error');
             });
         }
     };
-    $(document).on("click", "#exportBtn", function (e) {
+    $(document).on("click", "#exportBtn", function(e) {
         e.preventDefault();
         var id = document.getElementById('code_gigi').value;
         const swalWithBootstrapButtons = Swal.mixin({
@@ -484,7 +481,7 @@
                         "data": JSON.stringify(data, null, 2),
                     },
                     dataType: 'html',
-                }).done(function (data) {
+                }).done(function(data) {
                     if (data == 0) {
                         swalWithBootstrapButtons.fire({
                             title: "Kosong",
@@ -498,7 +495,7 @@
                             icon: "success"
                         });
                     }
-                }).fail(function () {
+                }).fail(function() {
                     swalWithBootstrapButtons.fire({
                         title: "Failed",
                         text: "Your Data Failed :)",
@@ -521,3 +518,44 @@
 
     });
 </script>
+@elseif ($poli->t_layanan_data_name == "POLI PENYAKIT DALAM")
+<div class="card mb-3">
+    <div class="card-header bg-300">
+        <span class="span bg-warrning">POLI Penyakit Dalam Belum Ada Template</span>
+        <input type="text" name="code_gigi" value="{{ $data->d_reg_order_poli_code }}" id="code_gigi" hidden>
+    </div>
+</div>
+
+@elseif ($poli->t_layanan_data_name == "POLI JANTUNG")
+<div class="card mb-3">
+    <div class="card-header bg-300">
+        <span class="span bg-warrning">Poli Jantung Belum Ada Template</span>
+        <input type="text" name="code_gigi" value="{{ $data->d_reg_order_poli_code }}" id="code_gigi" hidden>
+    </div>
+</div>
+@elseif ($poli->t_layanan_data_name == "POLI ANAK")
+<div class="card mb-3">
+    <div class="card-header bg-300">
+        <span class="span bg-warrning">Poli Anak Belum Ada Template</span>
+    </div>
+</div>
+@else
+
+@endif
+<div class="card mb-3">
+    <div class="card-header bg-300">
+        <h5 class="mb-0">Fasilitas Order</h5>
+    </div>
+    <div class="card-body bg-light">
+        @foreach ($layanan as $lay)
+        <button class="btn btn-falcon-warning btn-sm me-2" type="button" id="button-order-layanan-dokter"
+            data-code="{{$lay->t_layanan_cat_code}}" data-reg="{{$code}}"><span class="fab fa-squarespace"></span>
+            {{ $lay->t_layanan_cat_name }}</button>
+        @endforeach
+        <hr />
+        <div id="menu-order-layanan-dokter">
+
+        </div>
+    </div>
+
+</div>

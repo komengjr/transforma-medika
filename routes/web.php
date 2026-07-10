@@ -173,7 +173,7 @@ Route::prefix('{akses}/{id}')->group(function (): void {
     Route::get('master-data/data-movie', [MoviesController::class, 'master_data_movie'])->name('master_data_movie');
     // NEWS
     Route::get('menu_news/add', [NewsAdminController::class, 'menu_news_add'])->name('menu_news_add');
-    // NEWS
+    // EVENT
     Route::get('menu-event/create-event', [EventController::class, 'menu_event_create'])->name('menu_event_create');
     Route::get('menu-event/data-event', [EventController::class, 'menu_event_data'])->name('menu_event_data');
 
@@ -203,6 +203,7 @@ Route::prefix('{akses}/{id}')->group(function (): void {
     Route::get('master-koperasi/klasifikasi-simpanan-wajib', [KoperasiController::class, 'master_koperasi_simpanan_wajib'])->name('master_koperasi_simpanan_wajib');
     Route::get('master-koperasi/data-bank', [KoperasiController::class, 'master_koperasi_data_bank'])->name('master_koperasi_data_bank');
     Route::get('master-koperasi/data-coa', [KoperasiController::class, 'master_koperasi_data_coa'])->name('master_koperasi_data_coa');
+    Route::get('master-koperasi/data-coa-setting', [KoperasiController::class, 'master_koperasi_data_coa_setting'])->name('master_koperasi_data_coa_setting');
 });
 // MEDICA HEALTH
 Route::prefix('{akses}/{id}/application')->group(function () {
@@ -397,6 +398,9 @@ Route::prefix('application')->group(function () {
 // MENU KEUANGAN
 Route::prefix('application')->group(function () {
     Route::post('keuangan/menu-kasir/find-data', [KeuanganController::class, 'keuangan_menu_cashier_find_data'])->name('keuangan_menu_cashier_find_data');
+    Route::get('keuangan/menu-kasir/list-all-patient', [KeuanganController::class, 'keuangan_menu_cashier_list_all_patient'])->name('keuangan_menu_cashier_list_all_patient');
+    Route::get('keuangan/menu-kasir/find-data-v2', [KeuanganController::class, 'keuangan_menu_cashier_find_data_v2'])->name('keuangan_menu_cashier_find_data_v2');
+    Route::post('keuangan/menu-kasir/proses-payment', [KeuanganController::class, 'keuangan_menu_cashier_proses_payment'])->name('keuangan_menu_cashier_proses_payment');
     Route::post('keuangan/menu-kasir/find', [KeuanganController::class, 'keuangan_menu_cashier_find'])->name('keuangan_menu_cashier_find');
     Route::post('keuangan/menu-kasir/fix-payment', [KeuanganController::class, 'keuangan_menu_cashier_find_fix_payment'])->name('keuangan_menu_cashier_find_fix_payment');
     Route::post('transaksi-keuangan/penerimaan-transaksi/proses-transaksi', [KeuanganController::class, 'keuangan_penerimaan_proses_transaksi'])->name('keuangan_penerimaan_proses_transaksi');
@@ -632,6 +636,10 @@ Route::prefix('event/')->group(function (): void {
     Route::post('menu-event/data-event/form-registrasi-event', [EventController::class, 'menu_event_data_form_registrasi_event'])->name('menu_event_data_form_registrasi_event');
     Route::post('menu-event/data-event/form-registrasi-event/detail-sub-event', [EventController::class, 'menu_event_data_form_registrasi_event_detail_sub_event'])->name('menu_event_data_form_registrasi_event_detail_sub_event');
     Route::post('menu-event/data-event/form-registrasi-event/detail-sub-event/add-peserta', [EventController::class, 'menu_event_data_form_registrasi_event_detail_sub_event_add_peserta'])->name('menu_event_data_form_registrasi_event_detail_sub_event_add_peserta');
+    Route::post('menu-event/data-event/test-print', [EventController::class, 'menu_event_data_form_registrasi_event_test_print'])->name('menu_event_data_form_registrasi_event_test_print');
+
+
+    Route::get('menu-event/data-event/self-registrasi-event/{kode}', [EventController::class, 'menu_event_data_form_self_registrasi'])->name('menu_event_data_form_self_registrasi');
 });
 
 Route::prefix('app/')->group(function (): void {

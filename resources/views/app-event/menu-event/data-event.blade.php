@@ -51,6 +51,7 @@
                         <button class="dropdown-item" data-bs-toggle="modal" data-bs-target="#modal-cabang"
                             id="button-add-123" data-code="123"><span class="far fa-folder-open"></span>
                             Add Sub Event</button>
+
                     </div>
                 </div>
             </div>
@@ -120,6 +121,9 @@
                                 <button class="dropdown-item" data-bs-toggle="modal" data-bs-target="#modal-event"
                                     id="button-add-sub-event" data-code="{{$datas->event_data_code}}"><span class="fas fa-calendar-plus"></span>
                                     Add Sub Event</button>
+                                <div class="dropdown-divider"></div>
+                                <button class="dropdown-item" onclick='window.open(`{{ route("menu_event_data_form_self_registrasi",["kode"=>123]) }}`, "_blank");'><span class="fas fa-calendar-plus"></span>
+                                    Self Register</button>
                             </div>
                         </div>
                     </td>

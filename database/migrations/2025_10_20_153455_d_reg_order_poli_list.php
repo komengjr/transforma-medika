@@ -20,6 +20,7 @@ class DRegOrderPoliList extends Migration
             $table->string('p_sales_data_code');
             $table->string('order_poli_log_price');
             $table->string('order_poli_log_discount');
+            $table->string('status_pembayaran');
             $table->timestamps();
         });
     }

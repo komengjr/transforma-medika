@@ -56,6 +56,7 @@
                     <th>Tanggal Peminjaman</th>
                     <th>Nominal Peminjaman</th>
                     <th>Bunga</th>
+                    <th>Admin</th>
                     <th>Tenor Peminjaman</th>
                     <th>Kepala Cabang</th>
                     <th>Ketua Koperasi</th>
@@ -74,6 +75,7 @@
                     <td>{{ $datas->kop_proses_uang_tgl }}</td>
                     <td>@currency($datas->kop_proses_uang_nominal)</td>
                     <td>{{ $datas->kop_proses_uang_bunga }} %</td>
+                    <td>{{ $datas->kop_proses_uang_admin }} %</td>
                     <td>{{ $datas->kop_proses_uang_tenor }} Bulan</td>
                     <td>
                         @php
@@ -302,6 +304,7 @@
             },
             dataType: 'html',
         }).done(function(data) {
+            $('#menu-add-data-verifikasi').html('');
             $('#menu-status-kontrak').html(data);
         }).fail(function() {
             $('#menu-status-kontrak').html('eror');
@@ -310,27 +313,35 @@
     $(document).on("click", "#button-fix-payment-kontrak-bulanan", function(e) {
         e.preventDefault();
         var code = $(this).data("code");
-        $('#menu-status-kontrak').html(
-            '<div class="spinner-border my-3" style="display: block; margin-left: auto; margin-right: auto;" role="status"><span class="visually-hidden">Loading...</span></div>'
-        );
-        $.ajax({
-            url: "{{ route('menu_peminjaman_list_cek_kontrak_payment_fix') }}",
-            type: "POST",
-            cache: false,
-            data: {
-                "_token": "{{ csrf_token() }}",
-                "code": code
-            },
-            dataType: 'html',
-        }).done(function(data) {
-            setTimeout(() => {
-                Swal.fire('Berhasil!', 'Pembayaran Berhasil dilakukan', 'success').then(() => {
-                    location.reload();
-                });
-            }, 1000);
-        }).fail(function() {
-            $('#menu-status-kontrak').html('eror');
-        });
+        var akun = document.getElementById('akun_pembayaran').value;
+        if (akun == "") {
+            Swal.fire('Failed!', 'Akun Nya Harus di pilih', 'error').then(() => {
+
+            });
+        } else {
+            $('#menu-status-kontrak').html(
+                '<div class="spinner-border my-3" style="display: block; margin-left: auto; margin-right: auto;" role="status"><span class="visually-hidden">Loading...</span></div>'
+            );
+            $.ajax({
+                url: "{{ route('menu_peminjaman_list_cek_kontrak_payment_fix') }}",
+                type: "POST",
+                cache: false,
+                data: {
+                    "_token": "{{ csrf_token() }}",
+                    "akun": akun,
+                    "code": code
+                },
+                dataType: 'html',
+            }).done(function(data) {
+                setTimeout(() => {
+                    Swal.fire('Berhasil!', 'Pembayaran Berhasil dilakukan', 'success').then(() => {
+                        location.reload();
+                    });
+                }, 1000);
+            }).fail(function() {
+                $('#menu-status-kontrak').html('eror');
+            });
+        }
     });
 </script>
 
@@ -355,43 +366,53 @@
         }).then((result) => {
             if (result.isConfirmed) {
                 var code = $(this).data("code");
-                $('#loading-button-proses').html(
-                    '<div class="spinner-border my-3" style="display: block; margin-left: auto; margin-right: auto;" role="status"><span class="visually-hidden">Loading...</span></div>'
-                );
-                $.ajax({
-                    url: "{{ route('menu_peminjaman_list_proses_pengajuan_save_verif') }}",
-                    type: "POST",
-                    cache: false,
-                    data: {
-                        "_token": "{{ csrf_token() }}",
-                        "code": code
-                    },
-                    dataType: 'html',
-                }).done(function(data) {
-                    if (data == 1) {
-                        swalWithBootstrapButtons.fire({
-                            title: "Sukses!",
-                            text: "Your file has been Sukses.",
-                            icon: "success"
-                        });
-                        location.reload();
-                    } else {
+                var akun = document.getElementById('akun_pencairan').value;
+                if (akun == "") {
+                    swalWithBootstrapButtons.fire({
+                        title: "Failed",
+                        text: "Gagal Menyimpan Karena Akun Belum dipilih",
+                        icon: "error"
+                    });
+                } else {
+                    $('#loading-button-proses').html(
+                        '<div class="spinner-border my-3" style="display: block; margin-left: auto; margin-right: auto;" role="status"><span class="visually-hidden">Loading...</span></div>'
+                    );
+                    $.ajax({
+                        url: "{{ route('menu_peminjaman_list_proses_pengajuan_save_verif') }}",
+                        type: "POST",
+                        cache: false,
+                        data: {
+                            "_token": "{{ csrf_token() }}",
+                            "code": code,
+                            "akun": akun,
+                        },
+                        dataType: 'html',
+                    }).done(function(data) {
+                        if (data == 1) {
+                            swalWithBootstrapButtons.fire({
+                                title: "Sukses!",
+                                text: "Your file has been Sukses.",
+                                icon: "success"
+                            });
+                            location.reload();
+                        } else {
+                            swalWithBootstrapButtons.fire({
+                                title: "Cancelled",
+                                text: "Gagal Menyimpan",
+                                icon: "error"
+                            });
+                            $('#loading-button-proses').html(
+                                '<button class="btn btn-primary d-block w-100" type="button" id="button-proses-pengajuan-peminjaman">Pengajuan Peminjaman</button>'
+                            );
+                        }
+                    }).fail(function() {
                         swalWithBootstrapButtons.fire({
                             title: "Cancelled",
                             text: "Gagal Menyimpan",
                             icon: "error"
                         });
-                        $('#loading-button-proses').html(
-                            '<button class="btn btn-primary d-block w-100" type="button" id="button-proses-pengajuan-peminjaman">Pengajuan Peminjaman</button>'
-                        );
-                    }
-                }).fail(function() {
-                    swalWithBootstrapButtons.fire({
-                        title: "Cancelled",
-                        text: "Gagal Menyimpan",
-                        icon: "error"
                     });
-                });
+                }
             } else if (result.dismiss === Swal.DismissReason.cancel) {
                 swalWithBootstrapButtons.fire({
                     title: "Cancelled",
@@ -467,6 +488,99 @@
                 });
             }
         });
+    });
+</script>
+<!-- Kontrak baru -->
+<script>
+    $(document).on("click", "#button-create-data-kontrak-baru", function(e) {
+        e.preventDefault();
+        var code = $(this).data("code");
+        $('#menu-data-show-peminjaman-baru').html(
+            '<div class="spinner-border my-3" style="display: block; margin-left: auto; margin-right: auto;" role="status"><span class="visually-hidden">Loading...</span></div>'
+        );
+        $.ajax({
+            url: "{{ route('menu_peminjaman_list_proses_pengajuan_baru') }}",
+            type: "POST",
+            cache: false,
+            data: {
+                "_token": "{{ csrf_token() }}",
+                "code": code
+            },
+            dataType: 'html',
+        }).done(function(data) {
+            $('#menu-data-show-peminjaman-baru').html(data);
+            $('#menu-add-data-verifikasi').html('');
+        }).fail(function() {
+            $('#menu-data-show-peminjaman-baru').html('eror');
+        });
+    });
+    $(document).on("click", "#button-save-proses-pengajuan-peminjaman-baru", function(e) {
+        e.preventDefault();
+        const swalWithBootstrapButtons = Swal.mixin({
+            customClass: {
+                confirmButton: "btn btn-success",
+                cancelButton: "btn btn-danger"
+            },
+            buttonsStyling: true
+        });
+        swalWithBootstrapButtons.fire({
+            title: "Apakah Kamu yakin >?",
+            text: "Kamu Yakin Untuk Proses Data ini ?",
+            icon: "success",
+            showCancelButton: true,
+            confirmButtonText: "Yes, Setuju",
+            cancelButtonText: "No, Batal",
+            reverseButtons: true
+        }).then((result) => {
+            if (result.isConfirmed) {
+                var data = $("#form-pengajuan-peminjaman-uang").serialize();
+                $('#loading-button-proses').html(
+                    '<div class="spinner-border my-3" style="display: block; margin-left: auto; margin-right: auto;" role="status"><span class="visually-hidden">Loading...</span></div>'
+                );
+                $.ajax({
+                    url: "{{ route('menu_peminjaman_list_proses_pengajuan_baru_save') }}",
+                    type: "POST",
+                    cache: false,
+                    data: data,
+                    dataType: 'html',
+                }).done(function(data) {
+                    if (data == 1) {
+                        swalWithBootstrapButtons.fire({
+                            title: "Sukses!",
+                            text: "Your file has been Sukses.",
+                            icon: "success"
+                        });
+                        location.reload();
+                    } else {
+                        swalWithBootstrapButtons.fire({
+                            title: "Cancelled",
+                            text: "Gagal Menyimpan",
+                            icon: "error"
+                        });
+                        $('#loading-button-proses').html(
+                            '<button class="btn btn-primary d-block w-100" type="button" id="button-save-proses-pengajuan-peminjaman-baru">Pengajuan Peminjaman</button>'
+                        );
+                    }
+                }).fail(function() {
+                    swalWithBootstrapButtons.fire({
+                        title: "Cancelled",
+                        text: "Gagal Menyimpan",
+                        icon: "error"
+                    });
+                });
+
+
+            } else if (result.dismiss === Swal.DismissReason.cancel) {
+                swalWithBootstrapButtons.fire({
+                    title: "Cancelled",
+                    text: "Gagal Menyimpan",
+                    icon: "error"
+                });
+
+            }
+        });
+
+
     });
 </script>
 @endsection

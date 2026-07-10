@@ -20,6 +20,7 @@ class KoperasiVocherData extends Migration
             $table->string('kop_master_peserta_code');
             $table->string('kop_vocher_cat_code');
             $table->integer('kop_vocher_data_nominal');
+            $table->integer('kop_vocher_data_admin');
             $table->string('kop_vocher_data_number_id');
             $table->string('kop_vocher_data_ketua');
             $table->date('kop_vocher_data_date_start');

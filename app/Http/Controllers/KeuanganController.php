@@ -2,6 +2,10 @@
 
 namespace App\Http\Controllers;
 
+use App\Models\DRegOrder;
+use App\Models\DRegOrderLabList;
+use App\Models\DRegOrderList;
+use App\Models\DRegOrderRadList;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\DB;
@@ -96,6 +100,276 @@ class KeuanganController extends Controller
             ->get();
         return view('application.keuangan.menu-cashier.find-data-tagihan', ['data' => $data]);
     }
+    public function keuangan_menu_cashier_list_all_patient()
+    {
+        try {
+            // Hitung tagihan menggantung di tabel Laboratorium ter-join ke Jembatan Order List
+            $PoliQuery = DB::table('d_reg_order_poli_list')
+                ->join('d_reg_order_list', 'd_reg_order_poli_list.d_reg_order_poli_code', '=', 'd_reg_order_list.d_reg_order_list_code')
+                ->select(
+                    'd_reg_order_list.d_reg_order_code',
+                    DB::raw('SUM(order_poli_log_price - order_poli_log_discount) as total_tagihan'),
+                    DB::raw('"Poliklinik" as jenis_layanan')
+                )
+                ->where('status_pembayaran', '!=', 'Lunas')
+                ->groupBy('d_reg_order_list.d_reg_order_code');
+            // Hitung tagihan menggantung di tabel Laboratorium ter-join ke Jembatan Order List
+            $labQuery = DB::table('d_reg_order_lab_list')
+                ->join('d_reg_order_list', 'd_reg_order_lab_list.d_reg_order_lab_code', '=', 'd_reg_order_list.d_reg_order_list_code')
+                ->select(
+                    'd_reg_order_list.d_reg_order_code',
+                    DB::raw('SUM(order_lab_log_price - order_lab_log_discount) as total_tagihan'),
+                    DB::raw('"Laboratorium" as jenis_layanan')
+                )
+                ->where('status_pembayaran', '!=', 'Lunas')
+                ->groupBy('d_reg_order_list.d_reg_order_code');
+
+            // Hitung tagihan menggantung di tabel Radiologi ter-join ke Jembatan Order List
+            $combinedList = DB::table('d_reg_order_rad_list')
+                ->join('d_reg_order_list', 'd_reg_order_rad_list.d_reg_order_rad_code', '=', 'd_reg_order_list.d_reg_order_list_code')
+                ->select(
+                    'd_reg_order_list.d_reg_order_code',
+                    DB::raw('SUM(order_rad_log_price - order_rad_log_discount) as total_tagihan'),
+                    DB::raw('"Radiologi" as jenis_layanan')
+                )
+                ->where('status_pembayaran', '!=', 'Lunas')
+                ->groupBy('d_reg_order_list.d_reg_order_code')
+                ->unionAll($labQuery)
+                ->unionAll($PoliQuery)
+                ->get();
+
+            // Map data final dengan profil pasien dari tabel puncak d_reg_order
+            $finalList = $combinedList->groupBy('d_reg_order_code')->map(function ($items, $orderCode) {
+                $puncak = DB::table('d_reg_order')
+                    ->join('master_patient', 'd_reg_order.d_reg_order_rm', '=', 'master_patient.master_patient_code')
+                    ->where('d_reg_order.d_reg_order_code', '=', $orderCode)
+                    ->select('master_patient.master_patient_name', 'd_reg_order.d_reg_order_rm', 'd_reg_order.d_reg_order_date')
+                    ->first();
+
+                return [
+                    'd_reg_order_code'      => (string) $orderCode,
+                    'patient_name'          => $puncak ? $puncak->master_patient_name : 'Pasien ' . $orderCode,
+                    'rm_code'               => $puncak ? $puncak->d_reg_order_rm : '-',
+                    't_layanan_cat_code'    => $items->pluck('jenis_layanan')->unique()->implode(' & '),
+                    'd_reg_order_list_date' => $puncak ? $puncak->d_reg_order_date : date('Y-m-d'),
+                    'total_tagihan'         => (int) $items->sum('total_tagihan')
+                ];
+            })->values();
+
+            return response()->json(['success' => true, 'data' => $finalList]);
+        } catch (\Exception $e) {
+            return response()->json(['success' => false, 'message' => $e->getMessage()], 500);
+        }
+    }
+    public function keuangan_menu_cashier_find_data_v2(Request $request)
+    {
+        $noReg = $request->query('no_reg');
+
+        $order = DRegOrder::with([
+            'pasien',
+            'orderLists.laboratoriums.salesData.pemeriksaanList',
+            'orderLists.radiologis.salesData.pemeriksaanList',
+            'orderLists.radiologis.salesData.pemeriksaanList'
+        ])
+            ->where('d_reg_order_code', $noReg)
+            ->first();
+
+        if (!$order) {
+            return response()->json(['success' => false, 'message' => 'Berkas pendaftaran tidak ditemukan.'], 404);
+        }
+
+        $layananLab = collect();
+        $layananRad = collect();
+        $layananPoli = collect();
+        // Loop melalui jembatan d_reg_order_list untuk mengurai isi item lab dan rad di dalamnya
+        foreach ($order->orderLists as $list) {
+            foreach ($list->laboratoriums as $lab) {
+                $layananLab->push([
+                    'id' => $lab->id_d_reg_order_lab_list,
+                    'nama' => optional(optional($lab->salesData)->pemeriksaanList)->t_pemeriksaan_list_name ?? $lab->p_sales_data_code,
+                    'harga' => (int) $lab->order_lab_log_price,
+                    'diskon' => (int) $lab->order_lab_log_discount,
+                    'lunas' => $lab->status_pembayaran === 'Lunas'
+                ]);
+            }
+
+            foreach ($list->radiologis as $rad) {
+                $layananRad->push([
+                    'id' => $rad->id_d_reg_order_rad_list,
+                    'nama' => optional(optional($rad->salesData)->pemeriksaanList)->t_pemeriksaan_list_name ?? $rad->p_sales_data_code,
+                    'harga' => (int) $rad->order_rad_log_price,
+                    'diskon' => (int) $rad->order_rad_log_discount,
+                    'lunas' => $rad->status_pembayaran === 'Lunas'
+                ]);
+            }
+            // Ambil detail Poli
+            // $polis = DB::table('d_reg_order_poli_list')->where('d_reg_order_poli_code', $list->d_reg_order_list_code)->get();
+            foreach ($list->poliklinik as $poli) {
+                $layananPoli->push([
+                    'id' => $poli->id_d_reg_order_poli_list,
+                    'nama' => optional(optional($poli->salesData)->pemeriksaanList)->t_pemeriksaan_list_name ?? $poli->p_sales_data_code,
+                    'harga' => (int) $poli->order_poli_log_price,
+                    'diskon' => (int) $poli->order_poli_log_discount,
+                    'lunas' => $poli->status_pembayaran === 'Lunas'
+                ]);
+            }
+        }
+
+        return response()->json([
+            'success' => true,
+            'data' => [
+                'no_reg' => $order->d_reg_order_code,
+                'no_rm' => $order->d_reg_order_rm,
+                'nama' => $order->pasien ? $order->pasien->master_patient_name : '-',
+                'jk' => $order->pasien ? ($order->pasien->master_patient_jk == 'L' ? 'Laki-laki' : 'Perempuan') : '-',
+                'kategori_layanan' => $order->t_layanan_cat_code,
+                'tanggal' => $order->d_reg_order_date,
+                'layanan' => [
+                    'Layanan Laboratorium' => $layananLab,
+                    'Layanan Radiologi' => $layananRad,
+                    'Layanan Poliklinik' => $layananPoli
+                ]
+            ]
+        ]);
+    }
+    public function keuangan_menu_cashier_proses_payment(Request $request)
+    {
+        // 1. Ambil data input dari request JSON front-end
+        $dRegOrderCode = $request->input('d_reg_order_code'); // Kode order puncak (misal: ORD-001)
+        $metodePembayaran = $request->input('metode_pembayaran'); // Mengisi d_reg_order_payment_card
+        $items = $request->input('items'); // Array objek berisi ID dan kategori item
+
+        if (empty($items)) {
+            return response()->json(['success' => false, 'message' => 'Silakan pilih minimal satu item tindakan untuk dibayar!'], 400);
+        }
+
+        if (!$dRegOrderCode) {
+            return response()->json(['success' => false, 'message' => 'Kode order puncak tidak valid.'], 400);
+        }
+
+        // Mulai transaksi database (jika di tengah jalan ada error, data otomatis di-rollback/batal)
+        DB::beginTransaction();
+
+        try {
+            // Generasi nomor kwitansi/invoice unik terpusat untuk sesi pembayaran ini
+            $paymentCode = 'INV-' . date('Ymd') . '-' . strtoupper(Str::random(5));
+
+            // Variabel penampung akumulasi total uang riil yang dibayarkan saat membuat invoice ini
+            $grandTotalInvoiceIni = 0;
+
+            // Variabel pembantu untuk mencatat d_reg_order_list_code terakhir yang terlibat
+            $lastOrderListCode = null;
+
+            // 2. Loop & Update status item tindakan sekaligus hitung akumulasi harga bersihnya
+            foreach ($items as $item) {
+                if ($item['kategori'] === 'Layanan Laboratorium') {
+                    // Cari data asli di DB untuk mengambil log price & discount (menghindari manipulasi front-end)
+                    $labItem = DB::table('d_reg_order_lab_list')
+                        ->where('id_d_reg_order_lab_list', $item['id'])
+                        ->first();
+
+                    if ($labItem) {
+                        $lastOrderListCode = $labItem->d_reg_order_lab_code;
+
+                        // Hitung harga bersih item ini (Harga - Diskon)
+                        $biayaBersih = $labItem->order_lab_log_price - $labItem->order_lab_log_discount;
+                        $grandTotalInvoiceIni += $biayaBersih;
+
+                        // Ubah status item menjadi lunas
+                        DB::table('d_reg_order_lab_list')
+                            ->where('id_d_reg_order_lab_list', $item['id'])
+                            ->update(['status_pembayaran' => 'Lunas']);
+                    }
+                } elseif ($item['kategori'] === 'Layanan Radiologi') {
+                    $radItem = DB::table('d_reg_order_rad_list')
+                        ->where('id_d_reg_order_rad_list', $item['id'])
+                        ->first();
+
+                    if ($radItem) {
+                        $lastOrderListCode = $radItem->d_reg_order_rad_code;
+
+                        $biayaBersih = $radItem->order_rad_log_price - $radItem->order_rad_log_discount;
+                        $grandTotalInvoiceIni += $biayaBersih;
+
+                        DB::table('d_reg_order_rad_list')
+                            ->where('id_d_reg_order_rad_list', $item['id'])
+                            ->update(['status_pembayaran' => 'Lunas']);
+                    }
+                } elseif ($item['kategori'] === 'Layanan Poliklinik') {
+                    $radItem = DB::table('d_reg_order_poli_list')
+                        ->where('id_d_reg_order_poli_list', $item['id'])
+                        ->first();
+
+                    if ($radItem) {
+                        $lastOrderListCode = $radItem->d_reg_order_poli_code;
+
+                        $biayaBersih = $radItem->order_poli_log_price - $radItem->order_poli_log_discount;
+                        $grandTotalInvoiceIni += $biayaBersih;
+
+                        DB::table('d_reg_order_poli_list')
+                            ->where('id_d_reg_order_poli_list', $item['id'])
+                            ->update(['status_pembayaran' => 'Lunas']);
+                    }
+                }
+            }
+
+            // 3. Simpan riwayat transaksi ke tabel d_reg_order_payment (Cukup 1 baris per nota invoice)
+            DB::table('d_reg_order_payment')->insert([
+                'd_reg_order_payment_code'  => $paymentCode,
+                'd_reg_order_code'          => $dRegOrderCode,
+                'd_reg_order_list_code'     => $lastOrderListCode ?? '-', // Kode jembatan d_reg_order_list
+                'd_reg_order_payment_card'  => $metodePembayaran, // Simpan Tunai/Debit/QRIS
+                'd_reg_order_payment_total' => $grandTotalInvoiceIni, // <--- TOTAL RIIL YANG DIBAYAR PASIEN PADA INVOICE INI
+                'd_reg_order_payment_date'  => date('Y-m-d H:i:s'),
+                'd_reg_order_payment_user'  => auth()->user()->name ?? 'System_Kasir',
+                'created_at'                => now(),
+                'updated_at'                => now()
+            ]);
+
+            // 4. SISTEM CHECK otomatis pelunasan tingkat puncak (d_reg_order)
+            $cekLabSisa = DB::table('d_reg_order_lab_list')
+                ->join('d_reg_order_list', 'd_reg_order_lab_list.d_reg_order_lab_code', '=', 'd_reg_order_list.d_reg_order_list_code')
+                ->where('d_reg_order_list.d_reg_order_code', $dRegOrderCode)
+                ->where('d_reg_order_lab_list.status_pembayaran', '!=', 'Lunas')
+                ->exists();
+
+            $cekRadSisa = DB::table('d_reg_order_rad_list')
+                ->join('d_reg_order_list', 'd_reg_order_rad_list.d_reg_order_rad_code', '=', 'd_reg_order_list.d_reg_order_list_code')
+                ->where('d_reg_order_list.d_reg_order_code', $dRegOrderCode)
+                ->where('d_reg_order_rad_list.status_pembayaran', '!=', 'Lunas')
+                ->exists();
+
+            $cekPoliSisa = DB::table('d_reg_order_poli_list')
+                ->join('d_reg_order_list', 'd_reg_order_poli_list.d_reg_order_poli_code', '=', 'd_reg_order_list.d_reg_order_list_code')
+                ->where('d_reg_order_list.d_reg_order_code', $dRegOrderCode)
+                ->where('d_reg_order_poli_list.status_pembayaran', '!=', 'Lunas')
+                ->exists();
+
+            if (!$cekLabSisa && !$cekRadSisa && !$cekPoliSisa) {
+                DB::table('d_reg_order')
+                    ->where('d_reg_order_code', $dRegOrderCode)
+                    ->update(['d_reg_order_status' => 'Lunas']);
+            }
+
+            // Jika Poli, lab dan rad sudah tidak ada yang "Belum Lunas", tandai berkas pasien lunas total
+            // Semua operasi aman, kunci perubahan ke database
+            DB::commit();
+
+            return response()->json([
+                'success' => true,
+                'message' => 'Pembayaran berhasil disimpan!',
+                'invoice_code' => $paymentCode,
+                'total_dibayar' => $grandTotalInvoiceIni
+            ], 200);
+        } catch (\Exception $e) {
+            // Jika terjadi kegagalan sistem, batalkan seluruh update status di atas
+            DB::rollBack();
+            return response()->json([
+                'success' => false,
+                'message' => 'Terjadi kesalahan sistem: ' . $e->getMessage()
+            ], 500);
+        }
+    }
     public function keuangan_menu_cashier_find_fix_payment(Request $request)
     {
         if ($request['payment_method'] == 'CASH') {
@@ -155,7 +429,6 @@ class KeuanganController extends Controller
                 return ' Berhasil Melakukan Payment, Sisa Bayar ' . $sisabayar;
             }
         } elseif ($request->payment_method == 'DEBIT') {
-
         } else {
             return 0;
         }

@@ -19,6 +19,7 @@ class KoperasiMasterCoa extends Migration
             $table->integer('kop_master_coa_no');
             $table->string('kop_master_coa_name');
             $table->string('kop_master_coa_type');
+            $table->string('kop_master_coa_jenis');
             $table->string('kop_master_coa_status');
             $table->timestamps();
         });

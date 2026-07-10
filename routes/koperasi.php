@@ -26,6 +26,9 @@ Route::prefix('koperasi/')->group(function (): void {
     Route::post('menu-peminjaman/list-peminjaman/cek-status-kontrak/payment_fix', [KoperasiController::class, 'menu_peminjaman_list_cek_kontrak_payment_fix'])->name('menu_peminjaman_list_cek_kontrak_payment_fix');
     Route::post('menu-peminjaman/list-peminjaman/cek-status-kontrak/penyelesaian-kontrak', [KoperasiController::class, 'menu_peminjaman_list_cek_kontrak_penyelesaian_kontrak'])->name('menu_peminjaman_list_cek_kontrak_penyelesaian_kontrak');
 
+    Route::post('menu-peminjaman/list-peminjaman/proses-pengajuan-peminjaman-uang-baru', [KoperasiController::class, 'menu_peminjaman_list_proses_pengajuan_baru'])->name('menu_peminjaman_list_proses_pengajuan_baru');
+    Route::post('menu-peminjaman/list-peminjaman/proses-pengajuan-peminjaman-uang-baru/save', [KoperasiController::class, 'menu_peminjaman_list_proses_pengajuan_baru_save'])->name('menu_peminjaman_list_proses_pengajuan_baru_save');
+
     Route::post('menu-koperasi/arisan-koperasi/add-group', [KoperasiController::class, 'menu_koperasi_arisan_add_group'])->name('menu_koperasi_arisan_add_group');
     Route::post('menu-koperasi/arisan-koperasi/save-group', [KoperasiController::class, 'menu_koperasi_arisan_save_group'])->name('menu_koperasi_arisan_save_group');
     Route::post('menu-koperasi/arisan-koperasi/add-group-peserta', [KoperasiController::class, 'menu_koperasi_arisan_add_group_peserta'])->name('menu_koperasi_arisan_add_group_peserta');
@@ -92,4 +95,28 @@ Route::prefix('koperasi/')->group(function (): void {
     Route::post('master-koperasi/data-bank/save-data', [KoperasiController::class, 'master_koperasi_data_bank_save'])->name('master_koperasi_data_bank_save');
 
     Route::post('master-koperasi/data-coa/add-level', [KoperasiController::class, 'master_koperasi_data_coa_add_level'])->name('master_koperasi_data_coa_add_level');
+    Route::post('master-koperasi/data-coa/save-level', [KoperasiController::class, 'master_koperasi_data_coa_save_level'])->name('master_koperasi_data_coa_save_level');
+    Route::post('master-koperasi/data-coa/sinkronisasi', [KoperasiController::class, 'master_koperasi_data_coa_sinskronisasi'])->name('master_koperasi_data_coa_sinskronisasi');
+    Route::post('master-koperasi/data-coa/sinkronisasi-proses', [KoperasiController::class, 'master_koperasi_data_coa_sinskronisasi_proses'])->name('master_koperasi_data_coa_sinskronisasi_proses');
+
+    Route::post('master-koperasi/data-coa-setting/setup', [KoperasiController::class, 'master_koperasi_data_coa_setting_setup'])->name('master_koperasi_data_coa_setting_setup');
+    Route::post('master-koperasi/data-coa-setting/save', [KoperasiController::class, 'master_koperasi_data_coa_setting_save'])->name('master_koperasi_data_coa_setting_save');
+
+    // JURNAL
+    Route::get('akutansi-koperasi/jurnal-manual/get-peminjaman', [KoperasiController::class, 'akutansi_koperasi_get_peminjaman'])->name('akutansi_koperasi_get_peminjaman');
+    Route::post('akutansi-koperasi/jurnal-manual/get-peminjaman/{id}/cairkan', [KoperasiController::class, 'akutansi_koperasi_get_peminjaman_cairkan'])->name('akutansi_koperasi_get_peminjaman_cairkan');
+    Route::get('akutansi-koperasi/jurnal-manual/get-peminjaman-barang', [KoperasiController::class, 'akutansi_koperasi_get_peminjaman_barang'])->name('akutansi_koperasi_get_peminjaman_barang');
+    Route::post('akutansi-koperasi/jurnal-manual/get-peminjaman-barang/{id}/serahkan', [KoperasiController::class, 'akutansi_koperasi_get_peminjaman_barang_serahkan'])->name('akutansi_koperasi_get_peminjaman_barang_serahkan');
+    Route::get('akutansi-koperasi/jurnal-manual/get-vocher', [KoperasiController::class, 'akutansi_koperasi_get_vocher'])->name('akutansi_koperasi_get_vocher');
+    Route::post('akutansi-koperasi/jurnal-manual/get-vocher/{id}/cairkan', [KoperasiController::class, 'akutansi_koperasi_get_vocher_cairkan'])->name('akutansi_koperasi_get_vocher_cairkan');
+    Route::get('akutansi-koperasi/jurnal-manual/get-arisan', [KoperasiController::class, 'akutansi_koperasi_get_arisan'])->name('akutansi_koperasi_get_arisan');
+    Route::post('akutansi-koperasi/jurnal-manual/get-arisan/{id}/cairkan', [KoperasiController::class, 'akutansi_koperasi_get_arisan_cairkan'])->name('akutansi_koperasi_get_arisan_cairkan');
+    Route::get('akutansi-koperasi/jurnal-manual/get-tagihan-bulan', [KoperasiController::class, 'akutansi_koperasi_get_tagihan_bulan'])->name('akutansi_koperasi_get_tagihan_bulan');
+    Route::post('akutansi-koperasi/jurnal-manual/get-tagihan-bulan/{id}/bayar', [KoperasiController::class, 'akutansi_koperasi_get_tagihan_bulan_cairkan'])->name('akutansi_koperasi_get_tagihan_bulan_cairkan');
+    Route::get('akutansi-koperasi/report/jurnal', [KoperasiController::class, 'akutansi_koperasi_report_jurnal'])->name('akutansi_koperasi_report_jurnal');
+    Route::get('akutansi-koperasi/report/buku-besar', [KoperasiController::class, 'akutansi_koperasi_report_buku_besar'])->name('akutansi_koperasi_report_buku_besar');
+    Route::get('akutansi-koperasi/report/rugi-laba', [KoperasiController::class, 'akutansi_koperasi_report_rugi_laba'])->name('akutansi_koperasi_report_rugi_laba');
+    Route::get('akutansi-koperasi/report/neraca', [KoperasiController::class, 'akutansi_koperasi_report_neraca'])->name('akutansi_koperasi_report_neraca');
+    Route::get('akutansi-koperasi/report/perubahan-modal', [KoperasiController::class, 'akutansi_koperasi_report_perubahan_modal'])->name('akutansi_koperasi_report_perubahan_modal');
+    Route::get('akutansi-koperasi/report/arus-kas', [KoperasiController::class, 'akutansi_koperasi_report_arus_kas'])->name('akutansi_koperasi_report_arus_kas');
 });

@@ -16,7 +16,7 @@
             <div class="card bg-200 shadow border border-warning">
                 <div class="row gx-0 flex-between-center">
                     <div class="col-sm-auto d-flex align-items-center border-bottom">
-                        <img class="ms-3 mx-3 m-2" src="{{ asset('img/gigi.png') }}" alt="" width="60" />
+                        <img class="ms-3 mx-3 m-2" src="{{ asset('img/poliklikink.png') }}" alt="" width="60" />
                         <div>
                             <h6 class="text-warning fs--1 mb-0 pt-2">Welcome to </h6>
                             <h4 class="text-warning fw-bold mb-1">{{ Env('APP_LABEL')}} <span

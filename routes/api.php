@@ -1,6 +1,7 @@
 <?php
 
 use App\Http\Controllers\ApiCntroller;
+use App\Http\Controllers\Koperasi\KoperasiController;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Route;
 
@@ -15,9 +16,9 @@ use Illuminate\Support\Facades\Route;
 |
 */
 
-Route::middleware('auth:api')->get('/user', function (Request $request) {
-    return $request->user();
-});
+// Route::middleware('auth:api')->get('/user', function (Request $request) {
+//     return $request->user();
+// });
 Route::prefix('v1/')->group(function (): void {
     Route::get('data-product', [ApiCntroller::class, 'data_product'])->name('data_product');
     Route::get('data-antrian', [ApiCntroller::class, 'data_antrian'])->name('data_antrian');
@@ -29,3 +30,5 @@ Route::prefix('v2/')->group(function (): void {
     Route::get('getway/whatsapp-update/{code}', [ApiCntroller::class, 'getway_whatsapp_status'])->name('getway_whatsapp_status');
     Route::post('getway/whatsapp-update', [ApiCntroller::class, 'getway_whatsapp_update'])->name('getway_whatsapp_update');
 });
+Route::get('/peminjaman-uang', [KoperasiController::class, 'akutansi_koperasi_get_peminjaman']);
+Route::post('/peminjaman-uang/{id}/cairkan', [KoperasiController::class, 'akutansi_koperasi_get_peminjaman_cairkan']);

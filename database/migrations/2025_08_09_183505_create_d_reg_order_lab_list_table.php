@@ -20,6 +20,7 @@ class CreateDRegOrderLabListTable extends Migration
             $table->string('p_sales_data_code');
             $table->integer('order_lab_log_price');
             $table->integer('order_lab_log_discount');
+            $table->string('status_pembayaran');
             $table->timestamps();
         });
     }

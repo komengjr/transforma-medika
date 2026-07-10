@@ -36,7 +36,7 @@
                     <div class="col-12 pt-3">
                         <span id="menu-add-data-coa">
                             <button class="btn btn-success float-end" id="button-simpan-data-level-coa">Simpan
-                                Data</button>
+                                Data COA Koperasi</button>
                         </span>
                     </div>
                 </form>
@@ -56,23 +56,23 @@
                 </thead>
                 <tbody>
                     @php
-                        $no = 1;
+                    $no = 1;
                     @endphp
                     @foreach ($data as $datas)
-                        <tr>
-                            <td>{{ $no++ }}</td>
-                            <td>{{ $datas->acc_master_coa_code }}</td>
-                            <td>{{ $datas->acc_coa_data_code }}</td>
-                            <td>{{ $datas->acc_coa_data_no }}</td>
-                            <td>{{ $datas->acc_coa_data_name }}</td>
-                            <td class="text-center">
-                                @if ($datas->acc_coa_data_opt == 0)
-                                    <span class="badge bg-warning">Single</span>
-                                @else
-                                    <span class="badge bg-primary">Multi</span>
-                                @endif
-                            </td>
-                        </tr>
+                    <tr>
+                        <td>{{ $no++ }}</td>
+                        <td>{{ $datas->kop_master_coa_code }}</td>
+                        <td>{{ $datas->kop_coa_data_code }}</td>
+                        <td>{{ $datas->kop_coa_data_no }}</td>
+                        <td>{{ $datas->kop_coa_data_name }}</td>
+                        <td class="text-center">
+                            @if ($datas->kop_coa_data_opt == 0)
+                            <span class="badge bg-warning">Single</span>
+                            @else
+                            <span class="badge bg-primary">Multi</span>
+                            @endif
+                        </td>
+                    </tr>
                     @endforeach
 
                 </tbody>
@@ -87,6 +87,9 @@
     new DataTable('#data-account', {
         responsive: true,
         ordering: false,
-        "lengthMenu": [[5, 50, 25], [5, 50, 25]]
+        "lengthMenu": [
+            [5, 50, 25],
+            [5, 50, 25]
+        ]
     });
 </script>

@@ -16,6 +16,7 @@ class CreatePSalesDataTable extends Migration
         Schema::create('p_sales_data', function (Blueprint $table) {
             $table->id('id_p_sales_data');
             $table->string('p_sales_data_code')->unique();
+            $table->string('t_pemeriksaan_list_code');
             $table->string('p_sales_cat_code');
             $table->string('p_sales_data_name');
             $table->string('p_sales_data_type');

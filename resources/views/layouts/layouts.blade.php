@@ -5,25 +5,25 @@
     <meta charset="utf-8">
     <meta http-equiv="X-UA-Compatible" content="IE=edge">
     <meta name="viewport" content="width=device-width, initial-scale=1">
-
+    <meta name="csrf-token" content="{{ csrf_token() }}">
     <!-- ===============================================-->
     <!--    Document Title-->
     <!-- ===============================================-->
     @php
-        $super = DB::table('z_menu_super')->where('menu_super_code', $code)->first();
+    $super = DB::table('z_menu_super')->where('menu_super_code', $code)->first();
     @endphp
     @if (!$super)
-        <script>
-            window.location.replace("{{route('dashboard.home')}}")
-        </script>
+    <script>
+        window.location.replace("{{route('dashboard.home')}}")
+    </script>
     @else
-        <title>{{$super->menu_super_name}} - {{ Env('APP_VER') }}</title>
+    <title>{{$super->menu_super_name}} - {{ Env('APP_VER') }}</title>
     @endif
 
     @if (Auth::user()->access_status == 0)
-        <script>
-            window.location.replace("{{route('logout')}}")
-        </script>
+    <script>
+        window.location.replace("{{route('logout')}}")
+    </script>
     @endif
 
     <!-- ===============================================-->
@@ -152,125 +152,125 @@
                             </li>
 
                             @php
-                                $menu = DB::table('z_menu_user')
-                                    ->join('z_menu_sub', 'z_menu_sub.menu_sub_code', '=', 'z_menu_user.menu_sub_code')
-                                    ->join('z_menu', 'z_menu.menu_code', '=', 'z_menu_sub.menu_code')
-                                    ->where('z_menu_user.access_code', Auth::user()->access_code)
-                                    ->where('z_menu.menu_super_code', $code)
-                                    ->orderBy('z_menu.id_menu', 'ASC')
-                                    ->get()
-                                    ->unique('menu_code');
+                            $menu = DB::table('z_menu_user')
+                            ->join('z_menu_sub', 'z_menu_sub.menu_sub_code', '=', 'z_menu_user.menu_sub_code')
+                            ->join('z_menu', 'z_menu.menu_code', '=', 'z_menu_sub.menu_code')
+                            ->where('z_menu_user.access_code', Auth::user()->access_code)
+                            ->where('z_menu.menu_super_code', $code)
+                            ->orderBy('z_menu.id_menu', 'ASC')
+                            ->get()
+                            ->unique('menu_code');
                             @endphp
                             @foreach ($menu as $menus)
-                                <li class="nav-items">
-                                    <!-- label-->
-                                    <div class="row navbar-vertical-label-wrapper mt-1 mb-1">
-                                        <div class="col-auto navbar-vertical-label">{{ $menus->menu_name }}
-                                        </div>
-                                        <div class="col ps-0">
-                                            <hr class="mb-0 navbar-vertical-divider" />
-                                        </div>
+                            <li class="nav-items">
+                                <!-- label-->
+                                <div class="row navbar-vertical-label-wrapper mt-1 mb-1">
+                                    <div class="col-auto navbar-vertical-label">{{ $menus->menu_name }}
                                     </div>
+                                    <div class="col ps-0">
+                                        <hr class="mb-0 navbar-vertical-divider" />
+                                    </div>
+                                </div>
+                                @php
+                                $sub_menu = DB::table('z_menu_user')
+                                ->join('z_menu_sub', 'z_menu_sub.menu_sub_code', '=', 'z_menu_user.menu_sub_code')
+                                ->where('z_menu_user.access_code', Auth::user()->access_code)
+                                ->where('z_menu_sub.menu_code', $menus->menu_code)
+                                ->orderBy('z_menu_sub.id_menu_sub', 'ASC')
+                                ->get();
+                                @endphp
+                                @foreach ($sub_menu as $sub_menus)
+                                @if ($sub_menus->menu_sub_option == 'dropdown')
+                                @php
+                                $sub = DB::table('z_menu_sub_main')
+                                ->join('z_menu_user_sub', 'z_menu_user_sub.menu_main_sub_code', '=', 'z_menu_sub_main.menu_main_sub_code')
+                                ->where('z_menu_sub_main.menu_sub_code', $sub_menus->menu_sub_code)
+                                ->where('access_code', Auth::user()->access_code)->get();
+                                @endphp
+                            <li class="nav-item">
+                                <a class="nav-link dropdown-indicator" href="#menu-{{ $sub_menus->id_menu_sub }}"
+                                    role="button" data-bs-toggle="collapse" aria-expanded="false"
+                                    aria-controls="dashboard">
+                                    <div class="d-flex align-items-center "><span class="nav-link-icon"><span
+                                                class="{{ $sub_menus->menu_sub_icon }}"></span></span><span
+                                            class="nav-link-text ps-1">{{ $sub_menus->menu_sub_name }}</span>
+                                    </div>
+                                </a>
+                                @php
+                                $show = DB::table('z_menu_sub_main')
+                                ->where('menu_main_sub_code', $akses)
+                                ->where('menu_sub_code', $sub_menus->menu_sub_code)->first();
+                                @endphp
+                                @if ($show)
+                                @php
+                                $shown = 'show'
+                                @endphp
+                                @else
+                                @php
+                                $shown = 'false'
+                                @endphp
+                                @endif
+                                <ul class="nav collapse {{$shown}}" id="menu-{{ $sub_menus->id_menu_sub }}">
+                                    @foreach ($sub as $item)
                                     @php
-                                        $sub_menu = DB::table('z_menu_user')
-                                            ->join('z_menu_sub', 'z_menu_sub.menu_sub_code', '=', 'z_menu_user.menu_sub_code')
-                                            ->where('z_menu_user.access_code', Auth::user()->access_code)
-                                            ->where('z_menu_sub.menu_code', $menus->menu_code)
-                                            ->orderBy('z_menu_sub.id_menu_sub', 'ASC')
-                                            ->get();
+                                    $submenu = DB::table('z_menu_user_sub')
+                                    ->where('menu_main_sub_code', $item->menu_main_sub_code)
+                                    ->where('access_code', Auth::user()->access_code)->first();
                                     @endphp
-                                    @foreach ($sub_menu as $sub_menus)
-                                            @if ($sub_menus->menu_sub_option == 'dropdown')
-                                                    @php
-                                                        $sub = DB::table('z_menu_sub_main')
-                                                            ->join('z_menu_user_sub', 'z_menu_user_sub.menu_main_sub_code', '=', 'z_menu_sub_main.menu_main_sub_code')
-                                                            ->where('z_menu_sub_main.menu_sub_code', $sub_menus->menu_sub_code)
-                                                            ->where('access_code', Auth::user()->access_code)->get();
-                                                    @endphp
-                                                <li class="nav-item">
-                                                    <a class="nav-link dropdown-indicator" href="#menu-{{ $sub_menus->id_menu_sub }}"
-                                                        role="button" data-bs-toggle="collapse" aria-expanded="false"
-                                                        aria-controls="dashboard">
-                                                        <div class="d-flex align-items-center "><span class="nav-link-icon"><span
-                                                                    class="{{ $sub_menus->menu_sub_icon }}"></span></span><span
-                                                                class="nav-link-text ps-1">{{ $sub_menus->menu_sub_name }}</span>
-                                                        </div>
-                                                    </a>
-                                                    @php
-                                                        $show = DB::table('z_menu_sub_main')
-                                                            ->where('menu_main_sub_code', $akses)
-                                                            ->where('menu_sub_code', $sub_menus->menu_sub_code)->first();
-                                                    @endphp
-                                                    @if ($show)
-                                                        @php
-                                                            $shown = 'show'
-                                                        @endphp
-                                                    @else
-                                                        @php
-                                                            $shown = 'false'
-                                                        @endphp
-                                                    @endif
-                                                    <ul class="nav collapse {{$shown}}" id="menu-{{ $sub_menus->id_menu_sub }}">
-                                                        @foreach ($sub as $item)
-                                                            @php
-                                                                $submenu = DB::table('z_menu_user_sub')
-                                                                    ->where('menu_main_sub_code', $item->menu_main_sub_code)
-                                                                    ->where('access_code', Auth::user()->access_code)->first();
-                                                            @endphp
-                                                            <li class="nav-item">
-                                                                @if ($submenu)
-                                                                    @if ($akses == $item->menu_main_sub_code)
-                                                                        <a class="nav-link active"
-                                                                            href="{{ url($item->menu_main_sub_code . '/' . $item->menu_main_sub_link) }}"
-                                                                            aria-expanded="false">
-                                                                            <div class="d-flex align-items-center ">
-                                                                                <span class="nav-link-icon"><span
-                                                                                        class="{{$item->menu_main_sub_icon}}"></span></span>
-                                                                                <span class="nav-link-text fs--2"> {{$item->menu_main_sub_name}}</span>
-                                                                            </div>
-                                                                        </a>
-                                                                    @else
-                                                                        <a class="nav-link false"
-                                                                            href="{{ url($item->menu_main_sub_code . '/' . $item->menu_main_sub_link) }}"
-                                                                            aria-expanded="false">
-                                                                            <div class="d-flex align-items-center ">
-                                                                                <span class="nav-link-icon"><span
-                                                                                        class="{{$item->menu_main_sub_icon}}"></span></span>
-                                                                                <span class="nav-link-text fs--2"> {{$item->menu_main_sub_name}}</span>
-                                                                            </div>
-                                                                        </a>
-                                                                    @endif
-                                                                @endif
-                                                            </li>
-                                                        @endforeach
-                                                    </ul>
-                                                </li>
-                                            @else
-                                            <li class="nav-item">
-                                                @if ($akses == $sub_menus->menu_sub_code)
-                                                    <a class="nav-link active"
-                                                        href="{{ url($sub_menus->menu_sub_code . '/' . $sub_menus->menu_sub_link) }}"
-                                                        role="button" aria-expanded="false">
-                                                        <div class="d-flex align-items-center"><span class="nav-link-icon"><span
-                                                                    class="{{ $sub_menus->menu_sub_icon }}"></span></span><span
-                                                                class="nav-link-text ps-1">{{ $sub_menus->menu_sub_name }}</span>
-                                                        </div>
-                                                    </a>
-                                                @else
-                                                    <a class="nav-link"
-                                                        href="{{ url($sub_menus->menu_sub_code . '/' . $sub_menus->menu_sub_link) }}"
-                                                        role="button" aria-expanded="false">
-                                                        <div class="d-flex align-items-center"><span class="nav-link-icon"><span
-                                                                    class="{{ $sub_menus->menu_sub_icon }}"></span></span><span
-                                                                class="nav-link-text ps-1">{{ $sub_menus->menu_sub_name }}</span>
-                                                        </div>
-                                                    </a>
-                                                @endif
-                                            </li>
+                                    <li class="nav-item">
+                                        @if ($submenu)
+                                        @if ($akses == $item->menu_main_sub_code)
+                                        <a class="nav-link active"
+                                            href="{{ url($item->menu_main_sub_code . '/' . $item->menu_main_sub_link) }}"
+                                            aria-expanded="false">
+                                            <div class="d-flex align-items-center ">
+                                                <span class="nav-link-icon"><span
+                                                        class="{{$item->menu_main_sub_icon}}"></span></span>
+                                                <span class="nav-link-text fs--2"> {{$item->menu_main_sub_name}}</span>
+                                            </div>
+                                        </a>
+                                        @else
+                                        <a class="nav-link false"
+                                            href="{{ url($item->menu_main_sub_code . '/' . $item->menu_main_sub_link) }}"
+                                            aria-expanded="false">
+                                            <div class="d-flex align-items-center ">
+                                                <span class="nav-link-icon"><span
+                                                        class="{{$item->menu_main_sub_icon}}"></span></span>
+                                                <span class="nav-link-text fs--2"> {{$item->menu_main_sub_name}}</span>
+                                            </div>
+                                        </a>
                                         @endif
+                                        @endif
+                                    </li>
                                     @endforeach
-                                <!-- parent pages-->
-                                </li>
+                                </ul>
+                            </li>
+                            @else
+                            <li class="nav-item">
+                                @if ($akses == $sub_menus->menu_sub_code)
+                                <a class="nav-link active"
+                                    href="{{ url($sub_menus->menu_sub_code . '/' . $sub_menus->menu_sub_link) }}"
+                                    role="button" aria-expanded="false">
+                                    <div class="d-flex align-items-center"><span class="nav-link-icon"><span
+                                                class="{{ $sub_menus->menu_sub_icon }}"></span></span><span
+                                            class="nav-link-text ps-1">{{ $sub_menus->menu_sub_name }}</span>
+                                    </div>
+                                </a>
+                                @else
+                                <a class="nav-link"
+                                    href="{{ url($sub_menus->menu_sub_code . '/' . $sub_menus->menu_sub_link) }}"
+                                    role="button" aria-expanded="false">
+                                    <div class="d-flex align-items-center"><span class="nav-link-icon"><span
+                                                class="{{ $sub_menus->menu_sub_icon }}"></span></span><span
+                                            class="nav-link-text ps-1">{{ $sub_menus->menu_sub_name }}</span>
+                                    </div>
+                                </a>
+                                @endif
+                            </li>
+                            @endif
+                            @endforeach
+                            <!-- parent pages-->
+                            </li>
                             @endforeach
 
                         </ul>
@@ -396,8 +396,8 @@
                                         Profile &amp;
                                         account</a>
                                     @if (Auth::user()->access_code == 'master')
-                                        <a class="dropdown-item text-danger" href="{{route('master_dashboard')}}"><span
-                                                class="fas fa-user-cog"></span> Master Page</a>
+                                    <a class="dropdown-item text-danger" href="{{route('master_dashboard')}}"><span
+                                            class="fas fa-user-cog"></span> Master Page</a>
                                     @endif
                                     <div class="dropdown-divider"></div>
                                     {{-- <a class="dropdown-item" href="#">Settings</a> --}}
@@ -611,29 +611,29 @@
 
 
     @if (session('success'))
-        <div class="position-fixed bottom-0 end-0 p-3" style="z-index: 99999">
-            <div class="toast show" id="liveToast" role="alert" aria-live="assertive" aria-atomic="true"
-                data-options='{"autoShow":true,"showOnce":true,"cookieExpireTime":3}' data-autohide="false">
-                <div class="toast-header bg-primary text-white"><strong class="me-auto">Notice</strong><small>1 sec
-                        ago</small>
-                    <button class="btn-close btn-close-white" type="button" data-bs-dismiss="toast"
-                        aria-label="Close"></button>
-                </div>
-                <div class="toast-body">{{ session('success') }}</div>
+    <div class="position-fixed bottom-0 end-0 p-3" style="z-index: 99999">
+        <div class="toast show" id="liveToast" role="alert" aria-live="assertive" aria-atomic="true"
+            data-options='{"autoShow":true,"showOnce":true,"cookieExpireTime":3}' data-autohide="false">
+            <div class="toast-header bg-primary text-white"><strong class="me-auto">Notice</strong><small>1 sec
+                    ago</small>
+                <button class="btn-close btn-close-white" type="button" data-bs-dismiss="toast"
+                    aria-label="Close"></button>
             </div>
+            <div class="toast-body">{{ session('success') }}</div>
         </div>
+    </div>
     @elseif (session('error'))
-        <div class="position-fixed bottom-0 end-0 p-3" style="z-index: 99999">
-            <div class="toast show" id="liveToast" role="alert" aria-live="assertive" aria-atomic="true"
-                data-options='{"autoShow":true,"showOnce":true,"cookieExpireTime":720}' data-autohide="false">
-                <div class="toast-header bg-danger text-white"><strong class="me-auto">Notice</strong><small>1 sec
-                        ago</small>
-                    <button class="btn-close btn-close-white" type="button" data-bs-dismiss="toast"
-                        aria-label="Close"></button>
-                </div>
-                <div class="toast-body">{{ session('error') }}</div>
+    <div class="position-fixed bottom-0 end-0 p-3" style="z-index: 99999">
+        <div class="toast show" id="liveToast" role="alert" aria-live="assertive" aria-atomic="true"
+            data-options='{"autoShow":true,"showOnce":true,"cookieExpireTime":720}' data-autohide="false">
+            <div class="toast-header bg-danger text-white"><strong class="me-auto">Notice</strong><small>1 sec
+                    ago</small>
+                <button class="btn-close btn-close-white" type="button" data-bs-dismiss="toast"
+                    aria-label="Close"></button>
             </div>
+            <div class="toast-body">{{ session('error') }}</div>
         </div>
+    </div>
     @endif
 
 

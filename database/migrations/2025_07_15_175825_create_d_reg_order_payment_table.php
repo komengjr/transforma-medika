@@ -19,6 +19,8 @@ class CreateDRegOrderPaymentTable extends Migration
             $table->string('d_reg_order_code');
             $table->string('d_reg_order_list_code');
             $table->string('d_reg_order_payment_date');
+            $table->string('d_reg_order_payment_card');
+            $table->integer('d_reg_order_payment_total');
             $table->string('d_reg_order_payment_user');
             $table->timestamps();
         });

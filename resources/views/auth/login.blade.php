@@ -190,7 +190,7 @@
     <div class="login-card">
 
         <div class="logo">
-            <img src="https://innoventra.site/img/favicon.png" alt="Innoventra Logo">
+            <img src="{{ asset('img/logo-pt.png') }}" alt="Innoventra Logo">
         </div>
         <div class="brand-text">Innoventra by <small class="text-success">Transforma</small></div>
         <div class="subtitle">Masuk ke sistem</div>

@@ -62,7 +62,11 @@ class PelayananController extends Controller
             $total = DB::table('d_reg_order')->where('d_reg_order_cabang', Auth::user()->access_cabang)->count();
             $reject = DB::table('d_reg_order')->where('d_reg_order_cabang', Auth::user()->access_cabang)
                 ->where('d_reg_order_status', -1)->count();
-            $data = DB::select("CALL get_pasien_today(?)", [Auth::user()->access_cabang]);
+            // $data = DB::select("CALL get_pasien_today(?)", [Auth::user()->access_cabang]);
+            $data = DB::table('d_reg_order')
+                ->join('master_patient', 'master_patient.master_patient_code', '=', 'd_reg_order.d_reg_order_rm')
+                ->join('t_pasien_cat', 't_pasien_cat.t_pasien_cat_code', '=', 'd_reg_order.t_pasien_cat_code')
+                ->where("d_reg_order_cabang", Auth::user()->access_cabang)->get();
             return view('application.pelayanan.registrasi-pasien', [
                 'akses' => $akses,
                 'code' => $id,
@@ -381,7 +385,6 @@ class PelayananController extends Controller
                     ]);
                 }
             }
-
         }
         return 13;
     }
@@ -509,9 +512,9 @@ class PelayananController extends Controller
             'poli_gigi' => $poli_gigi,
         ], compact('image', 'file_gigi'))
             ->setPaper('A5', 'potrait')->setOptions([
-                    'isHtml5ParserEnabled' => true,
-                    'isRemoteEnabled' => true,
-                ]);
+                'isHtml5ParserEnabled' => true,
+                'isRemoteEnabled' => true,
+            ]);
         $pdf->output();
         $dompdf = $pdf->getDomPDF();
         $font = $dompdf->getFontMetrics()->get_font("helvetica", "bold");
@@ -525,10 +528,12 @@ class PelayananController extends Controller
             ');
         return base64_encode($pdf->stream());
     }
-    public function registrasi_pasien_list_que(Request $request){
+    public function registrasi_pasien_list_que(Request $request)
+    {
         return view('application.pelayanan.antrian.list-antrian');
     }
-    public function registrasi_pasien_choose_data_que(Request $request){
+    public function registrasi_pasien_choose_data_que(Request $request)
+    {
         return 123;
     }
     // DATA REGISTRASI
@@ -536,7 +541,10 @@ class PelayananController extends Controller
     {
         if ($this->url_akses($akses, $id) == true) {
             $auth = Auth::user()->access_cabang;
-            $data = DB::select("CALL get_pasien_today(?)", [$auth]);
+            $data = DB::table('d_reg_order')
+                ->join('master_patient', 'master_patient.master_patient_code', '=', 'd_reg_order.d_reg_order_rm')
+                ->join('t_pasien_cat', 't_pasien_cat.t_pasien_cat_code', '=', 'd_reg_order.t_pasien_cat_code')
+                ->where("d_reg_order_cabang", Auth::user()->access_cabang)->get();
             return view('application.pelayanan.list-pasien-registrasi', ['data' => $data, 'akses' => $akses, 'code' => $id]);
         } else {
             return Redirect::to('dashboard/home');
@@ -608,7 +616,6 @@ class PelayananController extends Controller
         } else {
             return 'belum ditemukan';
         }
-
     }
     public function menu_pelayanan_verifikasi_pembatalan_registrasi(Request $request)
     {
@@ -640,7 +647,6 @@ class PelayananController extends Controller
         } else {
             return 'Data Tidak Bisa di batalkan Karna Sudah di Prsoes';
         }
-
     }
     public function menu_pelayanan_verifikasi_registrasi_data_save(Request $request)
     {

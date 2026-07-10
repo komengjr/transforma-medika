@@ -5,7 +5,7 @@
         </p>
     </div>
     <div class="p-4 pb-4" id="menu-add-data-pr-all">
-        <div class="card mb-4">
+        <div class="card mb-3">
             <div class="card-header bg-300">
                 <div class="row flex-between-end">
                     <div class="col-auto align-self-center">
@@ -111,7 +111,7 @@
                 </div>
             </div>
         </div>
-        <div class="card">
+        <div class="card mb-3">
             <div class="card-header bg-300">
                 <div class="row flex-between-center">
                     <div class="col-sm-auto">
@@ -203,11 +203,35 @@
                 </div>
             </div>
         </div>
+        <div class="card">
+            <div class="card-header bg-300">
+                <div class="row flex-between-center">
+                    <div class="col-sm-auto">
+                        <h5 class="mb-2 mb-sm-0">Pilih Akun Pencairan</h5>
+                    </div>
+                    <div class="col-sm-auto" id="loading-button-kirim">
+
+                    </div>
+                </div>
+            </div>
+            <div class="card-body">
+                <div class="row">
+                    <div class="col-12">
+                        <label for="">Pilih Akun Pencairan</label>
+                        <select class="form-select form-control-lg" name="akun_pencairan" id="akun_pencairan">
+                            <option value="">Pilih Akun</option>
+                            @foreach ($akun as $akuns)
+                                <option value="{{ $akuns->coa_code }}">{{ $akuns->coa_code }} - {{ $akuns->coa_name }}</option>
+                            @endforeach
+                        </select>
+                    </div>
+                </div>
+            </div>
+        </div>
     </div>
 </div>
 <div class="modal-footer px-4 bg-300">
     <span id="menu-add-data-verifikasi">
-        <button class="btn btn-success float-end" id="button-simpan-data-verifikasi" data-code="{{ $data->kop_proses_uang_code }}">Simpan
-            Data</button>
+        <button class="btn btn-success float-end" id="button-simpan-data-verifikasi" data-code="{{ $data->kop_proses_uang_code }}">Pencairan Dana Pinjaman</button>
     </span>
 </div>

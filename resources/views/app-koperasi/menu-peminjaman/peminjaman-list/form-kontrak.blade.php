@@ -4,7 +4,7 @@
         <p class="fs--2 mb-0" style="color: white;">Support by <a class="link-600 fw-semi-bold" href="#!">Innoventra</a>
         </p>
     </div>
-    <div class="p-4 pb-4" id="menu-add-data-pr-all">
+    <div class="p-4 pb-4" id="menu-data-show-peminjaman-baru">
         <div class="card mb-2" id="menu-status-kontrak">
             <div class="card-header bg-300">
                 <div class="row flex-between-end">
@@ -119,8 +119,8 @@
                         <tfoot>
                             <tr>
                                 <td class="text-900" colspan="4">Subtotal :</td>
-                                <td class="fw-semi-bold align-middle text-end">@currency($total)</td>
-                                <td class="fw-semi-bold align-middle text-end">@currency($paid)</td>
+                                <td class="fw-semi-bold align-middle text-end ">@currency($total)</td>
+                                <td class="fw-semi-bold align-middle text-end text-success">@currency($paid)</td>
                             </tr>
                             <tr class="border-top">
                                 <td class="text-900" colspan="4">Biaya Admin :</td>
@@ -130,7 +130,7 @@
                             <tr class="border-top border-top-2 fw-bolder text-900">
                                 <td class="text-900" colspan="4">Total :</td>
                                 <td class="align-middle text-end">@currency($total + $admin)</td>
-                                <td class="fw-semi-bold align-middle text-end">@currency($paid + $admin)</td>
+                                <td class="fw-semi-bold align-middle text-end text-danger">@currency($paid + $admin)</td>
                             </tr>
                         </tfoot>
                     </table>
@@ -143,6 +143,10 @@
     @if ($total + $admin == $paid + $admin)
     <span id="menu-add-data-verifikasi">
         <button class="btn btn-success float-end" id="button-penyelesaian-data-kontrak" data-code="{{ $data->kop_proses_uang_code }}">Penyelesaian Data</button>
+    </span>
+    @else
+    <span id="menu-add-data-verifikasi">
+        <button class="btn btn-success float-end" id="button-create-data-kontrak-baru" data-code="{{ $data->kop_proses_uang_code }}">Membuat Kontrak Baru</button>
     </span>
     @endif
 </div>

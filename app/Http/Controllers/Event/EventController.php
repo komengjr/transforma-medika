@@ -8,6 +8,7 @@ use App\Models\Event\SubEventModel;
 use App\Models\Movie;
 use App\Models\NewsCat;
 use App\Models\NewsData;
+use Exception;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\DB;
@@ -15,15 +16,25 @@ use Illuminate\Support\Facades\Hash;
 use Illuminate\Support\Facades\Redirect;
 use Illuminate\Support\Facades\Storage;
 use Illuminate\Support\Str;
+use Mike42\Escpos\PrintConnectors\NetworkPrintConnector;
+use Mike42\Escpos\PrintConnectors\WindowsPrintConnector;
+use Mike42\Escpos\Printer;
 use Pion\Laravel\ChunkUpload\Handler\HandlerFactory;
 use Pion\Laravel\ChunkUpload\Receiver\FileReceiver;
+use App\Services\ZebraPrinterService;
 use Svg\Tag\Rect;
 
 class EventController extends Controller
 {
-    public function __construct()
+    // 2. WAJIB DEKLARASIKAN PROPERTI INI DI LUAR METHOD
+    protected $printerService;
+
+    // 3. SEPERTI INI CARA INJECT-NYA DI CONSTRUCTOR
+
+    public function __construct(ZebraPrinterService $printerService)
     {
         $this->middleware('auth');
+        $this->printerService = $printerService;
     }
     public function url_akses($akses, $id)
     {
@@ -164,6 +175,7 @@ class EventController extends Controller
     {
         if ($this->url_akses($akses, $id) == true) {
             $data = EventModel::latest()->get();
+
             return view('app-event.menu-event.data-event', ['akses' => $akses, 'code' => $id, 'data' => $data]);
         } else {
             return Redirect::to('dashboard/home');
@@ -249,7 +261,77 @@ class EventController extends Controller
         $session = DB::table('event_data_sub_session')->where('event_data_sub_code', $request->code)->get();
         return view('app-event.menu-event.data-event.data-table-sub-event-detail', compact('data', 'session'));
     }
-    public function menu_event_data_form_registrasi_event_detail_sub_event_add_peserta(Request $request){
+    public function menu_event_data_form_registrasi_event_detail_sub_event_add_peserta(Request $request)
+    {
         return view('app-event.menu-event.data-event.form-event.form-sub-event-add-peserta');
+    }
+    public function menu_event_data_form_self_registrasi($kode)
+    {
+        return view('app-event.menu-event.data-event.form-self-resgistrasi');
+    }
+
+    public function menu_event_data_form_registrasi_event_test_print(Request $request)
+    {
+        // 1. Validasi Input Form
+        $request->validate([
+            'nama_produk' => 'required|string|max:50',
+            'sku'         => 'required|string|max:20',
+            'harga'       => 'required|numeric',
+        ]);
+
+        // 2. Desain Label Menggunakan Bahasa ZPL (Zebra Programming Language)
+        $zplCode = "^XA";
+        $zplCode .= "^CI28"; // Mendukung UTF-8
+
+        // --- PENGATURAN UKURAN KERTAS (5x3 cm @203 DPI) ---
+        $width = 400;  // Lebar total label (400 dots)
+        $zplCode .= "^PW" . $width;
+        $zplCode .= "^LL240"; // Tinggi total label (240 dots)
+        $zplCode .= "^LS0";
+
+        // ============================================================
+        // 1. NAMA PRODUK (CENTER + AUTO WRAP)
+        // ============================================================
+        // Perubahan: fungsi substr() dihapus agar teks panjang tidak terpotong di PHP.
+        // Parameter ^FB diubah menjadi: 400 (lebar), 2 (maksimal 2 baris), 0 (spasi), C (Center)
+        // Ukuran font diturunkan sedikit ke 20,20 agar muat jika menjadi 2 baris.
+        $zplCode .= "^FO0,25^FB400,2,0,C^A0N,22,22^FD" . $request->nama_produk . "^FS";
+
+        // ============================================================
+        // 2. NAMA EVENT / HARGA (CENTER + AUTO WRAP)
+        // ============================================================
+        // Koordinat Y digeser agak ke bawah (Y=80) memberikan ruang jika Nama Produk di atas menjadi 2 baris.
+        // Menggunakan cara yang sama (^FB 400, 2, 0, C) agar tulisan panjang otomatis ke bawah dan tetap center.
+        $zplCode .= "^FO0,80^FB400,2,0,C^A0N,22,22^FD" . $request->nama_event . "^FS";
+
+        // ============================================================
+        // 3. BARCODE CODE 128 (CENTER MANUAL)
+        // ============================================================
+        $skuLength = strlen($request->sku);
+        $barcodeWidth = ($skuLength * 11 * 2) + 50;
+
+        // Hitung koordinat X agar posisi barcode pas di tengah kertas
+        $barcodeX = ($width - $barcodeWidth) / 2;
+
+        // Jika hasil perhitungan minus atau terlalu kecil, kunci di batas aman
+        if ($barcodeX < 20) {
+            $barcodeX = 20;
+        }
+
+        // Koordinat Y barcode diturunkan sedikit ke Y=140 agar aman dari teks di atasnya yang mungkin memanjang.
+        $zplCode .= "^FO" . $barcodeX . ",140^BY2^BCN,60,Y,N,N^FD" . $request->sku . "^FS";
+
+        $zplCode .= "^XZ";
+
+
+        // 3. Eksekusi cetak
+        $printResult = $this->printerService->sendToPrinter($zplCode);
+
+        // 4. Kembalikan respons ke halaman sebelumnya
+        if ($printResult['status']) {
+            return redirect()->back()->with('success', $printResult['message']);
+        } else {
+            return redirect()->back()->with('error', $printResult['message'])->withInput();
+        }
     }
 }

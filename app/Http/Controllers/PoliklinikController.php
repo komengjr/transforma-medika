@@ -96,9 +96,9 @@ class PoliklinikController extends Controller
                     $cek = DB::table('diag_poli_fisik_umum_d')
                         ->where('diag_poli_fisik_umum_code', $f->diag_poli_fisik_umum_code)
                         ->where('d_reg_order_poli_code', $request->no_registrasi)->update([
-                                'diag_poli_fisik_umum_d_val' => $request[$data],
-                                'updated_at' => now()
-                            ]);
+                            'diag_poli_fisik_umum_d_val' => $request[$data],
+                            'updated_at' => now()
+                        ]);
                 } else {
                     DB::table('diag_poli_fisik_umum_d')->insert([
                         'diag_poli_fisik_umum_d_code' => str::uuid(),
@@ -138,8 +138,17 @@ class PoliklinikController extends Controller
             ->join('d_reg_order', 'd_reg_order.d_reg_order_code', '=', 'd_reg_order_poli.d_reg_order_code')
             ->join('master_patient', 'master_patient.master_patient_code', '=', 'd_reg_order.d_reg_order_rm')
             ->where('d_reg_order.d_reg_order_code', $request->code)->first();
+        $poli = DB::table('d_reg_order_poli')
+            ->join('m_doctor_poli', 'm_doctor_poli.m_doctor_poli_code', '=', 'd_reg_order_poli.m_doctor_poli_code')
+            ->join('t_layanan_data', 't_layanan_data.t_layanan_data_code', '=', 'm_doctor_poli.t_layanan_data_code')
+            ->where('d_reg_order_poli.d_reg_order_code', $request->code)->first();
         $layanan = DB::table('t_layanan_cat')->get();
-        return view('application.poliklinik.poliklinik-handling.form-handling', ['data' => $data, 'layanan' => $layanan, 'code' => $request->code]);
+        return view('application.poliklinik.poliklinik-handling.form-handling', [
+            'data' => $data,
+            'poli' => $poli,
+            'layanan' => $layanan,
+            'code' => $request->code
+        ]);
     }
     public function data_registrasi_poliklinik_handling_order_layanan(Request $request)
     {
@@ -425,9 +434,9 @@ class PoliklinikController extends Controller
             'umur' => $umur,
         ], compact('image'))
             ->setPaper('A5', 'potrait')->setOptions([
-                    'isHtml5ParserEnabled' => true,
-                    'isRemoteEnabled' => true,
-                ]);
+                'isHtml5ParserEnabled' => true,
+                'isRemoteEnabled' => true,
+            ]);
         $pdf->output();
         $dompdf = $pdf->getDomPDF();
         $font = $dompdf->getFontMetrics()->get_font("helvetica", "bold");
@@ -466,9 +475,9 @@ class PoliklinikController extends Controller
             'umur' => $umur,
         ], compact('image'))
             ->setPaper('A5', 'potrait')->setOptions([
-                    'isHtml5ParserEnabled' => true,
-                    'isRemoteEnabled' => true,
-                ]);
+                'isHtml5ParserEnabled' => true,
+                'isRemoteEnabled' => true,
+            ]);
         $pdf->output();
         $dompdf = $pdf->getDomPDF();
         $font = $dompdf->getFontMetrics()->get_font("helvetica", "bold");
