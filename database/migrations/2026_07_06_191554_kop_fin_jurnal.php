@@ -24,6 +24,7 @@ class KopFinJurnal extends Migration
             $table->string('jurnal_ref_code');   // Isi: kop_proses_uang_code / kop_proses_brg_code / kop_vocher_data_code
 
             $table->string('jurnal_user');
+            $table->string('jurnal_cabang');
             $table->timestamps();
         });
     }

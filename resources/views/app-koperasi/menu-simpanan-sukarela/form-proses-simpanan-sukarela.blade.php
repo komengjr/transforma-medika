@@ -15,13 +15,19 @@
                                 <h5 class="mb-2">Verifikasi Oleh Ketua</h5>
 
                                 <strong class="text-primary">Sudah di Verifikasi</strong>
-
+                                <label for="">Pilih Akun Setoran</label>
+                                <select name="akun_setor" class="form-control form-control-lg" id="akun_setor">
+                                    <option value="">Pilih Akun</option>
+                                    @foreach ($akun as $akuns)
+                                    <option value="{{ $akuns->coa_code }}"> {{ $akuns->coa_code }} - {{ $akuns->coa_name }}</option>
+                                    @endforeach
+                                </select>
                                 <div class="form-check mb-0">
                                     <input type="text" name="data_simpanan_sukarela" id="data_simpanan_sukarela" value="{{ $data->kop_simpanan_sukarela_code }}" hidden>
                                 </div>
                                 <div class="form-check">
                                     <input class="form-check-input" id="protection-option-2" type="checkbox" checked="checked">
-                                    <label class="form-check-label mb-0" for="protection-option-2"> <strong>Saya Setujua, </strong>Dengan Semua prnyataan ini</label>
+                                    <label class="form-check-label mb-0" for="protection-option-2"> <strong>Saya Setuju, </strong>Dengan Semua prnyataan ini</label>
                                 </div>
 
                             </div>

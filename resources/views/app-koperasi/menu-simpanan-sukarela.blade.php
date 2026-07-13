@@ -226,6 +226,7 @@
     $(document).on("click", "#button-payment-data-penyimpanan-sukarela", function(e) {
         e.preventDefault();
         var code = document.getElementById('data_simpanan_sukarela').value;
+        var akun = document.getElementById('akun_setor').value;
         $('#menu-proses-data-simpanan').html(
             '<div class="spinner-border my-3" style="display: block; margin-left: auto; margin-right: auto;" role="status"><span class="visually-hidden">Loading...</span></div>'
         );
@@ -235,7 +236,8 @@
             cache: false,
             data: {
                 "_token": "{{ csrf_token() }}",
-                "code": code
+                "code": code,
+                "akun": akun
             },
             dataType: 'html',
         }).done(function(data) {

@@ -434,6 +434,7 @@ class KoperasiController extends Controller
                         'jurnal_ref_table' => 'kop_vocher_data',
                         'jurnal_ref_code' => $data->kop_vocher_data_code,
                         'jurnal_user' => Auth::user()->userid,
+                        'jurnal_cabang' => $data->kop_master_peserta_cabang,
                     ];
                     $set = DB::table('kop_fin_master_coa_set')
                         ->where('fin_master_coa_set_cabang', $data->kop_master_peserta_cabang)
@@ -509,6 +510,7 @@ class KoperasiController extends Controller
                         'jurnal_ref_table' => 'kop_vocher_data',
                         'jurnal_ref_code' => $data->kop_vocher_data_code,
                         'jurnal_user' => Auth::user()->userid,
+                        'jurnal_cabang' => $data->kop_master_peserta_cabang,
                     ];
                     $set = DB::table('kop_fin_master_coa_set')
                         ->where('fin_master_coa_set_cabang', $data->kop_master_peserta_cabang)
@@ -651,6 +653,7 @@ class KoperasiController extends Controller
                     'jurnal_ref_table' => 'kop_tagihan_bulan_peserta',
                     'jurnal_ref_code' => $request->code,
                     'jurnal_user' => Auth::user()->userid,
+                    'jurnal_cabang' => $datas->kop_master_peserta_cabang,
                 ];
                 $set = DB::table('kop_fin_master_coa_set')
                     ->where('fin_master_coa_set_cabang', $datas->kop_master_peserta_cabang)
@@ -702,6 +705,7 @@ class KoperasiController extends Controller
         if ($this->url_akses($akses, $id) == true) {
             $data = DB::table('kop_simpanan_sukarela')
                 ->join('kop_master_peserta', 'kop_master_peserta.kop_master_peserta_code', '=', 'kop_simpanan_sukarela.kop_master_peserta_code')
+                ->where('kop_master_peserta_cabang', Auth::user()->access_cabang)->orderBy('id_kop_simpanan_sukarela', 'desc')
                 ->get();
             return view('app-koperasi.menu-simpanan-sukarela', compact('data'), ['akses' => $akses, 'code' => $id]);
         } else {
@@ -716,8 +720,9 @@ class KoperasiController extends Controller
     public function menu_koperasi_sukarela_save(Request $request)
     {
         try {
+            $kode = 'SS-' . now()->format('Ymd') . '-' . strtoupper(uniqid());
             DB::table('kop_simpanan_sukarela')->insert([
-                'kop_simpanan_sukarela_code' => str::uuid(),
+                'kop_simpanan_sukarela_code' => $kode,
                 'kop_master_peserta_code' => $request->anggota,
                 'kop_tagihan_bulan_peserta_pokok' => $request->nominal - (($request->bunga / 100) * $request->nominal),
                 'kop_tagihan_bulan_peserta_bunga' => $request->bunga,
@@ -734,30 +739,67 @@ class KoperasiController extends Controller
     public function menu_koperasi_sukarela_proses(Request $request)
     {
         $data = DB::table('kop_simpanan_sukarela')->where('kop_simpanan_sukarela_code', $request->code)->first();
-        return view('app-koperasi.menu-simpanan-sukarela.form-proses-simpanan-sukarela', compact('data'));
+        $akun = DB::table('kop_fin_master_coa')->where('coa_type', 'aset')->get();
+        return view('app-koperasi.menu-simpanan-sukarela.form-proses-simpanan-sukarela', compact('data', 'akun'));
     }
     public function menu_koperasi_sukarela_proses_save(Request $request)
     {
-        $data = DB::table('kop_simpanan_sukarela')->where('kop_simpanan_sukarela_code', $request->code)->first();
-        try {
-            DB::table('kop_log_simpanan_sukarela')->insert([
-                'kop_log_simpanan_sukarela_code' => str::uuid(),
-                'kop_simpanan_sukarela_code' => $data->kop_simpanan_sukarela_code,
-                'kop_log_simpanan_sukarela_pokok' => $data->kop_tagihan_bulan_peserta_pokok,
-                'kop_log_simpanan_sukarela_bunga' => $data->kop_tagihan_bulan_peserta_bunga,
-                'kop_log_simpanan_sukarela_nominal' => $data->kop_tagihan_bulan_peserta_nominal,
-                'kop_log_simpanan_sukarela_date' => $data->kop_simpanan_sukarela_date,
-                'kop_log_simpanan_sukarela_status' => 0,
-                'created_at' => now()
-            ]);
-            DB::table('kop_simpanan_sukarela')->where('kop_simpanan_sukarela_code', $request->code)->update([
-                'kop_simpanan_sukarela_status' => 1,
-                'updated_at' => now(),
-            ]);
-            return 1;
-        } catch (\Throwable $e) {
-            return 0;
+        $data = DB::table('kop_simpanan_sukarela')
+            ->join('kop_master_peserta', 'kop_master_peserta.kop_master_peserta_code', '=', 'kop_simpanan_sukarela.kop_master_peserta_code')
+            ->where('kop_simpanan_sukarela_code', $request->code)->first();
+        // try {
+        $nominalPokok = $data->kop_tagihan_bulan_peserta_pokok;
+        $biayaAdmin = $data->kop_tagihan_bulan_peserta_nominal - $data->kop_tagihan_bulan_peserta_pokok;
+        $kasMasuk = $data->kop_tagihan_bulan_peserta_nominal;
+        $headerJurnal = [
+            'jurnal_tgl' => now()->format('Y-m-d'),
+            'jurnal_keterangan' => "Setoran Simpanan Sukarela Anggota Dengan No Simpanan Sukarela. " . $data->kop_simpanan_sukarela_code . " an. " . $data->kop_master_peserta_name . " ( " . $data->kop_master_peserta_nip . " ) ",
+            'jurnal_ref_table' => 'kop_simpanan_sukarela',
+            'jurnal_ref_code' => $request->code,
+            'jurnal_user' => Auth::user()->userid,
+            'jurnal_cabang' => $data->kop_master_peserta_cabang,
+        ];
+        $set = DB::table('kop_fin_master_coa_set')
+            ->where('fin_master_coa_set_cabang', $data->kop_master_peserta_cabang)
+            ->where('fin_master_coa_set_type', '=', 'simpanan_sukarela')->first();
+        if ($request->akun == "") {
+            $akun_pencairan = $set->fin_master_coa_set_kredit;
+        } else {
+            $akun_pencairan = $request->akun;
         }
+        if ($biayaAdmin == 0) {
+            $detailJurnal = [
+                ['coa_code' => $akun_pencairan, 'jurnal_debit' => $kasMasuk, 'jurnal_kredit' => 0], // Piutang Anggota
+                ['coa_code' => $set->fin_master_coa_set_kredit, 'jurnal_debit' => 0, 'jurnal_kredit' => $nominalPokok],    // Kas/Bank Koperasi
+            ];
+        } else {
+            $detailJurnal = [
+                ['coa_code' => $akun_pencairan, 'jurnal_debit' => $kasMasuk, 'jurnal_kredit' => 0], // Piutang Anggota
+                ['coa_code' => $set->fin_master_coa_set_adm, 'jurnal_debit' => 0, 'jurnal_kredit' => $biayaAdmin],   // Pendapatan Admin
+                ['coa_code' => $set->fin_master_coa_set_kredit, 'jurnal_debit' => 0, 'jurnal_kredit' => $nominalPokok],    // Kas/Bank Koperasi
+            ];
+        }
+
+        $this->accountingService->createJournal($headerJurnal, $detailJurnal);
+
+        DB::table('kop_log_simpanan_sukarela')->insert([
+            'kop_log_simpanan_sukarela_code' => str::uuid(),
+            'kop_simpanan_sukarela_code' => $data->kop_simpanan_sukarela_code,
+            'kop_log_simpanan_sukarela_pokok' => $data->kop_tagihan_bulan_peserta_pokok,
+            'kop_log_simpanan_sukarela_bunga' => $data->kop_tagihan_bulan_peserta_bunga,
+            'kop_log_simpanan_sukarela_nominal' => $data->kop_tagihan_bulan_peserta_nominal,
+            'kop_log_simpanan_sukarela_date' => $data->kop_simpanan_sukarela_date,
+            'kop_log_simpanan_sukarela_status' => 0,
+            'created_at' => now()
+        ]);
+        DB::table('kop_simpanan_sukarela')->where('kop_simpanan_sukarela_code', $request->code)->update([
+            'kop_simpanan_sukarela_status' => 1,
+            'updated_at' => now(),
+        ]);
+        return 1;
+        // } catch (\Throwable $e) {
+        //     return 0;
+        // }
     }
     // MENU TAGIHAN KOPERASI
     public function menu_koperasi_tagihan_koperasi(Request $request, $akses, $id)
@@ -1079,6 +1121,7 @@ class KoperasiController extends Controller
                     'jurnal_ref_table' => 'kop_proses_peminjaman_uang',
                     'jurnal_ref_code' => $request->code,
                     'jurnal_user' => Auth::user()->userid,
+                    'jurnal_cabang' => $data->kop_master_peserta_cabang,
                 ];
                 $set = DB::table('kop_fin_master_coa_set')
                     ->where('fin_master_coa_set_cabang', $data->kop_master_peserta_cabang)
@@ -1209,6 +1252,7 @@ class KoperasiController extends Controller
             'jurnal_ref_table' => 'kop_log_peminjaman_uang',
             'jurnal_ref_code' => $request->code,
             'jurnal_user' => Auth::user()->userid,
+            'jurnal_cabang' => $data->kop_master_peserta_cabang,
         ];
         $set = DB::table('kop_fin_master_coa_set')
             ->where('fin_master_coa_set_cabang', $data->kop_master_peserta_cabang)
@@ -1346,6 +1390,7 @@ class KoperasiController extends Controller
                 'jurnal_ref_table' => 'kop_proses_peminjaman_uang',
                 'jurnal_ref_code' => $kode,
                 'jurnal_user' => Auth::user()->userid,
+                'jurnal_cabang' => $data->kop_master_peserta_cabang,
             ];
             $set = DB::table('kop_fin_master_coa_set')
                 ->where('fin_master_coa_set_cabang', $data->kop_master_peserta_cabang)
@@ -1520,6 +1565,7 @@ class KoperasiController extends Controller
                     'jurnal_ref_table' => 'kop_proses_peminjaman_brg',
                     'jurnal_ref_code' => $request->code,
                     'jurnal_user' => Auth::user()->userid,
+                    'jurnal_cabang' =>$data->kop_master_peserta_cabang,
                 ];
                 $set = DB::table('kop_fin_master_coa_set')
                     ->where('fin_master_coa_set_cabang', $data->kop_master_peserta_cabang)
@@ -1589,6 +1635,7 @@ class KoperasiController extends Controller
             'jurnal_ref_table' => 'kop_log_peminjaman_barang',
             'jurnal_ref_code' => $request->code,
             'jurnal_user' => Auth::user()->userid,
+            'jurnal_cabang' => $data->kop_master_peserta_cabang,
         ];
         $set = DB::table('kop_fin_master_coa_set')
             ->where('fin_master_coa_set_cabang', $data->kop_master_peserta_cabang)
@@ -1675,6 +1722,29 @@ class KoperasiController extends Controller
             return 0;
         }
     }
+    // LAPORAN JURNAL UMUM
+    public function laporan_koperasi_jurnal_umum($akses, $id)
+    {
+        if ($this->url_akses($akses, $id) == true) {
+            $cabang = DB::table('kop_master_cabang')->get();
+            $divisi = DB::table('kop_master_div_bag')->join('kop_master_divisi', 'kop_master_divisi.kop_master_divisi_code', '=', 'kop_master_div_bag.kop_master_divisi_code')->get();
+            $pokok = DB::table('kop_simpanan_pokok')->get();
+            $wajib = DB::table('kop_simpanan_wajib')->get();
+            $coa = DB::table('kop_fin_master_coa')->get();
+            return view('app-koperasi.laporan-jurnal-umum', compact(
+                'coa',
+                'cabang',
+                'divisi',
+                'pokok',
+                'wajib'
+            ), [
+                'akses' => $akses,
+                'code' => $id
+            ]);
+        } else {
+            return Redirect::to('dashboard/home');
+        }
+    }
     // LAPORAN RUGI LABA
     public function laporan_koperasi_rugi_laba($akses, $id)
     {
@@ -1730,7 +1800,10 @@ class KoperasiController extends Controller
                 'divisi',
                 'pokok',
                 'wajib'
-            ), ['akses' => $akses, 'code' => $id]);
+            ), [
+                'akses' => $akses,
+                'code' => $id
+            ]);
         } else {
             return Redirect::to('dashboard/home');
         }
@@ -2724,5 +2797,23 @@ class KoperasiController extends Controller
             'total_arus_keluar' => (float)$totalKeluar,
             'kenaikan_bersih' => (float)($totalMasuk - $totalKeluar)
         ]);
+    }
+
+    public function akutansi_koperasi_report_jurnal_cabang(Request $request)
+    {
+        $dari = $request->query('tgl_mulai', now()->startOfMonth()->format('Y-m-d'));
+        $sampai = $request->query('tgl_selesai', now()->endOfMonth()->format('Y-m-d'));
+
+        $data = DB::table('kop_fin_jurnal_detail as d')
+            ->join('kop_fin_jurnal as j', 'd.jurnal_id', '=', 'j.id_jurnal')
+            ->join('kop_fin_master_coa as c', 'd.coa_code', '=', 'c.coa_code')
+            ->select('j.jurnal_tgl', 'j.jurnal_no_bukti', 'j.jurnal_keterangan', 'd.coa_code', 'c.coa_name', 'd.jurnal_debit', 'd.jurnal_kredit')
+            ->whereBetween('j.jurnal_tgl', [$dari, $sampai])
+            ->where('j.jurnal_cabang',Auth::user()->access_cabang)
+            ->orderBy('j.jurnal_tgl', 'asc')
+            ->orderBy('j.id_jurnal', 'asc')
+            ->get();
+
+        return response()->json($data);
     }
 }

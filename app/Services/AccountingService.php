@@ -35,6 +35,7 @@ class AccountingService
             'jurnal_ref_table'  => $header['jurnal_ref_table'],
             'jurnal_ref_code'   => $header['jurnal_ref_code'],
             'jurnal_user'       => $header['jurnal_user'],
+            'jurnal_cabang'     => $header['jurnal_cabang'],
             'created_at'        => now(),
             'updated_at'        => now()
         ]);

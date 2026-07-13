@@ -128,4 +128,6 @@ Route::prefix('koperasi/')->group(function (): void {
     Route::get('akutansi-koperasi/report/neraca', [KoperasiController::class, 'akutansi_koperasi_report_neraca'])->name('akutansi_koperasi_report_neraca');
     Route::get('akutansi-koperasi/report/perubahan-modal', [KoperasiController::class, 'akutansi_koperasi_report_perubahan_modal'])->name('akutansi_koperasi_report_perubahan_modal');
     Route::get('akutansi-koperasi/report/arus-kas', [KoperasiController::class, 'akutansi_koperasi_report_arus_kas'])->name('akutansi_koperasi_report_arus_kas');
+
+    Route::get('akutansi-koperasi/report/jurnal-cabang', [KoperasiController::class, 'akutansi_koperasi_report_jurnal_cabang'])->name('akutansi_koperasi_report_jurnal_cabang');
 });
