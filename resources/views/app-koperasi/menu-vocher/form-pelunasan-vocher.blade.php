@@ -14,14 +14,16 @@
                             <div class="flex-1">
                                 <h5 class="mb-2">Verifikasi Pelunasan Data Vocher</h5>
                                 <div class="row gx-3 mb-3">
-                                    <div class="col">
-                                        <label class="form-label ls text-uppercase text-600 fw-semi-bold mb-0 fs--1" for="cardNumber">Card Number</label>
-                                        <input class="form-control" id="cardNumber" placeholder="XXXX XXXX XXXX XXXX" type="text">
-                                    </div>
-                                    <div class="col">
-                                        <label class="form-label ls text-uppercase text-600 fw-semi-bold mb-0 fs--1" for="cardName">Name of Card</label>
-                                        <input class="form-control" id="cardName" placeholder="John Doe" type="text">
-                                    </div>
+                                    <label for="">Pilih Akun Pelunasan</label>
+                                    <select name="akun" class="form-control form-control-lg" id="">
+                                        <option value="">Pilih Akun</option>
+                                        @foreach ($akun as $akuns)
+                                        <option value="{{ $akuns->coa_code }}"> {{ $akuns->coa_code }} - {{ $akuns->coa_name }}</option>
+                                        @endforeach
+                                    </select>
+                                </div>
+                                <div class="form-check mb-0">
+                                    <input type="text" name="data_vocher" id="data_vocher" value="{{ $data->kop_vocher_data_code }}" hidden>
                                 </div>
                             </div>
                         </div>

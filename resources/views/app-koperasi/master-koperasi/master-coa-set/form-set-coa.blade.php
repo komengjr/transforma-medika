@@ -7,7 +7,7 @@
     <div class="p-4 pb-3" id="menu-add-data-pr-all">
         <form class="row g-4 pb-3" id="form-set-data-coa" method="POST">
             @csrf
-            <input type="text" name="code" value="{{ $code }}">
+            <input type="text" name="code" value="{{ $code }}" hidden>
             <div class="col-md-12">
                 <label for="inputLastName1" class="form-label">Transaksi Debit</label>
                 <div class="input-group"> <span class="input-group-text"><i class="fas fa-map-marked-alt"></i></span>

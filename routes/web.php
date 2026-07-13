@@ -660,7 +660,9 @@ Route::prefix('v3')->group(function (): void {
     Route::get('data-vocher/{code}', [PublicKoperasiController::class, 'data_vocher'])->name('data_vocher_koperasi');
     Route::post('data-vocher-save/sign', [PublicKoperasiController::class, 'data_vocher_save_sign'])->name('data_vocher_save_sign');
     Route::get('data-peminjaman-uang/{code}', [PublicKoperasiController::class, 'data_peminjaman_uang'])->name('data_peminjaman_uang');
+    Route::get('data-peminjaman-barang/{code}', [PublicKoperasiController::class, 'data_peminjaman_barang'])->name('data_peminjaman_barang');
     Route::post('data-peminjaman-uang-save/sign', [PublicKoperasiController::class, 'data_peminjaman_uang_sign'])->name('data_peminjaman_uang_sign');
+    Route::post('data-peminjaman-barang-save/sign', [PublicKoperasiController::class, 'data_peminjaman_barang_sign'])->name('data_peminjaman_barang_sign');
 });
 
 // MOVIE

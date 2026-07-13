@@ -39,7 +39,7 @@
                 <h5 class="text-white">Setting COA</h5>
             </div>
             <div class="d-flex">
-
+                <button class="btn btn-dark btn-sm" id="button-sinkronisasi-cabang" data-bs-toggle="modal" data-bs-target="#modal-coa">Sinkronisasi Cabang</button>
             </div>
         </div>
     </div>
@@ -171,6 +171,27 @@
             $('#menu-coa').html('eror');
         });
     });
+    $(document).on("click", "#button-sinkronisasi-cabang", function(e) {
+        e.preventDefault();
+        var code = $(this).data("code");
+        $('#menu-coa').html(
+            '<div class="spinner-border my-3" style="display: block; margin-left: auto; margin-right: auto;" role="status"><span class="visually-hidden">Loading...</span></div>'
+        );
+        $.ajax({
+            url: "{{ route('master_koperasi_data_coa_setting_sinkronisasi') }}",
+            type: "POST",
+            cache: false,
+            data: {
+                "_token": "{{ csrf_token() }}",
+                "code": code
+            },
+            dataType: 'html',
+        }).done(function(data) {
+            $('#menu-coa').html(data);
+        }).fail(function() {
+            $('#menu-coa').html('eror');
+        });
+    });
     $(document).on("click", "#button-simpan-data-set-coa", function(e) {
         e.preventDefault();
         var data = $("#form-set-data-coa").serialize();
@@ -192,6 +213,35 @@
                     footer: '<a href="#">Why do I have this issue?</a>'
                 });
                 $('#menu-set-data-coa').html('<button class="btn btn-success float-end" id="button-simpan-data-set-coa" data-code="">Simpan Data</button>');
+            } else {
+                $('#menu-set-data-coa').html(data);
+                location.reload();
+            }
+        }).fail(function() {
+            $('#menu-set-data-coa').html('eror');
+        });
+    });
+    $(document).on("click", "#button-simpan-data-cabang-coa", function(e) {
+        e.preventDefault();
+        var data = $("#form-set-data-cabang").serialize();
+        $('#menu-set-data-coa').html(
+            '<div class="spinner-border my-3" style="display: block; margin-left: auto; margin-right: auto;" role="status"><span class="visually-hidden">Loading...</span></div>'
+        );
+        $.ajax({
+            url: "{{ route('master_koperasi_data_coa_setting_sinkronisasi_save') }}",
+            type: "POST",
+            cache: false,
+            data: data,
+            dataType: 'html',
+        }).done(function(data) {
+            if (data == 0) {
+                Swal.fire({
+                    icon: "error",
+                    title: "Oops...",
+                    text: "Something went wrong!",
+                    footer: '<a href="#">Why do I have this issue?</a>'
+                });
+                $('#menu-set-data-coa').html('<button class="btn btn-success float-end" id="button-simpan-data-cabang-coa" data-code="">Simpan Data</button>');
             } else {
                 $('#menu-set-data-coa').html(data);
                 location.reload();

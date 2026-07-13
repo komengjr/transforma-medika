@@ -86,7 +86,7 @@
                         @elseif ($datas->kop_vocher_data_status == '1')
                         <span class="badge bg-info">Proses Pencairan</span>
                         @elseif ($datas->kop_vocher_data_status == '2')
-                        <span class="badge bg-warning">Pengeluaran</span>
+                        <span class="badge bg-warning">Proses Pelunasan</span>
                         @elseif ($datas->kop_vocher_data_status == '3')
                         <span class="badge bg-primary">Selesai</span>
                         @endif

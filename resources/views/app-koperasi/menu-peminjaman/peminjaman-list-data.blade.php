@@ -105,6 +105,15 @@
                         @elseif ($datas->kop_proses_uang_status == '-1')
                         <span class="badge bg-danger">Peminjaman Di Batalkan</span>
                         @endif
+                        @php
+                        $jurnal = DB::table('kop_fin_jurnal')
+                        ->where('jurnal_ref_table','=','kop_proses_peminjaman_uang')
+                        ->where('jurnal_ref_code',$datas->kop_proses_uang_code)
+                        ->first();
+                        @endphp
+                        @if ($jurnal)
+                        <br> <span class="badge bg-primary">{{ $jurnal->jurnal_no_bukti }}</span>
+                        @endif
                     </td>
                     <td>
                         <div class="btn-group" role="group">

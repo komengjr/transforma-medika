@@ -46,12 +46,20 @@
                 @endforeach
             </tbody>
         </table>
+
+
     </div>
 </div>
 <div class="modal-footer px-4 bg-300">
-    <span id="menu-add-tagihan-bulan">
-        <button class="btn btn-success float-end" id="button-payment-tagihan-bulan-peserta" data-code="{{ $code }}">
-            Lakukan Pembayaran</button>
+    <label for="">Pilih Akun Setoran</label>
+    <select name="akun_setor" class="form-control form-control-lg" id="akun_setor">
+        <option value="">Pilih Akun</option>
+        @foreach ($akun as $akuns)
+        <option value="{{ $akuns->coa_code }}"> {{ $akuns->coa_code }} - {{ $akuns->coa_name }}</option>
+        @endforeach
+    </select>
+    <span id="menu-add-tagihan-bulan" class="pt-2">
+        <button class="btn btn-success float-end" id="button-payment-tagihan-bulan-peserta" data-code="{{ $code }}"> Proses Penjurnalan Data Simpanan</button>
     </span>
 </div>
 <script>

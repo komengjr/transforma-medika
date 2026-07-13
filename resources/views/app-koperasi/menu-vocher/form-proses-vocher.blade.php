@@ -25,9 +25,20 @@
                                     <input class="form-check-input" id="protection-option-2" type="checkbox" checked="checked">
                                     <label class="form-check-label mb-0" for="protection-option-2"> <strong>Saya Setujua, </strong>Dengan Semua prnyataan ini</label>
                                 </div>
+                                @if ($data->kop_vocher_data_status == '0')
                                 <span id="menu-proses-token-vocher">
                                     <button class="btn btn-info btn-sm" id="button-send-token-verifikasi-vocher"><span class="fas fa-mail-bulk"></span> Kirim Pemberitahuan</button>
                                 </span>
+                                @elseif ($data->kop_vocher_data_status == '1')
+                                <label for="">Pilih Akun Pencairan</label>
+                                <select name="akun" class="form-control form-control-lg" id="">
+                                    <option value="">Pilih Akun</option>
+                                    @foreach ($akun as $akuns)
+                                    <option value="{{ $akuns->coa_code }}"> {{ $akuns->coa_code }} - {{ $akuns->coa_name }}</option>
+                                    @endforeach
+                                </select>
+                                @endif
+
                             </div>
                         </div>
                         <div class="vertical-line d-none d-md-block d-xl-block d-xxl-block"> </div>

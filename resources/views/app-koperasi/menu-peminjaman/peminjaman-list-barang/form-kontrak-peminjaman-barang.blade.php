@@ -35,19 +35,19 @@
                                     </tr>
                                     <tr>
                                         <th class="">Nominal Pengajuan</th>
-                                        <td>: @currency($data->kop_proses_uang_nominal)</td>
+                                        <td>: @currency($data->kop_proses_brg_nominal)</td>
                                     </tr>
                                     <tr>
                                         <th class="">Tanggal Pengajuan </th>
-                                        <td>: {{ $data->kop_proses_uang_tgl }}</td>
+                                        <td>: {{ $data->kop_proses_brg_tgl }}</td>
                                     </tr>
                                     <tr>
                                         <th class="">Tenor :</th>
-                                        <td>: {{ $data->kop_proses_uang_tenor }} Bulan</td>
+                                        <td>: {{ $data->kop_proses_brg_tenor }} Bulan</td>
                                     </tr>
                                     <tr class="alert-success fw-bold">
                                         <th class="">Suku Bunga </th>
-                                        <td>: {{ $data->kop_proses_uang_bunga }} %</td>
+                                        <td>: {{ $data->kop_proses_brg_bunga }} %</td>
                                     </tr>
                                 </tbody>
                             </table>
@@ -60,7 +60,7 @@
                             <tr class="bg-primary text-white dark__bg-1000">
                                 <th class="border-0">Bulan</th>
                                 <th class="border-0 text-center">Tenor Ke</th>
-                                <th class="border-0 text-center">Suku Bunga {{ $data->kop_proses_uang_bunga }} %</th>
+                                <th class="border-0 text-center">Suku Bunga {{ $data->kop_proses_brg_bunga }} %</th>
                                 <th class="border-0 text-end">Angsuran Pokok</th>
                                 <th class="border-0 text-end">Total Angsuran Bulanan</th>
                                 <th class="border-0 text-end">Status</th>
@@ -70,14 +70,14 @@
                             @php
                             $total = 0 ;
                             $paid = 0;
-                            $pokok = $data->kop_proses_uang_nominal/$data->kop_proses_uang_tenor ;
-                            $suku_bunga = ($data->kop_proses_uang_nominal * ($data->kop_proses_uang_bunga / 100))/$data->kop_proses_uang_tenor;
-                            $admin = ($data->kop_proses_uang_admin / 100) * $data->kop_proses_uang_nominal;
+                            $pokok = $data->kop_proses_brg_nominal/$data->kop_proses_brg_tenor ;
+                            $suku_bunga = ($data->kop_proses_brg_nominal * ($data->kop_proses_brg_bunga / 100))/$data->kop_proses_brg_tenor;
+                            $admin = ($data->kop_proses_brg_admin / 100) * $data->kop_proses_brg_nominal;
                             @endphp
-                            @for ($i = 1 ; $i <= $data->kop_proses_uang_tenor ; $i++)
+                            @for ($i = 1 ; $i <= $data->kop_proses_brg_tenor ; $i++)
                                 <tr>
                                     <td class="align-middle">
-                                        <h6 class="mb-0 text-nowrap">{{ date('d - M - Y', strtotime('+' . $i .' month', strtotime($data->kop_proses_uang_tgl))) }}</h6>
+                                        <h6 class="mb-0 text-nowrap">{{ date('d - M - Y', strtotime('+' . $i .' month', strtotime($data->kop_proses_brg_tgl))) }}</h6>
                                     </td>
                                     <td class="align-middle text-center">{{ $i }}</td>
                                     <td class="align-middle text-center">@currency($suku_bunga)</td>
@@ -85,16 +85,16 @@
                                     <td class="align-middle text-end">@currency($pokok + $suku_bunga)</td>
                                     <td class="align-middle text-end">
                                         @php
-                                        $cek = DB::table('kop_log_peminjaman_uang')
-                                        ->where('kop_proses_uang_code', $data->kop_proses_uang_code)
-                                        ->where('kop_log_peminjaman_uang_tenor', $i)
+                                        $cek = DB::table('kop_log_peminjaman_barang')
+                                        ->where('kop_proses_brg_code', $data->kop_proses_brg_code)
+                                        ->where('kop_log_peminjaman_brg_tenor', $i)
                                         ->first();
                                         @endphp
                                         @if ($cek)
-                                        @if ($cek->kop_log_peminjaman_uang_status == '0')
+                                        @if ($cek->kop_log_peminjaman_brg_status == '0')
 
-                                        @if ($cek->kop_log_peminjaman_uang_date <= date('Y-m-d') )
-                                            <button class="btn btn-info btn-sm" id="button-proses-pembayaran-bulanan" data-code="{{ $cek->kop_log_peminjaman_uang_code }}">Proses</button>
+                                        @if ($cek->kop_log_peminjaman_brg_date <= date('Y-m-d') )
+                                            <button class="btn btn-info btn-sm" id="button-proses-pembayaran-bulanan" data-code="{{ $cek->kop_log_peminjaman_barang_code }}">Proses</button>
                                             @else
                                             <button class="btn btn-dark btn-sm" disabled>Menunggu</button>
                                             @endif
@@ -102,8 +102,8 @@
                                             @else
                                             @php
                                             $jurnal = DB::table('kop_fin_jurnal')
-                                            ->where('jurnal_ref_table','=','kop_log_peminjaman_uang')
-                                            ->where('jurnal_ref_code',$cek->kop_log_peminjaman_uang_code)
+                                            ->where('jurnal_ref_table','=','kop_log_peminjaman_barang')
+                                            ->where('jurnal_ref_code',$cek->kop_log_peminjaman_barang_code)
                                             ->first();
                                             @endphp
                                             @if ($jurnal)
@@ -111,7 +111,7 @@
                                             @endif
                                             <!-- <span class="badge bg-primary">Sudah Bayars</span> -->
                                             @php
-                                            $paid = $paid + $cek->kop_log_peminjaman_uang_nominal;
+                                            $paid = $paid + $cek->kop_log_peminjaman_brg_nominal;
                                             @endphp
 
                                             @endif
@@ -151,11 +151,11 @@
 <div class="modal-footer px-4 bg-300">
     @if ($total + $admin == $paid + $admin)
     <span id="menu-add-data-verifikasi">
-        <button class="btn btn-success float-end" id="button-penyelesaian-data-kontrak" data-code="{{ $data->kop_proses_uang_code }}">Penyelesaian Data</button>
+        <button class="btn btn-success float-end" id="button-penyelesaian-data-kontrak" data-code="{{ $data->kop_proses_brg_code }}">Penyelesaian Data</button>
     </span>
     @else
     <span id="menu-add-data-verifikasi">
-        <button class="btn btn-success float-end" id="button-create-data-kontrak-baru" data-code="{{ $data->kop_proses_uang_code }}">Membuat Kontrak Baru</button>
+        <!-- <button class="btn btn-success float-end" id="button-create-data-kontrak-baru" data-code="{{ $data->kop_proses_brg_code }}">Membuat Kontrak Baru</button> -->
     </span>
     @endif
 </div>

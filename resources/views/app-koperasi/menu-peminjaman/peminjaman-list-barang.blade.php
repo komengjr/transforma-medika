@@ -185,7 +185,7 @@
             '<div class="spinner-border my-3" style="display: block; margin-left: auto; margin-right: auto;" role="status"><span class="visually-hidden">Loading...</span></div>'
         );
         $.ajax({
-            url: "{{ route('menu_peminjaman_list_proses_pengajuan') }}",
+            url: "{{ route('menu_peminjaman_list_barang_proses_pengajuan') }}",
             type: "POST",
             cache: false,
             data: {
@@ -206,7 +206,7 @@
             '<button class="btn btn-falcon-primary btn-sm" type="button" disabled=""><span class="spinner-border spinner-border-sm" role="status" aria-hidden="true"></span>Loading...</button>'
         );
         $.ajax({
-            url: "{{ route('menu_peminjaman_list_proses_pengajuan_send_verif') }}",
+            url: "{{ route('menu_peminjaman_list_barang_proses_pengajuan_send') }}",
             type: "POST",
             cache: false,
             data: {
@@ -270,7 +270,7 @@
             '<div class="spinner-border my-3" style="display: block; margin-left: auto; margin-right: auto;" role="status"><span class="visually-hidden">Loading...</span></div>'
         );
         $.ajax({
-            url: "{{ route('menu_peminjaman_list_cek_kontrak') }}",
+            url: "{{ route('menu_peminjaman_list_barang_cek_status_kontrak') }}",
             type: "POST",
             cache: false,
             data: {
@@ -291,7 +291,7 @@
             '<div class="spinner-border my-3" style="display: block; margin-left: auto; margin-right: auto;" role="status"><span class="visually-hidden">Loading...</span></div>'
         );
         $.ajax({
-            url: "{{ route('menu_peminjaman_list_cek_kontrak_payment') }}",
+            url: "{{ route('menu_peminjaman_list_barang_cek_status_kontrak_payment') }}",
             type: "POST",
             cache: false,
             data: {
@@ -312,7 +312,7 @@
             '<div class="spinner-border my-3" style="display: block; margin-left: auto; margin-right: auto;" role="status"><span class="visually-hidden">Loading...</span></div>'
         );
         $.ajax({
-            url: "{{ route('menu_peminjaman_list_cek_kontrak_payment_fix') }}",
+            url: "{{ route('menu_peminjaman_list_barang_cek_status_kontrak_payment_fix') }}",
             type: "POST",
             cache: false,
             data: {
@@ -357,7 +357,7 @@
                     '<div class="spinner-border my-3" style="display: block; margin-left: auto; margin-right: auto;" role="status"><span class="visually-hidden">Loading...</span></div>'
                 );
                 $.ajax({
-                    url: "{{ route('menu_peminjaman_list_proses_pengajuan_save_verif') }}",
+                    url: "{{ route('menu_peminjaman_list_barang_proses_pengajuan_save') }}",
                     type: "POST",
                     cache: false,
                     data: {

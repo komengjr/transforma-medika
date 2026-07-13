@@ -37,7 +37,7 @@
         <div class="d-flex justify-content-between">
             <div>
                 <a class="btn btn-falcon-default btn-sm" href="#" data-bs-toggle="modal" data-bs-target="#modal-koperasi" id="button-add-data-vocher">
-                    <span class="fas fa-plus me-2"></span> Buat Tagihan
+                    <span class="fas fa-plus me-2"></span> Buat Simpanan Wajib
                 </a>
                 <!-- <span class="mx-1 mx-sm-2 text-300">|</span>
                 <button class="btn btn-falcon-default btn-sm" type="button" data-bs-toggle="tooltip"
@@ -57,6 +57,7 @@
             <thead class="bg-300 fs--1">
                 <tr>
                     <th>No</th>
+                    <th>Cabang</th>
                     <th>Tanggal Tagihan</th>
                     <th>Biaya Pokok</th>
                     <th>Biaya Bunga</th>
@@ -73,6 +74,7 @@
                 @foreach ($data as $datas)
                 <tr>
                     <td>{{ $no++ }}</td>
+                    <td>{{ $datas->kop_master_cabang_name }} </td>
                     <td>{{ $datas->kop_tagihan_bulan_date }} </td>
                     <td class="text-end">@currency($datas->kop_tagihan_bulan_pokok)</td>
                     <td>{{ $datas->kop_tagihan_bulan_bunga }} %</td>
@@ -82,7 +84,7 @@
                         @if ($datas->kop_tagihan_bulan_status == "0")
                         <span class="badge bg-danger">Belum Aktif</span>
                         @elseif ($datas->kop_tagihan_bulan_status == "1")
-                        <span class="badge bg-warning">Proses Pelunasan</span>
+                        <span class="badge bg-warning">Proses Jurnal</span>
                         @else
                         <span class="badge bg-primary">Selesai</span>
                         @endif
@@ -100,11 +102,11 @@
                                 @elseif ($datas->kop_tagihan_bulan_status == "1")
                                 <button class="dropdown-item text-primary" data-bs-toggle="modal" data-bs-target="#modal-koperasi"
                                     id="button-proses-tagihan-bulanan-peserta" data-code="{{$datas->kop_tagihan_bulan_code}}"><span
-                                        class="far fa-hourglass"> </span> Proses Tagihan Peserta</button>
+                                        class="far fa-hourglass"> </span> Proses Jurnal</button>
                                 @else
                                 <button class="dropdown-item text-primary" data-bs-toggle="modal" data-bs-target="#modal-koperasi"
                                     id="button-cetak-tagihan-bulanan-peserta" data-code="{{$datas->kop_tagihan_bulan_code}}"><span
-                                        class="far fa-printer"> </span> Cetak Tagihan Peserta</button>
+                                        class="far fa-printer"> </span> Show Data Jurnal</button>
 
                                 @endif
 
@@ -277,6 +279,7 @@
     $(document).on("click", "#button-payment-tagihan-bulan-peserta", function(e) {
         e.preventDefault();
         var code = $(this).data("code");
+        var akun = document.getElementById('akun_setor').value;
         $('#menu-add-tagihan-bulan').html(
             '<div class="spinner-border my-3" style="display: block; margin-left: auto; margin-right: auto;" role="status"><span class="visually-hidden">Loading...</span></div>'
         );
@@ -286,7 +289,8 @@
             cache: false,
             data: {
                 "_token": "{{ csrf_token() }}",
-                "code": code
+                "code": code,
+                "akun": akun
             },
             dataType: 'html',
         }).done(function(data) {

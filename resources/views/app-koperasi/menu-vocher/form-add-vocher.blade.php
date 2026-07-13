@@ -36,17 +36,24 @@
                         id="whatsapp" placeholder="Ex. 089XXXXXXX">
                 </div>
             </div>
-            <div class="col-md-4">
+            <div class="col-md-3">
                 <label for="inputLastName1" class="form-label">Nomor ID</label>
                 <div class="input-group"> <span class="input-group-text"><i class="fas fa-map-marked-alt"></i></span>
                     <input type="text" name="nomor_id" class="form-control form-control-lg border-start-0"
                         id="whatsapp" placeholder="Ex. 089XXXXXXX">
                 </div>
             </div>
-            <div class="col-md-4">
+            <div class="col-md-3">
                 <label for="inputLastName1" class="form-label">Nominal Vocher</label>
                 <div class="input-group"> <span class="input-group-text"><i class="fas fa-map-marked-alt"></i></span>
                     <input type="text" name="nominal" class="form-control form-control-lg border-start-0"
+                        id="whatsapp" placeholder="Ex. 089XXXXXXX">
+                </div>
+            </div>
+            <div class="col-md-2">
+                <label for="inputLastName1" class="form-label">Admin Vocher</label>
+                <div class="input-group"> <span class="input-group-text"><i class="fas fa-map-marked-alt"></i></span>
+                    <input type="number" name="admin" class="form-control form-control-lg border-start-0"
                         id="whatsapp" placeholder="Ex. 089XXXXXXX">
                 </div>
             </div>

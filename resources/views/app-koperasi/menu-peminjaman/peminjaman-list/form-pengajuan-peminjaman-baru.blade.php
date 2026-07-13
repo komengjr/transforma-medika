@@ -12,8 +12,8 @@
                     <div class="col-12">
                         <label for="inputAddress3" class="form-label">Keperluan Peminjaman</label>
                         <textarea class="form-control" name="keperluan" id="inputAddress3" rows="3" required></textarea>
-                        <input type="text" name="kode_peminjaman" id="" value="{{ $code }}">
-                        <input type="text" name="nominal_tagihan" id="" value="{{ $sisa }}">
+                        <input type="text" name="kode_peminjaman" id="" value="{{ $code }}" hidden>
+                        <input type="text" name="nominal_tagihan" id="" value="{{ $sisa }}" hidden>
                     </div>
                     <div class="col-8">
                         <label class="form-label ls text-uppercase text-600 fw-semi-bold mb-0 fs--1" for="cardNumber">Nominal Peminjaman <strong class="text-danger">Maksimal Peminjaman @currency($data->kop_setup_cabang_koperasi_jp_uang)</strong></label>
