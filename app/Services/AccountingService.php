@@ -5,6 +5,7 @@ namespace App\Services;
 use App\Models\FinJurnal;
 use Illuminate\Support\Facades\DB;
 use Exception;
+use Illuminate\Support\Facades\Auth;
 
 class AccountingService
 {
@@ -36,6 +37,7 @@ class AccountingService
             'jurnal_ref_code'   => $header['jurnal_ref_code'],
             'jurnal_user'       => $header['jurnal_user'],
             'jurnal_cabang'     => $header['jurnal_cabang'],
+            'jurnal_created'    => Auth::user()->userid,
             'created_at'        => now(),
             'updated_at'        => now()
         ]);

@@ -29,8 +29,7 @@
             <div class="col-md-10">
                 <label for="inputLastName1" class="form-label">Nominal Simpanan</label>
                 <div class="input-group"> <span class="input-group-text"><i class="fas fa-map-marked-alt"></i></span>
-                    <input type="text" name="nominal" class="form-control form-control-lg border-start-0"
-                        id="whatsapp" placeholder="Ex. @currency(10000000)">
+                    <input type="text" name="nominal" class="form-control form-control-lg border-start-0" id="rupiahInput" oninput="formatRupiah(this)" placeholder="Ex. @currency(10000000)">
                 </div>
             </div>
             <div class="col-md-2">

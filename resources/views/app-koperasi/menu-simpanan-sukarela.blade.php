@@ -59,7 +59,7 @@
                     <th>No</th>
                     <th>Tanggal Simpanan</th>
                     <th>Nama Anggota</th>
-                    <th>Biaya Bunga</th>
+                    <th>Biaya Admin</th>
                     <th>Nominal Total</th>
                     <th>Status Simpanan</th>
                     <th>Action</th>
@@ -258,5 +258,30 @@
             $('#menu-proses-data-simpanan').html('eror');
         });
     });
+</script>
+<script>
+    function formatRupiah(input) {
+        // 1. Ambil value input, lalu buang semua karakter non-angka
+        let value = input.value.replace(/[^0-9]/g, '');
+
+        // 2. Jika input kosong, biarkan kosong
+        if (value === "") {
+            input.value = "";
+            return;
+        }
+
+        // 3. Format angka menggunakan regex untuk menyisipkan titik setiap 3 digit dari kanan
+        let formatted = value.replace(/\B(?=(\d{3})+(?!\d))/g, ".");
+
+        // 4. Masukkan kembali hasil format ke dalam input
+        input.value = formatted;
+    }
+
+    // Opsional: Cara mengambil nilai angka bersih (tanpa titik) saat ingin disimpan ke database
+    function getAngkaBersih() {
+        const inputVal = document.getElementById('rupiahInput').value;
+        const angkaBersih = inputVal.replace(/\./g, ''); // Menghapus semua titik
+        console.log(parseInt(angkaBersih) || 0);
+    }
 </script>
 @endsection

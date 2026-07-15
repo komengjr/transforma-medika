@@ -7,9 +7,13 @@ use App\Imports\Koperasi\PesertaImport;
 use App\Models\KopArisanGroup;
 use App\Models\Koperasi\Cabang;
 use App\Models\Koperasi\Tagihan;
+use App\Models\KopJadwalArisan;
+use App\Models\KopMasterArisan;
+use App\Models\KopMasterPeserta;
 use App\Models\KopProsesPeminjamanBrg;
 use App\Models\KopProsesPeminjamanUang;
 use App\Models\KopTagihanBulan;
+use App\Models\KopTransaksiArisan;
 use App\Models\KopVocherData;
 use Carbon\Carbon;
 use Illuminate\Http\Request;
@@ -319,6 +323,222 @@ class KoperasiController extends Controller
             return 1;
         }
     }
+    // MENU ARISAN SETUP
+    public function menu_koperasi_setup_arisan($akses, $id)
+    {
+        if ($this->url_akses_sub($akses, $id) == true) {
+            $data = DB::table('kop_arisan_group')->where('kop_arisan_group_cabang', Auth::user()->access_cabang)->get();
+            return view('app-koperasi.menu-arisan.arisan-setup', compact('data'), ['akses' => $akses, 'code' => $id]);
+        } else {
+            return Redirect::to('dashboard/home');
+        }
+    }
+    public function menu_koperasi_setup_arisan_save_master_arisan(Request $request)
+    {
+        $request->validate([
+            'kop_master_arisan_code' => 'required|unique:kop_master_arisan,kop_master_arisan_code',
+            'kop_master_arisan_name' => 'required|string|max:255',
+            'kop_master_arisan_nominal_point' => 'required|numeric|min:0',
+            'kop_master_arisan_thn_mulai' => 'required|integer',
+            'kop_master_arisan_thn_selesai' => 'required|integer',
+        ]);
+
+        KopMasterArisan::create([
+            'kop_master_arisan_code' => $request->kop_master_arisan_code,
+            'kop_master_arisan_name' => $request->kop_master_arisan_name,
+            'kop_master_arisan_nominal_point' => $request->kop_master_arisan_nominal_point,
+            'kop_master_arisan_thn_mulai' => $request->kop_master_arisan_thn_mulai,
+            'kop_master_arisan_thn_selesai' => $request->kop_master_arisan_thn_selesai,
+            'kop_master_arisan_status' => 'Draft', // Set default 'Draft' agar bisa diedit dulu
+        ]);
+
+        return response()->json(['success' => true, 'message' => 'Master Arisan Baru Berhasil Dibuat (Status: Draft)!']);
+    }
+    public function menu_koperasi_setup_arisan_get_data(Request $request)
+    {
+        $masterArisanList = KopMasterArisan::select(
+            'id_kop_master_arisan',
+            'kop_master_arisan_name',
+            'kop_master_arisan_status',
+            'kop_master_arisan_nominal_point'
+        )->get();
+
+        $cabangList = KopMasterPeserta::select('kop_master_peserta_cabang')
+            ->distinct()
+            ->whereNotNull('kop_master_peserta_cabang')
+            ->pluck('kop_master_peserta_cabang');
+
+        return response()->json([
+            'master_arisan_list' => $masterArisanList,
+            'cabang_list' => $cabangList
+        ]);
+    }
+    public function menu_koperasi_setup_arisan_get_peserta($cabang)
+    {
+        $peserta = KopMasterPeserta::where('kop_master_peserta_cabang', $cabang)
+            ->where('kop_master_peserta_status', '1')
+            ->select('id_kop_master_peserta', 'kop_master_peserta_name', 'kop_master_peserta_code')
+            ->get();
+
+        return response()->json($peserta);
+    }
+    public function menu_koperasi_setup_arisan_get_jadwal(Request $request)
+    {
+        $idMaster = $request->query('id_master');
+        $tahun = $request->query('tahun');
+
+        $master = KopMasterArisan::findOrFail($idMaster);
+
+        $jadwal = KopJadwalArisan::with(['peserta:id_kop_master_peserta,kop_master_peserta_name,kop_master_peserta_cabang'])
+            ->where('id_kop_master_arisan', $idMaster)
+            ->where('kop_jadwal_arisan_tahun', $tahun)
+            ->get();
+
+        return response()->json([
+            'status_master' => $master->kop_master_arisan_status,
+            'nominal_point' => $master->kop_master_arisan_nominal_point,
+            'jadwal' => $jadwal
+        ]);
+    }
+    public function menu_koperasi_setup_arisan_get_jadwal_store(Request $request)
+    {
+        $request->validate([
+            'id_kop_master_arisan' => 'required|exists:kop_master_arisan,id_kop_master_arisan',
+            'id_kop_master_peserta' => 'required|exists:kop_master_peserta,id_kop_master_peserta',
+            'kop_jadwal_arisan_bulan' => 'required|integer|between:1,12',
+            'kop_jadwal_arisan_tahun' => 'required|integer',
+            'kop_jadwal_arisan_point' => 'required|integer|min:1',
+        ]);
+
+        $master = KopMasterArisan::findOrFail($request->id_kop_master_arisan);
+        if ($master->kop_master_arisan_status === 'Aktif') {
+            return response()->json(['message' => 'Gagal! Status arisan sudah AKTIF (Terkuci).'], 403);
+        }
+
+        $exist = KopJadwalArisan::where('id_kop_master_arisan', $request->id_kop_master_arisan)
+            ->where('id_kop_master_peserta', $request->id_kop_master_peserta)
+            ->where('kop_jadwal_arisan_bulan', $request->kop_jadwal_arisan_bulan)
+            ->where('kop_jadwal_arisan_tahun', $request->kop_jadwal_arisan_tahun)
+            ->exists();
+
+        if ($exist) {
+            return response()->json(['message' => 'Peserta sudah terdaftar di bulan ini!'], 422);
+        }
+
+        KopJadwalArisan::create($request->all());
+        return response()->json(['success' => true, 'message' => 'Berhasil dijadwalkan!']);
+    }
+    public function menu_koperasi_setup_arisan_get_jadwal_delete($id)
+    {
+        $jadwal = KopJadwalArisan::findOrFail($id);
+        $master = KopMasterArisan::findOrFail($jadwal->id_kop_master_arisan);
+
+        if ($master->kop_master_arisan_status === 'Aktif') {
+            return response()->json(['message' => 'Gagal! Data aktif dikunci.'], 403);
+        }
+
+        $jadwal->delete();
+        return response()->json(['success' => true]);
+    }
+    // MENU ARISAN PENAGIHAN
+    public function menu_koperasi_penagihan_arisan($akses, $id)
+    {
+        if ($this->url_akses_sub($akses, $id) == true) {
+            $data = DB::table('kop_arisan_group')->where('kop_arisan_group_cabang', Auth::user()->access_cabang)->get();
+            return view('app-koperasi.menu-arisan.arisan-penagihan', compact('data'), ['akses' => $akses, 'code' => $id]);
+        } else {
+            return Redirect::to('dashboard/home');
+        }
+    }
+    public function menu_koperasi_penagihan_arisan_get_data(Request $request)
+    {
+        $masterAktif = KopMasterArisan::where('kop_master_arisan_status', 'Aktif')
+            ->select('id_kop_master_arisan', 'kop_master_arisan_name', 'kop_master_arisan_nominal_point')
+            ->get();
+
+        return response()->json(['master_aktif' => $masterAktif]);
+    }
+    public function menu_koperasi_penagihan_arisan_get_laporan(Request $request)
+    {
+        $request->validate([
+            'id_master' => 'required|exists:kop_master_arisan,id_kop_master_arisan',
+            'tahun' => 'required|integer',
+        ]);
+
+        $idMaster = $request->query('id_master');
+        $tahun = $request->query('tahun');
+
+        $master = KopMasterArisan::findOrFail($idMaster);
+        $nominalPoin = $master->kop_master_arisan_nominal_point;
+
+        // 1. Ambil data akumulasi poin tahunan per peserta
+        $tagihanTahunan = KopJadwalArisan::select(
+            'id_kop_master_peserta',
+            DB::raw('SUM(kop_jadwal_arisan_point) as total_poin_setahun')
+        )
+            ->where('id_kop_master_arisan', $idMaster)
+            ->where('kop_jadwal_arisan_tahun', $tahun)
+            ->groupBy('id_kop_master_peserta')
+            ->with(['peserta:id_kop_master_peserta,kop_master_peserta_code,kop_master_peserta_name,kop_master_peserta_cabang,kop_master_peserta_no_hp'])
+            ->get();
+
+        // 2. Ambil list bulan yang SUDAH dibayar oleh masing-masing peserta di tahun ini
+        $listPembayaran = KopTransaksiArisan::where('id_kop_master_arisan', $idMaster)
+            ->where('kop_transaksi_tahun', $tahun)
+            ->select('id_kop_master_peserta', 'kop_transaksi_bulan')
+            ->get()
+            ->groupBy('id_kop_master_peserta')
+            ->map(function ($transaksi) {
+                return $transaksi->pluck('kop_transaksi_bulan')->toArray();
+            });
+
+        // 3. Gabungkan data tagihan dengan riwayat pembayaran
+        $resultData = $tagihanTahunan->map(function ($item) use ($nominalPoin, $listPembayaran) {
+            $item->tagihan_per_bulan = $item->total_poin_setahun * $nominalPoin;
+
+            // Ambil array bulan yang sudah lunas (jika belum ada transaksi, default array kosong)
+            $item->bulan_lunas = $listPembayaran->get($item->id_kop_master_peserta, []);
+
+            return $item;
+        });
+
+        return response()->json([
+            'nama_arisan' => $master->kop_master_arisan_name,
+            'nominal_per_poin' => $nominalPoin,
+            'data_tagihan' => $resultData
+        ]);
+    }
+    public function menu_koperasi_penagihan_arisan_payment(Request $request)
+    {
+        $request->validate([
+            'id_kop_master_arisan' => 'required|exists:kop_master_arisan,id_kop_master_arisan',
+            'id_kop_master_peserta' => 'required|exists:kop_master_peserta,id_kop_master_peserta',
+            'kop_transaksi_bulan' => 'required|integer|between:1,12',
+            'kop_transaksi_tahun' => 'required|integer',
+            'kop_transaksi_total_poin' => 'required|integer',
+            'kop_transaksi_nominal' => 'required|numeric',
+            'kop_transaksi_metode' => 'required|string',
+        ]);
+
+        $sudahBayar = KopTransaksiArisan::where('id_kop_master_arisan', $request->id_kop_master_arisan)
+            ->where('id_kop_master_peserta', $request->id_kop_master_peserta)
+            ->where('kop_transaksi_bulan', $request->kop_transaksi_bulan)
+            ->where('kop_transaksi_tahun', $request->kop_transaksi_tahun)
+            ->exists();
+
+        if ($sudahBayar) {
+            return response()->json(['message' => 'Anggota sudah membayar iuran arisan pada bulan terpilih!'], 422);
+        }
+
+        $transaksi = KopTransaksiArisan::create($request->all());
+
+        return response()->json([
+            'success' => true,
+            'message' => 'Pembayaran kas arisan berhasil disimpan ke database!',
+            'data' => $transaksi
+        ]);
+    }
+
     // MENU VOCHER KOPERASI
     public function menu_koperasi_vocher($akses, $id)
     {
@@ -721,12 +941,16 @@ class KoperasiController extends Controller
     {
         try {
             $kode = 'SS-' . now()->format('Ymd') . '-' . strtoupper(uniqid());
+            $angka_bersih = str_replace('.', '', $request->nominal);
+
+            // Ubah menjadi tipe data integer
+            $nominal = (int)$angka_bersih;
             DB::table('kop_simpanan_sukarela')->insert([
                 'kop_simpanan_sukarela_code' => $kode,
                 'kop_master_peserta_code' => $request->anggota,
-                'kop_tagihan_bulan_peserta_pokok' => $request->nominal - (($request->bunga / 100) * $request->nominal),
+                'kop_tagihan_bulan_peserta_pokok' => $nominal - (($request->bunga / 100) * $nominal),
                 'kop_tagihan_bulan_peserta_bunga' => $request->bunga,
-                'kop_tagihan_bulan_peserta_nominal' => $request->nominal,
+                'kop_tagihan_bulan_peserta_nominal' => $nominal,
                 'kop_simpanan_sukarela_date' => $request->tanggal_simpan,
                 'kop_simpanan_sukarela_status' => 0,
                 'created_at' => now()
@@ -739,7 +963,7 @@ class KoperasiController extends Controller
     public function menu_koperasi_sukarela_proses(Request $request)
     {
         $data = DB::table('kop_simpanan_sukarela')->where('kop_simpanan_sukarela_code', $request->code)->first();
-        $akun = DB::table('kop_fin_master_coa')->where('coa_type', 'aset')->get();
+        $akun = DB::table('kop_fin_master_coa')->get();
         return view('app-koperasi.menu-simpanan-sukarela.form-proses-simpanan-sukarela', compact('data', 'akun'));
     }
     public function menu_koperasi_sukarela_proses_save(Request $request)
@@ -756,7 +980,7 @@ class KoperasiController extends Controller
             'jurnal_keterangan' => "Setoran Simpanan Sukarela Anggota Dengan No Simpanan Sukarela. " . $data->kop_simpanan_sukarela_code . " an. " . $data->kop_master_peserta_name . " ( " . $data->kop_master_peserta_nip . " ) ",
             'jurnal_ref_table' => 'kop_simpanan_sukarela',
             'jurnal_ref_code' => $request->code,
-            'jurnal_user' => Auth::user()->userid,
+            'jurnal_user' => $data->kop_master_peserta_code,
             'jurnal_cabang' => $data->kop_master_peserta_cabang,
         ];
         $set = DB::table('kop_fin_master_coa_set')
@@ -1564,8 +1788,8 @@ class KoperasiController extends Controller
                     'jurnal_keterangan' => "Pencairan Pinjaman Barang Dengan No Pengajuan. " . $data->kop_proses_brg_code . " an. " . $data->kop_master_peserta_name . " ( " . $data->kop_master_peserta_nip . " ) ",
                     'jurnal_ref_table' => 'kop_proses_peminjaman_brg',
                     'jurnal_ref_code' => $request->code,
-                    'jurnal_user' => Auth::user()->userid,
-                    'jurnal_cabang' =>$data->kop_master_peserta_cabang,
+                    'jurnal_user' => $data->kop_master_peserta_code,
+                    'jurnal_cabang' => $data->kop_master_peserta_cabang,
                 ];
                 $set = DB::table('kop_fin_master_coa_set')
                     ->where('fin_master_coa_set_cabang', $data->kop_master_peserta_cabang)
@@ -2809,7 +3033,7 @@ class KoperasiController extends Controller
             ->join('kop_fin_master_coa as c', 'd.coa_code', '=', 'c.coa_code')
             ->select('j.jurnal_tgl', 'j.jurnal_no_bukti', 'j.jurnal_keterangan', 'd.coa_code', 'c.coa_name', 'd.jurnal_debit', 'd.jurnal_kredit')
             ->whereBetween('j.jurnal_tgl', [$dari, $sampai])
-            ->where('j.jurnal_cabang',Auth::user()->access_cabang)
+            ->where('j.jurnal_cabang', Auth::user()->access_cabang)
             ->orderBy('j.jurnal_tgl', 'asc')
             ->orderBy('j.id_jurnal', 'asc')
             ->get();

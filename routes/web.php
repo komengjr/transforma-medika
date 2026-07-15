@@ -180,6 +180,8 @@ Route::prefix('{akses}/{id}')->group(function (): void {
     // KOPERASI
     Route::get('menu-koperasi/registrasi-peserta', [KoperasiController::class, 'menu_koperasi_registrasi_peserta'])->name('menu_koperasi_registrasi_peserta');
     Route::get('menu-koperasi/arisan-koperasi', [KoperasiController::class, 'menu_koperasi_arisan'])->name('menu_koperasi_arisan');
+    Route::get('menu-koperasi/setup-arisan', [KoperasiController::class, 'menu_koperasi_setup_arisan'])->name('menu_koperasi_setup_arisan');
+    Route::get('menu-koperasi/penagihan-arisan', [KoperasiController::class, 'menu_koperasi_penagihan_arisan'])->name('menu_koperasi_penagihan_arisan');
     Route::get('menu-koperasi/voucher-koperasi', [KoperasiController::class, 'menu_koperasi_vocher'])->name('menu_koperasi_vocher');
     Route::get('menu-koperasi/iuran-koperasi', [KoperasiController::class, 'menu_koperasi_iuran'])->name('menu_koperasi_iuran');
     Route::get('menu-koperasi/simpanan-sukarela', [KoperasiController::class, 'menu_koperasi_sukarela'])->name('menu_koperasi_sukarela');
@@ -254,6 +256,8 @@ Route::prefix('{akses}/{id}/application')->group(function () {
     // MASTER MEDIK PASIEN
     Route::get('master-data-patient', [MasterMedController::class, 'master_data_patient'])->name('master_data_patient');
     Route::get('master-member-patient', [MasterMedController::class, 'master_member_patient'])->name('master_member_patient');
+
+    Route::get('master-medical/interface-architec', [MasterMedController::class, 'master_medical_interface_architec'])->name('master_medical_interface_architec');
 
 
     Route::get('master-perusahaan/data-perusahaan', [MasterDataController::class, 'master_perusahaan_data'])->name('master_perusahaan_data');

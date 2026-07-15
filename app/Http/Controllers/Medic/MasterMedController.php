@@ -70,4 +70,14 @@ class MasterMedController extends Controller
             return Redirect::to('dashboard/home');
         }
     }
+    // MASTER INTERFACE
+    public function master_medical_interface_architec($akses, $id)
+    {
+        if ($this->url_akses_sub($akses, $id) == true) {
+            $data = DB::table('master_patient')->orderBy('id_master_patient', 'DESC')->get();
+            return view('app-medical.interface.master-interface-architec', ['akses' => $akses, 'code' => $id, 'data' => $data]);
+        } else {
+            return Redirect::to('dashboard/home');
+        }
+    }
 }
