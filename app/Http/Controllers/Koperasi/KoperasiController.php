@@ -10,6 +10,7 @@ use App\Models\Koperasi\Tagihan;
 use App\Models\KopJadwalArisan;
 use App\Models\KopMasterArisan;
 use App\Models\KopMasterPeserta;
+use App\Models\KopPencairanArisan;
 use App\Models\KopProsesPeminjamanBrg;
 use App\Models\KopProsesPeminjamanUang;
 use App\Models\KopTagihanBulan;
@@ -363,10 +364,14 @@ class KoperasiController extends Controller
             'kop_master_arisan_nominal_point'
         )->get();
 
-        $cabangList = KopMasterPeserta::select('kop_master_peserta_cabang')
+        $cabangList = KopMasterPeserta::join('kop_master_cabang', 'kop_master_peserta.kop_master_peserta_cabang', '=', 'kop_master_cabang.kop_master_cabang_code')
+            ->select(
+                'kop_master_cabang.kop_master_cabang_code', // Kolom Kode Cabang
+                'kop_master_cabang.kop_master_cabang_name'  // Kolom Nama Cabang
+            )
             ->distinct()
-            ->whereNotNull('kop_master_peserta_cabang')
-            ->pluck('kop_master_peserta_cabang');
+            ->whereNotNull('kop_master_peserta.kop_master_peserta_cabang')
+            ->get();
 
         return response()->json([
             'master_arisan_list' => $masterArisanList,
@@ -445,7 +450,8 @@ class KoperasiController extends Controller
     {
         if ($this->url_akses_sub($akses, $id) == true) {
             $data = DB::table('kop_arisan_group')->where('kop_arisan_group_cabang', Auth::user()->access_cabang)->get();
-            return view('app-koperasi.menu-arisan.arisan-penagihan', compact('data'), ['akses' => $akses, 'code' => $id]);
+            $akun = DB::table('kop_fin_master_coa')->get();
+            return view('app-koperasi.menu-arisan.arisan-penagihan', compact('data', 'akun'), ['akses' => $akses, 'code' => $id]);
         } else {
             return Redirect::to('dashboard/home');
         }
@@ -519,16 +525,46 @@ class KoperasiController extends Controller
             'kop_transaksi_nominal' => 'required|numeric',
             'kop_transaksi_metode' => 'required|string',
         ]);
+        $data = DB::table('kop_jadwal_arisan')
+            ->join('kop_master_arisan', 'kop_master_arisan.id_kop_master_arisan', '=', 'kop_jadwal_arisan.id_kop_master_arisan')
+            ->join('kop_master_peserta', 'kop_master_peserta.id_kop_master_peserta', '=', 'kop_jadwal_arisan.id_kop_master_peserta')
+            ->join('kop_master_cabang', 'kop_master_cabang.kop_master_cabang_code', '=', 'kop_master_peserta.kop_master_peserta_cabang')
+            ->where('kop_master_arisan.id_kop_master_arisan', $request->id_kop_master_arisan)
+            ->where('kop_jadwal_arisan.id_kop_master_peserta', $request->id_kop_master_peserta)
+            // ->where('kop_jadwal_arisan.kop_jadwal_arisan_bulan', ($request->kop_transaksi_bulan)
+            ->where('kop_jadwal_arisan.kop_jadwal_arisan_tahun', $request->kop_transaksi_tahun)->first();
 
         $sudahBayar = KopTransaksiArisan::where('id_kop_master_arisan', $request->id_kop_master_arisan)
             ->where('id_kop_master_peserta', $request->id_kop_master_peserta)
             ->where('kop_transaksi_bulan', $request->kop_transaksi_bulan)
             ->where('kop_transaksi_tahun', $request->kop_transaksi_tahun)
             ->exists();
-
+        if (!$data) {
+            return response()->json(['message' => 'Data Arisan Tidak di temukan'], 422);
+        }
         if ($sudahBayar) {
             return response()->json(['message' => 'Anggota sudah membayar iuran arisan pada bulan terpilih!'], 422);
         }
+
+        $nominalPokok = $request->kop_transaksi_nominal;
+        // $biayaAdmin = $data->kop_tagihan_bulan_peserta_nominal - $data->kop_tagihan_bulan_peserta_pokok;
+        $kasMasuk = $request->kop_transaksi_nominal;
+        $headerJurnal = [
+            'jurnal_tgl' => now()->format('Y-m-d'),
+            'jurnal_keterangan' => "Setoran Arisan Anggota . " . $data->kop_master_arisan_name . " an. " . $data->kop_master_peserta_name . " ( " . $data->kop_master_peserta_nip . " ) ",
+            'jurnal_ref_table' => 'kop_transaksi_arisan',
+            'jurnal_ref_code' => $data->id_kop_master_arisan,
+            'jurnal_user' => $data->kop_master_peserta_code,
+            'jurnal_cabang' => $data->kop_master_peserta_cabang,
+        ];
+
+        $detailJurnal = [
+            ['coa_code' => $request->kop_transaksi_metode, 'jurnal_debit' => $kasMasuk, 'jurnal_kredit' => 0], // Piutang Anggota
+            ['coa_code' => '2.3.1', 'jurnal_debit' => 0, 'jurnal_kredit' => $nominalPokok],    // Kas/Bank Koperasi
+        ];
+
+
+        $this->accountingService->createJournal($headerJurnal, $detailJurnal);
 
         $transaksi = KopTransaksiArisan::create($request->all());
 
@@ -537,6 +573,157 @@ class KoperasiController extends Controller
             'message' => 'Pembayaran kas arisan berhasil disimpan ke database!',
             'data' => $transaksi
         ]);
+    }
+    // MENU ARISAN PENCAIRAN
+    public function menu_koperasi_pencairan_arisan($akses, $id)
+    {
+        if ($this->url_akses_sub($akses, $id) == true) {
+            $data = DB::table('kop_arisan_group')->where('kop_arisan_group_cabang', Auth::user()->access_cabang)->get();
+            $akun = DB::table('kop_fin_master_coa')->get();
+            return view('app-koperasi.menu-arisan.arisan-pencairan', compact('data', 'akun'), ['akses' => $akses, 'code' => $id]);
+        } else {
+            return Redirect::to('dashboard/home');
+        }
+    }
+    public function menu_koperasi_pencairan_arisan_get_data()
+    {
+        $masterAktif = KopMasterArisan::where('kop_master_arisan_status', 'Aktif')
+            ->select('id_kop_master_arisan', 'kop_master_arisan_name', 'kop_master_arisan_nominal_point')
+            ->get();
+
+        return response()->json(['master_aktif' => $masterAktif]);
+    }
+    public function menu_koperasi_pencairan_arisan_cek_pemenang(Request $request)
+    {
+        $idMaster = $request->query('id_master');
+        $tahun = $request->query('tahun');
+        $bulan = $request->query('bulan');
+
+        $master = KopMasterArisan::findOrFail($idMaster);
+        $nominalRate = $master->kop_master_arisan_nominal_point;
+
+        // 1. Cari peserta yang terjadwal cair di bulan & tahun ini
+        $pemenangJadwal = KopJadwalArisan::where('id_kop_master_arisan', $idMaster)
+            ->where('kop_jadwal_arisan_tahun', $tahun)
+            ->where('kop_jadwal_arisan_bulan', $bulan)
+            ->with(['peserta'])
+            ->get();
+
+        $dataHasil = $pemenangJadwal->map(function ($jadwal) use ($idMaster, $tahun, $bulan, $nominalRate) {
+            $idPeserta = $jadwal->id_kop_master_peserta;
+            $poinBulanIni = $jadwal->kop_jadwal_arisan_point;
+
+            // RUMUS BARU: Poin Bulan Ini x Rate Poin x 12 Bulan Periode
+            $nominalPencairan = $poinBulanIni * $nominalRate * 12;
+
+            // 2. Cek tracking pembayaran dari Januari (bulan 1) sampai Bulan Berjalan ($bulan)
+            $listBulanWajib = range(1, $bulan);
+            $bulanSudahBayar = KopTransaksiArisan::where('id_kop_master_arisan', $idMaster)
+                ->where('id_kop_master_peserta', $idPeserta)
+                ->where('kop_transaksi_tahun', $tahun)
+                ->whereIn('kop_transaksi_bulan', $listBulanWajib)
+                ->pluck('kop_transaksi_bulan')
+                ->toArray();
+
+            $detailReviewBulan = [];
+            $siapCair = true;
+
+            foreach ($listBulanWajib as $b) {
+                $lunas = in_array($b, $bulanSudahBayar);
+                if (!$lunas) {
+                    $siapCair = false;
+                }
+                $detailReviewBulan[] = [
+                    'bulan' => $b,
+                    'status' => $lunas ? 'Lunas' : 'Belum Bayar'
+                ];
+            }
+
+            // 3. Cek double pencairan
+            $sudahCair = KopPencairanArisan::where('id_kop_master_arisan', $idMaster)
+                ->where('id_kop_master_peserta', $idPeserta)
+                ->where('kop_pencairan_tahun', $tahun)
+                ->where('kop_pencairan_bulan', $bulan)
+                ->exists();
+
+            return [
+                'id_peserta' => $idPeserta,
+                'nama_peserta' => $jadwal->peserta->kop_master_peserta_name,
+                'kode_peserta' => $jadwal->peserta->kop_master_peserta_code,
+                'cabang' => $jadwal->peserta->kop_master_peserta_cabang,
+                'poin_bulan_ini' => $poinBulanIni,
+                'nominal_pencairan' => $nominalPencairan,
+                'review_pembayaran' => $detailReviewBulan,
+                'is_siap_cair' => $siapCair,
+                'is_sudah_cair' => $sudahCair
+            ];
+        });
+
+        return response()->json([
+            'nominal_rate' => $nominalRate,
+            'pemenang' => $dataHasil
+        ]);
+    }
+    public function menu_koperasi_pencairan_arisan_proses(Request $request)
+    {
+        $request->validate([
+            'id_kop_master_arisan' => 'required|exists:kop_master_arisan,id_kop_master_arisan',
+            'id_kop_master_peserta' => 'required|exists:kop_master_peserta,id_kop_master_peserta',
+            'kop_pencairan_bulan' => 'required|integer',
+            'kop_pencairan_tahun' => 'required|integer',
+            'kop_pencairan_nominal' => 'required|numeric',
+        ]);
+
+        $data = DB::table('kop_jadwal_arisan')
+            ->join('kop_master_arisan', 'kop_master_arisan.id_kop_master_arisan', '=', 'kop_jadwal_arisan.id_kop_master_arisan')
+            ->join('kop_master_peserta', 'kop_master_peserta.id_kop_master_peserta', '=', 'kop_jadwal_arisan.id_kop_master_peserta')
+            ->join('kop_master_cabang', 'kop_master_cabang.kop_master_cabang_code', '=', 'kop_master_peserta.kop_master_peserta_cabang')
+            ->where('kop_master_arisan.id_kop_master_arisan', $request->id_kop_master_arisan)
+            ->where('kop_jadwal_arisan.id_kop_master_peserta', $request->id_kop_master_peserta)
+            ->where('kop_jadwal_arisan_bulan', $request->kop_pencairan_bulan)
+            ->where('kop_jadwal_arisan_tahun', $request->kop_pencairan_tahun)->first();
+
+        // Proteksi double pencairan
+        $exist = KopPencairanArisan::where('id_kop_master_arisan', $request->id_kop_master_arisan)
+            ->where('id_kop_master_peserta', $request->id_kop_master_peserta)
+            ->where('kop_pencairan_tahun', $request->kop_pencairan_tahun)
+            ->where('kop_pencairan_bulan', $request->kop_pencairan_bulan)
+            ->exists();
+
+        if ($exist) {
+            return response()->json(['message' => 'Dana arisan bulan ini untuk anggota tersebut sudah dicairkan sebelumnya!'], 422);
+        }
+
+        $nominalPokok = $request->kop_pencairan_nominal;
+        // $biayaAdmin = $data->kop_tagihan_bulan_peserta_nominal - $data->kop_tagihan_bulan_peserta_pokok;
+        $kasMasuk = $request->kop_pencairan_nominal;
+        $headerJurnal = [
+            'jurnal_tgl' => now()->format('Y-m-d'),
+            'jurnal_keterangan' => "Setoran Arisan Anggota . " . $data->kop_master_arisan_name . " an. " . $data->kop_master_peserta_name . " ( " . $data->kop_master_peserta_nip . " ) ",
+            'jurnal_ref_table' => 'kop_transaksi_arisan',
+            'jurnal_ref_code' => $data->id_kop_master_arisan,
+            'jurnal_user' => $data->kop_master_peserta_code,
+            'jurnal_cabang' => $data->kop_master_peserta_cabang,
+        ];
+
+        $detailJurnal = [
+            ['coa_code' => '2.3.1', 'jurnal_debit' => $kasMasuk, 'jurnal_kredit' => 0], // Piutang Anggota
+            ['coa_code' => $request->id_akun_keuangan, 'jurnal_debit' => 0, 'jurnal_kredit' => $nominalPokok],    // Kas/Bank Koperasi
+        ];
+
+        $this->accountingService->createJournal($headerJurnal, $detailJurnal);
+        KopPencairanArisan::create([
+            'id_kop_master_arisan' => $request->id_kop_master_arisan,
+            'id_kop_master_peserta' => $request->id_kop_master_peserta,
+            'kop_pencairan_bulan' => $request->kop_pencairan_bulan,
+            'kop_pencairan_tahun' => $request->kop_pencairan_tahun,
+            'kop_pencairan_nominal' => $request->kop_pencairan_nominal,
+            'kop_pencairan_tanggal' => Carbon::now(),
+            'kop_pencairan_status' => 'Cair',
+            'kop_pencairan_keterangan' => $request->kop_pencairan_keterangan ?? 'Pencairan Arisan Bulanan Terjadwal',
+        ]);
+
+        return response()->json(['success' => true, 'message' => 'Sukses! Dana arisan berhasil dicairkan kepada pemenang.']);
     }
 
     // MENU VOCHER KOPERASI

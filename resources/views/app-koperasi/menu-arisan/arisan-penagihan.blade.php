@@ -112,10 +112,10 @@
             </div>
             <form id="formBayarArisan" onsubmit="submitPembayaranKas(event)">
                 <div class="modal-body row g-3">
-                    <input type="hidden" id="modalIdPeserta">
-                    <input type="hidden" id="modalTotalPoin">
-                    <input type="hidden" id="modalRawNominal">
-                    <input type="hidden" id="modalBulanBayar">
+                    <input type="text" id="modalIdPeserta">
+                    <input type="text" id="modalTotalPoin">
+                    <input type="text" id="modalRawNominal">
+                    <input type="text" id="modalBulanBayar">
 
                     <div class="col-md-8">
                         <label class="form-label text-muted mb-0 small">Nama Anggota</label>
@@ -129,9 +129,10 @@
                     <div class="col-12">
                         <label class="form-label fw-semibold">Metode Pembayaran</label>
                         <select id="modalMetodeBayar" class="form-select border-primary" required>
-                            <option value="Tunai">Tunai / Cash</option>
-                            <option value="Transfer">Transfer Bank</option>
-                            <option value="Potong Gaji">Potong Gaji</option>
+                            <option value="">Pilih Akun</option>
+                            @foreach ($akun as $akuns)
+                            <option value="{{ $akuns->coa_code }}">{{ $akuns->coa_code }} - {{ $akuns->coa_name }}</option>
+                            @endforeach
                         </select>
                     </div>
 

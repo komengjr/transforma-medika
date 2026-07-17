@@ -252,8 +252,8 @@
             selectCabang.innerHTML = '<option value="">-- Pilih Cabang --</option>';
             data.cabang_list.forEach(c => {
                 let opt = document.createElement('option');
-                opt.value = c;
-                opt.textContent = 'Cabang ' + c;
+                opt.value = c.kop_master_cabang_code;
+                opt.textContent = `${c.kop_master_cabang_code} - ${c.kop_master_cabang_name}`;
                 selectCabang.appendChild(opt);
             });
         } catch (err) {
@@ -372,7 +372,7 @@
                 // Hilangkan tombol hapus jika status master arisan 'Aktif'
                 const tombolHapusHTML = (currentStatusMaster === 'Aktif') ?
                     '' :
-                    `<button type="button" class="btn btn-sm text-danger p-0 border-0" onclick="hapusJadwal(${j.id_kop_jadwal_arisan})"><i class="bi bi-x-circle-fill"></i></button>`;
+                    `<button type="button" class="btn btn-sm text-danger p-0 border-0" onclick="hapusJadwal(${j.id_kop_jadwal_arisan})"><i class="far fa-trash-alt"></i></button>`;
 
                 rowsHTML += `
                     <div class="member-row">

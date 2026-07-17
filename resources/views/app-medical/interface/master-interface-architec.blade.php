@@ -1,184 +1,237 @@
-<!DOCTYPE html>
-<html lang="id">
+@extends('layouts.layouts')
+@section('base.css')
+<link rel="stylesheet" href="https://cdn.datatables.net/2.2.2/css/dataTables.bootstrap5.css">
+<link rel="stylesheet" href="https://cdn.datatables.net/responsive/3.0.4/css/responsive.bootstrap5.css">
+<style>
+    #button-pick-request {
+        cursor: pointer;
+    }
 
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Architect Lab Data Acquisitor (RS-232 to LAN)</title>
-    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
-    <style>
-        .log-container {
-            background-color: #1e1e1e;
-            color: #00ff00;
-            font-family: 'Courier New', Courier, monospace;
-            height: 350px;
-            overflow-y: auto;
-            padding: 15px;
-            border-radius: 5px;
-        }
-    </style>
-</head>
+    #button-pick-request:hover {
+        background: rgb(223, 217, 25);
+    }
 
-<body class="bg-light">
-
-    <div class="container py-5">
-        <div class="row justify-content-center">
-            <div class="col-md-8">
-                <div class="card shadow border-0 mb-4">
-                    <div class="card-header bg-primary text-white text-center py-3">
-                        <h4 class="mb-0">Koneksi Alat Architect Lab (RS-232 to LAN)</h4>
+    #button-terima-order-barang-peminjaman:hover {
+        background: rgb(223, 217, 25);
+        cursor: pointer;
+    }
+</style>
+@endsection
+@section('content')
+<div class="row mb-3 ">
+    <div class="col">
+        <div class="card bg-200 shadow border border-primary bg-primary">
+            <div class="row gx-0 flex-between-center" style="color: white !important;">
+                <div class="col-sm-auto d-flex align-items-center border-bottom">
+                    <img class="ms-3 mx-3 m-2" src="{{ asset('img/pasien.png') }}" alt="" width="50" />
+                    <div>
+                        <h6 class="text-white fs--1 mb-0 pt-2">Welcome to </h6>
+                        <h4 class="text-white fw-bold mb-1">{{ env('APP_LABEL')}} <span
+                                class="text-white fw-medium">Management
+                                System</span></h4>
                     </div>
-                    <div class="card-body">
-                        <div class="row g-3">
-                            <div class="col-md-6">
-                                <label for="ipAddress" class="form-label">IP Address Converter</label>
-                                <input type="text" class="form-control" id="ipAddress" value="192.168.61.127" placeholder="Contoh: 192.168.1.50">
-                            </div>
-                            <div class="col-md-3">
-                                <label for="portNumber" class="form-label">Port</label>
-                                <input type="number" class="form-control" id="portNumber" value="6501" placeholder="8899">
-                            </div>
-                            <div class="col-md-3 d-flex align-items-end">
-                                <button id="btnConnect" class="btn btn-success w-100 fw-bold">Hubungkan</button>
-                            </div>
-                        </div>
-
-                        <div class="mt-4 d-flex align-items-center justify-content-between">
-                            <div>
-                                <span>Status Alat: </span>
-                                <span id="connectionStatus" class="badge bg-danger fs-6">Terputus</span>
-                            </div>
-                            <div>
-                                <button id="btnClear" class="btn btn-sm btn-outline-secondary">Hapus Log</button>
-                            </div>
-                        </div>
-                    </div>
+                    <img class="ms-n4 d-none d-lg-block "
+                        src="{{ asset('asset/img/illustrations/crm-line-chart.png') }}" alt="" width="150" />
                 </div>
-
-                <div class="card shadow border-0">
-                    <div class="card-header bg-dark text-white fw-bold">
-                        Stream Data Alat (Terambil Otomatis)
-                    </div>
-                    <div class="card-body">
-                        <div id="dataLog" class="log-container">
-                            [Sistem Ready] Silakan isi IP Converter dan klik "Hubungkan"...
-                        </div>
-                    </div>
-                    <div class="card-footer text-muted text-end small">
-                        Menggunakan Protokol WebSocket/TCP Bridge
-                    </div>
+                <div class="col-xl-auto px-3 py-2">
+                    <h6 class="text-white fs--1 mb-0">Menu : </h6>
+                    <h4 class="text-white fw-bold mb-0">Data <span class="text-white fw-medium">Pasien</span>
+                    </h4>
                 </div>
+            </div>
+        </div>
+    </div>
+</div>
+<div class="card mb-3">
+    <div class="card-body">
+        <div class="d-flex align-items-center justify-content-between mb-4 pb-3 border-bottom">
+            <div>
+                <h2 class="fw-bold text-dark mb-0">Architect Lab Data System</h2>
+                <p class="text-muted mb-0">Penerimaan data otomatis via RS-232 to LAN (TCP Client Mode)</p>
+            </div>
+            <div>
+                <span id="mainStatusBadge" class="badge bg-danger status-badge shadow-sm">
+                    <i id="mainStatusIcon" class="bi bi-broadcast-pin me-1"></i>
+                    <span id="mainStatusText">ALAT DISKONEK</span>
+                </span>
+            </div>
+        </div>
+    </div>
+</div>
 
+<div class="row g-3 mb-3">
+    <div class="col-lg-4">
+        <div class="card border-0 shadow-sm mb-3">
+            <div class="card-header bg-white fw-bold text-secondary">Foto Perangkat Serial Server</div>
+            <div class="card-body text-center">
+                <div class="device-img-container mb-3 border">
+                    <img id="deviceImage" src="https://sinergimsas.net/wp-content/uploads/2019/03/c4000-246x200.png" alt="ZQWL Device Image">
+                </div>
+                <small class="text-muted d-block">Model: ZQWL-EthRS (Serial to Ethernet)</small>
+            </div>
+        </div>
+
+        <div class="card border-0 shadow-sm mb-3">
+            <div class="card-body text-center p-4">
+                <h6 class="text-uppercase text-muted fw-bold mb-3 small">Live Status</h6>
+                <div id="statusIndicator" class="spinner-grow text-danger mb-3" role="status" style="width: 2.5rem; height: 2.5rem;"></div>
+                <h4 id="statusText" class="fw-bold text-danger">Alat Terputus</h4>
+                <p id="deviceIpDetail" class="text-muted small mb-0">Menunggu sambungan dari port 6501...</p>
+            </div>
+        </div>
+
+        <div class="card border-0 shadow-sm">
+            <div class="card-header bg-white fw-bold text-secondary">Parameter Konfigurasi</div>
+            <div class="card-body p-0">
+                <table class="table table-striped mb-0 small">
+                    <tbody>
+                        <tr>
+                            <td class="ps-3 text-muted">Mode Perangkat</td>
+                            <td class="fw-bold text-end pe-3">TCP_CLIENT</td>
+                        </tr>
+                        <tr>
+                            <td class="ps-3 text-muted">IP Target (PC Anda)</td>
+                            <td class="fw-bold text-end pe-3 text-primary">192.168.61.127</td>
+                        </tr>
+                        <tr>
+                            <td class="ps-3 text-muted">Remote Port Target</td>
+                            <td class="fw-bold text-end pe-3">6501</td>
+                        </tr>
+                        <tr>
+                            <td class="ps-3 text-muted">Baudrate Serial</td>
+                            <td class="fw-bold text-end pe-3">9600 bps</td>
+                        </tr>
+                    </tbody>
+                </table>
             </div>
         </div>
     </div>
 
-    <script>
-        let socket = null;
-        const btnConnect = document.getElementById('btnConnect');
-        const connectionStatus = document.getElementById('connectionStatus');
-        const dataLog = document.getElementById('dataLog');
-        const btnClear = document.getElementById('btnClear');
+    <div class="col-lg-8">
+        <div class="card border-0 shadow-sm">
+            <div class="card-header bg-white d-flex justify-content-between align-items-center py-3">
+                <h5 class="mb-0 fw-bold text-dark">Data Terambil (Real-time Stream)</h5>
+                <button id="btnClearLog" class="btn btn-sm btn-outline-secondary px-3">Bersihkan Layar</button>
+            </div>
+            <div class="card-body">
+                <div id="terminalLog" class="log-terminal">
+                    [SYSTEM] Menunggu koneksi dari server backend...
+                </div>
+            </div>
+            <div class="card-footer bg-white text-muted small text-end">
+                Data akan muncul otomatis di atas begitu alat melakukan transmisi.
+            </div>
+        </div>
+    </div>
+</div>
+@endsection
+@section('base.js')
+<div class="modal fade" id="modal-pegawai-xl" data-bs-keyboard="false" data-bs-backdrop="static" tabindex="-1"
+    aria-labelledby="staticBackdropLabel" aria-hidden="true">
+    <div class="modal-dialog modal-dialog-centered modal-xl" role="document">
+        <div class="modal-content border-0">
+            <div class="position-absolute top-0 end-0 mt-3 me-3 z-index-1">
+                <button class="btn-close btn btn-sm btn-circle d-flex flex-center transition-base"
+                    data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <div id="menu-pegawai-xl"></div>
+        </div>
+    </div>
+</div>
+<script src="https://cdn.datatables.net/2.2.2/js/dataTables.js"></script>
+<script src="https://cdn.datatables.net/2.2.2/js/dataTables.bootstrap5.js"></script>
+<script src="https://cdn.datatables.net/responsive/3.0.4/js/dataTables.responsive.js"></script>
+<script src="https://cdn.datatables.net/responsive/3.0.4/js/responsive.bootstrap5.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
 
-        // Fungsi untuk mencetak data/log ke layar
-        function appendLog(message, isData = false) {
-            const time = new Date().toLocaleTimeString();
-            const formatMsg = isData ? `[${time}] DATA -> ${message}` : `[${time}] SYSTEM: ${message}`;
-            dataLog.innerHTML += `<br>${formatMsg}`;
-            dataLog.scrollTop = dataLog.scrollHeight; // Auto-scroll ke bawah
+<script>
+    const terminalLog = document.getElementById('terminalLog');
+    const statusIndicator = document.getElementById('statusIndicator');
+    const statusText = document.getElementById('statusText');
+    const deviceIpDetail = document.getElementById('deviceIpDetail');
+    const btnClearLog = document.getElementById('btnClearLog');
+
+    // Element Status Atas
+    const mainStatusBadge = document.getElementById('mainStatusBadge');
+    const mainStatusIcon = document.getElementById('mainStatusIcon');
+    const mainStatusText = document.getElementById('mainStatusText');
+
+    // Sambungkan ke WebSocket Backend (Port 8080)
+    const ws = new WebSocket('ws://localhost:8080');
+
+    ws.onopen = () => {
+        printLog('Terhubung ke Backend Server. Siap menerima stream data dari port 6501.');
+    };
+
+    // PROSES PENERIMAAN DATA OTOMATIS
+    ws.onmessage = (event) => {
+        const message = event.data;
+
+        // Cek sinyal internal koneksi alat dari backend
+        if (message.startsWith('___CONNECTED___')) {
+            const ipAlat = message.split(':')[1];
+            setDeviceStatus(true, ipAlat);
+            printLog(`Alat dengan IP ${ipAlat} berhasil terhubung ke server!`, 'info');
+        } else if (message === '___DISCONNECTED___') {
+            setDeviceStatus(false);
+            printLog('Koneksi dari alat terputus!', 'error');
+        } else {
+            // JIKA MURNI DATA DARI ALAT ARCHITECT LAB
+            printLog(message, 'data');
+        }
+    };
+
+    ws.onclose = () => {
+        setDeviceStatus(false);
+        printLog('Koneksi ke Backend Server terputus! Pastikan Anda sudah menjalankan node server.js', 'error');
+    };
+
+    // Fungsi manipulasi status UI Konek dan Diskonek
+    function setDeviceStatus(isConnected, ip = '') {
+        if (isConnected) {
+            // Tampilan Tengah Card
+            statusIndicator.className = "spinner-grow text-success mb-3";
+            statusText.textContent = "Alat Terhubung";
+            statusText.className = "fw-bold text-success";
+            deviceIpDetail.textContent = `Menerima data aktif dari IP: ${ip}`;
+
+            // Tampilan Badge Atas (KONEK)
+            mainStatusBadge.className = "badge bg-success status-badge shadow-sm animate__animated animate__fadeIn";
+            mainStatusIcon.className = "bi bi-check-circle-fill me-1";
+            mainStatusText.textContent = "ALAT TERHUBUNG";
+        } else {
+            // Tampilan Tengah Card
+            statusIndicator.className = "spinner-grow text-danger mb-3";
+            statusText.textContent = "Alat Terputus";
+            statusText.className = "fw-bold text-danger";
+            deviceIpDetail.textContent = "Menunggu perangkat mengirim data ke port 6501...";
+
+            // Tampilan Badge Atas (DISKONEK)
+            mainStatusBadge.className = "badge bg-danger status-badge shadow-sm";
+            mainStatusIcon.className = "bi bi-exclamation-triangle-fill me-1";
+            mainStatusText.textContent = "ALAT DISKONEK";
+        }
+    }
+
+    // Fungsi mencetak log ke terminal tiruan
+    function printLog(text, type = 'system') {
+        const time = new Date().toLocaleTimeString();
+        let formattedText = '';
+
+        if (type === 'data') {
+            formattedText = `<div class="mb-1"><span class="text-warning">[${time}] DATA IN &gt;&gt;</span> <span class="text-white fw-bold">${text}</span></div>`;
+        } else if (type === 'error') {
+            formattedText = `<div class="text-danger mb-1">[${time}] ERROR: ${text}</div>`;
+        } else {
+            formattedText = `<div class="text-muted mb-1">[${time}] SYS: ${text}</div>`;
         }
 
-        // Event Klik Tombol Hubungkan
-        btnConnect.addEventListener('click', () => {
-            if (socket && socket.readyState === WebSocket.OPEN) {
-                // Jika sudah konek, klik tombol akan memutuskan koneksi
-                socket.close();
-                return;
-            }
+        terminalLog.innerHTML += formattedText;
+        terminalLog.scrollTop = terminalLog.scrollHeight;
+    }
 
-            const ip = document.getElementById('ipAddress').value;
-            const port = document.getElementById('portNumber').value;
-
-            if (!ip || !port) {
-                alert('IP Address dan Port Converter tidak boleh kosong!');
-                return;
-            }
-
-            appendLog(`Mencoba menghubungkan ke alat via ws://${ip}:${port}...`);
-            btnConnect.disabled = true;
-            btnConnect.textContent = 'Menghubungkan...';
-
-            // Membuat koneksi ke converter LAN (Bisa menggunakan WebSocket converter bawaan perangkat atau websocket bridge)
-            // Catatan: Pastikan Converter RS232-LAN Anda mendukung mode WebSocket Server.
-            try {
-                socket = new WebSocket(`ws://${ip}:${port}`);
-
-                // 1. KETIKA SUDAH CONNECTING OTOMATIS
-                socket.onopen = function(e) {
-                    connectionStatus.textContent = 'Terhubung';
-                    connectionStatus.className = 'badge bg-success fs-6';
-                    btnConnect.disabled = false;
-                    btnConnect.textContent = 'Putuskan';
-                    btnConnect.className = 'btn btn-danger w-100 fw-bold';
-
-                    appendLog("Koneksi sukses! Menunggu alat mengirimkan data...");
-
-                    // JIKA alat butuh dipicu perintah (Trigger Command) untuk mengeluarkan data:
-                    // Contoh mengirim byte hex khusus Architect Lab untuk meminta data:
-                    // socket.send("POLL_DATA_COMMAND");
-                };
-
-                // 2. DATA OTOMATIS TERAMBIL / DITERIMA
-                socket.onmessage = function(event) {
-                    // event.data berisi string data mentah (Raw ASCII/Hex) dari port RS-232 alat Architect
-                    const dataDiterima = event.data;
-
-                    // Tampilkan ke layar secara otomatis
-                    appendLog(dataDiterima, true);
-
-                    // Di sini Anda bisa menambahkan fungsi parsing data Lab (misal memisahkan data pasien, hasil tes, dll)
-                    parseLabData(dataDiterima);
-                };
-
-                // Ketika Koneksi Terputus
-                socket.onclose = function(event) {
-                    connectionStatus.textContent = 'Terputus';
-                    connectionStatus.className = 'badge bg-danger fs-6';
-                    btnConnect.disabled = false;
-                    btnConnect.textContent = 'Hubungkan';
-                    btnConnect.className = 'btn btn-success w-100 fw-bold';
-
-                    if (event.wasClean) {
-                        appendLog(`Koneksi ditutup dengan bersih.`);
-                    } else {
-                        appendLog(`Koneksi terputus tiba-tiba (Periksa kabel LAN / IP Converter).`);
-                    }
-                };
-
-                // Ketika Terjadi Error
-                socket.onerror = function(error) {
-                    appendLog(`Error: Gagal terhubung ke IP tersebut.`);
-                    console.error("WebSocket Error: ", error);
-                };
-
-            } catch (err) {
-                appendLog(`Error inisialisasi: ${err.message}`);
-                btnConnect.disabled = false;
-                btnConnect.textContent = 'Hubungkan';
-            }
-        });
-
-        // Simulasi fungsi parsing data khusus alat Architect
-        function parseLabData(rawData) {
-            console.log("Proses parsing data lab:", rawData);
-            // Anda bisa menyimpan rawData ke database lokal atau server di sini via fetch API
-        }
-
-        // Hapus Log Layar
-        btnClear.addEventListener('click', () => {
-            dataLog.innerHTML = '[Log dibersihkan]';
-        });
-    </script>
-</body>
-
-</html>
+    btnClearLog.addEventListener('click', () => {
+        terminalLog.innerHTML = `<div class="text-muted">[Layar dibersihkan pada ${new Date().toLocaleTimeString()}]</div>`;
+    });
+</script>
+@endsection

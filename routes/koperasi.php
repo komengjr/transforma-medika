@@ -57,6 +57,10 @@ Route::prefix('koperasi/')->group(function (): void {
     Route::get('menu-koperasi/penagihan-arisan/get-laporan', [KoperasiController::class, 'menu_koperasi_penagihan_arisan_get_laporan'])->name('menu_koperasi_penagihan_arisan_get_laporan');
     Route::post('menu-koperasi/penagihan-arisan/payment', [KoperasiController::class, 'menu_koperasi_penagihan_arisan_payment'])->name('menu_koperasi_penagihan_arisan_payment');
 
+    Route::get('menu-koperasi/pencairan-arisan/get-data', [KoperasiController::class, 'menu_koperasi_pencairan_arisan_get_data'])->name('menu_koperasi_pencairan_arisan_get_data');
+    Route::get('menu-koperasi/pencairan-arisan/cek-pemenang', [KoperasiController::class, 'menu_koperasi_pencairan_arisan_cek_pemenang'])->name('menu_koperasi_pencairan_arisan_cek_pemenang');
+    Route::post('menu-koperasi/pencairan-arisan/proses', [KoperasiController::class, 'menu_koperasi_pencairan_arisan_proses'])->name('menu_koperasi_pencairan_arisan_proses');
+
     Route::post('menu-koperasi/voucher-koperasi/add-data', [KoperasiController::class, 'menu_koperasi_vocher_add'])->name('menu_koperasi_vocher_add');
     Route::post('menu-koperasi/voucher-koperasi/save-data', [KoperasiController::class, 'menu_koperasi_vocher_save'])->name('menu_koperasi_vocher_save');
     Route::post('menu-koperasi/voucher-koperasi/proses-data-vocher', [KoperasiController::class, 'menu_koperasi_vocher_proses'])->name('menu_koperasi_vocher_proses');
