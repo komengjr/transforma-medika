@@ -25,6 +25,7 @@ class KopFinJurnal extends Migration
 
             $table->string('jurnal_user');
             $table->string('jurnal_cabang');
+            $table->string('jurnal_created');
             $table->timestamps();
         });
     }

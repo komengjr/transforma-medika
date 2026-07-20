@@ -53,10 +53,20 @@
             border-left: 5px solid #007bff;
         }
 
+        .form-grid {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 15px;
+        }
+
         .input-group {
             display: flex;
             flex-direction: column;
-            margin-bottom: 15px;
+            margin-bottom: 5px;
+        }
+
+        .input-group.full-width {
+            grid-column: span 2;
         }
 
         .input-group label {
@@ -73,12 +83,20 @@
             border-radius: 4px;
             font-size: 1rem;
             font-family: 'Times New Roman', Times, serif;
+            background-color: #fff;
+        }
+
+        .input-group input[readonly] {
+            background-color: #e9ecef;
+            color: #495057;
+            cursor: not-allowed;
         }
 
         .content {
             font-size: 1.1rem;
             line-height: 1.6;
             text-align: justify;
+            margin-top: 15px;
         }
 
         .date {
@@ -161,6 +179,14 @@
                 padding: 25px 15px;
             }
 
+            .form-grid {
+                grid-template-columns: 1fr;
+            }
+
+            .input-group.full-width {
+                grid-column: span 1;
+            }
+
             .signature-wrapper {
                 align-items: center;
             }
@@ -180,29 +206,56 @@
 
         <!-- Section Input Data -->
         <div class="form-section">
-            <div class="input-group">
-                <label>Nama Lengkap</label>
-                <input type="text" id="input-nama" value="{{ $data->kop_master_peserta_name }}" readonly>
-                <input type="text" id="data-code" value="{{ $data->kop_proses_uang_code }}" hidden>
-            </div>
+            <div class="form-grid">
+                <!-- Data Anggota -->
+                <div class="input-group">
+                    <label>Nama Lengkap Anggota</label>
+                    <input type="text" id="input-nama" value="{{ $data->kop_master_peserta_name }}" readonly>
+                    <input type="text" id="data-code" value="{{ $data->kop_proses_uang_code }}" hidden>
+                </div>
 
-            <div class="input-group">
-                <label>Nominal Peminjaman Uang (Rp)</label>
-                <input type="text" id="input-nominal" value="@currency($data->kop_proses_uang_nominal)" readonly>
-            </div>
+                <div class="input-group">
+                    <label>Tanggal Masuk Anggota</label>
+                    <input type="text" value="" readonly>
+                </div>
 
-            <div class="input-group">
-                <label>Persetujuan</label>
-                <select id="input-kebutuhan">
-                    <option value="">-- Pilih Persetujuan --</option>
-                    <option value="Y">Setuju</option>
-                    <option value="N">Tidak Setuju</option>
-                </select>
+                <!-- Rekam Jejak Kredit -->
+                <div class="input-group">
+                    <label>Jumlah Histori Pinjam (Frekuensi)</label>
+                    <input type="text" value="" readonly>
+                </div>
+
+                <div class="input-group">
+                    <label>Sisa Pinjaman Berjalan</label>
+                    <input type="text" value="" readonly>
+                </div>
+
+                <!-- Informasi Transaksi -->
+                <div class="input-group">
+                    <label>Nominal Pengajuan Baru (Rp)</label>
+                    <input type="text" id="input-nominal" value="@currency($data->kop_proses_uang_nominal)" readonly>
+                </div>
+
+                <div class="input-group">
+                    <label>Status Kelayakan / Kolektibilitas</label>
+                    <input type="text" value="" readonly style="font-weight: bold;">
+                </div>
+
+                <!-- Keputusan Validasi -->
+                <div class="input-group full-width">
+                    <label>Keputusan Persetujuan Verifikator</label>
+                    <select id="input-kebutuhan">
+                        <option value="">-- Pilih Persetujuan --</option>
+                        <option value="Y">Setuju</option>
+                        <option value="N">Tidak Setuju</option>
+                    </select>
+                </div>
             </div>
         </div>
 
         <div class="content">
-            <p>Saya yang bertanda tangan di bawah ini mengajukan permohonan Peminjaman Uang dengan rincian data di atas. Saya bertanggung jawab penuh atas penggunaan voucher tersebut sesuai dengan kebijakan perusahaan.</p>
+            <p>Berdasarkan data keanggotaan di atas, yang bersangkutan telah terdaftar sebagai anggota sejak tanggal <b>20-10-2025</b> dan telah melakukan pinjaman sebanyak <b>{{ $data->kop_proses_uang_frequency ?? '0' }} kali</b>.</p>
+            <p>Saya yang bertanda tangan di bawah ini selaku verifikator menyatakan bertanggung jawab penuh atas keputusan pengajuan peminjaman ini sesuai dengan aturan kelayakan internal yang berlaku pada sistem koperasi.</p>
         </div>
 
         <div class="signature-wrapper">
@@ -217,7 +270,7 @@
                     <button class="btn-clear" onclick="clearCanvas()">Ulangi</button>
                     <button class="btn-save" onclick="saveData()">Simpan Data</button>
                 </div>
-                <p><strong id="display-nama">( {{  $data->kop_user_verifikasi_name }} )</strong></p>
+                <p><strong id="display-nama">( {{ $data->kop_user_verifikasi_name }} )</strong></p>
             </div>
         </div>
 
@@ -229,6 +282,7 @@
             <textarea id="base64-output" readonly></textarea>
         </div>
     </div>
+
     <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.7.1/jquery.min.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
 
@@ -299,12 +353,12 @@
                 buttonsStyling: true
             });
             swalWithBootstrapButtons.fire({
-                title: "Persetujuan Signeture?",
-                text: "Yakin Untuk Melakukan Penyimpanan Sign!",
+                title: "Persetujuan Tanda Tangan?",
+                text: "Yakin untuk melakukan penyimpanan tanda tangan digital?",
                 icon: "warning",
                 showCancelButton: true,
-                confirmButtonText: "Yes,Setuju",
-                cancelButtonText: "No, Batal!",
+                confirmButtonText: "Ya, Setuju",
+                cancelButtonText: "Batal",
                 reverseButtons: true
             }).then((result) => {
                 if (result.isConfirmed) {
@@ -320,8 +374,7 @@
                         Swal.fire({
                             icon: "error",
                             title: "Oops...",
-                            text: "Pastikan Persetujuan Sudah Terisi!",
-                            footer: "<a href=\"#\">Why do I have this issue?</a>"
+                            text: "Pastikan Keputusan Persetujuan Sudah Terisi!"
                         });
                         return;
                     }
@@ -334,8 +387,7 @@
                         Swal.fire({
                             icon: "error",
                             title: "Oops...",
-                            text: "Pastikan Tanda Tangan Sudah Terisi!",
-                            footer: "<a href=\"#\">Why do I have this issue?</a>"
+                            text: "Pastikan Tanda Tangan Sudah Terisi!"
                         });
                         return;
                     }
@@ -344,11 +396,12 @@
 
                     // Tampilkan Hasil
                     document.getElementById('data-summary').innerHTML = `
-                    <b>Nama:</b> ${nama}<br>
-                    <b>Nominal:</b> ${nominal}<br>
-                    <b>Persetujuan :</b> ${kebutuhan}`;
+                        <b>Nama:</b> ${nama}<br>
+                        <b>Nominal Pengajuan:</b> ${nominal}<br>
+                        <b>Persetujuan:</b> ${kebutuhan === 'Y' ? 'Setuju' : 'Tidak Setuju'}`;
                     document.getElementById('base64-output').value = base64String;
                     document.getElementById('result-area').style.display = 'block';
+
                     $.ajax({
                         url: "{{ route('data_peminjaman_uang_sign') }}",
                         type: "POST",
@@ -363,32 +416,22 @@
                         dataType: 'html',
                     }).done(function(data) {
                         if (data == 1) {
-                            Swal.fire('Berhasil!', 'Tanda Tangan telah dibuat.', 'success').then(() => {
+                            Swal.fire('Berhasil!', 'Tanda Tangan telah disimpan.', 'success').then(() => {
                                 location.reload();
                             });
                         } else {
-                            Swal.fire('Gagal!', 'Tanda Tangan Gagal dibuat.', 'error').then(() => {
-                                location.reload();
-                            });
+                            Swal.fire('Gagal!', 'Gagal memproses tanda tangan.', 'error');
                         }
                     }).fail(function() {
-                        Swal.fire('Gagal!', 'Tanda Tangan Gagal dibuat.', 'error').then(() => {
-                            location.reload();
-                        });
+                        Swal.fire('Gagal!', 'Koneksi ke server terputus.', 'error');
                     });
+
                     // Scroll otomatis ke hasil
                     document.getElementById('result-area').scrollIntoView({
                         behavior: 'smooth'
                     });
-                } else if (result.dismiss === Swal.DismissReason.cancel) {
-                    swalWithBootstrapButtons.fire({
-                        title: "Cancelled",
-                        text: "Your imaginary file is safe :)",
-                        icon: "error"
-                    });
                 }
             });
-
         }
     </script>
 </body>

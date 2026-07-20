@@ -9,7 +9,7 @@ use Facade\FlareClient\Http\Response;
 use Illuminate\Database\QueryException;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
-
+use Illuminate\Support\Facades\Log;
 class ApiCntroller extends Controller
 {
     public function data_product()
@@ -77,5 +77,27 @@ class ApiCntroller extends Controller
             'v_log_whatsapp_status' => $request->status
         ]);
         return response()->json('Berhasil Kirim');
+    }
+    public function interface_alat(Request $request)
+    {
+        $payload = $request->all();
+
+        // Catat ke log Laravel sebagai bukti data berhasil ditangkap middleware
+        Log::info('Data ASTM Alat Masuk:', $payload);
+
+        $noLab = $request->input('nolab');
+        $results = $request->input('result', []);
+
+        // Lakukan proses validasi dan penyimpanan ke database di sini
+        // Contoh:
+        // foreach($results as $res) {
+        //     HasilLab::create([...]);
+        // }
+
+        return response()->json([
+            'status' => 'success',
+            'message' => 'Laravel berhasil menerima data untuk NoLab: ' . $noLab,
+            'total_data' => count($results)
+        ], 200);
     }
 }

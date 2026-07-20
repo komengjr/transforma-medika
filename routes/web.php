@@ -191,6 +191,8 @@ Route::prefix('{akses}/{id}')->group(function (): void {
     Route::get('menu-peminjaman/peminjaman-barang', [KoperasiController::class, 'menu_peminjaman_barang'])->name('menu_peminjaman_barang');
     Route::get('menu-peminjaman/list-peminjaman', [KoperasiController::class, 'menu_peminjaman_list'])->name('menu_peminjaman_list');
     Route::get('menu-peminjaman/list-peminjaman-barang', [KoperasiController::class, 'menu_peminjaman_list_barang'])->name('menu_peminjaman_list_barang');
+    Route::get('menu-koperasi/pembelian-barang-koperasi', [KoperasiController::class, 'menu_koperasi_pembelian_barang'])->name('menu_koperasi_pembelian_barang');
+    Route::get('menu-koperasi/mutasi-rekening-bank', [KoperasiController::class, 'menu_koperasi_mutasi_rekening_bank'])->name('menu_koperasi_mutasi_rekening_bank');
     Route::get('laporan-koperasi/laporan-tagihan', [KoperasiController::class, 'laporan_koperasi_tagihan'])->name('laporan_koperasi_tagihan');
     Route::get('laporan-koperasi/laporan-mutasi-bank', [KoperasiController::class, 'laporan_koperasi_mutasi_bank'])->name('laporan_koperasi_mutasi_bank');
     Route::get('laporan-koperasi/laporan-jurnal-umum', [KoperasiController::class, 'laporan_koperasi_jurnal_umum'])->name('laporan_koperasi_jurnal_umum');

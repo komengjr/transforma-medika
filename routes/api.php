@@ -30,5 +30,9 @@ Route::prefix('v2/')->group(function (): void {
     Route::get('getway/whatsapp-update/{code}', [ApiCntroller::class, 'getway_whatsapp_status'])->name('getway_whatsapp_status');
     Route::post('getway/whatsapp-update', [ApiCntroller::class, 'getway_whatsapp_update'])->name('getway_whatsapp_update');
 });
+Route::prefix('interface/')->group(function (): void {
+    Route::get('alat', [ApiCntroller::class, 'interface_alat'])->name('interface_alat');
+
+});
 Route::get('/peminjaman-uang', [KoperasiController::class, 'akutansi_koperasi_get_peminjaman']);
 Route::post('/peminjaman-uang/{id}/cairkan', [KoperasiController::class, 'akutansi_koperasi_get_peminjaman_cairkan']);

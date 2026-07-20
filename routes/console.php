@@ -3,6 +3,8 @@
 use Illuminate\Foundation\Inspiring;
 use Illuminate\Support\Facades\Artisan;
 use Illuminate\Support\Facades\DB;
+use Illuminate\Console\Scheduling\Schedule;
+
 
 /*
 |--------------------------------------------------------------------------
@@ -14,6 +16,9 @@ use Illuminate\Support\Facades\DB;
 | simple approach to interacting with each command's IO methods.
 |
 */
+
+// Artisan::command('koperasi:susutkan-aset');
+
 
 Artisan::command('inspire', function () {
     $this->comment(Inspiring::quote());

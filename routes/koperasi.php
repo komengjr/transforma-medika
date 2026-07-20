@@ -24,6 +24,7 @@ Route::prefix('koperasi/')->group(function (): void {
     Route::post('menu-peminjaman/list-peminjaman/cek-status-kontrak', [KoperasiController::class, 'menu_peminjaman_list_cek_kontrak'])->name('menu_peminjaman_list_cek_kontrak');
     Route::post('menu-peminjaman/list-peminjaman/cek-status-kontrak/payment', [KoperasiController::class, 'menu_peminjaman_list_cek_kontrak_payment'])->name('menu_peminjaman_list_cek_kontrak_payment');
     Route::post('menu-peminjaman/list-peminjaman/cek-status-kontrak/payment_fix', [KoperasiController::class, 'menu_peminjaman_list_cek_kontrak_payment_fix'])->name('menu_peminjaman_list_cek_kontrak_payment_fix');
+    Route::post('menu-peminjaman/list-peminjaman/cek-status-kontrak/payment-multi', [KoperasiController::class, 'menu_peminjaman_list_cek_kontrak_payment_multi'])->name('menu_peminjaman_list_cek_kontrak_payment_multi');
     Route::post('menu-peminjaman/list-peminjaman/cek-status-kontrak/penyelesaian-kontrak', [KoperasiController::class, 'menu_peminjaman_list_cek_kontrak_penyelesaian_kontrak'])->name('menu_peminjaman_list_cek_kontrak_penyelesaian_kontrak');
 
     Route::post('menu-peminjaman/list-peminjaman-barang/proses-pengajuan-peminjaman-barang', [KoperasiController::class, 'menu_peminjaman_list_barang_proses_pengajuan'])->name('menu_peminjaman_list_barang_proses_pengajuan');
@@ -32,6 +33,7 @@ Route::prefix('koperasi/')->group(function (): void {
     Route::post('menu-peminjaman/list-peminjaman-barang/cek-status-kontrak', [KoperasiController::class, 'menu_peminjaman_list_barang_cek_status_kontrak'])->name('menu_peminjaman_list_barang_cek_status_kontrak');
     Route::post('menu-peminjaman/list-peminjaman-barang/cek-status-kontrak/payment', [KoperasiController::class, 'menu_peminjaman_list_barang_cek_status_kontrak_payment'])->name('menu_peminjaman_list_barang_cek_status_kontrak_payment');
     Route::post('menu-peminjaman/list-peminjaman-barang/cek-status-kontrak/payment-fix', [KoperasiController::class, 'menu_peminjaman_list_barang_cek_status_kontrak_payment_fix'])->name('menu_peminjaman_list_barang_cek_status_kontrak_payment_fix');
+    Route::post('menu-peminjaman/list-peminjaman-barang/cek-status-kontrak/payment-multi', [KoperasiController::class, 'menu_peminjaman_list_barang_cek_status_kontrak_payment_multi'])->name('menu_peminjaman_list_barang_cek_status_kontrak_payment_multi');
 
     Route::post('menu-peminjaman/list-peminjaman/proses-pengajuan-peminjaman-uang-baru', [KoperasiController::class, 'menu_peminjaman_list_proses_pengajuan_baru'])->name('menu_peminjaman_list_proses_pengajuan_baru');
     Route::post('menu-peminjaman/list-peminjaman/proses-pengajuan-peminjaman-uang-baru/save', [KoperasiController::class, 'menu_peminjaman_list_proses_pengajuan_baru_save'])->name('menu_peminjaman_list_proses_pengajuan_baru_save');
@@ -83,10 +85,18 @@ Route::prefix('koperasi/')->group(function (): void {
 
     Route::get('menu-koperasi/tagihan-koperasi/load', [KoperasiController::class, 'menu_koperasi_tagihan_koperasi_load'])->name('menu_koperasi_tagihan_koperasi_load');
 
+    Route::get('menu-koperasi/pembelian-barang-koperasi/get-data', [KoperasiController::class, 'menu_koperasi_pembelian_barang_get_data'])->name('menu_koperasi_pembelian_barang_get_data');
+    Route::post('menu-koperasi/pembelian-barang-koperasi/save-data', [KoperasiController::class, 'menu_koperasi_pembelian_barang_save'])->name('menu_koperasi_pembelian_barang_save');
+
+    Route::post('menu-koperasi/mutasi-rekening-bank/save', [KoperasiController::class, 'menu_koperasi_mutasi_rekening_bank_save'])->name('menu_koperasi_mutasi_rekening_bank_save');
+
     Route::post('laporan-koperasi/laporan-tagihan/find-data', [KoperasiController::class, 'laporan_koperasi_tagihan_find'])->name('laporan_koperasi_tagihan_find');
 
     Route::post('laporan-koperasi/laporan-mutasi-bank/add-data', [KoperasiController::class, 'laporan_koperasi_mutasi_bank_add'])->name('laporan_koperasi_mutasi_bank_add');
     Route::post('laporan-koperasi/laporan-mutasi-bank/save-data', [KoperasiController::class, 'laporan_koperasi_mutasi_bank_save'])->name('laporan_koperasi_mutasi_bank_save');
+
+    Route::get('laporan-koperasi/laporan-jurnal-umum/get-coa', [KoperasiController::class, 'laporan_koperasi_jurnal_umum_get_coa'])->name('laporan_koperasi_jurnal_umum_get_coa');
+    Route::post('laporan-koperasi/laporan-jurnal-umum/save-data', [KoperasiController::class, 'laporan_koperasi_jurnal_umum_save_data'])->name('laporan_koperasi_jurnal_umum_save_data');
 
     Route::post('master-koperasi/peserta-koperasi/add-peserta', [KoperasiController::class, 'master_koperasi_peserta_add'])->name('master_koperasi_peserta_add');
     Route::post('master-koperasi/peserta-koperasi/save-peserta', [KoperasiController::class, 'master_koperasi_peserta_save'])->name('master_koperasi_peserta_save');
@@ -145,4 +155,9 @@ Route::prefix('koperasi/')->group(function (): void {
     Route::get('akutansi-koperasi/report/arus-kas', [KoperasiController::class, 'akutansi_koperasi_report_arus_kas'])->name('akutansi_koperasi_report_arus_kas');
 
     Route::get('akutansi-koperasi/report/jurnal-cabang', [KoperasiController::class, 'akutansi_koperasi_report_jurnal_cabang'])->name('akutansi_koperasi_report_jurnal_cabang');
+    Route::get('akutansi-koperasi/report/buku-besar-cabang', [KoperasiController::class, 'akutansi_koperasi_report_buku_besar_cabang'])->name('akutansi_koperasi_report_buku_besar_cabang');
+    Route::get('akutansi-koperasi/report/rugi-laba-cabang', [KoperasiController::class, 'akutansi_koperasi_report_rugi_laba_cabang'])->name('akutansi_koperasi_report_rugi_laba_cabang');
+
+    Route::get('laporan-koperasi/laporan-pembagian-shu/get-data', [KoperasiController::class, 'laporan_koperasi_pembagian_shu_get_data'])->name('laporan_koperasi_pembagian_shu_get_data');
+    Route::post('laporan-koperasi/laporan-pembagian-shu/cairkan-shu', [KoperasiController::class, 'laporan_koperasi_pembagian_shu_cairkan_shu'])->name('laporan_koperasi_pembagian_shu_cairkan_shu');
 });
