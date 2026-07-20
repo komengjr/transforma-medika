@@ -10,6 +10,7 @@ use Illuminate\Database\QueryException;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Log;
+
 class ApiCntroller extends Controller
 {
     public function data_product()
@@ -75,6 +76,18 @@ class ApiCntroller extends Controller
     {
         DB::table('v_log_whatsapp')->where('v_log_whatsapp_code', $request->code)->update([
             'v_log_whatsapp_status' => $request->status
+        ]);
+        return response()->json('Berhasil Kirim');
+    }
+    public function getway_whatsapp_koperasi()
+    {
+        $data = DB::table('kop_sender_wa')->where('kop_sender_wa_code_status', 0)->first();
+        return response()->json($data);
+    }
+    public function getway_whatsapp_koperasi_update(Request $request)
+    {
+        DB::table('kop_sender_wa')->where('kop_sender_wa_code', $request->code)->update([
+            'kop_sender_wa_code_status' => 1
         ]);
         return response()->json('Berhasil Kirim');
     }

@@ -193,6 +193,8 @@ Route::prefix('{akses}/{id}')->group(function (): void {
     Route::get('menu-peminjaman/list-peminjaman-barang', [KoperasiController::class, 'menu_peminjaman_list_barang'])->name('menu_peminjaman_list_barang');
     Route::get('menu-koperasi/pembelian-barang-koperasi', [KoperasiController::class, 'menu_koperasi_pembelian_barang'])->name('menu_koperasi_pembelian_barang');
     Route::get('menu-koperasi/mutasi-rekening-bank', [KoperasiController::class, 'menu_koperasi_mutasi_rekening_bank'])->name('menu_koperasi_mutasi_rekening_bank');
+    Route::get('menu-koperasi/pembelian-barang-anggota', [KoperasiController::class, 'menu_koperasi_pembelian_barang_anggota'])->name('menu_koperasi_pembelian_barang_anggota');
+    Route::get('menu-koperasi/penagihan-barang-anggota', [KoperasiController::class, 'menu_koperasi_penagihan_barang_anggota'])->name('menu_koperasi_penagihan_barang_anggota');
     Route::get('laporan-koperasi/laporan-tagihan', [KoperasiController::class, 'laporan_koperasi_tagihan'])->name('laporan_koperasi_tagihan');
     Route::get('laporan-koperasi/laporan-mutasi-bank', [KoperasiController::class, 'laporan_koperasi_mutasi_bank'])->name('laporan_koperasi_mutasi_bank');
     Route::get('laporan-koperasi/laporan-jurnal-umum', [KoperasiController::class, 'laporan_koperasi_jurnal_umum'])->name('laporan_koperasi_jurnal_umum');
@@ -671,6 +673,9 @@ Route::prefix('v3')->group(function (): void {
     Route::get('data-peminjaman-barang/{code}', [PublicKoperasiController::class, 'data_peminjaman_barang'])->name('data_peminjaman_barang');
     Route::post('data-peminjaman-uang-save/sign', [PublicKoperasiController::class, 'data_peminjaman_uang_sign'])->name('data_peminjaman_uang_sign');
     Route::post('data-peminjaman-barang-save/sign', [PublicKoperasiController::class, 'data_peminjaman_barang_sign'])->name('data_peminjaman_barang_sign');
+    Route::get('data-persetujuan-form', [PublicKoperasiController::class, 'data_persetujuan_form'])->name('data_persetujuan_form');
+    Route::get('data-persetujuan-form/get-data/{id}', [PublicKoperasiController::class, 'data_persetujuan_form_get_data'])->name('data_persetujuan_form_get_data');
+    Route::post('data-persetujuan-form/proses', [PublicKoperasiController::class, 'data_persetujuan_form_proses'])->name('data_persetujuan_form_proses');
 });
 
 // MOVIE

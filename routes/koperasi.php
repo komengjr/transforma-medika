@@ -90,6 +90,11 @@ Route::prefix('koperasi/')->group(function (): void {
 
     Route::post('menu-koperasi/mutasi-rekening-bank/save', [KoperasiController::class, 'menu_koperasi_mutasi_rekening_bank_save'])->name('menu_koperasi_mutasi_rekening_bank_save');
 
+    Route::post('menu-koperasi/pembelian-barang-anggota/save', [KoperasiController::class, 'menu_koperasi_pembelian_barang_anggota_save'])->name('menu_koperasi_pembelian_barang_anggota_save');
+
+    Route::get('menu-koperasi/penagihan-barang-anggota/get-data/{id_pembelian}', [KoperasiController::class, 'menu_koperasi_penagihan_barang_anggota_get_data'])->name('menu_koperasi_penagihan_barang_anggota_get_data');
+    Route::post('menu-koperasi/penagihan-barang-anggota/save', [KoperasiController::class, 'menu_koperasi_penagihan_barang_anggota_save'])->name('menu_koperasi_penagihan_barang_anggota_save');
+
     Route::post('laporan-koperasi/laporan-tagihan/find-data', [KoperasiController::class, 'laporan_koperasi_tagihan_find'])->name('laporan_koperasi_tagihan_find');
 
     Route::post('laporan-koperasi/laporan-mutasi-bank/add-data', [KoperasiController::class, 'laporan_koperasi_mutasi_bank_add'])->name('laporan_koperasi_mutasi_bank_add');

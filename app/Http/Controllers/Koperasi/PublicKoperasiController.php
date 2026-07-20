@@ -6,6 +6,7 @@ use App\Http\Controllers\Controller;
 use Illuminate\Http\Request;
 use PDF;
 use Illuminate\Support\Facades\DB;
+use Illuminate\Support\Facades\Validator;
 use Illuminate\Support\Str;
 
 class PublicKoperasiController extends Controller
@@ -258,6 +259,134 @@ class PublicKoperasiController extends Controller
             return 1;
         } catch (\Throwable $e) {
             return 0;
+        }
+    }
+    public function data_persetujuan_form()
+    {
+        return view('app-koperasi.public.form-validasi-persetujuan');
+    }
+    public function data_persetujuan_form_get_data($id)
+    {
+        $pengajuan = DB::table('kop_trx_pembelian_anggota as pa')
+            ->join('kop_master_peserta as p', 'pa.anggota_id', '=', 'p.id_kop_master_peserta')
+            ->select('pa.*', 'p.kop_master_peserta_name', 'p.kop_master_peserta_code')
+            ->where('pa.nota_nomor', $id)
+            ->first();
+
+        if (!$pengajuan) {
+            return response()->json([
+                'status' => 'error',
+                'message' => 'Nomor nota transaksi tidak ditemukan di sistem.'
+            ], 404);
+        }
+
+        return response()->json([
+            'status' => 'success',
+            'data' => $pengajuan
+        ]);
+    }
+    public function data_persetujuan_form_proses(Request $request)
+    {
+        $validator = Validator::make($request->all(), [
+            'id_pembelian' => 'required|integer',
+            'keputusan'    => 'required|in:DISETUJUI,DITOLAK',
+            'alasan'       => 'nullable|string|max:500'
+        ]);
+
+        if ($validator->fails()) {
+            return response()->json([
+                'status' => 'error',
+                'message' => 'Validasi gagal: ' . implode(', ', $validator->errors()->all())
+            ], 422);
+        }
+
+        // 2. Cari data pengajuan pembelian barang
+        $pembelian = DB::table('kop_trx_pembelian_anggota')
+            ->where('id_pembelian', $request->id_pembelian)
+            ->first();
+
+        if (!$pembelian) {
+            return response()->json([
+                'status' => 'error',
+                'message' => 'Data transaksi pengajuan tidak ditemukan di sistem.'
+            ], 404);
+        }
+
+        // Pastikan nota yang diproses statusnya masih PENDING
+        if ($pembelian->status_persetujuan !== 'PENDING') {
+            return response()->json([
+                'status' => 'error',
+                'message' => 'Transaksi ini sudah pernah diproses sebelumnya dengan status: ' . $pembelian->status_persetujuan
+            ], 400);
+        }
+
+        // 3. Eksekusi Database Transaction
+        DB::beginTransaction();
+        try {
+            $namaKetua = auth()->user()->name ?? 'Ketua Koperasi';
+
+            if ($request->keputusan === 'DISETUJUI') {
+
+                // A. Update status induk transaksi menjadi DISETUJUI
+                DB::table('kop_trx_pembelian_anggota')
+                    ->where('id_pembelian', $request->id_pembelian)
+                    ->update([
+                        'status_persetujuan'  => 'DISETUJUI',
+                        'disetujui_oleh'       => $namaKetua,
+                        'tanggal_persetujuan' => now(),
+                        'updated_at'          => now()
+                    ]);
+
+                // B. GENERATE OTOMATIS JADWAL TENOR (ANGSURAN BULANAN)
+                $tglBaseline = $pembelian->tanggal_transaksi;
+
+                for ($i = 1; $i <= $pembelian->tenor_bulan; $i++) {
+                    // Membuat tanggal jatuh tempo bertambah 1 bulan dari bulan sebelumnya
+                    $jatuhTempo = date('Y-m-d', strtotime("+$i month", strtotime($tglBaseline)));
+
+                    DB::table('kop_trx_pembelian_tenor')->insert([
+                        'id_pembelian'   => $pembelian->id_pembelian,
+                        'angsuran_ke'    => $i,
+                        'jatuh_tempo'    => $jatuhTempo,
+                        'jumlah_tagihan' => $pembelian->cicilan_per_bulan,
+                        'status_bayar'   => 'BELUM',
+                        'created_at'     => now(),
+                        'updated_at'     => now()
+                    ]);
+                }
+
+                $pesan = 'Pengajuan pembelian barang berhasil DISETUJUI. Jadwal tenor angsuran bulanan telah diaktifkan ke sistem penagihan.';
+            } else {
+
+                // C. Jika DITOLAK, cukup ubah status dan rekam alasannya
+                DB::table('kop_trx_pembelian_anggota')
+                    ->where('id_pembelian', $request->id_pembelian)
+                    ->update([
+                        'status_persetujuan'  => 'DITOLAK',
+                        'alasan_penolakan'    => $request->alasan,
+                        'disetujui_oleh'       => $namaKetua,
+                        'tanggal_persetujuan' => now(),
+                        'updated_at'          => now()
+                    ]);
+
+                $pesan = 'Pengajuan pembelian barang telah DITOLAK oleh Ketua Koperasi.';
+            }
+
+            // Commit perubahan ke database
+            DB::commit();
+
+            return response()->json([
+                'status'  => 'success',
+                'message' => $pesan
+            ], 200);
+        } catch (Exception $e) {
+            // Batalkan semua query jika terjadi kegagalan/error di tengah jalan
+            DB::rollBack();
+
+            return response()->json([
+                'status'  => 'error',
+                'message' => 'Terjadi kesalahan sistem internal: ' . $e->getMessage()
+            ], 500);
         }
     }
 }
