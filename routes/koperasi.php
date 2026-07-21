@@ -1,6 +1,7 @@
 <?php
 
 use App\Http\Controllers\Koperasi\KoperasiController;
+use App\Http\Controllers\Koperasi\MenuPenjualanController;
 use Illuminate\Support\Facades\Route;
 // FARMASI
 Route::prefix('koperasi/')->group(function (): void {
@@ -9,6 +10,15 @@ Route::prefix('koperasi/')->group(function (): void {
     Route::post('menu-peminjaman/peminjaman-uang/cari-data-peserta', [KoperasiController::class, 'menu_peminjaman_uang_cari_peserta'])->name('menu_peminjaman_uang_cari_peserta');
     Route::post('menu-peminjaman/peminjaman-uang/pilih-data-peserta', [KoperasiController::class, 'menu_peminjaman_uang_pilih_peserta'])->name('menu_peminjaman_uang_pilih_peserta');
     Route::post('menu-peminjaman/peminjaman-uang/proses-pengajuan-peminjaman', [KoperasiController::class, 'menu_peminjaman_uang_proses_pengajuan'])->name('menu_peminjaman_uang_proses_pengajuan');
+
+    Route::get('menu-koperasi/simpanan-pokok/get-data', [KoperasiController::class, 'menu_koperasi_simpanan_pokok_get_data'])->name('menu_koperasi_simpanan_pokok_get_data');
+    Route::post('menu-koperasi/simpanan-pokok/bayar/{id}', [KoperasiController::class, 'menu_koperasi_simpanan_pokok_bayar'])->name('menu_koperasi_simpanan_pokok_bayar');
+
+    Route::get('menu-koperasi/simpanan-wajib/get-data', [KoperasiController::class, 'menu_koperasi_simpanan_wajib_get_data'])->name('menu_koperasi_simpanan_wajib_get_data');
+    Route::post('menu-koperasi/simpanan-wajib/bayar', [KoperasiController::class, 'menu_koperasi_simpanan_wajib_bayar'])->name('menu_koperasi_simpanan_wajib_bayar');
+
+    Route::get('menu-koperasi/simpanan-sukarela-koperasi/get-data', [KoperasiController::class, 'menu_koperasi_simpanan_sukarela_koperasi_get_data'])->name('menu_koperasi_simpanan_sukarela_koperasi_get_data');
+    Route::post('menu-koperasi/simpanan-sukarela-koperasi/bayar', [KoperasiController::class, 'menu_koperasi_simpanan_sukarela_koperasi_bayar'])->name('menu_koperasi_simpanan_sukarela_koperasi_bayar');
 
     Route::post('menu-peminjaman/peminjaman-barang/cari-data-peserta', [KoperasiController::class, 'menu_peminjaman_barang_cari_peserta'])->name('menu_peminjaman_barang_cari_peserta');
     Route::post('menu-peminjaman/peminjaman-barang/pilih-data-peserta', [KoperasiController::class, 'menu_peminjaman_barang_pilih_peserta'])->name('menu_peminjaman_barang_pilih_peserta');
@@ -63,6 +73,7 @@ Route::prefix('koperasi/')->group(function (): void {
     Route::get('menu-koperasi/pencairan-arisan/cek-pemenang', [KoperasiController::class, 'menu_koperasi_pencairan_arisan_cek_pemenang'])->name('menu_koperasi_pencairan_arisan_cek_pemenang');
     Route::post('menu-koperasi/pencairan-arisan/proses', [KoperasiController::class, 'menu_koperasi_pencairan_arisan_proses'])->name('menu_koperasi_pencairan_arisan_proses');
 
+    Route::post('menu-koperasi/voucher-koperasi/store', [KoperasiController::class, 'menu_koperasi_vocher_store'])->name('menu_koperasi_vocher_store');
     Route::post('menu-koperasi/voucher-koperasi/add-data', [KoperasiController::class, 'menu_koperasi_vocher_add'])->name('menu_koperasi_vocher_add');
     Route::post('menu-koperasi/voucher-koperasi/save-data', [KoperasiController::class, 'menu_koperasi_vocher_save'])->name('menu_koperasi_vocher_save');
     Route::post('menu-koperasi/voucher-koperasi/proses-data-vocher', [KoperasiController::class, 'menu_koperasi_vocher_proses'])->name('menu_koperasi_vocher_proses');
@@ -94,6 +105,12 @@ Route::prefix('koperasi/')->group(function (): void {
 
     Route::get('menu-koperasi/penagihan-barang-anggota/get-data/{id_pembelian}', [KoperasiController::class, 'menu_koperasi_penagihan_barang_anggota_get_data'])->name('menu_koperasi_penagihan_barang_anggota_get_data');
     Route::post('menu-koperasi/penagihan-barang-anggota/save', [KoperasiController::class, 'menu_koperasi_penagihan_barang_anggota_save'])->name('menu_koperasi_penagihan_barang_anggota_save');
+
+    Route::get('menu-koperasi/menu-create-product/get-data', [MenuPenjualanController::class, 'menu_koperasi_penjualan_product_koperasi_get_data'])->name('menu_koperasi_penjualan_product_koperasi_get_data');
+    Route::post('menu-koperasi/menu-create-product/save-master', [MenuPenjualanController::class, 'menu_koperasi_penjualan_product_koperasi_save_master'])->name('menu_koperasi_penjualan_product_koperasi_save_master');
+    Route::post('menu-koperasi/menu-create-product/save-stok', [MenuPenjualanController::class, 'menu_koperasi_penjualan_product_koperasi_save_stok'])->name('menu_koperasi_penjualan_product_koperasi_save_stok');
+
+    Route::post('menu-koperasi/penagihan-belanja-koperasi/tagih', [MenuPenjualanController::class, 'menu_koperasi_penagihan_belanja_koperasi_tagih'])->name('menu_koperasi_penagihan_belanja_koperasi_tagih');
 
     Route::post('laporan-koperasi/laporan-tagihan/find-data', [KoperasiController::class, 'laporan_koperasi_tagihan_find'])->name('laporan_koperasi_tagihan_find');
 
@@ -146,6 +163,7 @@ Route::prefix('koperasi/')->group(function (): void {
     Route::post('akutansi-koperasi/jurnal-manual/get-peminjaman/{id}/cairkan', [KoperasiController::class, 'akutansi_koperasi_get_peminjaman_cairkan'])->name('akutansi_koperasi_get_peminjaman_cairkan');
     Route::get('akutansi-koperasi/jurnal-manual/get-peminjaman-barang', [KoperasiController::class, 'akutansi_koperasi_get_peminjaman_barang'])->name('akutansi_koperasi_get_peminjaman_barang');
     Route::post('akutansi-koperasi/jurnal-manual/get-peminjaman-barang/{id}/serahkan', [KoperasiController::class, 'akutansi_koperasi_get_peminjaman_barang_serahkan'])->name('akutansi_koperasi_get_peminjaman_barang_serahkan');
+
     Route::get('akutansi-koperasi/jurnal-manual/get-vocher', [KoperasiController::class, 'akutansi_koperasi_get_vocher'])->name('akutansi_koperasi_get_vocher');
     Route::post('akutansi-koperasi/jurnal-manual/get-vocher/{id}/cairkan', [KoperasiController::class, 'akutansi_koperasi_get_vocher_cairkan'])->name('akutansi_koperasi_get_vocher_cairkan');
     Route::get('akutansi-koperasi/jurnal-manual/get-arisan', [KoperasiController::class, 'akutansi_koperasi_get_arisan'])->name('akutansi_koperasi_get_arisan');

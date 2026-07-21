@@ -9,12 +9,14 @@ use App\Http\Controllers\dashboardController;
 use App\Http\Controllers\Event\EventController;
 use App\Http\Controllers\Farmasi\FarmasiController;
 use App\Http\Controllers\FileUploadController;
+use App\Http\Controllers\Finance\ShopController;
 use App\Http\Controllers\Hrm\HrmController;
 use App\Http\Controllers\inventaris\MasterBarangController;
 use App\Http\Controllers\inventaris\MasterController as InventarisMasterController;
 use App\Http\Controllers\inventaris\PeminjamanController;
 use App\Http\Controllers\KeuanganController;
 use App\Http\Controllers\Koperasi\KoperasiController;
+use App\Http\Controllers\Koperasi\MenuPenjualanController;
 use App\Http\Controllers\Koperasi\PublicKoperasiController;
 use App\Http\Controllers\LaboratoriumController;
 use App\Http\Controllers\LiveTvController;
@@ -179,6 +181,9 @@ Route::prefix('{akses}/{id}')->group(function (): void {
 
     // KOPERASI
     Route::get('menu-koperasi/registrasi-peserta', [KoperasiController::class, 'menu_koperasi_registrasi_peserta'])->name('menu_koperasi_registrasi_peserta');
+    Route::get('menu-koperasi/simpanan-pokok', [KoperasiController::class, 'menu_koperasi_simpanan_pokok'])->name('menu_koperasi_simpanan_pokok');
+    Route::get('menu-koperasi/simpanan-wajib-koperasi', [KoperasiController::class, 'menu_koperasi_simpanan_wajib_koperasi'])->name('menu_koperasi_simpanan_wajib_koperasi');
+    Route::get('menu-koperasi/simpanan-sukarela-koperasi', [KoperasiController::class, 'menu_koperasi_simpanan_sukarela_koperasi'])->name('menu_koperasi_simpanan_sukarela_koperasi');
     Route::get('menu-koperasi/arisan-koperasi', [KoperasiController::class, 'menu_koperasi_arisan'])->name('menu_koperasi_arisan');
     Route::get('menu-koperasi/setup-arisan', [KoperasiController::class, 'menu_koperasi_setup_arisan'])->name('menu_koperasi_setup_arisan');
     Route::get('menu-koperasi/penagihan-arisan', [KoperasiController::class, 'menu_koperasi_penagihan_arisan'])->name('menu_koperasi_penagihan_arisan');
@@ -195,6 +200,10 @@ Route::prefix('{akses}/{id}')->group(function (): void {
     Route::get('menu-koperasi/mutasi-rekening-bank', [KoperasiController::class, 'menu_koperasi_mutasi_rekening_bank'])->name('menu_koperasi_mutasi_rekening_bank');
     Route::get('menu-koperasi/pembelian-barang-anggota', [KoperasiController::class, 'menu_koperasi_pembelian_barang_anggota'])->name('menu_koperasi_pembelian_barang_anggota');
     Route::get('menu-koperasi/penagihan-barang-anggota', [KoperasiController::class, 'menu_koperasi_penagihan_barang_anggota'])->name('menu_koperasi_penagihan_barang_anggota');
+
+    Route::get('menu-koperasi/menu-create-product', [MenuPenjualanController::class, 'menu_koperasi_penjualan_product_koperasi'])->name('menu_koperasi_penjualan_product_koperasi');
+    Route::get('menu-koperasi/penagihan-belanja-koperasi', [MenuPenjualanController::class, 'menu_koperasi_penagihan_belanja_koperasi'])->name('menu_koperasi_penagihan_belanja_koperasi');
+
     Route::get('laporan-koperasi/laporan-tagihan', [KoperasiController::class, 'laporan_koperasi_tagihan'])->name('laporan_koperasi_tagihan');
     Route::get('laporan-koperasi/laporan-mutasi-bank', [KoperasiController::class, 'laporan_koperasi_mutasi_bank'])->name('laporan_koperasi_mutasi_bank');
     Route::get('laporan-koperasi/laporan-jurnal-umum', [KoperasiController::class, 'laporan_koperasi_jurnal_umum'])->name('laporan_koperasi_jurnal_umum');
@@ -652,6 +661,11 @@ Route::prefix('event/')->group(function (): void {
     Route::get('menu-event/data-event/self-registrasi-event/{kode}', [EventController::class, 'menu_event_data_form_self_registrasi'])->name('menu_event_data_form_self_registrasi');
 });
 
+Route::prefix('shop')->name('shop.')->group(function () {
+    Route::get('/', [ShopController::class, 'index'])->name('index');
+    Route::post('/checkout', [ShopController::class, 'prosesCheckout'])->name('checkout');
+    Route::post('/history', [ShopController::class, 'history'])->name('history');
+});
 Route::prefix('app/')->group(function (): void {
     Route::get('supplier/r_token/{id}/{token}', [PublicController::class, 'app_supp_token'])->name('app_supp_token');
     Route::post('supplier/r_token/user_token', [PublicController::class, 'app_supp_user_token'])->name('app_supp_user_token');
@@ -730,14 +744,14 @@ include 'koperasi.php';
 
 Route::post('/upload-sftp', [FileUploadController::class, 'uploadFile'])->name('upload.sftp');
 Route::post('/upload-ftp', [FileUploadController::class, 'uploadFileftp'])->name('upload.ftp');
-Route::get('/uploads', function () {
-    return view('upload');
-});
-Route::get('/test-ftp', function () {
-    try {
-        Storage::disk('ftp')->files('/');
-        dd('FTP CONNECTED');
-    } catch (\Exception $e) {
-        dd($e->getMessage());
-    }
-});
+// Route::get('/uploads', function () {
+//     return view('upload');
+// });
+// Route::get('/test-ftp', function () {
+//     try {
+//         Storage::disk('ftp')->files('/');
+//         dd('FTP CONNECTED');
+//     } catch (\Exception $e) {
+//         dd($e->getMessage());
+//     }
+// });

@@ -162,6 +162,416 @@ class KoperasiController extends Controller
             return 0;
         }
     }
+    // MENU SIMPANAN POKOK
+    public function menu_koperasi_simpanan_pokok($akses, $id)
+    {
+        if ($this->url_akses_sub($akses, $id) == true) {
+            $list_cabang = DB::table('kop_master_peserta')
+                ->select('kop_master_peserta_cabang')
+                ->distinct()
+                ->whereNotNull('kop_master_peserta_cabang')
+                ->pluck('kop_master_peserta_cabang');
+
+            // Ambil COA Pembayaran (Aset) langsung menggunakan Query Builder
+            $coa_pembayaran = DB::table('kop_fin_master_coa')
+                ->where('is_active', 1)
+                ->where('coa_type', 'aset')
+                ->orderBy('coa_code', 'asc')
+                ->get();
+
+            // Ambil COA Simpanan (Kewajiban & Ekuitas)
+            $coa_simpanan = DB::table('kop_fin_master_coa')
+                ->where('is_active', 1)
+                // ->whereIn('coa_type', ['kewajiban', 'ekuitas'])
+                ->orderBy('coa_code', 'asc')
+                ->get();
+
+            $nominal_simpanan_pokok = 100000;
+            return view('app-koperasi.menu-simpanan.menu-simpanan-pokok', compact(
+                'list_cabang',
+                'coa_pembayaran',
+                'coa_simpanan',
+                'nominal_simpanan_pokok'
+            ), ['akses' => $akses, 'code' => $id]);
+        } else {
+            return Redirect::to('dashboard/home');
+        }
+    }
+    public function menu_koperasi_simpanan_pokok_get_data(Request $request)
+    {
+        $cabang = $request->query('cabang');
+
+        if (!$cabang) {
+            return response()->json(['data' => []], 400);
+        }
+
+        $anggota = KopMasterPeserta::where('kop_master_peserta_cabang', $cabang)
+            ->orderBy('kop_master_peserta_name', 'asc')
+            ->get();
+
+        return response()->json([
+            'status' => 'success',
+            'data'   => $anggota
+        ]);
+    }
+    public function menu_koperasi_simpanan_pokok_bayar(Request $request, $id)
+    {
+        // Validasi input pilihan COA dari modal
+        $request->validate([
+            'coa_pembayaran' => 'required|string',
+            'coa_simpanan'   => 'required|string',
+        ]);
+
+        $peserta = KopMasterPeserta::findOrFail($id);
+
+        // 1. Ambil kode COA terpilih untuk kebutuhan integrasi jurnal akuntansi
+        $coaDebit  = $request->coa_pembayaran; // E.g., '1101' (Kas)
+        $coaKredit = $request->coa_simpanan;   // E.g., '3101' (Simpanan Pokok)
+
+
+        $headerJurnal = [
+            'jurnal_tgl' => now()->format('Y-m-d'),
+            'jurnal_keterangan' => "Simpanan Pokok.  an. " . $peserta->kop_master_peserta_name . " ( " . $peserta->kop_master_peserta_nip . " ) ",
+            'jurnal_ref_table' => 'simpanan_pokok',
+            'jurnal_ref_code' => $peserta->kop_master_peserta_code,
+            'jurnal_user' => $peserta->kop_master_peserta_code,
+            'jurnal_cabang' => $peserta->kop_master_peserta_cabang,
+        ];
+
+        $detailJurnal = [
+            ['coa_code' => $coaDebit, 'jurnal_debit' => $request->nominal_pokok, 'jurnal_kredit' => 0], // Piutang Anggota
+            ['coa_code' => $coaKredit, 'jurnal_debit' => 0, 'jurnal_kredit' => $request->nominal_pokok],    // Kas/Bank Koperasi
+        ];
+
+        // Aturan Akuntansi: Debit (Piutang), Kredit (Pendapatan Admin & Kas)
+
+        // 3. Eksekusi Jurnal
+        $this->accountingService->createJournal($headerJurnal, $detailJurnal);
+
+        // 2. Update status keanggotaan
+        if ($peserta->kop_master_peserta_tgl_anggota == "") {
+            $peserta->update([
+                'kop_master_peserta_status' => 'AKTIF',
+                'kop_master_peserta_tgl_anggota' => Carbon::now()->format('Y-m-d')
+            ]);
+        } else {
+            $peserta->update([
+                'kop_master_peserta_status' => 'AKTIF',
+            ]);
+        }
+
+        // Redirect kembali dengan membawa parameter cabang agar tabel otomatis ter-filter lagi setelah reload
+        return redirect()->back()->with('success', 'Simpanan pokok untuk ' . $peserta->kop_master_peserta_name . ' berhasil diproses menggunakan COA terpilih!');
+    }
+    // MENU SIMPANAN WAJIB
+    public function menu_koperasi_simpanan_wajib_koperasi($akses, $id)
+    {
+        if ($this->url_akses_sub($akses, $id) == true) {
+            // Ambil list cabang dari master peserta
+            $list_cabang = DB::table('kop_master_peserta')
+                ->select('kop_master_peserta_cabang')
+                ->distinct()
+                ->whereNotNull('kop_master_peserta_cabang')
+                ->pluck('kop_master_peserta_cabang');
+
+            // Ambil COA Pembayaran (Aset)
+            $coa_pembayaran = DB::table('kop_fin_master_coa')
+                ->where('is_active', true)
+                ->where('coa_type', 'aset')
+                ->orderBy('coa_code', 'asc')
+                ->get();
+
+            // Ambil COA Simpanan Wajib (Kewajiban / Ekuitas)
+            $coa_simpanan = DB::table('kop_fin_master_coa')
+                ->where('is_active', true)
+                // ->whereIn('coa_type', ['kewajiban', 'ekuitas'])
+                ->orderBy('coa_code', 'asc')
+                ->get();
+            $nominal_wajib = 50000;
+            return view('app-koperasi.menu-simpanan.menu-simpanan-wajib', compact(
+                'list_cabang',
+                'coa_pembayaran',
+                'coa_simpanan',
+                'nominal_wajib'
+            ), ['akses' => $akses, 'code' => $id]);
+        } else {
+            return Redirect::to('dashboard/home');
+        }
+    }
+    public function menu_koperasi_simpanan_wajib_get_data(Request $request)
+    {
+        $cabang = $request->query('cabang');
+        $bulanIni = Carbon::now()->format('Y-m'); // Output: 2026-07
+
+        if (!$cabang) return response()->json(['data' => []], 400);
+
+        // Ambil data anggota aktif
+        $anggota = DB::table('kop_master_peserta')
+            ->where('kop_master_peserta_cabang', $cabang)
+            ->where('kop_master_peserta_status', 'AKTIF')
+            ->orderBy('kop_master_peserta_name', 'asc')
+            ->get();
+
+        // Cari tahu siapa saja yang SUDAH bayar bulan ini di tabel histori
+        $sudahBayarIds = DB::table('kop_simpanan_wajib_histori')
+            ->where('periode_bulan', $bulanIni)
+            ->pluck('id_kop_master_peserta')
+            ->toArray();
+
+        // Petakan status ke dalam data anggota
+        $dataMapped = $anggota->map(function ($item) use ($sudahBayarIds) {
+            $item->sudah_bayar = in_array($item->id_kop_master_peserta, $sudahBayarIds);
+            return $item;
+        });
+
+        return response()->json([
+            'status' => 'success',
+            'data'   => $dataMapped
+        ]);
+    }
+    public function menu_koperasi_simpanan_wajib_bayar(Request $request)
+    {
+        $request->validate([
+            'cabang_terpilih' => 'required|string',
+            'ids_anggota'     => 'required|array|min:1',
+            'coa_pembayaran'  => 'required|string',
+            'coa_simpanan'    => 'required|string',
+            'nominal_wajib'   => 'required|numeric'
+        ]);
+
+        $ids = $request->ids_anggota;
+        $nominalPerAnggota = $request->nominal_wajib;
+        $totalNominal = $nominalPerAnggota * count($ids);
+        $bulanIni = Carbon::now()->format('Y-m');
+
+        // --- TAMBAHAN: Ambil nama-nama anggota untuk keterangan jurnal ---
+        $daftarNama = DB::table('kop_master_peserta')
+            ->whereIn('id_kop_master_peserta', $ids)
+            ->pluck('kop_master_peserta_name')
+            ->toArray();
+
+        // Gabungkan nama anggota dipisahkan dengan koma (Contoh: "Budi, Andi, Siti")
+        $keteranganNama = implode(', ', $daftarNama);
+
+        // Batasi panjang string jika daftar namanya terlalu panjang agar tidak error di DB (max 65.000 karakter untuk TEXT atau 255 untuk VARCHAR)
+        // Di sini kita potong aman di 500 karakter jika datanya masal sekali, atau sesuaikan dengan tipe data kolom Anda
+        $keteranganNama = strlen($keteranganNama) > 500 ? substr($keteranganNama, 0, 500) . '...dst' : $keteranganNama;
+        // -----------------------------------------------------------------
+
+        DB::beginTransaction();
+        try {
+            // 1. Generate Nomor Jurnal
+            $currentMonth = Carbon::now()->format('Ym');
+            $prefix = "JVW-" . $currentMonth . "-";
+
+            $lastJurnal = DB::table('kop_fin_jurnal')
+                ->where('jurnal_no_bukti', 'like', $prefix . '%')
+                ->orderBy('id_jurnal', 'desc')
+                ->first();
+
+            $nextNumber = $lastJurnal ? str_pad(((int) substr($lastJurnal->jurnal_no_bukti, -4)) + 1, 4, '0', STR_PAD_LEFT) : "0001";
+            $noBukti = 'JV-' . now()->format('Ymd') . '-' . strtoupper(uniqid());
+            $userLogin = Auth::user()->name ?? 'Admin Koperasi';
+
+            // 2. Insert Header Jurnal (Keterangan diperbarui dengan total & daftar nama)
+            $jurnalId = DB::table('kop_fin_jurnal')->insertGetId([
+                'jurnal_no_bukti'   => $noBukti,
+                'jurnal_tgl'        => Carbon::now()->format('Y-m-d'),
+                // Tampilan Keterangan: Simpanan Wajib Massal Juli 2026 - Cabang: PUSAT (3 Anggota: Budi, Andi, Siti)
+                'jurnal_keterangan' => "Simpanan Wajib Massal " . Carbon::now()->translatedFormat('F Y') .
+                    " - Cabang: " . strtoupper($request->cabang_terpilih) .
+                    " (" . count($ids) . " Anggota: " . $keteranganNama . ")",
+                'jurnal_ref_table'  => 'kop_master_peserta_massal',
+                'jurnal_ref_code'   => $request->cabang_terpihal . '-' . $currentMonth,
+                'jurnal_user'       => $userLogin,
+                'jurnal_cabang'     => $request->cabang_terpilih,
+                'jurnal_created'    => $userLogin,
+                'created_at'        => Carbon::now(),
+                'updated_at'        => Carbon::now(),
+            ]);
+
+            // 3. Insert Detail Jurnal (Debit & Kredit)
+            DB::table('kop_fin_jurnal_detail')->insert([
+                ['jurnal_id' => $jurnalId, 'coa_code' => $request->coa_pembayaran, 'jurnal_debit' => $totalNominal, 'jurnal_kredit' => 0, 'created_at' => Carbon::now(), 'updated_at' => Carbon::now()],
+                ['jurnal_id' => $jurnalId, 'coa_code' => $request->coa_simpanan, 'jurnal_debit' => 0, 'jurnal_kredit' => $totalNominal, 'created_at' => Carbon::now(), 'updated_at' => Carbon::now()]
+            ]);
+
+            // 4. LOOPING: Catat ke tabel histori per Anggota
+            $insertHistori = [];
+            foreach ($ids as $idAnggota) {
+                $insertHistori[] = [
+                    'id_kop_master_peserta' => $idAnggota,
+                    'id_jurnal'             => $jurnalId,
+                    'periode_bulan'         => $bulanIni,
+                    'tgl_bayar'             => Carbon::now()->format('Y-m-d'),
+                    'nominal'               => $nominalPerAnggota,
+                    'created_at'            => Carbon::now(),
+                    'updated_at'            => Carbon::now()
+                ];
+            }
+            DB::table('kop_simpanan_wajib_histori')->insert($insertHistori);
+
+            DB::commit();
+            return redirect()->back()->with('success', 'Berhasil memproses Simpanan Wajib untuk ' . count($ids) . ' anggota. No Jurnal: ' . $noBukti);
+        } catch (\Exception $e) {
+            DB::rollBack();
+            return redirect()->back()->with('error', 'Gagal memproses pembayaran: ' . $e->getMessage());
+        }
+    }
+    // MENU SIMPANAN SUKARELA
+    public function menu_koperasi_simpanan_sukarela_koperasi($akses, $id)
+    {
+        if ($this->url_akses_sub($akses, $id) == true) {
+            $list_cabang = DB::table('kop_master_peserta')
+                ->select('kop_master_peserta_cabang')
+                ->distinct()
+                ->whereNotNull('kop_master_peserta_cabang')
+                ->pluck('kop_master_peserta_cabang');
+
+            // COA Aset (Kas/Bank)
+            $coa_pembayaran = DB::table('kop_fin_master_coa')
+                ->where('is_active', 1)->where('coa_type', 'aset')->orderBy('coa_code', 'asc')->get();
+
+            // COA Simpanan Sukarela (Kewajiban Koperasi ke Anggota)
+            $coa_sukarela = DB::table('kop_fin_master_coa')
+                ->where('is_active', 1)->orderBy('coa_code', 'asc')->get();
+
+            // return view('koperasi.simpanan.sukarela', compact('list_cabang', 'coa_pembayaran', 'coa_sukarela'));
+            return view('app-koperasi.menu-simpanan.menu-simpanan-sukarela', compact(
+                'list_cabang',
+                'coa_pembayaran',
+                'coa_sukarela'
+            ), ['akses' => $akses, 'code' => $id]);
+        } else {
+            return Redirect::to('dashboard/home');
+        }
+    }
+    public function menu_koperasi_simpanan_sukarela_koperasi_get_data(Request $request)
+    {
+        $cabang = $request->query('cabang');
+        if (!$cabang) return response()->json(['data' => []], 400);
+
+        // Mengambil data anggota dan menghitung sisa saldo berjalan dari tabel transaksi
+        $anggota = DB::table('kop_master_peserta as p')
+            ->select(
+                'p.id_kop_master_peserta',
+                'p.kop_master_peserta_code',
+                'p.kop_master_peserta_name',
+                DB::raw("COALESCE(
+                    SUM(
+                        CASE
+                            WHEN t.jenis_transaksi = 'SETORAN' THEN t.nominal
+                            ELSE -t.nominal
+                        END
+                    ), 0
+                ) as saldo_sukarela")
+            )
+            ->leftJoin('kop_simpanan_sukarela_transaksi as t', 'p.id_kop_master_peserta', '=', 't.id_kop_master_peserta')
+            ->where('p.kop_master_peserta_cabang', $cabang)
+            ->where('p.kop_master_peserta_status', 'AKTIF')
+            ->groupBy('p.id_kop_master_peserta', 'p.kop_master_peserta_code', 'p.kop_master_peserta_name')
+            ->orderBy('p.kop_master_peserta_name', 'asc')
+            ->get();
+
+        return response()->json([
+            'status' => 'success',
+            'data'   => $anggota
+        ]);
+    }
+    public function menu_koperasi_simpanan_sukarela_koperasi_bayar(Request $request)
+    {
+        $request->validate([
+            'id_kop_master_peserta' => 'required',
+            'jenis_transaksi'       => 'required|in:SETORAN,PENARIKAN,POTONG_VOUCHER',
+            'nominal'               => 'required|numeric|min:1',
+            'coa_kas_bank'          => 'required|string',
+            'coa_sukarela'          => 'required|string',
+            'keterangan'            => 'nullable|string'
+        ]);
+
+        $idPeserta = $request->id_kop_master_peserta;
+        $jenis = $request->jenis_transaksi;
+        $nominal = $request->nominal;
+        $operator = Auth::user()->name ?? 'Admin';
+
+        // Ambil info nama & cabang peserta
+        $peserta = DB::table('kop_master_peserta')->where('id_kop_master_peserta', $idPeserta)->first();
+        if (!$peserta) return redirect()->back()->with('error', 'Anggota tidak ditemukan.');
+
+        // Cek kecukupan saldo jika melakukan Penarikan / Potong Voucher
+        if (in_array($jenis, ['PENARIKAN', 'POTONG_VOUCHER'])) {
+            $saldoSaatIni = DB::table('kop_simpanan_sukarela_transaksi')
+                ->where('id_kop_master_peserta', $idPeserta)
+                ->select(DB::raw("SUM(CASE WHEN jenis_transaksi = 'SETORAN' THEN nominal ELSE -nominal END) as total"))
+                ->value('total') ?? 0;
+
+            if ($saldoSaatIni < $nominal) {
+                return redirect()->back()->with('error', 'Transaksi Gagal! Saldo Sukarela tidak mencukupi. Sisa saldo saat ini: Rp ' . number_format($saldoSaatIni, 0, ',', '.'));
+            }
+        }
+
+        DB::beginTransaction();
+        try {
+            // 1. Generate Nomor Jurnal (JVS = Jurnal Voucher Sukarela)
+            $currentMonth = Carbon::now()->format('Ym');
+            $prefix = "JVS-" . $currentMonth . "-";
+            $lastJurnal = DB::table('kop_fin_jurnal')->where('jurnal_no_bukti', 'like', $prefix . '%')->orderBy('id_jurnal', 'desc')->first();
+            $nextNumber = $lastJurnal ? str_pad(((int) substr($lastJurnal->jurnal_no_bukti, -4)) + 1, 4, '0', STR_PAD_LEFT) : "0001";
+            $noBukti = $prefix . $nextNumber;
+
+            // Keterangan default jurnal
+            $ketJurnal = "Transaksi Sukarela [{$jenis}] - {$peserta->kop_master_peserta_name}. " . ($request->keterangan ?? '');
+
+            // 2. Insert Header Jurnal
+            $jurnalId = DB::table('kop_fin_jurnal')->insertGetId([
+                'jurnal_no_bukti'   => $noBukti,
+                'jurnal_tgl'        => Carbon::now()->format('Y-m-d'),
+                'jurnal_keterangan' => $ketJurnal,
+                'jurnal_ref_table'  => 'kop_simpanan_sukarela_transaksi',
+                'jurnal_ref_code'   => $noBukti,
+                'jurnal_user'       => $operator,
+                'jurnal_cabang'     => $peserta->kop_master_peserta_cabang,
+                'jurnal_created'    => $operator,
+                'created_at'        => Carbon::now(),
+                'updated_at'        => Carbon::now(),
+            ]);
+
+            // 3. Atur Posisi Debit & Kredit Accounting berdasarkan Jenis Transaksi
+            if ($jenis === 'SETORAN') {
+                // Uang masuk ke koperasi (Kas Bertambah [D], Tabungan Sukarela Anggota Bertambah/Kewajiban [K])
+                $debitCoa  = $request->coa_kas_bank;
+                $kreditCoa = $request->coa_sukarela;
+            } else {
+                // PENARIKAN / POTONG_VOUCHER: Tabungan Sukarela Berkurang [D], Kas Koperasi Berkurang [K]
+                $debitCoa  = $request->coa_sukarela;
+                $kreditCoa = $request->coa_kas_bank;
+            }
+
+            DB::table('kop_fin_jurnal_detail')->insert([
+                ['jurnal_id' => $jurnalId, 'coa_code' => $debitCoa, 'jurnal_debit' => $nominal, 'jurnal_kredit' => 0, 'created_at' => Carbon::now(), 'updated_at' => Carbon::now()],
+                ['jurnal_id' => $jurnalId, 'coa_code' => $kreditCoa, 'jurnal_debit' => 0, 'jurnal_kredit' => $nominal, 'created_at' => Carbon::now(), 'updated_at' => Carbon::now()]
+            ]);
+
+            // 4. Masukkan Mutasi ke Saldo Internal Sukarela
+            DB::table('kop_simpanan_sukarela_transaksi')->insert([
+                'id_kop_master_peserta' => $idPeserta,
+                'id_jurnal'             => $jurnalId,
+                'tgl_transaksi'         => Carbon::now()->format('Y-m-d'),
+                'jenis_transaksi'       => $jenis,
+                'nominal'               => $nominal,
+                'keterangan'            => $request->keterangan ?? "Mutasi saldo {$jenis}",
+                'operator'              => $operator,
+                'created_at'            => Carbon::now(),
+                'updated_at'            => Carbon::now()
+            ]);
+
+            DB::commit();
+            return redirect()->back()->with('success', "Sukses memproses {$jenis} sebesar Rp " . number_format($nominal, 0, ',', '.') . ". No Jurnal: " . $noBukti);
+        } catch (\Exception $e) {
+            DB::rollBack();
+            return redirect()->back()->with('error', 'Terjadi kesalahan sistem: ' . $e->getMessage());
+        }
+    }
     // MENU ARISAN KOPERASI
     public function menu_koperasi_arisan($akses, $id)
     {
@@ -383,7 +793,7 @@ class KoperasiController extends Controller
     public function menu_koperasi_setup_arisan_get_peserta($cabang)
     {
         $peserta = KopMasterPeserta::where('kop_master_peserta_cabang', $cabang)
-            ->where('kop_master_peserta_status', '1')
+            ->where('kop_master_peserta_status', 'AKTIF')
             ->select('id_kop_master_peserta', 'kop_master_peserta_name', 'kop_master_peserta_code')
             ->get();
 
@@ -736,10 +1146,52 @@ class KoperasiController extends Controller
                 ->join('kop_master_peserta', 'kop_master_peserta.kop_master_peserta_code', '=', 'kop_vocher_data.kop_master_peserta_code')
                 ->join('kop_user_verifikasi', 'kop_user_verifikasi.kop_user_verifikasi_code', '=', 'kop_vocher_data.kop_vocher_data_ketua')
                 ->where('kop_vocher_data_cabang', Auth::user()->access_cabang)->orderBy('id_vocher_data', 'desc')->get();
-            return view('app-koperasi.menu-vocher-koperasi', compact('data'), ['akses' => $akses, 'code' => $id]);
+            $categories = [
+                'ELC' => 'Listrik (PLN)',
+                'WTR' => 'PDAM',
+                'NET' => 'Internet / WiFi',
+                'TEL' => 'Pulsa / Pascabayar'
+            ];
+            return view('app-koperasi.menu-vocher-koperasi', compact('data', 'categories'), ['akses' => $akses, 'code' => $id]);
         } else {
             return Redirect::to('dashboard/home');
         }
+    }
+    public function menu_koperasi_vocher_store(Request $request)
+    {
+        $request->validate([
+            'kop_master_peserta_code' => 'required|string',
+            'kop_vocher_cat_code'    => 'required|string',
+            'kop_vocher_data_nominal' => 'required|numeric|min:1000',
+            'kop_vocher_data_admin'   => 'required|numeric|min:0',
+            'kop_vocher_data_number_id' => 'required|string',
+            'kop_vocher_data_cabang'   => 'required|string',
+        ]);
+
+        // Otomatisasi Tanggal (Mulai hari ini s.d Akhir Bulan Ini untuk tagihan akhir bulan)
+        $dateStart = Carbon::now();
+        $dateEnd   = Carbon::now()->endOfMonth(); // Jatuh tempo akhir bulan berjalan
+
+        // Generate Kode & Token Unik
+        $voucherCode = 'VCH-' . strtoupper(Str::random(8));
+        $token       = strtoupper(Str::random(12)); // Bisa disesuaikan dengan format API PPOB jika ada
+
+        KopVocherData::create([
+            'kop_vocher_data_code'     => $voucherCode,
+            'kop_vocher_data_token'    => $token,
+            'kop_master_peserta_code'  => $request->kop_master_peserta_code,
+            'kop_vocher_cat_code'      => $request->kop_vocher_cat_code,
+            'kop_vocher_data_nominal'  => $request->kop_vocher_data_nominal,
+            'kop_vocher_data_admin'    => $request->kop_vocher_data_admin,
+            'kop_vocher_data_number_id' => $request->kop_vocher_data_number_id,
+            'kop_vocher_data_ketua'    => 'Ketua Koperasi 2026', // Bisa dinamis dari session/config
+            'kop_vocher_data_date_start' => $dateStart->format('Y-m-d'),
+            'kop_vocher_data_date_end'  => $dateEnd->format('Y-m-d'),
+            'kop_vocher_data_cabang'   => $request->kop_vocher_data_cabang,
+            'kop_vocher_data_status'   => 'PENDING_BILL', // Status: Menunggu tagihan akhir bulan
+        ]);
+
+        return redirect()->back()->with('success', 'Voucher berhasil diterbitkan! Tagihan dimasukkan ke akhir bulan.');
     }
     public function menu_koperasi_vocher_add(Request $request)
     {
@@ -1005,7 +1457,7 @@ class KoperasiController extends Controller
     {
         $data = DB::table('kop_master_peserta')
             ->join('kop_tagihan_bulan', 'kop_tagihan_bulan.kop_tagihan_bulan_cabang', '=', 'kop_master_peserta.kop_master_peserta_cabang')
-            ->where('kop_master_peserta.kop_master_peserta_status', 1)
+            ->where('kop_master_peserta.kop_master_peserta_status', 'AKTIF')
             ->where('kop_tagihan_bulan_code', $request->code)->get();
         return view('app-koperasi.menu-iuran.form-proses-iuran', compact('data'), ['code' => $request->code]);
     }
@@ -1283,7 +1735,7 @@ class KoperasiController extends Controller
         $data = DB::table('kop_master_peserta')
             ->join('kop_master_cabang', 'kop_master_cabang.kop_master_cabang_code', '=', 'kop_master_peserta.kop_master_peserta_cabang')
             ->join('kop_setup_cabang_koperasi', 'kop_setup_cabang_koperasi.kop_setup_cabang_koperasi_cabang', '=', 'kop_master_peserta.kop_master_peserta_cabang')
-            ->where('kop_master_peserta.kop_master_peserta_status', 1)
+            ->where('kop_master_peserta.kop_master_peserta_status', 'AKTIF')
             ->get();
         return view('app-koperasi.menu-peminjaman.peminjaman-uang.form-cari-data', compact('data'));
     }
@@ -1347,7 +1799,7 @@ class KoperasiController extends Controller
         $data = DB::table('kop_master_peserta')
             ->join('kop_master_cabang', 'kop_master_cabang.kop_master_cabang_code', '=', 'kop_master_peserta.kop_master_peserta_cabang')
             ->join('kop_setup_cabang_koperasi', 'kop_setup_cabang_koperasi.kop_setup_cabang_koperasi_cabang', '=', 'kop_master_peserta.kop_master_peserta_cabang')
-            ->where('kop_master_peserta.kop_master_peserta_status', 1)
+            ->where('kop_master_peserta.kop_master_peserta_status', 'AKTIF')
             ->get();
         return view('app-koperasi.menu-peminjaman.peminjaman-barang.form-cari-data', compact('data'));
     }
@@ -2693,7 +3145,7 @@ class KoperasiController extends Controller
         if ($this->url_akses_sub($akses, $id) == true) {
             // 1. Ambil data peserta dengan status AKTIF berdasarkan struktur tabel kop_master_peserta
             $anggota = DB::table('kop_master_peserta')
-                ->where('kop_master_peserta_status', '1')
+                ->where('kop_master_peserta_status', 'AKTIF')
                 ->orderBy('kop_master_peserta_name', 'asc')
                 ->get();
 
@@ -2742,7 +3194,7 @@ class KoperasiController extends Controller
         // 2. Cek apakah ID Peserta benar-benar valid dan aktif di database
         $peserta = DB::table('kop_master_peserta')
             ->where('id_kop_master_peserta', $request->anggota_id)
-            ->where('kop_master_peserta_status', '1')
+            ->where('kop_master_peserta_status', 'AKTIF')
             ->first();
 
         if (!$peserta) {
@@ -4157,7 +4609,7 @@ class KoperasiController extends Controller
             // Hitung total peserta yang aktif di cabang tersebut
             $totalpeserta = DB::table('kop_master_peserta')
                 ->where('kop_master_peserta_cabang', $tagihan->kop_tagihan_bulan_cabang)
-                ->where('kop_master_peserta_status', 1)
+                ->where('kop_master_peserta_status', 'AKTIF')
                 ->count();
 
             // 1. Update Status Tagihan Jadi Lunas (1)

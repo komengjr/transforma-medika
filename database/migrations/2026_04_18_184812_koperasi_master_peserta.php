@@ -31,6 +31,7 @@ class KoperasiMasterPeserta extends Migration
             $table->date('kop_master_peserta_tgl_anggota');
             $table->text('kop_master_peserta_photo')->nullable();
             $table->string('kop_master_peserta_status');
+            $table->string('security_code', 6)->default('123456')->after('password');
             $table->timestamps();
         });
     }
