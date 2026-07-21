@@ -17,7 +17,7 @@ class KopMasterProduk extends Migration
             $table->id('id_produk');
             $table->string('kode_produk', 50)->unique();
             $table->string('nama_produk', 255);
-            $table->string('gambar_produk', 255)->nullable()->after('nama_produk');
+            $table->string('gambar_produk', 255)->nullable();
             $table->string('kategori', 100)->nullable();
             $table->decimal('harga_beli_default', 15, 2)->default(0);
             $table->decimal('harga_jual_default', 15, 2)->default(0);
