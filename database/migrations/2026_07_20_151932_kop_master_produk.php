@@ -29,14 +29,12 @@ class KopMasterProduk extends Migration
         // Tabel riwayat masuknya stok (pembelian barang oleh koperasi)
         Schema::create('kop_trx_produk_stok_masuk', function (Blueprint $table) {
             $table->id('id_stok_masuk');
-            $table->unsignedBigInteger('produk_id');
+            $table->foreign('produk_id')->references('id_produk')->on('kop_master_produk')->onDelete('cascade');
             $table->integer('jumlah_masuk');
             $table->decimal('harga_beli_satuan', 15, 2);
             $table->date('tanggal_masuk');
             $table->string('keterangan', 255)->nullable();
             $table->timestamps();
-
-            $table->foreign('produk_id')->references('id_produk')->on('kop_master_produk')->onDelete('cascade');
         });
     }
 
