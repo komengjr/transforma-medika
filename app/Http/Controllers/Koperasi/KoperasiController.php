@@ -166,11 +166,7 @@ class KoperasiController extends Controller
     public function menu_koperasi_simpanan_pokok($akses, $id)
     {
         if ($this->url_akses_sub($akses, $id) == true) {
-            $list_cabang = DB::table('kop_master_peserta')
-                ->select('kop_master_peserta_cabang')
-                ->distinct()
-                ->whereNotNull('kop_master_peserta_cabang')
-                ->pluck('kop_master_peserta_cabang');
+            $list_cabang = DB::table('kop_master_cabang')->get();
 
             // Ambil COA Pembayaran (Aset) langsung menggunakan Query Builder
             $coa_pembayaran = DB::table('kop_fin_master_coa')
@@ -186,7 +182,7 @@ class KoperasiController extends Controller
                 ->orderBy('coa_code', 'asc')
                 ->get();
 
-            $nominal_simpanan_pokok = 100000;
+            $nominal_simpanan_pokok = 200000;
             return view('app-koperasi.menu-simpanan.menu-simpanan-pokok', compact(
                 'list_cabang',
                 'coa_pembayaran',

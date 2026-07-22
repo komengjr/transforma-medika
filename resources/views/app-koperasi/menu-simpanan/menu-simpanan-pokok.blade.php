@@ -22,7 +22,7 @@
                         <select id="select-cabang" class="form-select form-select-lg">
                             <option value="">-- Pilih Cabang Terlebih Dahulu --</option>
                             @foreach($list_cabang as $cabang)
-                            <option value="{{ $cabang }}">{{ strtoupper($cabang) }}</option>
+                            <option value="{{ $cabang->kop_master_cabang_code }}">{{ $cabang->kop_master_cabang_name }}</option>
                             @endforeach
                         </select>
                     </div>
