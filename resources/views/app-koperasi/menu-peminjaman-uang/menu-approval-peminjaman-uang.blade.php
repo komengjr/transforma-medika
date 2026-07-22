@@ -122,8 +122,8 @@
 <div class="modal fade" id="modalReview" tabindex="-1" aria-labelledby="modalReviewLabel" aria-hidden="true">
     <div class="modal-dialog modal-lg">
         <div class="modal-content">
-            <div class="modal-header bg-primary text-white py-2">
-                <h6 class="modal-title fw-bold" id="modalReviewLabel"><i class="fas fa-file-contract me-2"></i> Review Pengajuan Pinjaman</h6>
+            <div class="modal-header bg-primary text-white py-3">
+                <h5 class="modal-title fw-bold text-white" id="modalReviewLabel"><i class="fas fa-file-contract me-2"></i> Review Pengajuan Pinjaman</h5>
                 <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal" aria-label="Close"></button>
             </div>
             <div class="modal-body bg-light">
@@ -299,6 +299,7 @@
 
                     let p = response.data.pinjaman;
                     let h = response.data.history;
+                    let tenors = response.data.tenors || []; // Pastikan backend mengirim data tenors
 
                     $('#review_trx_id').val(p.id);
                     $('#review_nota_nomor').val(p.nota_nomor);
@@ -311,29 +312,120 @@
                     $('#det_netto').text(formatRp(p.pencairan_netto));
                     $('#det_cicilan').text(p.tenor_bulan + ' Bulan @ ' + formatRp(p.cicilan_per_bulan));
 
+                    // --- TAMBAHAN: Tampilkan Status Tagihan (jika elemen HTML-nya ada) ---
+                    let statusTagihan = p.status_tagihan || 'PENDING';
+                    let badgeTagihanClass = statusTagihan === 'LUNAS' ? 'bg-success' : 'bg-warning text-dark';
+                    $('#det_status_tagihan').html(`<span class="badge ${badgeTagihanClass}">${statusTagihan}</span>`);
+
                     $('#prof_nama').text(p.kop_master_peserta_name);
                     $('#prof_kode').text(p.kop_master_peserta_code);
                     $('#prof_nip').text(p.kop_master_peserta_nip || '-');
                     $('#prof_hp').text(p.kop_master_peserta_no_hp || '-');
 
+                    // Render Riwayat Pinjaman
+                    // Render Riwayat Pinjaman Beserta Tenornya
                     let historyHtml = '';
                     if (h.length > 0) {
                         $.each(h, function(i, val) {
                             let badgeClass = val.status_pinjaman === 'APPROVED' ? 'bg-success' : (val.status_pinjaman === 'REJECTED' ? 'bg-danger' : 'bg-warning');
+                            let statusTagihanRiwayat = val.status_tagihan || 'PENDING';
+                            let badgeTagihanRwy = statusTagihanRiwayat === 'LUNAS' ? 'bg-success' : 'bg-warning text-dark';
+
+                            // Buat baris utama riwayat pinjaman
                             historyHtml += `
+                        <tr class="table-light fw-bold">
+                            <td><i class="fas fa-history text-secondary me-1"></i> ${val.tanggal_pinjaman}</td>
+                            <td>${val.nota_nomor}</td>
+                            <td>${formatRp(val.jumlah_pinjaman)}</td>
+                            <td>${val.tenor_bulan} Bln</td>
+                            <td><span class="badge ${badgeClass}">${val.status_pinjaman}</span></td>
+                            <td><span class="badge ${badgeTagihanRwy}">${statusTagihanRiwayat}</span></td>
+                        </tr>
+                    `;
+
+                            // Buat sub-tabel/baris untuk rincian tenor dari riwayat tersebut
+                            if (val.tenors && val.tenors.length > 0) {
+                                historyHtml += `
                             <tr>
-                                <td>${val.tanggal_pinjaman}</td>
-                                <td>${val.nota_nomor}</td>
-                                <td>${formatRp(val.jumlah_pinjaman)}</td>
-                                <td>${val.tenor_bulan} Bln</td>
-                                <td><span class="badge ${badgeClass}">${val.status_pinjaman}</span></td>
+                                <td colspan="6" class="p-3 bg-white border-bottom">
+                                    <div class="small fw-bold text-muted mb-1">Rincian Angsuran / Tenor (${val.nota_nomor}):</div>
+                                    <div class="table-responsive">
+                                        <table class="table table-sm table-bordered mb-0 align-middle font-monospace" style="font-size: 0.85rem;">
+                                            <thead class="table-secondary text-center">
+                                                <tr>
+                                                    <th>Angsuran</th>
+                                                    <th>Jatuh Tempo</th>
+                                                    <th>Pokok + Bunga (Total)</th>
+                                                    <th>Status Bayar</th>
+                                                    <th>Tanggal Bayar</th>
+                                                </tr>
+                                            </thead>
+                                            <tbody>
+                        `;
+
+                                $.each(val.tenors, function(idx, t) {
+                                    let isLunasRwy = (t.status_bayar === 'LUNAS');
+                                    let badgeTenorRwy = isLunasRwy ? 'bg-success' : 'bg-warning text-dark';
+                                    let totalTagihanRwy = parseFloat(t.jumlah_tagihan ?? 0);
+
+                                    historyHtml += `
+                                <tr class="${isLunasRwy ? 'table-success bg-opacity-10' : ''}">
+                                    <td class="text-center fw-bold">Bulan Ke-${t.angsuran_ke}</td>
+                                    <td class="text-center">${t.jatuh_tempo ?? '-'}</td>
+                                    <td class="text-end">${formatRp(totalTagihanRwy)}</td>
+                                    <td class="text-center"><span class="badge ${badgeTenorRwy}">${t.status_bayar}</span></td>
+                                    <td class="text-center">${t.tanggal_bayar ?? '-'}</td>
+                                </tr>
+                            `;
+                                });
+
+                                historyHtml += `
+                                            </tbody>
+                                        </table>
+                                    </div>
+                                </td>
                             </tr>
                         `;
+                            } else {
+                                historyHtml += `
+                            <tr>
+                                <td colspan="6" class="text-muted fst-italic ps-4 bg-white">Tidak ada rincian tenor untuk riwayat ini.</td>
+                            </tr>
+                        `;
+                            }
                         });
                     } else {
-                        historyHtml = `<tr><td colspan="5" class="text-center text-muted fst-italic">Belum ada riwayat pinjaman sebelumnya.</td></tr>`;
+                        historyHtml = `<tr><td colspan="6" class="text-center text-muted fst-italic">Belum ada riwayat pinjaman sebelumnya.</td></tr>`;
                     }
                     $('#tableRiwayatBody').html(historyHtml);
+
+                    // --- TAMBAHAN: Render Detail Tenor Angsuran ---
+                    let tenorHtml = '';
+                    if (tenors.length > 0) {
+                        $.each(tenors, function(i, t) {
+                            let isLunas = (t.status_bayar === 'LUNAS');
+                            let rowClass = isLunas ? 'table-success bg-opacity-25' : '';
+                            let badgeTenorClass = isLunas ? 'bg-success' : 'bg-warning text-dark';
+                            let totalTagihan = parseFloat(t.jumlah_tagihan ?? 0);
+                            let bunga = parseFloat(t.bunga_tagihan ?? 0);
+                            let pokok = totalTagihan - bunga;
+
+                            tenorHtml += `
+                        <tr class="${rowClass}">
+                            <td class="text-center fw-bold">Bulan Ke-${t.angsuran_ke}</td>
+                            <td>${t.jatuh_tempo ?? '-'}</td>
+                            <td class="text-end font-monospace">${formatRp(pokok)}</td>
+                            <td class="text-end font-monospace">${formatRp(bunga)}</td>
+                            <td class="text-end font-monospace fw-bold">${formatRp(totalTagihan)}</td>
+                            <td class="text-center"><span class="badge ${badgeTenorClass}">${t.status_bayar}</span></td>
+                        </tr>
+                    `;
+                        });
+                    } else {
+                        tenorHtml = `<tr><td colspan="6" class="text-center text-muted fst-italic">Belum ada rincian jadwal tenor.</td></tr>`;
+                    }
+                    $('#tableTenorBody').html(tenorHtml); // Sesuaikan ID elemen tbody tabel tenor di modal HTML Anda
+
                     $('#modalReview').modal('show');
                 },
                 error: function() {

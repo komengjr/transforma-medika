@@ -105,13 +105,25 @@
                         </div>
 
                         <div class="bg-light p-3 rounded mb-3 border">
-                            <div class="d-flex justify-content-between mb-1">
+                            <div class="d-flex justify-content-between mb-2">
                                 <span class="text-muted">Bulan Dipilih:</span>
-                                <span class="fw-bold font-monospace" id="label-total-bulan">0 Bulan</span>
+                                <span class="fw-bold font-monospace text-dark" id="label-total-bulan">0 Bulan</span>
                             </div>
+                            <div class="d-flex justify-content-between mb-1">
+                                <span class="text-muted">Total Pokok:</span>
+                                <span class="fw-bold font-monospace text-secondary" id="label-total-pokok">Rp 0</span>
+                            </div>
+                            <div class="d-flex justify-content-between mb-1">
+                                <span class="text-muted">Total Bunga:</span>
+                                <span class="fw-bold font-monospace text-warning" id="label-total-bunga">Rp 0</span>
+                            </div>
+                            <div class="d-flex justify-content-between mb-1 small text-muted fst-italic d-none" id="info-penambahan-bunga">
+                                <span colspan="2">* Kalkulasi bunga 10% x jumlah bulan</span>
+                            </div>
+                            <hr class="my-2">
                             <div class="d-flex justify-content-between align-items-center">
-                                <span class="text-muted fw-bold">Total Bayar:</span>
-                                <span class="fs-4 fw-bold text-success font-monospace" id="label-total-nominal">Rp 0</span>
+                                <span class="text-muted fw-bold">Total Tagihan:</span>
+                                <span class="fs-2 fw-bold text-success font-monospace" id="label-total-nominal">Rp 0</span>
                             </div>
                         </div>
 
@@ -204,17 +216,50 @@
             return `${day}-${month}-${year}`;
         }
 
-        // Kalkulasi Total saat Checkbox Berubah
+        // Kalkulasi Total & Detail Rincian Ringkasan Sesuai Aturan Terbaru
         function hitungTotalPilihan() {
-            let totalNominal = 0;
             let totalBulan = 0;
+            let sumPokok = 0;
+            let sampleBunga = 0; // Ambil referensi nilai bunga dari baris pertama yang dicentang
 
-            $('.checkbox-tenor:checked').each(function() {
-                totalNominal += parseFloat($(this).data('nominal') || 0);
+            $('.checkbox-tenor:checked').each(function(index) {
+                let p = parseFloat($(this).data('pokok') || 0);
+                let b = parseFloat($(this).data('bunga') || 0);
+
+                sumPokok += p;
+                if (index === 0) {
+                    sampleBunga = b; // Simpan nilai bunga acuan 1 bulan
+                }
                 totalBulan++;
             });
 
+            let finalPokok = 0;
+            let finalBunga = 0;
+            let totalNominal = 0;
+
+            if (totalBulan === 1) {
+                // Jika checklist hanya 1 bulan: Pokok + Bunga normal
+                let checkedEl = $('.checkbox-tenor:checked').first();
+                finalPokok = parseFloat(checkedEl.data('pokok') || 0);
+                finalBunga = parseFloat(checkedEl.data('bunga') || 0);
+                totalNominal = finalPokok + finalBunga;
+
+                $('#info-penambahan-bunga').addClass('d-none');
+            } else if (totalBulan > 1) {
+                // Jika checklist > 1 bulan: (pokok * jumlah bulan) + (bunga * 10% * jumlah bulan)
+                finalPokok = sumPokok;
+                finalBunga = sampleBunga * 0.10 * totalBulan;
+                totalNominal = finalPokok + finalBunga;
+
+                $('#info-penambahan-bunga').removeClass('d-none');
+            } else {
+                $('#info-penambahan-bunga').addClass('d-none');
+            }
+
+            // Tampilkan pada label ringkasan
             $('#label-total-bulan').text(totalBulan + ' Bulan');
+            $('#label-total-pokok').text(formatRupiah(finalPokok));
+            $('#label-total-bunga').text(formatRupiah(finalBunga));
             $('#label-total-nominal').text(formatRupiah(totalNominal));
 
             if (totalBulan > 0) {
@@ -257,7 +302,7 @@
                         $('#res-nama').text(kontrak.kop_master_peserta_name ?? '-');
                         $('#res-kode').text(kontrak.kop_master_peserta_code ?? '-');
                         $('#res-plafon').text(formatRupiah(kontrak.jumlah_pinjaman ?? kontrak.plafon));
-                        $('#res-bunga').text(formatRupiah(kontrak.total_bunga ?? kontrak.bunga));
+                        $('#res-bunga').text(formatRupiah(kontrak.bunga_koperasi ?? kontrak.bunga));
                         $('#res-total').text(formatRupiah(kontrak.total_piutang));
                         $('#res-cicilan').text(formatRupiah(kontrak.cicilan_per_bulan));
 
@@ -275,7 +320,7 @@
 
                                 let checkboxInput = isLunas ?
                                     `<span class="text-success"><i class="fas fa-check-double"></i></span>` :
-                                    `<input class="form-check-input checkbox-tenor shadow-sm" type="checkbox" value="${row.id}" data-nominal="${totalTagihan}">`;
+                                    `<input class="form-check-input checkbox-tenor shadow-sm" type="checkbox" value="${row.id}" data-nominal="${totalTagihan}" data-pokok="${pokokTagihan}" data-bunga="${bunga}">`;
 
                                 html += `
                                     <tr class="${rowClass}">
@@ -399,7 +444,10 @@
             $('#section-placeholder-kosong').removeClass('d-none');
             $('#table-jadwal-cicilan tbody').html('');
             $('#label-total-bulan').text('0 Bulan');
+            $('#label-total-pokok').text('Rp 0');
+            $('#label-total-bunga').text('Rp 0');
             $('#label-total-nominal').text('Rp 0');
+            $('#info-penambahan-bunga').addClass('d-none');
             $('#btn-proses-multi-bayar').attr('disabled', 'disabled');
         }
 

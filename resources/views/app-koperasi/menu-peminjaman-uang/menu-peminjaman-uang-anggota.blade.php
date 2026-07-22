@@ -47,7 +47,7 @@
                     <div class="mb-3">
                         <label class="form-label small fw-bold">Pilih Anggota <span class="text-danger">*</span></label>
                         <select class="form-select form-select-sm select2-peserta" id="pinjam_anggota_id" name="anggota_id" required>
-                            <option value=""></option>
+                            <option value="">Pilih Anggota Koperasi</option>
                             @foreach($peserta as $p)
                             <option value="{{ $p->id_kop_master_peserta }}"
                                 data-code="{{ $p->kop_master_peserta_code }}"
@@ -292,7 +292,7 @@
             <div class="card-header bg-white py-3 border-bottom">
                 <div class="d-flex align-items-center justify-content-between flex-wrap gap-2">
                     <div class="d-flex align-items-center">
-                        <i class="fas fa-history text-secondary me-2 fs-5"></i>
+                        <i class="fas fa-list-ul me-2 fs-2"></i>
                         <h5 class="card-title mb-0 fw-bold text-dark">Log Akad Pinjaman & Status Tenor</h5>
                     </div>
                     <!-- Filter Status -->
@@ -497,6 +497,7 @@
             let bankCoa = $('#pinjam_sumber_dana_coa').val();
             let coaAdmin = $('#pinjam_coa_pendapatan_admin').val();
             let coaBunga = $('#pinjam_coa_pendapatan_bunga').val();
+
             if (!anggota || jumlahPinjaman <= 0) {
                 Swal.fire({
                     title: 'Form Belum Lengkap',
@@ -514,6 +515,7 @@
                 });
                 return;
             }
+
             let pencairanNetto = jumlahPinjaman - biayaAdmin;
             let totalPiutangPengembalian = jumlahPinjaman + bungaKoperasi;
             let cicilanPerBulan = Math.round(totalPiutangPengembalian / tenor);
@@ -534,10 +536,18 @@
 
             let htmlTimeline = '';
             let startDate = new Date(tgl);
+            let startDay = startDate.getDate();
+
+            // Tentukan base date untuk angsuran pertama (Tanggal 26)
+            // Jika tanggal pinjam > 15, mulai bulan depan. Jika <= 15, mulai bulan ini.
+            let baseDate = new Date(startDate.getFullYear(), startDate.getMonth(), 26);
+            if (startDay > 15) {
+                baseDate.setMonth(baseDate.getMonth() + 1);
+            }
 
             for (let i = 1; i <= tenor; i++) {
-                let dueDate = new Date(startDate.getTime());
-                dueDate.setMonth(startDate.getMonth() + i);
+                // Buat salinan baseDate lalu tambahkan (i - 1) bulan dan pastikan tanggalnya 26
+                let dueDate = new Date(baseDate.getFullYear(), baseDate.getMonth() + (i - 1), 26);
 
                 let day = dueDate.getDate().toString().padStart(2, '0');
                 let month = (dueDate.getMonth() + 1).toString().padStart(2, '0');
@@ -549,14 +559,14 @@
                 let currentTotal = currentPokok + currentBunga;
 
                 htmlTimeline += `
-                    <tr>
-                        <td class="fw-semibold text-secondary ps-3">Angsuran Ke-${i}</td>
-                        <td><i class="far fa-calendar-check me-2 text-muted"></i> ${formattedDate}</td>
-                        <td class="text-end font-monospace text-muted">${formatRupiah(currentPokok)}</td>
-                        <td class="text-end font-monospace text-muted">${formatRupiah(currentBunga)}</td>
-                        <td class="text-end font-monospace fw-bold text-dark pe-3">${formatRupiah(currentTotal)}</td>
-                    </tr>
-                `;
+            <tr>
+                <td class="fw-semibold text-secondary ps-3">Angsuran Ke-${i}</td>
+                <td><i class="far fa-calendar-check me-2 text-muted"></i> ${formattedDate}</td>
+                <td class="text-end font-monospace text-muted">${formatRupiah(currentPokok)}</td>
+                <td class="text-end font-monospace text-muted">${formatRupiah(currentBunga)}</td>
+                <td class="text-end font-monospace fw-bold text-dark pe-3">${formatRupiah(currentTotal)}</td>
+            </tr>
+        `;
             }
 
             $('#simulasi-pinjaman-tenor-tbody').html(htmlTimeline);

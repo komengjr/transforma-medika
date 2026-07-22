@@ -2951,8 +2951,17 @@ class KoperasiController extends Controller
             $sisaBunga     = $bungaKoperasi - ($bungaPerBulan * $tenorBulan);
 
             $tenorData = [];
+
+            // Tentukan basis bulan awal jatuh tempo berdasarkan tanggal transaksi
+            // Jika tanggal pinjam > 15, mulai dari bulan depan. Jika <= 15, mulai bulan ini.
+            $baseDate = $tanggalPinjam->copy();
+            if ($tanggalPinjam->day > 15) {
+                $baseDate->addMonth();
+            }
+
             for ($i = 1; $i <= $tenorBulan; $i++) {
-                $dueDate = $tanggalPinjam->copy()->addMonths($i);
+                // Untuk iterasi ke-1 menggunakan baseDate, selanjutnya ditambah (i - 1) bulan dari baseDate
+                $dueDate = $baseDate->copy()->addMonths($i - 1)->day(26);
 
                 $currPokok = ($i === $tenorBulan) ? ($pokokPerBulan + $sisaPokok) : $pokokPerBulan;
                 $currBunga = ($i === $tenorBulan) ? ($bungaPerBulan + $sisaBunga) : $bungaPerBulan;
@@ -3068,17 +3077,37 @@ class KoperasiController extends Controller
         }
 
         // Ambil Riwayat Pinjaman Sebelumnya dari Anggota yang sama
-        $history = DB::table('kop_trx_pinjaman_anggota')
+        $historyRaw = DB::table('kop_trx_pinjaman_anggota')
             ->where('anggota_id', $pinjaman->anggota_id)
             ->where('id', '!=', $id) // Kecualikan pengajuan yang sedang direview
             ->orderBy('id', 'desc')
+            ->get();
+
+        // --- TAMBAHAN: Masukkan rincian tenor ke dalam masing-masing riwayat pinjaman ---
+        $history = [];
+        foreach ($historyRaw as $h) {
+            $tenorsRiwayat = DB::table('kop_trx_pinjaman_tenor')
+                ->where('id_pinjaman', $h->id)
+                ->orderBy('angsuran_ke', 'asc')
+                ->get();
+
+            // Ubah objek riwayat menjadi array / tambahkan properti tenors
+            $h->tenors = $tenorsRiwayat;
+            $history[] = $h;
+        }
+
+        // Ambil Rincian Jadwal Tenor untuk pinjaman utama yang sedang direview
+        $tenors = DB::table('kop_trx_pinjaman_tenor')
+            ->where('id_pinjaman', $id)
+            ->orderBy('angsuran_ke', 'asc')
             ->get();
 
         return response()->json([
             'status' => 'success',
             'data'   => [
                 'pinjaman' => $pinjaman,
-                'history'  => $history
+                'history'  => $history,
+                'tenors'   => $tenors
             ]
         ]);
     }
@@ -3121,6 +3150,36 @@ class KoperasiController extends Controller
                 'approved_at'     => now(),
                 'updated_at'      => now(),
             ]);
+
+            // 3. Tentukan tanggal acuan untuk jatuh tempo (Bisa menggunakan tanggal hari ini saat approve atau tanggal_pinjaman)
+            // Disini kita gunakan tanggal hari ini (saat disetujui), atau jika ingin berdasarkan tanggal_pinjaman ganti ke Carbon::parse($pinjaman->tanggal_pinjaman)
+            $tglApproval = Carbon::now();
+
+            // Aturan: Jika tanggal approval > 15, jatuh tempo pertama mulai bulan depan tanggal 26.
+            // Jika <= 15, jatuh tempo pertama mulai bulan ini tanggal 26.
+            $baseDate = $tglApproval->copy()->day(26);
+            if ($tglApproval->day > 15) {
+                $baseDate->addMonth();
+            }
+
+            // 4. Ambil ulang rincian tenor yang sudah ada untuk pinjaman ini
+            $tenors = DB::table('kop_trx_pinjaman_tenor')
+                ->where('id_pinjaman', $id)
+                ->orderBy('angsuran_ke', 'asc')
+                ->get();
+
+            // 5. Perbarui tanggal jatuh tempo masing-masing angsuran berdasarkan aturan baru
+            foreach ($tenors as $index => $tenor) {
+                // Hitung tanggal jatuh tempo untuk setiap angsuran ke-i (index 0 adalah angsuran ke-1)
+                $dueDate = $baseDate->copy()->addMonths($index);
+
+                DB::table('kop_trx_pinjaman_tenor')
+                    ->where('id', $tenor->id)
+                    ->update([
+                        'jatuh_tempo' => $dueDate->format('Y-m-d'),
+                        'updated_at'  => now(),
+                    ]);
+            }
 
             // B. Generate Nomor Bukti Jurnal (Contoh: JV-202607-0001)
             $prefixJurnal = 'JV-' . now()->format('Ym') . '-';
@@ -3346,7 +3405,7 @@ class KoperasiController extends Controller
         $request->validate([
             'id_tenors'         => 'required|array',
             'id_tenors.*'       => 'integer',
-            'sumber_dana_coa'   => 'required|string',
+            'sumber_dana_coa'   => 'required|string', // Akun Kas/Bank penerima setoran
         ]);
 
         DB::beginTransaction();
@@ -3354,34 +3413,72 @@ class KoperasiController extends Controller
             $idTenors = $request->id_tenors;
             $idPinjaman = null;
 
-            foreach ($idTenors as $tenorId) {
+            $totalBulan = count($idTenors);
+            $sumPokok = 0;
+            $sampleBunga = 0;
+            $tenorDetails = [];
+
+            // 1. Kumpulkan data dan hitung akumulasi pokok & bunga berdasarkan aturan
+            foreach ($idTenors as $index => $tenorId) {
                 $tenor = DB::table('kop_trx_pinjaman_tenor')->where('id', $tenorId)->first();
 
-                if (!$tenor) {
-                    continue;
-                }
-
-                // Lewatkan jika tenor sudah terlanjur lunas
-                if ($tenor->status_bayar === 'LUNAS') {
+                if (!$tenor || $tenor->status_bayar === 'LUNAS') {
                     continue;
                 }
 
                 $idPinjaman = $tenor->id_pinjaman;
-                $jumlahTagihan = $tenor->jumlah_tagihan;
+                $bungaNormal = floatval($tenor->bunga_tagihan ?? 0);
+                $totalTagihanRow = floatval($tenor->jumlah_tagihan ?? 0);
+                $pokokRow = $totalTagihanRow - $bungaNormal;
 
-                // 1. Update status tenor menjadi LUNAS
+                $sumPokok += $pokokRow;
+                if ($index === 0) {
+                    $sampleBunga = $bungaNormal;
+                }
+
+                $tenorDetails[] = [
+                    'id' => $tenorId,
+                    'pokok' => $pokokRow,
+                    'bunga_normal' => $bungaNormal
+                ];
+            }
+
+            if (empty($tenorDetails)) {
+                throw new \Exception('Tidak ada data angsuran valid yang dapat diproses.');
+            }
+
+            $finalPokok = $sumPokok;
+            $finalBunga = 0;
+
+            if ($totalBulan === 1) {
+                $finalBunga = $sampleBunga;
+            } else {
+                // Jika lebih dari 1 bulan: (bunga acuan * 10% * jumlah bulan)
+                $finalBunga = $sampleBunga * 0.10 * $totalBulan;
+            }
+
+            $totalNominalBayar = $finalPokok + $finalBunga;
+
+            // Ambil data kontrak pinjaman utama untuk referensi COA & nomor nota
+            $kontrakPinjaman = DB::table('kop_trx_pinjaman_anggota')->where('id', $idPinjaman)->first();
+            if (!$kontrakPinjaman) {
+                throw new \Exception('Data kontrak pinjaman tidak ditemukan.');
+            }
+
+            // 2. Update status setiap tenor yang dipilih menjadi LUNAS
+            foreach ($tenorDetails as $item) {
                 DB::table('kop_trx_pinjaman_tenor')
-                    ->where('id', $tenorId)
+                    ->where('id', $item['id'])
                     ->update([
                         'status_bayar'       => 'LUNAS',
-                        'jumlah_dibayar'     => $jumlahTagihan,
+                        'jumlah_dibayar'     => $item['pokok'] + ($totalBulan === 1 ? $item['bunga_normal'] : ($item['bunga_normal'] * 0.10)),
                         'tanggal_bayar'      => Carbon::now(),
                         'ref_pembayaran_id'  => $request->sumber_dana_coa,
                         'updated_at'         => Carbon::now()
                     ]);
             }
 
-            // 2. Cek apakah seluruh tenor pada pinjaman tersebut sudah lunas
+            // 3. Cek apakah seluruh tenor pada pinjaman tersebut sudah lunas
             if ($idPinjaman) {
                 $sisaTenorBelumLunas = DB::table('kop_trx_pinjaman_tenor')
                     ->where('id_pinjaman', $idPinjaman)
@@ -3389,7 +3486,6 @@ class KoperasiController extends Controller
                     ->count();
 
                 if ($sisaTenorBelumLunas === 0) {
-                    // Update status pinjaman utama jika sudah lunas seluruhnya
                     DB::table('kop_trx_pinjaman_anggota')
                         ->where('id', $idPinjaman)
                         ->update([
@@ -3399,13 +3495,63 @@ class KoperasiController extends Controller
                 }
             }
 
-            // Catatan: Anda bisa menyisipkan logika penjurnalan akuntansi otomatis di sini (Debet: Kas/Bank, Kredit: Piutang Anggota / Pendapatan Bunga)
+            // 4. Pembuatan Jurnal Finansial Otomatis (kop_fin_jurnal & kop_fin_jurnal_detail)
+            $noBuktiJurnal = 'JV-' . date('Ym') . '-' . str_pad(rand(1, 9999), 4, '0', STR_PAD_LEFT);
+
+            // Header Jurnal
+            $jurnalId = DB::table('kop_fin_jurnal')->insertGetId([
+                'jurnal_no_bukti'   => $noBuktiJurnal,
+                'jurnal_tgl'        => Carbon::now()->toDateString(),
+                'jurnal_keterangan' => 'Pelunasan multi-angsuran pinjaman (Nota: ' . $kontrakPinjaman->nota_nomor . ') sebanyak ' . $totalBulan . ' bulan',
+                'jurnal_ref_table'  => 'kop_trx_pinjaman_anggota',
+                'jurnal_ref_code'   => $kontrakPinjaman->nota_nomor,
+                'jurnal_user'       => Auth::user()->name ?? 'System',
+                'jurnal_cabang'     => Auth::user()->cabang ?? 'Pusat',
+                'jurnal_created'    => Auth::user()->id ?? 1,
+                'created_at'        => Carbon::now(),
+                'updated_at'        => Carbon::now()
+            ]);
+
+            // Detail Jurnal:
+            // A. SISI DEBIT: Kas / Bank penerima setoran (Sumber Dana COA)
+            DB::table('kop_fin_jurnal_detail')->insert([
+                'jurnal_id'     => $jurnalId,
+                'coa_code'      => $request->sumber_dana_coa,
+                'jurnal_debit'  => $totalNominalBayar,
+                'jurnal_kredit' => 0,
+                'created_at'    => Carbon::now(),
+                'updated_at'    => Carbon::now()
+            ]);
+
+            // B. SISI KREDIT: Piutang Anggota (Mengambil dari kolom coa_piutang di tabel pinjaman)
+            if ($finalPokok > 0) {
+                DB::table('kop_fin_jurnal_detail')->insert([
+                    'jurnal_id'     => $jurnalId,
+                    'coa_code'      => $kontrakPinjaman->coa_piutang ?? '1.1.3.01', // Fallback default jika null
+                    'jurnal_debit'  => 0,
+                    'jurnal_kredit' => $finalPokok,
+                    'created_at'    => Carbon::now(),
+                    'updated_at'    => Carbon::now()
+                ]);
+            }
+
+            // C. SISI KREDIT: Pendapatan Bunga (Mengambil dari kolom coa_pendapatan_bunga di tabel pinjaman)
+            if ($finalBunga > 0) {
+                DB::table('kop_fin_jurnal_detail')->insert([
+                    'jurnal_id'     => $jurnalId,
+                    'coa_code'      => $kontrakPinjaman->coa_pendapatan_bunga ?? '4.1.1.01', // Fallback default jika null
+                    'jurnal_debit'  => 0,
+                    'jurnal_kredit' => $finalBunga,
+                    'created_at'    => Carbon::now(),
+                    'updated_at'    => Carbon::now()
+                ]);
+            }
 
             DB::commit();
 
             return response()->json([
                 'status'  => 'success',
-                'message' => 'Pembayaran multi-angsuran berhasil diproses dan disimpan ke sistem.'
+                'message' => 'Pembayaran multi-angsuran berhasil diproses, total tagihan Rp ' . number_format($totalNominalBayar, 0, ',', '.') . ', serta jurnal akuntansi (No. Bukti: ' . $noBuktiJurnal . ') telah berhasil dicatat.'
             ]);
         } catch (\Exception $e) {
             DB::rollBack();
