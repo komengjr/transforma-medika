@@ -1,5 +1,6 @@
 @extends('layouts.layouts')
 @section('content')
+
 <div class="col-md-12">
 
     <!-- Flash Alert -->
@@ -42,7 +43,6 @@
         </div>
     </div>
 </div>
-
 
 <!-- MODAL TRANSAKSI -->
 <div class="modal fade" id="modalTransaksi" static data-bs-backdrop="static" tabindex="-1" aria-hidden="true">
@@ -98,7 +98,7 @@
 </div>
 @endsection
 @section('base.js')
-<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+
 <script>
     document.getElementById('select-cabang').addEventListener('change', function() {
         const cabang = this.value;
