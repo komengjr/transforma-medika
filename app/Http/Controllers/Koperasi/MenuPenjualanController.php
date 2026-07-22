@@ -202,7 +202,9 @@ class MenuPenjualanController extends Controller
                 ->whereNotNull('kop_master_peserta_cabang')
                 ->distinct()
                 ->pluck('kop_master_peserta_cabang');
-            return view('app-koperasi.menu-penjualan.menu-penagihan-belanja-anggota', compact('daftarCabang'), ['akses' => $akses, 'code' => $id]);
+            $daftarCoa = DB::table('kop_fin_master_coa')
+                ->get();
+            return view('app-koperasi.menu-penjualan.menu-penagihan-belanja-anggota', compact('daftarCabang', 'daftarCoa'), ['akses' => $akses, 'code' => $id]);
         } else {
             return Redirect::to('dashboard/home');
         }
@@ -215,21 +217,31 @@ class MenuPenjualanController extends Controller
 
         $cabangTerpilih = $request->cabang;
 
-        // Query mengelompokkan total tagihan per anggota di cabang tersebut
         $dataTagihan = DB::table('kop_master_peserta as p')
             ->join('kop_trx_belanja as b', 'p.id_kop_master_peserta', '=', 'b.id_kop_master_peserta')
+            ->join('kop_trx_belanja_detail as d', 'b.id_belanja', '=', 'd.id_belanja')
+            ->join('kop_master_produk as prd', 'd.id_produk', '=', 'prd.id_produk')
             ->where('p.kop_master_peserta_cabang', $cabangTerpilih)
             ->where('b.metode_bayar', 'MASUK_TAGIHAN')
-            ->where('b.status_transaksi', 'SUKSES') // Hanya transaksi sukses yang ditagih
+            ->where('b.status_transaksi', 'SUKSES')
             ->select([
                 'p.id_kop_master_peserta',
                 'p.kop_master_peserta_nip as nip',
                 'p.kop_master_peserta_name as nama_anggota',
+                // Menggunakan COALESCE agar aman jika ada beberapa variasi nama kolom HP/Telp di database Anda
+                DB::raw("COALESCE(p.kop_master_peserta_no_hp, p.kop_master_peserta_no_hp, p.kop_master_peserta_no_hp, '') as no_hp"),
                 'p.kop_master_peserta_cabang as cabang',
-                DB::raw('COUNT(b.id_belanja) as total_transaksi'),
-                DB::raw('SUM(b.total_harga) as total_tagihan')
+                DB::raw('COUNT(DISTINCT b.id_belanja) as total_transaksi'),
+                DB::raw('SUM(d.subtotal) as total_tagihan'),
+                DB::raw("GROUP_CONCAT(CONCAT(d.qty, 'x ', prd.nama_produk) SEPARATOR ', ') as rincian_barang")
             ])
-            ->groupBy('p.id_kop_master_peserta', 'p.kop_master_peserta_nip', 'p.kop_master_peserta_name', 'p.kop_master_peserta_cabang')
+            ->groupBy(
+                'p.id_kop_master_peserta',
+                'p.kop_master_peserta_nip',
+                'p.kop_master_peserta_name',
+                'p.kop_master_peserta_no_hp', // Sesuaikan jika nama kolom HP di DB Anda berbeda
+                'p.kop_master_peserta_cabang'
+            )
             ->orderBy('p.kop_master_peserta_name', 'asc')
             ->get();
 
@@ -238,5 +250,50 @@ class MenuPenjualanController extends Controller
             'cabang' => $cabangTerpilih,
             'data'   => $dataTagihan
         ], 200);
+    }
+    public function menu_koperasi_penagihan_belanja_koperasi_bayar(Request $request)
+    {
+        $request->validate([
+            'id_kop_master_peserta' => 'required',
+            'kode_coa'              => 'required',
+            'jumlah_bayar'          => 'required|numeric'
+        ]);
+
+        DB::beginTransaction();
+        try {
+            // Update status transaksi belanja anggota dari 'MASUK_TAGIHAN' menjadi lunas / update statusnya
+            DB::table('kop_trx_belanja')
+                ->where('id_kop_master_peserta', $request->id_kop_master_peserta)
+                ->where('metode_bayar', 'MASUK_TAGIHAN')
+                ->where('status_transaksi', 'SUKSES')
+                ->update([
+                    'status_transaksi' => 'LUNAS', // Atau disesuaikan dengan enum status Anda
+                    'updated_at'       => now()
+                ]);
+
+            // Opsional: Catat Jurnal Kas Masuk ke COA terpilih di sini
+            /*
+            DB::table('kop_jurnal')->insert([
+                'kode_coa'    => $request->kode_coa,
+                'debet'       => $request->jumlah_bayar,
+                'kredit'      => 0,
+                'keterangan'  => 'Pelunasan Tagihan Belanja Anggota ID: ' . $request->id_kop_master_peserta,
+                'created_at'  => now()
+            ]);
+            */
+
+            DB::commit();
+
+            return response()->json([
+                'status'  => 'success',
+                'message' => 'Pembayaran tagihan anggota berhasil diproses dan dicatat ke COA!'
+            ], 200);
+        } catch (\Exception $e) {
+            DB::rollBack();
+            return response()->json([
+                'status'  => 'error',
+                'message' => 'Gagal memproses pembayaran: ' . $e->getMessage()
+            ], 500);
+        }
     }
 }

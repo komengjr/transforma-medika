@@ -2818,6 +2818,603 @@ class KoperasiController extends Controller
             return response()->json(['status' => 'error', 'message' => 'Gagal simpan: ' . $e->getMessage()], 500);
         }
     }
+    // MENU PEMINJAMAN UANG ANGGOTA
+    public function menu_koperasi_peminjaman_uang_anggota($akses, $id)
+    {
+        if ($this->url_akses_sub($akses, $id) == true) {
+            // 1. Data Peserta Koperasi sesuai Schema kop_master_peserta
+            $peserta = DB::table('kop_master_peserta')
+                ->select(
+                    'id_kop_master_peserta',
+                    'kop_master_peserta_code',
+                    'kop_master_peserta_name',
+                    'kop_master_peserta_nip',
+                    'kop_master_peserta_no_hp'
+                )
+                ->where('kop_master_peserta_status', 'AKTIF') // Sesuaikan status aktif jika ada (misal: '1' / 'ACTIVE')
+                ->orderBy('kop_master_peserta_name', 'asc')
+                ->get();
+
+            // 2. Data Daftar Akun COA dari tabel kop_fin_master_coa
+            $coaList = DB::table('kop_fin_master_coa')
+                ->select('coa_code', 'coa_name', 'coa_type')
+                ->where('is_active', true)
+                ->orderBy('coa_code', 'asc')
+                ->get();
+
+            // 3. Riwayat Transaksi Peminjaman Uang untuk DataTables Log
+            $riwayat = DB::table('kop_trx_pinjaman_anggota as p')
+                ->leftJoin('kop_master_peserta as m', 'p.anggota_id', '=', 'm.id_kop_master_peserta')
+                ->select(
+                    'p.*',
+                    'm.kop_master_peserta_code',
+                    'm.kop_master_peserta_name',
+                    'm.kop_master_peserta_no_hp'
+                )
+                ->orderBy('p.id', 'desc')
+                ->get();
+            return view('app-koperasi.menu-peminjaman-uang.menu-peminjaman-uang-anggota', compact('peserta', 'coaList', 'riwayat'), ['akses' => $akses, 'code' => $id]);
+        } else {
+            return Redirect::to('dashboard/home');
+        }
+    }
+    public function menu_koperasi_peminjaman_uang_anggota_save(Request $request)
+    {
+        // --- 1. Validasi Input ---
+        $validator = Validator::make($request->all(), [
+            'anggota_id'             => 'required|integer|exists:kop_master_peserta,id_kop_master_peserta',
+            'tanggal_pinjaman'       => 'required|date',
+            'tujuan_pinjaman'        => 'nullable|string|max:255',
+            'jumlah_pinjaman'        => 'required|numeric|min:1000',
+            'pinjam_biaya_admin'     => 'nullable|numeric|min:0',
+            'pinjam_bunga_koperasi'  => 'nullable|numeric|min:0',
+            'tenor_bulan'            => 'required|integer|min:1',
+            'coa_piutang'            => 'required|string|exists:kop_fin_master_coa,coa_code',
+            'sumber_dana_coa'        => 'required|string|exists:kop_fin_master_coa,coa_code',
+            'coa_pendapatan_admin'   => 'nullable|string|exists:kop_fin_master_coa,coa_code',
+            'coa_pendapatan_bunga'   => 'nullable|string|exists:kop_fin_master_coa,coa_code',
+        ]);
+
+        if ($validator->fails()) {
+            return response()->json([
+                'status'  => 'error',
+                'message' => $validator->errors()->first()
+            ], 422);
+        }
+
+        DB::beginTransaction();
+        try {
+            // --- 2. Ambil Nilai Finansial ---
+            $jumlahPinjaman = (float) $request->input('jumlah_pinjaman');
+            $biayaAdmin    = (float) $request->input('pinjam_biaya_admin', 0);
+            $bungaKoperasi  = (float) $request->input('pinjam_bunga_koperasi', 0);
+            $tenorBulan     = (int) $request->input('tenor_bulan');
+            $tanggalPinjam  = Carbon::parse($request->input('tanggal_pinjaman'));
+
+            // Validasi Logis
+            if ($biayaAdmin >= $jumlahPinjaman) {
+                return response()->json([
+                    'status'  => 'error',
+                    'message' => 'Biaya admin tidak boleh melebihi atau sama dengan nominal plafon pinjaman.'
+                ], 400);
+            }
+
+            // Calculations
+            $pencairanNetto   = $jumlahPinjaman - $biayaAdmin;
+            $totalPiutang     = $jumlahPinjaman + $bungaKoperasi;
+            $cicilanPerBulan  = round($totalPiutang / $tenorBulan);
+
+            // --- 3. Generate Nomor Nota / Akad Pinjaman Otomatis ---
+            // Format Nota: PINJ/YYYYMM/0001
+            $prefixNota = 'PINJ/' . $tanggalPinjam->format('Ym') . '/';
+            $lastTrx = DB::table('kop_trx_pinjaman_anggota')
+                ->where('nota_nomor', 'LIKE', $prefixNota . '%')
+                ->orderBy('id', 'desc')
+                ->first();
+
+            $nextNumber = 1;
+            if ($lastTrx) {
+                $lastSequence = (int) substr($lastTrx->nota_nomor, -4);
+                $nextNumber   = $lastSequence + 1;
+            }
+            $notaNomor = $prefixNota . str_pad($nextNumber, 4, '0', STR_PAD_LEFT);
+
+            // --- 4. Insert Data Utama Transaksi Pinjaman ---
+            $pinjamanId = DB::table('kop_trx_pinjaman_anggota')->insertGetId([
+                'nota_nomor'            => $notaNomor,
+                'anggota_id'            => $request->input('anggota_id'),
+                'tujuan_pinjaman'       => $request->input('tujuan_pinjaman'),
+                'tanggal_pinjaman'      => $tanggalPinjam->format('Y-m-d'),
+                'jumlah_pinjaman'       => $jumlahPinjaman,
+                'biaya_admin'          => $biayaAdmin,
+                'pencairan_netto'        => $pencairanNetto,
+                'bunga_koperasi'       => $bungaKoperasi,
+                'total_piutang'         => $totalPiutang,
+                'tenor_bulan'           => $tenorBulan,
+                'cicilan_per_bulan'     => $cicilanPerBulan,
+                'status_pinjaman'       => 'PENDING_APPROVAL',
+                'status_tagihan'        => 'DRAFT',
+                'coa_piutang'           => $request->input('coa_piutang'),
+                'sumber_dana_coa'       => $request->input('sumber_dana_coa'),
+                'coa_pendapatan_admin'  => $request->input('coa_pendapatan_admin'),
+                'coa_pendapatan_bunga'  => $request->input('coa_pendapatan_bunga'),
+                'created_by'            => auth()->user()->name ?? 'System',
+                'created_at'            => now(),
+                'updated_at'            => now(),
+            ]);
+
+            // --- 5. Generate Rincian Schedule Tenor Bulanan ---
+            $pokokPerBulan = floor($jumlahPinjaman / $tenorBulan);
+            $sisaPokok     = $jumlahPinjaman - ($pokokPerBulan * $tenorBulan);
+
+            $bungaPerBulan = floor($bungaKoperasi / $tenorBulan);
+            $sisaBunga     = $bungaKoperasi - ($bungaPerBulan * $tenorBulan);
+
+            $tenorData = [];
+            for ($i = 1; $i <= $tenorBulan; $i++) {
+                $dueDate = $tanggalPinjam->copy()->addMonths($i);
+
+                $currPokok = ($i === $tenorBulan) ? ($pokokPerBulan + $sisaPokok) : $pokokPerBulan;
+                $currBunga = ($i === $tenorBulan) ? ($bungaPerBulan + $sisaBunga) : $bungaPerBulan;
+                $currTotal = $currPokok + $currBunga;
+
+                $tenorData[] = [
+                    'id_pinjaman'       => $pinjamanId,
+                    'angsuran_ke'       => $i,
+                    'jatuh_tempo'       => $dueDate->format('Y-m-d'),
+                    'pokok_tagihan'     => $currPokok,
+                    'bunga_tagihan'     => $currBunga,
+                    'jumlah_tagihan'    => $currTotal,
+                    'status_bayar'      => 'BELUM',
+                    'jumlah_dibayar'    => 0,
+                    'created_at'        => now(),
+                    'updated_at'        => now(),
+                ];
+            }
+
+            DB::table('kop_trx_pinjaman_tenor')->insert($tenorData);
+
+            DB::commit();
+
+            // --- 6. Persiapan Notifikasi WhatsApp (Gunakan kop_master_peserta_no_hp) ---
+            $peserta = DB::table('kop_master_peserta')
+                ->where('id_kop_master_peserta', $request->input('anggota_id'))
+                ->first();
+
+            $waUrl = null;
+            if ($peserta && !empty($peserta->kop_master_peserta_no_hp)) {
+                $phone = preg_replace('/[^0-9]/', '', $peserta->kop_master_peserta_no_hp);
+                if (str_starts_with($phone, '0')) {
+                    $phone = '62' . substr($phone, 1);
+                }
+
+                $pesanWA = "Halo *" . $peserta->kop_master_peserta_name . "*,\n\n"
+                    . "Pengajuan peminjaman uang Anda telah diterbitkan dengan rincian berikut:\n"
+                    . "- *No. Akad:* " . $notaNomor . "\n"
+                    . "- *Plafon Pinjaman:* Rp " . number_format($jumlahPinjaman, 0, ',', '.') . "\n"
+                    . "- *Pencairan Netto:* Rp " . number_format($pencairanNetto, 0, ',', '.') . "\n"
+                    . "- *Tenor:* " . $tenorBulan . " Bulan\n"
+                    . "- *Cicilan/Bln:* Rp " . number_format($cicilanPerBulan, 0, ',', '.') . "\n\n"
+                    . "Terima kasih!";
+
+                $waUrl = "https://wa.me/" . $phone . "?text=" . urlencode($pesanWA);
+            }
+
+            return response()->json([
+                'status'  => 'success',
+                'message' => 'Transaksi peminjaman uang dengan No. Akad [' . $notaNomor . '] berhasil disimpan!',
+                'wa_url'  => $waUrl
+            ]);
+        } catch (\Exception $e) {
+            DB::rollBack();
+            return response()->json([
+                'status'  => 'error',
+                'message' => 'Gagal menyimpan transaksi: ' . $e->getMessage()
+            ], 500);
+        }
+    }
+    // MENU APPROVAL PEMINJAMAN UANG ANGGOTA
+    public function menu_koperasi_approval_peminjaman_uang_anggota($akses, $id)
+    {
+        if ($this->url_akses_sub($akses, $id) == true) {
+            $pengajuan = DB::table('kop_trx_pinjaman_anggota as p')
+                ->leftJoin('kop_master_peserta as m', 'p.anggota_id', '=', 'm.id_kop_master_peserta')
+                ->select(
+                    'p.*',
+                    'm.kop_master_peserta_code',
+                    'm.kop_master_peserta_name',
+                    'm.kop_master_peserta_no_hp'
+                )
+                ->where('p.status_pinjaman', 'PENDING_APPROVAL')
+                ->orderBy('p.tanggal_pinjaman', 'asc')
+                ->get();
+            $history = DB::table('kop_trx_pinjaman_anggota as p')
+                ->leftJoin('kop_master_peserta as m', 'p.anggota_id', '=', 'm.id_kop_master_peserta')
+                ->select(
+                    'p.*',
+                    'm.kop_master_peserta_code',
+                    'm.kop_master_peserta_name',
+                    'm.kop_master_peserta_no_hp'
+                )
+                // ->where('p.status_pinjaman', ['APPROVED', 'REJECTED'])
+                ->orderBy('p.tanggal_pinjaman', 'asc')
+                ->get();
+            // $history = KopPinjaman::whereIn('status_pinjaman', ['APPROVED', 'REJECTED'])->latest()->get();
+            return view('app-koperasi.menu-peminjaman-uang.menu-approval-peminjaman-uang', compact('pengajuan', 'history'), ['akses' => $akses, 'code' => $id]);
+        } else {
+            return Redirect::to('dashboard/home');
+        }
+    }
+    public function menu_koperasi_approval_peminjaman_uang_anggota_detail($id)
+    {
+        // Data Pengajuan Saat Ini
+        $pinjaman = DB::table('kop_trx_pinjaman_anggota as p')
+            ->leftJoin('kop_master_peserta as m', 'p.anggota_id', '=', 'm.id_kop_master_peserta')
+            ->select(
+                'p.*',
+                'm.kop_master_peserta_code',
+                'm.kop_master_peserta_name',
+                'm.kop_master_peserta_nip',
+                'm.kop_master_peserta_no_hp'
+            )
+            ->where('p.id', $id)
+            ->first();
+
+        if (!$pinjaman) {
+            return response()->json([
+                'status'  => 'error',
+                'message' => 'Data pinjaman tidak ditemukan.'
+            ], 404);
+        }
+
+        // Ambil Riwayat Pinjaman Sebelumnya dari Anggota yang sama
+        $history = DB::table('kop_trx_pinjaman_anggota')
+            ->where('anggota_id', $pinjaman->anggota_id)
+            ->where('id', '!=', $id) // Kecualikan pengajuan yang sedang direview
+            ->orderBy('id', 'desc')
+            ->get();
+
+        return response()->json([
+            'status' => 'success',
+            'data'   => [
+                'pinjaman' => $pinjaman,
+                'history'  => $history
+            ]
+        ]);
+    }
+    public function menu_koperasi_approval_peminjaman_uang_anggota_approve(Request $request)
+    {
+        $id = $request->input('id');
+        $pinjaman = DB::table('kop_trx_pinjaman_anggota')->where('id', $id)->first();
+
+        // 1. Cek apakah data ada di database
+        if (!$pinjaman) {
+            return response()->json([
+                'status'  => 'error',
+                'message' => 'Data pinjaman dengan ID ' . $id . ' tidak ditemukan.'
+            ], 404);
+        }
+
+        // 2. Cek apakah statusnya PENDING / PENDING_APPROVAL
+        $statusSaatIni = strtoupper(trim($pinjaman->status_pinjaman));
+        if (!in_array($statusSaatIni, ['PENDING', 'PENDING_APPROVAL'])) {
+            return response()->json([
+                'status'  => 'error',
+                'message' => 'Gagal disetujui. Status pengajuan saat ini adalah "' . $pinjaman->status_pinjaman . '".'
+            ], 400);
+        }
+
+        // Ambil data anggota untuk keterangan jurnal & notifikasi
+        $peserta = DB::table('kop_master_peserta')->where('id_kop_master_peserta', $pinjaman->anggota_id)->first();
+        $namaAnggota = $peserta ? $peserta->kop_master_peserta_name : 'Anggota Tidak Diketahui';
+
+        // Siapkan data user (fallback ke 'System' jika auth tidak terbaca)
+        $userName = 'System';
+
+        DB::beginTransaction();
+        try {
+            // A. Update Data Pengajuan Pinjaman
+            DB::table('kop_trx_pinjaman_anggota')->where('id', $id)->update([
+                'status_pinjaman' => 'APPROVED',
+                'status_tagihan'  => 'BELUM_LUNAS', // Tagihan mulai aktif
+                'approved_by'     => $userName,
+                'approved_at'     => now(),
+                'updated_at'      => now(),
+            ]);
+
+            // B. Generate Nomor Bukti Jurnal (Contoh: JV-202607-0001)
+            $prefixJurnal = 'JV-' . now()->format('Ym') . '-';
+            $lastJurnal = DB::table('kop_fin_jurnal')
+                ->where('jurnal_no_bukti', 'like', $prefixJurnal . '%')
+                ->orderBy('id_jurnal', 'desc')
+                ->first();
+
+            if ($lastJurnal) {
+                $lastNo = (int) substr($lastJurnal->jurnal_no_bukti, -4);
+                $nextNo = str_pad($lastNo + 1, 4, '0', STR_PAD_LEFT);
+            } else {
+                $nextNo = '0001';
+            }
+            $noBuktiJurnal = $prefixJurnal . $nextNo;
+
+            // C. INSERT KE JURNAL HEADER (kop_fin_jurnal)
+            $jurnalId = DB::table('kop_fin_jurnal')->insertGetId([
+                'jurnal_no_bukti'   => $noBuktiJurnal,
+                'jurnal_tgl'        => now()->toDateString(),
+                'jurnal_keterangan' => 'Pencairan Pinjaman a.n. ' . $namaAnggota . ' (Akad: ' . $pinjaman->nota_nomor . ')',
+                'jurnal_ref_table'  => 'kop_trx_pinjaman_anggota',
+                'jurnal_ref_code'   => $pinjaman->nota_nomor,
+                'jurnal_user'       => $userName,
+                'jurnal_cabang'     => 'PUSAT',
+                'jurnal_created'    => $userName,
+                'created_at'        => now(),
+                'updated_at'        => now(),
+            ]);
+
+            // D. INSERT KE JURNAL DETAIL (kop_fin_jurnal_detail)
+            $jurnalDetails = [];
+
+            // 1. Debit: Piutang Pinjaman Anggota
+            if (empty($pinjaman->coa_piutang)) {
+                throw new \Exception('Kode COA Piutang belum diatur pada data pengajuan.');
+            }
+            $jurnalDetails[] = [
+                'jurnal_id'     => $jurnalId,
+                'coa_code'      => $pinjaman->coa_piutang,
+                'jurnal_debit'  => $pinjaman->jumlah_pinjaman,
+                'jurnal_kredit' => 0,
+                'created_at'    => now(),
+                'updated_at'    => now(),
+            ];
+
+            // 2. Kredit: Pendapatan Administrasi (Hanya jika ada biaya admin)
+            if ($pinjaman->biaya_admin > 0) {
+                if (empty($pinjaman->coa_pendapatan_admin)) {
+                    throw new \Exception('Kode COA Pendapatan Admin belum diatur pada data pengajuan.');
+                }
+                $jurnalDetails[] = [
+                    'jurnal_id'     => $jurnalId,
+                    'coa_code'      => $pinjaman->coa_pendapatan_admin,
+                    'jurnal_debit'  => 0,
+                    'jurnal_kredit' => $pinjaman->biaya_admin,
+                    'created_at'    => now(),
+                    'updated_at'    => now(),
+                ];
+            }
+
+            // 3. Kredit: Kas/Bank (Pencairan Netto ke Anggota)
+            if (empty($pinjaman->sumber_dana_coa)) {
+                throw new \Exception('Kode COA Sumber Dana (Kas/Bank) belum diatur pada data pengajuan.');
+            }
+            $jurnalDetails[] = [
+                'jurnal_id'     => $jurnalId,
+                'coa_code'      => $pinjaman->sumber_dana_coa,
+                'jurnal_debit'  => 0,
+                'jurnal_kredit' => $pinjaman->pencairan_netto,
+                'created_at'    => now(),
+                'updated_at'    => now(),
+            ];
+
+            // Insert semua detail sekaligus
+            DB::table('kop_fin_jurnal_detail')->insert($jurnalDetails);
+
+            DB::commit(); // Simpan permanen ke database
+
+            // E. Notifikasi WhatsApp (Jika nomor HP tersedia)
+            $waUrl = null;
+            if ($peserta && !empty($peserta->kop_master_peserta_no_hp)) {
+                $phone = preg_replace('/[^0-9]/', '', $peserta->kop_master_peserta_no_hp);
+                if (str_starts_with($phone, '0')) $phone = '62' . substr($phone, 1);
+
+                $pesanWA = "Halo *" . $namaAnggota . "*,\n\n"
+                    . "Selamat! Pengajuan pinjaman Anda dengan No. Akad *" . $pinjaman->nota_nomor . "* telah *DISETUJUI*.\n"
+                    . "Dana pencairan sebesar *Rp " . number_format($pinjaman->pencairan_netto, 0, ',', '.') . "* akan segera diproses.\n\n"
+                    . "Terima kasih.";
+
+                $waUrl = "https://wa.me/" . $phone . "?text=" . urlencode($pesanWA);
+            }
+
+            return response()->json([
+                'status'  => 'success',
+                'message' => 'Berhasil disetujui. Jurnal ' . $noBuktiJurnal . ' telah dibuat.',
+                'wa_url'  => $waUrl
+            ]);
+        } catch (\Exception $e) {
+            DB::rollBack(); // Batalkan semua jika ada error (mencegah data setengah jadi)
+            return response()->json([
+                'status'  => 'error',
+                'message' => 'Terjadi kesalahan sistem: ' . $e->getMessage()
+            ], 500);
+        }
+    }
+    public function menu_koperasi_approval_peminjaman_uang_anggota_reject(Request $request)
+    {
+        $id = $request->input('id');
+        $alasan = $request->input('alasan_tolak');
+        $pinjaman = DB::table('kop_trx_pinjaman_anggota')->where('id', $id)->first();
+
+        // 1. Cek apakah data ada di database
+        if (!$pinjaman) {
+            return response()->json([
+                'status'  => 'error',
+                'message' => 'Data pinjaman dengan ID ' . $id . ' tidak ditemukan.'
+            ], 404);
+        }
+
+        // 2. Cek apakah statusnya PENDING (dibikin kebal huruf besar/kecil dan spasi)
+        $statusSaatIni = strtoupper(trim($pinjaman->status_pinjaman));
+        if ($statusSaatIni !== 'PENDING_APPROVAL') {
+            return response()->json([
+                'status'  => 'error',
+                'message' => 'Gagal menolak. Status pengajuan saat ini adalah "' . $pinjaman->status_pinjaman . '".'
+            ], 400);
+        }
+
+        DB::beginTransaction();
+        try {
+            // Jika ada kolom alasan_tolak di DB Anda, bisa tambahkan di dalam update() ini.
+            DB::table('kop_trx_pinjaman_anggota')->where('id', $id)->update([
+                'status_pinjaman' => 'REJECTED',
+                'status_tagihan'  => 'BATAL',
+                // 'alasan_tolak' => $alasan, // Aktifkan jika Anda punya field alasan tolak di tabel ini
+                'updated_at'      => now(),
+            ]);
+
+
+            DB::commit();
+            return response()->json([
+                'status'  => 'success',
+                'message' => 'Pinjaman berhasil ditolak.'
+            ]);
+        } catch (\Exception $e) {
+            DB::rollBack();
+            return response()->json([
+                'status'  => 'error',
+                'message' => 'Terjadi kesalahan sistem: ' . $e->getMessage()
+            ], 500);
+        }
+    }
+    // MENU PENAGIHAN PEMINJAMAN UANG
+    public function menu_koperasi_approval_penagihan_peminjaman_uang_anggota(Request $request, $akses, $id)
+    {
+        if ($this->url_akses_sub($akses, $id) == true) {
+            // Ambil daftar nota pinjaman aktif
+            $listNota = DB::table('kop_trx_pinjaman_anggota as p')
+                ->join('kop_master_peserta as m', 'p.anggota_id', '=', 'm.id_kop_master_peserta')
+                ->select('p.id as id_peminjaman', 'p.nota_nomor', 'm.kop_master_peserta_name')
+                ->where('p.status_pinjaman', 'APPROVED')
+                ->where('p.status_tagihan', 'BELUM_LUNAS')
+                ->orderBy('p.created_at', 'desc')
+                ->get();
+
+            // Ambil daftar akun Kas/Bank dari tabel kop_fin_master_coa
+            // Contoh: Menyaring akun bertipe 'aset' dengan awalan kode '11' (biasanya Kas & Bank)
+            $bankCoa = DB::table('kop_fin_master_coa')
+                ->where('coa_type', 'aset')
+                ->where('is_active', 1)
+                ->where(function ($query) {
+                    $query->where('coa_code', 'LIKE', '11%'); // Sesuaikan awalan kode akun Kas/Bank Anda
+                })
+                ->get();
+            return view('app-koperasi.menu-peminjaman-uang.menu-penagihan-peminjaman-uang', compact('listNota', 'bankCoa'), ['akses' => $akses, 'code' => $id]);
+        } else {
+            return Redirect::to('dashboard/home');
+        }
+    }
+    public function menu_koperasi_approval_penagihan_peminjaman_uang_anggota_get_data($id)
+    {
+        try {
+            // Ambil data utama kontrak pinjaman beserta data anggota
+            $kontrak = DB::table('kop_trx_pinjaman_anggota as p')
+                ->join('kop_master_peserta as m', 'p.anggota_id', '=', 'm.id_kop_master_peserta')
+                ->select(
+                    'p.*',
+                    'm.kop_master_peserta_name',
+                    'm.kop_master_peserta_code'
+                )
+                ->where('p.id', $id)
+                ->first();
+
+            if (!$kontrak) {
+                return response()->json([
+                    'status'  => 'error',
+                    'message' => 'Data kontrak pinjaman tidak ditemukan.'
+                ], 404);
+            }
+
+            // Ambil rincian jadwal tenor angsuran
+            // Pastikan kolom-kolom seperti bunga_tagihan, jumlah_tagihan, jatuh_tempo, status_bayar ada di tabel ini
+            $jadwal = DB::table('kop_trx_pinjaman_tenor')
+                ->where('id_pinjaman', $id)
+                ->orderBy('angsuran_ke', 'asc')
+                ->get();
+
+            return response()->json([
+                'status'  => 'success',
+                'kontrak' => $kontrak,
+                'jadwal'  => $jadwal
+            ]);
+        } catch (\Exception $e) {
+            return response()->json([
+                'status'  => 'error',
+                'message' => 'Terjadi kesalahan pada server: ' . $e->getMessage()
+            ], 500);
+        }
+    }
+    public function menu_koperasi_approval_penagihan_peminjaman_uang_anggota_save(Request $request)
+    {
+        $request->validate([
+            'id_tenors'         => 'required|array',
+            'id_tenors.*'       => 'integer',
+            'sumber_dana_coa'   => 'required|string',
+        ]);
+
+        DB::beginTransaction();
+        try {
+            $idTenors = $request->id_tenors;
+            $idPinjaman = null;
+
+            foreach ($idTenors as $tenorId) {
+                $tenor = DB::table('kop_trx_pinjaman_tenor')->where('id', $tenorId)->first();
+
+                if (!$tenor) {
+                    continue;
+                }
+
+                // Lewatkan jika tenor sudah terlanjur lunas
+                if ($tenor->status_bayar === 'LUNAS') {
+                    continue;
+                }
+
+                $idPinjaman = $tenor->id_pinjaman;
+                $jumlahTagihan = $tenor->jumlah_tagihan;
+
+                // 1. Update status tenor menjadi LUNAS
+                DB::table('kop_trx_pinjaman_tenor')
+                    ->where('id', $tenorId)
+                    ->update([
+                        'status_bayar'       => 'LUNAS',
+                        'jumlah_dibayar'     => $jumlahTagihan,
+                        'tanggal_bayar'      => Carbon::now(),
+                        'ref_pembayaran_id'  => $request->sumber_dana_coa,
+                        'updated_at'         => Carbon::now()
+                    ]);
+            }
+
+            // 2. Cek apakah seluruh tenor pada pinjaman tersebut sudah lunas
+            if ($idPinjaman) {
+                $sisaTenorBelumLunas = DB::table('kop_trx_pinjaman_tenor')
+                    ->where('id_pinjaman', $idPinjaman)
+                    ->where('status_bayar', '!=', 'LUNAS')
+                    ->count();
+
+                if ($sisaTenorBelumLunas === 0) {
+                    // Update status pinjaman utama jika sudah lunas seluruhnya
+                    DB::table('kop_trx_pinjaman_anggota')
+                        ->where('id', $idPinjaman)
+                        ->update([
+                            'status_tagihan' => 'LUNAS',
+                            'updated_at'     => Carbon::now()
+                        ]);
+                }
+            }
+
+            // Catatan: Anda bisa menyisipkan logika penjurnalan akuntansi otomatis di sini (Debet: Kas/Bank, Kredit: Piutang Anggota / Pendapatan Bunga)
+
+            DB::commit();
+
+            return response()->json([
+                'status'  => 'success',
+                'message' => 'Pembayaran multi-angsuran berhasil diproses dan disimpan ke sistem.'
+            ]);
+        } catch (\Exception $e) {
+            DB::rollBack();
+            return response()->json([
+                'status'  => 'error',
+                'message' => 'Gagal memproses pembayaran: ' . $e->getMessage()
+            ], 500);
+        }
+    }
     // MENU PEMBELIAN BARANG KOPERASI
     public function menu_koperasi_pembelian_barang($akses, $id)
     {
@@ -3149,24 +3746,55 @@ class KoperasiController extends Controller
                 ->orderBy('kop_master_peserta_name', 'asc')
                 ->get();
 
-            // 2. Ambil COA kas/bank untuk opsi sumber pendanaan pembelian ke supplier
+            // 2. Ambil COA khusus Kas & Bank untuk opsi Sumber Dana Pembelian
             $bankCoa = DB::table('kop_fin_master_coa')
                 ->where('is_active', true)
-                ->where('coa_code', 'LIKE', '1.%')
+                ->where('coa_code', 'LIKE', '1.%') // Mengambil kelompok Aktiva/Lancar (Kas & Bank)
+                ->orderBy('coa_code', 'asc')
                 ->get();
 
-            // 3. Ambil 30 riwayat pembelian barang terakhir dengan join ke kop_master_peserta
+            $PenCoa = DB::table('kop_fin_master_coa')
+                ->where('is_active', true)
+                ->where('coa_code', 'LIKE', '4.%') // Mengambil kelompok Aktiva/Lancar (Kas & Bank)
+                ->orderBy('coa_code', 'asc')
+                ->get();
+
+            // 3. Ambil SELURUH Master COA aktif (diperlukan untuk dropdown COA Piutang, Pendapatan Admin & Pendapatan Bunga)
+            $allCoa = DB::table('kop_fin_master_coa')
+                ->where('is_active', true)
+                ->orderBy('coa_code', 'asc')
+                ->get();
+
+            // 4. Ambil 30 riwayat transaksi pengadaan barang terakhir beserta status approval-nya
             $riwayat = DB::table('kop_trx_pembelian_anggota as pa')
                 ->join('kop_master_peserta as p', 'pa.anggota_id', '=', 'p.id_kop_master_peserta')
                 ->select(
-                    'pa.*',
+                    'pa.id',
+                    'pa.nota_nomor',
+                    'pa.barang_nama',
+                    'pa.tanggal_transaksi',
+                    'pa.harga_beli',
+                    'pa.biaya_admin',     // UPDATE: Pengganti margin_koperasi (dipotong di awal)
+                    'pa.bunga_koperasi',  // UPDATE: Pengganti margin_koperasi (dicicil)
+                    'pa.total_piutang',
+                    'pa.tenor_bulan',
+                    'pa.cicilan_per_bulan',
+                    'pa.status_pembelian', // PENDING_APPROVAL, APPROVED, REJECTED
+                    'pa.status_tagihan',   // DRAFT, BELUM_LUNAS, LUNAS, BATAL
+                    'pa.created_by',
+                    'pa.created_at',
                     'p.kop_master_peserta_name',
                     'p.kop_master_peserta_code'
                 )
-                ->orderBy('pa.id_pembelian', 'desc')
+                ->orderBy('pa.id', 'desc')
                 ->limit(30)
                 ->get();
-            return view('app-koperasi.menu-pembelian-barang-anggota', compact('anggota', 'bankCoa', 'riwayat'), ['akses' => $akses, 'code' => $id]);
+
+            return view(
+                'app-koperasi.menu-pembelian-barang-anggota',
+                compact('anggota', 'bankCoa', 'allCoa', 'riwayat', 'PenCoa'),
+                ['akses' => $akses, 'code' => $id]
+            );
         } else {
             return Redirect::to('dashboard/home');
         }
@@ -3175,13 +3803,19 @@ class KoperasiController extends Controller
     {
         // 1. Validasi Input dari Frontend
         $validator = Validator::make($request->all(), [
-            'anggota_id'        => 'required|integer',
-            'barang_nama'       => 'required|string|max:255',
-            'tanggal_transaksi' => 'required|date',
-            'harga_beli'        => 'required|numeric|min:1',
-            'margin_koperasi'   => 'nullable|numeric|min:0',
-            'sumber_dana_coa'   => 'required|string',
-            'tenor_bulan'       => 'required|integer|in:3,6,12,18,24,36',
+            'anggota_id'             => 'required|integer',
+            'barang_nama'            => 'required|string|max:255',
+            'tanggal_transaksi'      => 'required|date',
+            'harga_beli'             => 'required|numeric|min:1',
+            'biaya_admin'            => 'nullable|numeric|min:0',
+            'bunga_koperasi'         => 'nullable|numeric|min:0',
+            'tenor_bulan'            => 'required|integer|in:3,6,12,18,24,36',
+
+            // Validasi COA yang dipilih
+            'coa_piutang'            => 'required|string',
+            'sumber_dana_coa'        => 'required|string',
+            'coa_pendapatan_admin'   => 'nullable|string',
+            'coa_pendapatan_bunga'   => 'nullable|string',
         ]);
 
         if ($validator->fails()) {
@@ -3191,7 +3825,7 @@ class KoperasiController extends Controller
             ], 422);
         }
 
-        // 2. Cek apakah ID Peserta benar-benar valid dan aktif di database
+        // 2. Cek Validasi Peserta Koperasi
         $peserta = DB::table('kop_master_peserta')
             ->where('id_kop_master_peserta', $request->anggota_id)
             ->where('kop_master_peserta_status', 'AKTIF')
@@ -3204,208 +3838,541 @@ class KoperasiController extends Controller
             ], 404);
         }
 
-        // 3. Mulai Database Transaction
         DB::beginTransaction();
         try {
-            // Kalkulasi finansial awal
-            $hargaBeli    = $request->harga_beli;
-            $margin       = $request->margin_koperasi ?? 0;
-            $totalPiutang = $hargaBeli + $margin;
-            $tenor        = $request->tenor_bulan;
+            $hargaBeli     = (float) $request->harga_beli;
+            $biayaAdmin    = (float) ($request->biaya_admin ?? 0);
+            $bungaKoperasi = (float) ($request->bunga_koperasi ?? 0);
 
-            // Pembulatan ke atas (ceil) agar tidak ada sisa pembagian nominal per bulan
-            $cicilan      = ceil($totalPiutang / $tenor);
+            // Total piutang yang dicicil anggota = Harga Beli + Bunga Koperasi
+            // (Biaya admin dipotong/dibayar di awal, sehingga tidak masuk ke tenor piutang)
+            $totalPiutang  = $hargaBeli + $biayaAdmin;
+            $tenor         = (int) $request->tenor_bulan;
+            $cicilan       = ceil($totalPiutang / $tenor);
 
-            // Generate nomor nota unik otomatis (Contoh: PBI-20260720-XYZ123)
+            // Generate nomor pengajuan unik
             $nota = 'PBI-' . date('Ymd') . '-' . strtoupper(substr(md5(uniqid()), 0, 6));
 
-            // A. Simpan data ke tabel utama (kop_trx_pembelian_anggota)
+            // Simpan Data dengan Status "PENDING_APPROVAL"
             $idPembelian = DB::table('kop_trx_pembelian_anggota')->insertGetId([
-                'nota_nomor'        => $nota,
-                'anggota_id'        => $request->anggota_id, // Menyimpan id_kop_master_peserta
-                'barang_nama'       => $request->barang_nama,
-                'harga_beli'        => $hargaBeli,
-                'margin_koperasi'   => $margin,
-                'total_piutang'     => $totalPiutang,
-                'tenor_bulan'       => $tenor,
-                'cicilan_per_bulan' => $cicilan,
-                'tanggal_transaksi' => $request->tanggal_transaksi,
-                'status_tagihan'    => 'BELUM_LUNAS',
-                'created_by'        => auth()->user()->name ?? 'Admin Finance',
-                'created_at'        => now(),
-                'updated_at'        => now()
+                'nota_nomor'             => $nota,
+                'anggota_id'             => $request->anggota_id,
+                'barang_nama'            => $request->barang_nama,
+                'harga_beli'             => $hargaBeli,
+                'biaya_admin'            => $biayaAdmin,
+                'bunga_koperasi'         => $bungaKoperasi,
+                'total_piutang'          => $totalPiutang,
+                'tenor_bulan'            => $tenor,
+                'cicilan_per_bulan'      => $cicilan,
+                'tanggal_transaksi'      => $request->tanggal_transaksi,
+
+                // STATUS AWAL: Membutuhkan Verifikasi/Persetujuan
+                'status_pembelian'       => 'PENDING_APPROVAL',
+                'status_tagihan'         => 'DRAFT', // Belum menjadi tagihan aktif
+
+                // Simpan Referensi Akun COA Terpilih
+                'coa_piutang'            => $request->coa_piutang,
+                'sumber_dana_coa'        => $request->sumber_dana_coa,
+                'coa_pendapatan_admin'   => $request->coa_pendapatan_admin,
+                'coa_pendapatan_bunga'   => $request->coa_pendapatan_bunga,
+
+                'created_by'             => auth()->user()->name ?? 'Staff Pengajuan',
+                'created_at'             => now(),
+                'updated_at'             => now()
             ]);
 
-            // B. Generate Otomatis Jadwal Angsuran Tenor Bulanan (kop_trx_pembelian_tenor)
-            $tglBaseline = $request->tanggal_transaksi;
-            for ($i = 1; $i <= $tenor; $i++) {
-                // Jatuh tempo dihitung maju secara presisi per bulan dari tanggal transaksi
+            DB::commit();
+
+            return response()->json([
+                'status'  => 'success',
+                'message' => 'Pengajuan pengadaan barang nomor ' . $nota . ' berhasil disimpan. Menunggu verifikasi/persetujuan dari pihak berwenang.'
+            ]);
+        } catch (\Exception $e) {
+            DB::rollBack();
+
+            return response()->json([
+                'status'  => 'error',
+                'message' => 'Gagal menyimpan pengajuan: ' . $e->getMessage()
+            ], 500);
+        }
+    }
+    // MENU APPROVAL PEMBELIAN BARANG
+    public function menu_koperasi_apporval_pembelian_barang($akses, $id)
+    {
+        if ($this->url_akses_sub($akses, $id) == true) {
+            // Pengajuan yang membutuhkan approval
+            $pendingList = DB::table('kop_trx_pembelian_anggota as pa')
+                ->join('kop_master_peserta as p', 'pa.anggota_id', '=', 'p.id_kop_master_peserta')
+                ->select(
+                    'pa.*',
+                    'p.kop_master_peserta_name',
+                    'p.kop_master_peserta_code'
+                )
+                ->where('pa.status_pembelian', 'PENDING_APPROVAL')
+                ->orderBy('pa.id', 'asc')
+                ->get();
+
+            // Riwayat approval terakhir (Approved / Rejected)
+            $historyList = DB::table('kop_trx_pembelian_anggota as pa')
+                ->join('kop_master_peserta as p', 'pa.anggota_id', '=', 'p.id_kop_master_peserta')
+                ->select(
+                    'pa.*',
+                    'p.kop_master_peserta_name',
+                    'p.kop_master_peserta_code'
+                )
+                ->whereIn('pa.status_pembelian', ['APPROVED', 'REJECTED'])
+                ->orderBy('pa.updated_at', 'desc')
+                ->limit(20)
+                ->get();
+
+            return view('app-koperasi.menu-pembelian-barang-anggota.approval-pembelian-barang', compact('pendingList', 'historyList'), ['akses' => $akses, 'code' => $id]);
+        } else {
+            return Redirect::to('dashboard/home');
+        }
+    }
+    public function menu_koperasi_approval_pembelian_barang_detail($id)
+    {
+        // 1. Ambil data pengajuan beserta informasi anggota
+        $pembelian = DB::table('kop_trx_pembelian_anggota as pa')
+            ->join('kop_master_peserta as p', 'pa.anggota_id', '=', 'p.id_kop_master_peserta')
+            ->select(
+                'pa.id',
+                'pa.nota_nomor',
+                'pa.anggota_id',
+                'pa.barang_nama',
+                'pa.harga_beli',
+                'pa.biaya_admin',
+                'pa.bunga_koperasi',
+                'pa.total_piutang',
+                'pa.tenor_bulan',
+                'pa.cicilan_per_bulan',
+                'pa.tanggal_transaksi',
+                'pa.status_pembelian',
+                'pa.status_tagihan',
+                'pa.coa_piutang',
+                'pa.sumber_dana_coa',
+                'pa.coa_pendapatan_admin',
+                'pa.coa_pendapatan_bunga',
+                'p.kop_master_peserta_name',
+                'p.kop_master_peserta_code'
+            )
+            ->where('pa.id', $id)
+            ->first();
+
+        if (!$pembelian) {
+            return response()->json([
+                'status'  => 'error',
+                'message' => 'Data pengajuan tidak ditemukan.'
+            ], 404);
+        }
+
+        // 2. Simulasi Proyeksi Schedule Tenor Angsuran (Jatuh Tempo per Bulan)
+        $proyeksiTenor = [];
+        $tglBaseline   = $pembelian->tanggal_transaksi;
+
+        for ($i = 1; $i <= $pembelian->tenor_bulan; $i++) {
+            $proyeksiTenor[] = [
+                'angsuran_ke'    => $i,
+                'jatuh_tempo'    => date('d/m/Y', strtotime("+$i month", strtotime($tglBaseline))),
+                'jumlah_tagihan' => number_format($pembelian->cicilan_per_bulan, 0, ',', '.')
+            ];
+        }
+
+        // 3. Return JSON Response ke AJAX Modal View
+        return response()->json([
+            'status' => 'success',
+            'data'   => $pembelian,
+            'tenor'  => $proyeksiTenor
+        ]);
+    }
+    public function menu_koperasi_approval_pembelian_barang_approve($id)
+    {
+        $pembelian = DB::table('kop_trx_pembelian_anggota')->where('id', $id)->first();
+
+        if (!$pembelian || $pembelian->status_pembelian !== 'PENDING_APPROVAL') {
+            return response()->json([
+                'status'  => 'error',
+                'message' => 'Transaksi tidak valid atau sudah diproses.'
+            ], 400);
+        }
+
+        $peserta    = DB::table('kop_master_peserta')->where('id_kop_master_peserta', $pembelian->anggota_id)->first();
+        $userName   = auth()->user()->name ?? 'Manager Koperasi';
+        $cabangUser = auth()->user()->cabang_code ?? 'HEAD_OFFICE';
+
+        DB::beginTransaction();
+        try {
+            // 1. Update Status Pembelian & Activate Tagihan
+            DB::table('kop_trx_pembelian_anggota')->where('id', $id)->update([
+                'status_pembelian' => 'APPROVED',
+                'status_tagihan'   => 'BELUM_LUNAS',
+                'approved_by'      => $userName,
+                'approved_at'      => now(),
+                'updated_at'       => now()
+            ]);
+
+            // 2. Hitung Komponen Bunga dan Pokok per Bulan
+            $bungaPerBulan = ($pembelian->tenor_bulan > 0)
+                ? (int) round(($pembelian->bunga_koperasi ?? 0) / $pembelian->tenor_bulan)
+                : 0;
+
+            $jumlahTagihan = (int) ($pembelian->cicilan_per_bulan ?? 0);
+            $pokokPerBulan = $jumlahTagihan - $bungaPerBulan; // <-- Menghitung Pokok Tagihan
+
+            // Generate Otomatis Jadwal Angsuran Tenor
+            $tglBaseline = $pembelian->tanggal_transaksi;
+            for ($i = 1; $i <= $pembelian->tenor_bulan; $i++) {
                 $jatuhTempo = date('Y-m-d', strtotime("+$i month", strtotime($tglBaseline)));
 
                 DB::table('kop_trx_pembelian_tenor')->insert([
-                    'id_pembelian'   => $idPembelian,
+                    'id_pembelian'   => $id,
                     'angsuran_ke'    => $i,
                     'jatuh_tempo'    => $jatuhTempo,
-                    'jumlah_tagihan' => $cicilan,
+                    'jumlah_tagihan' => $jumlahTagihan,
+                    'pokok_tagihan'  => $pokokPerBulan, // <-- DITAMBAHKAN DI SINI
+                    'bunga_tagihan'  => $bungaPerBulan,
                     'status_bayar'   => 'BELUM',
                     'created_at'     => now(),
                     'updated_at'     => now()
                 ]);
             }
 
-            // C. BAGIAN INTEGRASI JURNAL AKUNTANSI (Double Entry) - Opsional sesuai regulasi COA Koperasi Anda
-            /*
-            $jurnalId = DB::table('kop_fin_trx_jurnal')->insertGetId([
-                'jurnal_code' => 'JRN-' . date('Ymd') . '-' . rand(100,999),
-                'jurnal_date' => $request->tanggal_transaksi,
-                'description' => 'Pembelian barang tenor nota: ' . $nota . ' a/n ' . $peserta->kop_master_peserta_name,
-                'created_at'  => now()
+            // 3. Generate Jurnal Akuntansi (Sesuai Skema kop_fin_jurnal)
+            $noBuktiJurnal = 'JV-' . date('Ym') . '-' . str_pad(rand(1, 9999), 4, '0', STR_PAD_LEFT);
+
+            $idJurnal = DB::table('kop_fin_jurnal')->insertGetId([
+                'jurnal_no_bukti'   => $noBuktiJurnal,
+                'jurnal_tgl'        => $pembelian->tanggal_transaksi,
+                'jurnal_keterangan' => 'Pengadaan barang tenor nota: ' . $pembelian->nota_nomor . ' a/n ' . ($peserta->kop_master_peserta_name ?? 'Anggota'),
+                'jurnal_ref_table'  => 'kop_trx_pembelian_anggota',
+                'jurnal_ref_code'   => $pembelian->nota_nomor,
+                'jurnal_user'       => $peserta->kop_master_peserta_code ?? null,
+                'jurnal_cabang'     => $peserta->kop_master_peserta_cabang ?? $cabangUser,
+                'jurnal_created'    => $userName,
+                'created_at'        => now(),
+                'updated_at'        => now()
             ]);
 
-            // Debit: Akun Piutang Anggota (121-0001) -> Sebesar total piutang
-            DB::table('kop_fin_trx_jurnal_detail')->insert([
-                'jurnal_id' => $jurnalId, 'coa_code' => '121-0001', 'debit' => $totalPiutang, 'kredit' => 0
+            // Detail 1: Debet - Total Piutang Anggota
+            DB::table('kop_fin_jurnal_detail')->insert([
+                'jurnal_id'     => $idJurnal,
+                'coa_code'      => $pembelian->coa_piutang,
+                'jurnal_debit'  => (int) $pembelian->total_piutang,
+                'jurnal_kredit' => 0,
+                'created_at'    => now(),
+                'updated_at'    => now()
             ]);
-            // Kredit: Akun Kas/Bank Koperasi Asal -> Sebesar modal awal barang
-            DB::table('kop_fin_trx_jurnal_detail')->insert([
-                'jurnal_id' => $jurnalId, 'coa_code' => $request->sumber_dana_coa, 'debit' => 0, 'kredit' => $hargaBeli
+
+            // Detail 2: Kredit - Sumber Dana Kas/Bank (Harga Beli)
+            DB::table('kop_fin_jurnal_detail')->insert([
+                'jurnal_id'     => $idJurnal,
+                'coa_code'      => $pembelian->sumber_dana_coa,
+                'jurnal_debit'  => 0,
+                'jurnal_kredit' => (int) $pembelian->harga_beli,
+                'created_at'    => now(),
+                'updated_at'    => now()
             ]);
-            // Kredit: Akun Pendapatan Margin Pembiayaan (412-0005) jika ada keuntungan margin
-            if ($margin > 0) {
-                DB::table('kop_fin_trx_jurnal_detail')->insert([
-                    'jurnal_id' => $jurnalId, 'coa_code' => '412-0005', 'debit' => 0, 'kredit' => $margin
+
+            // Detail 3: Kredit - Pendapatan Biaya Admin (Jika > 0)
+            if (($pembelian->biaya_admin ?? 0) > 0 && !empty($pembelian->coa_pendapatan_admin)) {
+                DB::table('kop_fin_jurnal_detail')->insert([
+                    'jurnal_id'     => $idJurnal,
+                    'coa_code'      => $pembelian->coa_pendapatan_admin,
+                    'jurnal_debit'  => 0,
+                    'jurnal_kredit' => (int) $pembelian->biaya_admin,
+                    'created_at'    => now(),
+                    'updated_at'    => now()
                 ]);
             }
-            */
 
-            // Komit transaksi jika semua operasi database di atas berhasil tanpa error
             DB::commit();
 
             return response()->json([
                 'status'  => 'success',
-                'message' => 'Kontrak pengadaan barang berhasil dibukukan dengan nomor nota ' . $nota . '. Proyeksi jangka waktu ' . $tenor . ' bulan sudah diaktifkan.'
+                'message' => 'Pengajuan ' . $pembelian->nota_nomor . ' BERHASIL DISETUJUI. Tagihan aktif dan Jurnal (' . $noBuktiJurnal . ') telah diterbitkan.'
             ]);
-        } catch (Exception $e) {
-            // Batalkan semua perubahan jika di tengah jalan terdapat crash sistem/database
+        } catch (\Exception $e) {
             DB::rollBack();
-
             return response()->json([
                 'status'  => 'error',
-                'message' => 'Gagal memproses transaksi: ' . $e->getMessage()
+                'message' => 'Gagal memproses approval: ' . $e->getMessage()
             ], 500);
         }
+    }
+    public function menu_koperasi_approval_pembelian_barang_reject($id)
+    {
+        $pembelian = DB::table('kop_trx_pembelian_anggota')->where('id', $id)->first();
+
+        if (!$pembelian || $pembelian->status_pembelian !== 'PENDING_APPROVAL') {
+            return response()->json(['status' => 'error', 'message' => 'Transaksi tidak valid.'], 400);
+        }
+
+        DB::table('kop_trx_pembelian_anggota')->where('id', $id)->update([
+            'status_pembelian' => 'REJECTED',
+            'status_tagihan'   => 'BATAL',
+            'approved_by'      => auth()->user()->name ?? 'Manager Koperasi',
+            'updated_at'       => now()
+        ]);
+
+        return response()->json([
+            'status'  => 'success',
+            'message' => 'Pengajuan ' . $pembelian->nota_nomor . ' telah DITOLAK.'
+        ]);
     }
     // MENU PENAGIHAN BARANG ANGGOTA
     public function menu_koperasi_penagihan_barang_anggota(Request $request, $akses, $id)
     {
         if ($this->url_akses_sub($akses, $id) == true) {
-            $bankCoa = DB::table('kop_fin_master_coa')->where('is_active', true)->where('coa_code', 'LIKE', '11%')->get();
-
+            // Fetch daftar nota aktif yang berstatus BELUM_LUNAS
             $listNota = DB::table('kop_trx_pembelian_anggota as pa')
                 ->join('kop_master_peserta as p', 'pa.anggota_id', '=', 'p.id_kop_master_peserta')
+                ->select('pa.id as id_pembelian', 'pa.nota_nomor', 'p.kop_master_peserta_name')
+                ->where('pa.status_pembelian', 'APPROVED')
                 ->where('pa.status_tagihan', 'BELUM_LUNAS')
-                ->select('pa.id_pembelian', 'pa.nota_nomor', 'p.kop_master_peserta_name')
+                ->orderBy('pa.id', 'desc')
                 ->get();
 
-            return view('app-koperasi.menu-penagihan-barang-anggota', compact('bankCoa', 'listNota'), ['akses' => $akses, 'code' => $id]);
+            // Fetch COA Kas/Bank aktif dari tabel kop_fin_master_coa
+            $bankCoa = DB::table('kop_fin_master_coa')
+                ->where('coa_type', 'aset')
+                ->where('normal_balance', 'debit')
+                ->where('is_active', true)
+                ->orderBy('coa_code', 'asc')
+                ->get();
+
+            $kontrak = null;
+            $detailJadwal = [];
+
+            if ($request->filled('pembelian_id')) {
+                $kontrak = DB::table('kop_trx_pembelian_anggota as pa')
+                    ->join('kop_master_peserta as p', 'pa.anggota_id', '=', 'p.id_kop_master_peserta')
+                    ->select('pa.*', 'p.kop_master_peserta_name', 'p.kop_master_peserta_code')
+                    ->where('pa.id', $request->pembelian_id)
+                    ->first();
+
+                if ($kontrak) {
+                    $detailJadwal = DB::table('kop_trx_pembelian_tenor')
+                        ->where('id_pembelian', $kontrak->id)
+                        ->orderBy('angsuran_ke', 'asc')
+                        ->get();
+                }
+            }
+
+            return view('app-koperasi.menu-pembelian-barang-anggota.menu-penagihan-barang-anggota', compact('listNota', 'bankCoa', 'kontrak', 'detailJadwal'), ['akses' => $akses, 'code' => $id]);
         } else {
             return Redirect::to('dashboard/home');
         }
     }
     public function menu_koperasi_penagihan_barang_anggota_get_data($id_pembelian)
     {
+        // 1. Ambil data Detail Kontrak / Pembelian Anggota
         $kontrak = DB::table('kop_trx_pembelian_anggota as pa')
             ->join('kop_master_peserta as p', 'pa.anggota_id', '=', 'p.id_kop_master_peserta')
-            ->where('pa.id_pembelian', $id_pembelian)
-            ->select('pa.*', 'p.kop_master_peserta_name', 'p.kop_master_peserta_code')
+            ->select(
+                'pa.id as id_pembelian',
+                'pa.nota_nomor',
+                'pa.barang_nama',
+                'pa.harga_beli',
+                'pa.biaya_admin',
+                'pa.bunga_koperasi',
+                'pa.total_piutang',
+                'pa.cicilan_per_bulan',
+                'pa.tenor_bulan',
+                'p.kop_master_peserta_name',
+                'p.kop_master_peserta_code'
+            )
+            ->where('pa.id', $id_pembelian)
             ->first();
 
         if (!$kontrak) {
-            return response()->json(['status' => 'error', 'message' => 'Data kontrak tidak ditemukan'], 404);
+            return response()->json([
+                'status'  => 'error',
+                'message' => 'Data kontrak tidak ditemukan'
+            ], 404);
         }
 
+        // 2. Ambil data Detail Jadwal Tenor Angsuran
         $detailJadwal = DB::table('kop_trx_pembelian_tenor')
-            ->where('id_pembelian', $id_pembelian)
+            ->select(
+                'id',               // Primary Key tabel tenor
+                'angsuran_ke',
+                'jatuh_tempo',
+                'bunga_tagihan',    // Kolom bunga tagihan per bulan
+                'jumlah_tagihan',   // Total tagihan per bulan (Pokok + Bunga)
+                'status_bayar',
+                'jumlah_dibayar'
+            )
+            ->where('id_pembelian', $id_pembelian) // FK ke pa.id
             ->orderBy('angsuran_ke', 'asc')
             ->get();
 
         return response()->json([
-            'status' => 'success',
+            'status'  => 'success',
             'kontrak' => $kontrak,
-            'jadwal' => $detailJadwal
+            'jadwal'  => $detailJadwal
         ]);
     }
     public function menu_koperasi_penagihan_barang_anggota_save(Request $request)
     {
-        $validator = Validator::make($request->all(), [
-            'id_tenor'        => 'required|integer',
-            'sumber_dana_coa' => 'required|string',
+        $request->validate([
+            'id_tenor'        => 'required|integer|exists:kop_trx_pembelian_tenor,id',
+            'sumber_dana_coa' => 'required|string'
         ]);
-
-        if ($validator->fails()) {
-            return response()->json(['status' => 'error', 'message' => 'Data tidak valid.'], 422);
-        }
-
-        // Ambil data tenor yang akan dibayar
-        $tenor = DB::table('kop_trx_pembelian_tenor')->where('id_tenor', $request->id_tenor)->first();
-        if (!$tenor || $tenor->status_bayar === 'LUNAS') {
-            return response()->json(['status' => 'error', 'message' => 'Tagihan sudah lunas atau tidak ditemukan.'], 404);
-        }
-
-        // Ambil data induk pembelian
-        $pembelian = DB::table('kop_trx_pembelian_anggota')->where('id_pembelian', $tenor->id_pembelian)->first();
 
         DB::beginTransaction();
         try {
-            // 1. Update status tabel tenor detail menjadi LUNAS
-            DB::table('kop_trx_pembelian_tenor')
-                ->where('id_tenor', $request->id_tenor)
-                ->update([
-                    'status_bayar'  => 'LUNAS',
-                    'tanggal_bayar' => now(),
-                    'updated_at'    => now()
-                ]);
+            // 1. Lock record tenor yang akan dibayar
+            $tenor = DB::table('kop_trx_pembelian_tenor')
+                ->where('id', $request->id_tenor)
+                ->lockForUpdate()
+                ->first();
 
-            // 2. Cek apakah seluruh tenor untuk id_pembelian ini sudah lunas semua
-            $sisaTagihan = DB::table('kop_trx_pembelian_tenor')
+            if (!$tenor) {
+                DB::rollBack();
+                return response()->json(['status' => 'error', 'message' => 'Data angsuran tidak ditemukan.'], 404);
+            }
+
+            if ($tenor->status_bayar === 'LUNAS') {
+                DB::rollBack();
+                return response()->json(['status' => 'error', 'message' => 'Angsuran bulan ini sudah LUNAS sebelumnya.'], 422);
+            }
+
+            // 2. Validasi Urutan Angsuran (Harus bayar berurutan)
+            $unpaidPrevious = DB::table('kop_trx_pembelian_tenor')
                 ->where('id_pembelian', $tenor->id_pembelian)
-                ->where('status_bayar', 'BELUM')
+                ->where('angsuran_ke', '<', $tenor->angsuran_ke)
+                ->where('status_bayar', '!=', 'LUNAS')
+                ->exists();
+
+            if ($unpaidPrevious) {
+                DB::rollBack();
+                return response()->json([
+                    'status'  => 'error',
+                    'message' => 'Pembayaran harus berurutan! Harap lunasi angsuran bulan sebelumnya terlebih dahulu.'
+                ], 422);
+            }
+
+            // 3. Ambil Data Pembelian Induk
+            $pembelian = DB::table('kop_trx_pembelian_anggota')
+                ->join('kop_master_peserta', 'kop_master_peserta.id_kop_master_peserta', '=', 'kop_trx_pembelian_anggota.anggota_id')
+                ->where('kop_trx_pembelian_anggota.id', $tenor->id_pembelian)
+                ->first();
+
+            // Format Nomor Bukti Jurnal (misal: JV-202607-0001)
+            $tglHariIni  = date('Y-m-d');
+            $prefixBulan = date('Ym');
+            $countJurnal = DB::table('kop_fin_jurnal')
+                ->where('jurnal_no_bukti', 'like', "JV-{$prefixBulan}-%")
                 ->count();
 
-            // Jika tidak ada sisa tagihan, update tabel utama menjadi LUNAS
-            if ($sisaTagihan === 0) {
+            $nomorUrut   = str_pad($countJurnal + 1, 4, '0', STR_PAD_LEFT);
+            $noBukti     = "JV-{$prefixBulan}-{$nomorUrut}";
+
+            $userActive  = Auth::user()->name ?? 'System';
+
+            // 4. Update Status Tenor Menjadi LUNAS
+            DB::table('kop_trx_pembelian_tenor')
+                ->where('id', $tenor->id)
+                ->update([
+                    'status_bayar'      => 'LUNAS',
+                    'jumlah_dibayar'    => $tenor->jumlah_tagihan,
+                    'tanggal_bayar'     => $tglHariIni,
+                    'ref_pembayaran_id' => $noBukti,
+                    'updated_at'        => now()
+                ]);
+
+            // 5. Cek Apakah Seluruh Angsuran Sudah Lunas
+            $sisaBelumLunas = DB::table('kop_trx_pembelian_tenor')
+                ->where('id_pembelian', $tenor->id_pembelian)
+                ->where('status_bayar', '!=', 'LUNAS')
+                ->count();
+
+            if ($sisaBelumLunas === 0) {
                 DB::table('kop_trx_pembelian_anggota')
-                    ->where('id_pembelian', $tenor->id_pembelian)
+                    ->where('id', $tenor->id_pembelian)
                     ->update([
                         'status_tagihan' => 'LUNAS',
                         'updated_at'     => now()
                     ]);
+            } else {
+                if ($pembelian->status_tagihan === 'DRAFT') {
+                    DB::table('kop_trx_pembelian_anggota')
+                        ->where('id', $tenor->id_pembelian)
+                        ->update([
+                            'status_tagihan' => 'BELUM_LUNAS',
+                            'updated_at'     => now()
+                        ]);
+                }
             }
 
-            // 3. DRAFT OTOMATIS JURNAL AKUNTANSI (Uang Masuk / Pelunasan Piutang)
-            /*
-            $jurnalId = DB::table('kop_fin_trx_jurnal')->insertGetId([
-                'jurnal_code' => 'KAS-' . date('Ymd') . '-' . rand(100,999),
-                'jurnal_date' => date('Y-m-d'),
-                'description' => 'Terima cicilan ke-' . $tenor->angsuran_ke . ' nota: ' . $pembelian->nota_nomor,
-                'created_at'  => now()
+            // 6. ENTRI HEADER JURNAL (kop_fin_jurnal)
+            $keteranganJurnal = "Setoran Angsuran Ke-{$tenor->angsuran_ke} Nota Pembelian {$pembelian->nota_nomor}";
+
+            $idJurnal = DB::table('kop_fin_jurnal')->insertGetId([
+                'jurnal_no_bukti'   => $noBukti,
+                'jurnal_tgl'        => $tglHariIni,
+                'jurnal_keterangan' => $keteranganJurnal,
+                'jurnal_ref_table'  => 'kop_trx_pembelian_tenor',
+                'jurnal_ref_code'   => (string) $tenor->id,
+                'jurnal_user'       => $pembelian->kop_master_peserta_code,
+                'jurnal_cabang'     => $pembelian->kop_master_peserta_cabang,
+                'jurnal_created'    => $userActive,
+                'created_at'        => now(),
+                'updated_at'        => now()
+            ], 'id_jurnal');
+
+            // 7. ENTRI DETAIL JURNAL (kop_fin_jurnal_detail)
+            $coaKas     = $request->sumber_dana_coa;
+            $coaPiutang = $pembelian->coa_piutang; // Default COA Piutang
+            $coaBunga   = $pembelian->coa_pendapatan_bunga; // Default COA Pendapatan Bunga/Margin
+
+            // Kalkulasi Nominal Jurnal
+            $totalTagihan  = (int) $tenor->jumlah_tagihan;
+
+            // Ambil nominal bunga dari kolom tenor (Sesuaikan nama kolom dengan tabel Anda, misal: angsuran_bunga/bunga/margin)
+            $nominalBunga  = (int) ($tenor->bunga_tagihan);
+
+            // Nominal Pokok Piutang = Total Tagihan - Bunga
+            $nominalPokok  = $totalTagihan - $nominalBunga;
+
+            // Line 1: DEBIT Kas/Bank (Total Uang Masuk Dari Anggota)
+            DB::table('kop_fin_jurnal_detail')->insert([
+                'jurnal_id'     => $idJurnal,
+                'coa_code'      => $coaKas,
+                'jurnal_debit'  => $totalTagihan,
+                'jurnal_kredit' => 0,
+                'created_at'    => now(),
+                'updated_at'    => now()
             ]);
 
-            // Debit: Kas/Bank Koperasi Asal yang dipilih -> Menerima uang tunai cicilan
-            DB::table('kop_fin_trx_jurnal_detail')->insert([
-                'jurnal_id' => $jurnalId, 'coa_code' => $request->sumber_dana_coa, 'debit' => $tenor->jumlah_tagihan, 'kredit' => 0
+            // Line 2: KREDIT Piutang Anggota (Berkurang Sebesar Pokok)
+            DB::table('kop_fin_jurnal_detail')->insert([
+                'jurnal_id'     => $idJurnal,
+                'coa_code'      => $coaPiutang,
+                'jurnal_debit'  => 0,
+                'jurnal_kredit' => $nominalPokok,
+                'created_at'    => now(),
+                'updated_at'    => now()
             ]);
 
-            // Kredit: Mengurangi Piutang Pembelian Barang Anggota (121-0001)
-            DB::table('kop_fin_trx_jurnal_detail')->insert([
-                'jurnal_id' => $jurnalId, 'coa_code' => '121-0001', 'debit' => 0, 'kredit' => $tenor->jumlah_tagihan
-            ]);
-            */
+            // Line 3: KREDIT Pendapatan Bunga (Hanya jika Bunga > 0)
+            if ($nominalBunga > 0) {
+                DB::table('kop_fin_jurnal_detail')->insert([
+                    'jurnal_id'     => $idJurnal,
+                    'coa_code'      => $pembelian->coa_pendapatan_bunga,
+                    'jurnal_debit'  => 0,
+                    'jurnal_kredit' => $nominalBunga,
+                    'created_at'    => now(),
+                    'updated_at'    => now()
+                ]);
+            }
 
             DB::commit();
+
             return response()->json([
                 'status'  => 'success',
-                'message' => 'Pembayaran angsuran ke-' . $tenor->angsuran_ke . ' berhasil diverifikasi.'
+                'message' => "Pembayaran Angsuran Bulan Ke-{$tenor->angsuran_ke} berhasil diproses!",
+                'ref_no'  => $noBukti
             ]);
         } catch (Exception $e) {
             DB::rollBack();

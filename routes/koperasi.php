@@ -101,7 +101,20 @@ Route::prefix('koperasi/')->group(function (): void {
 
     Route::post('menu-koperasi/mutasi-rekening-bank/save', [KoperasiController::class, 'menu_koperasi_mutasi_rekening_bank_save'])->name('menu_koperasi_mutasi_rekening_bank_save');
 
+    Route::post('menu-peminjaman/peminjaman-uang-angdgota/save', [KoperasiController::class, 'menu_koperasi_peminjaman_uang_anggota_save'])->name('menu_koperasi_peminjaman_uang_anggota_save');
+
+    Route::get('menu-peminjaman/approval-peminjaman-uang-anggota/detail/{id}', [KoperasiController::class, 'menu_koperasi_approval_peminjaman_uang_anggota_detail'])->name('menu_koperasi_approval_peminjaman_uang_anggota_detail');
+    Route::post('menu-peminjaman/approval-peminjaman-uang-anggota/approve', [KoperasiController::class, 'menu_koperasi_approval_peminjaman_uang_anggota_approve'])->name('menu_koperasi_approval_peminjaman_uang_anggota_approve');
+    Route::post('menu-peminjaman/approval-peminjaman-uang-anggota/reject', [KoperasiController::class, 'menu_koperasi_approval_peminjaman_uang_anggota_reject'])->name('menu_koperasi_approval_peminjaman_uang_anggota_reject');
+
+   Route::get('menu-koperasi/penagihan-peminjaman/get-data/{id}', [KoperasiController::class, 'menu_koperasi_approval_penagihan_peminjaman_uang_anggota_get_data'])->name('menu_koperasi_approval_penagihan_peminjaman_uang_anggota_get_data');
+   Route::post('menu-peminjaman/penagihan-peminjaman-uang-anggota/save', [KoperasiController::class, 'menu_koperasi_approval_penagihan_peminjaman_uang_anggota_save'])->name('menu_koperasi_approval_penagihan_peminjaman_uang_anggota_save');
+
     Route::post('menu-koperasi/pembelian-barang-anggota/save', [KoperasiController::class, 'menu_koperasi_pembelian_barang_anggota_save'])->name('menu_koperasi_pembelian_barang_anggota_save');
+
+    Route::get('menu-koperasi/apporval-pembelian-barang/detail/{id}', [KoperasiController::class, 'menu_koperasi_approval_pembelian_barang_detail'])->name('menu_koperasi_approval_pembelian_barang_detail');
+    Route::post('menu-koperasi/apporval-pembelian-barang/approve/{id}', [KoperasiController::class, 'menu_koperasi_approval_pembelian_barang_approve'])->name('menu_koperasi_approval_pembelian_barang_approve');
+    Route::post('menu-koperasi/apporval-pembelian-barang/reject/{id}', [KoperasiController::class, 'menu_koperasi_approval_pembelian_barang_reject'])->name('menu_koperasi_approval_pembelian_barang_reject');
 
     Route::get('menu-koperasi/penagihan-barang-anggota/get-data/{id_pembelian}', [KoperasiController::class, 'menu_koperasi_penagihan_barang_anggota_get_data'])->name('menu_koperasi_penagihan_barang_anggota_get_data');
     Route::post('menu-koperasi/penagihan-barang-anggota/save', [KoperasiController::class, 'menu_koperasi_penagihan_barang_anggota_save'])->name('menu_koperasi_penagihan_barang_anggota_save');
@@ -111,6 +124,7 @@ Route::prefix('koperasi/')->group(function (): void {
     Route::post('menu-koperasi/menu-create-product/save-stok', [MenuPenjualanController::class, 'menu_koperasi_penjualan_product_koperasi_save_stok'])->name('menu_koperasi_penjualan_product_koperasi_save_stok');
 
     Route::post('menu-koperasi/penagihan-belanja-koperasi/tagih', [MenuPenjualanController::class, 'menu_koperasi_penagihan_belanja_koperasi_tagih'])->name('menu_koperasi_penagihan_belanja_koperasi_tagih');
+    Route::post('menu-koperasi/penagihan-belanja-koperasi/bayar', [MenuPenjualanController::class, 'menu_koperasi_penagihan_belanja_koperasi_bayar'])->name('menu_koperasi_penagihan_belanja_koperasi_bayar');
 
     Route::post('laporan-koperasi/laporan-tagihan/find-data', [KoperasiController::class, 'laporan_koperasi_tagihan_find'])->name('laporan_koperasi_tagihan_find');
 

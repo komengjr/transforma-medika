@@ -196,10 +196,14 @@ Route::prefix('{akses}/{id}')->group(function (): void {
     Route::get('menu-peminjaman/peminjaman-barang', [KoperasiController::class, 'menu_peminjaman_barang'])->name('menu_peminjaman_barang');
     Route::get('menu-peminjaman/list-peminjaman', [KoperasiController::class, 'menu_peminjaman_list'])->name('menu_peminjaman_list');
     Route::get('menu-peminjaman/list-peminjaman-barang', [KoperasiController::class, 'menu_peminjaman_list_barang'])->name('menu_peminjaman_list_barang');
+    Route::get('menu-peminjaman/peminjaman-uang-anggota', [KoperasiController::class, 'menu_koperasi_peminjaman_uang_anggota'])->name('menu_koperasi_peminjaman_uang_anggota');
+    Route::get('menu-peminjaman/approval-peminjaman-uang-anggota', [KoperasiController::class, 'menu_koperasi_approval_peminjaman_uang_anggota'])->name('menu_koperasi_approval_peminjaman_uang_anggota');
+    Route::get('menu-peminjaman/penagihan-peminjaman-uang-anggota', [KoperasiController::class, 'menu_koperasi_approval_penagihan_peminjaman_uang_anggota'])->name('menu_koperasi_approval_penagihan_peminjaman_uang_anggota');
     Route::get('menu-koperasi/pembelian-barang-koperasi', [KoperasiController::class, 'menu_koperasi_pembelian_barang'])->name('menu_koperasi_pembelian_barang');
     Route::get('menu-koperasi/mutasi-rekening-bank', [KoperasiController::class, 'menu_koperasi_mutasi_rekening_bank'])->name('menu_koperasi_mutasi_rekening_bank');
     Route::get('menu-koperasi/pembelian-barang-anggota', [KoperasiController::class, 'menu_koperasi_pembelian_barang_anggota'])->name('menu_koperasi_pembelian_barang_anggota');
     Route::get('menu-koperasi/penagihan-barang-anggota', [KoperasiController::class, 'menu_koperasi_penagihan_barang_anggota'])->name('menu_koperasi_penagihan_barang_anggota');
+    Route::get('menu-koperasi/apporval-pembelian-barang', [KoperasiController::class, 'menu_koperasi_apporval_pembelian_barang'])->name('menu_koperasi_apporval_pembelian_barang');
 
     Route::get('menu-koperasi/menu-create-product', [MenuPenjualanController::class, 'menu_koperasi_penjualan_product_koperasi'])->name('menu_koperasi_penjualan_product_koperasi');
     Route::get('menu-koperasi/penagihan-belanja-koperasi', [MenuPenjualanController::class, 'menu_koperasi_penagihan_belanja_koperasi'])->name('menu_koperasi_penagihan_belanja_koperasi');
