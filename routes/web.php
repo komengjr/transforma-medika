@@ -204,6 +204,7 @@ Route::prefix('{akses}/{id}')->group(function (): void {
     Route::get('menu-koperasi/pembelian-barang-anggota', [KoperasiController::class, 'menu_koperasi_pembelian_barang_anggota'])->name('menu_koperasi_pembelian_barang_anggota');
     Route::get('menu-koperasi/penagihan-barang-anggota', [KoperasiController::class, 'menu_koperasi_penagihan_barang_anggota'])->name('menu_koperasi_penagihan_barang_anggota');
     Route::get('menu-koperasi/apporval-pembelian-barang', [KoperasiController::class, 'menu_koperasi_apporval_pembelian_barang'])->name('menu_koperasi_apporval_pembelian_barang');
+    Route::get('menu-peminjaman/pembelian-vocher-layanan', [KoperasiController::class, 'menu_koperasi_pembelian_vocher_layanan'])->name('menu_koperasi_pembelian_vocher_layanan');
 
     Route::get('menu-koperasi/menu-create-product', [MenuPenjualanController::class, 'menu_koperasi_penjualan_product_koperasi'])->name('menu_koperasi_penjualan_product_koperasi');
     Route::get('menu-koperasi/penagihan-belanja-koperasi', [MenuPenjualanController::class, 'menu_koperasi_penagihan_belanja_koperasi'])->name('menu_koperasi_penagihan_belanja_koperasi');

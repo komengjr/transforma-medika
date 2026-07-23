@@ -32,7 +32,7 @@
 <!-- FORM INPUT & SIMULASI PINJAMAN -->
 <div class="row g-3">
     <!-- FORM PENGATURAN KONTRAK PINJAMAN -->
-    <div class="col-lg-5 mb-4">
+    <div class="col-lg-5 mb-3">
         <div class="card border-0 shadow-sm h-100">
             <div class="card-header bg-white py-3 border-bottom">
                 <h6 class="card-title mb-0 fw-bold text-dark">
@@ -373,12 +373,12 @@
 
                                     <a href="https://wa.me/{{ $phone }}?text={{ urlencode($pesanWA) }}"
                                         target="_blank"
-                                        class="btn btn-sm btn-success d-inline-flex align-items-center gap-1 shadow-sm">
-                                        <i class="fab fa-whatsapp fs-6"></i>
-                                        <span>Kirim WA</span>
+                                        class="btn btn-sm btn-success  align-items-center shadow-sm">
+                                        <i class="fab fa-whatsapp fs-2"></i>
+                                        <!-- <span>Kirim WA</span> -->
                                     </a>
-                                    @else
-                                    <span class="text-muted small">-</span>
+                                    @elseif(strtoupper(trim($row->status_tagihan)) == 'BELUM_LUNAS')
+                                    <button class="btn btn-dark btn-sm" id="button-print-pengajuan-peminjaman" data-code="{{ $row->id }}}}" data-bs-toggle="modal" data-bs-target="#modal-koperasi">Print</button>
                                     @endif
                                 </td>
                             </tr>
@@ -393,6 +393,18 @@
 
 @endsection
 @section('base.js')
+<div class="modal fade" id="modal-koperasi" data-bs-keyboard="false" data-bs-backdrop="static" tabindex="-1"
+    aria-labelledby="staticBackdropLabel" aria-hidden="false">
+    <div class="modal-dialog modal-dialog-centered modal-xl" role="document">
+        <div class="modal-content border-0">
+            <div class="position-absolute top-0 end-0 mt-3 me-3 z-index-1">
+                <button class="btn-close btn btn-sm btn-circle d-flex flex-center transition-base"
+                    data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <div id="menu-koperasi"></div>
+        </div>
+    </div>
+</div>
 <!-- SweetAlert2, Select2, & DataTables JS -->
 <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
 <script src="https://cdn.jsdelivr.net/npm/select2@4.1.0-rc.0/dist/js/select2.min.js"></script>
@@ -437,7 +449,7 @@
 
         // Select2 Init
         if ($.isFunction($.fn.select2)) {
-            $('.select2-peserta-pinjam').select2({
+            $('.select2-peserta').select2({
                 theme: 'bootstrap-5',
                 width: '100%',
                 placeholder: 'Cari NIP, Code, atau Nama Peserta...',
@@ -654,6 +666,32 @@
                     });
                 }
             });
+        });
+    });
+</script>
+<script>
+    $(document).on("click", "#button-print-pengajuan-peminjaman", function(e) {
+        e.preventDefault();
+        var code = $(this).data("code");
+        $('#menu-koperasi').html(
+            '<div class="spinner-border my-3" style="display: block; margin-left: auto; margin-right: auto;" role="status"><span class="visually-hidden">Loading...</span></div>'
+        );
+        $.ajax({
+            url: "{{ route('menu_koperasi_peminjaman_uang_anggota_print') }}",
+            type: "POST",
+            cache: false,
+            data: {
+                "_token": "{{ csrf_token() }}",
+                "code": code
+            },
+            dataType: 'html',
+        }).done(function(data) {
+            $('#menu-koperasi').html(
+                '<iframe src="data:application/pdf;base64, ' +
+                data +
+                '" style="width:100%; height:533px;" frameborder="0"></iframe>');
+        }).fail(function() {
+            $('#menu-koperasi').html('eror');
         });
     });
 </script>

@@ -3018,6 +3018,82 @@ class KoperasiController extends Controller
             ], 500);
         }
     }
+    public function menu_koperasi_peminjaman_uang_anggota_print(Request $request)
+    {
+
+        // 1. Ambil data pinjaman berdasarkan ID beserta relasi pesertanya (kop_master_peserta)
+        $pinjaman = DB::table('kop_trx_pinjaman_anggota')
+            ->join('kop_master_peserta', 'kop_trx_pinjaman_anggota.anggota_id', '=', 'kop_master_peserta.id_kop_master_peserta')
+            ->select(
+                'kop_trx_pinjaman_anggota.*',
+                'kop_master_peserta.kop_master_peserta_name',
+                'kop_master_peserta.kop_master_peserta_cabang',
+                'kop_master_peserta.kop_master_peserta_code'
+            )
+            ->where('kop_trx_pinjaman_anggota.id', $request->code)
+            ->first();
+
+        // 2. Validasi jika data tidak ditemukan
+        if (!$pinjaman) {
+            abort(404, 'Data pengajuan atau kontrak peminjaman uang tidak ditemukan.');
+        }
+        // 2. Ambil data PINJAMAN SEBELUMNYA milik anggota yang sama (yang ID-nya kurang dari ID saat ini atau berdasarkan tanggal)
+        $pinjamanSebelumnya = DB::table('kop_trx_pinjaman_anggota')
+            ->where('anggota_id', $pinjaman->anggota_id)
+            ->where('id', '<', $pinjaman->id) // Mengambil transaksi sebelum ID saat ini
+            ->orderBy('id', 'desc')
+            ->first();
+
+        // 3. Mapping data pinjaman sebelumnya ke objek $pinjaman agar mudah dibaca di view HTML
+        if ($pinjamanSebelumnya) {
+            // Hitung sisa tenor / angsuran yang belum lunas pada pinjaman sebelumnya jika ada
+            $sisaTenor = DB::table('kop_trx_pinjaman_tenor')
+                ->where('id_pinjaman', $pinjamanSebelumnya->id)
+                ->where('status_bayar', '!=', 'LUNAS')
+                ->count();
+
+            $pinjaman->prev_angsuran_bulan = $pinjamanSebelumnya->nota_nomor; // atau bisa diisi keterangan lain
+            $pinjaman->prev_total_angsuran = $pinjamanSebelumnya->total_piutang;
+            $pinjaman->prev_sisa_angsuran = $sisaTenor . ' Bulan';
+
+            // Asumsi rincian pokok/bunga pelunasan jika ada pelunasan dipercepat (overlapping)
+            $pinjaman->prev_pokok_lb = $pinjamanSebelumnya->jumlah_pinjaman;
+            $pinjaman->prev_bunga_lb = $pinjamanSebelumnya->bunga_koperasi;
+            $pinjaman->prev_total_pokok_lb = $pinjamanSebelumnya->cicilan_per_bulan;
+            $pinjaman->prev_penalty = 0; // Sesuaikan jika ada kolom pinalti di database Anda
+            $pinjaman->prev_total_potongan = $pinjamanSebelumnya->total_piutang;
+        } else {
+            // Jika tidak ada pinjaman sebelumnya (bersih / anggota baru)
+            $pinjaman->prev_angsuran_bulan = '-';
+            $pinjaman->prev_total_angsuran = 0;
+            $pinjaman->prev_sisa_angsuran = '0 Bulan';
+            $pinjaman->prev_pokok_lb = 0;
+            $pinjaman->prev_bunga_lb = 0;
+            $pinjaman->prev_total_pokok_lb = 0;
+            $pinjaman->prev_penalty = 0;
+            $pinjaman->prev_total_potongan = 0;
+        }
+        $image = base64_encode(file_get_contents(public_path('img/logo.png')));
+        $pdf = \Barryvdh\DomPDF\Facade\Pdf::loadview('app-koperasi.menu-peminjaman-uang.report.report-pengajuan-peminjaman', compact('image', 'pinjaman'), [
+            'code' => $request->code
+        ])->setPaper('A4', 'landscape')->setOptions([
+            'isHtml5ParserEnabled' => true,
+            'isRemoteEnabled' => true,
+        ]);
+        $pdf->output();
+        $dompdf = $pdf->getDomPDF();
+        $font = $dompdf->getFontMetrics()->get_font("helvetica", "bold");
+        $font1 = $dompdf->getFontMetrics()->get_font("helvetica", "normal");
+        $dompdf->get_canvas()->page_text(300, 560, "{PAGE_NUM} / {PAGE_COUNT}", $font, 10, array(0, 0, 0));
+        // $dompdf->get_canvas()->page_text(34, 390, "Note. Slip elektronik Ini Simpan Sebagai Bukti", $font1, 10, array(0, 5, 1));
+        $dompdf->get_canvas()->page_text(350, 560, "Print by. " . Auth::user()->fullname, $font1, 10, array(0, 0, 0));
+        $canvas = $pdf->getDomPDF()->getCanvas();
+        $canvas->page_script('
+            // $pdf->set_opacity(.9);
+            $pdf->image("img/cover.png", 12, 12, 875, 823);
+            ');
+        return base64_encode($pdf->stream());
+    }
     // MENU APPROVAL PEMINJAMAN UANG ANGGOTA
     public function menu_koperasi_approval_peminjaman_uang_anggota($akses, $id)
     {
@@ -4524,6 +4600,81 @@ class KoperasiController extends Controller
             ], 500);
         }
     }
+    // MENU PENAGIHAN BARANG ANGGOTA
+    public function menu_koperasi_pembelian_vocher_layanan(Request $request, $akses, $id)
+    {
+        if ($this->url_akses_sub($akses, $id) == true) {
+            // Mengambil data peserta untuk select option
+            $peserta = DB::table('kop_master_peserta')->get();
+
+            $coas = DB::table('kop_fin_master_coa')
+                ->where('is_active', true)
+                ->orderBy('coa_code', 'asc')
+                ->get();
+            // Mengambil data riwayat transaksi di-join dengan data peserta
+            $transaksis = DB::table('kop_trx_tagihan_layanan')
+                ->join('kop_master_peserta', 'kop_trx_tagihan_layanan.anggota_id', '=', 'kop_master_peserta.id_kop_master_peserta')
+                ->select('kop_trx_tagihan_layanan.*', 'kop_master_peserta.kop_master_peserta_name', 'kop_master_peserta.kop_master_peserta_code')
+                ->orderBy('kop_trx_tagihan_layanan.created_at', 'desc')
+                ->get();
+            return view('app-koperasi.menu-pembelian-barang-anggota.menu-layanan-vocher', compact('peserta', 'transaksis', 'coas'), ['akses' => $akses, 'code' => $id]);
+        } else {
+            return Redirect::to('dashboard/home');
+        }
+    }
+    public function menu_koperasi_pembelian_vocher_layanan_save(Request $request)
+    {
+        // 1. Validasi input dari form
+        $request->validate([
+            'kode_transaksi'       => 'required|string|unique:kop_trx_tagihan_layanan,kode_transaksi',
+            'anggota_id'           => 'required|exists:kop_master_peserta,id_kop_master_peserta',
+            'jenis_layanan'        => 'required|in:LISTRIK,PDAM,INTERNET,PULSA,LAINNYA',
+            'nomor_tujuan'         => 'required|string|max:100',
+            'nama_pelanggan'       => 'nullable|string|max:150',
+            'nominal'              => 'required',
+            'admin_fee'            => 'required',
+            'piutang_coa'          => 'required|string|max:50',
+            'sumber_dana_coa'      => 'required|string|max:50',
+            'pendapatan_admin_coa' => 'required|string|max:50',
+        ]);
+
+        try {
+            DB::beginTransaction();
+
+            // 2. Bersihkan format rupiah (hapus titik, ubah koma jadi titik jika ada)
+            $nominal = floatval(str_replace(['.', ','], ['', '.'], $request->nominal));
+            $adminFee = floatval(str_replace(['.', ','], ['', '.'], $request->admin_fee));
+            $totalTagihan = $nominal + $adminFee;
+
+            // 3. Simpan data menggunakan DB::table()->insert()
+            DB::table('kop_trx_tagihan_layanan')->insert([
+                'kode_transaksi'       => $request->kode_transaksi,
+                'anggota_id'           => $request->anggota_id,
+                'jenis_layanan'        => $request->jenis_layanan,
+                'nomor_tujuan'         => $request->nomor_tujuan,
+                'nama_pelanggan'       => $request->nama_pelanggan,
+                'nominal'              => $nominal,
+                'admin_fee'            => $adminFee,
+                'total_tagihan'        => $totalTagihan,
+                'piutang_coa'          => $request->piutang_coa,
+                'sumber_dana_coa'      => $request->sumber_dana_coa,
+                'pendapatan_admin_coa' => $request->pendapatan_admin_coa,
+                'status_tagihan'       => 'LUNAS', // Atau sesuaikan dengan kebutuhan
+                'created_by'           => Auth::user()->name ?? 'System',
+                'created_at'           => now(),
+                'updated_at'           => now(),
+            ]);
+
+            DB::commit();
+
+            return redirect()->back()->with('success', 'Transaksi tagihan & layanan berhasil disimpan.');
+        } catch (\Exception $e) {
+            DB::rollBack();
+            return redirect()->back()->with('error', 'Terjadi kesalahan: ' . $e->getMessage())->withInput();
+        }
+    }
+
+
     // LAPORAN TAGIHAN
     public function laporan_koperasi_tagihan($akses, $id)
     {

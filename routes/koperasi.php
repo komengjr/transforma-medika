@@ -102,6 +102,7 @@ Route::prefix('koperasi/')->group(function (): void {
     Route::post('menu-koperasi/mutasi-rekening-bank/save', [KoperasiController::class, 'menu_koperasi_mutasi_rekening_bank_save'])->name('menu_koperasi_mutasi_rekening_bank_save');
 
     Route::post('menu-peminjaman/peminjaman-uang-angdgota/save', [KoperasiController::class, 'menu_koperasi_peminjaman_uang_anggota_save'])->name('menu_koperasi_peminjaman_uang_anggota_save');
+    Route::post('menu-peminjaman/peminjaman-uang-angdgota/print', [KoperasiController::class, 'menu_koperasi_peminjaman_uang_anggota_print'])->name('menu_koperasi_peminjaman_uang_anggota_print');
 
     Route::get('menu-peminjaman/approval-peminjaman-uang-anggota/detail/{id}', [KoperasiController::class, 'menu_koperasi_approval_peminjaman_uang_anggota_detail'])->name('menu_koperasi_approval_peminjaman_uang_anggota_detail');
     Route::post('menu-peminjaman/approval-peminjaman-uang-anggota/approve', [KoperasiController::class, 'menu_koperasi_approval_peminjaman_uang_anggota_approve'])->name('menu_koperasi_approval_peminjaman_uang_anggota_approve');
@@ -118,6 +119,8 @@ Route::prefix('koperasi/')->group(function (): void {
 
     Route::get('menu-koperasi/penagihan-barang-anggota/get-data/{id_pembelian}', [KoperasiController::class, 'menu_koperasi_penagihan_barang_anggota_get_data'])->name('menu_koperasi_penagihan_barang_anggota_get_data');
     Route::post('menu-koperasi/penagihan-barang-anggota/save', [KoperasiController::class, 'menu_koperasi_penagihan_barang_anggota_save'])->name('menu_koperasi_penagihan_barang_anggota_save');
+
+    Route::post('menu-peminjaman/pembelian-vocher-layanan/save', [KoperasiController::class, 'menu_koperasi_pembelian_vocher_layanan_save'])->name('menu_koperasi_pembelian_vocher_layanan_save');
 
     Route::get('menu-koperasi/menu-create-product/get-data', [MenuPenjualanController::class, 'menu_koperasi_penjualan_product_koperasi_get_data'])->name('menu_koperasi_penjualan_product_koperasi_get_data');
     Route::post('menu-koperasi/menu-create-product/save-master', [MenuPenjualanController::class, 'menu_koperasi_penjualan_product_koperasi_save_master'])->name('menu_koperasi_penjualan_product_koperasi_save_master');

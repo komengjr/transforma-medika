@@ -112,10 +112,10 @@
             </div>
             <form id="formBayarArisan" onsubmit="submitPembayaranKas(event)">
                 <div class="modal-body row g-3">
-                    <input type="text" id="modalIdPeserta">
-                    <input type="text" id="modalTotalPoin">
-                    <input type="text" id="modalRawNominal">
-                    <input type="text" id="modalBulanBayar">
+                    <input type="hidden" id="modalIdPeserta">
+                    <input type="hidden" id="modalTotalPoin">
+                    <input type="hidden" id="modalRawNominal">
+                    <input type="hidden" id="modalBulanBayar">
 
                     <div class="col-md-8">
                         <label class="form-label text-muted mb-0 small">Nama Anggota</label>
