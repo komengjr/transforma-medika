@@ -155,7 +155,7 @@
                                             <i class="fas fa-file-invoice-dollar fa-lg"></i>
                                         </div>
                                         <span class="fw-bold fs--2 text-center text-dark">Potong Gaji</span>
-                                        <span class="badge bg-info text-dark mt-1 fs--2">PIUTANG</span>
+                                        <span class="badge bg-info text-white mt-1 fs--2">PIUTANG</span>
                                     </label>
                                 </div>
                                 <!-- Opsi 3: Tagihan Bulan Ini (PENDING) -->
@@ -166,7 +166,7 @@
                                             <i class="fas fa-clock fa-lg"></i>
                                         </div>
                                         <span class="fw-bold fs--2 text-center text-dark">Tagihan Bulan</span>
-                                        <span class="badge bg-warning text-dark mt-1 fs--2">PENDING</span>
+                                        <span class="badge bg-warning text-white mt-1 fs--2">PENDING</span>
                                     </label>
                                 </div>
                             </div>
@@ -296,7 +296,7 @@
                                     <span class="text-muted">{{ $trx->kop_master_peserta_name }} ({{ $trx->kop_master_peserta_code }})</span>
                                 </td>
                                 <td>
-                                    <span class="badge bg-primary bg-opacity-15 text-primary fs--2">{{ $trx->jenis_layanan }}</span>
+                                    <span class="badge bg-primary bg-opacity-15 text-white fs--2">{{ $trx->jenis_layanan }}</span>
                                     <div class="font-monospace text-dark mt-1">{{ $trx->nomor_tujuan }}</div>
                                     @if($trx->nama_pelanggan)
                                     <small class="text-muted">Pelanggan: {{ $trx->nama_pelanggan }}</small>
@@ -304,7 +304,7 @@
                                 </td>
                                 <td>
                                     <div class="fw-semibold">Rp {{ number_format($trx->total_tagihan, 0, ',', '.') }}</div>
-                                    <span class="badge bg-light text-success border mt-1 fs--2"><i class="fas fa-wallet me-1"></i> {{ $trx->sumber_dana_coa }}</span>
+                                    <span class="badge bg-dark text-success border mt-1 fs--2"><i class="fas fa-wallet me-1"></i> {{ $trx->sumber_dana_coa }}</span>
                                 </td>
                                 <td>
                                     @if($trx->status_tagihan == 'LUNAS')
@@ -318,8 +318,31 @@
                                     @endif
                                 </td>
                                 <td class="text-end pe-3">
-                                    <button class="btn btn-sm btn-outline-info py-0 px-1 fs--2" title="Detail"><i class="fas fa-eye"></i></button>
-                                    <button class="btn btn-sm btn-outline-danger py-0 px-1 fs--2" title="Hapus"><i class="fas fa-trash"></i></button>
+                                    {{-- Tombol Pelunasan (Hanya muncul jika status belum LUNAS) --}}
+                                    @if($trx->status_tagihan != 'LUNAS')
+                                    <button class="btn btn-sm btn-outline-success py-0 px-1 fs--2 btn-lunas"
+                                        title="Lunasi Tagihan"
+                                        data-id="{{ $trx->id }}"
+                                        data-kode="{{ $trx->kode_transaksi }}"
+                                        data-total="{{ $trx->total_tagihan }}"
+                                        data-bs-toggle="modal"
+                                        data-bs-target="#modalPelunasan">
+                                        <i class="fas fa-check-circle"></i> Lunasi
+                                    </button>
+                                    @else
+                                    <span class="badge bg-success fs--2">Lunas</span>
+                                    @endif
+
+                                    {{-- Tombol Hapus (Hanya muncul jika status BELUM LUNAS / PENDING / PIUTANG) --}}
+                                    @if($trx->status_tagihan != 'LUNAS')
+                                    <form action="{{ route('menu_koperasi_pembelian_vocher_layanan_destroy', $trx->id) }}" method="POST" class="d-inline-block ms-1" onsubmit="return confirm('Apakah Anda yakin ingin menghapus transaksi ini?')">
+                                        @csrf
+                                        @method('DELETE')
+                                        <button type="submit" class="btn btn-sm btn-outline-danger py-0 px-1 fs--2" title="Hapus">
+                                            <i class="fas fa-trash"></i>
+                                        </button>
+                                    </form>
+                                    @endif
                                 </td>
                             </tr>
                             @empty
@@ -344,7 +367,51 @@
         </div>
     </div>
 </div>
+<!-- Modal Pelunasan Tagihan -->
+<div class="modal fade" id="modalPelunasan" tabindex="-1" aria-labelledby="modalPelunasanLabel" aria-hidden="true">
+    <div class="modal-dialog">
+        <form action="{{ route('menu_koperasi_pembelian_vocher_layanan_lunas') }}" method="POST">
+            @csrf
+            @method('PUT')
+            <div class="modal-content">
+                <div class="modal-header bg-success text-white py-2">
+                    <h5 class="modal-title fs--2 fw-bold" id="modalPelunasanLabel"><i class="fas fa-money-bill-wave me-1"></i> Form Pelunasan Tagihan Layanan</h5>
+                    <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal" aria-label="Close"></button>
+                </div>
+                <div class="modal-body fs--2">
+                    <!-- Hidden ID Transaksi -->
+                    <input type="hidden" name="id_transaksi" id="lunasIdTransaksi">
 
+                    <div class="mb-3">
+                        <label class="form-label fw-semibold">Kode Transaksi</label>
+                        <input type="text" class="form-control fs--2 bg-light font-monospace" id="lunasKodeTransaksi" readonly>
+                    </div>
+
+                    <div class="mb-3">
+                        <label class="form-label fw-semibold">Total Tagihan yang Harus Dibayar</label>
+                        <input type="text" class="form-control fs--2 bg-light fw-bold text-danger" id="lunasTotalTagihan" readonly>
+                    </div>
+
+                    <div class="mb-3">
+                        <label class="form-label fw-semibold">Pilih Akun Kas / Bank Pembayaran (Debet/Kas Masuk)</label>
+                        <select class="form-select fs--2" name="sumber_dana_pelunasan_coa" required>
+                            <option value="" disabled selected>-- Pilih COA Kas / Bank --</option>
+                            @foreach($coas as $coa)
+                            <option value="{{ $coa->coa_code }}">
+                                {{ $coa->coa_code }} - {{ $coa->coa_name }} ({{ strtoupper($coa->coa_type) }})
+                            </option>
+                            @endforeach
+                        </select>
+                    </div>
+                </div>
+                <div class="modal-footer bg-light py-2">
+                    <button type="button" class="btn btn-secondary fs--2" data-bs-dismiss="modal">Batal</button>
+                    <button type="submit" class="btn btn-success fs--2"><i class="fas fa-save me-1"></i> Simpan Pelunasan</button>
+                </div>
+            </div>
+        </form>
+    </div>
+</div>
 @endsection
 
 @section('base.js')
@@ -489,6 +556,25 @@
                 inputAdmin.value = Number(inputAdmin.value).toLocaleString('id-ID');
             }
             calculateJournal();
+        }
+        // Script untuk mengisi data ke Modal Pelunasan
+        const modalPelunasan = document.getElementById('modalPelunasan');
+        if (modalPelunasan) {
+            modalPelunasan.addEventListener('show.bs.modal', function(event) {
+                let button = event.relatedTarget;
+
+                let id = button.getAttribute('data-id');
+                let kode = button.getAttribute('data-kode');
+                let total = button.getAttribute('data-total');
+
+                document.getElementById('lunasIdTransaksi').value = id;
+                document.getElementById('lunasKodeTransaksi').value = kode;
+                document.getElementById('lunasTotalTagihan').value = new Intl.NumberFormat('id-ID', {
+                    style: 'currency',
+                    currency: 'IDR',
+                    maximumFractionDigits: 0
+                }).format(total);
+            });
         }
     });
 </script>

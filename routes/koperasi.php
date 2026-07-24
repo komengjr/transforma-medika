@@ -121,6 +121,8 @@ Route::prefix('koperasi/')->group(function (): void {
     Route::post('menu-koperasi/penagihan-barang-anggota/save', [KoperasiController::class, 'menu_koperasi_penagihan_barang_anggota_save'])->name('menu_koperasi_penagihan_barang_anggota_save');
 
     Route::post('menu-peminjaman/pembelian-vocher-layanan/save', [KoperasiController::class, 'menu_koperasi_pembelian_vocher_layanan_save'])->name('menu_koperasi_pembelian_vocher_layanan_save');
+    Route::put('menu-peminjaman/pembelian-vocher-layanan/lunas', [KoperasiController::class, 'menu_koperasi_pembelian_vocher_layanan_lunas'])->name('menu_koperasi_pembelian_vocher_layanan_lunas');
+    Route::delete('menu-peminjaman/pembelian-vocher-layanan/delete/{id}', [KoperasiController::class, 'menu_koperasi_pembelian_vocher_layanan_destroy'])->name('menu_koperasi_pembelian_vocher_layanan_destroy');
 
     Route::get('menu-koperasi/menu-create-product/get-data', [MenuPenjualanController::class, 'menu_koperasi_penjualan_product_koperasi_get_data'])->name('menu_koperasi_penjualan_product_koperasi_get_data');
     Route::post('menu-koperasi/menu-create-product/save-master', [MenuPenjualanController::class, 'menu_koperasi_penjualan_product_koperasi_save_master'])->name('menu_koperasi_penjualan_product_koperasi_save_master');

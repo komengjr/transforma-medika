@@ -4673,6 +4673,60 @@ class KoperasiController extends Controller
             return redirect()->back()->with('error', 'Terjadi kesalahan: ' . $e->getMessage())->withInput();
         }
     }
+    public function menu_koperasi_pembelian_vocher_layanan_lunas(Request $request)
+    {
+        $request->validate([
+            'id_transaksi'             => 'required|exists:kop_trx_tagihan_layanan,id',
+            'sumber_dana_pelunasan_coa' => 'required|string|max:50',
+        ]);
+
+        try {
+            DB::beginTransaction();
+
+            // Update status tagihan menjadi LUNAS dan simpan COA kas pelunasannya jika diperlukan
+            DB::table('kop_trx_tagihan_layanan')
+                ->where('id', $request->id_transaksi)
+                ->update([
+                    'status_tagihan'        => 'LUNAS',
+                    'sumber_dana_coa'       => $request->sumber_dana_pelunasan_coa, // Memperbarui sumber dana lunas
+                    'updated_at'            => now(),
+                ]);
+
+            DB::commit();
+
+            return redirect()->back()->with('success', 'Tagihan layanan berhasil dilunasi.');
+        } catch (\Exception $e) {
+            DB::rollBack();
+            return redirect()->back()->with('error', 'Gagal melunasi tagihan: ' . $e->getMessage());
+        }
+    }
+    public function menu_koperasi_pembelian_vocher_layanan_destroy($id)
+    {
+        try {
+            DB::beginTransaction();
+
+            // Cek data terlebih dahulu apakah statusnya sudah lunas atau belum (opsional untuk pengaman tambahan)
+            $transaksi = DB::table('kop_trx_tagihan_layanan')->where('id', $id)->first();
+
+            if (!$transaksi) {
+                return redirect()->back()->with('error', 'Data transaksi tidak ditemukan.');
+            }
+
+            if ($transaksi->status_tagihan === 'LUNAS') {
+                return redirect()->back()->with('error', 'Transaksi yang sudah lunas tidak dapat dihapus.');
+            }
+
+            // Proses hapus data
+            DB::table('kop_trx_tagihan_layanan')->where('id', $id)->delete();
+
+            DB::commit();
+
+            return redirect()->back()->with('success', 'Transaksi tagihan layanan berhasil dihapus.');
+        } catch (\Exception $e) {
+            DB::rollBack();
+            return redirect()->back()->with('error', 'Gagal menghapus transaksi: ' . $e->getMessage());
+        }
+    }
 
 
     // LAPORAN TAGIHAN
