@@ -24,36 +24,41 @@
 </div>
 
 <!-- Statistik Ringkas Berdasarkan Status -->
+<!-- Statistik Ringkas Berdasarkan Status Dari Database -->
 <div class="row g-3 mb-3">
+    <!-- Status Pending -->
     <div class="col-xl-3 col-md-6">
         <div class="card border-0 shadow-sm border-start border-warning border-4">
             <div class="card-body">
                 <div class="fw-bold text-warning text-uppercase mb-1 fs--2">Status Pending</div>
-                <div class="mb-0 fw-bold text-gray-800 fs--2">Rp 4.500.000</div>
+                <div class="mb-0 fw-bold text-gray-800 fs--2">Rp {{ number_format($totalPending ?? 0, 0, ',', '.') }}</div>
             </div>
         </div>
     </div>
+    <!-- Status Piutang -->
     <div class="col-xl-3 col-md-6">
         <div class="card border-0 shadow-sm border-start border-info border-4">
             <div class="card-body">
                 <div class="fw-bold text-info text-uppercase mb-1 fs--2">Status Piutang</div>
-                <div class="mb-0 fw-bold text-gray-800 fs--2">Rp 12.800.000</div>
+                <div class="mb-0 fw-bold text-gray-800 fs--2">Rp {{ number_format($totalPiutang ?? 0, 0, ',', '.') }}</div>
             </div>
         </div>
     </div>
+    <!-- Total Lunas Bulan Ini -->
     <div class="col-xl-3 col-md-6">
         <div class="card border-0 shadow-sm border-start border-success border-4">
             <div class="card-body">
                 <div class="fw-bold text-success text-uppercase mb-1 fs--2">Total Lunas Bulan Ini</div>
-                <div class="mb-0 fw-bold text-gray-800 fs--2">Rp 45.200.000</div>
+                <div class="mb-0 fw-bold text-gray-800 fs--2">Rp {{ number_format($totalLunasBulanIni ?? 0, 0, ',', '.') }}</div>
             </div>
         </div>
     </div>
+    <!-- Status Batal -->
     <div class="col-xl-3 col-md-6">
         <div class="card border-0 shadow-sm border-start border-danger border-4">
             <div class="card-body">
                 <div class="fw-bold text-danger text-uppercase mb-1 fs--2">Status Batal</div>
-                <div class="mb-0 fw-bold text-gray-800 fs--2">Rp 350.000</div>
+                <div class="mb-0 fw-bold text-gray-800 fs--2">Rp {{ number_format($totalBatal ?? 0, 0, ',', '.') }}</div>
             </div>
         </div>
     </div>

@@ -4617,7 +4617,27 @@ class KoperasiController extends Controller
                 ->select('kop_trx_tagihan_layanan.*', 'kop_master_peserta.kop_master_peserta_name', 'kop_master_peserta.kop_master_peserta_code')
                 ->orderBy('kop_trx_tagihan_layanan.created_at', 'desc')
                 ->get();
-            return view('app-koperasi.menu-pembelian-barang-anggota.menu-layanan-vocher', compact('peserta', 'transaksis', 'coas'), ['akses' => $akses, 'code' => $id]);
+            // 3. Hitung total nominal berdasarkan status tagihan dari database
+            $totalPending = DB::table('kop_trx_tagihan_layanan')->where('status_tagihan', 'PENDING')->sum('total_tagihan');
+            $totalPiutang = DB::table('kop_trx_tagihan_layanan')->where('status_tagihan', 'PIUTANG')->sum('total_tagihan');
+
+            // Total lunas khusus bulan ini (berdasarkan bulan saat ini)
+            $totalLunasBulanIni = DB::table('kop_trx_tagihan_layanan')
+                ->where('status_tagihan', 'LUNAS')
+                ->whereMonth('updated_at', date('m'))
+                ->whereYear('updated_at', date('Y'))
+                ->sum('total_tagihan');
+
+            $totalBatal = DB::table('kop_trx_tagihan_layanan')->where('status_tagihan', 'BATAL')->sum('total_tagihan');
+            return view('app-koperasi.menu-pembelian-barang-anggota.menu-layanan-vocher', compact(
+                'peserta',
+                'transaksis',
+                'coas',
+                'totalPending',
+                'totalPiutang',
+                'totalLunasBulanIni',
+                'totalBatal'
+            ), ['akses' => $akses, 'code' => $id]);
         } else {
             return Redirect::to('dashboard/home');
         }
