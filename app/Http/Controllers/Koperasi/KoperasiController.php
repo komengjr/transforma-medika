@@ -4659,7 +4659,7 @@ class KoperasiController extends Controller
                 'piutang_coa'          => $request->piutang_coa,
                 'sumber_dana_coa'      => $request->sumber_dana_coa,
                 'pendapatan_admin_coa' => $request->pendapatan_admin_coa,
-                'status_tagihan'       => 'LUNAS', // Atau sesuaikan dengan kebutuhan
+                'status_tagihan'       => $request->status_tagihan,
                 'created_by'           => Auth::user()->name ?? 'System',
                 'created_at'           => now(),
                 'updated_at'           => now(),

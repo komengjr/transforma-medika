@@ -361,12 +361,34 @@
         const sumTotalKredit = document.getElementById('sumTotalKredit');
 
 
+
         let terbilangContainer = document.getElementById('terbilangNominal');
         if (!terbilangContainer && inputNominal) {
             terbilangContainer = document.createElement('div');
             terbilangContainer.id = 'terbilangNominal';
             terbilangContainer.className = 'form-text text-muted fst-italic mt-1 fs--2';
             inputNominal.parentNode.appendChild(terbilangContainer);
+        }
+
+        const radioSaldo = document.getElementById('metodeSaldo');
+        const radioPotongGaji = document.getElementById('metodePotongGaji');
+        const radioTagihanBulan = document.getElementById('metodeTagihanBulan');
+        const inputStatusTagihan = document.getElementById('inputStatusTagihan');
+
+        function updateStatusTagihan() {
+            if (radioSaldo.checked) {
+                inputStatusTagihan.value = 'LUNAS';
+            } else if (radioPotongGaji.checked) {
+                inputStatusTagihan.value = 'PIUTANG'; // Atau sesuaikan dengan enum database Anda
+            } else if (radioTagihanBulan.checked) {
+                inputStatusTagihan.value = 'PENDING';
+            }
+        }
+
+        if (radioSaldo && radioPotongGaji && radioTagihanBulan) {
+            radioSaldo.addEventListener('change', updateStatusTagihan);
+            radioPotongGaji.addEventListener('change', updateStatusTagihan);
+            radioTagihanBulan.addEventListener('change', updateStatusTagihan);
         }
 
         function formatRupiah(angka) {
