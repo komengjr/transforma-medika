@@ -289,23 +289,48 @@ class RadiologiController extends Controller
                     $http->withBasicAuth($username, $password);
                 }
 
-                // Gunakan endpoint /tools/find untuk ambil detail sekaligus
+                // Gunakan endpoint /tools/find dengan MINTA TAG ModalitiesInStudy
                 $response = $http->post("{$baseUrl}/tools/find", [
-                    'Level'   => 'Study',
-                    'Query'   => (object)[], // Kosongkan untuk mengambil SEMUA study
-                    'Expand'  => true,       // true = sertakan detail tag DICOM pasien
+                    'Level'         => 'Study',
+                    'Query'         => (object)[], // Kosongkan untuk mengambil SEMUA study
+                    'Expand'        => true,       // true = sertakan detail tag DICOM pasien
+                    'RequestedTags' => ['ModalitiesInStudy'] // <--- INI KUNCINYA agar Modality (CR, DX, CT) langsung keluar
                 ]);
 
                 if ($response->successful()) {
                     $studies = $response->json() ?? [];
 
                     foreach ($studies as $study) {
+                        // 1. Ambil Modality dari RequestedTags atau MainDicomTags
+                        $modality = $study['RequestedTags']['ModalitiesInStudy']
+                            ?? $study['MainDicomTags']['ModalitiesInStudy']
+                            ?? null;
+
+                        // Jika masih null/array, format menjadi string (misal "CR" atau "CR, DX")
+                        if (is_array($modality)) {
+                            $modality = implode(', ', $modality);
+                        } elseif (!$modality) {
+                            $modality = 'CR'; // Fallback default
+                        }
+
+                        // 2. Hitung jumlah instance/gambar DICOM keseluruhan
+                        $instancesCount = 0;
+                        if (isset($study['Series']) && is_array($study['Series'])) {
+                            // Biasanya jumlah instance estimasi dari series
+                            $instancesCount = count($study['Series']);
+                        }
+
                         $studiesList[] = [
-                            'orthanc_study_id' => $study['ID'] ?? '',
-                            'patient_name'     => $study['PatientMainDicomTags']['PatientName'] ?? 'N/A',
-                            'patient_id'       => $study['PatientMainDicomTags']['PatientID'] ?? 'N/A',
-                            'study_date'       => $study['MainDicomTags']['StudyDate'] ?? 'N/A',
-                            'modality'         => $study['Series'][0] ?? 'N/A',
+                            'orthanc_study_id'   => $study['ID'],
+                            'patient_id'         => $study['PatientMainDicomTags']['PatientID'] ?? '-',
+                            'patient_name'       => $study['PatientMainDicomTags']['PatientName'] ?? 'anon',
+                            'patient_birth_date' => $study['PatientMainDicomTags']['PatientBirthDate'] ?? '-',
+                            'study_description'  => $study['MainDicomTags']['StudyDescription'] ?? '-',
+                            'study_date'         => $study['MainDicomTags']['StudyDate'] ?? '-',
+                            'modality'           => $modality, // <--- Sudah berisi CR, DX, CT, MR, dll.
+                            'accession_number'   => $study['MainDicomTags']['AccessionNumber'] ?? '-',
+                            'series_count'       => count($study['Series'] ?? []),
+                            'instances_count'    => $instancesCount,
                         ];
                     }
                 } else {
@@ -314,6 +339,7 @@ class RadiologiController extends Controller
             } catch (\Exception $e) {
                 Log::error("Gagal terhubung ke Orthanc: " . $e->getMessage());
             }
+
             return view('application.radiologi.pacs-server.studies-list', compact('studiesList'), ['akses' => $akses, 'code' => $id]);
         } else {
             return Redirect::to('dashboard/home');
