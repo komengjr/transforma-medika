@@ -69,7 +69,7 @@
     <!-- SISI KIRI: Form Input Transaksi -->
     <div class="col-lg-4">
         <div class="card border-0 shadow-sm">
-            <div class="card-header bg-primary text-white py-3">
+            <div class="card-header bg-light text-white py-3">
                 <h5 class="mb-0 fw-semibold fs--2"><i class="fas fa-file-invoice-dollar me-2"></i>Form Transaksi Baru</h5>
             </div>
             <form action="{{ route('menu_koperasi_pembelian_vocher_layanan_save') }}" method="POST">

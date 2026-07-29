@@ -6,6 +6,8 @@ use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Hash;
+use Illuminate\Support\Facades\Http;
+use Illuminate\Support\Facades\Log;
 use Illuminate\Support\Facades\Redirect;
 use Illuminate\Support\Str;
 use League\CommonMark\Extension\CommonMark\Node\Inline\Code;
@@ -267,5 +269,133 @@ class RadiologiController extends Controller
         } else {
             return Redirect::to('dashboard/home');
         }
+    }
+    // PACS SERVER
+    public function pacs_server_studies_list($akses, $id)
+    {
+        if ($this->url_akses_sub($akses, $id) == true) {
+            $baseUrl = config('services.orthanc.url');
+            $username = config('services.orthanc.username'); // Opsional jika pakai auth
+            $password = config('services.orthanc.password'); // Opsional jika pakai auth
+
+            $studiesList = [];
+
+            try {
+                // Menyiapkan HTTP Request ke Orthanc
+                $http = Http::timeout(10);
+
+                // Tambahkan Basic Auth jika diset di .env
+                if ($username && $password) {
+                    $http->withBasicAuth($username, $password);
+                }
+
+                // Gunakan endpoint /tools/find untuk ambil detail sekaligus
+                $response = $http->post("{$baseUrl}/tools/find", [
+                    'Level'   => 'Study',
+                    'Query'   => (object)[], // Kosongkan untuk mengambil SEMUA study
+                    'Expand'  => true,       // true = sertakan detail tag DICOM pasien
+                ]);
+
+                if ($response->successful()) {
+                    $studies = $response->json() ?? [];
+
+                    foreach ($studies as $study) {
+                        $studiesList[] = [
+                            'orthanc_study_id' => $study['ID'] ?? '',
+                            'patient_name'     => $study['PatientMainDicomTags']['PatientName'] ?? 'N/A',
+                            'patient_id'       => $study['PatientMainDicomTags']['PatientID'] ?? 'N/A',
+                            'study_date'       => $study['MainDicomTags']['StudyDate'] ?? 'N/A',
+                            'modality'         => $study['Series'][0] ?? 'N/A',
+                        ];
+                    }
+                } else {
+                    Log::error("Orthanc API Error Status: " . $response->status());
+                }
+            } catch (\Exception $e) {
+                Log::error("Gagal terhubung ke Orthanc: " . $e->getMessage());
+            }
+            return view('application.radiologi.pacs-server.studies-list', compact('studiesList'), ['akses' => $akses, 'code' => $id]);
+        } else {
+            return Redirect::to('dashboard/home');
+        }
+    }
+    public function pacs_server_studies_show(Request $request, $studyId)
+    {
+        $baseUrl = config('services.orthanc.url');
+        $username = config('services.orthanc.username');
+        $password = config('services.orthanc.password');
+
+        $studyDetail = null;
+        $studyInstanceUID = null;
+
+        try {
+            $http = Http::timeout(5);
+            if ($username && $password) {
+                $http->withBasicAuth($username, $password);
+            }
+
+            // Ambil detail Study dari Orthanc
+            $response = $http->get("{$baseUrl}/studies/{$studyId}");
+
+            if ($response->successful()) {
+                $studyDetail = $response->json();
+                // Mengambil StudyInstanceUID dari tag DICOM
+                $studyInstanceUID = $studyDetail['MainDicomTags']['StudyInstanceUID'] ?? null;
+            }
+        } catch (\Exception $e) {
+            // Handle error jika koneksi gagal
+        }
+
+        // =========================================================================
+        // SOLUSI: Sisipkan Basic Auth langsung ke dalam URL Viewer
+        // =========================================================================
+        if ($username && $password) {
+            // Mengubah "http://192.168.1.100:8042"
+            // Menjadi "http://username:password@192.168.1.100:8042"
+            $authenticatedBaseUrl = preg_replace(
+                '#^https?://#',
+                '$0' . rawurlencode($username) . ':' . rawurlencode($password) . '@',
+                $baseUrl
+            );
+            $viewerUrl = "{$baseUrl}/ohif/viewer?StudyInstanceUIDs={$studyInstanceUID}";
+        } else {
+            $viewerUrl = "{$baseUrl}/ohif/viewer?StudyInstanceUIDs={$studyInstanceUID}";
+        }
+
+        // ATAU Jika OHIF berdiri sendiri (standalone server/docker/app terpisah):
+        // $ohifUrl = "http://192.168.1.100:3000/viewer?StudyInstanceUIDs={$studyInstanceUID}";
+
+        return view('application.radiologi.pacs-server.studies-show', compact('viewerUrl', 'studyId', 'studyDetail'));
+    }
+    public function proxy(Request $request, $path = null)
+    {
+        $baseUrl  = config('services.orthanc.url');
+        $username = config('services.orthanc.username');
+        $password = config('services.orthanc.password');
+
+        // Susun target URL ke Orthanc
+        $targetUrl = "{$baseUrl}/{$path}";
+        if ($request->getQueryString()) {
+            $targetUrl .= '?' . $request->getQueryString();
+        }
+
+        // Kirim request dari Laravel ke Orthanc membawa Basic Auth
+        $http = Http::timeout(15);
+        if ($username && $password) {
+            $http->withBasicAuth($username, $password);
+        }
+
+        // Meneruskan method (GET, POST, dll) beserta body jika ada
+        $response = $http->send($request->method(), $targetUrl, [
+            'body' => $request->getContent(),
+            'headers' => [
+                'Content-Type' => $request->header('Content-Type', 'application/json'),
+            ]
+        ]);
+
+        // Kembalikan response Orthanc langsung ke browser pengguna
+        return response($response->body(), $response->status())
+            ->header('Content-Type', $response->header('Content-Type'))
+            ->header('Access-Control-Allow-Origin', '*');
     }
 }

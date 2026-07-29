@@ -78,6 +78,10 @@ class PelayananController extends Controller
             return Redirect::to('dashboard/home');
         }
     }
+    public function registrasi_pasien_v2($akses, $id)
+    {
+        return view('application.pelayanan.registrasi-v2');
+    }
     public function registrasi_pasien_add(Request $request)
     {
         return view('application.pelayanan.form.form-registrasi');

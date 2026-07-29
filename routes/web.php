@@ -232,6 +232,7 @@ Route::prefix('{akses}/{id}/application')->group(function () {
     Route::get('home', [ApplicationController::class, 'home'])->name('home');
     // PELAYANAN
     Route::get('registrasi-pasien', [PelayananController::class, 'registrasi_pasien'])->name('registrasi_pasien');
+    Route::get('registrasi-pasien-v2', [PelayananController::class, 'registrasi_pasien_v2'])->name('registrasi_pasien_v2');
     Route::get('data-registrasi', [PelayananController::class, 'data_registrasi'])->name('data_registrasi');
     Route::get('menu-pelayanan/verifikasi-data-registrasi', [PelayananController::class, 'menu_pelayanan_verifikasi_registrasi'])->name('menu_pelayanan_verifikasi_registrasi');
     Route::get('menu-pelayanan/menu-supervisior', [PelayananController::class, 'menu_pelayanan_supervisior'])->name('menu_pelayanan_supervisior');
@@ -253,6 +254,7 @@ Route::prefix('{akses}/{id}/application')->group(function () {
     Route::get('hasil-radiologi/verifikasi-hasil', [RadiologiController::class, 'hasil_radiologi_verifikasi'])->name('hasil_radiologi_verifikasi');
     Route::get('hasil-radiologi/dokumntasi-hasil', [RadiologiController::class, 'hasil_radiologi_dokumnatasi'])->name('hasil_radiologi_dokumnatasi');
     Route::get('hasil-radiologi/pengiriman-hasil', [RadiologiController::class, 'hasil_radiologi_pengiriman'])->name('hasil_radiologi_pengiriman');
+    Route::get('pacs-server/studies-list', [RadiologiController::class, 'pacs_server_studies_list'])->name('pacs_server_studies_list');
     // KEUANGAN
     Route::get('keuangan/menu-kasir', [KeuanganController::class, 'keuangan_menu_cashier'])->name('keuangan_menu_cashier');
     Route::get('transaksi-keuangan/penerimaan-transaksi', [KeuanganController::class, 'keuangan_penerimaan_transaksi'])->name('keuangan_penerimaan_transaksi');
@@ -397,6 +399,10 @@ Route::prefix('application')->group(function () {
     Route::post('hasil-radiologi/verifikasi-hasil/preview-report', [RadiologiController::class, 'verifikasi_radiologi_preview_report'])->name('verifikasi_radiologi_preview_report');
     Route::post('hasil-radiologi/dokumentasi-hasil/detail', [RadiologiController::class, 'dokumentasi_hasil_radiologi_detail'])->name('dokumentasi_hasil_radiologi_detail');
     Route::post('hasil-radiologi/dokumentasi-hasil/kirim-hasil', [RadiologiController::class, 'dokumentasi_hasil_radiologi_detail_kirim_hasil'])->name('dokumentasi_hasil_radiologi_detail_kirim_hasil');
+    Route::get('pacs-server/studies-get/{studyId}', [RadiologiController::class, 'pacs_server_studies_show'])->name('pacs_server_studies_show');
+    Route::any('/orthanc-proxy/{path?}', [RadiologiController::class, 'proxy'])
+        ->where('path', '.*')
+        ->name('orthanc.proxy');
 });
 // MENU LABORATORIUM
 Route::prefix('application')->group(function () {
@@ -712,6 +718,7 @@ Route::prefix('news/')->group(function (): void {
 
 use App\Http\Controllers\MovieController;
 use App\Http\Controllers\News\NewsController;
+use App\Http\Controllers\OrthancController;
 use Illuminate\Support\Facades\Storage;
 
 Route::get('/movie', [MovieController::class, 'index'])->name('movies.index');
@@ -760,3 +767,5 @@ Route::post('/upload-ftp', [FileUploadController::class, 'uploadFileftp'])->name
 //         dd($e->getMessage());
 //     }
 // });
+Route::get('/orthanc/viewer', [OrthancController::class, 'showViewer'])->name('orthanc.viewer');
+Route::get('/orthanc/get-data', [OrthancController::class, 'getStudies'])->name('orthanc.getStudies');

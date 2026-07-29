@@ -120,8 +120,8 @@
 <div class="modal fade" id="modalApproval" tabindex="-1" aria-hidden="true">
     <div class="modal-dialog modal-lg modal-dialog-centered">
         <div class="modal-content border-0 shadow">
-            <div class="modal-header bg-primary text-white">
-                <h5 class="modal-title fw-bold"><i class="bi bi-shield-check me-2"></i>Verifikasi Pengajuan Pembelian</h5>
+            <div class="modal-header bg-dark">
+                <h5 class="modal-title fw-bold text-white"><i class="bi bi-shield-check me-2"></i>Verifikasi Pengajuan Pembelian</h5>
                 <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal" aria-label="Close"></button>
             </div>
             <div class="modal-body p-4">
@@ -129,15 +129,15 @@
 
                 <div class="row g-3 mb-4">
                     <div class="col-md-6">
-                        <div class="p-3 bg-light rounded">
+                        <div class="p-3 bg-light rounded border border-dark">
                             <small class="text-muted d-block">Nomor Nota</small>
                             <span class="fw-bold fs-2 text-primary" id="v_nota">-</span>
                         </div>
                     </div>
                     <div class="col-md-6">
-                        <div class="p-3 bg-light rounded">
+                        <div class="p-3 bg-light rounded border border-dark">
                             <small class="text-muted d-block">Nama Anggota</small>
-                            <span class="fw-bold fs-2" id="v_anggota">-</span>
+                            <span class="fw-bold fs--2" id="v_anggota">-</span>
                         </div>
                     </div>
                     <div class="col-md-6">
@@ -248,7 +248,7 @@
 
                 $('#modal_pembelian_id').val(data.id);
                 $('#v_nota').text(data.nota_nomor);
-                $('#v_anggota').text(data.kop_master_peserta_name + ' (' + data.kop_master_peserta_code + ')');
+                $('#v_anggota').text(data.kop_master_peserta_name + '\n\n (' + data.kop_master_peserta_code + ')');
                 $('#v_barang').text(data.barang_nama);
                 $('#v_tanggal').text(data.tanggal_transaksi);
 

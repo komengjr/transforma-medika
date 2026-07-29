@@ -29,5 +29,10 @@ return [
         'secret' => env('AWS_SECRET_ACCESS_KEY'),
         'region' => env('AWS_DEFAULT_REGION', 'us-east-1'),
     ],
+    'orthanc' => [
+        'url' => env('ORTHANC_URL', 'http://192.168.61.249:8042'),
+        'username' => env('ORTHANC_USERNAME', 'orthanc'),
+        'password' => env('ORTHANC_PASWORD', 'orthanc'),
+    ],
 
 ];
