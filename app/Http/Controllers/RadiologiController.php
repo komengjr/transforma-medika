@@ -365,21 +365,14 @@ class RadiologiController extends Controller
 
             if ($response->successful()) {
                 $studyDetail = $response->json();
-                // Mengambil StudyInstanceUID dari tag DICOM
                 $studyInstanceUID = $studyDetail['MainDicomTags']['StudyInstanceUID'] ?? null;
             }
         } catch (\Exception $e) {
-            // Handle error jika koneksi gagal
             Log::error("Gagal terhubung ke Orthanc: " . $e->getMessage());
         }
 
-        // =========================================================================
-        // SOLUSI: Arahkan ke OHIF Viewer melalui Proxy Route Laravel
-        // Format OHIF: /ohif/viewer?StudyInstanceUIDs={StudyInstanceUID}
-        // =========================================================================
+        // Arahkan viewer URL ke OHIF
         $viewerUrl = url("/orthanc-proxy/ohif/viewer?StudyInstanceUIDs={$studyInstanceUID}");
-
-
         return view('application.radiologi.pacs-server.studies-show', compact('viewerUrl', 'studyId', 'studyDetail'));
     }
     public function proxy(Request $request, $path = null)
@@ -394,30 +387,45 @@ class RadiologiController extends Controller
             $http->withBasicAuth($username, $password);
         }
 
-        $targetUrl = "{$baseUrl}/{$path}";
+        // =========================================================================
+        // FIX UTAMA: Jika browser meminta asset OHIF tanpa prefiks 'ohif/'
+        // (misal /orthanc-proxy/app-config.js), alihkan otomatis ke /ohif/app-config.js
+        // =========================================================================
+        $targetPath = $path;
+        if ($path && !str_starts_with($path, 'ohif/') && (
+            str_contains($path, '.js') ||
+            str_contains($path, '.css') ||
+            str_contains($path, '.json') ||
+            str_contains($path, '.wasm')
+        )) {
+            $targetPath = "ohif/{$path}";
+        }
+
+        $targetUrl = "{$baseUrl}/{$targetPath}";
 
         try {
             $response = $http->send($request->method(), $targetUrl, [
-                'query'   => $request->query(),
-                'body'    => $request->getContent(),
+                'query' => $request->query(),
+                'body'  => $request->getContent(),
             ]);
 
             $body = $response->body();
             $contentType = $response->header('Content-Type', 'text/html');
 
-            // PERBAIKAN UTAMA UNTUK FIX ERROR 404 ASSET OHIF:
+            // REWRITE HTML AGAR ASSETS MERUJUK KE JALUR PROXY YANG BENAR
             if (str_contains($contentType, 'text/html')) {
-                // Pasang Base URL yang mengunci folder /ohif/ secara presisi
-                $proxyBase = url('/orthanc-proxy/ohif/');
+                $ohifProxyBase = url('/orthanc-proxy/ohif');
 
-                // Hapus base tag lama jika ada, lalu inject base tag yang benar
+                // 1. Hapus base tag lama jika ada
                 $body = preg_replace('#<base[^>]*>#i', '', $body);
-                $baseTag = "<base href=\"{$proxyBase}\">";
-                $body = str_replace('<head>', "<head>\n  {$baseTag}", $body);
 
-                // Perbaiki referensi script relatif di HTML jika diawali dengan "/"
-                $body = str_replace('src="/', 'src="' . $proxyBase, $body);
-                $body = str_replace('href="/', 'href="' . $proxyBase, $body);
+                // 2. Timpa absolute root paths ("/" / "href="/") agar mengarah ke /orthanc-proxy/ohif/
+                $body = str_replace('src="/', 'src="' . $ohifProxyBase . '/', $body);
+                $body = str_replace('href="/', 'href="' . $ohifProxyBase . '/', $body);
+
+                // 3. Inject base tag
+                $baseTag = "<base href=\"{$ohifProxyBase}/\">";
+                $body = str_replace('<head>', "<head>\n  {$baseTag}", $body);
             }
 
             return response($body, $response->status())
