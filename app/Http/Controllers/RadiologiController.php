@@ -365,98 +365,63 @@ class RadiologiController extends Controller
 
             if ($response->successful()) {
                 $studyDetail = $response->json();
+                // Mengambil StudyInstanceUID dari tag DICOM
                 $studyInstanceUID = $studyDetail['MainDicomTags']['StudyInstanceUID'] ?? null;
             }
         } catch (\Exception $e) {
-            Log::error("Gagal terhubung ke Orthanc: " . $e->getMessage());
+            // Handle error jika koneksi gagal
         }
 
-        // Arahkan viewer URL ke OHIF
-        $viewerUrl = url("/orthanc-proxy/ohif/viewer?StudyInstanceUIDs={$studyInstanceUID}");
+        // =========================================================================
+        // SOLUSI: Sisipkan Basic Auth langsung ke dalam URL Viewer
+        // =========================================================================
+        if ($username && $password) {
+            // Mengubah "http://192.168.1.100:8042"
+            // Menjadi "http://username:password@192.168.1.100:8042"
+            $authenticatedBaseUrl = preg_replace(
+                '#^https?://#',
+                '$0' . rawurlencode($username) . ':' . rawurlencode($password) . '@',
+                $baseUrl
+            );
+            $viewerUrl = "{$baseUrl}/ohif/viewer?StudyInstanceUIDs={$studyInstanceUID}";
+        } else {
+            $viewerUrl = "{$baseUrl}/ohif/viewer?StudyInstanceUIDs={$studyInstanceUID}";
+        }
+
+        // ATAU Jika OHIF berdiri sendiri (standalone server/docker/app terpisah):
+        // $ohifUrl = "http://192.168.1.100:3000/viewer?StudyInstanceUIDs={$studyInstanceUID}";
+
         return view('application.radiologi.pacs-server.studies-show', compact('viewerUrl', 'studyId', 'studyDetail'));
     }
     public function proxy(Request $request, $path = null)
     {
-        $baseUrl = config('services.orthanc.url');
+        $baseUrl  = config('services.orthanc.url');
         $username = config('services.orthanc.username');
         $password = config('services.orthanc.password');
 
-        // 1. Bypass Service Worker agar tidak error di jaringan HTTP non-SSL
-        if ($path === 'init-service-worker.js' || str_ends_with($path, 'init-service-worker.js')) {
-            return response("console.log('Service Worker disabled via Laravel Proxy.');", 200)
-                ->header('Content-Type', 'application/javascript');
+        // Susun target URL ke Orthanc
+        $targetUrl = "{$baseUrl}/{$path}";
+        if ($request->getQueryString()) {
+            $targetUrl .= '?' . $request->getQueryString();
         }
 
-        $http = Http::timeout(60);
-
+        // Kirim request dari Laravel ke Orthanc membawa Basic Auth
+        $http = Http::timeout(15);
         if ($username && $password) {
             $http->withBasicAuth($username, $password);
         }
 
-        // Redirect otomatis jika asset OHIF dipanggil tanpa prefix 'ohif/'
-        $targetPath = $path;
-        if ($path && !str_starts_with($path, 'ohif/') && (
-            str_contains($path, '.js') ||
-            str_contains($path, '.css') ||
-            str_contains($path, '.json') ||
-            str_contains($path, '.wasm')
-        )) {
-            $targetPath = "ohif/{$path}";
-        }
+        // Meneruskan method (GET, POST, dll) beserta body jika ada
+        $response = $http->send($request->method(), $targetUrl, [
+            'body' => $request->getContent(),
+            'headers' => [
+                'Content-Type' => $request->header('Content-Type', 'application/json'),
+            ]
+        ]);
 
-        $targetUrl = "{$baseUrl}/{$targetPath}";
-
-        try {
-            $response = $http->send($request->method(), $targetUrl, [
-                'query' => $request->query(),
-                'body'  => $request->getContent(),
-            ]);
-
-            $body = $response->body();
-            $contentType = $response->header('Content-Type', 'text/html');
-
-            // =========================================================================
-            // FIX GAMBAR TIDAK MUNCUL: Modifikasi app-config.js OHIF
-            // =========================================================================
-            if (str_contains($path, 'app-config.js')) {
-                $proxyBaseUrl = url('/orthanc-proxy');
-
-                // Ganti wadoRoot, qidoRoot, dan dicomWebRoot agar mengarah ke Laravel Proxy
-                $body = str_replace(
-                    ['/dicom-web', '"/wado"', '"/studies"', '"/orthanc/'],
-                    [$proxyBaseUrl . '/dicom-web', '"' . $proxyBaseUrl . '/wado"', '"' . $proxyBaseUrl . '/studies"', '"' . $proxyBaseUrl . '/orthanc/'],
-                    $body
-                );
-
-                return response($body, 200)->header('Content-Type', 'application/javascript');
-            }
-
-            // REWRITE HTML
-            if (str_contains($contentType, 'text/html')) {
-                $ohifProxyBase = url('/orthanc-proxy/ohif');
-
-                // 1. Hapus tag script init-service-worker dari HTML jika ada
-                $body = preg_replace('#<script[^>]*init-service-worker\.js[^>]*></script>#i', '', $body);
-
-                // 2. Hapus base tag lama
-                $body = preg_replace('#<base[^>]*>#i', '', $body);
-
-                // 3. Timpa absolute root paths agar mengarah ke /orthanc-proxy/ohif/
-                $body = str_replace('src="/', 'src="' . $ohifProxyBase . '/', $body);
-                $body = str_replace('href="/', 'href="' . $ohifProxyBase . '/', $body);
-
-                // 4. Inject base tag baru
-                $baseTag = "<base href=\"{$ohifProxyBase}/\">";
-                $body = str_replace('<head>', "<head>\n  {$baseTag}", $body);
-            }
-
-            return response($body, $response->status())
-                ->header('Content-Type', $contentType)
-                ->header('X-Frame-Options', 'ALLOWALL')
-                ->header('Access-Control-Allow-Origin', '*')
-                ->header('Access-Control-Allow-Headers', '*');
-        } catch (\Exception $e) {
-            return response("Gagal memuat citra PACS: " . $e->getMessage(), 500);
-        }
+        // Kembalikan response Orthanc langsung ke browser pengguna
+        return response($response->body(), $response->status())
+            ->header('Content-Type', $response->header('Content-Type'))
+            ->header('Access-Control-Allow-Origin', '*');
     }
 }
