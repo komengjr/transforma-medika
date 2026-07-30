@@ -370,26 +370,14 @@ class RadiologiController extends Controller
             }
         } catch (\Exception $e) {
             // Handle error jika koneksi gagal
+            Log::error("Gagal terhubung ke Orthanc: " . $e->getMessage());
         }
 
         // =========================================================================
-        // SOLUSI: Sisipkan Basic Auth langsung ke dalam URL Viewer
+        // SOLUSI: Arahkan ke OHIF Viewer melalui Proxy Route Laravel
+        // Format OHIF: /ohif/viewer?StudyInstanceUIDs={StudyInstanceUID}
         // =========================================================================
-        if ($username && $password) {
-            // Mengubah "http://192.168.1.100:8042"
-            // Menjadi "http://username:password@192.168.1.100:8042"
-            $authenticatedBaseUrl = preg_replace(
-                '#^https?://#',
-                '$0' . rawurlencode($username) . ':' . rawurlencode($password) . '@',
-                $baseUrl
-            );
-            $viewerUrl = url("/orthanc-proxy/stone-webviewer/index.html?study={$studyId}");
-        } else {
-            $viewerUrl = url("/orthanc-proxy/stone-webviewer/index.html?study={$studyId}");
-        }
-
-        // ATAU Jika OHIF berdiri sendiri (standalone server/docker/app terpisah):
-        // $ohifUrl = "http://192.168.1.100:3000/viewer?StudyInstanceUIDs={$studyInstanceUID}";
+        $viewerUrl = url("/orthanc-proxy/ohif/viewer?StudyInstanceUIDs={$studyInstanceUID}");
 
         return view('application.radiologi.pacs-server.studies-show', compact('viewerUrl', 'studyId', 'studyDetail'));
     }
@@ -410,20 +398,23 @@ class RadiologiController extends Controller
         try {
             // Forward request lengkap beserta query string dan body
             $response = $http->send($request->method(), $targetUrl, [
-                'query'   => $request->query(),
-                'body'    => $request->getContent(),
+                'query' => $request->query(),
+                'body'  => $request->getContent(),
             ]);
 
             $body = $response->body();
             $contentType = $response->header('Content-Type', 'text/html');
 
-            // Jika mengembalikan HTML (Halaman Viewer)
+            // Khusus OHIF Viewer: Inject Base Tag dan sesuaikan router jika membalas HTML
             if (str_contains($contentType, 'text/html')) {
-                $proxyBase = url('/orthanc-proxy/');
+                $proxyBase = url('/orthanc-proxy/ohif/');
 
-                // Inject <base> tag agar semua request relatif otomatis mengarah ke route proxy Laravel
-                $baseTag = "<base href=\"{$proxyBase}/{$path}\">";
-                $body = str_replace('<head>', "<head>\n  {$baseTag}", $body);
+                // Memastikan React Router pada OHIF membaca path proxy dengan benar
+                $baseTag = "<base href=\"{$proxyBase}\">";
+
+                if (str_contains($body, '<head>')) {
+                    $body = str_replace('<head>', "<head>\n  {$baseTag}", $body);
+                }
             }
 
             return response($body, $response->status())
