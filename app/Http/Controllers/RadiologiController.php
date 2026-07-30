@@ -381,11 +381,9 @@ class RadiologiController extends Controller
         $username = config('services.orthanc.username');
         $password = config('services.orthanc.password');
 
-        // =========================================================================
-        // FIX 1: Matikan Service Worker jika dipanggil langsung agar tidak crash
-        // =========================================================================
+        // 1. Bypass Service Worker agar tidak error di jaringan HTTP non-SSL
         if ($path === 'init-service-worker.js' || str_ends_with($path, 'init-service-worker.js')) {
-            return response("console.log('Service Worker disabled via Laravel Proxy for HTTP compatibility.');", 200)
+            return response("console.log('Service Worker disabled via Laravel Proxy.');", 200)
                 ->header('Content-Type', 'application/javascript');
         }
 
@@ -416,6 +414,22 @@ class RadiologiController extends Controller
 
             $body = $response->body();
             $contentType = $response->header('Content-Type', 'text/html');
+
+            // =========================================================================
+            // FIX GAMBAR TIDAK MUNCUL: Modifikasi app-config.js OHIF
+            // =========================================================================
+            if (str_contains($path, 'app-config.js')) {
+                $proxyBaseUrl = url('/orthanc-proxy');
+
+                // Ganti wadoRoot, qidoRoot, dan dicomWebRoot agar mengarah ke Laravel Proxy
+                $body = str_replace(
+                    ['/dicom-web', '"/wado"', '"/studies"', '"/orthanc/'],
+                    [$proxyBaseUrl . '/dicom-web', '"' . $proxyBaseUrl . '/wado"', '"' . $proxyBaseUrl . '/studies"', '"' . $proxyBaseUrl . '/orthanc/'],
+                    $body
+                );
+
+                return response($body, 200)->header('Content-Type', 'application/javascript');
+            }
 
             // REWRITE HTML
             if (str_contains($contentType, 'text/html')) {
