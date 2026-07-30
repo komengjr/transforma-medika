@@ -9,7 +9,7 @@
 <style>
     /* Styling khusus menyerupai Orthanc UI */
     .pacs-container {
-        background-color: #e9ecef;
+        /* background-color: #e9ecef; */
         padding: 15px;
         border-radius: 4px;
         font-family: Arial, sans-serif;
@@ -54,10 +54,10 @@
         color: #fff;
     }
 
-    .pacs-table {
+    /* .pacs-table {
         background-color: #fff;
         font-size: 0.9rem;
-    }
+    } */
 
     .pacs-table td {
         vertical-align: middle;
@@ -75,7 +75,7 @@
                     <img class="ms-3 mx-3" src="{{ asset('img/verif.png') }}" alt="" width="80" />
                     <div>
                         <h6 class="text-primary fs--1 mb-0 pt-2">Welcome to </h6>
-                        <h4 class="text-primary fw-bold mb-1">Trans <span class="text-primary fw-medium">Management System</span></h4>
+                        <h4 class="text-primary fw-bold mb-1">Innoventra <span class="text-primary fw-medium">Management System</span></h4>
                     </div>
                     <img class="ms-n4 d-none d-lg-block " src="{{ asset('asset/img/illustrations/crm-line-chart.png') }}" alt="" width="150" />
                 </div>

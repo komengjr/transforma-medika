@@ -383,9 +383,9 @@ class RadiologiController extends Controller
                 '$0' . rawurlencode($username) . ':' . rawurlencode($password) . '@',
                 $baseUrl
             );
-            $viewerUrl = "{$baseUrl}/ohif/viewer?StudyInstanceUIDs={$studyInstanceUID}";
+            $viewerUrl = url("/orthanc-proxy/stone-webviewer/index.html?study={$studyId}");
         } else {
-            $viewerUrl = "{$baseUrl}/ohif/viewer?StudyInstanceUIDs={$studyInstanceUID}";
+            $viewerUrl = url("/orthanc-proxy/stone-webviewer/index.html?study={$studyId}");
         }
 
         // ATAU Jika OHIF berdiri sendiri (standalone server/docker/app terpisah):
@@ -395,33 +395,44 @@ class RadiologiController extends Controller
     }
     public function proxy(Request $request, $path = null)
     {
-        $baseUrl  = config('services.orthanc.url');
+        $baseUrl = config('services.orthanc.url');
         $username = config('services.orthanc.username');
         $password = config('services.orthanc.password');
 
-        // Susun target URL ke Orthanc
-        $targetUrl = "{$baseUrl}/{$path}";
-        if ($request->getQueryString()) {
-            $targetUrl .= '?' . $request->getQueryString();
-        }
+        $http = Http::timeout(60);
 
-        // Kirim request dari Laravel ke Orthanc membawa Basic Auth
-        $http = Http::timeout(15);
         if ($username && $password) {
             $http->withBasicAuth($username, $password);
         }
 
-        // Meneruskan method (GET, POST, dll) beserta body jika ada
-        $response = $http->send($request->method(), $targetUrl, [
-            'body' => $request->getContent(),
-            'headers' => [
-                'Content-Type' => $request->header('Content-Type', 'application/json'),
-            ]
-        ]);
+        $targetUrl = "{$baseUrl}/{$path}";
 
-        // Kembalikan response Orthanc langsung ke browser pengguna
-        return response($response->body(), $response->status())
-            ->header('Content-Type', $response->header('Content-Type'))
-            ->header('Access-Control-Allow-Origin', '*');
+        try {
+            // Forward request lengkap beserta query string dan body
+            $response = $http->send($request->method(), $targetUrl, [
+                'query'   => $request->query(),
+                'body'    => $request->getContent(),
+            ]);
+
+            $body = $response->body();
+            $contentType = $response->header('Content-Type', 'text/html');
+
+            // Jika mengembalikan HTML (Halaman Viewer)
+            if (str_contains($contentType, 'text/html')) {
+                $proxyBase = url('/orthanc-proxy/');
+
+                // Inject <base> tag agar semua request relatif otomatis mengarah ke route proxy Laravel
+                $baseTag = "<base href=\"{$proxyBase}/{$path}\">";
+                $body = str_replace('<head>', "<head>\n  {$baseTag}", $body);
+            }
+
+            return response($body, $response->status())
+                ->header('Content-Type', $contentType)
+                ->header('X-Frame-Options', 'ALLOWALL')
+                ->header('Access-Control-Allow-Origin', '*')
+                ->header('Access-Control-Allow-Headers', '*');
+        } catch (\Exception $e) {
+            return response("Gagal memuat citra PACS: " . $e->getMessage(), 500);
+        }
     }
 }

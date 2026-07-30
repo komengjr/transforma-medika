@@ -400,10 +400,9 @@ Route::prefix('application')->group(function () {
     Route::post('hasil-radiologi/dokumentasi-hasil/detail', [RadiologiController::class, 'dokumentasi_hasil_radiologi_detail'])->name('dokumentasi_hasil_radiologi_detail');
     Route::post('hasil-radiologi/dokumentasi-hasil/kirim-hasil', [RadiologiController::class, 'dokumentasi_hasil_radiologi_detail_kirim_hasil'])->name('dokumentasi_hasil_radiologi_detail_kirim_hasil');
     Route::get('pacs-server/studies-get/{studyId}', [RadiologiController::class, 'pacs_server_studies_show'])->name('pacs_server_studies_show');
-    Route::any('/orthanc-proxy/{path?}', [RadiologiController::class, 'proxy'])
-        ->where('path', '.*')
-        ->name('orthanc.proxy');
 });
+Route::get('/orthanc-proxy/{path?}', [RadiologiController::class, 'proxy'])->where('path', '.*');
+Route::post('/orthanc-proxy/{path?}', [RadiologiController::class, 'proxy'])->where('path', '.*');
 // MENU LABORATORIUM
 Route::prefix('application')->group(function () {
     Route::post('menu-laboratorium/data-registrasi-lab/handling', [LaboratoriumController::class, 'data_registrasi_lab_handling'])->name('data_registrasi_lab_handling');
