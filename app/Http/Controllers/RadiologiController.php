@@ -379,6 +379,7 @@ class RadiologiController extends Controller
         // =========================================================================
         $viewerUrl = url("/orthanc-proxy/ohif/viewer?StudyInstanceUIDs={$studyInstanceUID}");
 
+
         return view('application.radiologi.pacs-server.studies-show', compact('viewerUrl', 'studyId', 'studyDetail'));
     }
     public function proxy(Request $request, $path = null)
@@ -396,25 +397,27 @@ class RadiologiController extends Controller
         $targetUrl = "{$baseUrl}/{$path}";
 
         try {
-            // Forward request lengkap beserta query string dan body
             $response = $http->send($request->method(), $targetUrl, [
-                'query' => $request->query(),
-                'body'  => $request->getContent(),
+                'query'   => $request->query(),
+                'body'    => $request->getContent(),
             ]);
 
             $body = $response->body();
             $contentType = $response->header('Content-Type', 'text/html');
 
-            // Khusus OHIF Viewer: Inject Base Tag dan sesuaikan router jika membalas HTML
+            // PERBAIKAN UTAMA UNTUK FIX ERROR 404 ASSET OHIF:
             if (str_contains($contentType, 'text/html')) {
+                // Pasang Base URL yang mengunci folder /ohif/ secara presisi
                 $proxyBase = url('/orthanc-proxy/ohif/');
 
-                // Memastikan React Router pada OHIF membaca path proxy dengan benar
+                // Hapus base tag lama jika ada, lalu inject base tag yang benar
+                $body = preg_replace('#<base[^>]*>#i', '', $body);
                 $baseTag = "<base href=\"{$proxyBase}\">";
+                $body = str_replace('<head>', "<head>\n  {$baseTag}", $body);
 
-                if (str_contains($body, '<head>')) {
-                    $body = str_replace('<head>', "<head>\n  {$baseTag}", $body);
-                }
+                // Perbaiki referensi script relatif di HTML jika diawali dengan "/"
+                $body = str_replace('src="/', 'src="' . $proxyBase, $body);
+                $body = str_replace('href="/', 'href="' . $proxyBase, $body);
             }
 
             return response($body, $response->status())
