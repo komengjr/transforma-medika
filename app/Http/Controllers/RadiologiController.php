@@ -381,16 +381,21 @@ class RadiologiController extends Controller
         $username = config('services.orthanc.username');
         $password = config('services.orthanc.password');
 
+        // =========================================================================
+        // FIX 1: Matikan Service Worker jika dipanggil langsung agar tidak crash
+        // =========================================================================
+        if ($path === 'init-service-worker.js' || str_ends_with($path, 'init-service-worker.js')) {
+            return response("console.log('Service Worker disabled via Laravel Proxy for HTTP compatibility.');", 200)
+                ->header('Content-Type', 'application/javascript');
+        }
+
         $http = Http::timeout(60);
 
         if ($username && $password) {
             $http->withBasicAuth($username, $password);
         }
 
-        // =========================================================================
-        // FIX UTAMA: Jika browser meminta asset OHIF tanpa prefiks 'ohif/'
-        // (misal /orthanc-proxy/app-config.js), alihkan otomatis ke /ohif/app-config.js
-        // =========================================================================
+        // Redirect otomatis jika asset OHIF dipanggil tanpa prefix 'ohif/'
         $targetPath = $path;
         if ($path && !str_starts_with($path, 'ohif/') && (
             str_contains($path, '.js') ||
@@ -412,18 +417,21 @@ class RadiologiController extends Controller
             $body = $response->body();
             $contentType = $response->header('Content-Type', 'text/html');
 
-            // REWRITE HTML AGAR ASSETS MERUJUK KE JALUR PROXY YANG BENAR
+            // REWRITE HTML
             if (str_contains($contentType, 'text/html')) {
                 $ohifProxyBase = url('/orthanc-proxy/ohif');
 
-                // 1. Hapus base tag lama jika ada
+                // 1. Hapus tag script init-service-worker dari HTML jika ada
+                $body = preg_replace('#<script[^>]*init-service-worker\.js[^>]*></script>#i', '', $body);
+
+                // 2. Hapus base tag lama
                 $body = preg_replace('#<base[^>]*>#i', '', $body);
 
-                // 2. Timpa absolute root paths ("/" / "href="/") agar mengarah ke /orthanc-proxy/ohif/
+                // 3. Timpa absolute root paths agar mengarah ke /orthanc-proxy/ohif/
                 $body = str_replace('src="/', 'src="' . $ohifProxyBase . '/', $body);
                 $body = str_replace('href="/', 'href="' . $ohifProxyBase . '/', $body);
 
-                // 3. Inject base tag
+                // 4. Inject base tag baru
                 $baseTag = "<base href=\"{$ohifProxyBase}/\">";
                 $body = str_replace('<head>', "<head>\n  {$baseTag}", $body);
             }
