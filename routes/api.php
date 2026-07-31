@@ -1,5 +1,6 @@
 <?php
 
+use App\Http\Controllers\Api\Xn500Controller;
 use App\Http\Controllers\ApiCntroller;
 use App\Http\Controllers\Koperasi\KoperasiController;
 use Illuminate\Http\Request;
@@ -34,7 +35,9 @@ Route::prefix('v2/')->group(function (): void {
 });
 Route::prefix('interface/')->group(function (): void {
     Route::get('alat', [ApiCntroller::class, 'interface_alat'])->name('interface_alat');
+    // Route::post('xn-500', [ApiCntroller::class, 'interface_alat_xn_500'])->name('interface_alat_xn_500');
 
 });
+Route::post('/interface/xn-500', [Xn500Controller::class, 'receiveData']);
 Route::get('/peminjaman-uang', [KoperasiController::class, 'akutansi_koperasi_get_peminjaman']);
 Route::post('/peminjaman-uang/{id}/cairkan', [KoperasiController::class, 'akutansi_koperasi_get_peminjaman_cairkan']);

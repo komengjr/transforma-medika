@@ -113,4 +113,7 @@ class ApiCntroller extends Controller
             'total_data' => count($results)
         ], 200);
     }
+    public function interface_alat_xn_500(Request $request){
+
+    }
 }
