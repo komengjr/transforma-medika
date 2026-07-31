@@ -279,6 +279,7 @@ Route::prefix('{akses}/{id}/application')->group(function () {
     Route::get('master-member-patient', [MasterMedController::class, 'master_member_patient'])->name('master_member_patient');
 
     Route::get('master-medical/interface-architec', [MasterMedController::class, 'master_medical_interface_architec'])->name('master_medical_interface_architec');
+    Route::get('master-medical/xn-500', [MasterMedController::class, 'master_medical_interface_xn_500'])->name('master_medical_interface_xn_500');
 
 
     Route::get('master-perusahaan/data-perusahaan', [MasterDataController::class, 'master_perusahaan_data'])->name('master_perusahaan_data');
@@ -520,6 +521,9 @@ Route::prefix('application')->group(function () {
     Route::post('master-pemeriksaan/group-pemeriksaan/add-pemeriksaan/save', [MasterDataController::class, 'master_pemeriksaan_group_add_pemeriksaan_save'])->name('master_pemeriksaan_group_add_pemeriksaan_save');
     Route::post('master-pemeriksaan/group-pemeriksaan/add-value-pemeriksaan', [MasterDataController::class, 'master_pemeriksaan_group_add_value_pemeriksaan'])->name('master_pemeriksaan_group_add_value_pemeriksaan');
     Route::post('master-pemeriksaan/group-pemeriksaan/add-value-pemeriksaan/save', [MasterDataController::class, 'master_pemeriksaan_group_add_value_pemeriksaan_save'])->name('master_pemeriksaan_group_add_value_pemeriksaan_save');
+
+    Route::get('master-medical/interface-architec/get-data', [MasterMedController::class, 'master_medical_interface_architec_get_data'])->name('master_medical_interface_architec_get_data');
+    Route::get('master-medical/xn-500/get-data', [MasterMedController::class, 'master_medical_interface_xn_500_get_data'])->name('master_medical_interface_xn_500_get_data');
 });
 
 Route::post('file-upload/upload-file-profile', [UploadFileController::class, 'upload_profile'])->name('file-upload.data-profile');
