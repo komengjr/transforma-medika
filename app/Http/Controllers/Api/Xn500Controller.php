@@ -113,4 +113,38 @@ class Xn500Controller extends Controller
             ], 500);
         }
     }
+    public function receiveDataAll(Request $request)
+    {
+        try {
+            Log::info('Data Result masuk:', $request->all());
+
+            $nolab = $request->input('nolab') ?? ('UNKNOWN_' . time());
+
+            $insertedId = DB::table('medical_interface_result')->insertGetId([
+                'instrument_id' => $request->input('instrumentID'),
+                'nolab'         => $nolab,
+                'tanggal'       => $request->input('tanggal') ?? now(),
+                'flag_qc'       => $request->input('flag_qc', 'N'),
+                'flag_query'    => $request->input('flag_query', 'N'),
+                'results'       => json_encode($request->input('result', [])),
+                'raw_payload'   => json_encode($request->all()),
+                'created_at'    => now(),
+                'updated_at'    => now(),
+            ]);
+
+            return response()->json([
+                'status'  => 'success',
+                'message' => 'Data Interface berhasil disimpan ke database',
+                'id'      => $insertedId
+            ], 201);
+        } catch (\Exception $e) {
+            Log::error('Error save Data: ' . $e->getMessage());
+
+            return response()->json([
+                'status'  => 'error',
+                'message' => 'Gagal menyimpan data Result',
+                'error'   => $e->getMessage()
+            ], 500);
+        }
+    }
 }

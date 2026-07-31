@@ -248,6 +248,7 @@ Route::prefix('{akses}/{id}/application')->group(function () {
     Route::get('hasil-lab/verifikasi-hasil', [LaboratoriumController::class, 'verifikasi_laboratorium'])->name('verifikasi_laboratorium');
     Route::get('hasil-lab/dokumentasi-hasil', [LaboratoriumController::class, 'dokumentasi_hasil_laboratorium'])->name('dokumentasi_hasil_laboratorium');
     Route::get('hasil-lab/pengiriman-hasil', [LaboratoriumController::class, 'pengiriman_hasil_laboratorium'])->name('pengiriman_hasil_laboratorium');
+    Route::get('pendaftaran-lab/registrasi', [LaboratoriumController::class, 'pendaftaran_lab_registrasi'])->name('pendaftaran_lab_registrasi');
     // RADIOLOGI
     Route::get('menu-radiologi/data-registrasi-radiologi', [RadiologiController::class, 'data_registrasi_radiologi'])->name('data_registrasi_radiologi');
     Route::get('menu-radiologi/radiologi-handling', [RadiologiController::class, 'menu_radiologi_handling'])->name('menu_radiologi_handling');

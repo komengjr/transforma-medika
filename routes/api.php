@@ -3,6 +3,8 @@
 use App\Http\Controllers\Api\Xn500Controller;
 use App\Http\Controllers\ApiCntroller;
 use App\Http\Controllers\Koperasi\KoperasiController;
+use App\Http\Controllers\Medic\LabRegistrationController;
+use App\Http\Controllers\Medic\MedicalPemeriksaanLabController;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Route;
 
@@ -41,7 +43,25 @@ Route::prefix('interface/')->group(function (): void {
 Route::post('/interface/xn-500', [Xn500Controller::class, 'receiveData']);
 Route::post('/interface/cobas-411', [Xn500Controller::class, 'receiveDataCobas']);
 Route::post('/interface/architect-ci4100', [Xn500Controller::class, 'receiveDataArchitec']);
+Route::post('/interface/all', [Xn500Controller::class, 'receiveDataAll']);
 
 
 Route::get('/peminjaman-uang', [KoperasiController::class, 'akutansi_koperasi_get_peminjaman']);
 Route::post('/peminjaman-uang/{id}/cairkan', [KoperasiController::class, 'akutansi_koperasi_get_peminjaman_cairkan']);
+
+// Master Pemeriksaan Lab
+// Route::get('/lab/pasien/search', [LabRegistrationController::class, 'searchPatient']);
+Route::get('/lab/pemeriksaan', [MedicalPemeriksaanLabController::class, 'index']);
+Route::post('/lab/pemeriksaan', [MedicalPemeriksaanLabController::class, 'store']);
+Route::get('/lab/pendaftaran/{nolab}', [LabRegistrationController::class, 'getDetailOrder']);
+
+Route::prefix('lab')->group(function () {
+    Route::get('/', [LabRegistrationController::class, 'index']);
+    Route::get('/master-pemeriksaan', [LabRegistrationController::class, 'getMasterPemeriksaan']);
+    Route::get('/pasien/search', [LabRegistrationController::class, 'searchPasien']);
+    Route::get('/pendaftaran', [LabRegistrationController::class, 'getDaftarPendaftaran']);
+    Route::post('/pendaftaran', [LabRegistrationController::class, 'storePendaftaran']);
+    Route::get('/pendaftaran/{nolab}', [LabRegistrationController::class, 'showDetail']);
+    Route::post('/sync-sysmex', [LabRegistrationController::class, 'syncSysmex']);
+    Route::put('/pendaftaran/{id}/hasil', [LabRegistrationController::class, 'updateHasil']);
+});

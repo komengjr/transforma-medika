@@ -495,4 +495,14 @@ class LaboratoriumController extends Controller
         $pdf->output();
         return $pdf->stream();
     }
+    // PENGIRIMAN HASIL
+    public function pendaftaran_lab_registrasi($akses, $id)
+    {
+        if ($this->url_akses_sub($akses, $id) == true) {
+            $data = DB::table('d_reg_order_lab')->join('v_log_whatsapp', 'v_log_whatsapp.d_reg_order_list_code', '=', 'd_reg_order_lab.d_reg_order_lab_code')->get();
+            return view('app-medical.laboratorium.pendaftara-lab', ['akses' => $akses, 'data' => $data, 'code' => $id]);
+        } else {
+            return Redirect::to('dashboard/home');
+        }
+    }
 }
