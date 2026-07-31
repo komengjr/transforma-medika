@@ -12,20 +12,14 @@ class Xn500Controller extends Controller
     public function receiveData(Request $request)
     {
         try {
-            // Log payload masuk
-            Log::info('Data XN-500 diterima:', $request->all());
+            // Log payload yang masuk dari Node.js
+            Log::info('Data XN-500 masuk:', $request->all());
 
-            $nolab = $request->input('nolab');
-            if (!$nolab) {
-                return response()->json([
-                    'status' => 'error',
-                    'message' => 'Nolab / Sample ID tidak ditemukan'
-                ], 400);
-            }
+            $nolab = $request->input('nolab') ?? ('UNKNOWN_' . time());
 
-            // Simpan otomatis ke tabel interface_alat_xn_500
+            // Insert ke database
             $insertedId = DB::table('interface_alat_xn_500')->insertGetId([
-                'instrument_id' => $request->input('instrumentID'),
+                'instrument_id' => $request->input('instrumentID', 17),
                 'nolab'         => $nolab,
                 'tanggal'       => $request->input('tanggal') ?? now(),
                 'flag_qc'       => $request->input('flag_qc', 'N'),
@@ -38,15 +32,15 @@ class Xn500Controller extends Controller
 
             return response()->json([
                 'status'  => 'success',
-                'message' => 'Data XN-500 berhasil dimasukkan ke database',
+                'message' => 'Data berhasil disimpan ke database',
                 'id'      => $insertedId
             ], 201);
         } catch (\Exception $e) {
-            Log::error('Gagal memproses data XN-500: ' . $e->getMessage());
+            Log::error('Error save XN-500: ' . $e->getMessage());
 
             return response()->json([
                 'status'  => 'error',
-                'message' => 'Gagal menyimpan ke database',
+                'message' => 'Gagal menyimpan data ke database',
                 'error'   => $e->getMessage()
             ], 500);
         }
