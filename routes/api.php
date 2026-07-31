@@ -40,5 +40,8 @@ Route::prefix('interface/')->group(function (): void {
 });
 Route::post('/interface/xn-500', [Xn500Controller::class, 'receiveData']);
 Route::post('/interface/cobas-411', [Xn500Controller::class, 'receiveDataCobas']);
+Route::post('/interface/architect-ci4100', [Xn500Controller::class, 'receiveDataArchitec']);
+
+
 Route::get('/peminjaman-uang', [KoperasiController::class, 'akutansi_koperasi_get_peminjaman']);
 Route::post('/peminjaman-uang/{id}/cairkan', [KoperasiController::class, 'akutansi_koperasi_get_peminjaman_cairkan']);

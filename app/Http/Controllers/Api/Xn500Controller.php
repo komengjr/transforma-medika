@@ -79,4 +79,38 @@ class Xn500Controller extends Controller
             ], 500);
         }
     }
+    public function receiveDataArchitec(Request $request)
+    {
+        try {
+            Log::info('Data Architect ci4100 masuk:', $request->all());
+
+            $nolab = $request->input('nolab') ?? ('UNKNOWN_' . time());
+
+            $insertedId = DB::table('interface_alat_architect_ci4100')->insertGetId([
+                'instrument_id' => $request->input('instrumentID', 4100),
+                'nolab'         => $nolab,
+                'tanggal'       => $request->input('tanggal') ?? now(),
+                'flag_qc'       => $request->input('flag_qc', 'N'),
+                'flag_query'    => $request->input('flag_query', 'N'),
+                'results'       => json_encode($request->input('result', [])),
+                'raw_payload'   => json_encode($request->all()),
+                'created_at'    => now(),
+                'updated_at'    => now(),
+            ]);
+
+            return response()->json([
+                'status'  => 'success',
+                'message' => 'Data Architect ci4100 berhasil disimpan ke database',
+                'id'      => $insertedId
+            ], 201);
+        } catch (\Exception $e) {
+            Log::error('Error save Architect ci4100: ' . $e->getMessage());
+
+            return response()->json([
+                'status'  => 'error',
+                'message' => 'Gagal menyimpan data Architect ci4100',
+                'error'   => $e->getMessage()
+            ], 500);
+        }
+    }
 }
