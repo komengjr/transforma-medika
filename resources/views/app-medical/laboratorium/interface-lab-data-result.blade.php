@@ -1,123 +1,180 @@
 @extends('layouts.layouts')
 @section('base.css')
-<link rel="stylesheet" href="https://cdn.datatables.net/1.13.6/css/dataTables.bootstrap5.min.css">
+<!-- <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet"> -->
+<!-- DataTables Bootstrap 5 CSS -->
+<link href="https://cdn.datatables.net/1.13.6/css/dataTables.bootstrap5.min.css" rel="stylesheet">
+<!-- FontAwesome for Icons -->
+<link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" rel="stylesheet">
+
+<style>
+    .pre-raw {
+        background-color: #1e1e1e;
+        color: #00ff66;
+        padding: 15px;
+        border-radius: 6px;
+        font-family: 'Courier New', Courier, monospace;
+        max-height: 400px;
+        overflow-y: auto;
+        white-space: pre-wrap;
+        word-wrap: break-word;
+    }
+</style>
 @endsection
 @section('content')
-
-<!-- CARD FILTER -->
-<div class="card shadow-sm mb-3">
+<div class="card shadow-sm">
+    <div class="card-header bg-primary text-white d-flex justify-content-between align-items-center">
+        <h5 class="mb-0 text-white"><i class="fas fa-microscope me-2"></i> Data Hasil Interface Laboratory Information System</h5>
+    </div>
     <div class="card-body">
-        <h6 class="fw-bold mb-3"><i class="fa-solid fa-filter me-1"></i> Filter Data</h6>
-        <div class="row g-3">
-            <div class="col-md-4">
-                <label for="filter_nolab" class="form-label small text-muted">Nomor Lab / Sample ID</label>
-                <div class="input-group">
-                    <span class="input-group-text"><i class="fas fa-vial"></i></span>
-                    <input type="text" id="filter_nolab" class="form-control" placeholder="Contoh: LAB-20260801-001">
-                </div>
+
+        <!-- Filter Form -->
+        <div class="row g-3 mb-4">
+            <div class="col-md-3">
+                <label class="form-label fw-bold">No. Laboratorium</label>
+                <input type="text" id="filter_nolab" class="form-control" placeholder="Cari No Lab...">
             </div>
-            <div class="col-md-4">
-                <label for="filter_tanggal" class="form-label small text-muted">Tanggal Pemeriksaan</label>
-                <div class="input-group">
-                    <span class="input-group-text"><i class="fas fa-calendar-day"></i></span>
-                    <input type="date" id="filter_tanggal" class="form-control">
-                </div>
+            <div class="col-md-3">
+                <label class="form-label fw-bold">Tanggal Pemeriksaan</label>
+                <input type="date" id="filter_tanggal" class="form-control">
             </div>
-            <div class="col-md-4 d-flex align-items-end gap-2">
-                <button id="btn-filter" class="btn btn-primary w-100">
-                    <i class="fa-solid fa-magnifying-glass me-1"></i> Cari
+            <div class="col-md-3">
+                <label class="form-label fw-bold">Pilih Alat / Instrument</label>
+                <select id="filter_instrument" class="form-select">
+                    <option value="">-- Semua Alat --</option>
+                    @foreach($alatList as $alat)
+                    <option value="{{ $alat->instrument_id }}">{{ $alat->nama_alat }} ({{ $alat->kode_alat }})</option>
+                    @endforeach
+                </select>
+            </div>
+            <div class="col-md-3 d-flex align-items-end gap-2">
+                <button type="button" id="btn-filter" class="btn btn-primary flex-fill">
+                    <i class="fas fa-filter me-1"></i> Filter
                 </button>
-                <button id="btn-reset" class="btn btn-outline-secondary w-100">
-                    <i class="fa-solid fa-rotate-right me-1"></i> Reset
+                <button type="button" id="btn-reset" class="btn btn-secondary">
+                    <i class="fas fa-rotate-left"></i> Reset
                 </button>
             </div>
         </div>
-    </div>
-</div>
 
-<!-- CARD DATA TABLE -->
-<div class="card shadow-sm">
-    <div class="card-body">
+        <!-- Table -->
         <div class="table-responsive">
-            <table class="table table-hover table-striped align-middle" id="medicalTable" style="width:100%">
-                <thead class="table-light">
+            <table id="table-medical-results" class="table table-striped table-bordered align-middle w-100">
+                <thead class="table-dark">
                     <tr>
                         <th style="width: 50px;">ID</th>
-                        <th>No. Lab / Sample</th>
-                        <th>Instrument ID</th>
-                        <th>Waktu Pemeriksaan</th>
-                        <th class="text-center">QC Status</th>
-                        <th class="text-center">Query Status</th>
-                        <th style="width: 180px;" class="text-center">Menu Aksi</th>
+                        <th>No. Lab</th>
+                        <th>Instrument / Alat</th>
+                        <th>Tanggal</th>
+                        <th class="text-center" style="width: 80px;">QC</th>
+                        <th class="text-center" style="width: 80px;">Query</th>
+                        <th class="text-center" style="width: 160px;">Aksi</th>
                     </tr>
                 </thead>
-                <tbody>
-                    <!-- Data Diisi via AJAX DataTables -->
-                </tbody>
+                <tbody></tbody>
             </table>
         </div>
+
     </div>
 </div>
+
 @endsection
 @section('base.js')
-<!-- MODAL DETAIL HASIL & RAW PAYLOAD -->
-<div class="modal fade" id="detailModal" tabindex="-1" aria-labelledby="detailModalLabel" aria-hidden="true">
-    <div class="modal-dialog modal-lg modal-dialog-centered">
+
+<!-- Modal Detail Hasil -->
+<div class="modal fade" id="modalDetail" tabindex="-1" aria-hidden="true">
+    <div class="modal-dialog modal-lg">
         <div class="modal-content">
-            <div class="modal-header bg-primary text-white">
-                <h5 class="modal-title fw-bold" id="detailModalLabel">
-                    <i class="fa-solid fa-file-medical me-2"></i> Detail Data - <span id="modalNoLab"></span>
-                </h5>
-                <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal" aria-label="Close"></button>
+            <div class="modal-header bg-info text-white">
+                <h5 class="modal-title"><i class="fa-solid fa-list-check me-2"></i> Detail Hasil Pemeriksaan</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
             </div>
-            <div class="modal-body" id="modalBodyContent">
-                <!-- Konten dinamis akan disisipkan via JS (Tabel Detail / Raw JSON) -->
-            </div>
-            <div class="modal-footer">
-                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Tutup</button>
+            <div class="modal-body">
+                <!-- Info Header -->
+                <div class="row mb-3 bg-light p-2 rounded border">
+                    <div class="col-md-6">
+                        <strong>No. Lab:</strong> <span id="info-nolab">-</span><br>
+                        <strong>Alat:</strong> <span id="info-alat">-</span>
+                    </div>
+                    <div class="col-md-6 text-md-end">
+                        <strong>Tanggal:</strong> <span id="info-tanggal">-</span><br>
+                        <strong>Status:</strong> <span id="info-status">-</span>
+                    </div>
+                </div>
+
+                <!-- Table Hasil -->
+                <div class="table-responsive">
+                    <table class="table table-sm table-hover table-bordered">
+                        <thead class="table-secondary">
+                            <tr>
+                                <th>Parameter</th>
+                                <th>Hasil</th>
+                                <th>Satuan</th>
+                                <th>Nilai Rujukan</th>
+                                <th>Flag</th>
+                            </tr>
+                        </thead>
+                        <tbody id="detail-results-body">
+                            <!-- Injected via Javascript -->
+                        </tbody>
+                    </table>
+                </div>
             </div>
         </div>
     </div>
 </div>
 
-<!-- SCRIPTS -->
+<!-- Modal Raw Payload -->
+<div class="modal fade" id="modalRaw" tabindex="-1" aria-hidden="true">
+    <div class="modal-dialog modal-lg">
+        <div class="modal-content">
+            <div class="modal-header bg-dark text-white">
+                <h5 class="modal-title"><i class="fas fa-code me-2"></i> Raw Payload (ASTM / HL7 / Protocol Data)</h5>
+                <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <div class="modal-body">
+                <p>No. Lab: <strong id="raw-nolab">-</strong></p>
+                <pre id="raw-content" class="pre-raw">Memuat data...</pre>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Scripts -->
+<!-- <script src="https://code.jquery.com/jquery-3.7.0.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script> -->
 <script src="https://cdn.datatables.net/1.13.6/js/jquery.dataTables.min.js"></script>
 <script src="https://cdn.datatables.net/1.13.6/js/dataTables.bootstrap5.min.js"></script>
 
 <script>
     $(document).ready(function() {
-        // 1. Inisialisasi DataTable Server-Side
-        let table = $('#medicalTable').DataTable({
+
+        // 1. Inisialisasi DataTables
+        var table = $('#table-medical-results').DataTable({
             processing: true,
             serverSide: true,
-            responsive: true,
-            order: [
-                [0, 'desc']
-            ],
             ajax: {
                 url: "{{ route('interfave_lab_data_result_get_data') }}",
-                type: "GET",
                 data: function(d) {
                     d.nolab = $('#filter_nolab').val();
                     d.tanggal = $('#filter_tanggal').val();
+                    d.instrument_id = $('#filter_instrument').val();
                 }
             },
             columns: [{
                     data: 'id',
-                    name: 'id'
+                    name: 'mir.id'
                 },
                 {
                     data: 'nolab',
-                    name: 'nolab',
-                    className: 'fw-bold text-primary'
+                    name: 'mir.nolab'
                 },
                 {
-                    data: 'instrument_id',
-                    name: 'instrument_id'
+                    data: 'nama_instrument',
+                    name: 'mma.nama_alat'
                 },
                 {
                     data: 'tanggal',
-                    name: 'tanggal'
+                    name: 'mir.tanggal'
                 },
                 {
                     data: 'flag_qc',
@@ -136,109 +193,12 @@
                     searchable: false
                 }
             ],
-            language: {
-                processing: '<div class="spinner-border text-primary" role="status"><span class="visually-hidden">Loading...</span></div>',
-                search: "Cari Cepat:",
-                lengthMenu: "Tampilkan _MENU_ data",
-                info: "Menampilkan _START_ sampai _END_ dari _TOTAL_ data",
-                infoEmpty: "Tidak ada data tersedia",
-                zeroRecords: "Data tidak ditemukan",
-                paginate: {
-                    first: "Awal",
-                    last: "Akhir",
-                    next: "<i class='fas fa-chevron-right'></i>",
-                    previous: "<i class='fas fa-chevron-left'></i>"
-                }
-            }
+            order: [
+                [0, 'desc']
+            ]
         });
 
-        // 2. Event Listener: Ketika Select Dropdown Aksi Diubah
-        $('#medicalTable').on('change', '.action-select', function() {
-            let selectElement = $(this);
-            let selectedValue = selectElement.val();
-            let id = selectElement.data('id');
-
-            if (!selectedValue) return;
-
-            // Ambil data detail via AJAX
-            $.ajax({
-                url: "{{ url('application/interface-lab/data-result') }}/" + id,
-                type: "GET",
-                beforeSend: function() {
-                    selectElement.prop('disabled', true);
-                },
-                success: function(data) {
-                    $('#modalNoLab').text(data.nolab);
-                    let content = '';
-
-                    // Opsi 1: Tampilkan Detail Hasil Pemeriksaan
-                    if (selectedValue === 'toggle-detail') {
-                        $('#detailModalLabel').html('<i class="fa-solid fa-square-poll-vertical me-2"></i> Detail Hasil Lab - ' + data.nolab);
-
-                        let rows = '';
-                        if (data.results && Array.isArray(data.results) && data.results.length > 0) {
-                            data.results.forEach(item => {
-                                let flagBadge = item.flag ?
-                                    `<span class="badge bg-warning text-dark">${item.flag}</span>` :
-                                    `<span class="badge bg-light text-dark">-</span>`;
-
-                                rows += `<tr>
-                                <td class="fw-semibold">${item.px || item.parameter || '-'}</td>
-                                <td class="text-primary fw-bold">${item.result || item.nilai || '-'}</td>
-                                <td>${flagBadge}</td>
-                            </tr>`;
-                            });
-                        } else {
-                            rows = '<tr><td colspan="3" class="text-center text-muted py-3">Tidak ada detail hasil pemeriksaan.</td></tr>';
-                        }
-
-                        content = `
-                        <div class="table-responsive">
-                            <table class="table table-bordered table-striped align-middle mb-0">
-                                <thead class="table-dark">
-                                    <tr>
-                                        <th>Parameter (PX)</th>
-                                        <th>Hasil (Result)</th>
-                                        <th>Flag</th>
-                                    </tr>
-                                </thead>
-                                <tbody>${rows}</tbody>
-                            </table>
-                        </div>
-                    `;
-                    }
-                    // Opsi 2: Tampilkan Raw Payload Data
-                    else if (selectedValue === 'raw-payload') {
-                        $('#detailModalLabel').html('<i class="fa-solid fa-code me-2"></i> Raw Payload - ' + data.nolab);
-
-                        let payloadText = data.raw_payload ?
-                            JSON.stringify(data.raw_payload, null, 2) :
-                            'Raw payload kosong.';
-
-                        content = `
-                        <div class="bg-dark text-success p-3 rounded" style="max-height: 400px; overflow-y: auto;">
-                            <pre class="mb-0" style="font-size: 13px;"><code>${payloadText}</code></pre>
-                        </div>
-                    `;
-                    }
-
-                    // Inject Konten ke Modal Body dan Tampilkan Modal
-                    $('#modalBodyContent').html(content);
-                    $('#detailModal').modal('show');
-
-                    // Reset nilai select kembali ke default
-                    selectElement.val('');
-                    selectElement.prop('disabled', false);
-                },
-                error: function() {
-                    alert('Gagal mengambil data detail!');
-                    selectElement.prop('disabled', false);
-                    selectElement.val('');
-                }
-            });
-        });
-
-        // 3. Custom Filter Events
+        // 2. Event Handler Filter & Reset
         $('#btn-filter').click(function() {
             table.draw();
         });
@@ -246,9 +206,91 @@
         $('#btn-reset').click(function() {
             $('#filter_nolab').val('');
             $('#filter_tanggal').val('');
+            $('#filter_instrument').val('');
             table.draw();
         });
+
+        // 3. Event Handler Dropdown Action
+        $('#table-medical-results').on('change', '.action-select', function() {
+            var action = $(this).val();
+            var id = $(this).data('id');
+
+            // Reset dropdown pilihan ke default
+            $(this).val('');
+
+            if (action === 'toggle-detail') {
+                loadDetail(id);
+            } else if (action === 'raw-payload') {
+                loadRawPayload(id);
+            }
+        });
+
+        // 4. Function Ajax Detail Hasil
+        function loadDetail(id) {
+            var url = "{{ route('interfave_lab_data_result_show_data_detail', ':id') }}".replace(':id', id);
+
+            $.get(url, function(res) {
+                if (res.status === 'success') {
+                    $('#info-nolab').text(res.info.nolab);
+                    $('#info-alat').text(res.info.nama_alat + ' (' + res.info.kode_alat + ')');
+                    $('#info-tanggal').text(res.info.tanggal);
+
+                    var flags = '';
+                    if (res.info.flag_qc === 'Y') flags += '<span class="badge bg-warning text-dark me-1">QC</span>';
+                    if (res.info.flag_query === 'Y') flags += '<span class="badge bg-danger">Query</span>';
+                    if (flags === '') flags = '<span class="badge bg-secondary">Normal</span>';
+                    $('#info-status').html(flags);
+
+                    var tbody = $('#detail-results-body');
+                    tbody.empty();
+
+                    if (res.results.length === 0) {
+                        tbody.append('<tr><td colspan="5" class="text-center text-muted">Tidak ada item hasil pemeriksaan</td></tr>');
+                    } else {
+                        $.each(res.results, function(index, item) {
+                            tbody.append(`
+                            <tr>
+                                <td><strong>${item.test_name || item.code || '-'}</strong></td>
+                                <td>${item.value || '-'}</td>
+                                <td>${item.unit || '-'}</td>
+                                <td>${item.reference_range || '-'}</td>
+                                <td>${item.flag ? `<span class="badge bg-danger">${item.flag}</span>` : '-'}</td>
+                            </tr>
+                        `);
+                        });
+                    }
+
+                    $('#modalDetail').modal('show');
+                }
+            }).fail(function() {
+                alert('Gagal mengambil detail data.');
+            });
+        }
+
+        // 5. Function Ajax Raw Payload
+        function loadRawPayload(id) {
+            var url = "{{ route('interfave_lab_data_result_show_data_raw', ':id') }}".replace(':id', id);
+
+            $('#raw-content').text('Memuat data...');
+            $('#modalRaw').modal('show');
+
+            $.get(url, function(res) {
+                if (res.status === 'success') {
+                    $('#raw-nolab').text(res.nolab);
+
+                    // Format jika berbentuk JSON String
+                    try {
+                        var parsed = JSON.parse(res.raw_payload);
+                        $('#raw-content').text(JSON.stringify(parsed, null, 4));
+                    } catch (e) {
+                        $('#raw-content').text(res.raw_payload);
+                    }
+                }
+            }).fail(function() {
+                $('#raw-content').text('Gagal memuat raw payload.');
+            });
+        }
+
     });
 </script>
-
 @endsection

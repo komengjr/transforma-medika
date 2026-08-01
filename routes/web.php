@@ -430,7 +430,8 @@ Route::prefix('application')->group(function () {
     Route::get('verifikasi-lab/pengiriman-hasil/template', [LaboratoriumController::class, 'pengiriman_hasil_laboratorium_template'])->name('pengiriman_hasil_laboratorium_template');
 
     Route::get('interface-lab/data-result/data', [LaboratoriumController::class, 'interfave_lab_data_result_get_data'])->name('interfave_lab_data_result_get_data');
-    Route::get('interface-lab/data-result/{id}', [LaboratoriumController::class, 'interfave_lab_data_result_show_data'])->name('interfave_lab_data_result_show_data');
+    Route::get('interface-lab/data-result/{id}/detail', [LaboratoriumController::class, 'interfave_lab_data_result_show_data_detail'])->name('interfave_lab_data_result_show_data_detail');
+    Route::get('interface-lab/data-result/{id}/raw', [LaboratoriumController::class, 'interfave_lab_data_result_show_data_raw'])->name('interfave_lab_data_result_show_data_raw');
 });
 // MENU KEUANGAN
 Route::prefix('application')->group(function () {

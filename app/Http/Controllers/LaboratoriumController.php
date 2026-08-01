@@ -657,74 +657,79 @@ class LaboratoriumController extends Controller
     public function interfave_lab_data_result($akses, $id)
     {
         if ($this->url_akses_sub($akses, $id) == true) {
-            $data = DB::table('d_reg_order_lab')->join('v_log_whatsapp', 'v_log_whatsapp.d_reg_order_list_code', '=', 'd_reg_order_lab.d_reg_order_lab_code')->get();
-            return view('app-medical.laboratorium.interface-lab-data-result', ['akses' => $akses, 'data' => $data, 'code' => $id]);
+            // Mengambil daftar alat untuk dropdown filter di frontend
+            $alatList = DB::table('medical_master_alat')
+                ->where('status', 'aktif')
+                ->select('instrument_id', 'kode_alat', 'nama_alat')
+                ->get();
+            return view('app-medical.laboratorium.interface-lab-data-result', ['akses' => $akses, 'alatList' => $alatList, 'code' => $id]);
         } else {
             return Redirect::to('dashboard/home');
         }
     }
     public function interfave_lab_data_result_get_data(Request $request)
     {
-        // 1. Inisialisasi Query dasar dengan DB::table & select()
-        $query = DB::table('medical_interface_result')
+        // 1. Base Query dengan JOIN ke tabel medical_master_alat
+        $query = DB::table('medical_interface_result as mir')
+            ->leftJoin('medical_master_alat as mma', 'mir.instrument_id', '=', 'mma.instrument_id')
             ->select([
-                'id',
-                'instrument_id',
-                'nolab',
-                'tanggal',
-                'flag_qc',
-                'flag_query'
+                'mir.id',
+                'mir.nolab',
+                'mir.tanggal',
+                'mir.flag_qc',
+                'mir.flag_query',
+                'mir.instrument_id',
+                'mma.kode_alat',
+                'mma.nama_alat',
+                'mma.lokasi_ruangan'
             ]);
 
-        // Hitung total records sebelum filter
         $totalData = DB::table('medical_interface_result')->count();
 
-        // 2. Filter dari Form Custom (No. Lab & Tanggal)
+        // 2. Filter No. Lab
         if ($request->filled('nolab')) {
-            $query->where('nolab', 'like', '%' . $request->nolab . '%');
+            $query->where('mir.nolab', 'like', '%' . trim($request->nolab) . '%');
         }
 
+        // 3. Filter Tanggal
         if ($request->filled('tanggal')) {
-            $query->whereDate('tanggal', $request->tanggal);
+            $query->whereDate('mir.tanggal', $request->tanggal);
         }
 
-        // 3. Global Search bawaan DataTables (kolom pencarian di kanan atas tabel)
+        // 4. Filter Berdasarkan Alat / Instrument ID
+        if ($request->filled('instrument_id')) {
+            $query->where('mir.instrument_id', $request->instrument_id);
+        }
+
+        // 5. Global Search DataTables
         $searchValue = $request->input('search.value');
         if (!empty($searchValue)) {
             $query->where(function ($q) use ($searchValue) {
-                $q->where('nolab', 'like', "%{$searchValue}%")
-                    ->orWhere('instrument_id', 'like', "%{$searchValue}%");
+                $q->where('mir.nolab', 'like', "%{$searchValue}%")
+                    ->orWhere('mma.kode_alat', 'like', "%{$searchValue}%")
+                    ->orWhere('mma.nama_alat', 'like', "%{$searchValue}%");
             });
         }
 
-        // Hitung total records setelah dikeyword/difilter
         $totalFiltered = $query->count();
 
-        // 4. Sorting / Pengurutan Kolom Manual
-        $columns = ['id', 'nolab', 'instrument_id', 'tanggal', 'flag_qc', 'flag_query'];
-        $orderColumnIndex = $request->input('order.0.column', 0);
-        $orderDir = $request->input('order.0.dir', 'asc');
-
-        if (isset($columns[$orderColumnIndex])) {
-            $query->orderBy($columns[$orderColumnIndex], $orderDir);
-        } else {
-            $query->orderBy('id', 'desc');
-        }
-
-        // 5. Pagination Manual (Limit & Offset)
+        // 6. Pagination & Ordering
         $start = $request->input('start', 0);
         $length = $request->input('length', 10);
 
-        $data = $query->offset($start)
+        $data = $query->orderBy('mir.tanggal', 'desc')
+            ->offset($start)
             ->limit($length)
             ->get();
 
-        // 6. Formatting Data Manual untuk Tampilan
+        // 7. Format Data Response
         $formattedData = $data->map(function ($row) {
             return [
                 'id' => $row->id,
                 'nolab' => $row->nolab,
-                'instrument_id' => $row->instrument_id ?? '-',
+                'nama_instrument' => $row->nama_alat
+                    ? "<strong>{$row->nama_alat}</strong> <br><small class='text-muted'>[{$row->kode_alat}] - {$row->lokasi_ruangan}</small>"
+                    : "<span class='text-muted'>ID: " . ($row->instrument_id ?? '-') . "</span>",
                 'tanggal' => $row->tanggal ? date('d-m-Y H:i:s', strtotime($row->tanggal)) : '-',
                 'flag_qc' => $row->flag_qc === 'Y'
                     ? '<span class="badge bg-warning text-dark">QC</span>'
@@ -742,7 +747,6 @@ class LaboratoriumController extends Controller
             ];
         });
 
-        // 7. Kembalikan Format JSON Standar DataTables
         return response()->json([
             'draw' => intval($request->input('draw')),
             'recordsTotal' => intval($totalData),
@@ -750,21 +754,46 @@ class LaboratoriumController extends Controller
             'data' => $formattedData
         ]);
     }
-    public function interfave_lab_data_result_show_data($id)
+    public function interfave_lab_data_result_show_data_detail($id)
     {
-        $result = DB::table('medical_interface_result')
-            ->select('id', 'nolab', 'results', 'raw_payload')
-            ->where('id', $id)
+        $result = DB::table('medical_interface_result as mir')
+            ->leftJoin('medical_master_alat as mma', 'mir.instrument_id', '=', 'mma.instrument_id')
+            ->where('mir.id', $id)
+            ->select('mir.*', 'mma.nama_alat', 'mma.kode_alat')
             ->first();
 
         if (!$result) {
-            return response()->json(['message' => 'Data tidak ditemukan'], 404);
+            return response()->json(['status' => 'error', 'message' => 'Data tidak ditemukan'], 404);
         }
 
-        // Decode JSON manual
-        $result->results = json_decode($result->results, true);
-        $result->raw_payload = json_decode($result->raw_payload, true);
+        // Decode JSON results ke Array
+        $parsedResults = json_decode($result->results, true) ?? [];
 
-        return response()->json($result);
+        return response()->json([
+            'status' => 'success',
+            'info' => [
+                'nolab' => $result->nolab,
+                'nama_alat' => $result->nama_alat ?? 'Unknown Instrument',
+                'kode_alat' => $result->kode_alat ?? '-',
+                'tanggal' => $result->tanggal ? date('d-m-Y H:i:s', strtotime($result->tanggal)) : '-',
+                'flag_qc' => $result->flag_qc,
+                'flag_query' => $result->flag_query,
+            ],
+            'results' => $parsedResults
+        ]);
+    }
+    public function interfave_lab_data_result_show_data_raw($id)
+    {
+        $result = DB::table('medical_interface_result')->where('id', $id)->first();
+
+        if (!$result) {
+            return response()->json(['status' => 'error', 'message' => 'Data tidak ditemukan'], 404);
+        }
+
+        return response()->json([
+            'status' => 'success',
+            'nolab' => $result->nolab,
+            'raw_payload' => $result->raw_payload ?? 'Tidak ada data raw payload.'
+        ]);
     }
 }
