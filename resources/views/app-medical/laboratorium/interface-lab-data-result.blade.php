@@ -226,6 +226,7 @@
         });
 
         // 4. Function Ajax Detail Hasil
+        // Function Ajax Detail Hasil
         function loadDetail(id) {
             var url = "{{ route('interfave_lab_data_result_show_data_detail', ':id') }}".replace(':id', id);
 
@@ -244,19 +245,33 @@
                     var tbody = $('#detail-results-body');
                     tbody.empty();
 
-                    if (res.results.length === 0) {
+                    if (!res.results || res.results.length === 0) {
                         tbody.append('<tr><td colspan="5" class="text-center text-muted">Tidak ada item hasil pemeriksaan</td></tr>');
                     } else {
                         $.each(res.results, function(index, item) {
+                            // Penyesuaian Key JSON:
+                            // 1. Parameter/Code -> item.px
+                            // 2. Nilai Hasil -> item.result
+                            // 3. Satuan -> item.unit
+                            // 4. Flag -> item.flag
+
+                            var param = item.px || item.test_name || item.code || '-';
+                            var hasil = item.result || item.value || '-';
+                            var satuan = item.unit || '-';
+                            var rujukan = item.reference_range || '-';
+                            var flag = item.flag ?
+                                `<span class="badge bg-danger">${item.flag}</span>` :
+                                '-';
+
                             tbody.append(`
-                            <tr>
-                                <td><strong>${item.test_name || item.code || '-'}</strong></td>
-                                <td>${item.value || '-'}</td>
-                                <td>${item.unit || '-'}</td>
-                                <td>${item.reference_range || '-'}</td>
-                                <td>${item.flag ? `<span class="badge bg-danger">${item.flag}</span>` : '-'}</td>
-                            </tr>
-                        `);
+                        <tr>
+                            <td><strong>PX ${param}</strong></td>
+                            <td>${hasil}</td>
+                            <td>${satuan}</td>
+                            <td>${rujukan}</td>
+                            <td class="text-center">${flag}</td>
+                        </tr>
+                    `);
                         });
                     }
 
