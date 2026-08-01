@@ -21,7 +21,7 @@
 </style>
 @endsection
 @section('content')
-<div class="card shadow-sm">
+<div class="card shadow-sm mb-3">
     <div class="card-header bg-primary text-white d-flex justify-content-between align-items-center">
         <h5 class="mb-0 text-white"><i class="fas fa-microscope me-2"></i> Data Hasil Interface Laboratory Information System</h5>
     </div>
