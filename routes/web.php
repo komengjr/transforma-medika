@@ -249,6 +249,7 @@ Route::prefix('{akses}/{id}/application')->group(function () {
     Route::get('hasil-lab/dokumentasi-hasil', [LaboratoriumController::class, 'dokumentasi_hasil_laboratorium'])->name('dokumentasi_hasil_laboratorium');
     Route::get('hasil-lab/pengiriman-hasil', [LaboratoriumController::class, 'pengiriman_hasil_laboratorium'])->name('pengiriman_hasil_laboratorium');
     Route::get('pendaftaran-lab/registrasi', [LaboratoriumController::class, 'pendaftaran_lab_registrasi'])->name('pendaftaran_lab_registrasi');
+    Route::get('interface-lab/data-result', [LaboratoriumController::class, 'interfave_lab_data_result'])->name('interfave_lab_data_result');
     // RADIOLOGI
     Route::get('menu-radiologi/data-registrasi-radiologi', [RadiologiController::class, 'data_registrasi_radiologi'])->name('data_registrasi_radiologi');
     Route::get('menu-radiologi/radiologi-handling', [RadiologiController::class, 'menu_radiologi_handling'])->name('menu_radiologi_handling');
@@ -415,6 +416,8 @@ Route::prefix('application')->group(function () {
     Route::post('menu-laboratorium/specimen-collection/proses-simpan', [LaboratoriumController::class, 'data_specimen_collection_lab_proses_simpan'])->name('data_specimen_collection_lab_proses_simpan');
     Route::post('menu-laboratorium/specimen-collection/proses-fix-simpan', [LaboratoriumController::class, 'data_specimen_collection_lab_proses_simpan_fix'])->name('data_specimen_collection_lab_proses_simpan_fix');
     Route::post('menu-laboratorium/proses-result/detail', [LaboratoriumController::class, 'menu_lab_proses_result_detail'])->name('menu_lab_proses_result_detail');
+    Route::post('menu-laboratorium/proses-result/detail/proses-sinkronisasi', [LaboratoriumController::class, 'menu_lab_proses_result_detail_sinkronisasi'])->name('menu_lab_proses_result_detail_sinkronisasi');
+    Route::post('menu-laboratorium/proses-result/detail/simpan-sinkronisasi', [LaboratoriumController::class, 'menu_lab_proses_result_simpan_sinkronisasi'])->name('menu_lab_proses_result_simpan_sinkronisasi');
     Route::post('menu-laboratorium/proses-result/detail/proses-save', [LaboratoriumController::class, 'menu_lab_proses_result_detail_proses_save'])->name('menu_lab_proses_result_detail_proses_save');
     Route::post('verifikasi-lab/verifikasi-hasil/detail', [LaboratoriumController::class, 'verifikasi_laboratorium_detail'])->name('verifikasi_laboratorium_detail');
     Route::post('verifikasi-lab/verifikasi-hasil/verifikasi-data', [LaboratoriumController::class, 'verifikasi_laboratorium_verifikasi_data'])->name('verifikasi_laboratorium_verifikasi_data');
@@ -425,6 +428,9 @@ Route::prefix('application')->group(function () {
     Route::post('verifikasi-lab/pengiriman-hasil/add', [LaboratoriumController::class, 'pengiriman_hasil_laboratorium_add'])->name('pengiriman_hasil_laboratorium_add');
     Route::post('verifikasi-lab/pengiriman-hasil/save', [LaboratoriumController::class, 'pengiriman_hasil_laboratorium_save'])->name('pengiriman_hasil_laboratorium_save');
     Route::get('verifikasi-lab/pengiriman-hasil/template', [LaboratoriumController::class, 'pengiriman_hasil_laboratorium_template'])->name('pengiriman_hasil_laboratorium_template');
+
+    Route::get('interface-lab/data-result/data', [LaboratoriumController::class, 'interfave_lab_data_result_get_data'])->name('interfave_lab_data_result_get_data');
+    Route::get('interface-lab/data-result/{id}', [LaboratoriumController::class, 'interfave_lab_data_result_show_data'])->name('interfave_lab_data_result_show_data');
 });
 // MENU KEUANGAN
 Route::prefix('application')->group(function () {

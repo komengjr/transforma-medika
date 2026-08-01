@@ -176,6 +176,154 @@ class LaboratoriumController extends Controller
             ->where('d_reg_order_lab_code', $request->code)->get();
         return view('application.laboratorium.proses-result.detail-proses-result', ['data' => $data, 'pemeriksaan' => $pemeriksaan, 'code' => $request->code]);
     }
+    public function menu_lab_proses_result_detail_sinkronisasi(Request $request)
+    {
+        $code = $request->input('code'); // d_reg_order_lab_code / nolab
+        $listCodes = $request->input('list_codes', []); // Array kode HANYA dari halaman aktif
+
+        if (empty($listCodes)) {
+            return response()->json([
+                'status' => 'error',
+                'message' => 'Tidak ada kode parameter yang dikirim dari halaman.'
+            ], 400);
+        }
+
+        // 1. Ambil data alat dari medical_interface_result berdasarkan nolab
+        $interfaceData = DB::table('medical_interface_result')
+            ->where('nolab', $code)
+            ->latest('tanggal')
+            ->first();
+
+        if (!$interfaceData || empty($interfaceData->results)) {
+            return response()->json([
+                'status' => 'error',
+                'message' => 'Data dari alat tidak ditemukan untuk No. Lab: ' . $code
+            ], 404);
+        }
+
+        // 2. Decode kolom results dari JSON
+        $resultsArray = is_string($interfaceData->results)
+            ? json_decode($interfaceData->results, true)
+            : $interfaceData->results;
+
+        if (!is_array($resultsArray) || empty($resultsArray)) {
+            return response()->json([
+                'status' => 'error',
+                'message' => 'Format data JSON hasil alat tidak valid.'
+            ], 400);
+        }
+
+        DB::beginTransaction();
+        try {
+            $savedCount = 0;
+            $updatedValues = [];
+
+            foreach ($resultsArray as $item) {
+                $px = $item['px'] ?? null; // urutan 1, 2, 3...
+                $rawResult = $item['result'] ?? null;
+
+                if ($px !== null && $rawResult !== null && $rawResult !== '') {
+
+                    // Match px (1-based) ke indeks array listCodes yang dikirim dari HTML (0-based)
+                    $index = ((int) $px) - 1;
+
+                    // Ambil kode t_pem_list_val_code yang ada pada urutan ke-index di halaman ini
+                    if (!isset($listCodes[$index])) {
+                        continue; // Jika urutan alat melampaui jumlah row di halaman, lewati
+                    }
+
+                    $testCode = $listCodes[$index];
+
+                    // Parsing format hasil jika mengandung '^' (misal "25^1+" -> diambil "1+")
+                    if (str_contains($rawResult, '^')) {
+                        $parts = explode('^', $rawResult);
+                        $value = !empty($parts[1]) ? $parts[1] : $parts[0];
+                    } else {
+                        $value = $rawResult;
+                    }
+
+                    // Cek data existing
+                    $existing = DB::table('h_reg_lab')
+                        ->where('d_reg_order_lab_code', $code)
+                        ->where('t_pem_list_val_code', $testCode)
+                        ->first();
+
+                    // Upsert ke database
+                    DB::table('h_reg_lab')->updateOrInsert(
+                        [
+                            'd_reg_order_lab_code' => $code,
+                            't_pem_list_val_code'  => $testCode,
+                        ],
+                        [
+                            'h_reg_lab_code'   => $existing ? $existing->h_reg_lab_code : 'LAB-' . strtoupper(Str::random(10)),
+                            'h_reg_lab_value'  => $value,
+                            'h_reg_lab_metode' => $existing ? $existing->h_reg_lab_metode : '-',
+                            'updated_at'       => now(),
+                            'created_at'       => $existing ? $existing->created_at : now(),
+                        ]
+                    );
+
+                    $updatedValues[$testCode] = $value;
+                    $savedCount++;
+                }
+            }
+
+            DB::commit();
+
+            return response()->json([
+                'status'  => 'success',
+                'message' => 'Berhasil menyinkronkan ' . $savedCount . ' parameter.',
+                'data'    => $updatedValues
+            ]);
+        } catch (\Exception $e) {
+            DB::rollBack();
+
+            return response()->json([
+                'status'  => 'error',
+                'message' => 'Gagal menyimpan data: ' . $e->getMessage()
+            ], 500);
+        }
+    }
+    public function menu_lab_proses_result_simpan_sinkronisasi(Request $request)
+    {
+        $orderCode = $request->input('code'); // d_reg_order_lab_code
+        $hasilData = $request->input('hasil', []); // Array [t_pem_list_val_code => value]
+        $metodeData = $request->input('metode', []); // Array [t_pem_list_val_code => metode]
+
+        DB::beginTransaction();
+        try {
+            foreach ($hasilData as $valCode => $value) {
+                // Abaikan jika nilai hasil kosong
+                if ($value === null || $value === '') {
+                    continue;
+                }
+
+                $metode = $metodeData[$valCode] ?? '-';
+
+                // Gunakan updateOrInsert (Upsert) berdasarkan Order Code & Value Code
+                DB::table('h_reg_lab')->updateOrInsert(
+                    [
+                        'd_reg_order_lab_code' => $orderCode,
+                        't_pem_list_val_code'  => $valCode,
+                    ],
+                    [
+                        // Generate code acak jika record baru
+                        'h_reg_lab_code'   => 'LAB-' . strtoupper(Str::random(10)),
+                        'h_reg_lab_value'  => $value,
+                        'h_reg_lab_metode' => $metode,
+                        'updated_at'       => now(),
+                        'created_at'       => now(),
+                    ]
+                );
+            }
+
+            DB::commit();
+            return redirect()->back()->with('success', 'Data hasil pemeriksaan berhasil disimpan!');
+        } catch (\Exception $e) {
+            DB::rollBack();
+            return redirect()->back()->with('error', 'Gagal menyimpan data: ' . $e->getMessage());
+        }
+    }
     public function menu_lab_proses_result_detail_proses_save(Request $request)
     {
         $data = DB::table('d_reg_order_lab_list')
@@ -189,10 +337,10 @@ class LaboratoriumController extends Controller
                 DB::table('h_reg_lab')
                     ->where('d_reg_order_lab_code', $request->code)
                     ->where('t_pem_list_val_code', $value->t_pem_list_val_code)->update([
-                            'h_reg_lab_value' => $request[$value->t_pem_list_val_code],
-                            'h_reg_lab_metode' => $request['opt' . $value->t_pem_list_val_code],
-                            'created_at' => now()
-                        ]);
+                        'h_reg_lab_value' => $request[$value->t_pem_list_val_code],
+                        'h_reg_lab_metode' => $request['opt' . $value->t_pem_list_val_code],
+                        'created_at' => now()
+                    ]);
             } else {
                 DB::table('h_reg_lab')->insert([
                     'h_reg_lab_code' => str::uuid(),
@@ -504,5 +652,119 @@ class LaboratoriumController extends Controller
         } else {
             return Redirect::to('dashboard/home');
         }
+    }
+    // INTERFACE DATA RESULT
+    public function interfave_lab_data_result($akses, $id)
+    {
+        if ($this->url_akses_sub($akses, $id) == true) {
+            $data = DB::table('d_reg_order_lab')->join('v_log_whatsapp', 'v_log_whatsapp.d_reg_order_list_code', '=', 'd_reg_order_lab.d_reg_order_lab_code')->get();
+            return view('app-medical.laboratorium.interface-lab-data-result', ['akses' => $akses, 'data' => $data, 'code' => $id]);
+        } else {
+            return Redirect::to('dashboard/home');
+        }
+    }
+    public function interfave_lab_data_result_get_data(Request $request)
+    {
+        // 1. Inisialisasi Query dasar dengan DB::table & select()
+        $query = DB::table('medical_interface_result')
+            ->select([
+                'id',
+                'instrument_id',
+                'nolab',
+                'tanggal',
+                'flag_qc',
+                'flag_query'
+            ]);
+
+        // Hitung total records sebelum filter
+        $totalData = DB::table('medical_interface_result')->count();
+
+        // 2. Filter dari Form Custom (No. Lab & Tanggal)
+        if ($request->filled('nolab')) {
+            $query->where('nolab', 'like', '%' . $request->nolab . '%');
+        }
+
+        if ($request->filled('tanggal')) {
+            $query->whereDate('tanggal', $request->tanggal);
+        }
+
+        // 3. Global Search bawaan DataTables (kolom pencarian di kanan atas tabel)
+        $searchValue = $request->input('search.value');
+        if (!empty($searchValue)) {
+            $query->where(function ($q) use ($searchValue) {
+                $q->where('nolab', 'like', "%{$searchValue}%")
+                    ->orWhere('instrument_id', 'like', "%{$searchValue}%");
+            });
+        }
+
+        // Hitung total records setelah dikeyword/difilter
+        $totalFiltered = $query->count();
+
+        // 4. Sorting / Pengurutan Kolom Manual
+        $columns = ['id', 'nolab', 'instrument_id', 'tanggal', 'flag_qc', 'flag_query'];
+        $orderColumnIndex = $request->input('order.0.column', 0);
+        $orderDir = $request->input('order.0.dir', 'asc');
+
+        if (isset($columns[$orderColumnIndex])) {
+            $query->orderBy($columns[$orderColumnIndex], $orderDir);
+        } else {
+            $query->orderBy('id', 'desc');
+        }
+
+        // 5. Pagination Manual (Limit & Offset)
+        $start = $request->input('start', 0);
+        $length = $request->input('length', 10);
+
+        $data = $query->offset($start)
+            ->limit($length)
+            ->get();
+
+        // 6. Formatting Data Manual untuk Tampilan
+        $formattedData = $data->map(function ($row) {
+            return [
+                'id' => $row->id,
+                'nolab' => $row->nolab,
+                'instrument_id' => $row->instrument_id ?? '-',
+                'tanggal' => $row->tanggal ? date('d-m-Y H:i:s', strtotime($row->tanggal)) : '-',
+                'flag_qc' => $row->flag_qc === 'Y'
+                    ? '<span class="badge bg-warning text-dark">QC</span>'
+                    : '<span class="badge bg-secondary">N</span>',
+                'flag_query' => $row->flag_query === 'Y'
+                    ? '<span class="badge bg-danger">Query</span>'
+                    : '<span class="badge bg-secondary">N</span>',
+                'action' => '
+                    <select class="form-select form-select-sm action-select" data-id="' . $row->id . '">
+                        <option value="" selected disabled>-- Pilih Aksi --</option>
+                        <option value="toggle-detail">👁️ Detail Hasil</option>
+                        <option value="raw-payload">📜 Raw Payload</option>
+                    </select>
+                '
+            ];
+        });
+
+        // 7. Kembalikan Format JSON Standar DataTables
+        return response()->json([
+            'draw' => intval($request->input('draw')),
+            'recordsTotal' => intval($totalData),
+            'recordsFiltered' => intval($totalFiltered),
+            'data' => $formattedData
+        ]);
+    }
+    public function interfave_lab_data_result_show_data($id)
+    {
+        $result = DB::table('medical_interface_result')
+            ->select('id', 'nolab', 'results', 'raw_payload')
+            ->where('id', $id)
+            ->first();
+
+        if (!$result) {
+            return response()->json(['message' => 'Data tidak ditemukan'], 404);
+        }
+
+        // Decode JSON manual
+        $result->results = json_decode($result->results, true);
+        $result->raw_payload = json_decode($result->raw_payload, true);
+
+        return response()->json($result);
     }
 }

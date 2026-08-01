@@ -12,11 +12,11 @@
                     <div class="avatar avatar-5lg shadow-sm justify-content-center">
                         <div class="h-100 w-100 overflow-hidden ">
                             @if ($data->master_patient_profile == "")
-                                <img src="{{ asset('img/pasien.png') }}" class="img-thumbnail " alt="" id="videoPreview"
-                                    data-dz-thumbnail="data-dz-thumbnail">
+                            <img src="{{ asset('img/pasien.png') }}" class="img-thumbnail " alt="" id="videoPreview"
+                                data-dz-thumbnail="data-dz-thumbnail">
                             @else
-                                <img src="{{ Storage::url($data->master_patient_profile) }}" class="img-thumbnail " alt=""
-                                    id="videoPreview" data-dz-thumbnail="data-dz-thumbnail">
+                            <img src="{{ Storage::url($data->master_patient_profile) }}" class="img-thumbnail " alt=""
+                                id="videoPreview" data-dz-thumbnail="data-dz-thumbnail">
                             @endif
                         </div>
 
@@ -113,61 +113,10 @@
         </form>
         <div class="card my-3 border border-warning">
             <div class="card-body d-flex justify-content-between ">
-                <div><a class="btn btn-falcon-default btn-sm" href="../../app/email/inbox.html" data-bs-toggle="tooltip"
-                        data-bs-placement="top" title="" data-bs-original-title="Back to inbox"
-                        aria-label="Back to inbox"><svg class="svg-inline--fa fa-arrow-left fa-w-14" aria-hidden="true"
-                            focusable="false" data-prefix="fas" data-icon="arrow-left" role="img"
-                            xmlns="http://www.w3.org/2000/svg" viewBox="0 0 448 512" data-fa-i2svg="">
-                            <path fill="currentColor"
-                                d="M257.5 445.1l-22.2 22.2c-9.4 9.4-24.6 9.4-33.9 0L7 273c-9.4-9.4-9.4-24.6 0-33.9L201.4 44.7c9.4-9.4 24.6-9.4 33.9 0l22.2 22.2c9.5 9.5 9.3 25-.4 34.3L136.6 216H424c13.3 0 24 10.7 24 24v32c0 13.3-10.7 24-24 24H136.6l120.5 114.8c9.8 9.3 10 24.8.4 34.3z">
-                            </path>
-                        </svg><!-- <span class="fas fa-arrow-left"></span> Font Awesome fontawesome.com --></a><span
-                        class="mx-1 mx-sm-2 text-300">|</span>
-                    <button class="btn btn-falcon-default btn-sm" type="button" data-bs-toggle="tooltip"
-                        data-bs-placement="top" title="" data-bs-original-title="Archive" aria-label="Archive"><svg
-                            class="svg-inline--fa fa-archive fa-w-16" aria-hidden="true" focusable="false"
-                            data-prefix="fas" data-icon="archive" role="img" xmlns="http://www.w3.org/2000/svg"
-                            viewBox="0 0 512 512" data-fa-i2svg="">
-                            <path fill="currentColor"
-                                d="M32 448c0 17.7 14.3 32 32 32h384c17.7 0 32-14.3 32-32V160H32v288zm160-212c0-6.6 5.4-12 12-12h104c6.6 0 12 5.4 12 12v8c0 6.6-5.4 12-12 12H204c-6.6 0-12-5.4-12-12v-8zM480 32H32C14.3 32 0 46.3 0 64v48c0 8.8 7.2 16 16 16h480c8.8 0 16-7.2 16-16V64c0-17.7-14.3-32-32-32z">
-                            </path>
-                        </svg><!-- <span class="fas fa-archive"></span> Font Awesome fontawesome.com --></button>
-                    <button class="btn btn-falcon-default btn-sm ms-1 ms-sm-2" type="button" data-bs-toggle="tooltip"
-                        data-bs-placement="top" title="" data-bs-original-title="Delete" aria-label="Delete"><svg
-                            class="svg-inline--fa fa-trash-alt fa-w-14" aria-hidden="true" focusable="false"
-                            data-prefix="fas" data-icon="trash-alt" role="img" xmlns="http://www.w3.org/2000/svg"
-                            viewBox="0 0 448 512" data-fa-i2svg="">
-                            <path fill="currentColor"
-                                d="M32 464a48 48 0 0 0 48 48h288a48 48 0 0 0 48-48V128H32zm272-256a16 16 0 0 1 32 0v224a16 16 0 0 1-32 0zm-96 0a16 16 0 0 1 32 0v224a16 16 0 0 1-32 0zm-96 0a16 16 0 0 1 32 0v224a16 16 0 0 1-32 0zM432 32H312l-9.4-18.7A24 24 0 0 0 281.1 0H166.8a23.72 23.72 0 0 0-21.4 13.3L136 32H16A16 16 0 0 0 0 48v32a16 16 0 0 0 16 16h416a16 16 0 0 0 16-16V48a16 16 0 0 0-16-16z">
-                            </path>
-                        </svg><!-- <span class="fas fa-trash-alt"></span> Font Awesome fontawesome.com --></button>
-                    <button class="btn btn-falcon-default btn-sm ms-1 ms-sm-2" type="button" data-bs-toggle="tooltip"
-                        data-bs-placement="top" title="" data-bs-original-title="Mark as unread"
-                        aria-label="Mark as unread"><svg class="svg-inline--fa fa-envelope fa-w-16" aria-hidden="true"
-                            focusable="false" data-prefix="fas" data-icon="envelope" role="img"
-                            xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512" data-fa-i2svg="">
-                            <path fill="currentColor"
-                                d="M502.3 190.8c3.9-3.1 9.7-.2 9.7 4.7V400c0 26.5-21.5 48-48 48H48c-26.5 0-48-21.5-48-48V195.6c0-5 5.7-7.8 9.7-4.7 22.4 17.4 52.1 39.5 154.1 113.6 21.1 15.4 56.7 47.8 92.2 47.6 35.7.3 72-32.8 92.3-47.6 102-74.1 131.6-96.3 154-113.7zM256 320c23.2.4 56.6-29.2 73.4-41.4 132.7-96.3 142.8-104.7 173.4-128.7 5.8-4.5 9.2-11.5 9.2-18.9v-19c0-26.5-21.5-48-48-48H48C21.5 64 0 85.5 0 112v19c0 7.4 3.4 14.3 9.2 18.9 30.6 23.9 40.7 32.4 173.4 128.7 16.8 12.2 50.2 41.8 73.4 41.4z">
-                            </path>
-                        </svg><!-- <span class="fas fa-envelope"></span> Font Awesome fontawesome.com --></button>
-                    <button class="btn btn-falcon-default btn-sm ms-1 ms-sm-2" type="button" data-bs-toggle="tooltip"
-                        data-bs-placement="top" title="" data-bs-original-title="Snooze" aria-label="Snooze"><svg
-                            class="svg-inline--fa fa-clock fa-w-16" aria-hidden="true" focusable="false"
-                            data-prefix="fas" data-icon="clock" role="img" xmlns="http://www.w3.org/2000/svg"
-                            viewBox="0 0 512 512" data-fa-i2svg="">
-                            <path fill="currentColor"
-                                d="M256,8C119,8,8,119,8,256S119,504,256,504,504,393,504,256,393,8,256,8Zm92.49,313h0l-20,25a16,16,0,0,1-22.49,2.5h0l-67-49.72a40,40,0,0,1-15-31.23V112a16,16,0,0,1,16-16h32a16,16,0,0,1,16,16V256l58,42.5A16,16,0,0,1,348.49,321Z">
-                            </path>
-                        </svg><!-- <span class="fas fa-clock"></span> Font Awesome fontawesome.com --></button>
-                    <button class="btn btn-falcon-default btn-sm ms-1 ms-sm-2 d-none d-sm-inline-block" type="button"
-                        data-bs-toggle="tooltip" data-bs-placement="top" title="" data-bs-original-title="Print"
-                        aria-label="Print"><svg class="svg-inline--fa fa-print fa-w-16" aria-hidden="true"
-                            focusable="false" data-prefix="fas" data-icon="print" role="img"
-                            xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512" data-fa-i2svg="">
-                            <path fill="currentColor"
-                                d="M448 192V77.25c0-8.49-3.37-16.62-9.37-22.63L393.37 9.37c-6-6-14.14-9.37-22.63-9.37H96C78.33 0 64 14.33 64 32v160c-35.35 0-64 28.65-64 64v112c0 8.84 7.16 16 16 16h48v96c0 17.67 14.33 32 32 32h320c17.67 0 32-14.33 32-32v-96h48c8.84 0 16-7.16 16-16V256c0-35.35-28.65-64-64-64zm-64 256H128v-96h256v96zm0-224H128V64h192v48c0 8.84 7.16 16 16 16h48v96zm48 72c-13.25 0-24-10.75-24-24 0-13.26 10.75-24 24-24s24 10.74 24 24c0 13.25-10.75 24-24 24z">
-                            </path>
-                        </svg><!-- <span class="fas fa-print"></span> Font Awesome fontawesome.com --></button>
+                <div>
+                    <button class="btn btn-falcon-primary" id="button-sinkronisasi-proses-result">
+                        <span class="far fa-save"></span> Sinkronisasi Alat
+                    </button>
                 </div>
                 <div class="d-flex">
                     <button class="btn btn-falcon-primary" id="button-simpan-proses-result"><span
@@ -176,10 +125,10 @@
             </div>
         </div>
         <div class="mt-3 border rounded">
-            <form id="form-result-pasien" method="post" enctype="multipart/form-data">
+            <form id="form-result-pasien" action="{{ route('menu_lab_proses_result_simpan_sinkronisasi') }}" method="post" enctype="multipart/form-data">
                 @csrf
+                <input type="text" name="code" value="{{ $code }}" hidden>
 
-                <input type="text" name="code" id="" value="{{ $code }}" hidden>
                 <table class="table table-bordered fs--2 mb-0 border text-dark">
                     <thead class="bg-300">
                         <tr>
@@ -192,62 +141,53 @@
                     </thead>
                     <tbody>
                         @foreach ($pemeriksaan as $pem)
-                            <tr>
-                                <td colspan="5"><strong>{{$pem->t_pemeriksaan_list_name}}</strong></td>
-                            </tr>
-                            @php
-                                $sub = DB::table('t_pemeriksaan_list_val')->where('t_pemeriksaan_list_code', $pem->t_pemeriksaan_list_code)->get();
-                            @endphp
-                            @foreach ($sub as $subs)
-                                <tr>
-                                    <td>{{$subs->t_pem_list_val_name}}</td>
-                                    <td style="width: 20%;">
-                                        @php
-                                            $nilai = DB::table('h_reg_lab')->where('d_reg_order_lab_code', $code)->where('t_pem_list_val_code', $subs->t_pem_list_val_code)->first();
-                                        @endphp
-                                        @if ($nilai)
-                                            <div class="input-group has-validation">
-                                                <input type="text" class="form-control" name="{{$subs->t_pem_list_val_code}}"
-                                                    id="validationTooltipUsername"
-                                                    aria-describedby="validationTooltipUsernamePrepend" required=""
-                                                    value="{{ $nilai->h_reg_lab_value }}">
-                                                <span class="input-group-text"
-                                                    id="validationTooltipUsernamePrepend">{{$subs->t_pem_list_val_satuan}}</span>
-                                                <div class="invalid-tooltip">Please choose a unique and valid username.</div>
-                                            </div>
-                                        @else
-                                            <div class="input-group has-validation">
-                                                <input type="text" class="form-control" name="{{$subs->t_pem_list_val_code}}"
-                                                    id="validationTooltipUsername"
-                                                    aria-describedby="validationTooltipUsernamePrepend" required="">
-                                                <span class="input-group-text"
-                                                    id="validationTooltipUsernamePrepend">{{$subs->t_pem_list_val_satuan}}</span>
-                                                <div class="invalid-tooltip">Please choose a unique and valid username.</div>
-                                            </div>
-                                        @endif
+                        <tr>
+                            <td colspan="5"><strong>{{$pem->t_pemeriksaan_list_name}}</strong></td>
+                        </tr>
+                        @php
+                        $sub = DB::table('t_pemeriksaan_list_val')->where('t_pemeriksaan_list_code', $pem->t_pemeriksaan_list_code)->get();
+                        @endphp
 
-                                    </td>
-                                    <td>*</td>
-                                    <td>{{$subs->t_pem_list_val_rujukan}}</td>
-                                    <td class="fs--2">
-                                        @if ($nilai)
-                                            <select name="opt{{$subs->t_pem_list_val_code}}" class="form-control fs--2" id="">
-                                                <option value="{{$nilai->h_reg_lab_metode}}">{{$nilai->h_reg_lab_metode}}</option>
-                                                <option value="RBC PULSE HEIGHT DETECTION">RBC PULSE HEIGHT DETECTION</option>
-                                                <option value="RBC PULSE AJA">RBC PULUSE AJA</option>
-                                            </select>
-                                        @else
-                                            <select name="opt{{$subs->t_pem_list_val_code}}" class="form-control fs--2" id="">
-                                                <option value="-">-</option>
-                                                <option value="RBC PULSE HEIGHT DETECTION">RBC PULSE HEIGHT DETECTION</option>
-                                                <option value="RBC PULSE AJA">RBC PULUSE AJA</option>
-                                            </select>
-                                        @endif
-                                    </td>
+                        @foreach ($sub as $subs)
+                        <tr>
+                            <td>{{$subs->t_pem_list_val_name}}</td>
+                            <td style="width: 20%;">
+                                @php
+                                $nilai = DB::table('h_reg_lab')
+                                ->where('d_reg_order_lab_code', $code)
+                                ->where('t_pem_list_val_code', $subs->t_pem_list_val_code)
+                                ->first();
 
+                                // Cek apakah sudah ada nilainya
+                                $hasValue = $nilai && !empty($nilai->h_reg_lab_value);
+                                @endphp
 
-                                </tr>
-                            @endforeach
+                                <div class="input-group has-validation">
+                                    <!-- Tambahkan attribute disabled dan class border/bg-success jika $hasValue true -->
+                                    <input type="text"
+                                        class="form-control input-hasil {{ $hasValue ? 'border-success bg-light-success' : '' }}"
+                                        data-code="{{ $subs->t_pem_list_val_code }}"
+                                        name="hasil[{{ $subs->t_pem_list_val_code }}]"
+                                        value="{{ $hasValue ? $nilai->h_reg_lab_value : '' }}"
+                                        {{ $hasValue ? 'disabled' : '' }}>
+
+                                    <span class="input-group-text {{ $hasValue ? 'border-success' : '' }} fs--2">{{$subs->t_pem_list_val_satuan}}</span>
+                                </div>
+                            </td>
+                            <td>*</td>
+                            <td>{{$subs->t_pem_list_val_rujukan}}</td>
+                            <td class="fs--2">
+                                <select name="metode[{{ $subs->t_pem_list_val_code }}]"
+                                    class="form-control fs--2 select-metode {{ $hasValue ? 'border-success bg-light-success' : '' }}"
+                                    data-code="{{ $subs->t_pem_list_val_code }}"
+                                    {{ $hasValue ? 'disabled' : '' }}>
+                                    <option value="{{ $nilai ? $nilai->h_reg_lab_metode : '-' }}">{{ $nilai ? $nilai->h_reg_lab_metode : '-' }}</option>
+                                    <option value="RBC PULSE HEIGHT DETECTION">RBC PULSE HEIGHT DETECTION</option>
+                                    <option value="RBC PULSE AJA">RBC PULUSE AJA</option>
+                                </select>
+                            </td>
+                        </tr>
+                        @endforeach
                         @endforeach
                     </tbody>
                 </table>
@@ -255,3 +195,82 @@
         </div>
     </div>
 </div>
+<script>
+    $(document).ready(function() {
+        $('#button-sinkronisasi-proses-result').on('click', function(e) {
+            e.preventDefault();
+            let btn = $(this);
+            let codeLab = $('input[name="code"]').val();
+            // 1. Ambil semua t_pem_list_val_code yang ADA HANYA DI HALAMAN INI
+            let listCodes = [];
+            $('.select-metode').each(function() {
+                let code = $(this).data('code');
+                if (code) {
+                    listCodes.push(code);
+                }
+            });
+            if (listCodes.length === 0) {
+                alert('Tidak ada parameter pemeriksaan di halaman ini.');
+                return;
+            }
+            btn.prop('disabled', true).html('<span class="spinner-border spinner-border-sm"></span> Menyinkronkan...');
+
+            // 2. Kirim listCodes bersamaan dengan code lab
+            $.ajax({
+                url: "{{ route('menu_lab_proses_result_detail_sinkronisasi') }}",
+                type: "POST",
+                data: {
+                    _token: "{{ csrf_token() }}",
+                    code: codeLab,
+                    list_codes: listCodes // Send array of codes on this page
+                },
+                success: function(response) {
+                    if (response.status === 'success') {
+                        let updatedData = response.data; // Objek [code => value]
+
+                        $('.input-hasil').each(function() {
+                            let code = $(this).data('code');
+
+                            if (updatedData[code] !== undefined && updatedData[code] !== '') {
+                                let inputEl = $(this);
+                                let selectMetode = $('.select-metode[data-code="' + code + '"]');
+                                let inputGroupText = inputEl.siblings('.input-group-text');
+
+                                // Isi nilai
+                                inputEl.val(updatedData[code]);
+
+                                // Lock & Style
+                                inputEl.prop('disabled', true);
+                                selectMetode.prop('disabled', true);
+
+                                inputEl.addClass('border-success bg-light-success');
+                                selectMetode.addClass('border-success bg-light-success');
+                                inputGroupText.addClass('border-success');
+                            }
+                        });
+
+                        alert(response.message);
+                    }
+                },
+                error: function(xhr) {
+                    let msg = xhr.responseJSON ? xhr.responseJSON.message : 'Terjadi kesalahan saat sinkronisasi.';
+                    alert(msg);
+                },
+                complete: function() {
+                    btn.prop('disabled', false).html('<span class="far fa-save"></span> Sinkronisasi Alat');
+                }
+            });
+        });
+
+        // Otomatis lepas disabled sejenak sebelum form disubmit agar data tetap ikut terkirim
+        $('#form-result-pasien').on('submit', function() {
+            $(this).find(':disabled').removeAttr('disabled');
+        });
+
+        $('#button-simpan-proses-result').on('click', function(e) {
+            e.preventDefault();
+            $('#form-result-pasien').submit();
+        });
+
+    });
+</script>
