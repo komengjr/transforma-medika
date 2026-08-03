@@ -5,110 +5,171 @@
 <link rel="stylesheet" href="https://cdn.datatables.net/responsive/3.0.4/css/responsive.bootstrap5.css">
 <link href="{{ asset('vendors/choices/choices.min.css') }}" rel="stylesheet" />
 <link href="{{ asset('vendors/flatpickr/flatpickr.min.css') }}" rel="stylesheet" />
+
 <style>
-    .table-radiologi th {
-        font-weight: 600;
-        text-transform: uppercase;
-        font-size: 0.75rem;
-        letter-spacing: 0.5px;
+    /* ==========================================
+     * RADIOLOGY & X-RAY THEME CUSTOM CSS
+     * ========================================== */
+    :root {
+        --rad-dark-bg: #0f172a;
+        --rad-card-bg: #1e293b;
+        --rad-accent-cyan: #38bdf8;
+        --rad-glow-cyan: rgba(56, 189, 248, 0.35);
     }
 
+    /* Hero Header Radiologi */
+    .rad-hero-header {
+        background: linear-gradient(135deg, #0f172a 0%, #1e293b 60%, #0369a1 100%);
+        border: 1px solid rgba(56, 189, 248, 0.25);
+        border-radius: 14px;
+        color: #ffffff;
+        box-shadow: 0 6px 20px rgba(15, 23, 42, 0.35);
+        position: relative;
+        overflow: hidden;
+    }
+
+    .rad-hero-header::before {
+        content: '';
+        position: absolute;
+        top: -60px;
+        right: -30px;
+        width: 250px;
+        height: 250px;
+        background: radial-gradient(circle, var(--rad-glow-cyan) 0%, transparent 75%);
+        pointer-events: none;
+    }
+
+    /* Card Table Frame */
+    .rad-card {
+        background: #ffffff;
+        border-radius: 14px;
+        border: 1px solid #e2e8f0;
+        box-shadow: 0 4px 16px rgba(0, 0, 0, 0.04);
+        overflow: hidden;
+    }
+
+    .rad-card-header {
+        background: linear-gradient(90deg, #0f172a 0%, #1e293b 100%);
+        color: #ffffff;
+        border-bottom: 2px solid #0284c7;
+        padding: 14px 20px;
+    }
+
+    /* Table Radiology Custom Styling */
+    .table-radiologi thead th {
+        background-color: #f8fafc !important;
+        color: #334155 !important;
+        font-weight: 700;
+        text-transform: uppercase;
+        font-size: 0.72rem;
+        letter-spacing: 0.6px;
+        border-bottom: 2px solid #e2e8f0;
+        padding: 12px 10px;
+    }
+
+    .table-radiologi tbody tr {
+        transition: all 0.2s ease;
+    }
+
+    .table-radiologi tbody tr:hover {
+        background-color: #f0f9ff !important;
+    }
+
+    /* Code Chips */
     .code-chip {
         font-family: 'Courier New', Courier, monospace;
         font-weight: 700;
-        padding: 2px 6px;
-        border-radius: 4px;
-        background-color: #f8f9fa;
-        border: 1px solid #e3e6ed;
+        padding: 3px 8px;
+        border-radius: 6px;
+        background-color: #f1f5f9;
+        border: 1px solid #cbd5e1;
+        display: inline-block;
+    }
+
+    .code-chip-cyan {
+        background-color: #e0f2fe;
+        color: #0369a1;
+        border-color: #bae6fd;
+    }
+
+    /* Modals Custom Styling */
+    .modal-content.rad-modal {
+        border-radius: 16px;
+        overflow: hidden;
+        border: 1px solid rgba(56, 189, 248, 0.3);
+        box-shadow: 0 20px 50px rgba(15, 23, 42, 0.5);
+    }
+
+    /* Flatpickr Input Custom */
+    .rad-date-input {
+        border-radius: 20px !important;
+        border: 1px solid rgba(255, 255, 255, 0.3);
+        background: rgba(255, 255, 255, 0.15) !important;
+        color: #fff !important;
+    }
+
+    .rad-date-input::placeholder {
+        color: #cbd5e1 !important;
     }
 </style>
 @endsection
 
 @section('content')
-<!-- Header Card -->
- <div class="row mb-3">
+<!-- HERO HEADER RADIOLOGI -->
+<div class="row mb-3">
     <div class="col-12">
-        <div class="card border-0 shadow-lg rounded-4 overflow-hidden position-relative"
-            style="background: linear-gradient(135deg, #ae0303 0%, #623838 50%, #e70a0a 100%);">
-
-            <!-- Hiasan Blur Glowing Circle -->
-            <div class="position-absolute rounded-circle bg-primary opacity-25 blur-3xl"
-                style="width: 250px; height: 250px; top: -80px; right: 10%; filter: blur(60px);"></div>
-            <div class="position-absolute rounded-circle bg-info opacity-25 blur-3xl"
-                style="width: 200px; height: 200px; bottom: -80px; left: -50px; filter: blur(50px);"></div>
-
-            <div class="card-body p-4 text-white position-relative z-1">
-                <div class="row align-items-center gy-3">
-
-                    <!-- Brand & App Label -->
-                    <div class="col-lg-7 d-flex align-items-center">
-                        <div class="p-2 bg-opacity-10 rounded-4 shadow-sm me-3 border-opacity-10 d-flex align-items-center justify-content-center backdrop-blur"
-                            style="width: 65px; height: 65px; backdrop-filter: blur(10px);">
-                            <img src="{{ asset('img/rad.png') }}" alt="Logo" class="img-fluid drop-shadow" width="42" />
-                        </div>
-                        <div>
-                            <div class="d-flex align-items-center gap-2 mb-1">
-                                <span class="badge bg-primary text-dark fw-bold px-2 py-1 rounded-pill" style="font-size: 0.68rem; letter-spacing: 0.5px;">
-                                    <i class="fas fa-shield-alt me-1 text-info"></i> <span class="text-white" style="font-size: 0.75rem;">v2.4 Medical Suite</span>
-                                </span>
-                            </div>
-                            <h3 class="text-white fw-extrabold mb-0 tracking-tight" style="font-size: 1.4rem;">
-                                Welcome to {{ Env('APP_LABEL')}} <span class="text-warning fw-light">Management System</span>
-                            </h3>
-                        </div>
+        <div class="rad-hero-header p-3 p-md-4">
+            <div class="d-flex align-items-center justify-content-between flex-wrap gap-3">
+                <div class="d-flex align-items-center">
+                    <div class="p-2 bg-white bg-opacity-10 rounded-3 me-3 border border-white-50 d-flex align-items-center justify-content-center"
+                        style="width: 60px; height: 60px; backdrop-filter: blur(8px);">
+                        <img src="{{ asset('img/rad.png') }}" alt="Radiology Logo" class="img-fluid" width="40" />
                     </div>
-
-                    <!-- Module Badge / Quick Nav -->
-                    <div class="col-lg-5 text-lg-end border-start-lg border-white border-opacity-10 ps-lg-4">
-                        <!-- <span class="text-white-50 text-uppercase fw-semibold d-block mb-1" style="font-size: 0.7rem; letter-spacing: 1px;">Module Aktif</span> -->
-                        <div class="d-inline-flex align-items-center bg-white bg-opacity-10 border border-white border-opacity-20 px-3 py-2 rounded-pill backdrop-blur">
-                            <!-- <span class="p-1 bg-success rounded-circle me-2 animate-pulse" style="width: 8px; height: 8px;"></span> -->
-                            <h6 class="text-danger fw-bold mb-0" style="font-size: 0.95rem;">
-                                <i class="fas fa-file-alt me-1"></i> Data Registrasi Radiologi
-                            </h6>
+                    <div>
+                        <div class="d-flex align-items-center gap-2 mb-1">
+                            <span class="badge bg-info bg-opacity-20 text-cyan px-2 py-1 rounded-pill fw-semibold" style="font-size: 0.7rem; color: #fffdfc;">
+                                <i class="fas fa-radiation me-1"></i> MEDICAL SUITE v2.4
+                            </span>
                         </div>
+                        <h4 class="fw-bold mb-0 text-white" style="font-size: 1.3rem;">
+                            Welcome to {{ Env('APP_LABEL')}} <span style="color: #38bdf8;">Management System</span>
+                        </h4>
+                        <p class="text-white-50 mb-0 small" style="font-size: 0.75rem;">Manajemen & Monitoring Antrean Registrasi Radiologi</p>
                     </div>
+                </div>
 
+                <div class="d-flex align-items-center">
+                    <span class="badge bg-dark border border-info px-3 py-2 rounded-3 text-info" style="font-size: 0.78rem;">
+                        <i class="fas fa-radiation fa-spin me-1"></i> Data Registrasi Radiologi
+                    </span>
                 </div>
             </div>
         </div>
     </div>
 </div>
-<!-- <div class="row mb-3">
-    <div class="col-12">
-        <div class="card bg-200 shadow-sm border border-danger">
-            <div class="row gx-2 flex-between-center">
-                <div class="col-sm-auto d-flex align-items-center p-2">
-                    <img class="ms-2 me-3" src="{{ asset('img/rad.png') }}" alt="Radiologi Logo" width="45" />
-                    <div>
-                        <h6 class="text-danger fs--1 mb-0">Welcome to </h6>
-                        <h4 class="text-danger fw-bold mb-0">Trans <span class="text-warning fw-medium">Management System</span></h4>
-                    </div>
-                </div>
-                <div class="col-xl-auto px-3 py-2 border-start-lg border-300">
-                    <h6 class="text-danger fs--1 mb-0">Menu Utama:</h6>
-                    <h4 class="text-danger fw-bold mb-0">Radiologi <span class="text-secondary fs-0 fw-normal">| Data Registrasi</span></h4>
-                </div>
-            </div>
-        </div>
-    </div>
-</div> -->
 
-<!-- Main Table Card -->
-<div class="card mb-3 shadow-sm">
-    <div class="card-header bg-danger text-white py-2">
-        <div class="d-flex justify-content-between align-items-center">
-            <div class="d-flex align-items-center">
-                <a class="btn btn-falcon-default btn-sm me-2" href="javascript:void(0)" onclick="location.reload();" data-bs-toggle="tooltip" title="Refresh Data">
-                    <span class="fas fa-redo-alt text-primary"></span>
-                </a>
-                <span class="text-300 me-2">|</span>
-                <span class="fw-semi-bold fs--1 text-white">List Antrean Registrasi Radiologi</span>
+<!-- MAIN TABLE CARD -->
+<div class="rad-card mb-4">
+    <div class="rad-card-header">
+        <div class="d-flex justify-content-between align-items-center flex-wrap gap-2">
+            <div class="d-flex align-items-center gap-2">
+                <button class="btn btn-sm btn-outline-light rounded-circle p-2 d-flex align-items-center justify-content-center"
+                    onclick="location.reload();"
+                    data-bs-toggle="tooltip"
+                    title="Refresh Data"
+                    style="width: 32px; height: 32px;">
+                    <i class="fas fa-redo-alt text-info"></i>
+                </button>
+                <span class="text-white-50">|</span>
+                <span class="fw-bold fs--1 text-white">
+                    <i class="fas fa-list me-1 text-info"></i> List Antrean Registrasi Pasien
+                </span>
             </div>
+
             <div class="d-flex align-items-center">
                 <div class="input-group input-group-sm">
-                    <span class="input-group-text bg-white border-end-0"><i class="fas fa-calendar-alt text-primary"></i></span>
-                    <input class="form-control datetimepicker ps-2" id="timepicker3" type="text" placeholder="Filter Tanggal..." data-options='{"mode":"range","dateFormat":"d/m/Y","disableMobile":true,"locale":"en"}' />
+                    <span class="input-group-text bg-dark border-secondary text-info"><i class="fas fa-calendar-alt"></i></span>
+                    <input class="form-control datetimepicker ps-2 rad-date-input" id="timepicker3" type="text" placeholder="Filter Tanggal..." data-options='{"mode":"range","dateFormat":"d/m/Y","disableMobile":true,"locale":"en"}' />
                 </div>
             </div>
         </div>
@@ -116,8 +177,8 @@
 
     <div class="card-body p-0">
         <div class="table-responsive">
-            <table id="example" class="table table-bordered table-hover align-middle table-radiologi w-100">
-                <thead class="bg-200 text-800">
+            <table id="example" class="table table-hover align-middle table-radiologi w-100 mb-0">
+                <thead>
                     <tr>
                         <th class="text-center" style="width: 40px;">No</th>
                         <th>Kode & User Reg</th>
@@ -127,14 +188,13 @@
                         <th>Dokter Rujukan</th>
                         <th class="text-center">Status Bayar</th>
                         <th class="text-center">Status Reg</th>
-                        <th class="text-center" style="width: 80px;">Aksi</th>
+                        <th class="text-center" style="width: 100px;">Aksi</th>
                     </tr>
                 </thead>
                 <tbody class="fs--1">
                     @php $no = 1; @endphp
                     @foreach ($data as $datas)
                     @php
-                    // Catatan: Disarankan untuk memindahkan query ini ke Controller via JOIN
                     $user = DB::table('user_mains')
                     ->select('fullname')
                     ->where('userid', $datas->d_reg_order_rad_user)
@@ -153,13 +213,13 @@
                     ->first();
                     @endphp
                     <tr>
-                        <td class="text-center fw-bold">{{ $no++ }}</td>
+                        <td class="text-center fw-bold text-secondary">{{ $no++ }}</td>
                         <td>
                             <div class="mb-1">
                                 <span class="code-chip text-dark fs--2">{{ $datas->d_reg_order_code }}</span>
                             </div>
                             <div class="mb-1">
-                                <span class="code-chip text-danger fs--2 fw-bold">{{ $datas->d_reg_order_rad_code }}</span>
+                                <span class="code-chip code-chip-cyan fs--2">{{ $datas->d_reg_order_rad_code }}</span>
                             </div>
                             <div>
                                 @if ($user)
@@ -170,53 +230,53 @@
                             </div>
                         </td>
                         <td>
-                            <div class="fw-bold text-900">{{ $datas->master_patient_name }}</div>
+                            <div class="fw-bold text-dark">{{ $datas->master_patient_name }}</div>
                         </td>
                         <td>
                             @if ($pasien)
                             <span class="badge bg-soft-info text-info fw-bold">{{ $pasien->t_pasien_cat_name }}</span>
                             @else
-                            <span class="text-400">-</span>
+                            <span class="text-muted">-</span>
                             @endif
                         </td>
                         <td>
-                            <i class="far fa-clock me-1 text-500"></i>{{ \Carbon\Carbon::parse($datas->d_reg_order_rad_date)->format('d/m/Y H:i') }}
+                            <span class="text-secondary"><i class="far fa-clock me-1 text-info"></i>{{ \Carbon\Carbon::parse($datas->d_reg_order_rad_date)->format('d/m/Y H:i') }}</span>
                         </td>
                         <td>
                             @if ($dokter)
-                            <div class="fw-semi-bold text-800">
+                            <div class="fw-semibold text-dark">
                                 {{ $dokter->master_doctor_title_f }} {{ $dokter->master_doctor_name }} {{ $dokter->master_doctor_title_e }}
                             </div>
                             @else
-                            <span class="text-400">-</span>
+                            <span class="text-muted">-</span>
                             @endif
                         </td>
                         <td class="text-center">
                             @if ($payment)
-                            <span class="badge rounded-pill bg-soft-success text-success"><i class="fas fa-check-circle me-1"></i>Lunas</span>
+                            <span class="badge rounded-pill bg-soft-success text-success px-2 py-1"><i class="fas fa-check-circle me-1"></i>Lunas</span>
                             @else
-                            <span class="badge rounded-pill bg-soft-danger text-danger"><i class="fas fa-times-circle me-1"></i>Belum Lunas</span>
+                            <span class="badge rounded-pill bg-soft-danger text-danger px-2 py-1"><i class="fas fa-times-circle me-1"></i>Belum Lunas</span>
                             @endif
                         </td>
                         <td class="text-center">
                             @if ($datas->d_reg_order_rad_status == 0)
-                            <span class="badge rounded-pill bg-soft-warning text-warning"><i class="fas fa-hourglass-half me-1"></i>Belum Diproses</span>
+                            <span class="badge rounded-pill bg-soft-warning text-warning px-2 py-1"><i class="fas fa-hourglass-half me-1"></i>Belum Diproses</span>
                             @else
-                            <span class="badge rounded-pill bg-soft-success text-success"><i class="fas fa-check me-1"></i>Selesai</span>
+                            <span class="badge rounded-pill bg-soft-success text-success px-2 py-1"><i class="fas fa-check me-1"></i>Selesai</span>
                             @endif
                         </td>
                         <td class="text-center">
                             <div class="dropdown font-sans-serif position-static">
-                                <button class="btn btn-sm btn-outline-danger dropdown-toggle" type="button" id="dropdownMenuButton" data-bs-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+                                <button class="btn btn-sm btn-outline-info rounded-pill dropdown-toggle px-3" type="button" id="dropdownMenuButton" data-bs-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
                                     <i class="fas fa-cog me-1"></i>Aksi
                                 </button>
-                                <div class="dropdown-menu dropdown-menu-end border py-2" aria-labelledby="dropdownMenuButton">
-                                    <a class="dropdown-item text-primary" href="javascript:void(0)"
+                                <div class="dropdown-menu dropdown-menu-end border shadow-sm py-2" aria-labelledby="dropdownMenuButton">
+                                    <a class="dropdown-item text-primary fw-semibold" href="javascript:void(0)"
                                         data-bs-toggle="modal"
                                         data-bs-target="#modal-radiologi"
                                         id="button-proses-handling"
                                         data-code="{{ $datas->d_reg_order_rad_code }}">
-                                        <i class="fas fa-user-check me-2"></i>Proses Handling Pasien
+                                        <i class="fas fa-user-check me-2 text-info"></i>Proses Handling Pasien
                                     </a>
                                 </div>
                             </div>
@@ -234,9 +294,9 @@
 <!-- Modal Section -->
 <div class="modal fade" id="modal-poliklinik-full" data-bs-keyboard="false" data-bs-backdrop="static" tabindex="-1" aria-hidden="true">
     <div class="modal-dialog modal-dialog-centered modal-fullscreen" role="document">
-        <div class="modal-content border-0">
+        <div class="modal-content rad-modal border-0">
             <div class="position-absolute top-0 end-0 mt-3 me-3 z-index-1">
-                <button class="btn-close btn btn-sm btn-circle d-flex flex-center transition-base" data-bs-dismiss="modal" aria-label="Close"></button>
+                <button class="btn-close btn btn-sm btn-circle d-flex flex-center transition-base bg-light" data-bs-dismiss="modal" aria-label="Close"></button>
             </div>
             <div id="menu-poliklinik-full"></div>
         </div>
@@ -245,9 +305,9 @@
 
 <div class="modal fade" id="modal-radiologi" data-bs-keyboard="false" data-bs-backdrop="static" tabindex="-1" aria-hidden="true">
     <div class="modal-dialog modal-dialog-centered modal-xl" role="document">
-        <div class="modal-content border-0 shadow">
+        <div class="modal-content rad-modal border-0 shadow-lg">
             <div class="position-absolute top-0 end-0 mt-3 me-3 z-index-1">
-                <button class="btn-close btn btn-sm btn-circle d-flex flex-center transition-base" data-bs-dismiss="modal" aria-label="Close"></button>
+                <button class="btn-close btn btn-sm btn-circle d-flex flex-center transition-base bg-light" data-bs-dismiss="modal" aria-label="Close"></button>
             </div>
             <div id="menu-radiologi" class="p-3"></div>
         </div>
@@ -276,7 +336,7 @@
                 infoFiltered: "(difilter dari total _MAX_ data)"
             },
             pageLength: 10,
-            dom: "<'row p-3'<'col-sm-12 col-md-6'l><'col-sm-12 col-md-6'f>>" +
+            dom: "<'row p-3 align-items-center'<'col-sm-12 col-md-6'l><'col-sm-12 col-md-6'f>>" +
                 "<'row'<'col-sm-12'tr>>" +
                 "<'row p-3 align-items-center'<'col-sm-12 col-md-5'i><'col-sm-12 col-md-7'p>>"
         });
@@ -289,10 +349,11 @@
 
         $('#menu-radiologi').html(`
             <div class="text-center my-5 py-4">
-                <div class="spinner-border text-danger" role="status" style="width: 3rem; height: 3rem;">
+                <div class="spinner-border text-info" role="status" style="width: 3.5rem; height: 3.5rem;">
                     <span class="visually-hidden">Loading...</span>
                 </div>
-                <p class="mt-2 text-600 fw-semi-bold">Memuat Data Handling Radiologi...</p>
+                <h6 class="mt-3 fw-bold text-dark">Memuat Data Handling Radiologi...</h6>
+                <p class="text-muted small mb-0">Mohon tunggu sebentar, sedang mengambil informasi pemeriksaan.</p>
             </div>
         `);
 
@@ -309,8 +370,10 @@
             $('#menu-radiologi').html(data);
         }).fail(function(xhr, status, error) {
             $('#menu-radiologi').html(`
-                <div class="alert alert-danger text-center my-4" role="alert">
-                    <i class="fas fa-exclamation-circle me-2"></i> Gagal memuat data. Silakan coba beberapa saat lagi.
+                <div class="alert alert-danger border-0 rounded-3 text-center my-4 p-4" role="alert">
+                    <i class="fas fa-exclamation-triangle fa-2x mb-2"></i>
+                    <h6>Gagal Memuat Data</h6>
+                    <p class="mb-0 small">Terjadi kesalahan sistem. Silakan coba beberapa saat lagi.</p>
                 </div>
             `);
         });
