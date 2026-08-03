@@ -144,7 +144,7 @@ class RadiologiController extends Controller
                 foreach ($seriesDetail['Instances'] as $instanceId) {
                     $images[] = [
                         'instance_id' => $instanceId,
-                        'preview_url' => route('radiologi.orthanc.render', ['instanceId' => $instanceId]),
+                        'preview_url' => route('menu_radiologi_handling_pasien_rander_image', ['instanceId' => $instanceId]),
                         'caption'    => 'Instance: ' . substr($instanceId, 0, 8)
                     ];
                 }
