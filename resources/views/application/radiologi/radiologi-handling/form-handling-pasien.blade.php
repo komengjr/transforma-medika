@@ -222,10 +222,10 @@ $payment = DB::table('d_reg_order_payment')->where('d_reg_order_list_code', $cod
                 <!-- Image items akan di-inject melalui Fetch API -->
             </div>
 
-            <!-- State Kosong (Tidak ada citra) -->
+            <!-- State Kosong / Error -->
             <div id="orthanc-empty" class="text-center py-4 bg-white rounded border d-none">
-                <i class="fas fa-file-medical-alt fa-2x text-muted mb-2"></i>
-                <p class="text-muted mb-0">Belum ada foto/citra radiologi yang diunggah di Orthanc.</p>
+                <i class="fas fa-file-medical-alt fa-2x text-muted mb-2" id="orthanc-empty-icon"></i>
+                <p class="text-muted mb-0" id="orthanc-empty-text">Belum ada foto/citra radiologi yang diunggah di Orthanc.</p>
             </div>
         </div>
 
@@ -262,20 +262,40 @@ $payment = DB::table('d_reg_order_payment')->where('d_reg_order_list_code', $cod
 
     </div>
 </div>
-
 <!-- LIGHTBOX MODAL -->
 <div class="modal fade lightbox-modal" id="lightbox-modal" tabindex="-1" aria-hidden="true">
     <div class="modal-dialog modal-fullscreen">
-        <div class="modal-content">
-            <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal" aria-label="Close"></button>
-            <div class="modal-body">
-                <div class="container-fluid p-0">
+        <div class="modal-content bg-dark">
+            <button type="button" class="btn-close btn-close-white ms-auto m-3" data-bs-dismiss="modal" aria-label="Close"></button>
+            <div class="modal-body p-0 d-flex align-items-center justify-content-center">
+                <div class="container-fluid p-0 w-100 h-100 d-flex align-items-center justify-content-center">
                     <!-- Carousel dynamic injection -->
                 </div>
             </div>
         </div>
     </div>
 </div>
+
+<style>
+    /* Tambahan Perbaikan CSS Gambar Grid */
+    .rad-img-container {
+        position: relative;
+        min-height: 180px;
+        /* Memastikan container punya tinggi minimal */
+        background-color: #1e293b;
+        border-radius: 8px;
+        overflow: hidden;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+    }
+
+    .rad-img-container img {
+        min-height: 180px;
+        max-height: 250px;
+        object-fit: cover;
+    }
+</style>
 
 <!-- SCRIPT FETCH & LIGHTBOX VIEWER -->
 <script>
@@ -286,11 +306,12 @@ $payment = DB::table('d_reg_order_payment')->where('d_reg_order_list_code', $cod
         const loader = document.getElementById("orthanc-loader");
         const gallery = document.getElementById("orthanc-gallery");
         const emptyState = document.getElementById("orthanc-empty");
+        const emptyText = document.getElementById("orthanc-empty-text");
+        const emptyIcon = document.getElementById("orthanc-empty-icon");
         const btnReload = document.getElementById("btn-reload-orthanc");
 
         let loadedImages = [];
 
-        // Function Fetch Gambar dari Controller Proxy
         function loadOrthancImages() {
             loader.classList.remove("d-none");
             gallery.classList.add("d-none");
@@ -303,41 +324,54 @@ $payment = DB::table('d_reg_order_payment')->where('d_reg_order_list_code', $cod
                         "Accept": "application/json"
                     }
                 })
-                .then(response => response.json())
+                .then(response => {
+                    if (!response.ok) {
+                        throw new Error("HTTP error status: " + response.status);
+                    }
+                    return response.json();
+                })
                 .then(data => {
                     loader.classList.add("d-none");
 
-                    if (data.success && data.images.length > 0) {
+                    if (data.success && data.images && data.images.length > 0) {
                         loadedImages = data.images;
                         renderGallery(data.images);
                         gallery.classList.remove("d-none");
                     } else {
-                        emptyState.classList.remove("d-none");
+                        showEmpty("Belum ada foto/citra radiologi yang diunggah di Orthanc.");
                     }
                 })
                 .catch(error => {
                     console.error("Error loading Orthanc images:", error);
                     loader.classList.add("d-none");
-                    emptyState.classList.remove("d-none");
-                    emptyState.innerHTML = `
-                <i class="fas fa-exclamation-triangle fa-2x text-danger mb-2"></i>
-                <p class="text-danger mb-0">Gagal terhubung ke PACS Orthanc.</p>
-            `;
+                    showEmpty("Gagal terhubung ke PACS Orthanc atau render gambar bermasalah.", true);
                 });
         }
 
-        // Function Render HTML Grid
+        function showEmpty(message, isError = false) {
+            emptyState.classList.remove("d-none");
+            emptyText.textContent = message;
+            if (isError) {
+                emptyIcon.className = "fas fa-exclamation-triangle fa-2x text-danger mb-2";
+                emptyText.className = "text-danger mb-0 fw-bold";
+            } else {
+                emptyIcon.className = "fas fa-file-medical-alt fa-2x text-muted mb-2";
+                emptyText.className = "text-muted mb-0";
+            }
+        }
+
         function renderGallery(images) {
             images.forEach((img, index) => {
                 const col = document.createElement("div");
                 col.className = "col-6 col-sm-4 col-md-3";
                 col.innerHTML = `
-                <div class="rad-img-container">
-                    <a href="#" class="d-block open-lightbox" data-index="${index}">
+                <div class="rad-img-container border">
+                    <a href="#" class="d-block w-100 open-lightbox" data-index="${index}">
                         <img src="${img.preview_url}"
                              class="img-fluid w-100"
                              alt="${img.caption}"
-                             loading="lazy">
+                             onerror="this.onerror=null; this.src='https://via.placeholder.com/300x300/1e293b/ffffff?text=Error+Loading+DICOM';"
+                             loading="eager">
                         <div class="rad-img-overlay">
                             <span class="btn btn-sm btn-light rounded-circle shadow-sm">
                                 <i class="fas fa-search-plus text-dark"></i>
@@ -372,10 +406,10 @@ $payment = DB::table('d_reg_order_payment')->where('d_reg_order_list_code', $cod
             let slides = "";
             loadedImages.forEach((img, idx) => {
                 slides += `
-                <div class="carousel-item ${idx === activeIndex ? 'active' : ''}">
-                    <img src="${img.preview_url}" alt="${img.caption}">
-                    <div class="carousel-caption">
-                        <p class="m-0 fw-bold">${img.caption}</p>
+                <div class="carousel-item ${idx === activeIndex ? 'active' : ''} text-center py-4">
+                    <img src="${img.preview_url}" class="img-fluid mx-auto" style="max-height: 80vh; object-fit: contain;" alt="${img.caption}">
+                    <div class="carousel-caption d-none d-md-block bg-dark bg-opacity-75 rounded p-2">
+                        <p class="m-0 fw-bold text-white">${img.caption}</p>
                     </div>
                 </div>
             `;
