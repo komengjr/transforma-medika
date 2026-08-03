@@ -462,7 +462,7 @@ Route::prefix('radiologi')->group(function () {
     Route::post('/get-sub-sales', [RegisterPelayananController::class, 'getSubSales'])->name('radiologi.get_sub_sales');
     Route::post('/get-paket-cat', [RegisterPelayananController::class, 'getPaketCat'])->name('radiologi.get_paket_cat');
     Route::post('/get-items', [RegisterPelayananController::class, 'getItemPemeriksaanRad'])->name('radiologi.get_items');
-    Route::post('/fix-registrasi', [RegisterPelayananController::class, 'fixRegistrasiRad'])->name('registrasi_pasien_pilih_data_pasien_kebutuhan_fix_registrasi_rad');
+    Route::post('/fix-registrasi', [RegisterPelayananController::class, 'fixRegistrasiRad'])->name('fixRegistrasiRad');
 });
 Route::prefix('pemeriksaan-setting')->name('pemeriksaan.setting.')->group(function () {
     Route::get('/', [PemeriksaanSettingController::class, 'index'])->name('index');
