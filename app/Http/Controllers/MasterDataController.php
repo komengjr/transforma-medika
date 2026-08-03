@@ -200,7 +200,8 @@ class MasterDataController extends Controller
                 ->join('t_pemeriksaan_cat', 't_pemeriksaan_cat.t_pemeriksaan_cat_code', '=', 't_pemeriksaan_data.t_pemeriksaan_cat_code')
                 ->get();
             $layanan = DB::table('t_pemeriksaan_cat')->get();
-            return view('application.master-data.master-pemeriksaan-group', ['akses' => $akses, 'data' => $data, 'layanan' => $layanan, 'code' => $id]);
+            return view('application.master-data.master-setting-pemeriksaan', ['akses' => $akses, 'data' => $data, 'layanan' => $layanan, 'code' => $id]);
+            // return view('application.master-data.master-pemeriksaan-group', ['akses' => $akses, 'data' => $data, 'layanan' => $layanan, 'code' => $id]);
         } else {
             return Redirect::to('dashboard/home');
         }
@@ -235,7 +236,8 @@ class MasterDataController extends Controller
     }
     public function master_pemeriksaan_group_add_value_pemeriksaan(Request $request)
     {
-        return view('application.master-data.pemeriksaan-group.form-add-value', ['code' => $request->code]);
+        $alat = DB::table('medical_master_alat')->get();
+        return view('application.master-data.pemeriksaan-group.form-add-value', compact('alat'), ['code' => $request->code]);
     }
     public function master_pemeriksaan_group_add_value_pemeriksaan_save(Request $request)
     {
@@ -247,6 +249,8 @@ class MasterDataController extends Controller
             't_pem_list_val_nilai' => 0,
             't_pem_list_val_rujukan' => $request->rujukan,
             't_pem_list_val_satuan' => $request->satuan,
+            't_pem_list_val_instrumen' => $request->instrumen,
+            't_pem_list_val_param' => $request->parameter,
             'created_at' => now(),
         ]);
         return redirect()->back()->withSuccess('Great! Berhasil Menambahkan Data List Pemeriksaan');
@@ -257,7 +261,19 @@ class MasterDataController extends Controller
         if ($this->url_akses_sub($akses, $id) == true) {
             $data = DB::table('p_m_pemeriksaan')->get();
             $cat = DB::table('t_pemeriksaan_cat')->get();
-            return view('application.master-data.master-pemeriksaan-harga', ['data' => $data, 'cat' => $cat, 'akses' => $akses, 'code' => $id]);
+            $masterSales = DB::table('p_m_sales')
+                ->where('p_m_sales_status', '1') // sesuaikan kondisi status aktif
+                ->get();
+            // 2. Ambil List Pemeriksaan yang aktif
+            $pemeriksaanList = DB::table('t_pemeriksaan_list')
+                ->where('t_pemeriksaan_list_status', '1') // sesuaikan kondisi status aktif
+                ->select('t_pemeriksaan_list_code', 't_pemeriksaan_list_name')
+                ->get();
+            // 3. Mengambil semua data p_sales_data di awal dengan DB Select
+            $salesDataList = collect([]);
+            $layananCategories = DB::table('t_layanan_cat')->get(); // atau ->all()
+            return view('application.master-data.master-sale-pemeriksaan', compact('masterSales', 'pemeriksaanList', 'salesDataList', 'layananCategories'), ['data' => $data, 'cat' => $cat, 'akses' => $akses, 'code' => $id]);
+            // return view('application.master-data.master-pemeriksaan-harga', ['data' => $data, 'cat' => $cat, 'akses' => $akses, 'code' => $id]);
         } else {
             return Redirect::to('dashboard/home');
         }

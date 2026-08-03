@@ -18,6 +18,7 @@ class CreateHRegLabTable extends Migration
             $table->string('h_reg_lab_code')->unique();
             $table->string('d_reg_order_lab_code');
             $table->string('t_pem_list_val_code');
+            $table->string('h_reg_lab_flag');
             $table->string('h_reg_lab_value');
             $table->string('h_reg_lab_metode');
             $table->timestamps();

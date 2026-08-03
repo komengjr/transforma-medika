@@ -15,8 +15,9 @@ class CreatePSalesDataSubTable extends Migration
     {
         Schema::create('p_sales_data_sub', function (Blueprint $table) {
             $table->id('id_p_sales_data_sub');
-            $table->string('p_sales_data_code')->unique();
-            $table->string('p_sales_data_sub_code');
+            $table->string('p_sales_data_sub_code')->unique();
+            $table->string('t_pemeriksaan_list_code');
+            $table->string('p_sales_data_code');
             $table->string('p_sales_data_sub_name');
             $table->timestamps();
         });

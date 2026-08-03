@@ -1,129 +1,84 @@
 <div class="card mb-3">
-    <div class="card-header bg-300">
-        <div class="d-flex justify-content-between">
-            <h5 class="mb-0">Pasien Details No Reg {{ $code }}</h5>
+    <div class="card-header bg-300 py-2">
+        <div class="d-flex justify-content-between align-items-center">
+            <!-- Judul Header -->
+            <h5 class="mb-0 fs-0 text-dark fw-bold">
+                <i class="fas fa-user-check text-primary me-1"></i> Pasien Details No Reg: <span class="text-primary">{{ $code }}</span>
+            </h5>
 
+            <!-- Group Tombol Aksi Berwarna -->
+            <div class="d-flex gap-2">
+                <button type="button" class="btn btn-sm btn-info text-white shadow-sm fw-bold px-2 py-1 fs--1" id="button-sinkronisasi-proses-result">
+                    <i class="fas fa-sync-alt me-1"></i> Sinkronisasi Alat
+                </button>
+                <button type="button" class="btn btn-sm btn-success text-white shadow-sm fw-bold px-3 py-1 fs--1" id="button-simpan-proses-result">
+                    <i class="fas fa-check-circle me-1"></i> Simpan
+                </button>
+            </div>
         </div>
     </div>
     <div class="card-body bg-light">
-        <form>
-            <div class="row g-3">
-                <div class="col-md-2 d-flex justify-content-center">
-                    <div class="avatar avatar-5lg shadow-sm justify-content-center">
-                        <div class="h-100 w-100 overflow-hidden ">
-                            @if ($data->master_patient_profile == "")
-                            <img src="{{ asset('img/pasien.png') }}" class="img-thumbnail " alt="" id="videoPreview"
-                                data-dz-thumbnail="data-dz-thumbnail">
+
+        <div class="row align-items-center">
+
+            <!-- KIRI: Foto Pasien -->
+            <div class="col-md-3 col-lg-2 text-center border-end-md mb-3 mb-md-0">
+                <div class="avatar avatar-5lg mx-auto mb-2">
+                    @if (empty($data->master_patient_profile))
+                    <img src="{{ asset('img/pasien.png') }}" class="rounded-circle img-thumbnail shadow-sm" alt="Foto Pasien" style="width: 100px; height: 100px; object-fit: cover;">
+                    @else
+                    <img src="{{ Storage::url($data->master_patient_profile) }}" class="rounded-circle img-thumbnail shadow-sm" alt="Foto Pasien" style="width: 100px; height: 100px; object-fit: cover;">
+                    @endif
+                </div>
+                <span class="badge bg-soft-primary text-primary fw-bold px-3 py-1 rounded-pill fs--2">
+                    {{ $data->master_patient_code ?? '-' }}
+                </span>
+            </div>
+
+            <!-- KANAN: Detail Informasi Pasien -->
+            <div class="col-md-9 col-lg-10 ps-md-4">
+                <!-- Nama Pasien Utama -->
+                <div class="mb-3">
+                    <h4 class="mb-0 text-dark fw-bold">{{ $data->master_patient_name ?? '-' }}</h4>
+                    <small class="text-muted"><i class="fas fa-id-badge me-1"></i> NIK: <strong>{{ $data->master_patient_nik ?? '-' }}</strong></small>
+                </div>
+
+                <hr class="my-2 text-200">
+
+                <!-- Informasi Ringkas Grid -->
+                <div class="row g-2 fs--1 text-dark">
+                    <div class="col-sm-6 col-md-4">
+                        <div class="text-muted fs--2">No. Rekam Medis</div>
+                        <div class="fw-semibold text-primary"><i class="fas fa-hashtag me-1"></i>{{ $data->master_patient_code ?? '-' }}</div>
+                    </div>
+
+                    <div class="col-sm-6 col-md-4">
+                        <div class="text-muted fs--2">Jenis Kelamin</div>
+                        <div class="fw-semibold">
+                            @if(strtolower($data->master_patient_jk) == 'l' || strtolower($data->master_patient_jk) == 'laki-laki')
+                            <i class="fas fa-mars text-info me-1"></i> Laki-laki
+                            @elseif(strtolower($data->master_patient_jk) == 'p' || strtolower($data->master_patient_jk) == 'perempuan')
+                            <i class="fas fa-venus text-danger me-1"></i> Perempuan
                             @else
-                            <img src="{{ Storage::url($data->master_patient_profile) }}" class="img-thumbnail " alt=""
-                                id="videoPreview" data-dz-thumbnail="data-dz-thumbnail">
+                            <i class="fas fa-genderless me-1"></i> {{ $data->master_patient_jk ?? '-' }}
                             @endif
                         </div>
-
                     </div>
 
-                </div>
-                <div class="col-md-10">
-                    <div class="row">
-                        <div class="col-md-12">
-                            <label for="inputLastName1" class="form-label text-primary">Nama Lengkap</label>
-                            <div class="input-group"> <span class="input-group-text"><i
-                                        class="fas fa-user-friends"></i></span>
-                                <input type="text" name="nama"
-                                    class="form-control form-control-lg border-start-0 bg-white"
-                                    value="{{ $data->master_patient_name }}" disabled>
-                            </div>
-                        </div>
-                        <div class="col-md-6">
-                            <label for="inputLastName1" class="form-label text-youtube">NIK</label>
-                            <div class="input-group"> <span class="input-group-text"><i
-                                        class="fas fa-money-check"></i></span>
-                                <input type="text" name="nik"
-                                    class="form-control form-control-lg border-start-0 bg-white" id="nik"
-                                    value="{{ $data->master_patient_nik }}" disabled>
-                            </div>
-                        </div>
-                        <div class="col-md-6">
-                            <label for="inputLastName1" class="form-label text-youtube">No Rekam
-                                Medis</label>
-                            <div class="input-group"> <span class="input-group-text"><i
-                                        class="fas fa-money-check"></i></span>
-                                <input type="text" name="nik"
-                                    class="form-control form-control-lg border-start-0 bg-white" id="nik"
-                                    value="{{ $data->master_patient_code }}" disabled>
-
-                            </div>
-                        </div>
-
-                    </div>
-                </div>
-                <div class="col-md-4">
-                    <label for="inputLastName1" class="form-label text-youtube">Tanggal
-                        Lahir</label>
-                    <div class="input-group"> <span class="input-group-text"><i class="fas fa-calendar-day"></i></span>
-                        <input type="date" name="tgl_lahir" class="form-control form-control-lg bg-white border-start-0"
-                            id="tgl_lahir" value="{{ $data->master_patient_tgl_lahir }}" disabled>
-                    </div>
-                </div>
-                <div class="col-md-4">
-                    <label for="inputLastName1" class="form-label text-youtube">Jenis
-                        Kelamin</label>
-                    <div class="input-group"> <span class="input-group-text"><i
-                                class="fas fa-transgender fs-2"></i></span>
-                        <input type="text" class="form-control form-control-lg bg-white border-start-0" id="tgl_lahir"
-                            value="{{ $data->master_patient_jk }}" disabled>
-                    </div>
-                </div>
-                <div class="col-md-4">
-                    <label for="inputLastName1" class="form-label">Tempat Lahir</label>
-                    <div class="input-group"> <span class="input-group-text"><i
-                                class="fas fa-map-marked-alt"></i></span>
-                        <input type="text" name="tempat_lahir"
-                            class="form-control form-control-lg border-start-0 bg-white" id="inputLastName1"
-                            value="{{ $data->master_patient_tempat_lahir }}" disabled>
-                    </div>
-                </div>
-                <!-- <div class="col-md-4">
-                    <label for="inputEmailAddress" class="form-label text-youtube">Agama</label>
-                    <div class="input-group"> <span class="input-group-text"><i class="fas fa-pray fs-2"></i></span>
-                        <input type="text" class="form-control form-control-lg bg-white border-start-0"
-                            value="{{ $data->master_patient_agama }}" disabled>
+                    <div class="col-sm-6 col-md-4">
+                        <div class="text-muted fs--2">Tanggal Lahir</div>
+                        <div class="fw-semibold"><i class="fas fa-calendar-alt text-warning me-1"></i>{{ $data->master_patient_tgl_lahir ? date('d-m-Y', strtotime($data->master_patient_tgl_lahir)) : '-' }}</div>
                     </div>
 
-                </div>
-                <div class="col-md-4">
-                    <label for="inputLastName2" class="form-label text-youtube">No Handphone</label>
-                    <div class="input-group"> <span class="input-group-text"><i
-                                class="fas fa-phone-square-alt"></i></span>
-                        <input type="text" name="no_hp"
-                            class="form-control form-control-lg border-start-0 bg-white" id="no_hp"
-                            value="{{ $data->master_patient_no_hp }}" disabled>
+                    <div class="col-sm-6 col-md-4 mt-2">
+                        <div class="text-muted fs--2">Tempat Lahir</div>
+                        <div class="fw-semibold"><i class="fas fa-map-marker-alt text-danger me-1"></i>{{ $data->master_patient_tempat_lahir ?? '-' }}</div>
                     </div>
-                </div>
-                <div class="col-md-4">
-                    <label for="inputLastName2" class="form-label">Email</label>
-                    <div class="input-group"> <span class="input-group-text"><i class="fas fa-mail-bulk"></i></span>
-                        <input type="email" name="email"
-                            class="form-control form-control-lg border-start-0 bg-white" id="inputLastName2"
-                            value="{{ $data->master_patient_email }}" disabled>
-                    </div>
-                </div> -->
-
-            </div>
-        </form>
-        <div class="card my-3 border border-warning">
-            <div class="card-body d-flex justify-content-between ">
-                <div>
-                    <button class="btn btn-falcon-primary" id="button-sinkronisasi-proses-result">
-                        <span class="far fa-save"></span> Sinkronisasi Alat
-                    </button>
-                </div>
-                <div class="d-flex">
-                    <button class="btn btn-falcon-primary" id="button-simpan-proses-result"><span
-                            class="far fa-save"></span> Simpan</button>
                 </div>
             </div>
+
         </div>
+
         <div class="mt-3 border rounded">
             <form id="form-result-pasien" action="{{ route('menu_lab_proses_result_simpan_sinkronisasi') }}" method="post" enctype="multipart/form-data">
                 @csrf
@@ -133,60 +88,105 @@
                     <thead class="bg-300">
                         <tr>
                             <th>Nama Pemeriksaan</th>
-                            <th>Hasil ( Unit )</th>
-                            <th>Flag</th>
-                            <th>Nilai Normal</th>
-                            <th>Metode</th>
+                            <th style="width: 25%;">Hasil ( Unit )</th>
+                            <th style="width: 18%;">Flag</th>
+                            <th style="width: 20%;">Nilai Normal</th>
+                            <th style="width: 20%;">Metode</th>
                         </tr>
                     </thead>
                     <tbody>
                         @foreach ($pemeriksaan as $pem)
-                        <tr>
-                            <td colspan="5"><strong>{{$pem->t_pemeriksaan_list_name}}</strong></td>
+                        <!-- HEADER UTAMA PEMERIKSAAN -->
+                        <tr class="bg-200 fw-bold">
+                            <td colspan="5" class="py-2 text-primary">
+                                <i class="fas fa-flask me-1"></i> {{ $pem->t_pemeriksaan_list_name }}
+                            </td>
                         </tr>
+
                         @php
-                        $sub = DB::table('t_pemeriksaan_list_val')->where('t_pemeriksaan_list_code', $pem->t_pemeriksaan_list_code)->get();
+                        $sub = DB::table('t_pemeriksaan_list_val')
+                        ->where('t_pemeriksaan_list_code', $pem->t_pemeriksaan_list_code)
+                        ->get();
                         @endphp
 
                         @foreach ($sub as $subs)
+                        @php
+                        $isParentHeader = ($subs->t_pem_list_val_opt === 'Y');
+                        $isChild = !empty($subs->t_pem_list_val_opt_code);
+
+                        $nilai = DB::table('h_reg_lab')
+                        ->where('d_reg_order_lab_code', $code)
+                        ->where('t_pem_list_val_code', $subs->t_pem_list_val_code)
+                        ->first();
+
+                        $hasValue = $nilai && !empty($nilai->h_reg_lab_value);
+                        $currentFlag = $nilai ? $nilai->h_reg_lab_flag : '*';
+                        @endphp
+
+                        @if($isParentHeader)
+                        <!-- JIKA KEPALA (OPT = Y): HANYA RENDER HEADER JUDUL (TANPA INPUT HASIL) -->
+                        <tr class="bg-100 fw-bold">
+                            <td colspan="5" class="ps-3 py-2 text-dark">
+                                <i class="fas fa-folder-open text-warning me-1"></i> {{ $subs->t_pem_list_val_name }}
+                            </td>
+                        </tr>
+                        @else
+                        <!-- JIKA ANAKAN ATAU PARAMETER SINGLE -->
                         <tr>
-                            <td>{{$subs->t_pem_list_val_name}}</td>
-                            <td style="width: 20%;">
-                                @php
-                                $nilai = DB::table('h_reg_lab')
-                                ->where('d_reg_order_lab_code', $code)
-                                ->where('t_pem_list_val_code', $subs->t_pem_list_val_code)
-                                ->first();
-
-                                // Cek apakah sudah ada nilainya
-                                $hasValue = $nilai && !empty($nilai->h_reg_lab_value);
-                                @endphp
-
+                            <td class="{{ $isChild ? 'ps-4' : 'ps-3' }}">
+                                @if($isChild)
+                                <i class="fas fa-level-up-alt fa-rotate-90 text-400 me-2"></i>
+                                @endif
+                                <span class="{{ $isChild ? 'fw-semibold' : 'fw-bold' }}">{{ $subs->t_pem_list_val_name }}</span>
+                            </td>
+                            <td>
                                 <div class="input-group has-validation">
-                                    <!-- Tambahkan attribute disabled dan class border/bg-success jika $hasValue true -->
                                     <input type="text"
-                                        class="form-control input-hasil {{ $hasValue ? 'border-success bg-light-success' : '' }}"
+                                        class="form-control form-control-sm input-hasil {{ $hasValue ? 'border-success bg-light-success' : '' }}"
                                         data-code="{{ $subs->t_pem_list_val_code }}"
                                         name="hasil[{{ $subs->t_pem_list_val_code }}]"
-                                        value="{{ $hasValue ? $nilai->h_reg_lab_value : '' }}"
-                                        {{ $hasValue ? 'disabled' : '' }}>
+                                        value="{{ $hasValue ? $nilai->h_reg_lab_value : '' }}">
 
-                                    <span class="input-group-text {{ $hasValue ? 'border-success' : '' }} fs--2">{{$subs->t_pem_list_val_satuan}}</span>
+                                    <span class="input-group-text {{ $hasValue ? 'border-success' : '' }} fs--2 py-0 px-2">
+                                        {{ $subs->t_pem_list_val_satuan }}
+                                    </span>
                                 </div>
                             </td>
-                            <td>*</td>
-                            <td>{{$subs->t_pem_list_val_rujukan}}</td>
-                            <td class="fs--2">
+
+                            <!-- INPUT / SELECT FLAG -->
+                            <td class="text-center align-middle">
+                                <select name="flag[{{ $subs->t_pem_list_val_code }}]"
+                                    class="form-select form-select-sm fs--2 text-center select-flag {{ $hasValue ? 'border-success bg-light-success' : '' }}"
+                                    data-code="{{ $subs->t_pem_list_val_code }}">
+                                    <option value="*" {{ $currentFlag == '*' ? 'selected' : '' }}>*</option>
+                                    <option value="N" {{ $currentFlag == 'N' ? 'selected' : '' }}>N (Normal)</option>
+                                    <option value="H" {{ $currentFlag == 'H' ? 'selected' : '' }}>H (High)</option>
+                                    <option value="L" {{ $currentFlag == 'L' ? 'selected' : '' }}>L (Low)</option>
+                                    <option value="A" {{ $currentFlag == 'A' ? 'selected' : '' }}>A (Abnormal)</option>
+                                </select>
+                            </td>
+
+                            <td class="align-middle">{{ $subs->t_pem_list_val_rujukan }}</td>
+                            <td class="fs--2 align-middle">
                                 <select name="metode[{{ $subs->t_pem_list_val_code }}]"
-                                    class="form-control fs--2 select-metode {{ $hasValue ? 'border-success bg-light-success' : '' }}"
-                                    data-code="{{ $subs->t_pem_list_val_code }}"
-                                    {{ $hasValue ? 'disabled' : '' }}>
-                                    <option value="{{ $nilai ? $nilai->h_reg_lab_metode : '-' }}">{{ $nilai ? $nilai->h_reg_lab_metode : '-' }}</option>
+                                    class="form-select form-select-sm fs--2 select-metode {{ $hasValue ? 'border-success bg-light-success' : '' }}"
+                                    data-code="{{ $subs->t_pem_list_val_code }}">
+
+                                    @php
+                                    $currentMetode = $nilai ? $nilai->h_reg_lab_metode : ($subs->t_pem_list_val_metode ?? '-');
+                                    @endphp
+
+                                    <option value="{{ $currentMetode }}" selected>{{ $currentMetode }}</option>
+                                    @if($currentMetode !== 'RBC PULSE HEIGHT DETECTION')
                                     <option value="RBC PULSE HEIGHT DETECTION">RBC PULSE HEIGHT DETECTION</option>
-                                    <option value="RBC PULSE AJA">RBC PULUSE AJA</option>
+                                    @endif
+                                    @if($currentMetode !== 'RBC PULSE AJA')
+                                    <option value="RBC PULSE AJA">RBC PULSE AJA</option>
+                                    @endif
                                 </select>
                             </td>
                         </tr>
+                        @endif
                         @endforeach
                         @endforeach
                     </tbody>
@@ -195,13 +195,15 @@
         </div>
     </div>
 </div>
+
 <script>
     $(document).ready(function() {
+        // --- SINKRONISASI ALAT ---
         $('#button-sinkronisasi-proses-result').on('click', function(e) {
             e.preventDefault();
             let btn = $(this);
             let codeLab = $('input[name="code"]').val();
-            // 1. Ambil semua t_pem_list_val_code yang ADA HANYA DI HALAMAN INI
+
             let listCodes = [];
             $('.select-metode').each(function() {
                 let code = $(this).data('code');
@@ -209,20 +211,21 @@
                     listCodes.push(code);
                 }
             });
+
             if (listCodes.length === 0) {
-                alert('Tidak ada parameter pemeriksaan di halaman ini.');
+                alert('Tidak ada parameter pemeriksaan yang dapat disinkronkan.');
                 return;
             }
+
             btn.prop('disabled', true).html('<span class="spinner-border spinner-border-sm"></span> Menyinkronkan...');
 
-            // 2. Kirim listCodes bersamaan dengan code lab
             $.ajax({
                 url: "{{ route('menu_lab_proses_result_detail_sinkronisasi') }}",
                 type: "POST",
                 data: {
                     _token: "{{ csrf_token() }}",
                     code: codeLab,
-                    list_codes: listCodes // Send array of codes on this page
+                    list_codes: listCodes
                 },
                 success: function(response) {
                     if (response.status === 'success') {
@@ -234,17 +237,16 @@
                             if (updatedData[code] !== undefined && updatedData[code] !== '') {
                                 let inputEl = $(this);
                                 let selectMetode = $('.select-metode[data-code="' + code + '"]');
+                                let selectFlag = $('.select-flag[data-code="' + code + '"]');
                                 let inputGroupText = inputEl.siblings('.input-group-text');
 
-                                // Isi nilai
+                                // Isi nilai hasil
                                 inputEl.val(updatedData[code]);
 
-                                // Lock & Style
-                                inputEl.prop('disabled', true);
-                                selectMetode.prop('disabled', true);
-
+                                // Hanya beri warna/styling tanpa disable agar bisa di-edit manual
                                 inputEl.addClass('border-success bg-light-success');
                                 selectMetode.addClass('border-success bg-light-success');
+                                selectFlag.addClass('border-success bg-light-success');
                                 inputGroupText.addClass('border-success');
                             }
                         });
@@ -257,20 +259,57 @@
                     alert(msg);
                 },
                 complete: function() {
-                    btn.prop('disabled', false).html('<span class="far fa-save"></span> Sinkronisasi Alat');
+                    btn.prop('disabled', false).html('<i class="fas fa-sync-alt me-1"></i> Sinkronisasi Alat');
                 }
             });
         });
 
-        // Otomatis lepas disabled sejenak sebelum form disubmit agar data tetap ikut terkirim
-        $('#form-result-pasien').on('submit', function() {
-            $(this).find(':disabled').removeAttr('disabled');
-        });
-
+        // --- SIMPAN RESULT VIA AJAX (TANPA RELOAD) ---
         $('#button-simpan-proses-result').on('click', function(e) {
             e.preventDefault();
-            $('#form-result-pasien').submit();
-        });
 
+            let btn = $(this);
+            let form = $('#form-result-pasien');
+
+            btn.prop('disabled', true).html('<span class="spinner-border spinner-border-sm"></span> Menyimpan...');
+
+            // Serialize data dari form
+            let formData = form.serialize();
+
+            $.ajax({
+                url: form.attr('action'),
+                type: "POST",
+                data: formData,
+                success: function(response) {
+                    if (response.status === 'success') {
+                        let savedCodes = response.saved_codes || [];
+
+                        // Beri penanda visual hijau pada elemen yang baru disimpan (tanpa disable)
+                        savedCodes.forEach(function(code) {
+                            let inputEl = $('.input-hasil[data-code="' + code + '"]');
+                            let selectMetode = $('.select-metode[data-code="' + code + '"]');
+                            let selectFlag = $('.select-flag[data-code="' + code + '"]');
+                            let inputGroupText = inputEl.siblings('.input-group-text');
+
+                            inputEl.addClass('border-success bg-light-success');
+                            selectMetode.addClass('border-success bg-light-success');
+                            selectFlag.addClass('border-success bg-light-success');
+                            inputGroupText.addClass('border-success');
+                        });
+
+                        alert(response.message);
+                    } else {
+                        alert(response.message || 'Gagal menyimpan data.');
+                    }
+                },
+                error: function(xhr) {
+                    let msg = xhr.responseJSON ? xhr.responseJSON.message : 'Terjadi kesalahan saat menyimpan data.';
+                    alert(msg);
+                },
+                complete: function() {
+                    btn.prop('disabled', false).html('<i class="fas fa-check-circle me-1"></i> Simpan');
+                }
+            });
+        });
     });
 </script>

@@ -12,9 +12,9 @@
             <div class="input-group"> <span class="input-group-text"><i class="fas fa-diagnoses"></i></span>
                 <select name="kategori" id="kategori" class="form-control form-control-lg single-layanan">
                     <option value="">Pilih Kategori</option>
-                    <option data-id="pribadi" value="pribadi">Pasien Pribadi</option>
-                    <option data-id="asuransi" value="asuransi">Pasien Asuransi</option>
-                    <option data-id="perusahaan" value="perusahaan">Pasien Perusahaan</option>
+                    <option data-id="pribadi" value="ranap">Pasien Rawat Jalan</option>
+                    <option data-id="asuransi" value="rajal">Pasien Rawat Inap</option>
+                    <!-- <option data-id="perusahaan" value="perusahaan">Pasien Perusahaan</option> -->
 
                 </select>
             </div>

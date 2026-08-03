@@ -17,7 +17,7 @@ class CreateSSpecimenLogTable extends Migration
             $table->id('id_s_specimen_log');
             $table->string('s_specimen_log_code')->unique();
             $table->string('t_pem_specimen_code');
-            $table->string('d_reg_order_list_code');
+            $table->string('order_lab_list_code');
             $table->string('s_specimen_log_time');
             $table->string('s_specimen_log_end_time');
             $table->string('s_specimen_log_user');

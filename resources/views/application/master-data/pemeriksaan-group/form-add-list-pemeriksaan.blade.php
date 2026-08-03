@@ -10,7 +10,7 @@
             <label class="form-label" for="inputAddress">Nama Pemeriksaan</label>
             <input class="form-control form-control-lg" id="inputAddress" type="text" name="name"
                 placeholder="Hematologi Lengkap" required />
-            <input type="text"  name="code" value="{{ $code }}" hidden>
+            <input type="text" name="code" value="{{ $code }}" hidden>
         </div>
         <div class="col-6">
             <label class="form-label" for="inputAddress">Jenis Pemeriksaan</label>
@@ -28,6 +28,7 @@
                 <option value="multi">Mulitple</option>
             </select>
         </div>
+
         <div class="col-12">
             <div class="form-check">
                 <input class="form-check-input" id="gridCheck" type="checkbox" required />

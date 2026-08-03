@@ -190,19 +190,30 @@ class PelayananController extends Controller
         if ($request->id == '14de0404-0c88-4cff-bae1-d28ea75b53ad') {
             $poli = DB::table('t_layanan_data')->where('t_layanan_cat_code', '14de0404-0c88-4cff-bae1-d28ea75b53ad')->where('t_layanan_data_status', 1)->get();
             return view('application.pelayanan.form.kebutuhan.form-poliklinik', ['poli' => $poli, 'cat' => $pasien_cat]);
-        } elseif ($request->id == '0bd4ea7f-bd6e-4fa7-878a-29295f74f0ac') {
+        } elseif ($request->id == 'LAB') {
             $dokter = DB::table('master_doctor')->get();
             $agrement = DB::table('p_sales')->get();
-            $code = '0bd4ea7f-bd6e-4fa7-878a-29295f74f0ac';
-            return view('application.pelayanan.form.kebutuhan.form-laboratorium', ['cat' => $pasien_cat, 'dokter' => $dokter, 'agrement' => $agrement, 'code' => $code]);
+            $code = 'LAB';
+            $masterSales = DB::table('p_m_sales')
+                ->where('p_m_sales_status', '1') // atau atur filter status aktif jika ada
+                ->get();
+            return view('application.pelayanan.form.kebutuhan.form-laboratorium', compact('masterSales'), ['cat' => $pasien_cat, 'dokter' => $dokter, 'agrement' => $agrement, 'code' => $code]);
         } elseif ($request->id == '857946b2-62c2-488b-af9d-c4d330041b44') {
             $dokter = DB::table('master_doctor')->get();
             return view('application.pelayanan.form.kebutuhan.form-igd', ['cat' => $pasien_cat, 'dokter' => $dokter]);
-        } elseif ($request->id == '80304154-baeb-4b7a-8ba8-f818726a84df') {
+        } elseif ($request->id == 'RAD') {
+            $code = $request->code ?? 'RAD';
+            // Fetch Dokter Master
             $dokter = DB::table('master_doctor')->get();
-            $agrement = DB::table('p_sales')->get();
-            $code = '80304154-baeb-4b7a-8ba8-f818726a84df';
-            return view('application.pelayanan.form.kebutuhan.form-radiologi', ['cat' => $pasien_cat, 'dokter' => $dokter, 'agrement' => $agrement, 'code' => $code]);
+            // Fetch Kategori tambahan pasien jika ada
+            $cat = DB::table('t_pasien_cat_data')->get();
+
+            // Fetch STEP 1: Master Sales / Agreement (Sama seperti Lab)
+            $masterSales = DB::table('p_m_sales')
+                ->select('p_m_sales_code', 'p_m_sales_name')
+                ->orderBy('p_m_sales_name', 'ASC')
+                ->get();
+            return view('application.pelayanan.form.kebutuhan.form-radiologi', compact('dokter', 'cat', 'masterSales', 'code'));
         } else {
             return '<span class="badge bg-warning">Coming Soon</span>';
         }
@@ -294,8 +305,7 @@ class PelayananController extends Controller
     public function registrasi_pasien_pilih_data_pasien_kebutuhan_pilih_poli_type_agrement(Request $request)
     {
         $data = DB::table('p_sales_data')
-            ->join('t_pemeriksaan_list', 't_pemeriksaan_list.t_pemeriksaan_list_code', '=', 'p_sales_data.t_pemeriksaan_list_code')
-            ->where('p_sales_data.p_sales_cat_code', $request->id)->get();
+            ->join('t_pemeriksaan_list', 't_pemeriksaan_list.t_pemeriksaan_list_code', '=', 'p_sales_data.t_pemeriksaan_list_code')->get();
         return view('application.pelayanan.form.kebutuhan.radiologi.data-table-pemeriksaan', ['data' => $data]);
     }
     public function registrasi_pasien_pilih_data_pasien_kebutuhan_pilih_poli_pemeriksaan(Request $request)
@@ -483,10 +493,11 @@ class PelayananController extends Controller
     {
         $data = DB::table('d_reg_order')->join('master_patient', 'master_patient.master_patient_code', '=', 'd_reg_order.d_reg_order_rm')
             ->where('d_reg_order.d_reg_order_code', $request->code)->first();
-        return view('application.pelayanan.form.form-nomor-registrasi', [
-            'code' => $request->code,
-            'data' => $data
-        ]);
+        return 'sukses';
+        // return view('application.pelayanan.form.form-nomor-registrasi', [
+        //     'code' => $request->code,
+        //     'data' => $data
+        // ]);
     }
     public function registrasi_pasien_pilih_data_pasien_preview_pdf(Request $request)
     {
@@ -547,12 +558,139 @@ class PelayananController extends Controller
             $auth = Auth::user()->access_cabang;
             $data = DB::table('d_reg_order')
                 ->join('master_patient', 'master_patient.master_patient_code', '=', 'd_reg_order.d_reg_order_rm')
-                ->join('t_pasien_cat', 't_pasien_cat.t_pasien_cat_code', '=', 'd_reg_order.t_pasien_cat_code')
-                ->where("d_reg_order_cabang", Auth::user()->access_cabang)->get();
+                ->join('t_pasien_cat', 't_pasien_cat.t_pasien_cat_code', '=', 'd_reg_order.t_pasien_cat_code')->get();
             return view('application.pelayanan.list-pasien-registrasi', ['data' => $data, 'akses' => $akses, 'code' => $id]);
         } else {
             return Redirect::to('dashboard/home');
         }
+    }
+    public function data_registrasi_data_table(Request $request)
+    {
+        // 1. Base Query (Disesuaikan dengan skema master_patient)
+        $query = DB::table('d_reg_order')
+            ->join('master_patient', 'master_patient.master_patient_code', '=', 'd_reg_order.d_reg_order_rm')
+            ->leftJoin('t_pasien_cat', 't_pasien_cat.t_pasien_cat_code', '=', 'd_reg_order.t_pasien_cat_code')
+            ->select([
+                'd_reg_order.d_reg_order_code',
+                'd_reg_order.d_reg_order_rm',
+                'd_reg_order.d_reg_order_user',
+                'd_reg_order.created_at',
+                'master_patient.master_patient_name',
+                'master_patient.master_patient_tempat_lahir',
+                'master_patient.master_patient_tgl_lahir',
+                'master_patient.master_patient_jk',
+                't_pasien_cat.t_pasien_cat_name'
+            ]);
+
+        // Filter Rentang Tanggal jika diisi
+        if ($request->filled('tgl1') && $request->filled('tgl2')) {
+            $query->whereBetween('d_reg_order.d_reg_order_date', [$request->tgl1, $request->tgl2]);
+        }
+
+        // Total data sebelum filter
+        $totalData = $query->count();
+
+        // 2. Global Search (Live Search Input)
+        if ($searchValue = $request->input('search.value')) {
+            $query->where(function ($q) use ($searchValue) {
+                $q->where('d_reg_order.d_reg_order_code', 'like', "%{$searchValue}%")
+                    ->orWhere('d_reg_order.d_reg_order_rm', 'like', "%{$searchValue}%")
+                    ->orWhere('master_patient.master_patient_name', 'like', "%{$searchValue}%")
+                    ->orWhere('master_patient.master_patient_nik', 'like', "%{$searchValue}%");
+            });
+        }
+
+        $totalFiltered = $query->count();
+
+        // 3. Pagination & Ordering
+        $start  = $request->input('start', 0);
+        $length = $request->input('length', 10);
+
+        $data = $query->offset($start)
+            ->limit($length)
+            ->orderBy('d_reg_order.created_at', 'desc')
+            ->get();
+
+        // Fetch User Fullnames
+        $userIds = $data->pluck('d_reg_order_user')->unique();
+        $users = DB::table('user_mains')
+            ->whereIn('userid', $userIds)
+            ->pluck('fullname', 'userid');
+
+        // Fetch Layanan
+        $orderCodes = $data->pluck('d_reg_order_code');
+        $layananData = DB::table('d_reg_order_list')
+            ->join('t_layanan_cat', 't_layanan_cat.t_layanan_cat_code', '=', 'd_reg_order_list.t_layanan_cat_code')
+            ->whereIn('d_reg_order_list.d_reg_order_code', $orderCodes)
+            ->select('d_reg_order_list.d_reg_order_code', 't_layanan_cat.t_layanan_cat_name')
+            ->get()
+            ->groupBy('d_reg_order_code');
+
+        // 4. Formatting Output JSON
+        $formattedData = [];
+        $no = $start + 1;
+
+        foreach ($data as $item) {
+            $userName = $users[$item->d_reg_order_user] ?? null;
+            $initial  = strtoupper(substr($item->master_patient_name ?? 'P', 0, 1));
+
+            // Format Badge Petugas
+            $userBadge = $userName
+                ? '<span class="badge bg-primary-subtle text-primary border border-primary-subtle fw-semibold" style="font-size: 0.7rem;"><i class="fas fa-user-edit me-1"></i>' . e($userName) . '</span>'
+                : '<span class="badge bg-danger-subtle text-danger border border-danger-subtle fw-semibold" style="font-size: 0.7rem;"><i class="fas fa-user-slash me-1"></i>Unknown</span>';
+
+            // Format List Layanan
+            $layananHtml = '<div class="d-flex flex-column gap-1">';
+            if (isset($layananData[$item->d_reg_order_code])) {
+                foreach ($layananData[$item->d_reg_order_code] as $l) {
+                    $layananHtml .= '<div class="layanan-pill"><i class="fas fa-stethoscope me-1"></i><strong>' . e($l->t_layanan_cat_name) . '</strong></div>';
+                }
+            }
+            $layananHtml .= '</div>';
+
+            // Badge Gender / JK
+            $jkBadge = ($item->master_patient_jk == 'L' || strtolower($item->master_patient_jk) == 'laki-laki')
+                ? '<span class="badge bg-primary-subtle text-primary ms-1" style="font-size:0.65rem;">L</span>'
+                : '<span class="badge bg-danger-subtle text-danger ms-1" style="font-size:0.65rem;">P</span>';
+
+            $formattedData[] = [
+                'no' => $no++,
+                'no_reg' => '<div>
+                                <div class="fw-bold text-primary mb-1">' . e($item->d_reg_order_code) . '</div>
+                                ' . $userBadge . '
+                            </div>',
+                'pasien' => '<div class="d-flex align-items-center">
+                                <div class="avatar-patient me-2 flex-shrink-0">' . $initial . '</div>
+                                <div>
+                                    <div class="fw-bold text-body-highlight">' . e($item->master_patient_name) . ' ' . $jkBadge . '</div>
+                                    <small class="text-muted" style="font-size: 0.75rem;">RM: ' . e($item->d_reg_order_rm) . '</small>
+                                </div>
+                            </div>',
+                'ttl' => '<i class="fas fa-map-marker-alt text-danger me-1" style="font-size: 0.75rem;"></i>'
+                    . e($item->master_patient_tempat_lahir ?? '-') . ', <br><span class="fw-semibold text-body">' . date('d/m/Y', strtotime($item->master_patient_tgl_lahir)) . '</span>',
+                'kategori' => '<span class="badge bg-info text-white border border-info-subtle px-2 py-1 fw-bold"><i class="fas fa-id-card me-1"></i>' . e($item->t_pasien_cat_name ?? 'UMUM') . '</span>',
+                'layanan' => $layananHtml,
+                'created_at' => '<span class="badge bg-dark text-white border border-subtle fw-medium" style="font-size: 0.72rem;"><i class="far fa-clock me-1 text-muted"></i>' . date('d/m/Y H:i', strtotime($item->created_at)) . '</span>',
+                'action' => '<div class="dropdown text-end">
+                                <button class="btn btn-sm btn-light border border-subtle dropdown-toggle shadow-none" type="button" data-bs-toggle="dropdown"><i class="fas fa-ellipsis-v text-secondary"></i></button>
+                                <ul class="dropdown-menu dropdown-menu-end shadow-sm border border-subtle">
+                                    <li>
+                                        <button class="dropdown-item d-flex align-items-center gap-2 py-2 button-data-history-pasien" data-bs-toggle="modal" data-bs-target="#modal-registrasi" data-code="' . e($item->d_reg_order_rm) . '">
+                                            <i class="fas fa-history text-primary"></i>
+                                            <span class="fw-semibold">Riwayat Pasien</span>
+                                        </button>
+                                    </li>
+                                </ul>
+                            </div>'
+            ];
+        }
+
+        return response()->json([
+            "draw"            => intval($request->input('draw')),
+            "recordsTotal"    => intval($totalData),
+            "recordsFiltered" => intval($totalFiltered),
+            "data"            => $formattedData
+        ]);
     }
     public function data_registrasi_history(Request $request)
     {

@@ -23,7 +23,9 @@ use App\Http\Controllers\LiveTvController;
 use App\Http\Controllers\Logsitik\LogistikController;
 use App\Http\Controllers\MasterController;
 use App\Http\Controllers\MasterDataController;
+use App\Http\Controllers\Medic\LabRegistrationController;
 use App\Http\Controllers\Medic\MasterMedController;
+use App\Http\Controllers\Medic\PemeriksaanSettingController;
 use App\Http\Controllers\Movie\MovieController as MoviesController;
 use App\Http\Controllers\News\NewsAdminController;
 use App\Http\Controllers\PacsController;
@@ -31,8 +33,10 @@ use App\Http\Controllers\PageController;
 use App\Http\Controllers\PelayananController;
 use App\Http\Controllers\Pembelian\PurchaseController;
 use App\Http\Controllers\PoliklinikController;
+use App\Http\Controllers\PriceSettingController;
 use App\Http\Controllers\PublicController;
 use App\Http\Controllers\RadiologiController;
+use App\Http\Controllers\RegisterPelayananController;
 use App\Http\Controllers\Supplier\SupplierController;
 use App\Http\Controllers\UploadFileController;
 // use App\Http\Controllers\inventaris\PeminjamanController;
@@ -295,6 +299,16 @@ Route::prefix('{akses}/{id}/application')->group(function () {
     Route::get('master-penjualan/kategori-penjualan', [MasterDataController::class, 'master_penjualan_kategori'])->name('master_penjualan_kategori');
 });
 
+// PENGATURAN HARGA PEMERIKSAAN
+Route::get('/get-sub-sales/{mSalesCode}', [PriceSettingController::class, 'getSubSales']);
+Route::get('/get-sales-cat/{salesCode}', [PriceSettingController::class, 'getSalesCat']);
+Route::post('/price-setting/store', [PriceSettingController::class, 'store'])->name('price-setting.store');
+Route::get('/get-sales-data-filter', [PriceSettingController::class, 'getSalesDataFilter']);
+Route::post('/save-package-items', [PriceSettingController::class, 'savePackageItems'])->name('price-setting.save-package-items');
+Route::get('/get-package-items/{pSalesDataCode}', [PriceSettingController::class, 'getPackageItems']);
+Route::post('/master-sales/store', [PriceSettingController::class, 'storeMasterSales'])->name('master-sales.store');
+Route::post('/sub-sales/store', [PriceSettingController::class, 'storeSubSales'])->name('sub-sales.store');
+Route::post('/sales-cat/store', [PriceSettingController::class, 'storeSalesCat'])->name('sales-cat.store');
 // MENU PELAYANAN
 Route::prefix('application')->group(function () {
     // PENDAFTARAAN SATU PINTU
@@ -329,6 +343,7 @@ Route::prefix('application')->group(function () {
     Route::post('registrasi-pasien/list-que', [PelayananController::class, 'registrasi_pasien_list_que'])->name('registrasi_pasien_list_que');
     Route::post('registrasi-pasien/choose-data-que', [PelayananController::class, 'registrasi_pasien_choose_data_que'])->name('registrasi_pasien_choose_data_que');
     // DATA REGISTRASI
+    Route::post('data-registrasi/data-table', [PelayananController::class, 'data_registrasi_data_table'])->name('data_registrasi_data_table');
     Route::post('data-registrasi/history', [PelayananController::class, 'data_registrasi_history'])->name('data_registrasi_history');
     Route::post('data-registrasi/find-date', [PelayananController::class, 'data_registrasi_find_data'])->name('data_registrasi_find_data');
     Route::post('data-registrasi/refresh-data', [PelayananController::class, 'data_registrasi_refresh_data'])->name('data_registrasi_refresh_data');
@@ -412,6 +427,8 @@ Route::prefix('application')->group(function () {
     Route::post('menu-laboratorium/data-registrasi-lab/handling-proses', [LaboratoriumController::class, 'data_registrasi_lab_handling_proses'])->name('data_registrasi_lab_handling_proses');
     Route::post('menu-laboratorium/specimen-collection/detail', [LaboratoriumController::class, 'data_specimen_collection_lab_detail'])->name('data_specimen_collection_lab_detail');
     Route::post('menu-laboratorium/specimen-collection/cari-data', [LaboratoriumController::class, 'data_specimen_collection_lab_cari_data'])->name('data_specimen_collection_lab_cari_data');
+    Route::get('menu-laboratorium/specimen-collection/print-barcode', [LaboratoriumController::class, 'data_specimen_collection_lab_print_barcode'])->name('data_specimen_collection_lab_print_barcode');
+    Route::post('menu-laboratorium/specimen-collection/print-barcode-proses', [LaboratoriumController::class, 'data_specimen_collection_lab_print_barcode_proses'])->name('data_specimen_collection_lab_print_barcode_proses');
     Route::post('menu-laboratorium/specimen-collection/proses', [LaboratoriumController::class, 'data_specimen_collection_lab_proses'])->name('data_specimen_collection_lab_proses');
     Route::post('menu-laboratorium/specimen-collection/proses-simpan', [LaboratoriumController::class, 'data_specimen_collection_lab_proses_simpan'])->name('data_specimen_collection_lab_proses_simpan');
     Route::post('menu-laboratorium/specimen-collection/proses-fix-simpan', [LaboratoriumController::class, 'data_specimen_collection_lab_proses_simpan_fix'])->name('data_specimen_collection_lab_proses_simpan_fix');
@@ -433,6 +450,27 @@ Route::prefix('application')->group(function () {
     Route::get('interface-lab/data-result/{id}/detail', [LaboratoriumController::class, 'interfave_lab_data_result_show_data_detail'])->name('interfave_lab_data_result_show_data_detail');
     Route::get('interface-lab/data-result/{id}/raw', [LaboratoriumController::class, 'interfave_lab_data_result_show_data_raw'])->name('interfave_lab_data_result_show_data_raw');
 });
+Route::prefix('pelayanan/laboratorium')->name('lab.')->group(function () {
+    Route::get('/', [LabRegistrationController::class, 'index'])->name('index');
+    Route::post('/get-sub-sales', [LabRegistrationController::class, 'getSubSales'])->name('get_sub_sales');
+    Route::post('/get-categories', [LabRegistrationController::class, 'getCategories'])->name('get_categories');
+    Route::post('/get-pemeriksaan-items', [LabRegistrationController::class, 'getPemeriksaanItems'])->name('get_pemeriksaan_items');
+    Route::post('/store-registrasi', [LabRegistrationController::class, 'storeRegistrasi'])->name('store_registrasi');
+});
+Route::prefix('radiologi')->group(function () {
+    Route::get('/registrasi', [RegisterPelayananController::class, 'index'])->name('radiologi.index');
+    Route::post('/get-sub-sales', [RegisterPelayananController::class, 'getSubSales'])->name('radiologi.get_sub_sales');
+    Route::post('/get-paket-cat', [RegisterPelayananController::class, 'getPaketCat'])->name('radiologi.get_paket_cat');
+    Route::post('/get-items', [RegisterPelayananController::class, 'getItemPemeriksaanRad'])->name('radiologi.get_items');
+    Route::post('/fix-registrasi', [RegisterPelayananController::class, 'fixRegistrasiRad'])->name('registrasi_pasien_pilih_data_pasien_kebutuhan_fix_registrasi_rad');
+});
+Route::prefix('pemeriksaan-setting')->name('pemeriksaan.setting.')->group(function () {
+    Route::get('/', [PemeriksaanSettingController::class, 'index'])->name('index');
+    Route::post('/datatable', [PemeriksaanSettingController::class, 'getDatatable'])->name('datatable');
+    Route::post('/get-params', [PemeriksaanSettingController::class, 'getParameters'])->name('get_params');
+    Route::post('/store', [PemeriksaanSettingController::class, 'storeParameters'])->name('store');
+});
+
 // MENU KEUANGAN
 Route::prefix('application')->group(function () {
     Route::post('keuangan/menu-kasir/find-data', [KeuanganController::class, 'keuangan_menu_cashier_find_data'])->name('keuangan_menu_cashier_find_data');
@@ -442,6 +480,7 @@ Route::prefix('application')->group(function () {
     Route::post('keuangan/menu-kasir/find', [KeuanganController::class, 'keuangan_menu_cashier_find'])->name('keuangan_menu_cashier_find');
     Route::post('keuangan/menu-kasir/fix-payment', [KeuanganController::class, 'keuangan_menu_cashier_find_fix_payment'])->name('keuangan_menu_cashier_find_fix_payment');
     Route::post('transaksi-keuangan/penerimaan-transaksi/proses-transaksi', [KeuanganController::class, 'keuangan_penerimaan_proses_transaksi'])->name('keuangan_penerimaan_proses_transaksi');
+    Route::get('/cashier/download-receipt-pdf/{orderCode}', [KeuanganController::class, 'downloadReceiptPdf'])->name('keuangan_menu_cashier_download_pdf');
 });
 // MASTER DATA MEDICAL
 Route::prefix('application')->group(function () {

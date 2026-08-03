@@ -18,8 +18,22 @@
         </div>
         <div class="col-6">
             <label class="form-label" for="inputAddress">Satuan Nilai</label>
-           <input class="form-control form-control-lg" id="inputAddress" type="text" name="satuan"
+            <input class="form-control form-control-lg" id="inputAddress" type="text" name="satuan"
                 placeholder="ng/mL" required />
+        </div>
+        <div class="col-md-6">
+            <label for="">Pilih Instrument</label>
+            <select name="instrumen" class="form-control choices-single-type" id="">
+                <option value="">Pilih Instrumen</option>
+                @foreach ($alat as $alats)
+                <option value="{{ $alats->instrument_id }}">{{ $alats->nama_alat }}</option>
+                @endforeach
+            </select>
+        </div>
+        <div class="col-md-6">
+            <label for="">Parameter Instrumen</label>
+            <input class="form-control form-control-lg" id="parameter" type="text" name="parameter"
+                placeholder="Px2" required />
         </div>
         <div class="col-12">
             <div class="form-check">

@@ -1,310 +1,418 @@
 <!DOCTYPE html>
-<html lang="en">
+<html lang="id">
 
 <head>
-    <title>Report Vladiation</title>
+    <meta charset="UTF-8">
+    <title>Hasil Pemeriksaan Laboratorium - {{ $code }}</title>
+    <style>
+        @page {
+            margin: 20px 25px 20px 25px;
+        }
+
+        body {
+            font-family: 'Helvetica', 'Arial', sans-serif;
+            font-size: 11px;
+            color: #222222;
+            line-height: 1.3;
+            margin: 0;
+            padding: 0;
+        }
+
+        /* HELPER STYLES */
+        .text-center {
+            text-align: center;
+        }
+
+        .text-right {
+            text-align: right;
+        }
+
+        .text-left {
+            text-align: left;
+        }
+
+        .fw-bold {
+            font-weight: bold;
+        }
+
+        .text-muted {
+            color: #666666;
+        }
+
+        .text-danger {
+            color: #d9534f;
+        }
+
+        .text-primary {
+            color: #1a5bb8;
+        }
+
+        /* HEADER / KOP SURAT */
+        .header-table {
+            width: 100%;
+            border-bottom: 2px solid #1a5bb8;
+            padding-bottom: 8px;
+            margin-bottom: 12px;
+        }
+
+        .header-logo {
+            width: 130px;
+            vertical-align: middle;
+        }
+
+        .header-title {
+            text-align: center;
+            vertical-align: middle;
+        }
+
+        .header-title h2 {
+            margin: 0;
+            font-size: 15px;
+            color: #1a5bb8;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+        }
+
+        .header-title h3 {
+            margin: 3px 0 0 0;
+            font-size: 13px;
+            color: #333333;
+        }
+
+        .header-title p {
+            margin: 3px 0 0 0;
+            font-size: 9px;
+            color: #666666;
+        }
+
+        .header-qr {
+            width: 80px;
+            text-align: right;
+            vertical-align: middle;
+        }
+
+        /* TITLE DOKUMEN */
+        .doc-title {
+            background-color: #f0f4f9;
+            border-left: 4px solid #1a5bb8;
+            padding: 6px 10px;
+            margin-bottom: 12px;
+        }
+
+        .doc-title table {
+            width: 100%;
+        }
+
+        /* INFORMASI PASIEN */
+        .patient-info-table {
+            width: 100%;
+            margin-bottom: 15px;
+            border-collapse: collapse;
+        }
+
+        .patient-info-table td {
+            padding: 3px 4px;
+            vertical-align: top;
+            font-size: 10.5px;
+        }
+
+        .patient-info-table .label {
+            color: #555555;
+            width: 15%;
+        }
+
+        .patient-info-table .separator {
+            width: 2%;
+            text-align: center;
+        }
+
+        .patient-info-table .value {
+            font-weight: bold;
+            width: 33%;
+        }
+
+        /* TABEL HASIL LAB */
+        .lab-table {
+            width: 100%;
+            border-collapse: collapse;
+            margin-bottom: 15px;
+        }
+
+        .lab-table th {
+            background-color: #1a5bb8;
+            color: #ffffff;
+            font-weight: bold;
+            text-transform: uppercase;
+            padding: 6px 8px;
+            font-size: 10px;
+            border: 1px solid #1a5bb8;
+        }
+
+        .lab-table td {
+            padding: 6px 8px;
+            border-bottom: 1px solid #e0e0e0;
+            font-size: 10px;
+        }
+
+        /* Header Kelompok Utama (Judul Besar) */
+        .lab-table tr.main-category-row td {
+            background-color: #f0f4f9;
+            color: #1a5bb8;
+            font-weight: bold;
+            padding: 6px 8px;
+            font-size: 10.5px;
+            border-bottom: 1px solid #c8d9f1;
+        }
+
+        /* Sub-Header / Kepala (t_pem_list_val_opt = Y) seperti Hitung Jenis di gambar */
+        .lab-table tr.parent-header-row td {
+            background-color: #f8fafc;
+            font-weight: bold;
+            color: #222222;
+            padding: 6px 8px;
+            border-bottom: 1px solid #e0e0e0;
+        }
+
+        /* Anak (Child Row) */
+        .lab-table tr.child-row td {
+            background-color: #ffffff;
+        }
+
+        .child-prefix {
+            color: #888888;
+            font-family: monospace, sans-serif;
+            margin-right: 4px;
+        }
+
+        /* FOOTER & TANDA TANGAN */
+        .footer-container {
+            width: 100%;
+            margin-top: 20px;
+        }
+
+        .footer-table {
+            width: 100%;
+            border-collapse: collapse;
+        }
+
+        .footer-table td {
+            vertical-align: bottom;
+        }
+
+        .notes-card {
+            border: 1px dashed #cccccc;
+            background-color: #fafafa;
+            padding: 8px;
+            font-size: 9px;
+            color: #555555;
+            border-radius: 4px;
+        }
+
+        .signature-box {
+            text-align: center;
+        }
+
+        .signature-box p {
+            margin: 2px 0;
+            font-size: 10px;
+        }
+    </style>
 </head>
-<style>
-    @page {
-        margin-left: 25px;
-        margin-top: 5px;
-        font-family: Calibri (Body);
-    }
-</style>
-<style>
-    div.header {
-        position: relative;
-        left: 20px;
-        width: 100%;
-        height: 106px;
-        border: 0.2px solid #000000;
-    }
 
-    div.body {
-        position: relative;
-        left: 20px;
-        width: 100%;
-        height: 500px;
-        border: 0px solid #302a2a;
-        font-size: 15px;
-    }
+<body>
 
-    div.absolute {
-        position: absolute;
-        top: 0px;
-        right: 0;
-        width: 101px;
-        height: 104px;
-        border: 1px solid #252424;
-    }
+    <!-- KOP SURAT / HEADER -->
+    <table class="header-table">
+        <tr>
+            <td class="header-logo">
+                <img src="data:image/png;base64, {{ $image }}" width="120" alt="Logo">
+            </td>
+            <td class="header-title">
+                <h2>TRANSFORMA MEDIKA</h2>
+                <h3>RUMAH SAKIT ASUPAN BERTENAGA</h3>
+                <p>Jl. Simulasi Kecamatan Singsingamaraja No. 98Z | Telp: (021) 12345678</p>
+            </td>
+            <td class="header-qr">
+                <img src="data:image/png;base64, {!! base64_encode(QrCode::style('round')->eye('circle')->format('svg')->size(75)->errorCorrection('H')->generate($code)) !!}" width="75" alt="QR Code">
+            </td>
+        </tr>
+    </table>
 
-    div.absolute-kiri {
-        position: absolute;
-        top: 0px;
-        left: 0;
-        width: 156px;
-        height: 104px;
-        border: 1px solid #252424;
-    }
-
-    table {
-        border-collapse: collapse;
-    }
-
-    table tr td p {
-
-        padding: 0px;
-        margin: 0px;
-        font-weight: bold;
-    }
-
-    .card {
-        padding: 1%;
-        width: 97.8%;
-        border: 1px solid #000000;
-    }
-
-    .table thead {
-        font-weight: bold;
-        border: 1px solid #000000;
-    }
-
-    .table thead tr td {
-        padding: 5px;
-    }
-
-    .table tbody tr td {
-
-        border: none;
-        border-bottom: 1px solid #000000;
-        padding: 5px;
-    }
-
-    div.footer {
-        position: fixed;
-        left: 0;
-        bottom: 15px;
-        border: 0px solid #302a2a;
-        font-size: 15px;
-    }
-
-    .table-footer tr td {
-        padding-top: 20%;
-        text-align: center;
-        border: none;
-    }
-</style>
-</head>
-
-<body style="padding-top: 25px; padding-left: 0px;">
-
-    <div class="header">
-        <div class="absolute-kiri">
-
-            <img style="padding-top: 0px; margin: 2px; left: 2px; ;" src="data:image/png;base64, {{ $image }}"
-                width="152">
-
-            <hr style="padding: 0%; margin: 0%;">
-            <p style="font-size: 9px; text-align: center; margin-left: 2px;margin-right: 2px;">jl Simulasi Kecamatan
-                Singsingamaraja No 98Z</p>
-        </div>
-        <h4 style=" margin: 20px; margin-top: 2%; left: 100px; padding-left: 60px; text-align: center;">( TRNSFORMASI
-            SISTEM INFORMASI MEDIKA ) <br>TRANSFORMA MEDIKA </h4>
-        <h5 style=" margin: 20px; margin-top: 1%; left: 100px; padding-left: 60px; text-align: center;">RUMAH SAKIT ASUPAN BERTENAGA</h5>
-        {{-- <img style="padding-top: 11px;" src="data:image/png;base64, {!! base64_encode( QrCode::eyeColor(0, 255, 0, 0, 0, 0, 0)->style('round')->eye('circle')->format('svg')->size(107)->errorCorrection('H')->generate(123123),) !!}"> --}}
-
-        <div class="absolute">
-            <img style="padding-top: 3px; padding-left: 2px;" src="data:image/png;base64, {!! base64_encode(
-                QrCode::style('round')->eye('circle')->format('svg')->size(97)->errorCorrection('H')->generate($code),
-            ) !!}">
-        </div>
+    <!-- BAR TITLE DOKUMEN -->
+    <div class="doc-title">
+        <table>
+            <tr>
+                <td class="fw-bold text-primary" style="font-size: 12px;">HASIL PEMERIKSAAN LABORATORIUM</td>
+                <td class="text-right text-muted" style="font-size: 9.5px;">No. Form: LAB. 33-FRM-PU-03.1/02</td>
+            </tr>
+        </table>
     </div>
-    <div class="body">
-        <br>
-        <p style="margin-bottom: 0%; color: #0f02ffff;">HASIL PEMERIKSAAN LABORATORIUM<span style="float: right;">{{$code}} LAB. 33-FRM-PU-03.
-                1/02</span></p>
-        <hr style="margin-bottom: 0%;">
 
-        <table style="width: 100%; border: none; margin-bottom: 5%; vertical-align: top;">
-            <tr style="border: none; vertical-align: top;">
-                <td style="border: none;">No Reg</td>
-                <td style="border: none;">:</td>
-                <td style="border: none;">{{$code}}</td>
-                <td style="border: none;">Tanggal Reg</td>
-                <td style="border: none;">:</td>
-                <td style="border: none;">{{ date('d-m-Y', strtotime($data->master_patient_tgl_lahir)) }}</td>
+    <!-- INFORMASI PASIEN -->
+    <table class="patient-info-table">
+        <tr>
+            <td class="label">No. Registrasi</td>
+            <td class="separator">:</td>
+            <td class="value text-primary">{{ $code }}</td>
+
+            <td class="label">Tgl. Registrasi</td>
+            <td class="separator">:</td>
+            <td class="value">
+                {{ !empty($reg->d_reg_order_lab_date) ? date('d-m-Y', strtotime($reg->d_reg_order_lab_date)) : date('d-m-Y') }}
+            </td>
+        </tr>
+        <tr>
+            <td class="label">Nama Pasien</td>
+            <td class="separator">:</td>
+            <td class="value">{{ $data->master_patient_name }}</td>
+
+            <td class="label">ID Pasien / RM</td>
+            <td class="separator">:</td>
+            <td class="value">{{ $data->master_patient_code }}</td>
+        </tr>
+        <tr>
+            <td class="label">Dokter Pengirim</td>
+            <td class="separator">:</td>
+            <td class="value">{{ $reg->d_reg_order_lab_rujukan ?? '-' }}</td>
+
+            <td class="label">Jenis Kelamin</td>
+            <td class="separator">:</td>
+            <td class="value">
+                {{ ($data->master_patient_jk == 'L' || $data->master_patient_jk == 'Laki-laki') ? 'Laki-Laki' : 'Perempuan' }}
+            </td>
+        </tr>
+        <tr>
+            <td class="label">Alamat Pasien</td>
+            <td class="separator">:</td>
+            <td class="value">{{ $data->master_patient_alamat ?? '-' }}</td>
+
+            <td class="label">Tanggal Lahir</td>
+            <td class="separator">:</td>
+            <td class="value">
+                {{ !empty($data->master_patient_tgl_lahir) ? date('d-m-Y', strtotime($data->master_patient_tgl_lahir)) : '-' }}
+            </td>
+        </tr>
+    </table>
+
+    <!-- TABEL PEMERIKSAAN RESULT -->
+    <table class="lab-table">
+        <thead>
+            <tr>
+                <th class="text-left" style="width: 35%;">JENIS PEMERIKSAAN</th>
+                <th class="text-center" style="width: 15%;">HASIL</th>
+                <th class="text-center" style="width: 18%;">NILAI RUJUKAN</th>
+                <th class="text-center" style="width: 12%;">SATUAN</th>
+                <th class="text-left" style="width: 20%;">METODE</th>
             </tr>
-            <tr style="border: none; vertical-align: top;">
-                <td style="border: none;">Nama</td>
-                <td style="border: none;">:</td>
-                <td style="border: none;">{{$data->master_patient_name}}</td>
-                <td style="border: none;">Pasien ID</td>
-                <td style="border: none;">:</td>
-                <td style="border: none;">{{$data->master_patient_code}}</td>
+        </thead>
+        <tbody>
+            @foreach ($pemeriksaan as $pem)
+            <!-- Header Utama Kelompok Pemeriksaan -->
+            <tr class="main-category-row">
+                <td colspan="5">
+                    <span style="text-transform: uppercase;">{{ $pem->t_pemeriksaan_list_name }}</span>
+                </td>
             </tr>
-            <tr style="border: none; vertical-align: top;">
-                <td style="border: none;">Pengirim</td>
-                <td style="border: none;">:</td>
-                <td style="border: none;">{{$reg->d_reg_order_lab_rujukan}}</td>
-                <td style="border: none;">Jenis Kelamin</td>
-                <td style="border: none;">:</td>
-                <td style="border: none;">
-                    @if ($data->master_patient_jk == 'L')
-                    Laki - Laki
+
+            @php
+            $sub = DB::table('t_pemeriksaan_list_val')
+            ->where('t_pemeriksaan_list_code', $pem->t_pemeriksaan_list_code)
+            ->get();
+
+            // Variabel penanda apakah sedang di dalam grup anak/parent
+            $isInsideParent = false;
+            @endphp
+
+            @foreach ($sub as $subs)
+            @if ($subs->t_pem_list_val_opt == 'Y')
+            @php $isInsideParent = true; @endphp
+            <!-- KEPALA / PARENT (seperti Hitung Jenis pada Gambar) -->
+            <tr class="parent-header-row">
+                <td colspan="5">
+                    <span style="color: #e65100; font-size: 11px;"></span>
+                    <strong>{{ $subs->t_pem_list_val_name }}</strong>
+                </td>
+            </tr>
+            @else
+            @php
+            $nilai = DB::table('h_reg_lab')
+            ->where('d_reg_order_lab_code', $reg->d_reg_order_lab_code)
+            ->where('t_pem_list_val_code', $subs->t_pem_list_val_code)
+            ->first();
+            @endphp
+
+            <!-- ITEM BARIS (Anak atau Item Biasa) -->
+            <tr class="{{ $isInsideParent ? 'child-row' : '' }}">
+                <!-- Kolom Nama Jenis Pemeriksaan -->
+                <td style="{{ $isInsideParent ? 'padding-left: 22px;' : '' }}">
+                    @if ($isInsideParent)
+                    <!-- Icon panah anak seperti di gambar (↪) -->
+                    <span class="child-prefix">-</span>
+                    @endif
+                    <span class="{{ !$isInsideParent ? 'fw-bold' : '' }}">
+                        {{ $subs->t_pem_list_val_name }}
+                    </span>
+                </td>
+
+                <!-- Kolom Hasil -->
+                <td class="text-center fw-bold">
+                    @if ($nilai && !empty($nilai->h_reg_lab_value))
+                    {{ $nilai->h_reg_lab_value }}
                     @else
-                    Perempuan
+                    <span class="text-danger" style="font-style: italic;">Belum</span>
+                    @endif
+                </td>
+
+                <!-- Nilai Rujukan -->
+                <td class="text-center">{{ $subs->t_pem_list_val_rujukan ?? '-' }}</td>
+
+                <!-- Satuan -->
+                <td class="text-center">{{ $subs->t_pem_list_val_satuan ?? '-' }}</td>
+
+                <!-- Metode -->
+                <td class="text-left">
+                    @if ($nilai && !empty($nilai->h_reg_lab_metode))
+                    {{ $nilai->h_reg_lab_metode }}
+                    @else
+                    <span class="text-muted" style="font-style: italic;">-</span>
                     @endif
                 </td>
             </tr>
-            <tr style="border: none; vertical-align: top;">
-                <td style="border: none;">Alamat</td>
-                <td style="border: none; width: 2%;">:</td>
-                <td style="border: none; width: 40%;"> {{$data->master_patient_alamat}}</td>
-                <td style="border: none; width: 20%;">Tanggal Lahir</td>
-                <td style="border: none; width: 2%;">:</td>
-                <td style="border: none;">23-09-1999</td>
+            @endif
+            @endforeach
+            @endforeach
+        </tbody>
+    </table>
+
+    <!-- FOOTER / TANDA TANGAN -->
+    <div class="footer-container">
+        <table class="footer-table">
+            <tr>
+                <td style="width: 60%; vertical-align: top;">
+                    <div class="notes-card">
+                        <strong class="text-primary">Informasi Layanan:</strong>
+                        <p style="margin: 3px 0 6px 0; line-height: 1.4;">
+                            Hasil laboratorium ini dapat diakses secara online melalui Web Resmi kami atau Email terdaftar.<br>
+                            Jika ada pertanyaan, silakan hubungi Customer Service RS.
+                        </p>
+                        <span class="text-muted" style="font-size: 8.5px;">
+                            Dicetak oleh: <strong>agus</strong> pada {{ date('d-m-Y H:i:s') }} WIB
+                        </span>
+                    </div>
+                </td>
+
+                <td style="width: 40%;" class="signature-box">
+                    <p class="fw-bold">Petugas Validasi,</p>
+                    <div style="margin: 6px 0;">
+                        <img src="data:image/png;base64, {!! base64_encode(QrCode::style('round')->eye('circle')->format('svg')->size(55)->errorCorrection('H')->generate($code)) !!}" width="55" alt="Validation Stamp">
+                    </div>
+                    <p class="fw-bold text-primary" style="text-decoration: underline;">Penanggung Jawab Lab</p>
+                    <p class="text-muted" style="font-size: 8px;">SIP: 446/LAB/{{ date('Y') }}</p>
+                </td>
             </tr>
         </table>
-
-        <div class="card">
-            <table class="table" style="width: 100%;">
-                <thead>
-                    <tr>
-                        <td>JENIS PEMERIKSAAN</td>
-                        <td>NILAI</td>
-                        <td>HASIL RUJUKAN</td>
-                        <td>SATUAN</td>
-                        <td style="width: 20%;">METODE</td>
-                    </tr>
-                </thead>
-                <tbody>
-                    @foreach ($pemeriksaan as $pem)
-                    <tr>
-                        <td colspan="5"><strong>{{$pem->t_pemeriksaan_list_name}}</strong></td>
-                    </tr>
-                    @php
-                    $sub = DB::table('t_pemeriksaan_list_val')->where('t_pemeriksaan_list_code',$pem->t_pemeriksaan_list_code)->get();
-                    @endphp
-                    @foreach ($sub as $subs)
-                    <tr>
-                        <td>{{$subs->t_pem_list_val_name}}</td>
-                        <td>
-                            @php
-                            $nilai = DB::table('h_reg_lab')
-                            ->where('d_reg_order_lab_code',$reg->d_reg_order_lab_code)
-                            ->where('t_pem_list_val_code',$subs->t_pem_list_val_code)->first();
-                            @endphp
-                            @if ($nilai)
-                            {{ $nilai->h_reg_lab_value }}
-                            @else
-                            <span style="color: red;">belum</span>
-                            @endif
-                        </td>
-                        <td>{{$subs->t_pem_list_val_rujukan}}</td>
-                        <td>{{$subs->t_pem_list_val_satuan}}</td>
-                        <td>
-                            @if ($nilai)
-                            {{ $nilai->h_reg_lab_metode }}
-                            @else
-                            <span style="color: red;">belum</span>
-                            @endif
-                        </td>
-                    </tr>
-                    @endforeach
-                    @endforeach
-                    <!-- <tr>
-                        <td colspan="5">EMATOLOGI RUTIN</td>
-                    </tr>
-                    <tr>
-                        <td colspan="5">Hematologi Lengkap</td>
-                    </tr>
-                    <tr>
-                        <td>Hemoglobin</td>
-                        <td>15,1</td>
-                        <td>13,1 - 17,2</td>
-                        <td>g/dL</td>
-                        <td>SLS HEMOGLOBIN</td>
-                    </tr>
-                    <tr>
-                        <td>Erytrosit</td>
-                        <td>15,1</td>
-                        <td>13,1 - 17,2</td>
-                        <td>g/dL</td>
-                        <td>IMPEDANCE WITH HDFC</td>
-                    </tr>
-                    <tr>
-                        <td>Hematokrit</td>
-                        <td>15,1</td>
-                        <td>13,1 - 17,2</td>
-                        <td>g/dL</td>
-                        <td>RBC PULSE HEIGHT DETECT</td>
-                    </tr>
-                    <tr>
-                        <td colspan="5">HEMATOLOGI</td>
-                    </tr>
-                    <tr>
-                        <td colspan="5">EMATOLOGI RUTIN</td>
-                    </tr>
-                    <tr>
-                        <td colspan="5">Hematologi Lengkap</td>
-                    </tr>
-                    <tr>
-                        <td>Hemoglobin</td>
-                        <td>15,1</td>
-                        <td>13,1 - 17,2</td>
-                        <td>g/dL</td>
-                        <td>SLS HEMOGLOBIN</td>
-                    </tr>
-                    <tr>
-                        <td>Erytrosit</td>
-                        <td>15,1</td>
-                        <td>13,1 - 17,2</td>
-                        <td>g/dL</td>
-                        <td>IMPEDANCE WITH HDFC</td>
-                    </tr>
-                    <tr>
-                        <td>Hematokrit</td>
-                        <td>15,1</td>
-                        <td>13,1 - 17,2</td>
-                        <td>g/dL</td>
-                        <td>RBC PULSE HEIGHT DETECT</td>
-                    </tr> -->
-                </tbody>
-            </table>
-        </div>
-        <br>
-        <div class="footer">
-            <table class="table-footer"
-                style="font-size: 8px; margin: 0px; padding: 0px; width: 100%; font-size: 11px; font-family: Calibri (Body);">
-
-                <tr>
-                    <td></td>
-                    <td></td>
-                </tr>
-                <tr>
-                    <td class="text-center" style=" width: 66%;">
-                        <p style="text-align: left; margin-top: 0px;">Kini hasil laboratorium bisa dibuka di Web Resmi Kami
-                            dan email anda.
-                            Info lebih lanjut hubungi Customer Service kami
-                            <br><br>
-                            Printed by : agus / {{date('d-m-Y H:i:s')}} / {{$code}}
-                        </p>
-
-                    </td>
-
-                    <td class="text-center" style="width: 33%;">
-                        <p>Validasi Oleh</p><br>
-                        <img style="padding-top: 1px; left: 1px;"
-                            src="data:image/png;base64, {!! base64_encode(
-                                QrCode::style('round')->eye('circle')->format('svg')->size(50)->errorCorrection('H')->generate(123),
-                            ) !!}"><br>
-                        <p>Penanggung Jawab</p>
-                    </td>
-                </tr>
-
-            </table>
-        </div>
     </div>
+
 </body>
 
 </html>

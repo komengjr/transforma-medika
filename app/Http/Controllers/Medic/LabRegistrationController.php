@@ -8,9 +8,11 @@ use App\Models\medical\MedicalPemeriksaanLab;
 use App\Models\medical\MedicalPendaftaranLab;
 use App\Models\medical\MedicalPendaftaranLabDetail;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Log;
 use Illuminate\Support\Facades\Schema;
+use Illuminate\Support\Str;
 
 class LabRegistrationController extends Controller
 {
@@ -530,6 +532,197 @@ class LabRegistrationController extends Controller
             return response()->json([
                 'status'  => 'error',
                 'message' => 'Gagal menyimpan hasil lab: ' . $e->getMessage()
+            ], 500);
+        }
+    }
+    // Fungsi Menangani Pilihan AJAX Master & Paket Agreement
+    public function pilihLabAgrement(Request $request) {}
+
+    // Fungsi Menyimpan Data Registrasi
+    public function fixRegistrasiLab(Request $request)
+    {
+        $rujukan = $request->rujukan;
+        $date = $request->date;
+        $agreement = $request->pilih_agrement_lab;
+        $items = json_decode($request->items, true); // Array berisi item pemeriksaan terpilih
+
+        // Proses penyimpanan file rujukan jika ada
+        if ($request->hasFile('file')) {
+            $filePath = $request->file('file')->store('rujukan_files', 'public');
+        }
+
+        // Contoh Penyimpanan Data Transaksi Ke Database
+        // DB::transaction(...);
+
+        return response()->json(['status' => 'success', 'message' => 'Registrasi Berhasil']);
+    }
+    public function getSubSales(Request $request)
+    {
+        $mSalesCode = $request->m_sales_code;
+
+        $subSales = DB::table('p_sales')
+            ->where('p_m_sales_code', $mSalesCode)
+            ->where('p_sales_status', '1')
+            ->get();
+
+        if ($subSales->isEmpty()) {
+            return response()->json([
+                'status' => 'empty',
+                'html'   => '<div class="alert alert-warning mb-0"><i class="fas fa-exclamation-circle me-1"></i> Tidak ada Sub Master Agreement untuk pilihan ini.</div>'
+            ]);
+        }
+
+        return response()->json([
+            'status' => 'success',
+            'data'   => $subSales
+        ]);
+    }
+
+    /**
+     * AJAX Step 2 -> Step 3: Ambil Kategori / Paket (p_sales_cat) berdasarkan Sub Sales (p_sales)
+     */
+    public function getCategories(Request $request)
+    {
+        $salesCode = $request->sales_code;
+
+        $categories = DB::table('p_sales_cat')
+            ->where('p_sales_code', $salesCode)
+            ->get();
+
+        if ($categories->isEmpty()) {
+            return response()->json([
+                'status' => 'empty',
+                'html'   => '<div class="alert alert-warning mb-0"><i class="fas fa-exclamation-circle me-1"></i> Tidak ada paket pemeriksaan dalam kelompok ini.</div>'
+            ]);
+        }
+
+        return response()->json([
+            'status' => 'success',
+            'data'   => $categories
+        ]);
+    }
+
+    /**
+     * AJAX Step 3 -> Step 4: Ambil Item Pemeriksaan & Harga (p_sales_data) berdasarkan Kategori (p_sales_cat)
+     */
+    public function getPemeriksaanItems(Request $request)
+    {
+        $catCode = $request->cat_code;
+
+        $items = DB::table('p_sales_data')
+            ->where('p_sales_cat_code', $catCode)
+            ->get();
+
+        return response()->json([
+            'status' => 'success',
+            'data'   => $items
+        ]);
+    }
+
+    /**
+     * AJAX Final: Simpan Data Registrasi Lab
+     */
+    public function storeRegistrasi(Request $request)
+    {
+        Log::info('RAW ITEMS FROM REQUEST:', ['raw' => $request->items]);
+
+        $items = json_decode($request->items, true);
+        Log::info('PARSED ITEMS:', ['parsed' => $items]);
+
+        if (empty($items) || !is_array($items)) {
+            return response()->json([
+                'status'  => 'error',
+                'message' => 'Gagal: Data item pemeriksaan kosong di Controller!'
+            ], 400);
+        }
+
+        DB::beginTransaction();
+        try {
+            $user  = Auth::user()->name ?? 'System';
+            $today = date('Y-m-d');
+            $now   = now();
+
+            $orderCode    = 'ORD-' . date('YmdHis') . '-' . rand(100, 999);
+            $orderLabCode = 'LAB-' . date('YmdHis') . '-' . rand(100, 999);
+            $labNumber    = 'REG-LAB-' . date('Ymd') . '-' . rand(1000, 9999);
+
+            // Insert Header 1
+            DB::table('d_reg_order')->insert([
+                'd_reg_order_code'   => $orderCode,
+                'd_reg_order_rm'     => $request->no_rm ?? '-',
+                'd_reg_order_date'   => $request->date ?? $today,
+                't_layanan_cat_code' => 'LAB',
+                't_pasien_cat_code'  => $request->patient_cat,
+                'd_reg_order_status' => '1',
+                'd_reg_order_user'   => Auth::user()->userid,
+                'd_reg_order_cabang' => '-',
+                'created_at'         => $now,
+                'updated_at'         => $now,
+            ]);
+
+            // Insert Header 2
+            DB::table('d_reg_order_lab')->insert([
+                'd_reg_order_lab_code'   => $orderLabCode,
+                'd_reg_order_code'       => $orderCode,
+                'd_reg_order_lab_date'   => $request->date ?? $today,
+                'd_reg_order_lab_number' => $labNumber,
+                'd_reg_order_lab_rujukan' => $request->rujukan,
+                'd_reg_order_lab_status' => '1',
+                'd_reg_order_lab_user'   => $user,
+                'created_at'             => $now,
+                'updated_at'             => $now,
+            ]);
+
+            // Insert Header 3
+            DB::table('d_reg_order_list')->insert([
+                'd_reg_order_list_code' => $orderLabCode,
+                'd_reg_order_code'      => $orderCode,
+                't_layanan_cat_code'    => 'LAB',
+                'd_reg_order_list_date' => $request->date ?? $today,
+                'created_at'            => $now,
+                'updated_at'            => $now,
+            ]);
+
+            // Insert Detail Item (d_reg_order_lab_list)
+            // 1. Pastikan $items ter-decode menjadi Array jika dikirim sebagai String
+            $items = is_string($request->items) ? json_decode($request->items, true) : $request->items;
+
+            // 2. Siapkan Array Bulk Insert
+            $insertLabList = [];
+
+            foreach ($items as $index => $item) {
+                // KODE UNIK DENGAN MICROTIME AGAR GUARANTEED UNIK
+                $uniqueCode = 'L' . date('ymd') . '' . Str::upper(Str::random(2)) . '' . sprintf("%02d", $index + 1);
+
+                $insertLabList[] = [
+                    'order_lab_list_code'   => $uniqueCode,
+                    'd_reg_order_lab_code'  => $orderLabCode,
+                    'p_sales_data_code'     => $item['code'],
+                    'order_lab_log_price'    => (int) $item['harga'],
+                    'order_lab_log_discount' => 0,
+                    'status_pembayaran'     => '0',
+                    'created_at'            => $now,
+                    'updated_at'            => $now,
+                ];
+            }
+
+            // 3. Eksekusi Ekstraksi Sekaligus (Lebih Efisien & Cepat)
+            if (!empty($insertLabList)) {
+                DB::table('d_reg_order_lab_list')->insert($insertLabList);
+            }
+
+            DB::commit();
+
+            return response()->json([
+                'status'  => 'success',
+                'message' => 'Registrasi Lab Berhasil Disimpan!'
+            ]);
+        } catch (\Exception $e) {
+            DB::rollBack();
+            Log::error('ERROR SIMPAN LAB LIST:', ['error' => $e->getMessage()]);
+            return response()->json([
+                'status'  => 'error',
+                'message' => 'Error DB: ' . $e->getMessage()
             ], 500);
         }
     }

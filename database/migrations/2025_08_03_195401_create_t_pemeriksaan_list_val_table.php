@@ -21,6 +21,13 @@ class CreateTPemeriksaanListValTable extends Migration
             $table->string('t_pem_list_val_nilai');
             $table->string('t_pem_list_val_rujukan');
             $table->string('t_pem_list_val_satuan');
+            $table->string('t_pem_list_val_instrumen');
+            $table->string('t_pem_list_val_param');
+            $table->string('t_pem_list_val_param');
+            $table->string('t_pem_list_val_metode');
+            $table->string('t_pem_list_val_kali');
+            $table->string('t_pem_list_val_opt');
+            $table->string('t_pem_list_val_opt_code')->nullable();
             $table->timestamps();
         });
     }

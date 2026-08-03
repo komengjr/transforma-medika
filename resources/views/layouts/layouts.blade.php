@@ -387,17 +387,15 @@
                                             class="fas fa-crown me-1"></span><span>Go Pro</span></a> --}}
                                     <a class="dropdown-item text-primary text-center">{{ Auth::user()->fullname }}</a>
                                     <div class="dropdown-divider"></div>
-                                    <a class="dropdown-item text-warning" href="#!" id="button-setup-notification"
-                                        data-bs-toggle="modal" data-bs-target="#modal-template-sm"><span
-                                            class="fas fa-user-cog"></span> Set Notification</a>
-                                    <a class="dropdown-item text-info" href="#" id="button-setup-profil"
-                                        data-bs-toggle="modal" data-bs-target="#modal-template-xl"><span
-                                            class="fas fa-user-cog"></span>
-                                        Profile &amp;
-                                        account</a>
+                                    <a class="dropdown-item " href="#!" id="button-setup-notification"
+                                        data-bs-toggle="modal" data-bs-target="#modal-template-sm">
+                                        <span class="fas fa-cogs me-1 text-warning"></span> Set Notification</a>
+                                    <a class="dropdown-item " href="#" id="button-setup-profil"
+                                        data-bs-toggle="modal" data-bs-target="#modal-template-xl">
+                                        <span class="fas fa-user-cog me-1 text-info"></span> Profile & account</a>
                                     @if (Auth::user()->access_code == 'master')
-                                    <a class="dropdown-item text-danger" href="{{route('master_dashboard')}}"><span
-                                            class="fas fa-user-cog"></span> Master Page</a>
+                                    <a class="dropdown-item " href="{{route('master_dashboard')}}">
+                                        <span class="fas fa-th-large me-2 text-danger"></span> Master Page</a>
                                     @endif
                                     <div class="dropdown-divider"></div>
                                     {{-- <a class="dropdown-item" href="#">Settings</a> --}}

@@ -12,12 +12,15 @@ use League\CommonMark\Extension\CommonMark\Node\Inline\Code;
 use Maatwebsite\Excel\Facades\Excel;
 use SimpleSoftwareIO\QrCode\Facades\QrCode;
 use Spatie\PdfToImage\Pdf;
+use App\Services\ZebraPrinterService;
 
 class LaboratoriumController extends Controller
 {
-    public function __construct()
+    protected $printerService;
+    public function __construct(ZebraPrinterService $printerService)
     {
         $this->middleware('auth');
+        $this->printerService = $printerService;
     }
     public function url_akses($akses, $id)
     {
@@ -120,27 +123,220 @@ class LaboratoriumController extends Controller
     {
         return 123;
     }
+    public function data_specimen_collection_lab_print_barcode(Request $request)
+    {
+        $codeId     = $request->query('code');     // id_t_pemeriksaan_list
+        $specimenId = $request->query('specimen'); // t_pem_specimen_code
+        $regId      = $request->query('reg');      // order_lab_list_code
+
+        // 1. Ambil data spesimen saja (tanpa join ke order_lab_list yang tidak ada)
+        $specimenData = DB::table('t_pem_specimen as tps')
+            ->join('s_specimen_data as ssd', 'ssd.s_specimen_data_code', '=', 'tps.s_specimen_data_code')
+            ->where('tps.t_pem_specimen_code', '=', $specimenId) // Di-binding aman oleh Query Builder
+            ->select(
+                'tps.t_pem_specimen_code',
+                'ssd.s_specimen_data_name'
+            )
+            ->first();
+
+        // Jika Anda punya tabel registrasi/pasien lain, ganti 'NAMA_TABEL_ANDA' di bawah:
+        /*
+    $patientData = DB::table('NAMA_TABEL_ANDA')
+        ->where('order_lab_list_code', $regId)
+        ->first();
+    */
+
+        if (!$specimenData) {
+            return response('
+            <div class="alert alert-danger text-center m-0 p-2">
+                <i class="fas fa-exclamation-triangle me-1"></i> Data spesimen tidak ditemukan.
+            </div>
+        ', 404);
+        }
+
+        // 2. Generate Barcode (C128)
+        $dns1d = new \Milon\Barcode\DNS1D();
+        $barcodeHtml = $dns1d->getBarcodeHTML($regId, 'C128', 1.5, 45);
+
+        // 3. Susun HTML Preview
+        $html = '
+        <div style="font-family: Arial, sans-serif; text-align: center; color: #333; padding: 5px;">
+            <div style="font-size: 11px; font-weight: bold; margin-bottom: 4px;">
+                Sample : ' . e($specimenData->s_specimen_data_name) . '
+            </div>
+
+            <div style="display: flex; justify-content: center; align-items: center; margin: 8px 0; background: #fff; padding: 4px;">
+                ' . $barcodeHtml . '
+            </div>
+
+            <div style="font-size: 10px; font-weight: bold; letter-spacing: 0.5px;">
+                ' . e($regId) . '
+            </div>
+
+
+        </div>
+        ';
+
+        return response($html, 200)->header('Content-Type', 'text/html');
+    }
+    public function data_specimen_collection_lab_print_barcode_proses(Request $request)
+    {
+        try {
+            $code     = $request->input('code');     // id_t_pemeriksaan_list / kode pemeriksaan
+            $specimen = $request->input('specimen'); // t_pem_specimen_code / kode spesimen
+            $reg      = $request->input('reg');      // order_lab_list_code / no reg yang di-barcode
+
+            // 1. Ambil nama spesimen dari database agar tampilan cetakan lebih informatif
+            $specimenData = DB::table('t_pem_specimen as tps')
+                ->join('s_specimen_data as ssd', 'ssd.s_specimen_data_code', '=', 'tps.s_specimen_data_code')
+                ->where('tps.t_pem_specimen_code', '=', $specimen)
+                ->select('ssd.s_specimen_data_name')
+                ->first();
+
+            $specimenName = $specimenData->s_specimen_data_name ?? 'Spesimen';
+
+            // 2. Susun Kode ZPL untuk Printer Zebra (Label 5x3 cm @ 203 DPI)
+            $zplCode = "^XA";
+            $zplCode .= "^CI28"; // Support UTF-8
+
+            // Pengaturan Ukuran Label (400x240 dots)
+            $width = 400;
+            $zplCode .= "^PW" . $width;
+            $zplCode .= "^LL240";
+            $zplCode .= "^LS0";
+
+            // Teks Header 1: No. Registrasi / Kode Pemeriksaan
+            $zplCode .= "^FO0,20^FB400,1,0,C^A0N,22,22^FDREG: " . $reg . "^FS";
+
+            // Teks Header 2: Nama Spesimen
+            $zplCode .= "^FO0,50^FB400,1,0,C^A0N,20,20^FDSAMPEL: " . $specimenName . "^FS";
+
+            // Perhitungan Lebar & Posisi Presisi Barcode (Code 128)
+            // Nilai barcode yang dicetak menggunakan $specimen (atau $reg sesuai kebutuhan)
+            $barcodeValue = $specimen;
+            $skuLength    = strlen($barcodeValue);
+
+            // Modul lebar 2 (BY2) -> estimasi ~11 dots per karakter + quiet zone
+            $barcodeWidth = ($skuLength * 11 * 2) + 40;
+            $barcodeX     = floor(($width - $barcodeWidth) / 2);
+
+            // Batas aman margin kiri jika teks barcode sangat panjang
+            if ($barcodeX < 15) {
+                $barcodeX = 15;
+            }
+
+            // Cetak Barcode Code128 (^BCN, tinggi 60 dots, print text interpretation below = Y)
+            $zplCode .= "^FO" . $barcodeX . ",90^BY2^BCN,60,Y,N,N^FD" . $barcodeValue . "^FS";
+
+            $zplCode .= "^XZ";
+
+            // 3. Eksekusi pengiriman perintah ZPL ke Printer Zebra
+            $printResult = $this->printerService->sendToPrinter($zplCode);
+
+            // Periksa status pengiriman printer
+            if ($printResult) {
+                return response()->json([
+                    'success' => true,
+                    'message' => 'Label barcode spesimen berhasil dikirim ke printer Zebra.'
+                ]);
+            } else {
+                return response()->json([
+                    'success' => false,
+                    'message' => 'Gagal terhubung atau mengirim perintah ke printer Zebra.'
+                ], 500);
+            }
+        } catch (\Exception $e) {
+            return response()->json([
+                'success' => false,
+                'message' => 'Terjadi kesalahan sistem: ' . $e->getMessage()
+            ], 500);
+        }
+    }
     public function data_specimen_collection_lab_proses(Request $request)
     {
         DB::table('s_specimen_log')->insert([
-            's_specimen_log_code' => str::uuid(),
+            's_specimen_log_code' => $request->reg . '' . Str::upper(Str::random(2)),
             't_pem_specimen_code' => $request->specimen,
-            'd_reg_order_list_code' => $request->reg,
+            'order_lab_list_code' => $request->reg,
             's_specimen_log_time' => now(),
             's_specimen_log_end_time' => 0,
             's_specimen_log_user' => Auth::user()->userid,
             's_specimen_log_status' => 0,
             'created_at' => now(),
         ]);
-        return '<button class="btn btn-falcon-warning btn-sm" id="button-simpan-specimen' . $request->code . '' . $request->specimen . '" data-code="123" data-specimen="' . $request->specimen . '" data-reg="' . $request->reg . '">' . now() . '</button>';
+        $specimenData = DB::table('t_pem_specimen')
+            ->join('s_specimen_data', 's_specimen_data.s_specimen_data_code', '=', 't_pem_specimen.s_specimen_data_code')
+            ->where('t_pem_specimen_code', $request->specimen)
+            ->first();
+        $specimenName = $specimenData->s_specimen_data_name ?? 'Spesimen';
+        $codeId     = $request->code;
+        $specimenId = $request->specimen;
+        $regId      = $request->reg;
+        $logTime    = now()->format('H:i');
+        return '
+        <div class="d-inline-flex flex-column align-items-center">
+            <button class="btn btn-warning btn-sm shadow-sm px-3 py-1 d-flex align-items-center justify-content-center gap-1"
+                id="button-simpan-specimen' . $codeId . $specimenId . '"
+                data-code="' . $codeId . '"
+                data-specimen="' . $specimenId . '"
+                data-reg="' . $regId . '"
+                title="Klik untuk Menyelesaikan Proses Spesimen">
+                <i class="fas fa-clock me-1"></i> Proses (' . $logTime . ')
+            </button>
+            <small class="text-muted fw-semibold mt-1 fs--2">
+                ' . $specimenName . '
+            </small>
+        </div>';
     }
     public function data_specimen_collection_lab_proses_simpan(Request $request)
     {
-        DB::table('s_specimen_log')->where('t_pem_specimen_code', $request->specimen)->where('d_reg_order_list_code', $request->reg)->update([
-            's_specimen_log_end_time' => now(),
-            's_specimen_log_status' => 1,
-        ]);
-        return '<button class="btn btn-falcon-success btn-sm" id="" data-code="132">Selesai</button>';
+        DB::table('s_specimen_log')
+            ->where('t_pem_specimen_code', $request->specimen)
+            ->where('order_lab_list_code', $request->reg)
+            ->update([
+                's_specimen_log_end_time' => now(),
+                's_specimen_log_status'   => 1,
+            ]);
+
+        // Ambil data pendukung untuk identifier tombol (jika diperlukan)
+        $codeId     = $request->code;
+        $specimenId = $request->specimen;
+        $regId      = $request->reg;
+        // 2. Ambil nama spesimen dari database
+        $specimenData = DB::table('t_pem_specimen')
+            ->join('s_specimen_data', 's_specimen_data.s_specimen_data_code', '=', 't_pem_specimen.s_specimen_data_code')
+            ->where('t_pem_specimen_code', $request->specimen)
+            ->first();
+
+        $specimenName = $specimenData->s_specimen_data_name ?? 'Spesimen';
+        // Mengembalikan tampilan tombol Selesai + Tombol Print Barcode + Event Handler JS
+        return '
+        <div class="d-inline-flex flex-column align-items-center">
+            <button class="btn btn-success btn-sm shadow-sm px-3 py-1 d-flex align-items-center justify-content-center gap-1"
+                id="button-print-barcode-ajax-' . $codeId . '"
+                data-code="' . $codeId . '"
+                data-specimen="' . $specimenId . '"
+                data-reg="' . $regId . '"
+                title="Klik untuk Cetak Barcode Sampel">
+                <i class="fas fa-barcode"></i> Print Barcode
+            </button>
+            <small class="text-muted fw-semibold mt-1 fs--2">
+                ' . $specimenName . '
+            </small>
+        </div>
+
+        <script>
+            $(document).off("click", "#button-print-barcode-ajax-' . $codeId . '").on("click", "#button-print-barcode-ajax-' . $codeId . '", function(e) {
+                e.preventDefault();
+                var code = $(this).data("code");
+                var specimen = $(this).data("specimen");
+                var reg = $(this).data("reg");
+
+                var url = "' . url('data-specimen-collection-lab/print-barcode') . '?code=" + code + "&specimen=" + specimen + "&reg=" + reg;
+                window.open(url, "_blank", "width=400,height=500");
+            });
+        </script>
+        ';
     }
     public function data_specimen_collection_lab_proses_simpan_fix(Request $request)
     {
@@ -179,11 +375,11 @@ class LaboratoriumController extends Controller
     public function menu_lab_proses_result_detail_sinkronisasi(Request $request)
     {
         $code = $request->input('code'); // d_reg_order_lab_code / nolab
-        $listCodes = $request->input('list_codes', []); // Array kode HANYA dari halaman aktif
+        $listCodes = $request->input('list_codes', []); // Array kode dari halaman aktif
 
         if (empty($listCodes)) {
             return response()->json([
-                'status' => 'error',
+                'status'  => 'error',
                 'message' => 'Tidak ada kode parameter yang dikirim dari halaman.'
             ], 400);
         }
@@ -196,10 +392,13 @@ class LaboratoriumController extends Controller
 
         if (!$interfaceData || empty($interfaceData->results)) {
             return response()->json([
-                'status' => 'error',
+                'status'  => 'error',
                 'message' => 'Data dari alat tidak ditemukan untuk No. Lab: ' . $code
             ], 404);
         }
+
+        // Ambil instrumen/alat jika ada di kolom medical_interface_result
+        $instrumentId = $interfaceData->instrumen ?? $interfaceData->id_instrumen ?? null;
 
         // 2. Decode kolom results dari JSON
         $resultsArray = is_string($interfaceData->results)
@@ -208,64 +407,104 @@ class LaboratoriumController extends Controller
 
         if (!is_array($resultsArray) || empty($resultsArray)) {
             return response()->json([
-                'status' => 'error',
+                'status'  => 'error',
                 'message' => 'Format data JSON hasil alat tidak valid.'
             ], 400);
         }
+
+        // 3. Ambil master parameter t_pemeriksaan_list_val berdasarkan list_codes halaman aktif
+        $masterParams = DB::table('t_pemeriksaan_list_val')
+            ->whereIn('t_pem_list_val_code', $listCodes)
+            ->get();
 
         DB::beginTransaction();
         try {
             $savedCount = 0;
             $updatedValues = [];
 
+            // Pre-fetch data existing h_reg_lab untuk efisiensi
+            $existingRecords = DB::table('h_reg_lab')
+                ->where('d_reg_order_lab_code', $code)
+                ->whereIn('t_pem_list_val_code', $listCodes)
+                ->get()
+                ->keyBy('t_pem_list_val_code');
+
             foreach ($resultsArray as $item) {
-                $px = $item['px'] ?? null; // urutan 1, 2, 3...
-                $rawResult = $item['result'] ?? null;
+                $paramPx   = $item['px'] ?? null;     // Kode parameter dari alat ("GLUC", "1", dll)
+                $rawResult = $item['result'] ?? null; // Hasil alat ("140", "25^1+", dll)
+                $rawFlag   = $item['flag'] ?? null;   // Flag alat ("EXP^HIGH", "HIGH", "L", dll)
 
-                if ($px !== null && $rawResult !== null && $rawResult !== '') {
-
-                    // Match px (1-based) ke indeks array listCodes yang dikirim dari HTML (0-based)
-                    $index = ((int) $px) - 1;
-
-                    // Ambil kode t_pem_list_val_code yang ada pada urutan ke-index di halaman ini
-                    if (!isset($listCodes[$index])) {
-                        continue; // Jika urutan alat melampaui jumlah row di halaman, lewati
-                    }
-
-                    $testCode = $listCodes[$index];
-
-                    // Parsing format hasil jika mengandung '^' (misal "25^1+" -> diambil "1+")
-                    if (str_contains($rawResult, '^')) {
-                        $parts = explode('^', $rawResult);
-                        $value = !empty($parts[1]) ? $parts[1] : $parts[0];
-                    } else {
-                        $value = $rawResult;
-                    }
-
-                    // Cek data existing
-                    $existing = DB::table('h_reg_lab')
-                        ->where('d_reg_order_lab_code', $code)
-                        ->where('t_pem_list_val_code', $testCode)
-                        ->first();
-
-                    // Upsert ke database
-                    DB::table('h_reg_lab')->updateOrInsert(
-                        [
-                            'd_reg_order_lab_code' => $code,
-                            't_pem_list_val_code'  => $testCode,
-                        ],
-                        [
-                            'h_reg_lab_code'   => $existing ? $existing->h_reg_lab_code : 'LAB-' . strtoupper(Str::random(10)),
-                            'h_reg_lab_value'  => $value,
-                            'h_reg_lab_metode' => $existing ? $existing->h_reg_lab_metode : '-',
-                            'updated_at'       => now(),
-                            'created_at'       => $existing ? $existing->created_at : now(),
-                        ]
-                    );
-
-                    $updatedValues[$testCode] = $value;
-                    $savedCount++;
+                // Lewati jika px atau hasilnya kosong
+                if ($paramPx === null || $rawResult === null || $rawResult === '') {
+                    continue;
                 }
+
+                // 4. Match px dari JSON alat ke t_pem_list_val_param & t_pem_list_val_instrumen
+                $matchedMaster = $masterParams->first(function ($master) use ($paramPx, $instrumentId) {
+                    $paramMatches = (string) $master->t_pem_list_val_param === (string) $paramPx;
+
+                    if ($instrumentId && !empty($master->t_pem_list_val_instrumen)) {
+                        return $paramMatches && (strcasecmp($master->t_pem_list_val_instrumen, $instrumentId) === 0);
+                    }
+
+                    return $paramMatches;
+                });
+
+                // Jika tidak cocok dengan master parameter halaman aktif, lewati
+                if (!$matchedMaster) {
+                    continue;
+                }
+
+                $testCode = $matchedMaster->t_pem_list_val_code;
+
+                // --- Ambil Metode dari t_pemeriksaan_list_val ---
+                $metode = !empty($matchedMaster->t_pem_list_val_metode) ? $matchedMaster->t_pem_list_val_metode : '-';
+
+                // --- Parsing format Value jika mengandung '^' ---
+                if (str_contains($rawResult, '^')) {
+                    $partsValue = explode('^', $rawResult);
+                    $value = !empty($partsValue[1]) ? $partsValue[1] : $partsValue[0];
+                } else {
+                    $value = $rawResult;
+                }
+
+                // --- PERKALIAN VALUE DENGAN FIELD t_pem_list_val_kali ---
+                $multiplier = $matchedMaster->t_pem_list_val_kali ?? null;
+                if (is_numeric($value) && is_numeric($multiplier) && (float)$multiplier != 0) {
+                    $value = (float)$value * (float)$multiplier;
+                }
+
+                // --- Parsing format Flag jika mengandung '^' (misal: "EXP^HIGH" -> "HIGH") ---
+                $flag = '-';
+                if (!empty($rawFlag)) {
+                    if (str_contains($rawFlag, '^')) {
+                        $partsFlag = explode('^', $rawFlag);
+                        $flag = !empty($partsFlag[1]) ? $partsFlag[1] : $partsFlag[0];
+                    } else {
+                        $flag = $rawFlag;
+                    }
+                }
+
+                $existing = $existingRecords->get($testCode);
+
+                // 5. Upsert ke h_reg_lab
+                DB::table('h_reg_lab')->updateOrInsert(
+                    [
+                        'd_reg_order_lab_code' => $code,
+                        't_pem_list_val_code'  => $testCode,
+                    ],
+                    [
+                        'h_reg_lab_code'   => $existing ? $existing->h_reg_lab_code : 'LAB-' . strtoupper(Str::random(10)),
+                        'h_reg_lab_value'  => $value, // <-- NILAI YANG SUDAH DIKALIKAN
+                        'h_reg_lab_flag'   => $flag,
+                        'h_reg_lab_metode' => $metode,
+                        'updated_at'       => now(),
+                        'created_at'       => $existing ? $existing->created_at : now(),
+                    ]
+                );
+
+                $updatedValues[$testCode] = $value;
+                $savedCount++;
             }
 
             DB::commit();
@@ -286,42 +525,81 @@ class LaboratoriumController extends Controller
     }
     public function menu_lab_proses_result_simpan_sinkronisasi(Request $request)
     {
-        $orderCode = $request->input('code'); // d_reg_order_lab_code
-        $hasilData = $request->input('hasil', []); // Array [t_pem_list_val_code => value]
+        $orderCode  = $request->input('code'); // d_reg_order_lab_code
+        $hasilData  = $request->input('hasil', []); // Array [t_pem_list_val_code => value]
+        $flagData   = $request->input('flag', []);  // Array [t_pem_list_val_code => flag]
         $metodeData = $request->input('metode', []); // Array [t_pem_list_val_code => metode]
+
+        $savedCodes = [];
 
         DB::beginTransaction();
         try {
             foreach ($hasilData as $valCode => $value) {
-                // Abaikan jika nilai hasil kosong
+                // 1. Abaikan jika nilai hasil kosong
                 if ($value === null || $value === '') {
                     continue;
                 }
 
-                $metode = $metodeData[$valCode] ?? '-';
+                // 2. Proteksi Tambahan: Abaikan jika data berupa Kepala/Parent (opt = 'Y')
+                $masterVal = DB::table('t_pemeriksaan_list_val')
+                    ->where('t_pem_list_val_code', $valCode)
+                    ->first();
 
-                // Gunakan updateOrInsert (Upsert) berdasarkan Order Code & Value Code
-                DB::table('h_reg_lab')->updateOrInsert(
-                    [
+                if ($masterVal && $masterVal->t_pem_list_val_opt === 'Y') {
+                    continue;
+                }
+
+                $flag   = $flagData[$valCode] ?? '*';
+                $metode = $metodeData[$valCode] ?? ($masterVal->t_pem_list_val_metode ?? '-');
+
+                // 3. Cek apakah record di h_reg_lab sudah ada sebelumnya
+                $existing = DB::table('h_reg_lab')
+                    ->where('d_reg_order_lab_code', $orderCode)
+                    ->where('t_pem_list_val_code', $valCode)
+                    ->first();
+
+                if ($existing) {
+                    // Update record yang sudah ada
+                    DB::table('h_reg_lab')
+                        ->where('d_reg_order_lab_code', $orderCode)
+                        ->where('t_pem_list_val_code', $valCode)
+                        ->update([
+                            'h_reg_lab_flag'   => $flag,
+                            'h_reg_lab_value'  => $value,
+                            'h_reg_lab_metode' => $metode,
+                            'updated_at'       => now(),
+                        ]);
+                } else {
+                    // Insert record baru
+                    DB::table('h_reg_lab')->insert([
+                        'h_reg_lab_code'       => 'LAB-' . strtoupper(Str::random(10)),
                         'd_reg_order_lab_code' => $orderCode,
                         't_pem_list_val_code'  => $valCode,
-                    ],
-                    [
-                        // Generate code acak jika record baru
-                        'h_reg_lab_code'   => 'LAB-' . strtoupper(Str::random(10)),
-                        'h_reg_lab_value'  => $value,
-                        'h_reg_lab_metode' => $metode,
-                        'updated_at'       => now(),
-                        'created_at'       => now(),
-                    ]
-                );
+                        'h_reg_lab_flag'       => $flag,
+                        'h_reg_lab_value'      => $value,
+                        'h_reg_lab_metode'     => $metode,
+                        'created_at'           => now(),
+                        'updated_at'           => now(),
+                    ]);
+                }
+
+                $savedCodes[] = $valCode;
             }
 
             DB::commit();
-            return redirect()->back()->with('success', 'Data hasil pemeriksaan berhasil disimpan!');
+
+            return response()->json([
+                'status'      => 'success',
+                'message'     => 'Data hasil pemeriksaan berhasil disimpan!',
+                'saved_codes' => $savedCodes
+            ]);
         } catch (\Exception $e) {
             DB::rollBack();
-            return redirect()->back()->with('error', 'Gagal menyimpan data: ' . $e->getMessage());
+
+            return response()->json([
+                'status'  => 'error',
+                'message' => 'Gagal menyimpan data: ' . $e->getMessage()
+            ], 500);
         }
     }
     public function menu_lab_proses_result_detail_proses_save(Request $request)

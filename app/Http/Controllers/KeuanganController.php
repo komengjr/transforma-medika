@@ -6,6 +6,7 @@ use App\Models\DRegOrder;
 use App\Models\DRegOrderLabList;
 use App\Models\DRegOrderList;
 use App\Models\DRegOrderRadList;
+use Barryvdh\DomPDF\Facade\Pdf;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\DB;
@@ -186,6 +187,7 @@ class KeuanganController extends Controller
             foreach ($list->laboratoriums as $lab) {
                 $layananLab->push([
                     'id' => $lab->id_d_reg_order_lab_list,
+                    'reg' => $lab->d_reg_order_lab_code,
                     'nama' => optional(optional($lab->salesData)->pemeriksaanList)->t_pemeriksaan_list_name ?? $lab->p_sales_data_code,
                     'harga' => (int) $lab->order_lab_log_price,
                     'diskon' => (int) $lab->order_lab_log_discount,
@@ -196,6 +198,7 @@ class KeuanganController extends Controller
             foreach ($list->radiologis as $rad) {
                 $layananRad->push([
                     'id' => $rad->id_d_reg_order_rad_list,
+                    'reg' => $noReg,
                     'nama' => optional(optional($rad->salesData)->pemeriksaanList)->t_pemeriksaan_list_name ?? $rad->p_sales_data_code,
                     'harga' => (int) $rad->order_rad_log_price,
                     'diskon' => (int) $rad->order_rad_log_discount,
@@ -207,6 +210,7 @@ class KeuanganController extends Controller
             foreach ($list->poliklinik as $poli) {
                 $layananPoli->push([
                     'id' => $poli->id_d_reg_order_poli_list,
+                    'reg' => $noReg,
                     'nama' => optional(optional($poli->salesData)->pemeriksaanList)->t_pemeriksaan_list_name ?? $poli->p_sales_data_code,
                     'harga' => (int) $poli->order_poli_log_price,
                     'diskon' => (int) $poli->order_poli_log_discount,
@@ -431,6 +435,103 @@ class KeuanganController extends Controller
         } elseif ($request->payment_method == 'DEBIT') {
         } else {
             return 0;
+        }
+    }
+    public function downloadReceiptPdf($orderCode)
+    {
+        try {
+            // 1. Ambil data utama Order/Registrasi & Pasien
+            $order = DB::table('d_reg_order as r')
+                ->leftJoin('master_patient as pt', 'r.d_reg_order_rm', '=', 'pt.master_patient_code')
+                ->select(
+                    'r.*',
+                    'pt.master_patient_code',
+                    'pt.master_patient_name',
+                    'pt.master_patient_alamat'
+                )
+                ->where('r.d_reg_order_code', $orderCode)
+                ->first();
+
+            if (!$order) {
+                return response()->json([
+                    'success' => false,
+                    'message' => 'Data order registrasi tidak ditemukan.'
+                ], 404);
+            }
+
+            // 2. Query Item List dengan Join ke Lab, Rad, dan Poli
+            $allItems = DB::table('d_reg_order_list as l')
+                // Join ke detail Lab
+                ->leftJoin('d_reg_order_lab_list as lab', 'l.d_reg_order_list_code', '=', 'lab.d_reg_order_lab_code')
+                ->leftJoin('p_sales_data as s_lab', 'lab.p_sales_data_code', '=', 's_lab.p_sales_data_code')
+
+                // Join ke detail Rad
+                ->leftJoin('d_reg_order_rad_list as rad', 'l.d_reg_order_list_code', '=', 'rad.d_reg_order_rad_code')
+                ->leftJoin('p_sales_data as s_rad', 'rad.p_sales_data_code', '=', 's_rad.p_sales_data_code')
+
+                // Join ke detail Poli
+                ->leftJoin('d_reg_order_poli_list as poli', 'l.d_reg_order_list_code', '=', 'poli.d_reg_order_poli_code')
+                ->leftJoin('p_sales_data as s_poli', 'poli.p_sales_data_code', '=', 's_poli.p_sales_data_code')
+
+                // Join ke Payment khusus log tanggal/metode
+                ->leftJoin('d_reg_order_payment as p', 'l.d_reg_order_list_code', '=', 'p.d_reg_order_list_code')
+
+                ->select(
+                    'l.d_reg_order_list_code',
+                    'l.t_layanan_cat_code',
+
+                    // Nama Item / Layanan
+                    DB::raw("COALESCE(s_lab.p_sales_data_name, s_rad.p_sales_data_name, s_poli.p_sales_data_name, CONCAT('Layanan ', l.t_layanan_cat_code)) as item_name"),
+
+                    // Harga Log
+                    DB::raw("COALESCE(lab.order_lab_log_price, rad.order_rad_log_price, poli.order_poli_log_price, 0) as price"),
+
+                    // Diskon Log
+                    DB::raw("COALESCE(lab.order_lab_log_discount, rad.order_rad_log_discount, poli.order_poli_log_discount, 0) as discount"),
+
+                    'p.d_reg_order_payment_code',
+                    'p.d_reg_order_payment_date',
+                    'p.d_reg_order_payment_card',
+
+                    // PENGECEKAN STATUS LUNAS DARI MASING-MASING TABEL LIST
+                    DB::raw("
+                CASE
+                    WHEN COALESCE(lab.status_pembayaran, rad.status_pembayaran, poli.status_pembayaran, '') IN ('LUNAS', 'PAID', '1', 1) THEN 'LUNAS'
+                    ELSE 'BELUM BAYAR'
+                END as status_bayar
+            ")
+                )
+                ->where('l.d_reg_order_code', $orderCode)
+                ->get();
+
+            // 3. FILTER STATUS LUNAS DAN DISTINCT/UNIQUE BERDASARKAN NAMA PEMERIKSAAN / KODE ITEM
+            $items = $allItems->where('status_bayar', 'LUNAS')
+                ->unique('item_name') // <--- DI-DISTINCT KAN BERDASARKAN NAMA PEMERIKSAAN
+                ->values();
+
+            // Cek jika tidak ada 1 pun item yang lunas
+            if ($items->isEmpty()) {
+                return response()->json([
+                    'success' => false,
+                    'message' => 'Belum ada transaksi item yang lunas untuk dicetak pada order ini.'
+                ], 404);
+            }
+
+            // 4. Hitung Total Pelunasan Murni dari 2 Item Unik Tersebut
+            $totalLunas = $items->sum(function ($item) {
+                return $item->price - $item->discount;
+            });
+
+            // 5. Render ke PDF View
+            $pdf = Pdf::loadView('application.keuangan.menu-cashier.report.bukti_pembayaran', compact('order', 'items', 'totalLunas'))
+                ->setPaper('a5', 'landscape');
+
+            return $pdf->download("Kuitansi_Lunas_{$orderCode}.pdf");
+        } catch (\Exception $e) {
+            return response()->json([
+                'success' => false,
+                'message' => 'Gagal mencetak PDF: ' . $e->getMessage()
+            ], 500);
         }
     }
     // PERNERIMAAN TRANSAKSI

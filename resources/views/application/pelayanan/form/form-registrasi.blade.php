@@ -1,7 +1,7 @@
 <div class="modal-body p-0">
     <div class="bg-dark rounded-top-lg py-3 ps-4 pe-6">
         <h4 class="mb-1 text-white" id="staticBackdropLabel">Registrasi Pasien</h4>
-        <p class="fs--2 mb-0 text-warning">Support by <a class="text-warning fw-semi-bold" href="#!">Transforma</a>
+        <p class="fs--2 mb-0 text-warning">Support by <a class="text-warning fw-semi-bold" href="#!">Innoventra</a>
         </p>
     </div>
     <div class="card m-3 border border-info bg-300">

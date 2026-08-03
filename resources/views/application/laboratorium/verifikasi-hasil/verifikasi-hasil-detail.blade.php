@@ -1,277 +1,286 @@
 <div class="modal-body p-0">
-    <div class="bg-300 rounded-top-lg py-3 ps-4 pe-6">
-        <h4 class="mb-1" id="staticBackdropLabel">Verifikasi Pasien Laboratorium</h4>
-        <p class="fs--2 mb-0">Support by <a class="link-600 fw-semi-bold" href="#!">Transforma</a></p>
+    <!-- Header Modal dengan Soft Gradient -->
+    <div class="bg-gradient-primary text-white rounded-top-lg py-3 px-4 d-flex justify-content-between align-items-center" style="background: linear-gradient(135deg, #2c7be5 0%, #1a5bb8 100%);">
+        <div class="d-flex align-items-center gap-2">
+            <div class="avatar avatar-xl bg-white bg-opacity-10 rounded-circle p-2 d-flex align-items-center justify-content-center">
+                <i class="fas fa-microscope text-white fs-1"></i>
+            </div>
+            <div>
+                <h4 class="mb-0 text-white fw-bold" id="staticBackdropLabel">Verifikasi Hasil Pasien Laboratorium</h4>
+                <p class="fs--2 mb-0 opacity-75">Supported by Transforma Hospital System</p>
+            </div>
+        </div>
     </div>
-    <div class="p-4">
-        <div class="row g-0" id="menu-verifikasi-hasil">
-            <div class="col-lg-4 pe-lg-2">
-                <div class="">
-                    <div class="card mb-3 mb-lg-0">
-                        <div class="card-header bg-300">
-                            <h5 class="mb-0"> No Reg. {{ $reg }}</h5>
+
+    <div class="p-4 bg-light">
+        <div class="row g-3" id="menu-verifikasi-hasil">
+
+            <!-- Sidebar: Profil & Informasi Pasien (DESIGN KEREN) -->
+            <div class="col-lg-4">
+                <div class="card h-100 shadow-sm border-0 overflow-hidden">
+                    <!-- Card Header dengan Style Gradient Teal/Cyan -->
+                    <div class="card-header border-0 py-3 px-3 position-relative" style="background: linear-gradient(135deg, #1f2937 0%, #111827 100%);">
+                        <div class="d-flex justify-content-between align-items-center position-relative z-index-1">
+                            <div>
+                                <span class="badge bg-primary bg-opacity-20 text-primary-light border border-primary border-opacity-20 rounded-pill px-2 py-1 fs--2">
+                                    <i class="fas fa-hashtag me-1"></i>No. Registrasi
+                                </span>
+                                <h5 class="mb-0 text-white fw-extrabold mt-1 tracking-wide">{{ $reg }}</h5>
+                            </div>
+                            <div class="text-end">
+                                <span class="badge bg-success bg-opacity-20 text-success-light border border-success border-opacity-25 rounded-pill px-2 py-1 fs--2">
+                                    <i class="fas fa-check-circle me-1"></i>Terdaftar
+                                </span>
+                            </div>
                         </div>
-                        <div class="card-body fs--1">
-                            <form>
-                                <div class="row g-3">
-                                    <div class="col-md-4 d-flex justify-content-center">
-                                        <div class="avatar avatar-5lg shadow-sm justify-content-center">
-                                            <div class="h-100 w-100 overflow-hidden ">
-                                               @if ($data->master_patient_profile == "")
-                                                    <img src="{{ asset('img/pasien.png') }}" class="img-thumbnail " alt="" id="videoPreview"
-                                                        data-dz-thumbnail="data-dz-thumbnail">
-                                                @else
-                                                    <img src="{{ Storage::url($data->master_patient_profile) }}" class="img-thumbnail " alt=""
-                                                        id="videoPreview" data-dz-thumbnail="data-dz-thumbnail">
-                                                @endif
-                                            </div>
+                    </div>
 
-                                        </div>
+                    <div class="card-body p-3">
+                        <!-- Profil Pasien Avatar & Nama -->
+                        <div class="text-center position-relative mb-3 pt-2">
+                            <div class="avatar avatar-5xl shadow-lg rounded-circle mx-auto mb-3 position-relative p-1 bg-white border border-2 border-primary">
+                                @if (empty($data->master_patient_profile))
+                                <img src="{{ asset('img/pasien.png') }}" class="rounded-circle img-fluid w-100 h-100 object-fit-cover" alt="Foto Pasien" id="videoPreview">
+                                @else
+                                <img src="{{ Storage::url($data->master_patient_profile) }}" class="rounded-circle img-fluid w-100 h-100 object-fit-cover" alt="Foto Pasien" id="videoPreview">
+                                @endif
+                                <span class="position-absolute bottom-0 end-0 p-2 bg-success border border-2 border-white rounded-circle" title="Pasien Aktif"></span>
+                            </div>
 
+                            <h5 class="mb-1 fw-bold text-900 fs-0">{{ $data->master_patient_name }}</h5>
+                            <div class="d-flex align-items-center justify-content-center gap-1">
+                                <span class="badge bg-soft-secondary text-secondary fw-bold fs--2">
+                                    <i class="fas fa-id-badge me-1"></i>RM: {{ $data->master_patient_code }}
+                                </span>
+                            </div>
+                        </div>
+
+                        <!-- Divider Halus -->
+                        <div class="d-flex align-items-center my-3">
+                            <div class="flex-grow-1 border-top border-200"></div>
+                            <span class="mx-2 fs--2 text-400 fw-semi-bold text-uppercase">Informasi Personal</span>
+                            <div class="flex-grow-1 border-top border-200"></div>
+                        </div>
+
+                        <!-- Info Grid Cards (Lebih Keren dari sekedar Form Input) -->
+                        <div class="row g-2 fs--1">
+                            <!-- NIK -->
+                            <div class="col-12">
+                                <div class="p-2 rounded-2 bg-soft-info border border-info-subtle d-flex align-items-center">
+                                    <div class="icon-item icon-item-sm bg-info text-white rounded-2 me-2 flex-shrink-0">
+                                        <i class="fas fa-id-card"></i>
                                     </div>
-                                    <div class="col-md-8">
-                                        <div class="row">
-                                            <div class="col-md-12">
-                                                <label for="inputLastName1" class="form-label text-primary">Nama
-                                                    Lengkap</label>
-                                                <div class="input-group"> <span class="input-group-text"><i
-                                                            class="fas fa-user-friends"></i></span>
-                                                    <input type="text" name="nama"
-                                                        class="form-control border-start-0 bg-white"
-                                                        value="{{ $data->master_patient_name }}" disabled>
-                                                </div>
-                                            </div>
-                                            <div class="col-md-12">
-                                                <label for="inputLastName1" class="form-label text-youtube">NIK</label>
-                                                <div class="input-group"> <span class="input-group-text"><i
-                                                            class="fas fa-money-check"></i></span>
-                                                    <input type="text" name="nik"
-                                                        class="form-control border-start-0 bg-white" id="nik"
-                                                        value="{{ $data->master_patient_nik }}" disabled>
-                                                </div>
-                                            </div>
-                                            <div class="col-md-12">
-                                                <label for="inputLastName1" class="form-label text-youtube">No Rekam
-                                                    Medis</label>
-                                                <div class="input-group"> <span class="input-group-text"><i
-                                                            class="fas fa-money-check"></i></span>
-                                                    <input type="text" name="nik"
-                                                        class="form-control border-start-0 bg-white" id="nik"
-                                                        value="{{ $data->master_patient_code }}" disabled>
-
-                                                </div>
-                                            </div>
-
-                                        </div>
+                                    <div class="overflow-hidden">
+                                        <div class="fs--2 text-600 text-uppercase fw-semi-bold">Nomor Induk Kependudukan (NIK)</div>
+                                        <div class="fw-bold text-800 text-truncate">{{ $data->master_patient_nik ?? '-' }}</div>
                                     </div>
-                                    <div class="col-md-6">
-                                        <label for="inputLastName1" class="form-label text-youtube">Tanggal
-                                            Lahir</label>
-                                        <div class="input-group"> <span class="input-group-text"><i
-                                                    class="fas fa-calendar-day"></i></span>
-                                            <input type="date" name="tgl_lahir"
-                                                class="form-control  bg-white border-start-0" id="tgl_lahir"
-                                                value="{{ $data->master_patient_tgl_lahir }}" disabled>
-                                        </div>
-                                    </div>
-                                    <div class="col-md-6">
-                                        <label for="inputLastName1" class="form-label text-youtube">Jenis
-                                            Kelamin</label>
-                                        <div class="input-group"> <span class="input-group-text"><i
-                                                    class="fas fa-transgender fs-2"></i></span>
-                                            <input type="text" class="form-control  bg-white border-start-0"
-                                                id="tgl_lahir" value="{{ $data->master_patient_jk }}" disabled>
-                                        </div>
-                                    </div>
-                                    <div class="col-md-6">
-                                        <label for="inputLastName1" class="form-label">Tempat Lahir</label>
-                                        <div class="input-group"> <span class="input-group-text"><i
-                                                    class="fas fa-map-marked-alt"></i></span>
-                                            <input type="text" name="tempat_lahir"
-                                                class="form-control border-start-0 bg-white" id="inputLastName1"
-                                                value="{{ $data->master_patient_tempat_lahir }}" disabled>
-                                        </div>
-                                    </div>
-
-
                                 </div>
-                            </form>
+                            </div>
 
+                            <!-- Tanggal Lahir -->
+                            <div class="col-6">
+                                <div class="p-2 rounded-2 bg-soft-warning border border-warning-subtle d-flex align-items-center h-100">
+                                    <div class="icon-item icon-item-sm bg-warning text-white rounded-2 me-2 flex-shrink-0">
+                                        <i class="fas fa-birthday-cake"></i>
+                                    </div>
+                                    <div class="overflow-hidden">
+                                        <div class="fs--2 text-600 text-uppercase fw-semi-bold">Tgl Lahir</div>
+                                        <div class="fw-bold text-800 fs--1">{{ $data->master_patient_tgl_lahir ?? '-' }}</div>
+                                    </div>
+                                </div>
+                            </div>
+
+                            <!-- Jenis Kelamin -->
+                            <div class="col-6">
+                                <div class="p-2 rounded-2 bg-soft-primary border border-primary-subtle d-flex align-items-center h-100">
+                                    <div class="icon-item icon-item-sm bg-primary text-white rounded-2 me-2 flex-shrink-0">
+                                        <i class="fas fa-venus-mars"></i>
+                                    </div>
+                                    <div class="overflow-hidden">
+                                        <div class="fs--2 text-600 text-uppercase fw-semi-bold">Gender</div>
+                                        <div class="fw-bold text-800 fs--1">{{ $data->master_patient_jk ?? '-' }}</div>
+                                    </div>
+                                </div>
+                            </div>
+
+                            <!-- Tempat Lahir -->
+                            <div class="col-12">
+                                <div class="p-2 rounded-2 bg-soft-danger border border-danger-subtle d-flex align-items-center">
+                                    <div class="icon-item icon-item-sm bg-danger text-white rounded-2 me-2 flex-shrink-0">
+                                        <i class="fas fa-map-marker-alt"></i>
+                                    </div>
+                                    <div class="overflow-hidden">
+                                        <div class="fs--2 text-600 text-uppercase fw-semi-bold">Tempat Lahir</div>
+                                        <div class="fw-bold text-800 text-truncate">{{ $data->master_patient_tempat_lahir ?? '-' }}</div>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="col-21">
+                                <button class="btn btn-danger btn-sm shadow-sm" id="button-verifikasi-preview-report"
+                                    data-code="{{ $code }}" data-reg="{{ $reg }}">
+                                    <i class="fas fa-file-pdf me-1"></i> Preview Report
+                                </button>
+                                <hr>
+                                <div id="view-map"></div>
+                            </div>
                         </div>
-                        <div class="card-footer bg-light p-0 border-top"><a class="btn btn-link d-block w-100"
-                                href="#">History<svg class="svg-inline--fa fa-chevron-right fa-w-10 ms-1 fs--2"
-                                    aria-hidden="true" focusable="false" data-prefix="fas" data-icon="chevron-right"
-                                    role="img" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 320 512"
-                                    data-fa-i2svg="">
-                                    <path fill="currentColor"
-                                        d="M285.476 272.971L91.132 467.314c-9.373 9.373-24.569 9.373-33.941 0l-22.667-22.667c-9.357-9.357-9.375-24.522-.04-33.901L188.505 256 34.484 101.255c-9.335-9.379-9.317-24.544.04-33.901l22.667-22.667c9.373-9.373 24.569-9.373 33.941 0L285.475 239.03c9.373 9.372 9.373 24.568.001 33.941z">
-                                    </path>
-                                </svg><!-- <span class="fas fa-chevron-right ms-1 fs--2"></span> Font Awesome fontawesome.com --></a>
-                        </div>
+                    </div>
+
+                    <div class="card-footer bg-100 p-2 border-top text-center">
+                        <button class="btn btn-link btn-sm text-primary text-decoration-none fw-bold" type="button">
+                            <i class="fas fa-notes-medical me-1"></i> Lihat Rekam Medis Lengkap <i class="fas fa-arrow-right ms-1 fs--2"></i>
+                        </button>
                     </div>
                 </div>
             </div>
-            <div class="col-lg-8 ps-lg-2">
-                <div class="card mb-3 mb-lg-0">
-                    <div class="card-header bg-300">
-                        <div class="d-flex justify-content-between">
-                            <h5 class="mb-0">Events you may like</h5>
-                            <button class="btn btn-warning btn-sm" id="button-verifikasi-preview-report"
-                                data-code="{{ $code }}" data-reg="{{ $reg }}"><span class="fas fa-file-pdf"></span>
-                                Preview Report</button>
 
+            <!-- Main Content: Hasil Laboratorium -->
+            <div class="col-lg-8">
+                <div class="card h-100 shadow-sm border-0">
+                    <!-- Header Hasil Laboratorium dengan Aksen Warna Biru Navy / Primary -->
+                    <div class="card-header  text-white py-3 d-flex justify-content-between align-items-center" style="background: linear-gradient(135deg, #1e293b 0%, #334155 100%);">
+                        <h6 class="mb-0 fw-bold text-white"><i class="fas fa-flask text-info me-2"></i>Rincian Hasil Laboratorium</h6>
+                        <div class="d-flex align-items-center gap-2">
+                            <!-- Text Peringatan Status real-time (Opsional) -->
+                            <span id="text-status-verifikasi" class="fs--2 fw-semi-bold text-danger me-2"></span>
+
+                            <!-- Tombol Verifikasi dengan Dynamic State -->
+                            <button class="btn btn-danger btn-sm px-4 shadow-sm" id="button-verifikasi-hasil-lab"
+                                data-code="{{ $code }}" data-reg="{{ $reg }}" disabled>
+                                <i class="fas fa-exclamation-circle me-1" id="icon-button-verifikasi"></i>
+                                <span id="label-button-verifikasi">Hasil Belum Lengkap</span>
+                            </button>
                         </div>
                     </div>
-                    <div class="card-body">
-                        <h5 class="fs-0 mb-3">Pastikan Nilai Sudah Benar</h5>
 
+                    <div class="card-body p-0">
+                        <!-- Tabel Hasil -->
                         <div class="table-responsive scrollbar">
-                            <table class="table border fs--2">
-                                <thead class="bg-300 text-700">
+                            <table class="table table-bordered align-middle fs--1 mb-0 border-200">
+                                <thead class="bg-200 text-800 text-center">
                                     <tr>
-                                        <th>Jenis Pemeriksaan</th>
-                                        <th>Hasil ( Unit )</th>
-                                        <th>Flag</th>
-                                        <th>Nilai Normal</th>
-                                        <th>Metode</th>
-                                        <th>Catatan</th>
+                                        <th style="width: 18%;">Pemeriksaan</th>
+                                        <th style="width: 15%;">Hasil</th>
+                                        <th style="width: 10%;">Flag</th>
+                                        <th style="width: 15%;">Nilai Rujukan</th>
+                                        <th style="width: 15%;">Metode</th>
+                                        <th style="width: 27%;">Catatan</th>
                                     </tr>
                                 </thead>
                                 <tbody>
                                     @foreach ($pemeriksaan as $pem)
-                                        <tr>
-                                            <td colspan="6">{{$pem->t_pemeriksaan_list_name}}</td>
-                                        </tr>
-                                        @php
-                                            $sub = DB::table('t_pemeriksaan_list_val')->where('t_pemeriksaan_list_code', $pem->t_pemeriksaan_list_code)->get();
-                                        @endphp
-                                        @foreach ($sub as $subs)
-                                            <tr class="">
-                                                <td>{{$subs->t_pem_list_val_name}}</td>
-                                                <td>
-                                                    @php
-                                                        $nilai = DB::table('h_reg_lab')->where('d_reg_order_lab_code', $reg)->where('t_pem_list_val_code', $subs->t_pem_list_val_code)->first();
-                                                    @endphp
-                                                    @if ($nilai)
-                                                        <div class="input-group has-validation">
-                                                            <input type="text" class="form-control fs--2" value="{{ $nilai->h_reg_lab_value }}"
-                                                                id="validationTooltipUsername"
-                                                                aria-describedby="validationTooltipUsernamePrepend" required=""
-                                                                disabled>
-                                                            <span class="input-group-text fs--2"
-                                                                id="validationTooltipUsernamePrepend">{{$subs->t_pem_list_val_satuan}}</span>
-                                                            <div class="invalid-tooltip">Please choose a unique and valid username.
-                                                            </div>
-                                                        </div>
-                                                    @else
-                                                        <div class="input-group has-validation">
-                                                            <input type="text" class="form-control fs--2" value="1"
-                                                                id="validationTooltipUsername"
-                                                                aria-describedby="validationTooltipUsernamePrepend" required=""
-                                                                disabled>
-                                                            <span class="input-group-text fs--2"
-                                                                id="validationTooltipUsernamePrepend">{{$subs->t_pem_list_val_satuan}}</span>
-                                                            <div class="invalid-tooltip">Please choose a unique and valid username.
-                                                            </div>
-                                                        </div>
-                                                    @endif
-                                                </td>
-                                                <td>*</td>
-                                                <td>{{$subs->t_pem_list_val_rujukan}}</td>
-                                                <td>
-                                                    @if ($nilai)
+                                    <!-- Header Kelompok Utama dengan Style Header Berwarna Blue/Teal -->
+                                    <tr class="bg-soft-primary border-top border-primary border-2">
+                                        <td colspan="6" class="fw-bold text-primary ps-3 py-2">
+                                            <i class="fas fa-vial text-primary me-2"></i>{{ strtoupper($pem->t_pemeriksaan_list_name) }}
+                                        </td>
+                                    </tr>
 
-                                                    {{$nilai->h_reg_lab_metode}}<i class="bx bx-edit text-warning"></i>
-                                                    @else
-                                                        -
-                                                    @endif
-                                                </td>
+                                    @php
+                                    $sub = DB::table('t_pemeriksaan_list_val')
+                                    ->where('t_pemeriksaan_list_code', $pem->t_pemeriksaan_list_code)
+                                    ->get();
+                                    $is_child = false;
+                                    @endphp
 
-                                                <td><input type="text" class="form-control" name="" id=""></td>
-                                            </tr>
+                                    @foreach ($sub as $subs)
+                                    @php
+                                    $nilai = DB::table('h_reg_lab')
+                                    ->where('d_reg_order_lab_code', $reg)
+                                    ->where('t_pem_list_val_code', $subs->t_pem_list_val_code)
+                                    ->first();
+                                    @endphp
 
-                                        @endforeach
+                                    {{-- JIKA INDUK / GROUP (t_pem_list_val_opt == 'Y') --}}
+                                    @if ($subs->t_pem_list_val_opt == 'Y')
+                                    @php $is_child = true; @endphp
+                                    <tr class="bg-soft-warning border-start border-3 border-warning">
+                                        <!-- Sejajar rata kiri dengan parameter asli + Ikon Folder Oranye -->
+                                        <td colspan="6" class="fw-bold text-800 ps-3 py-2">
+                                            <i class="fas fa-folder text-warning me-2 fs-0"></i>{{ $subs->t_pem_list_val_name }}
+                                        </td>
+                                    </tr>
+                                    @else
+                                    {{-- JIKA PARAMETER BIASA / ANAK TURUNAN --}}
+                                    <tr class="hover-actions-trigger">
+                                        <!-- Parameter Name -->
+                                        <td class="{{ $is_child ? 'ps-4' : 'ps-3' }}">
+                                            @if($is_child)
+                                            <!-- Panah siku ↳ untuk anak turunan -->
+                                            <span class="text-400 me-2 fw-bold">↳</span>
+                                            <span class="text-700 fw-medium">{{ $subs->t_pem_list_val_name }}</span>
+                                            @else
+                                            <!-- Parameter Utama Mandiri -->
+                                            <span class="fw-bold text-800">{{ $subs->t_pem_list_val_name }}</span>
+                                            @endif
+                                        </td>
+
+                                        <!-- Input Hasil & Satuan -->
+                                        <td>
+                                            <div class="input-group input-group-sm">
+                                                <input type="text" class="form-control text-end bg-white fw-bold text-primary"
+                                                    name="hasil[{{ $subs->t_pem_list_val_code }}]"
+                                                    value="{{ $nilai ? $nilai->h_reg_lab_value : '' }}">
+                                                @if(!empty($subs->t_pem_list_val_satuan))
+                                                <span class="input-group-text bg-100 text-600 px-2 fs--2 fw-semi-bold" style="min-width: 45px; justify-content: center;">
+                                                    {{ $subs->t_pem_list_val_satuan }}
+                                                </span>
+                                                @endif
+                                            </div>
+                                        </td>
+
+                                        <!-- Dropdown Flag -->
+                                        <td class="text-center">
+                                            <select class="form-select form-select-sm text-center px-1 fw-bold text-danger" name="flag[{{ $subs->t_pem_list_val_code }}]">
+                                                <option value="">-</option>
+                                                <option value="N" {{ ($nilai && $nilai->h_reg_lab_flag == 'N') ? 'selected' : '' }}>N</option>
+                                                <option value="H" class="text-danger fw-bold" {{ ($nilai && $nilai->h_reg_lab_flag == 'H') ? 'selected' : '' }}>H</option>
+                                                <option value="L" class="text-warning fw-bold" {{ ($nilai && $nilai->h_reg_lab_flag == 'L') ? 'selected' : '' }}>L</option>
+                                                <option value="*" class="text-danger fw-bold" {{ ($nilai && $nilai->h_reg_lab_flag == '*') ? 'selected' : '' }}>*</option>
+                                            </select>
+                                        </td>
+
+                                        <!-- Nilai Rujukan -->
+                                        <td class="text-center text-700 fs--2 fw-medium">
+                                            {{ $subs->t_pem_list_val_rujukan ?? '-' }}
+                                        </td>
+
+                                        <!-- Dropdown Metode -->
+                                        <td>
+                                            <select class="form-select form-select-sm fs--2 text-uppercase" name="metode[{{ $subs->t_pem_list_val_code }}]">
+                                                <option value="">-- Pilih --</option>
+                                                <option value="LASER OPTICAL FLOWCY" {{ ($nilai && $nilai->h_reg_lab_metode == 'LASER OPTICAL FLOWCY') ? 'selected' : '' }}>LASER OPTICAL FLOWCY</option>
+                                                <option value="IMPEDANCE WITH HDFC" {{ ($nilai && $nilai->h_reg_lab_metode == 'IMPEDANCE WITH HDFC') ? 'selected' : '' }}>IMPEDANCE WITH HDFC</option>
+                                                <option value="SLS HEMOGLOBIN" {{ ($nilai && $nilai->h_reg_lab_metode == 'SLS HEMOGLOBIN') ? 'selected' : '' }}>SLS HEMOGLOBIN</option>
+                                                <option value="RBC PULSE HEIGHT DETE" {{ ($nilai && $nilai->h_reg_lab_metode == 'RBC PULSE HEIGHT DETE') ? 'selected' : '' }}>RBC PULSE HEIGHT DETE</option>
+                                                <option value="CALCULATION" {{ ($nilai && $nilai->h_reg_lab_metode == 'CALCULATION') ? 'selected' : '' }}>CALCULATION</option>
+                                                @if($nilai && !empty($nilai->h_reg_lab_metode))
+                                                <option value="{{ $nilai->h_reg_lab_metode }}" selected>{{ $nilai->h_reg_lab_metode }}</option>
+                                                @endif
+                                            </select>
+                                        </td>
+
+                                        <!-- Input Catatan -->
+                                        <td>
+                                            <input type="text" class="form-control form-control-sm fs--2" name="catatan[{{ $subs->t_pem_list_val_code }}]" placeholder="...">
+                                        </td>
+                                    </tr>
+                                    @endif
                                     @endforeach
-
+                                    @endforeach
                                 </tbody>
                             </table>
                         </div>
-                        <div class="card mb-3 border">
-                            <div class="card-body d-flex justify-content-between ">
-                                <div><a class="btn btn-falcon-default btn-sm" href="../../app/email/inbox.html"
-                                        data-bs-toggle="tooltip" data-bs-placement="top" title=""
-                                        data-bs-original-title="Back to inbox" aria-label="Back to inbox"><svg
-                                            class="svg-inline--fa fa-arrow-left fa-w-14" aria-hidden="true"
-                                            focusable="false" data-prefix="fas" data-icon="arrow-left" role="img"
-                                            xmlns="http://www.w3.org/2000/svg" viewBox="0 0 448 512" data-fa-i2svg="">
-                                            <path fill="currentColor"
-                                                d="M257.5 445.1l-22.2 22.2c-9.4 9.4-24.6 9.4-33.9 0L7 273c-9.4-9.4-9.4-24.6 0-33.9L201.4 44.7c9.4-9.4 24.6-9.4 33.9 0l22.2 22.2c9.5 9.5 9.3 25-.4 34.3L136.6 216H424c13.3 0 24 10.7 24 24v32c0 13.3-10.7 24-24 24H136.6l120.5 114.8c9.8 9.3 10 24.8.4 34.3z">
-                                            </path>
-                                        </svg><!-- <span class="fas fa-arrow-left"></span> Font Awesome fontawesome.com --></a><span
-                                        class="mx-1 mx-sm-2 text-300">|</span>
-                                    <button class="btn btn-falcon-default btn-sm" type="button" data-bs-toggle="tooltip"
-                                        data-bs-placement="top" title="" data-bs-original-title="Archive"
-                                        aria-label="Archive"><svg class="svg-inline--fa fa-archive fa-w-16"
-                                            aria-hidden="true" focusable="false" data-prefix="fas" data-icon="archive"
-                                            role="img" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512"
-                                            data-fa-i2svg="">
-                                            <path fill="currentColor"
-                                                d="M32 448c0 17.7 14.3 32 32 32h384c17.7 0 32-14.3 32-32V160H32v288zm160-212c0-6.6 5.4-12 12-12h104c6.6 0 12 5.4 12 12v8c0 6.6-5.4 12-12 12H204c-6.6 0-12-5.4-12-12v-8zM480 32H32C14.3 32 0 46.3 0 64v48c0 8.8 7.2 16 16 16h480c8.8 0 16-7.2 16-16V64c0-17.7-14.3-32-32-32z">
-                                            </path>
-                                        </svg><!-- <span class="fas fa-archive"></span> Font Awesome fontawesome.com --></button>
-                                    <button class="btn btn-falcon-default btn-sm ms-1 ms-sm-2" type="button"
-                                        data-bs-toggle="tooltip" data-bs-placement="top" title=""
-                                        data-bs-original-title="Delete" aria-label="Delete"><svg
-                                            class="svg-inline--fa fa-trash-alt fa-w-14" aria-hidden="true"
-                                            focusable="false" data-prefix="fas" data-icon="trash-alt" role="img"
-                                            xmlns="http://www.w3.org/2000/svg" viewBox="0 0 448 512" data-fa-i2svg="">
-                                            <path fill="currentColor"
-                                                d="M32 464a48 48 0 0 0 48 48h288a48 48 0 0 0 48-48V128H32zm272-256a16 16 0 0 1 32 0v224a16 16 0 0 1-32 0zm-96 0a16 16 0 0 1 32 0v224a16 16 0 0 1-32 0zm-96 0a16 16 0 0 1 32 0v224a16 16 0 0 1-32 0zM432 32H312l-9.4-18.7A24 24 0 0 0 281.1 0H166.8a23.72 23.72 0 0 0-21.4 13.3L136 32H16A16 16 0 0 0 0 48v32a16 16 0 0 0 16 16h416a16 16 0 0 0 16-16V48a16 16 0 0 0-16-16z">
-                                            </path>
-                                        </svg><!-- <span class="fas fa-trash-alt"></span> Font Awesome fontawesome.com --></button>
-                                    <button class="btn btn-falcon-default btn-sm ms-1 ms-sm-2" type="button"
-                                        data-bs-toggle="tooltip" data-bs-placement="top" title=""
-                                        data-bs-original-title="Mark as unread" aria-label="Mark as unread"><svg
-                                            class="svg-inline--fa fa-envelope fa-w-16" aria-hidden="true"
-                                            focusable="false" data-prefix="fas" data-icon="envelope" role="img"
-                                            xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512" data-fa-i2svg="">
-                                            <path fill="currentColor"
-                                                d="M502.3 190.8c3.9-3.1 9.7-.2 9.7 4.7V400c0 26.5-21.5 48-48 48H48c-26.5 0-48-21.5-48-48V195.6c0-5 5.7-7.8 9.7-4.7 22.4 17.4 52.1 39.5 154.1 113.6 21.1 15.4 56.7 47.8 92.2 47.6 35.7.3 72-32.8 92.3-47.6 102-74.1 131.6-96.3 154-113.7zM256 320c23.2.4 56.6-29.2 73.4-41.4 132.7-96.3 142.8-104.7 173.4-128.7 5.8-4.5 9.2-11.5 9.2-18.9v-19c0-26.5-21.5-48-48-48H48C21.5 64 0 85.5 0 112v19c0 7.4 3.4 14.3 9.2 18.9 30.6 23.9 40.7 32.4 173.4 128.7 16.8 12.2 50.2 41.8 73.4 41.4z">
-                                            </path>
-                                        </svg><!-- <span class="fas fa-envelope"></span> Font Awesome fontawesome.com --></button>
-                                    <button class="btn btn-falcon-default btn-sm ms-1 ms-sm-2" type="button"
-                                        data-bs-toggle="tooltip" data-bs-placement="top" title=""
-                                        data-bs-original-title="Snooze" aria-label="Snooze"><svg
-                                            class="svg-inline--fa fa-clock fa-w-16" aria-hidden="true" focusable="false"
-                                            data-prefix="fas" data-icon="clock" role="img"
-                                            xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512" data-fa-i2svg="">
-                                            <path fill="currentColor"
-                                                d="M256,8C119,8,8,119,8,256S119,504,256,504,504,393,504,256,393,8,256,8Zm92.49,313h0l-20,25a16,16,0,0,1-22.49,2.5h0l-67-49.72a40,40,0,0,1-15-31.23V112a16,16,0,0,1,16-16h32a16,16,0,0,1,16,16V256l58,42.5A16,16,0,0,1,348.49,321Z">
-                                            </path>
-                                        </svg><!-- <span class="fas fa-clock"></span> Font Awesome fontawesome.com --></button>
-                                    <button class="btn btn-falcon-default btn-sm ms-1 ms-sm-2 d-none d-sm-inline-block"
-                                        type="button" data-bs-toggle="tooltip" data-bs-placement="top" title=""
-                                        data-bs-original-title="Print" aria-label="Print"><svg
-                                            class="svg-inline--fa fa-print fa-w-16" aria-hidden="true" focusable="false"
-                                            data-prefix="fas" data-icon="print" role="img"
-                                            xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512" data-fa-i2svg="">
-                                            <path fill="currentColor"
-                                                d="M448 192V77.25c0-8.49-3.37-16.62-9.37-22.63L393.37 9.37c-6-6-14.14-9.37-22.63-9.37H96C78.33 0 64 14.33 64 32v160c-35.35 0-64 28.65-64 64v112c0 8.84 7.16 16 16 16h48v96c0 17.67 14.33 32 32 32h320c17.67 0 32-14.33 32-32v-96h48c8.84 0 16-7.16 16-16V256c0-35.35-28.65-64-64-64zm-64 256H128v-96h256v96zm0-224H128V64h192v48c0 8.84 7.16 16 16 16h48v96zm48 72c-13.25 0-24-10.75-24-24 0-13.26 10.75-24 24-24s24 10.74 24 24c0 13.25-10.75 24-24 24z">
-                                            </path>
-                                        </svg><!-- <span class="fas fa-print"></span> Font Awesome fontawesome.com --></button>
-                                </div>
-                                <div class="d-flex">
-                                    <button class="btn btn-falcon-primary" id="button-verifikasi-hasil-lab"
-                                        data-code="{{ $code }}" data-reg="{{ $reg }}"
-                                        style="display: none;">Verifikasi</button>
-                                </div>
-                            </div>
-                        </div>
-                        <div class="googlemap rounded-3" id="view-map" data-latlng="23.8383608,90.3680554"
-                            data-scrollwheel="false" data-icon="../../assets/img/icons/map-marker.png" data-zoom="17"
-                            data-theme="Default" style="position: relative; overflow: hidden;">
-                            <!-- <iframe src="{{ asset('file/file.pdf') }}" frameborder="0" style="width: 100%; height: 450px;"></iframe> -->
-                        </div>
+                    </div>
+
+                    <!-- Footer & Aksi Utama -->
+                    <!-- Footer & Aksi Utama -->
+                    <div class="card-footer bg-light py-3 border-top d-flex justify-content-between align-items-center">
+                        <button class="btn btn-falcon-default btn-sm" data-bs-dismiss="modal">
+                            <i class="fas fa-times me-1"></i> Batal
+                        </button>
+
+
                     </div>
                 </div>
             </div>
@@ -279,3 +288,56 @@
         </div>
     </div>
 </div>
+<script>
+    $(document.body).ready(function() {
+
+        // Fungsi untuk memeriksa kelengkapan semua input hasil
+        function checkFormCompleteness() {
+            let totalInput = 0;
+            let emptyCount = 0;
+
+            // Loop seluruh input yang namanya berawalan 'hasil['
+            $('input[name^="hasil"]').each(function() {
+                totalInput++;
+                // Trim spasi untuk memastikan tidak menganggap spasi kosong sebagai isi
+                if ($(this).val().trim() === '') {
+                    emptyCount++;
+                }
+            });
+
+            const $btn = $('#button-verifikasi-hasil-lab');
+            const $label = $('#label-button-verifikasi');
+            const $icon = $('#icon-button-verifikasi');
+            const $statusText = $('#text-status-verifikasi');
+
+            if (emptyCount > 0) {
+                // JIKA BELUM LENGKAP: Set tombol jadi MERAH & DISABLE
+                $btn.removeClass('btn-success')
+                    .addClass('btn-danger')
+                    .prop('disabled', true);
+
+                $icon.attr('class', 'fas fa-exclamation-circle me-1');
+                $label.text(`Belum Lengkap (${emptyCount} Kosong)`);
+                $statusText.html(`<i class="fas fa-info-circle me-1"></i> Ada ${emptyCount} parameter belum diisi`);
+            } else {
+                // JIKA SUDAH TERISI SEMUA: Set tombol jadi HIJAU & ENABLED
+                $btn.removeClass('btn-danger')
+                    .addClass('btn-success')
+                    .prop('disabled', false);
+
+                $icon.attr('class', 'fas fa-check-circle me-1');
+                $label.text('Verifikasi Hasil');
+                $statusText.html('<span class="text-success"><i class="fas fa-check me-1"></i> Semua hasil siap diverifikasi</span>');
+            }
+        }
+
+        // 1. Jalankan pengecekan otomatis saat modal pertama kali terbuka
+        checkFormCompleteness();
+
+        // 2. Jalankan pengecekan secara Real-Time saat user mengetik / mengubah nilai input hasil
+        $(document).on('input change', 'input[name^="hasil"]', function() {
+            checkFormCompleteness();
+        });
+
+    });
+</script>
