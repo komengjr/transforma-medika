@@ -66,17 +66,53 @@ class PemeriksaanSettingController extends Controller
     // Get Data Parameter Berdasarkan Kode Pemeriksaan
     public function getParameters(Request $request)
     {
+        $code = $request->input('code');
+
+        // Ambil data parameter pemeriksaan dari tabel detail
         $params = DB::table('t_pemeriksaan_list_val')
-            ->where('t_pemeriksaan_list_code', $request->code)
+            ->where('t_pemeriksaan_list_code', $code)
             ->get();
 
+        // Ambil data master alat dari tabel medical_master_alat (mengambil instrument_id)
+        $instruments = DB::table('medical_master_alat')
+            ->select('instrument_id', 'kode_alat', 'nama_alat')
+            ->where('status', 'aktif')
+            ->orderBy('nama_alat', 'asc')
+            ->get();
         return response()->json([
             'status' => 'success',
-            'data'   => $params
+            'data'   => $params,
+            'instruments' => $instruments // Dikirim ke JS di View
         ]);
     }
 
     // Simpan / Update Parameter Pemeriksaan
+    // public function storeParameters(Request $request)
+    // {
+    //     $code = $request->input('code');
+
+    //     // Ambil data parameter pemeriksaan
+    //     $params = DB::table('t_pemeriksaan_list_val')
+    //         ->where('t_pemeriksaan_list_code', $code)
+    //         ->get();
+
+    //     // Ambil instrument_id & nama_alat dari medical_master_alat
+    //     $instruments = DB::table('medical_master_alat')
+    //         ->select('instrument_id', 'nama_alat', 'kode_alat')
+    //         ->where('status', 'aktif')
+    //         ->orderBy('nama_alat', 'asc')
+    //         ->get();
+
+    //     return response()->json([
+    //         'status'      => 'success',
+    //         'data'        => $params,
+    //         'instruments' => $instruments
+    //     ]);
+    // }
+
+    // ==========================================
+    // 2. STORE / SAVE PARAMETER
+    // ==========================================
     public function storeParameters(Request $request)
     {
         $pemeriksaanCode = $request->t_pemeriksaan_list_code;
@@ -84,70 +120,79 @@ class PemeriksaanSettingController extends Controller
 
         DB::beginTransaction();
         try {
-            // 1. Hapus parameter lama untuk pemeriksaan ini
+            // 1. Hapus parameter lama terkait kode pemeriksaan ini
             DB::table('t_pemeriksaan_list_val')
                 ->where('t_pemeriksaan_list_code', $pemeriksaanCode)
                 ->delete();
 
-            // 2. Insert Parameter Baru
+            // 2. Simpan parameter baru (Parent & Child)
             if (!empty($items) && is_array($items)) {
                 $insertData = [];
 
                 foreach ($items as $item) {
-                    // Generasi kode Unik menggunakan Kombinasi Waktu + Random String (Atau Str::uuid())
                     $parentCode = 'VAL-' . date('YmdHis') . '-' . Str::upper(Str::random(4));
+                    $instrumentId = $item['t_pem_list_val_instrumen'] ?? null;
 
-                    // Simpan Data Induk (Parent)
+                    // Data Induk (Parent)
                     $insertData[] = [
-                        't_pem_list_val_code'     => $parentCode,
-                        't_pemeriksaan_list_code' => $pemeriksaanCode,
-                        't_pem_list_val_name'     => $item['name'] ?? '',
-                        't_pem_list_val_nilai'    => $item['nilai'] ?? '',
-                        't_pem_list_val_rujukan'  => $item['rujukan'] ?? '',
-                        't_pem_list_val_satuan'   => $item['satuan'] ?? '',
-                        't_pem_list_val_instrumen' => $item['instrumen'] ?? '',
-                        't_pem_list_val_param'    => $item['param'] ?? '',
-                        't_pem_list_val_metode'   => $item['metode'] ?? '',
-                        't_pem_list_val_kali'     => $item['kali'] ?? '1',
-                        't_pem_list_val_opt'      => $item['opt'] ?? 'N',
-                        't_pem_list_val_opt_code' => null,
-                        'created_at'              => now(),
-                        'updated_at'              => now(),
+                        't_pem_list_val_code'      => $parentCode,
+                        't_pemeriksaan_list_code'  => $pemeriksaanCode,
+                        't_pem_list_val_name'      => $item['name'] ?? '',
+                        't_pem_list_val_nilai'     => $item['nilai'] ?? '',
+                        't_pem_list_val_rujukan'   => $item['rujukan'] ?? '',
+                        't_pem_list_val_satuan'    => $item['satuan'] ?? '',
+                        't_pem_list_val_instrumen' => $instrumentId, // Memakai instrument_id
+                        't_pem_list_val_param'     => $item['param'] ?? '',
+                        't_pem_list_val_metode'    => $item['metode'] ?? '',
+                        't_pem_list_val_kali'      => $item['kali'] ?? '1',
+                        't_pem_list_val_opt'       => $item['opt'] ?? 'N',
+                        't_pem_list_val_opt_code'  => null,
+                        'created_at'               => now(),
+                        'updated_at'               => now(),
                     ];
 
-                    // Simpan Data Sub-Anakan (Child)
+                    // Data Sub-Anakan (Child) jika opsi Opsi/Anakan = Y
                     if (($item['opt'] ?? 'N') === 'Y' && isset($item['children']) && is_array($item['children'])) {
                         foreach ($item['children'] as $child) {
                             $childCode = 'VAL-' . date('YmdHis') . '-' . Str::upper(Str::random(4));
+                            $childInstrumentId = $child['t_pem_list_val_instrumen'] ?? null;
 
                             $insertData[] = [
-                                't_pem_list_val_code'     => $childCode,
-                                't_pemeriksaan_list_code' => $pemeriksaanCode,
-                                't_pem_list_val_name'     => $child['name'] ?? '',
-                                't_pem_list_val_nilai'    => $child['nilai'] ?? '',
-                                't_pem_list_val_rujukan'  => $child['rujukan'] ?? '',
-                                't_pem_list_val_satuan'   => $child['satuan'] ?? '',
-                                't_pem_list_val_instrumen' => $child['instrumen'] ?? '',
-                                't_pem_list_val_param'    => $child['param'] ?? '',
-                                't_pem_list_val_metode'   => $child['metode'] ?? '',
-                                't_pem_list_val_kali'     => $child['kali'] ?? '1',
-                                't_pem_list_val_opt'      => 'N',
-                                't_pem_list_val_opt_code' => $parentCode, // Tetap merujuk ke parentCode
-                                'created_at'              => now(),
-                                'updated_at'              => now(),
+                                't_pem_list_val_code'      => $childCode,
+                                't_pemeriksaan_list_code'  => $pemeriksaanCode,
+                                't_pem_list_val_name'      => $child['name'] ?? '',
+                                't_pem_list_val_nilai'     => $child['nilai'] ?? '',
+                                't_pem_list_val_rujukan'   => $child['rujukan'] ?? '',
+                                't_pem_list_val_satuan'    => $child['satuan'] ?? '',
+                                't_pem_list_val_instrumen' => $childInstrumentId, // Memakai instrument_id
+                                't_pem_list_val_param'     => $child['param'] ?? '',
+                                't_pem_list_val_metode'    => $child['metode'] ?? '',
+                                't_pem_list_val_kali'      => $child['kali'] ?? '1',
+                                't_pem_list_val_opt'       => 'N',
+                                't_pem_list_val_opt_code'  => $parentCode,
+                                'created_at'               => now(),
+                                'updated_at'               => now(),
                             ];
                         }
                     }
                 }
 
-                DB::table('t_pemeriksaan_list_val')->insert($insertData);
+                if (!empty($insertData)) {
+                    DB::table('t_pemeriksaan_list_val')->insert($insertData);
+                }
             }
 
             DB::commit();
-            return response()->json(['status' => 'success', 'message' => 'Parameter pemeriksaan berhasil disimpan!']);
+            return response()->json([
+                'status'  => 'success',
+                'message' => 'Parameter pemeriksaan berhasil disimpan!'
+            ]);
         } catch (\Exception $e) {
             DB::rollBack();
-            return response()->json(['status' => 'error', 'message' => $e->getMessage()], 500);
+            return response()->json([
+                'status'  => 'error',
+                'message' => 'Gagal menyimpan parameter: ' . $e->getMessage()
+            ], 500);
         }
     }
 }
