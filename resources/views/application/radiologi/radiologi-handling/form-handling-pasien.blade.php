@@ -301,7 +301,7 @@ $payment = DB::table('d_reg_order_payment')->where('d_reg_order_list_code', $cod
 <script>
     document.addEventListener("DOMContentLoaded", function() {
         const code = "{{ $code }}";
-        const fetchUrl = "{{ route('menu_radiologi_handling_pasien_image', ':code') }}".replace(':code', code);
+        const fetchUrl = "{{ route('menu_radiologi_handling_pasien_rander_image', ':code') }}".replace(':code', code);
 
         const loader = document.getElementById("orthanc-loader");
         const gallery = document.getElementById("orthanc-gallery");
