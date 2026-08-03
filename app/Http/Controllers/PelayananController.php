@@ -10,6 +10,7 @@ use Illuminate\Support\Carbon;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Hash;
+use Illuminate\Support\Facades\Log;
 use Illuminate\Support\Facades\Redirect;
 use Illuminate\Support\Facades\Storage;
 use Illuminate\Support\Str;
@@ -404,90 +405,224 @@ class PelayananController extends Controller
     }
     public function registrasi_pasien_pilih_data_pasien_kebutuhan_fix_registrasi_lab(Request $request)
     {
-        $data = DB::table('d_reg_order_lab_log')->where('d_reg_order_code', $request->no_reg)->get();
-        $code = 'L' . $request->no_reg . '0001';
-        foreach ($data as $value) {
-            DB::table('d_reg_order_lab_list')->insert([
-                'order_lab_list_code' => str::uuid(),
-                'd_reg_order_lab_code' => $code,
-                'p_sales_data_code' => $value->p_sales_data_code,
-                'order_lab_log_price' => $value->order_lab_log_price,
-                'order_lab_log_discount' => $value->order_lab_log_discount,
-                'created_at' => now()
-            ]);
-        }
-        DB::table('d_reg_order')->insert([
-            'd_reg_order_code' => $request->no_reg,
-            'd_reg_order_rm' => $request->no_rm,
-            'd_reg_order_date' => now(),
-            't_layanan_cat_code' => $request->layanan,
-            't_pasien_cat_code' => $request->cat,
-            'd_reg_order_cabang' => Auth::user()->access_cabang,
-            'd_reg_order_status' => 0,
-            'd_reg_order_user' => Auth::user()->userid,
-            'created_at' => now()
-        ]);
+        Log::info('RAW ITEMS FROM REQUEST:', ['raw' => $request->items]);
 
-        DB::table('d_reg_order_list')->insert([
-            'd_reg_order_list_code' => $code,
-            'd_reg_order_code' => $request->no_reg,
-            't_layanan_cat_code' => $request->layanan,
-            'd_reg_order_list_date' => now(),
-        ]);
-        DB::table('d_reg_order_lab')->insert([
-            'd_reg_order_lab_code' => $code,
-            'd_reg_order_code' => $request->no_reg,
-            'd_reg_order_lab_rujukan' => $request->rujukan,
-            'd_reg_order_lab_date' => $request->date,
-            'd_reg_order_lab_number' => 1,
-            'd_reg_order_lab_status' => 0,
-            'd_reg_order_lab_user' => Auth::user()->userid,
-            'created_at' => now()
-        ]);
-        return 123;
+        $items = json_decode($request->items, true);
+        Log::info('PARSED ITEMS:', ['parsed' => $items]);
+
+        if (empty($items) || !is_array($items)) {
+            return response()->json([
+                'status'  => 'error',
+                'message' => 'Gagal: Data item pemeriksaan kosong di Controller!'
+            ], 400);
+        }
+
+        DB::beginTransaction();
+        try {
+            $user  = Auth::user()->name ?? 'System';
+            $today = date('Y-m-d');
+            $now   = now();
+
+            $orderCode    = 'ORD-' . date('YmdHis') . '-' . rand(100, 999);
+            $orderLabCode = 'LAB-' . date('YmdHis') . '-' . rand(100, 999);
+            $labNumber    = 'REG-LAB-' . date('Ymd') . '-' . rand(1000, 9999);
+
+            // Insert Header 1
+            DB::table('d_reg_order')->insert([
+                'd_reg_order_code'   => $orderCode,
+                'd_reg_order_rm'     => $request->no_rm ?? '-',
+                'd_reg_order_date'   => $request->date ?? $today,
+                't_layanan_cat_code' => 'LAB',
+                't_pasien_cat_code'  => $request->patient_cat,
+                'd_reg_order_status' => '1',
+                'd_reg_order_user'   => Auth::user()->userid,
+                'd_reg_order_cabang' => '-',
+                'created_at'         => $now,
+                'updated_at'         => $now,
+            ]);
+
+            // Insert Header 2
+            DB::table('d_reg_order_lab')->insert([
+                'd_reg_order_lab_code'   => $orderLabCode,
+                'd_reg_order_code'       => $orderCode,
+                'd_reg_order_lab_date'   => $request->date ?? $today,
+                'd_reg_order_lab_number' => $labNumber,
+                'd_reg_order_lab_rujukan' => $request->rujukan,
+                'd_reg_order_lab_status' => '1',
+                'd_reg_order_lab_user'   => $user,
+                'created_at'             => $now,
+                'updated_at'             => $now,
+            ]);
+
+            // Insert Header 3
+            DB::table('d_reg_order_list')->insert([
+                'd_reg_order_list_code' => $orderLabCode,
+                'd_reg_order_code'      => $orderCode,
+                't_layanan_cat_code'    => 'LAB',
+                'd_reg_order_list_date' => $request->date ?? $today,
+                'created_at'            => $now,
+                'updated_at'            => $now,
+            ]);
+
+            // Insert Detail Item (d_reg_order_lab_list)
+            // 1. Pastikan $items ter-decode menjadi Array jika dikirim sebagai String
+            $items = is_string($request->items) ? json_decode($request->items, true) : $request->items;
+
+            // 2. Siapkan Array Bulk Insert
+            $insertLabList = [];
+
+            foreach ($items as $index => $item) {
+                // KODE UNIK DENGAN MICROTIME AGAR GUARANTEED UNIK
+                $uniqueCode = 'L' . date('ymd') . '' . Str::upper(Str::random(2)) . '' . sprintf("%02d", $index + 1);
+
+                $insertLabList[] = [
+                    'order_lab_list_code'   => $uniqueCode,
+                    'd_reg_order_lab_code'  => $orderLabCode,
+                    'p_sales_data_code'     => $item['code'],
+                    'order_lab_log_price'    => (int) $item['harga'],
+                    'order_lab_log_discount' => 0,
+                    'status_pembayaran'     => '0',
+                    'created_at'            => $now,
+                    'updated_at'            => $now,
+                ];
+            }
+
+            // 3. Eksekusi Ekstraksi Sekaligus (Lebih Efisien & Cepat)
+            if (!empty($insertLabList)) {
+                DB::table('d_reg_order_lab_list')->insert($insertLabList);
+            }
+
+            DB::commit();
+
+            return response()->json([
+                'status'  => 'success',
+                'message' => 'Registrasi Lab Berhasil Disimpan!'
+            ]);
+        } catch (\Exception $e) {
+            DB::rollBack();
+            Log::error('ERROR SIMPAN LAB LIST:', ['error' => $e->getMessage()]);
+            return response()->json([
+                'status'  => 'error',
+                'message' => 'Error DB: ' . $e->getMessage()
+            ], 500);
+        }
     }
     public function registrasi_pasien_pilih_data_pasien_kebutuhan_fix_registrasi_rad(Request $request)
     {
-        $data = DB::table('d_reg_order_rad_log')->where('d_reg_order_rad_code', $request->no_reg)->get();
-        $code = 'R' . $request->no_reg . '0001';
-        foreach ($data as $value) {
-            DB::table('d_reg_order_rad_list')->insert([
-                'order_rad_list_code' => str::uuid(),
-                'd_reg_order_rad_code' => $code,
-                'p_sales_data_code' => $value->p_sales_data_code,
-                'order_rad_log_price' => $value->order_rad_log_price,
-                'order_rad_log_discount' => $value->order_rad_log_discount,
-                'created_at' => now()
+        // 1. Validasi Input Data
+        $request->validate([
+            'no_rm'        => 'required|string',
+            'date'         => 'required|date',
+            'rujukan'      => 'required|string',
+            'items'        => 'required|array|min:1',
+            'items.*.code' => 'required|string',
+            'items.*.price' => 'required|numeric',
+            // 'file_rujukan' => 'nullable|file|mimes:pdf,jpg,jpeg,png|max:5120' // Maks 5MB
+        ]);
+
+        DB::beginTransaction();
+
+        try {
+            $userLogin   = Auth::user()->name ?? 'System';
+            $tglPeriksa  = $request->date;
+            $nowTime     = now();
+
+            // Handle Upload File Rujukan (jika ada)
+            $filePath = null;
+            if ($request->hasFile('file_rujukan')) {
+                $filePath = $request->file('file_rujukan')->store('rujukan_radiologi', 'public');
+            }
+
+            // Generate Kode Unik
+            $orderCode    = 'ORD-' . date('YmdHis') . '-' . rand(100, 999);
+            $orderRadCode = 'RAD-' . date('YmdHis') . '-' . rand(100, 999);
+
+            // -------------------------------------------------------------
+            // TABEL 1: d_reg_order
+            // -------------------------------------------------------------
+            DB::table('d_reg_order')->insert([
+                'd_reg_order_code'   => $orderCode,
+                'd_reg_order_rm'     => $request->no_rm,
+                'd_reg_order_date'   => $tglPeriksa,
+                't_layanan_cat_code' => $request->t_layanan_cat_code ?? 'RAD', // Kode layanan Radiologi
+                't_pasien_cat_code'  => $request->patient_cat ?? 'pribadi',
+                'd_reg_order_status' => 'PENDING',
+                'd_reg_order_user'   => Auth::user()->userid,
+                'd_reg_order_cabang' => '-',
+                'created_at'         => $nowTime,
+                'updated_at'         => $nowTime,
             ]);
+
+            // -------------------------------------------------------------
+            // TABEL 2: d_reg_order_list
+            // -------------------------------------------------------------
+            DB::table('d_reg_order_list')->insert([
+                'd_reg_order_list_code' => $orderRadCode,
+                'd_reg_order_code'      => $orderCode,
+                't_layanan_cat_code'    => 'RAD',
+                'd_reg_order_list_date' => $tglPeriksa,
+                'created_at'            => $nowTime,
+                'updated_at'            => $nowTime,
+            ]);
+
+            // -------------------------------------------------------------
+            // TABEL 3: d_reg_order_rad
+            // -------------------------------------------------------------
+            DB::table('d_reg_order_rad')->insert([
+                'd_reg_order_rad_code'       => $orderRadCode,
+                'd_reg_order_code'           => $orderCode,
+                'd_reg_order_rad_dr_rujukan' => $request->rujukan,
+                'd_reg_order_rad_dr_baca'    => $request->dr_baca ?? '', // Dokter spesialis Radiologi
+                'd_reg_order_rad_date'       => $tglPeriksa,
+                'd_reg_order_rad_desc'       => $filePath ?? '', // Menyimpan path file rujukan/keterangan
+                'd_reg_order_rad_number'     => 'RAD-NO-' . rand(1000, 9999),
+                'd_reg_order_rad_status'     => 'PENDING',
+                'd_reg_order_rad_user'       => $userLogin,
+                'created_at'                 => $nowTime,
+                'updated_at'                 => $nowTime,
+            ]);
+
+            // -------------------------------------------------------------
+            // TABEL 4: d_reg_order_rad_list (Looping Item Pemeriksaan)
+            // -------------------------------------------------------------
+            $itemsData = [];
+            foreach ($request->items as $index => $item) {
+                $uniqueCode = 'R' . date('ymd') . '' . Str::upper(Str::random(2)) . '' . sprintf("%02d", $index + 1);
+                $itemsData[] = [
+                    'order_rad_list_code'    => $uniqueCode,
+                    'd_reg_order_rad_code'   => $orderRadCode,
+                    'p_sales_data_code'      => $item['code'],
+                    'order_rad_log_price'    => (int) $item['price'],
+                    'order_rad_log_discount' => (int) ($item['discount'] ?? 0),
+                    'status_pembayaran'      => 'BELUM LULUS', // atau 'UNPAID'
+                    'created_at'             => $nowTime,
+                    'updated_at'             => $nowTime,
+                ];
+            }
+
+            // Mass Insert Ke Tabel Detail
+            DB::table('d_reg_order_rad_list')->insert($itemsData);
+
+            // Jika Semua Query Berhasil
+            DB::commit();
+
+            return response()->json([
+                'status'  => 'success',
+                'message' => 'Registrasi Radiologi Berhasil Disimpan!',
+                'data'    => [
+                    'order_code'     => $orderCode,
+                    'order_rad_code' => $orderRadCode
+                ]
+            ], 200);
+        } catch (Exception $e) {
+            // Batalkan semua transaksi jika terjadi error
+            DB::rollBack();
+
+            return response()->json([
+                'status'  => 'error',
+                'message' => 'Gagal menyimpan data registrasi radiologi: ' . $e->getMessage()
+            ], 500);
         }
-        DB::table('d_reg_order')->insert([
-            'd_reg_order_code' => $request->no_reg,
-            'd_reg_order_rm' => $request->no_rm,
-            'd_reg_order_date' => now(),
-            't_layanan_cat_code' => $request->layanan,
-            't_pasien_cat_code' => $request->cat,
-            'd_reg_order_cabang' => Auth::user()->access_cabang,
-            'd_reg_order_status' => 0,
-            'd_reg_order_user' => Auth::user()->userid,
-            'created_at' => now()
-        ]);
-        DB::table('d_reg_order_list')->insert([
-            'd_reg_order_list_code' => $code,
-            'd_reg_order_code' => $request->no_reg,
-            't_layanan_cat_code' => $request->layanan,
-            'd_reg_order_list_date' => now(),
-        ]);
-        DB::table('d_reg_order_rad')->insert([
-            'd_reg_order_rad_code' => $code,
-            'd_reg_order_code' => $request->no_reg,
-            'd_reg_order_rad_dr_rujukan' => $request->rujukan,
-            'd_reg_order_rad_date' => $request->date,
-            'd_reg_order_rad_number' => 1,
-            'd_reg_order_rad_status' => 0,
-            'd_reg_order_rad_user' => Auth::user()->userid,
-            'created_at' => now()
-        ]);
-        return 123;
     }
     public function registrasi_pasien_pilih_data_pasien_end_proses(Request $request)
     {

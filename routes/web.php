@@ -412,6 +412,9 @@ Route::prefix('application')->group(function () {
 Route::prefix('application')->group(function () {
     Route::post('menu-radiologi/data-registrasi-radiologi/handling', [RadiologiController::class, 'data_registrasi_radiologi_handling'])->name('data_registrasi_radiologi_handling');
     Route::post('menu-radiologi/data-registrasi-radiologi/handling-pasien', [RadiologiController::class, 'menu_radiologi_handling_pasien'])->name('menu_radiologi_handling_pasien');
+    Route::get('menu-radiologi/data-registrasi-radiologi/handling-pasien/images/{code}', [RadiologiController::class, 'menu_radiologi_handling_pasien_image'])->name('menu_radiologi_handling_pasien_image');
+    Route::get('menu-radiologi/data-registrasi-radiologi/handling-pasien/render/{instanceId}', [RadiologiController::class, 'menu_radiologi_handling_pasien_rander_image'])->name('menu_radiologi_handling_pasien_rander_image');
+
     Route::post('hasil-radiologi/verifikasi-hasil/detail', [RadiologiController::class, 'hasil_radiologi_verifikasi_detail'])->name('hasil_radiologi_verifikasi_detail');
     Route::post('hasil-radiologi/verifikasi-hasil/verifikasi-data', [RadiologiController::class, 'hasil_radiologi_verifikasi_data'])->name('hasil_radiologi_verifikasi_data');
     Route::post('hasil-radiologi/verifikasi-hasil/preview-report', [RadiologiController::class, 'verifikasi_radiologi_preview_report'])->name('verifikasi_radiologi_preview_report');
@@ -455,14 +458,14 @@ Route::prefix('pelayanan/laboratorium')->name('lab.')->group(function () {
     Route::post('/get-sub-sales', [LabRegistrationController::class, 'getSubSales'])->name('get_sub_sales');
     Route::post('/get-categories', [LabRegistrationController::class, 'getCategories'])->name('get_categories');
     Route::post('/get-pemeriksaan-items', [LabRegistrationController::class, 'getPemeriksaanItems'])->name('get_pemeriksaan_items');
-    Route::post('/store-registrasi', [LabRegistrationController::class, 'storeRegistrasi'])->name('store_registrasi');
+    // Route::post('/store-registrasi', [LabRegistrationController::class, 'storeRegistrasi'])->name('store_registrasi');
 });
 Route::prefix('radiologi')->group(function () {
     Route::get('/registrasi', [RegisterPelayananController::class, 'index'])->name('radiologi.index');
     Route::post('/get-sub-sales', [RegisterPelayananController::class, 'getSubSales'])->name('radiologi.get_sub_sales');
     Route::post('/get-paket-cat', [RegisterPelayananController::class, 'getPaketCat'])->name('radiologi.get_paket_cat');
     Route::post('/get-items', [RegisterPelayananController::class, 'getItemPemeriksaanRad'])->name('radiologi.get_items');
-    Route::post('/fix-registrasi', [RegisterPelayananController::class, 'fixRegistrasiRad'])->name('fixRegistrasiRad');
+    // Route::post('/fix-registrasi', [RegisterPelayananController::class, 'fixRegistrasiRad'])->name('fixRegistrasiRad');
 });
 Route::prefix('pemeriksaan-setting')->name('pemeriksaan.setting.')->group(function () {
     Route::get('/', [PemeriksaanSettingController::class, 'index'])->name('index');

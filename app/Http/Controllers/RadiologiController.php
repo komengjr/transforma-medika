@@ -92,6 +92,87 @@ class RadiologiController extends Controller
         $layanan = DB::table('t_layanan_cat')->get();
         return view('application.radiologi.radiologi-handling.form-handling-pasien', ['data' => $data, 'layanan' => $layanan, 'code' => $request->code]);
     }
+    private $orthancUrl = 'http://192.168.61.249:8042'; // Ganti dengan IP/Port Orthanc Anda
+    private $orthancUser = 'orthanc';               // Kosongkan jika tanpa auth
+    private $orthancPass = 'orthanc';               // Kosongkan jika tanpa auth
+    public function menu_radiologi_handling_pasien_image($code)
+    {
+        try {
+            // 1. Ambil data registrasi/order dari DB
+            // $order = DB::table('d_reg_order_list')
+            //     ->where('code', $code)
+            //     ->first();
+
+            // if (!$order) {
+            //     return response()->json(['success' => false, 'message' => 'Data order tidak ditemukan'], 404);
+            // }
+
+            // 2. Cari Study di Orthanc berdasarkan PatientID (Kode Pasien / RM) atau Accession Number
+            $patientId = '080A5M64PA';
+
+            $response = Http::withBasicAuth($this->orthancUser, $this->orthancPass)
+                ->post("{$this->orthancUrl}/tools/find", [
+                    'Level' => 'Study',
+                    'Query' => [
+                        'PatientID' => $patientId,
+                        // 'AccessionNumber' => $code // Gunakan jika pencarian berdasarkan No Order/Accession
+                    ]
+                ]);
+
+            if ($response->failed()) {
+                return response()->json(['success' => false, 'message' => 'Gagal terhubung ke PACS Orthanc'], 500);
+            }
+
+            $studies = $response->json();
+
+            if (empty($studies)) {
+                return response()->json(['success' => true, 'images' => []]);
+            }
+
+            // 3. Ambil detail Study pertama & dapatkan semua Series -> Instances
+            $studyId = $studies[0];
+            $studyDetail = Http::withBasicAuth($this->orthancUser, $this->orthancPass)
+                ->get("{$this->orthancUrl}/studies/{$studyId}")
+                ->json();
+
+            $images = [];
+            foreach ($studyDetail['Series'] as $seriesId) {
+                $seriesDetail = Http::withBasicAuth($this->orthancUser, $this->orthancPass)
+                    ->get("{$this->orthancUrl}/series/{$seriesId}")
+                    ->json();
+
+                foreach ($seriesDetail['Instances'] as $instanceId) {
+                    $images[] = [
+                        'instance_id' => $instanceId,
+                        'preview_url' => route('radiologi.orthanc.render', ['instanceId' => $instanceId]),
+                        'caption'    => 'Instance: ' . substr($instanceId, 0, 8)
+                    ];
+                }
+            }
+
+            return response()->json([
+                'success' => true,
+                'images'  => $images
+            ]);
+        } catch (\Exception $e) {
+            return response()->json([
+                'success' => false,
+                'message' => 'Terjadi kesalahan: ' . $e->getMessage()
+            ], 500);
+        }
+    }
+    public function menu_radiologi_handling_pasien_rander_image($instanceId)
+    {
+        $response = Http::withBasicAuth($this->orthancUser, $this->orthancPass)
+            ->get("{$this->orthancUrl}/instances/{$instanceId}/preview");
+
+        if ($response->failed()) {
+            abort(404);
+        }
+
+        return response($response->body(), 200)
+            ->header('Content-Type', 'image/png');
+    }
     // VERIFIKASI HASIL RADIOLOGI
     public function hasil_radiologi_verifikasi($akses, $id)
     {

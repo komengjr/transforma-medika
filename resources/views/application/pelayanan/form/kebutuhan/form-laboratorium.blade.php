@@ -529,7 +529,7 @@
         }).then((result) => {
             if (result.isConfirmed) {
                 $.ajax({
-                    url: "{{ route('lab.store_registrasi') }}",
+                    url: "{{ route('registrasi_pasien_pilih_data_pasien_kebutuhan_fix_registrasi_lab') }}",
                     type: "POST",
                     data: {
                         "_token": "{{ csrf_token() }}",
