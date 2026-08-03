@@ -164,7 +164,7 @@
             border-bottom: 1px solid #c8d9f1;
         }
 
-        /* Sub-Header / Kepala (t_pem_list_val_opt = Y) seperti Hitung Jenis di gambar */
+        /* Sub-Header / Kepala (t_pem_list_val_opt = Y) */
         .lab-table tr.parent-header-row td {
             background-color: #f8fafc;
             font-weight: bold;
@@ -318,21 +318,23 @@
             $sub = DB::table('t_pemeriksaan_list_val')
             ->where('t_pemeriksaan_list_code', $pem->t_pemeriksaan_list_code)
             ->get();
-
-            // Variabel penanda apakah sedang di dalam grup anak/parent
-            $isInsideParent = false;
             @endphp
 
             @foreach ($sub as $subs)
+            @php
+            // Cek apakah item ini merupakan anak (memiliki t_pem_list_val_opt_code)
+            $is_child = !empty($subs->t_pem_list_val_opt_code);
+            @endphp
+
+            {{-- CASE 1: JIKA INI KEPALA / PARENT (t_pem_list_val_opt == 'Y') --}}
             @if ($subs->t_pem_list_val_opt == 'Y')
-            @php $isInsideParent = true; @endphp
-            <!-- KEPALA / PARENT (seperti Hitung Jenis pada Gambar) -->
             <tr class="parent-header-row">
                 <td colspan="5">
-                    <span style="color: #e65100; font-size: 11px;"></span>
                     <strong>{{ $subs->t_pem_list_val_name }}</strong>
                 </td>
             </tr>
+
+            {{-- CASE 2: ITEM BARIS HASIL (Anak atau Parameter Mandiri) --}}
             @else
             @php
             $nilai = DB::table('h_reg_lab')
@@ -341,15 +343,14 @@
             ->first();
             @endphp
 
-            <!-- ITEM BARIS (Anak atau Item Biasa) -->
-            <tr class="{{ $isInsideParent ? 'child-row' : '' }}">
+            <tr class="{{ $is_child ? 'child-row' : '' }}">
                 <!-- Kolom Nama Jenis Pemeriksaan -->
-                <td style="{{ $isInsideParent ? 'padding-left: 22px;' : '' }}">
-                    @if ($isInsideParent)
-                    <!-- Icon panah anak seperti di gambar (↪) -->
+                <td style="{{ $is_child ? 'padding-left: 22px;' : '' }}">
+                    @if ($is_child)
+                    <!-- Indikator Anak -->
                     <span class="child-prefix">-</span>
                     @endif
-                    <span class="{{ !$isInsideParent ? 'fw-bold' : '' }}">
+                    <span class="{{ !$is_child ? 'fw-bold' : '' }}">
                         {{ $subs->t_pem_list_val_name }}
                     </span>
                 </td>

@@ -15,10 +15,10 @@
     <div class="p-4 bg-light">
         <div class="row g-3" id="menu-verifikasi-hasil">
 
-            <!-- Sidebar: Profil & Informasi Pasien (DESIGN KEREN) -->
+            <!-- Sidebar: Profil & Informasi Pasien -->
             <div class="col-lg-4">
                 <div class="card h-100 shadow-sm border-0 overflow-hidden">
-                    <!-- Card Header dengan Style Gradient Teal/Cyan -->
+                    <!-- Card Header -->
                     <div class="card-header border-0 py-3 px-3 position-relative" style="background: linear-gradient(135deg, #1f2937 0%, #111827 100%);">
                         <div class="d-flex justify-content-between align-items-center position-relative z-index-1">
                             <div>
@@ -55,14 +55,14 @@
                             </div>
                         </div>
 
-                        <!-- Divider Halus -->
+                        <!-- Divider -->
                         <div class="d-flex align-items-center my-3">
                             <div class="flex-grow-1 border-top border-200"></div>
                             <span class="mx-2 fs--2 text-400 fw-semi-bold text-uppercase">Informasi Personal</span>
                             <div class="flex-grow-1 border-top border-200"></div>
                         </div>
 
-                        <!-- Info Grid Cards (Lebih Keren dari sekedar Form Input) -->
+                        <!-- Info Grid Cards -->
                         <div class="row g-2 fs--1">
                             <!-- NIK -->
                             <div class="col-12">
@@ -115,12 +115,13 @@
                                     </div>
                                 </div>
                             </div>
-                            <div class="col-21">
-                                <button class="btn btn-danger btn-sm shadow-sm" id="button-verifikasi-preview-report"
+
+                            <div class="col-12 mt-3">
+                                <button class="btn btn-danger btn-sm w-100 shadow-sm" id="button-verifikasi-preview-report"
                                     data-code="{{ $code }}" data-reg="{{ $reg }}">
                                     <i class="fas fa-file-pdf me-1"></i> Preview Report
                                 </button>
-                                <hr>
+                                <hr class="my-2">
                                 <div id="view-map"></div>
                             </div>
                         </div>
@@ -137,14 +138,12 @@
             <!-- Main Content: Hasil Laboratorium -->
             <div class="col-lg-8">
                 <div class="card h-100 shadow-sm border-0">
-                    <!-- Header Hasil Laboratorium dengan Aksen Warna Biru Navy / Primary -->
-                    <div class="card-header  text-white py-3 d-flex justify-content-between align-items-center" style="background: linear-gradient(135deg, #1e293b 0%, #334155 100%);">
+                    <!-- Header Hasil Laboratorium -->
+                    <div class="card-header text-white py-3 d-flex justify-content-between align-items-center" style="background: linear-gradient(135deg, #1e293b 0%, #334155 100%);">
                         <h6 class="mb-0 fw-bold text-white"><i class="fas fa-flask text-info me-2"></i>Rincian Hasil Laboratorium</h6>
                         <div class="d-flex align-items-center gap-2">
-                            <!-- Text Peringatan Status real-time (Opsional) -->
                             <span id="text-status-verifikasi" class="fs--2 fw-semi-bold text-danger me-2"></span>
 
-                            <!-- Tombol Verifikasi dengan Dynamic State -->
                             <button class="btn btn-danger btn-sm px-4 shadow-sm" id="button-verifikasi-hasil-lab"
                                 data-code="{{ $code }}" data-reg="{{ $reg }}" disabled>
                                 <i class="fas fa-exclamation-circle me-1" id="icon-button-verifikasi"></i>
@@ -159,17 +158,17 @@
                             <table class="table table-bordered align-middle fs--1 mb-0 border-200">
                                 <thead class="bg-200 text-800 text-center">
                                     <tr>
-                                        <th style="width: 18%;">Pemeriksaan</th>
-                                        <th style="width: 15%;">Hasil</th>
+                                        <th style="width: 25%;">Pemeriksaan</th>
+                                        <th style="width: 18%;">Hasil</th>
                                         <th style="width: 10%;">Flag</th>
                                         <th style="width: 15%;">Nilai Rujukan</th>
-                                        <th style="width: 15%;">Metode</th>
-                                        <th style="width: 27%;">Catatan</th>
+                                        <th style="width: 17%;">Metode</th>
+                                        <th style="width: 15%;">Catatan</th>
                                     </tr>
                                 </thead>
                                 <tbody>
                                     @foreach ($pemeriksaan as $pem)
-                                    <!-- Header Kelompok Utama dengan Style Header Berwarna Blue/Teal -->
+                                    <!-- Header Kelompok Utama -->
                                     <tr class="bg-soft-primary border-top border-primary border-2">
                                         <td colspan="6" class="fw-bold text-primary ps-3 py-2">
                                             <i class="fas fa-vial text-primary me-2"></i>{{ strtoupper($pem->t_pemeriksaan_list_name) }}
@@ -180,7 +179,6 @@
                                     $sub = DB::table('t_pemeriksaan_list_val')
                                     ->where('t_pemeriksaan_list_code', $pem->t_pemeriksaan_list_code)
                                     ->get();
-                                    $is_child = false;
                                     @endphp
 
                                     @foreach ($sub as $subs)
@@ -189,28 +187,33 @@
                                     ->where('d_reg_order_lab_code', $reg)
                                     ->where('t_pem_list_val_code', $subs->t_pem_list_val_code)
                                     ->first();
+
+                                    // PENGECEKAN PERSISI:
+                                    // Berdasarkan kolom t_pem_list_val_opt_code di DB:
+                                    // Jika t_pem_list_val_opt_code ADA Isinya -> Berarti ini ANAK
+                                    // Jika KOSONG -> Berarti ini BUKAN Anak (Bisa Kepala / Parameter Mandiri)
+                                    $is_child = !empty($subs->t_pem_list_val_opt_code);
                                     @endphp
 
-                                    {{-- JIKA INDUK / GROUP (t_pem_list_val_opt == 'Y') --}}
+                                    {{-- CASE 1: JIKA INI KEPALA TURUNAN (t_pem_list_val_opt == 'Y') --}}
                                     @if ($subs->t_pem_list_val_opt == 'Y')
-                                    @php $is_child = true; @endphp
                                     <tr class="bg-soft-warning border-start border-3 border-warning">
-                                        <!-- Sejajar rata kiri dengan parameter asli + Ikon Folder Oranye -->
                                         <td colspan="6" class="fw-bold text-800 ps-3 py-2">
                                             <i class="fas fa-folder text-warning me-2 fs-0"></i>{{ $subs->t_pem_list_val_name }}
                                         </td>
                                     </tr>
+
+                                    {{-- CASE 2: PARAMETER INPUT (Bisa Anakan ATAU Parameter Mandiri) --}}
                                     @else
-                                    {{-- JIKA PARAMETER BIASA / ANAK TURUNAN --}}
                                     <tr class="hover-actions-trigger">
                                         <!-- Parameter Name -->
                                         <td class="{{ $is_child ? 'ps-4' : 'ps-3' }}">
                                             @if($is_child)
-                                            <!-- Panah siku ↳ untuk anak turunan -->
+                                            <!-- Jika Anak (Limfosit, Monosit, dll) -->
                                             <span class="text-400 me-2 fw-bold">↳</span>
                                             <span class="text-700 fw-medium">{{ $subs->t_pem_list_val_name }}</span>
                                             @else
-                                            <!-- Parameter Utama Mandiri -->
+                                            <!-- Jika Parameter Mandiri (Trombosit, Hemoglobin, dll) -->
                                             <span class="fw-bold text-800">{{ $subs->t_pem_list_val_name }}</span>
                                             @endif
                                         </td>
@@ -273,14 +276,11 @@
                         </div>
                     </div>
 
-                    <!-- Footer & Aksi Utama -->
-                    <!-- Footer & Aksi Utama -->
+                    <!-- Footer Modal -->
                     <div class="card-footer bg-light py-3 border-top d-flex justify-content-between align-items-center">
                         <button class="btn btn-falcon-default btn-sm" data-bs-dismiss="modal">
                             <i class="fas fa-times me-1"></i> Batal
                         </button>
-
-
                     </div>
                 </div>
             </div>
@@ -288,18 +288,17 @@
         </div>
     </div>
 </div>
+
 <script>
     $(document.body).ready(function() {
 
-        // Fungsi untuk memeriksa kelengkapan semua input hasil
+        // Fungsi mengecek apakah semua input hasil terisi
         function checkFormCompleteness() {
             let totalInput = 0;
             let emptyCount = 0;
 
-            // Loop seluruh input yang namanya berawalan 'hasil['
             $('input[name^="hasil"]').each(function() {
                 totalInput++;
-                // Trim spasi untuk memastikan tidak menganggap spasi kosong sebagai isi
                 if ($(this).val().trim() === '') {
                     emptyCount++;
                 }
@@ -311,7 +310,6 @@
             const $statusText = $('#text-status-verifikasi');
 
             if (emptyCount > 0) {
-                // JIKA BELUM LENGKAP: Set tombol jadi MERAH & DISABLE
                 $btn.removeClass('btn-success')
                     .addClass('btn-danger')
                     .prop('disabled', true);
@@ -320,7 +318,6 @@
                 $label.text(`Belum Lengkap (${emptyCount} Kosong)`);
                 $statusText.html(`<i class="fas fa-info-circle me-1"></i> Ada ${emptyCount} parameter belum diisi`);
             } else {
-                // JIKA SUDAH TERISI SEMUA: Set tombol jadi HIJAU & ENABLED
                 $btn.removeClass('btn-danger')
                     .addClass('btn-success')
                     .prop('disabled', false);
@@ -331,10 +328,10 @@
             }
         }
 
-        // 1. Jalankan pengecekan otomatis saat modal pertama kali terbuka
+        // Run otomatis saat load
         checkFormCompleteness();
 
-        // 2. Jalankan pengecekan secara Real-Time saat user mengetik / mengubah nilai input hasil
+        // Real-time listener
         $(document).on('input change', 'input[name^="hasil"]', function() {
             checkFormCompleteness();
         });
