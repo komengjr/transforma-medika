@@ -412,6 +412,7 @@ Route::prefix('application')->group(function () {
 Route::prefix('application')->group(function () {
     Route::post('menu-radiologi/data-registrasi-radiologi/handling', [RadiologiController::class, 'data_registrasi_radiologi_handling'])->name('data_registrasi_radiologi_handling');
     Route::post('menu-radiologi/data-registrasi-radiologi/handling-pasien', [RadiologiController::class, 'menu_radiologi_handling_pasien'])->name('menu_radiologi_handling_pasien');
+    Route::get('menu-radiologi/data-registrasi-radiologi/handling-pasien/print-barcode/{code}', [RadiologiController::class, 'menu_radiologi_handling_pasien_print_barcode'])->name('menu_radiologi_handling_pasien_print_barcode');
     Route::get('menu-radiologi/data-registrasi-radiologi/handling-pasien/images/{code}', [RadiologiController::class, 'menu_radiologi_handling_pasien_image'])->name('menu_radiologi_handling_pasien_image');
     Route::get('menu-radiologi/data-registrasi-radiologi/handling-pasien/render/{instanceId}', [RadiologiController::class, 'menu_radiologi_handling_pasien_rander_image'])->name('menu_radiologi_handling_pasien_rander_image');
 

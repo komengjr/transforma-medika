@@ -85,12 +85,58 @@ class RadiologiController extends Controller
     }
     public function menu_radiologi_handling_pasien(Request $request)
     {
+        // 1. Validasi input No Registrasi
+        if (!$request->filled('code')) {
+            return response()->view('components.alert-error', [
+                'message' => 'Kode Registrasi Radiologi tidak ditemukan.'
+            ], 400);
+        }
+
+        $code = $request->code;
+
+        // 2. Ambil data Master Registrasi Radiologi & Detail Pasien (1 Row Utama)
         $data = DB::table('d_reg_order_rad')
             ->join('d_reg_order', 'd_reg_order.d_reg_order_code', '=', 'd_reg_order_rad.d_reg_order_code')
             ->join('master_patient', 'master_patient.master_patient_code', '=', 'd_reg_order.d_reg_order_rm')
-            ->where('d_reg_order_rad.d_reg_order_rad_code', $request->code)->first();
+            ->where('d_reg_order_rad.d_reg_order_rad_code', $code)
+            ->select('d_reg_order_rad.*', 'd_reg_order.*', 'master_patient.*')
+            ->first();
+
+        // Jika No Registrasi Master tidak ditemukan
+        if (!$data) {
+            return response()->html(
+                '<div class="alert alert-warning border-0 rounded-3 shadow-sm p-4 text-center">' .
+                    '<i class="fas fa-exclamation-circle fa-2x mb-2 text-warning"></i>' .
+                    '<h6>Data Tidak Ditemukan</h6>' .
+                    '<p class="mb-0 small">No Registrasi Radiologi (' . e($code) . ') tidak terdaftar di sistem.</p>' .
+                    '</div>'
+            );
+        }
+
+        // 3. Ambil SEMUA Item Pemeriksaan di bawah No Registrasi Master ini
+        // (Akan mengambil Panoramic & Thorax jika pasien memesan 2 pemeriksaan sekaligus)
+        $pemeriksaanList = DB::table('d_reg_order_rad_list')
+            ->leftJoin('p_sales_data', 'p_sales_data.p_sales_data_code', '=', 'd_reg_order_rad_list.p_sales_data_code')
+            ->where('d_reg_order_rad_list.d_reg_order_rad_code', $code)
+            ->select(
+                'd_reg_order_rad_list.*',
+                'p_sales_data.p_sales_data_name as nama_pemeriksaan'
+            )
+            ->get();
+
+        // 4. Ambil Master Layanan (opsional/pendukung)
         $layanan = DB::table('t_layanan_cat')->get();
-        return view('application.radiologi.radiologi-handling.form-handling-pasien', ['data' => $data, 'layanan' => $layanan, 'code' => $request->code]);
+
+        // 5. Render view Blade dan kembalikan HTML ke AJAX
+        return view('application.radiologi.radiologi-handling.form-handling-pasien', [
+            'data'            => $data,            // Header Pasien & Registrasi
+            'pemeriksaanList' => $pemeriksaanList, // Array List Pemeriksaan (Multiple/Single)
+            'layanan'         => $layanan,
+            'code'            => $code             // No Registrasi Radiologi Master
+        ]);
+    }
+    public function menu_radiologi_handling_pasien_print_barcode(Request $request){
+
     }
     private $orthancUrl = 'http://192.168.61.249:8042'; // Ganti dengan IP/Port Orthanc Anda
     private $orthancUser = 'orthanc';               // Kosongkan jika tanpa auth
@@ -98,80 +144,113 @@ class RadiologiController extends Controller
     public function menu_radiologi_handling_pasien_image($code)
     {
         try {
-            // 1. Ambil data registrasi/order dari DB
-            // $order = DB::table('d_reg_order_list')
-            //     ->where('code', $code)
-            //     ->first();
+            // 1. Ambil SEMUA item pemeriksaan berdasarkan d_reg_order_rad_code
+            $orders = DB::table('d_reg_order_rad_list')
+                ->join('d_reg_order_rad', 'd_reg_order_rad.d_reg_order_rad_code', '=', 'd_reg_order_rad_list.d_reg_order_rad_code')
+                ->join('d_reg_order', 'd_reg_order.d_reg_order_code', '=', 'd_reg_order_rad.d_reg_order_code')
+                ->leftJoin('p_sales_data', 'p_sales_data.p_sales_data_code', '=', 'd_reg_order_rad_list.p_sales_data_code')
+                ->where('d_reg_order_rad_list.d_reg_order_rad_code', $code)
+                ->select(
+                    'd_reg_order_rad_list.order_rad_list_code',
+                    'd_reg_order_rad.d_reg_order_rad_code',
+                    'p_sales_data.p_sales_data_name as nama_pemeriksaan'
+                )
+                ->get();
 
-            // if (!$order) {
-            //     return response()->json(['success' => false, 'message' => 'Data order tidak ditemukan'], 404);
-            // }
-
-            // 2. Cari Study di Orthanc berdasarkan PatientID (Kode Pasien / RM) atau Accession Number
-            $patientId = '080A5M64PA';
-
-            $response = Http::withBasicAuth($this->orthancUser, $this->orthancPass)
-                ->post("{$this->orthancUrl}/tools/find", [
-                    'Level' => 'Study',
-                    'Query' => [
-                        'PatientID' => $patientId,
-                        // 'AccessionNumber' => $code // Gunakan jika pencarian berdasarkan No Order/Accession
-                    ]
-                ]);
-
-            if ($response->failed()) {
-                return response()->json(['success' => false, 'message' => 'Gagal terhubung ke PACS Orthanc'], 500);
+            if ($orders->isEmpty()) {
+                return response()->json(['success' => false, 'message' => 'Data order tidak ditemukan'], 404);
             }
-
-            $studies = $response->json();
-
-            if (empty($studies)) {
-                return response()->json(['success' => true, 'images' => []]);
-            }
-
-            // 3. Ambil detail Study pertama & dapatkan semua Series -> Instances
-            $studyId = $studies[0];
-            $studyDetail = Http::withBasicAuth($this->orthancUser, $this->orthancPass)
-                ->get("{$this->orthancUrl}/studies/{$studyId}")
-                ->json();
 
             $images = [];
-            foreach ($studyDetail['Series'] as $seriesId) {
-                $seriesDetail = Http::withBasicAuth($this->orthancUser, $this->orthancPass)
-                    ->get("{$this->orthancUrl}/series/{$seriesId}")
-                    ->json();
+            $studiesList = [];
 
-                foreach ($seriesDetail['Instances'] as $instanceId) {
-                    $images[] = [
-                        'instance_id' => $instanceId,
-                        'preview_url' => route('menu_radiologi_handling_pasien_rander_image', ['instanceId' => $instanceId]),
-                        'caption'    => 'Instance: ' . substr($instanceId, 0, 8)
-                    ];
+            // 2. LOOPING PER ITEM PEMERIKSAAN (Agar Tombol OHIF Dipisah Per Pemeriksaan)
+            foreach ($orders as $item) {
+                $listCode = $item->order_rad_list_code;
+                $namaPemeriksaan = $item->nama_pemeriksaan ?? 'Pemeriksaan Radiologi';
+
+                // Cari Study di Orthanc berdasarkan PatientID = order_rad_list_code
+                $res = Http::withBasicAuth($this->orthancUser, $this->orthancPass)
+                    ->post("{$this->orthancUrl}/tools/find", [
+                        'Level' => 'Study',
+                        'Query' => [
+                            'PatientID' => $listCode
+                        ]
+                    ]);
+
+                if ($res->successful()) {
+                    $studies = $res->json();
+
+                    foreach ($studies as $studyId) {
+                        $studyDetail = Http::withBasicAuth($this->orthancUser, $this->orthancPass)
+                            ->get("{$this->orthancUrl}/studies/{$studyId}")
+                            ->json();
+
+                        if (!isset($studyDetail['Series'])) {
+                            continue;
+                        }
+
+                        // Tambahkan ke daftar Study terpisah per item pemeriksaan
+                        $studiesList[] = [
+                            'order_rad_list_code' => $listCode,
+                            'nama_pemeriksaan'    => $namaPemeriksaan,
+                            'orthanc_study_id'   => $studyDetail['ID'] ?? $studyId,
+                            'study_description'  => $studyDetail['MainDicomTags']['StudyDescription'] ?? $namaPemeriksaan,
+                        ];
+
+                        // Ambil instance gambar untuk preview gallery
+                        foreach ($studyDetail['Series'] as $seriesId) {
+                            $seriesDetail = Http::withBasicAuth($this->orthancUser, $this->orthancPass)
+                                ->get("{$this->orthancUrl}/series/{$seriesId}")
+                                ->json();
+
+                            $modality = $seriesDetail['MainDicomTags']['Modality'] ?? 'CR';
+
+                            if (isset($seriesDetail['Instances'])) {
+                                foreach ($seriesDetail['Instances'] as $instanceId) {
+                                    $images[] = [
+                                        'study_id'         => $studyId,
+                                        'instance_id'      => $instanceId,
+                                        'nama_pemeriksaan' => $namaPemeriksaan,
+                                        'preview_url'      => route('menu_radiologi_handling_pasien_rander_image', ['instanceId' => $instanceId]),
+                                        'caption'          => "[$modality] " . $namaPemeriksaan . ' - ' . substr($instanceId, 0, 8)
+                                    ];
+                                }
+                            }
+                        }
+                    }
                 }
             }
 
             return response()->json([
-                'success' => true,
-                'images'  => $images
+                'success'      => true,
+                'studies_list' => $studiesList, // Berisi list study + nama pemeriksaan untuk membuat button OHIF terpisah
+                'images'       => $images
             ]);
         } catch (\Exception $e) {
             return response()->json([
                 'success' => false,
-                'message' => 'Terjadi kesalahan: ' . $e->getMessage()
+                'message' => 'Terjadi kesalahan sistem: ' . $e->getMessage()
             ], 500);
         }
     }
     public function menu_radiologi_handling_pasien_rander_image($instanceId)
     {
-        $response = Http::withBasicAuth($this->orthancUser, $this->orthancPass)
-            ->get("{$this->orthancUrl}/instances/{$instanceId}/preview");
+        try {
+            // Mengambil preview gambar (PNG) langsung dari API Orthanc
+            $response = Http::withBasicAuth($this->orthancUser, $this->orthancPass)
+                ->get("{$this->orthancUrl}/instances/{$instanceId}/preview");
 
-        if ($response->failed()) {
-            abort(404);
+            if ($response->failed()) {
+                return response('Gagal mengambil preview gambar', 404);
+            }
+
+            return response($response->body(), 200)
+                ->header('Content-Type', 'image/png')
+                ->header('Cache-Control', 'max-age=86400, public');
+        } catch (\Exception $e) {
+            return response('Error: ' . $e->getMessage(), 500);
         }
-
-        return response($response->body(), 200)
-            ->header('Content-Type', 'image/png');
     }
     // VERIFIKASI HASIL RADIOLOGI
     public function hasil_radiologi_verifikasi($akses, $id)
