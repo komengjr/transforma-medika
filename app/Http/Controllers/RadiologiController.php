@@ -85,7 +85,7 @@ class RadiologiController extends Controller
     }
     public function menu_radiologi_handling_pasien(Request $request)
     {
-        // 1. Validasi input No Registrasi
+        // 1. Validasi input
         if (!$request->filled('code')) {
             return response()->view('components.alert-error', [
                 'message' => 'Kode Registrasi Radiologi tidak ditemukan.'
@@ -94,7 +94,7 @@ class RadiologiController extends Controller
 
         $code = $request->code;
 
-        // 2. Ambil data Master Registrasi Radiologi & Detail Pasien (1 Row Utama)
+        // 2. Ambil data Master Pasien & Order
         $data = DB::table('d_reg_order_rad')
             ->join('d_reg_order', 'd_reg_order.d_reg_order_code', '=', 'd_reg_order_rad.d_reg_order_code')
             ->join('master_patient', 'master_patient.master_patient_code', '=', 'd_reg_order.d_reg_order_rm')
@@ -102,7 +102,6 @@ class RadiologiController extends Controller
             ->select('d_reg_order_rad.*', 'd_reg_order.*', 'master_patient.*')
             ->first();
 
-        // Jika No Registrasi Master tidak ditemukan
         if (!$data) {
             return response()->html(
                 '<div class="alert alert-warning border-0 rounded-3 shadow-sm p-4 text-center">' .
@@ -113,31 +112,43 @@ class RadiologiController extends Controller
             );
         }
 
-        // 3. Ambil SEMUA Item Pemeriksaan di bawah No Registrasi Master ini
-        // (Akan mengambil Panoramic & Thorax jika pasien memesan 2 pemeriksaan sekaligus)
+        // 3. Query Join Bertahap: d_reg_order_rad_list -> p_sales_data -> t_pemeriksaan_list
         $pemeriksaanList = DB::table('d_reg_order_rad_list')
-            ->leftJoin('p_sales_data', 'p_sales_data.p_sales_data_code', '=', 'd_reg_order_rad_list.p_sales_data_code')
+            ->join('p_sales_data', 'p_sales_data.p_sales_data_code', '=', 'd_reg_order_rad_list.p_sales_data_code')
+            ->leftJoin('t_pemeriksaan_list', 't_pemeriksaan_list.t_pemeriksaan_list_code', '=', 'p_sales_data.t_pemeriksaan_list_code')
             ->where('d_reg_order_rad_list.d_reg_order_rad_code', $code)
             ->select(
                 'd_reg_order_rad_list.*',
-                'p_sales_data.p_sales_data_name as nama_pemeriksaan'
+                'p_sales_data.p_sales_data_name',
+                'p_sales_data.t_pemeriksaan_list_code',
+                't_pemeriksaan_list.t_pemeriksaan_list_name',
+                't_pemeriksaan_list.t_pemeriksaan_list_type'
             )
             ->get();
 
-        // 4. Ambil Master Layanan (opsional/pendukung)
+        // 4. Loop untuk mengambil parameter dari t_pemeriksaan_list_val
+        $pemeriksaanList->transform(function ($item) {
+            if (!empty($item->t_pemeriksaan_list_code)) {
+                $item->parameters = DB::table('t_pemeriksaan_list_val')
+                    ->where('t_pemeriksaan_list_code', $item->t_pemeriksaan_list_code)
+                    ->get();
+            } else {
+                $item->parameters = collect([]);
+            }
+
+            return $item;
+        });
+
         $layanan = DB::table('t_layanan_cat')->get();
 
-        // 5. Render view Blade dan kembalikan HTML ke AJAX
         return view('application.radiologi.radiologi-handling.form-handling-pasien', [
-            'data'            => $data,            // Header Pasien & Registrasi
-            'pemeriksaanList' => $pemeriksaanList, // Array List Pemeriksaan (Multiple/Single)
+            'data'            => $data,
+            'pemeriksaanList' => $pemeriksaanList,
             'layanan'         => $layanan,
-            'code'            => $code             // No Registrasi Radiologi Master
+            'code'            => $code
         ]);
     }
-    public function menu_radiologi_handling_pasien_print_barcode(Request $request){
-
-    }
+    public function menu_radiologi_handling_pasien_print_barcode(Request $request) {}
     private $orthancUrl = 'http://192.168.61.249:8042'; // Ganti dengan IP/Port Orthanc Anda
     private $orthancUser = 'orthanc';               // Kosongkan jika tanpa auth
     private $orthancPass = 'orthanc';               // Kosongkan jika tanpa auth
@@ -252,6 +263,80 @@ class RadiologiController extends Controller
             return response('Error: ' . $e->getMessage(), 500);
         }
     }
+    public function menu_radiologi_handling_pasien_simpan_hasil(Request $request)
+    {
+        // 1. Validasi Request
+        $request->validate([
+            'code'                    => 'required|string', // Kode pendaftaran utama
+            'order_rad_list_code'     => 'required|string', // Unique per-item pemeriksaan
+            't_pemeriksaan_list_code' => 'nullable|string',
+            'results'                 => 'required|array',
+            'results.*.t_pem_list_val_code' => 'required|string',
+            'results.*.nilai'                => 'required|string',
+        ], [
+            'results.*.nilai.required' => 'Semua parameter hasil pemeriksaan wajib diisi.'
+        ]);
+
+        DB::beginTransaction();
+
+        try {
+            $orderRadListCode = $request->order_rad_list_code;
+            $results          = $request->results; // Array data hasil dari form
+
+            foreach ($results as $item) {
+                $valCode = $item['t_pem_list_val_code'];
+                $nilai   = $item['nilai'];
+
+                // Ambil metode dari master t_pemeriksaan_list_val
+                $masterVal = DB::table('t_pemeriksaan_list_val')
+                    ->where('t_pem_list_val_code', $valCode)
+                    ->first();
+
+                $metode = $masterVal->t_pem_list_val_metode ?? '-';
+
+                // Generate kode unik h_reg_radcode
+                $radCode = 'HRAD-' . date('Ymd') . '-' . strtoupper(Str::random(5));
+
+                // Simpan / Update ke tabel h_reg_rad berdasarkan order_rad_list_code
+                DB::table('h_reg_rad')->updateOrInsert(
+                    [
+                        'order_rad_list_code' => $orderRadListCode, // Match per item pemeriksaan
+                        't_pem_list_val_code' => $valCode,          // Match per parameter
+                    ],
+                    [
+                        'h_reg_radcode'    => $radCode, // Terisi saat INSERT data baru
+                        'h_reg_rad_flag'   => 'COMPLETED',
+                        'h_reg_rad_value'  => $nilai,
+                        'h_reg_rad_metode' => $metode,
+                        'updated_at'       => now(),
+                        'created_at'       => now(),
+                    ]
+                );
+            }
+
+            // 2. Update status pada item order (d_reg_order_rad_list / tabel detail order)
+            DB::table('d_reg_order_rad_list')
+                ->where('order_rad_list_code', $orderRadListCode)
+                ->update([
+                    'status_pembayaran' => $request->status_pembayaran ?? 'DONE', // atau kolom status terkait
+                    'updated_at'        => now()
+                ]);
+
+            DB::commit();
+
+            return response()->json([
+                'status'  => 'success',
+                'message' => 'Hasil ekspertise radiologi berhasil disimpan!'
+            ], 200);
+        } catch (\Exception $e) {
+            DB::rollBack();
+
+            return response()->json([
+                'status'  => 'error',
+                'message' => 'Gagal menyimpan hasil: ' . $e->getMessage()
+            ], 500);
+        }
+    }
     // VERIFIKASI HASIL RADIOLOGI
     public function hasil_radiologi_verifikasi($akses, $id)
     {
@@ -267,7 +352,55 @@ class RadiologiController extends Controller
     }
     public function hasil_radiologi_verifikasi_detail(Request $request)
     {
-        return view('application.radiologi.verifikasi-hasil.verifikasi-hasil-detail', ['code' => $request->code, 'reg' => $request->reg]);
+        $code = $request->code; // d_reg_order_rad_code
+        $reg  = $request->reg;  // Kode registrasi pasien
+
+        // 1. Ambil daftar pemeriksaan radiologi dari d_reg_order_rad_list
+        $pemeriksaanList = DB::table('d_reg_order_rad_list as dro')
+            ->leftJoin('p_sales_data as psd', 'dro.p_sales_data_code', '=', 'psd.p_sales_data_code')
+            ->leftJoin('t_pemeriksaan_list as tpl', 'dro.p_sales_data_code', '=', 'tpl.t_pemeriksaan_list_code')
+            ->where('dro.d_reg_order_rad_code', $reg)
+            ->select(
+                'dro.order_rad_list_code',
+                'dro.p_sales_data_code',
+                DB::raw("COALESCE(tpl.t_pemeriksaan_list_code, dro.p_sales_data_code) as t_pemeriksaan_list_code"),
+                DB::raw("COALESCE(tpl.t_pemeriksaan_list_name, psd.p_sales_data_name, 'Radiologi') as t_pemeriksaan_list_name")
+            )
+            ->get();
+
+        // 2. Ambil parameter & hasil ekspertise dari h_reg_rad untuk setiap item pemeriksaan
+        foreach ($pemeriksaanList as $item) {
+            $item->parameters = DB::table('t_pemeriksaan_list_val as tplv')
+                ->leftJoin('h_reg_rad as hrr', function ($join) use ($item) {
+                    $join->on('hrr.t_pem_list_val_code', '=', 'tplv.t_pem_list_val_code')
+                        ->where('hrr.order_rad_list_code', '=', $item->order_rad_list_code);
+                })
+                ->where('tplv.t_pemeriksaan_list_code', $item->t_pemeriksaan_list_code)
+                ->select(
+                    'tplv.t_pem_list_val_code',
+                    'tplv.t_pem_list_val_name',
+                    'tplv.t_pem_list_val_satuan',
+                    'tplv.t_pem_list_val_rujukan',
+                    'hrr.h_reg_rad_value',
+                    'hrr.h_reg_rad_flag',
+                    'hrr.h_reg_rad_metode'
+                )
+                ->get();
+
+            // Fallback jika pemeriksaan tidak menggunakan sub-parameter/t_pemeriksaan_list_val
+            if ($item->parameters->isEmpty()) {
+                $item->fallbackResult = DB::table('h_reg_rad')
+                    ->where('order_rad_list_code', $item->order_rad_list_code)
+                    ->first();
+            }
+        }
+
+        // 3. Kirim data ke view
+        return view('application.radiologi.verifikasi-hasil.verifikasi-hasil-detail', [
+            'code'            => $code,
+            'reg'             => $reg,
+            'pemeriksaanList' => $pemeriksaanList
+        ]);
     }
     public function verifikasi_radiologi_preview_report(Request $request)
     {

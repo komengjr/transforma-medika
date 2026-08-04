@@ -137,6 +137,24 @@
         border-color: transparent !important;
         cursor: not-allowed;
     }
+
+    /* Styling Link Teks Dropdown OHIF */
+    .link-ohif-item {
+        text-decoration: none !important;
+        color: #2c3e50 !important;
+        transition: background-color 0.15s ease-in-out, color 0.15s ease-in-out;
+    }
+
+    .link-ohif-item:hover {
+        background-color: #f1f5f9 !important;
+        /* Latar belakang abu-biru sangat muda */
+        color: #0d6efd !important;
+        /* Warna teks berubah jadi biru saat hover */
+    }
+
+    .link-ohif-item:hover i {
+        color: #0d6efd !important;
+    }
 </style>
 
 <!-- CARD PROFIL PASIEN -->
@@ -342,45 +360,109 @@ $payment = DB::table('d_reg_order_payment')->where('d_reg_order_list_code', $cod
 @if ($payment)
 <!-- CONTAINER UTAMA FOTO RADIOLOGI & FORM -->
 <div class="row g-3 mb-4">
-    <!-- KOLOM KIRI: GALERI CITRA RADIOLOGI -->
-    <div class="col-lg-7">
+    <!-- KOLOM KIRI: CITRA RADIOLOGI PACS ORTHANC -->
+    <div class="col-lg-6">
         <div class="card border-0 shadow-sm rounded-3 h-100">
-            <div class="card-header bg-dark text-white py-3 d-flex align-items-center justify-content-between flex-wrap gap-2">
-                <h6 class="mb-0 text-white fw-bold fs--1">
-                    <i class="fas fa-x-ray me-2 text-info"></i> Citra Radiologi PACS Orthanc
-                    <span class="badge bg-info text-dark ms-2">{{ count($pemeriksaanList) }} Pemeriksaan</span>
-                </h6>
+            <!-- CARD HEADER -->
+            <div class="card-header bg-dark text-white p-3">
+                <!-- BARIS 1: JUDUL & REFRESH -->
+                <div class="d-flex align-items-center justify-content-between mb-2">
+                    <div class="d-flex align-items-center gap-2">
+                        <i class="fas fa-x-ray text-info fs-0"></i>
+                        <h6 class="mb-0 text-white fw-bold fs--1">Citra Radiologi PACS Orthanc</h6>
+                        <span class="badge bg-info text-dark fw-bold fs--2 rounded-pill px-2">
+                            {{ count($pemeriksaanList) }} Item
+                        </span>
+                    </div>
 
-                <!-- CONTAINER TOMBOL OHIF DINAMIS -->
-                <div class="d-flex align-items-center gap-2 flex-wrap" id="container-ohif-buttons">
-                    <!-- Button OHIF Viewer akan di-inject oleh JavaScript di sini -->
+                    <button id="btn-fetch-orthanc" type="button" class="btn btn-xs btn-outline-light rounded-pill px-2.5 py-1 fs--2">
+                        <i class="fas fa-sync-alt me-1"></i> Refresh
+                    </button>
                 </div>
 
-                <button id="btn-fetch-orthanc" class="btn btn-xs btn-outline-light rounded-pill px-3">
-                    <i class="fas fa-sync-alt me-1"></i> Refresh Citra
-                </button>
-            </div>
+                <!-- BARIS 2: SUB-HEADER TOOLBAR OHIF DROPDOWN -->
+                <div class="border-top border-secondary border-opacity-50 pt-2 mt-2 d-flex align-items-center justify-content-between">
+                    <span class="text-white-50 fs--2 fw-semibold">
+                        <i class="fas fa-desktop text-info me-1"></i> Buka Full DICOM Viewer:
+                    </span>
 
+                    <!-- DROPDOWN -->
+                    <div class="dropdown" id="container-ohif-dropdown">
+                        <!-- Tombol Pemicu Dropdown -->
+                        <button class="btn btn-sm btn-info text-dark fw-bold dropdown-toggle px-3 py-1 fs--2 rounded-2 shadow-sm"
+                            type="button"
+                            id="dropdownOhifMenu"
+                            data-bs-toggle="dropdown"
+                            aria-expanded="false">
+                            <i class="fas fa-external-link-alt me-1"></i> Pilih OHIF Viewer
+                        </button>
+
+                        <!-- MENU DROPDOWN BERISI TEKS LINK A HREF -->
+                        <ul class="dropdown-menu dropdown-menu-end shadow-lg border-0 py-1 fs--1 mt-1"
+                            aria-labelledby="dropdownOhifMenu"
+                            id="container-ohif-buttons"
+                            style="min-width: 250px;">
+
+                            @forelse($pemeriksaanList as $index => $item)
+                            @php
+                            $namaExam = $item->nama_pemeriksaan ?? $item->d_reg_order_rad_item_name ?? 'Pemeriksaan ' . ($index + 1);
+                            @endphp
+                            <li>
+                                <a class="dropdown-item py-2 px-3 d-flex align-items-center justify-content-between text-dark link-ohif-item"
+                                    href="#"
+                                    target="_blank"
+                                    data-code="{{ $item->order_rad_list_code }}">
+
+                                    <span class="fs--1 text-dark">
+                                        <i class="fas fa-file-medical-alt text-primary me-2"></i>
+                                        OHIF: <strong>{{ $namaExam }}</strong>
+                                    </span>
+
+                                    <i class="fas fa-external-link-alt text-muted fs--2 ms-2"></i>
+                                </a>
+                            </li>
+                            @if(!$loop->last)
+                            <li>
+                                <hr class="dropdown-divider my-0 opacity-25">
+                            </li>
+                            @endif
+                            @empty
+                            <li>
+                                <span class="dropdown-item disabled text-muted fs--2 text-center py-2">
+                                    Tidak ada link viewer
+                                </span>
+                            </li>
+                            @endforelse
+
+                        </ul>
+                    </div>
+                </div>
+            </div>
+            <!-- CARD BODY -->
             <div class="card-body p-3 bg-light">
-                <div id="orthanc-alert" class="alert alert-danger alert-dismissible fade show d-none mb-3" role="alert">
+                <!-- ALERT ERROR -->
+                <div id="orthanc-alert" class="alert alert-danger alert-dismissible fade show d-none mb-3 fs--1 p-2 rounded-3 shadow-sm" role="alert">
                     <div class="d-flex align-items-center">
-                        <i class="fas fa-exclamation-triangle me-2"></i>
+                        <i class="fas fa-exclamation-triangle me-2 fs-0"></i>
                         <span id="orthanc-alert-text"></span>
                     </div>
-                    <button type="button" class="btn-close" onclick="document.getElementById('orthanc-alert').classList.add('d-none')"></button>
+                    <button type="button" class="btn-close py-2" onclick="document.getElementById('orthanc-alert').classList.add('d-none')"></button>
                 </div>
 
+                <!-- LOADER STATE -->
                 <div id="orthanc-loader" class="text-center py-5">
-                    <div class="spinner-border text-primary" role="status">
+                    <div class="spinner-border text-info" role="status" style="width: 2.2rem; height: 2.2rem;">
                         <span class="visually-hidden">Loading DICOM...</span>
                     </div>
                     <p class="text-muted mt-2 fs--1 mb-0">Mengambil citra dari PACS Orthanc...</p>
                 </div>
 
+                <!-- GALLERY CONTAINER -->
                 <div id="orthanc-gallery" class="row g-2 d-none">
                     <!-- Image items di-inject via JS -->
                 </div>
 
+                <!-- EMPTY STATE -->
                 <div id="orthanc-empty" class="text-center py-4 bg-white rounded border d-none">
                     <i class="fas fa-file-medical-alt fa-2x text-muted mb-2"></i>
                     <p class="text-muted mb-0 fs--1" id="orthanc-empty-text">Belum ada foto/citra radiologi yang diunggah.</p>
@@ -389,30 +471,26 @@ $payment = DB::table('d_reg_order_payment')->where('d_reg_order_list_code', $cod
         </div>
     </div>
 
-    <!-- KOLOM KANAN: FORM PENGISIAN EKSPERTISE -->
-    <div class="col-lg-5">
+    <div class="col-lg-6">
         <div class="card border-0 shadow-sm rounded-3 h-100">
 
             <!-- CARD HEADER -->
             <div class="card-header bg-primary text-white p-3">
-                <!-- BARIS 1: Judul Card & Total Badge -->
                 <div class="d-flex align-items-center justify-content-between mb-2">
                     <h6 class="mb-0 text-white fw-bold fs--1">
-                        <i class="fas fa-file-signature me-2"></i> Pengisian Ekspertise
+                        <i class="fas fa-file-signature me-2"></i> Pengisian Ekspertise / Hasil
                     </h6>
                     <span class="badge bg-white text-primary fw-bold px-2 py-1 fs--2">
                         {{ count($pemeriksaanList) }} Pemeriksaan
                     </span>
                 </div>
 
-                <!-- BARIS 2: TAB HEADER (Hanya jika > 1 pemeriksaan, diletakkan di baris terpisah) -->
-                <!-- BARIS 2: TAB HEADER DENGAN KONTRAS WARNA YANG JELAS -->
                 @if(count($pemeriksaanList) > 1)
                 <div class="border-top border-white border-opacity-25 pt-2 mt-2">
                     <ul class="nav nav-pills card-header-pills gap-1" id="ekspertiseTab" role="tablist">
                         @foreach($pemeriksaanList as $index => $item)
                         @php
-                        $namaExam = $item->nama_pemeriksaan ?? $item->d_reg_order_rad_item_name ?? 'Pemeriksaan ' . ($index + 1);
+                        $namaExam = $item->t_pemeriksaan_list_name ?? $item->p_sales_data_name ?? 'Pemeriksaan ' . ($index + 1);
                         $isItemDisabled = isset($item->is_ready) ? !$item->is_ready : false;
                         @endphp
                         <li class="nav-item" role="presentation">
@@ -423,7 +501,6 @@ $payment = DB::table('d_reg_order_payment')->where('d_reg_order_list_code', $cod
                                 type="button"
                                 role="tab"
                                 @if($isItemDisabled) disabled tabindex="-1" aria-disabled="true" @endif>
-
                                 <i class="fas {{ $isItemDisabled ? 'fa-lock' : 'fa-x-ray' }} me-1"></i>
                                 {{ $namaExam }}
                             </button>
@@ -437,7 +514,6 @@ $payment = DB::table('d_reg_order_payment')->where('d_reg_order_list_code', $cod
             <!-- CARD BODY -->
             <div class="card-body p-3">
 
-                <!-- Alert Peringatan Umum jika Gambar Belum Ada -->
                 <div id="alert-no-image" class="alert alert-warning d-flex align-items-center mb-3 fs--1 p-2 rounded-3">
                     <i class="fas fa-exclamation-triangle me-2 fs-0"></i>
                     <div>
@@ -448,13 +524,15 @@ $payment = DB::table('d_reg_order_payment')->where('d_reg_order_list_code', $cod
                 <div class="tab-content" id="ekspertiseTabContent">
                     @foreach($pemeriksaanList as $index => $item)
                     @php
-                    $namaExam = $item->nama_pemeriksaan ?? $item->d_reg_order_rad_item_name ?? 'Radiologi';
+                    $namaExam = $item->t_pemeriksaan_list_name ?? $item->p_sales_data_name ?? 'Radiologi';
                     $isItemDisabled = isset($item->is_ready) ? !$item->is_ready : false;
+
+                    $parameters = $item->parameters ?? [];
+                    $totalParams = count($parameters);
                     @endphp
 
                     <div class="tab-pane fade {{ $index === 0 ? 'show active' : '' }}" id="content-item-{{ $index }}" role="tabpanel">
 
-                        <!-- ALERT SPESIFIK JIKA PEMERIKSAAN INI TERKUNCI/BELUM SIAP -->
                         @if($isItemDisabled)
                         <div class="alert alert-danger d-flex align-items-center mb-3 fs--1 p-2 rounded-3">
                             <i class="fas fa-ban me-2 fs-0"></i>
@@ -464,56 +542,139 @@ $payment = DB::table('d_reg_order_payment')->where('d_reg_order_list_code', $cod
                         </div>
                         @endif
 
-                        <form class="form-ekspertise-single" action="#" method="POST">
+                        <!-- FORM SIMPAN TANPA RELOAD -->
+                        <form class="form-ekspertise-single" action="{{ route('menu_radiologi_handling_pasien_simpan_hasil') }}" method="POST">
                             @csrf
                             <input type="hidden" name="code" value="{{ $code }}">
-                            <input type="hidden" name="rad_item_id" value="{{ $item->id_d_reg_order_rad_list ?? $item->d_reg_order_rad_id ?? '' }}">
+                            <input type="hidden" name="order_rad_list_code" value="{{ $item->order_rad_list_code }}">
+                            <input type="hidden" name="t_pemeriksaan_list_code" value="{{ $item->t_pemeriksaan_list_code }}">
 
-                            <!-- STRIP NAMA PEMERIKSAAN (Minimalis & Elegan) -->
+                            <!-- HEADER PEMERIKSAAN -->
                             <div class="d-flex align-items-center justify-content-between p-2 mb-3 bg-light rounded-2 border">
                                 <span class="fs--1 fw-bold text-dark">
                                     <i class="fas fa-stethoscope text-primary me-1"></i> {{ $namaExam }}
                                 </span>
                                 <span class="badge bg-soft-primary text-primary font-monospace fs--2">
-                                    {{ $item->order_rad_list_code ?? '-' }}
+                                    {{ $item->t_pemeriksaan_list_code ?? '-' }}
                                 </span>
                             </div>
 
-                            <!-- INPUT DOKTER RADIOLOGI -->
+                            <!-- DOKTER PEMERIKSA -->
                             <div class="mb-3">
                                 <label class="form-label fw-bold fs--1 text-secondary mb-1">Dokter Pemeriksa / Radiolog</label>
                                 <input type="text" class="form-control form-control-sm bg-light" name="dokter_radiologi"
-                                    value="{{ auth()->user()->name ?? 'Dr. Radiologi' }}" readonly disabled>
+                                    value="{{ auth()->user()->name ?? 'Dr. Radiologi' }}" readonly>
                             </div>
 
-                            <!-- DESKRIPSI EKSPERTISE -->
-                            <div class="mb-3">
-                                <label class="form-label fw-bold fs--1 text-secondary mb-1">
-                                    Hasil Bacaan / Deskripsi Ekspertise <span class="text-danger">*</span>
-                                </label>
-                                <textarea class="form-control field-ekspertise"
-                                    name="hasil_ekspertise"
-                                    rows="4"
-                                    placeholder="Ketik hasil ekspertise untuk {{ $namaExam }}..."
-                                    required
-                                    @if($isItemDisabled) disabled @else disabled @endif></textarea>
-                            </div>
+                            <!-- LIST PARAMETER DINAMIS (t_pemeriksaan_list_val) -->
+                            <div class="border rounded-2 p-2 mb-3 bg-white">
+                                <div class="d-flex align-items-center justify-content-between mb-2 border-bottom pb-1">
+                                    <h6 class="fs--1 fw-bold text-dark mb-0">
+                                        <i class="fas fa-list-check me-1 text-primary"></i> Parameter Hasil Pemeriksaan
+                                    </h6>
+                                    <span class="badge bg-light text-secondary fs--2 border">
+                                        {{ $totalParams }} Parameter
+                                    </span>
+                                </div>
 
-                            <!-- KESAN / KESIMPULAN -->
-                            <div class="mb-3">
-                                <label class="form-label fw-bold fs--1 text-secondary mb-1">Kesan / Kesimpulan</label>
-                                <textarea class="form-control field-ekspertise"
-                                    name="kesan"
-                                    rows="2"
-                                    placeholder="Kesan klinis untuk {{ $namaExam }}..."
-                                    @if($isItemDisabled) disabled @else disabled @endif></textarea>
+                                @forelse($parameters as $valIndex => $val)
+                                @php
+                                $namaDeskripsi = $val->t_pem_list_val_name;
+
+                                if (!empty($val->t_pem_list_val_kali) && is_numeric($val->t_pem_list_val_kali)) {
+                                $computedRows = (int) $val->t_pem_list_val_kali;
+                                } else {
+                                $computedRows = $totalParams <= 1 ? 6 : ($totalParams==2 ? 4 : 3);
+                                    }
+
+                                    $optType=strtolower($val->t_pem_list_val_opt ?? 'textarea');
+
+                                    // --- PENGECEKAN KE TABEL h_reg_rad ---
+                                    $savedResult = \DB::table('h_reg_rad')
+                                    ->where('order_rad_list_code', $item->order_rad_list_code)
+                                    ->where('t_pem_list_val_code', $val->t_pem_list_val_code)
+                                    ->value('h_reg_rad_value');
+
+                                    // Ambil nilai tersimpan, jika tidak ada fallback ke nilai awal master/kosong
+                                    $currentValue = $savedResult ?? $val->t_pem_list_val_nilai ?? '';
+                                    @endphp
+
+                                    <div class="mb-3 p-2 border-bottom last-border-0">
+                                        <label class="form-label fw-bold fs--1 text-dark mb-1 d-flex justify-content-between align-items-center">
+                                            <span>
+                                                <i class="fas fa-angle-right text-primary me-1 fs--2"></i>
+                                                {{ $namaDeskripsi }} <span class="text-danger">*</span>
+                                            </span>
+                                            @if(!empty($val->t_pem_list_val_satuan))
+                                            <span class="badge bg-soft-secondary text-secondary fw-normal fs--2">
+                                                {{ $val->t_pem_list_val_satuan }}
+                                            </span>
+                                            @endif
+                                        </label>
+
+                                        <!-- Hidden Code Parameter Unique -->
+                                        <input type="hidden" name="results[{{ $valIndex }}][t_pem_list_val_code]" value="{{ $val->t_pem_list_val_code }}">
+
+                                        <!-- INPUT OPTION: Select / Text / Textarea -->
+                                        @if(($optType == 'select' || $optType == 'option') && !empty($val->t_pem_list_val_opt_code))
+                                        <select name="results[{{ $valIndex }}][nilai]" class="form-select form-select-sm" {{ $isItemDisabled ? 'disabled' : '' }} required>
+                                            <option value="">-- Pilih {{ $namaDeskripsi }} --</option>
+                                            @foreach(explode(',', $val->t_pem_list_val_opt_code) as $opt)
+                                            @php $optTrimmed = trim($opt); @endphp
+                                            <option value="{{ $optTrimmed }}" {{ $currentValue == $optTrimmed ? 'selected' : '' }}>
+                                                {{ $optTrimmed }}
+                                            </option>
+                                            @endforeach
+                                        </select>
+
+                                        @elseif($optType == 'text' || $optType == 'input' || $optType == 'string')
+                                        <input type="text" class="form-control form-control-sm"
+                                            name="results[{{ $valIndex }}][nilai]"
+                                            placeholder="Masukkan hasil {{ $namaDeskripsi }}..."
+                                            value="{{ $currentValue }}"
+                                            {{ $isItemDisabled ? 'disabled' : '' }} required>
+
+                                        @else
+                                        <!-- TEXTAREA DINAMIS -->
+                                        <textarea class="form-control form-control-sm field-ekspertise"
+                                            name="results[{{ $valIndex }}][nilai]"
+                                            rows="{{ $computedRows }}"
+                                            placeholder="Ketik deskripsi hasil untuk {{ $namaDeskripsi }}..."
+                                            {{ $isItemDisabled ? 'disabled' : '' }} required>{{ $currentValue }}</textarea>
+                                        @endif
+
+                                        @if(!empty($val->t_pem_list_val_rujukan))
+                                        <div class="form-text fs--2 mt-1 text-muted">
+                                            <i class="fas fa-info-circle me-1"></i> Nilai Rujukan: <code>{{ $val->t_pem_list_val_rujukan }}</code>
+                                        </div>
+                                        @endif
+                                    </div>
+                                    @empty
+                                    <!-- Fallback jika pemeriksaan tidak punya sub-parameter -->
+                                    @php
+                                    $fallbackResult = \DB::table('h_reg_rad')
+                                    ->where('order_rad_list_code', $item->order_rad_list_code)
+                                    ->where('t_pem_list_val_code', 'DEFAULT')
+                                    ->value('h_reg_rad_value');
+                                    @endphp
+                                    <div class="mb-3">
+                                        <label class="form-label fw-bold fs--1 text-secondary mb-1">
+                                            Hasil Pemeriksaan / Deskripsi Ekspertise <span class="text-danger">*</span>
+                                        </label>
+                                        <textarea class="form-control field-ekspertise"
+                                            name="hasil_ekspertise"
+                                            rows="5"
+                                            placeholder="Ketik hasil ekspertise untuk {{ $namaExam }}..."
+                                            {{ $isItemDisabled ? 'disabled' : '' }} required>{{ $fallbackResult ?? '' }}</textarea>
+                                    </div>
+                                    @endforelse
                             </div>
 
                             <!-- TOMBOL SIMPAN -->
                             <div class="d-flex justify-content-end">
                                 <button type="submit"
                                     class="btn btn-sm btn-success px-3 btn-save-ekspertise shadow-sm"
-                                    @if($isItemDisabled) disabled @else disabled @endif>
+                                    {{ $isItemDisabled ? 'disabled' : '' }}>
                                     <i class="fas fa-save me-1"></i> Simpan Ekspertise
                                 </button>
                             </div>
@@ -634,15 +795,49 @@ $payment = DB::table('d_reg_order_payment')->where('d_reg_order_list_code', $cod
 
                         // A. RENDER TOMBOL OHIF VIEWER DIPISAH PER PEMERIKSAAN
                         if (containerOhif) {
-                            data.studies_list.forEach((study) => {
-                                const ohifUrl = ohifRoutePattern.replace(':studyId', study.orthanc_study_id);
-                                const btnHtml = `
-                            <a href="${ohifUrl}" target="_blank" class="btn btn-xs btn-outline-info rounded-pill px-2 shadow-sm fw-bold" title="Buka OHIF Viewer ${study.nama_pemeriksaan}">
-                                <i class="fas fa-microscope me-1"></i> OHIF: ${study.nama_pemeriksaan}
-                            </a>
-                        `;
-                                containerOhif.insertAdjacentHTML('beforeend', btnHtml);
-                            });
+                            // Kosongkan isi container dropdown terlebih dahulu sebelum mengisi data baru
+                            containerOhif.innerHTML = '';
+
+                            if (data.studies_list && data.studies_list.length > 0) {
+                                data.studies_list.forEach((study, index) => {
+                                    const ohifUrl = ohifRoutePattern.replace(':studyId', study.orthanc_study_id);
+
+                                    // Tambahkan garis pemisah (divider) jika bukan item terakhir
+                                    const isLast = index === data.studies_list.length - 1;
+                                    const dividerHtml = !isLast ? '<li><hr class="dropdown-divider my-0 opacity-25"></li>' : '';
+
+                                    // Template item berupa Link Teks murni (A HREF)
+                                    const itemHtml = `
+                                                        <li>
+                                                            <a href="${ohifUrl}"
+                                                            target="_blank"
+                                                            class="dropdown-item py-2 px-3 d-flex align-items-center justify-content-between text-dark link-ohif-item"
+                                                            title="Buka OHIF Viewer ${study.nama_pemeriksaan}">
+
+                                                                <span class="fs--1 text-dark">
+                                                                    <i class="fas fa-file-medical-alt text-primary me-2"></i>
+                                                                    OHIF: <strong>${study.nama_pemeriksaan}</strong>
+                                                                </span>
+
+                                                                <i class="fas fa-external-link-alt text-muted fs--2 ms-2"></i>
+                                                            </a>
+                                                        </li>
+                                                        ${dividerHtml}
+                                                    `;
+
+                                    containerOhif.insertAdjacentHTML('beforeend', itemHtml);
+                                });
+                            } else {
+                                // Tampilan jika tidak ada study/pemeriksaan yang tersedia
+                                const emptyHtml = `
+                                                        <li>
+                                                            <span class="dropdown-item disabled text-muted fs--2 text-center py-2">
+                                                                Viewer Tidak Tersedia
+                                                            </span>
+                                                        </li>
+                                                    `;
+                                containerOhif.insertAdjacentHTML('beforeend', emptyHtml);
+                            }
                         }
 
                         // B. RENDER GALERI GAMBAR JIKA TERSEDIA

@@ -349,4 +349,74 @@
         });
     });
 </script>
+<script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script> <!-- Jika belum terpasang SweetAlert2 -->
+
+<script>
+    $(document).ready(function() {
+        // Intercept form submit event untuk class .form-ekspertise-single
+        $(document).on('submit', '.form-ekspertise-single', function(e) {
+            e.preventDefault(); // Menghentikan reload bawaan browser
+
+            let form = $(this);
+            let actionUrl = form.attr('action');
+            let btnSave = form.find('.btn-save-ekspertise');
+            let originalBtnHtml = btnSave.html();
+
+            // Indikator Loading pada Tombol
+            btnSave.prop('disabled', true).html('<i class="fas fa-spinner fa-spin me-1"></i> Menyimpan...');
+
+            $.ajax({
+                url: actionUrl,
+                type: 'POST',
+                data: form.serialize(), // Mengambil seluruh inputan (termasuk CSRF token)
+                dataType: 'json',
+                headers: {
+                    'X-CSRF-TOKEN': $('meta[name="csrf-token"]').attr('content')
+                },
+                success: function(response) {
+                    // Kembalikan status tombol
+                    btnSave.prop('disabled', false).html(originalBtnHtml);
+
+                    if (response.status === 'success') {
+                        // Tampilkan notifikasi sukses menggunakan SweetAlert2
+                        Swal.fire({
+                            icon: 'success',
+                            title: 'Berhasil Disimpan!',
+                            text: response.message || 'Data ekspertise radiologi berhasil disimpan ke database.',
+                            timer: 2000,
+                            showConfirmButton: false
+                        });
+                    } else {
+                        Swal.fire({
+                            icon: 'warning',
+                            title: 'Perhatian!',
+                            text: response.message || 'Terjadi masalah saat menyimpan data.'
+                        });
+                    }
+                },
+                error: function(xhr) {
+                    // Kembalikan status tombol jika gagal
+                    btnSave.prop('disabled', false).html(originalBtnHtml);
+
+                    let errorMessage = 'Gagal menyimpan data.';
+
+                    // Tangkap error validasi dari Laravel (jika ada inputan kosong)
+                    if (xhr.status === 422 && xhr.responseJSON.errors) {
+                        let errors = xhr.responseJSON.errors;
+                        let firstErrorKey = Object.keys(errors)[0];
+                        errorMessage = errors[firstErrorKey][0];
+                    } else if (xhr.responseJSON && xhr.responseJSON.message) {
+                        errorMessage = xhr.responseJSON.message;
+                    }
+
+                    Swal.fire({
+                        icon: 'error',
+                        title: 'Error!',
+                        text: errorMessage
+                    });
+                }
+            });
+        });
+    });
+</script>
 @endsection
