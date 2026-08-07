@@ -154,7 +154,12 @@
             font-size: 10px;
         }
 
-        /* Header Kelompok Utama (Judul Besar) */
+        /* Tr Mencegah Pemotongan Baris oleh Dompdf */
+        .lab-table tr {
+            page-break-inside: avoid;
+        }
+
+        /* Header Kelompok Utama */
         .lab-table tr.main-category-row td {
             background-color: #f0f4f9;
             color: #1a5bb8;
@@ -188,6 +193,7 @@
         .footer-container {
             width: 100%;
             margin-top: 20px;
+            page-break-inside: avoid;
         }
 
         .footer-table {
@@ -322,7 +328,6 @@
 
             @foreach ($sub as $subs)
             @php
-            // Cek apakah item ini merupakan anak (memiliki t_pem_list_val_opt_code)
             $is_child = !empty($subs->t_pem_list_val_opt_code);
             @endphp
 
@@ -338,7 +343,7 @@
             @else
             @php
             $nilai = DB::table('h_reg_lab')
-            ->where('d_reg_order_lab_code', $reg->d_reg_order_lab_code)
+            ->where('order_lab_list_code', $pem->order_lab_list_code)
             ->where('t_pem_list_val_code', $subs->t_pem_list_val_code)
             ->first();
             @endphp
@@ -347,7 +352,6 @@
                 <!-- Kolom Nama Jenis Pemeriksaan -->
                 <td style="{{ $is_child ? 'padding-left: 22px;' : '' }}">
                     @if ($is_child)
-                    <!-- Indikator Anak -->
                     <span class="child-prefix">-</span>
                     @endif
                     <span class="{{ !$is_child ? 'fw-bold' : '' }}">

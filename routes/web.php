@@ -241,6 +241,7 @@ Route::prefix('{akses}/{id}/application')->group(function () {
     Route::get('menu-pelayanan/verifikasi-data-registrasi', [PelayananController::class, 'menu_pelayanan_verifikasi_registrasi'])->name('menu_pelayanan_verifikasi_registrasi');
     Route::get('menu-pelayanan/menu-supervisior', [PelayananController::class, 'menu_pelayanan_supervisior'])->name('menu_pelayanan_supervisior');
     // POLIKLINIK
+    Route::get('poliklinik/registrasi-poliklinik', [PoliklinikController::class, 'poliklinik_register_poli'])->name('poliklinik_register_poli');
     Route::get('menu-poliklinik/data-registrasi', [PoliklinikController::class, 'data_registrasi_poli'])->name('data_registrasi_poli');
     Route::get('menu-poliklinik/poliklinik-handling', [PoliklinikController::class, 'data_registrasi_poliklinik_handling'])->name('data_registrasi_poliklinik_handling');
     Route::get('verifikasi-poliklinik/verifikasi-dokter', [PoliklinikController::class, 'verifikasi_poliklinik_dokter'])->name('verifikasi_poliklinik_dokter');
@@ -329,6 +330,11 @@ Route::prefix('application')->group(function () {
     Route::post('registrasi-pasien/pilih-data-pasien/kebutuhan/pilih-laboratorium/pilih-pemeriksaan', [PelayananController::class, 'registrasi_pasien_pilih_data_pasien_kebutuhan_pilih_lab_pemeriksaan'])->name('registrasi_pasien_pilih_data_pasien_kebutuhan_pilih_lab_pemeriksaan');
     Route::post('registrasi-pasien/pilih-data-pasien/kebutuhan/pilih-laboratorium/remove-pemeriksaan-lab', [PelayananController::class, 'registrasi_pasien_pilih_data_pasien_kebutuhan_remove_pemeriksaan_lab'])->name('registrasi_pasien_pilih_data_pasien_kebutuhan_remove_pemeriksaan_lab');
     Route::post('registrasi-pasien/pilih-data-pasien/kebutuhan/pilih-poli', [PelayananController::class, 'registrasi_pasien_pilih_data_pasien_kebutuhan_pilih_poli'])->name('registrasi_pasien_pilih_data_pasien_kebutuhan_pilih_poli');
+    Route::post('registrasi-pasien/pilih-data-pasien/kebutuhan/pilih-poli/get-doctor-poli', [PelayananController::class, 'registrasi_pasien_pilih_data_pasien_get_dokter_poli'])->name('registrasi_pasien_pilih_data_pasien_get_dokter_poli');
+    Route::post('registrasi-pasien/pilih-data-pasien/kebutuhan/pilih-poli/get-doctor-quota', [PelayananController::class, 'registrasi_pasien_pilih_data_pasien_get_dokter_quota'])->name('registrasi_pasien_pilih_data_pasien_get_dokter_quota');
+    Route::post('registrasi-pasien/pilih-data-pasien/kebutuhan/pilih-poli/save-registration', [PelayananController::class, 'registrasi_pasien_pilih_data_pasien_storeRegistration'])->name('registrasi_pasien_pilih_data_pasien_storeRegistration');
+    Route::post('registrasi-pasien/pilih-data-pasien/kebutuhan/pilih-poli/print-ticket', [PelayananController::class, 'registrasi_pasien_pilih_data_pasien_print_ticket'])->name('registrasi_pasien_pilih_data_pasien_print_ticket');
+
     Route::post('registrasi-pasien/pilih-data-pasien/kebutuhan/pilih-poli/pilih-agrement', [PelayananController::class, 'registrasi_pasien_pilih_data_pasien_kebutuhan_pilih_poli_agrement'])->name('registrasi_pasien_pilih_data_pasien_kebutuhan_pilih_poli_agrement');
     Route::post('registrasi-pasien/pilih-data-pasien/kebutuhan/pilih-poli/pilih-type-agrement', [PelayananController::class, 'registrasi_pasien_pilih_data_pasien_kebutuhan_pilih_poli_type_agrement'])->name('registrasi_pasien_pilih_data_pasien_kebutuhan_pilih_poli_type_agrement');
     Route::post('registrasi-pasien/pilih-data-pasien/kebutuhan/pilih-poli/pilih-pemeriksaan', [PelayananController::class, 'registrasi_pasien_pilih_data_pasien_kebutuhan_pilih_poli_pemeriksaan'])->name('registrasi_pasien_pilih_data_pasien_kebutuhan_pilih_poli_pemeriksaan');
@@ -386,10 +392,15 @@ Route::prefix('master-data')->group(function () {
 });
 // MENU POLIKLINIK
 Route::prefix('application')->group(function () {
+    Route::get('poliklinik/registrasi-poliklinik/searchPatient', [PoliklinikController::class, 'poliklinik_register_poli_searchPatient'])->name('poliklinik_register_poli_searchPatient');
+    Route::get('poliklinik/registrasi-poliklinik/getAvailableDoctors', [PoliklinikController::class, 'poliklinik_register_poli_getAvailableDoctors'])->name('poliklinik_register_poli_getAvailableDoctors');
+    Route::get('poliklinik/registrasi-poliklinik/store', [PoliklinikController::class, 'poliklinik_register_poli_store'])->name('poliklinik_register_poli_store');
+
     Route::post('menu-poliklinik/data-registrasi/handling', [PoliklinikController::class, 'data_registrasi_poli_handling'])->name('data_registrasi_poli_handling');
     Route::post('menu-poliklinik/data-registrasi/handling-pasien', [PoliklinikController::class, 'data_registrasi_poli_handling_pasien'])->name('data_registrasi_poli_handling_pasien');
     Route::post('menu-poliklinik/poliklinik-handling/detail', [PoliklinikController::class, 'data_registrasi_poliklinik_handling_detail'])->name('data_registrasi_poliklinik_handling_detail');
     Route::post('menu-poliklinik/poliklinik-handling/order-layanan', [PoliklinikController::class, 'data_registrasi_poliklinik_handling_order_layanan'])->name('data_registrasi_poliklinik_handling_order_layanan');
+    Route::post('menu-poliklinik/poliklinik-handling/order-layanan/save', [PoliklinikController::class, 'data_registrasi_poliklinik_handling_order_layanan_save'])->name('data_registrasi_poliklinik_handling_order_layanan_save');
     Route::post('menu-poliklinik/poliklinik-handling/order-layanan/rad', [PoliklinikController::class, 'data_registrasi_poliklinik_handling_order_layanan_rad'])->name('data_registrasi_poliklinik_handling_order_layanan_rad');
     Route::post('menu-poliklinik/poliklinik-handling/poli-gigi/save-odontogram', [PoliklinikController::class, 'data_registrasi_poliklinik_save_odontogram'])->name('data_registrasi_poliklinik_save_odontogram');
     Route::post('menu-poliklinik/poliklinik-handling/poli-gigi/reset-odontogram', [PoliklinikController::class, 'data_registrasi_poliklinik_reset_odontogram'])->name('data_registrasi_poliklinik_reset_odontogram');
@@ -489,12 +500,25 @@ Route::prefix('application')->group(function () {
 });
 // MASTER DATA MEDICAL
 Route::prefix('application')->group(function () {
+    Route::post('master-doctor/data-doctor/import', [MasterDataController::class, 'master_doctor_data_doctor_import'])->name('master_doctor_data_doctor_import');
+    Route::get('master-doctor/data-doctor/download-template', [MasterDataController::class, 'master_doctor_download_template'])->name('master_doctor_download_template');
     Route::post('master-doctor/data-doctor/add', [MasterDataController::class, 'master_doctor_data_doctor_add'])->name('master_doctor_data_doctor_add');
     Route::post('master-doctor/data-doctor/save', [MasterDataController::class, 'master_doctor_data_doctor_save'])->name('master_doctor_data_doctor_save');
+
+    Route::get('master-doctor/doctor-poliklinik/list', [MasterDataController::class, 'master_doctor_poliklinik_list'])->name('master_doctor_poliklinik_list');
+    Route::get('master-doctor/doctor-poliklinik/get-doctor', [MasterDataController::class, 'master_doctor_poliklinik_get_doctor'])->name('master_doctor_poliklinik_get_doctor');
+
     Route::post('master-doctor/doctor-poliklinik/add', [MasterDataController::class, 'master_doctor_poliklinik_add'])->name('master_doctor_poliklinik_add');
     Route::post('master-doctor/doctor-poliklinik/save', [MasterDataController::class, 'master_doctor_poliklinik_save'])->name('master_doctor_poliklinik_save');
+    Route::post('master-doctor/doctor-poliklinik/remove', [MasterDataController::class, 'master_doctor_poliklinik_remove'])->name('master_doctor_poliklinik_remove');
     Route::post('master-doctor/doctor-poliklinik/pilih-dokter', [MasterDataController::class, 'master_doctor_poliklinik_pilih_dokter'])->name('master_doctor_poliklinik_pilih_dokter');
     Route::post('master-doctor/doctor-poliklinik/pilih-dokter-save', [MasterDataController::class, 'master_doctor_poliklinik_pilih_dokter_save'])->name('master_doctor_poliklinik_pilih_dokter_save');
+    // JADWAL DOKTER POLI
+    Route::get('master-doctor/jadwal-dokter-poli/getSchedules', [MasterDataController::class, 'master_jadwal_doctor_poliklinik_getSchedules'])->name('master_jadwal_doctor_poliklinik_getSchedules');
+    Route::get('master-doctor/jadwal-dokter-poli/getDoctorsByPoli', [MasterDataController::class, 'master_jadwal_doctor_poliklinik_getDoctorsByPoli'])->name('master_jadwal_doctor_poliklinik_getDoctorsByPoli');
+    Route::post('master-doctor/jadwal-dokter-poli/saveSchedule', [MasterDataController::class, 'master_jadwal_doctor_poliklinik_saveSchedule'])->name('master_jadwal_doctor_poliklinik_saveSchedule');
+    Route::delete('master-doctor/jadwal-dokter-poli/remove', [MasterDataController::class, 'master_jadwal_doctor_poliklinik_remove'])->name('master_jadwal_doctor_poliklinik_remove');
+
     // PEMERIKSAAN
     Route::post('master-pemeriksaan/category-pemeriksaan/add', [MasterDataController::class, 'master_pemeriksaan_category_add'])->name('master_pemeriksaan_category_add');
     Route::post('master-pemeriksaan/category-pemeriksaan/save', [MasterDataController::class, 'master_pemeriksaan_category_save'])->name('master_pemeriksaan_category_save');

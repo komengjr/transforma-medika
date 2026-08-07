@@ -137,8 +137,8 @@
     <div class="col-lg-8">
         <div class="card shadow-sm border-0">
             <div class="card-header bg-dark text-white py-3 d-flex justify-content-between align-items-center">
-                <h5 class="mb-0 fw-bold"><i class="bi bi-table me-2"></i>Daftar Harga Pemeriksaan</h5>
-                <span class="badge bg-primary px-3 py-2 fs-6" id="totalBadge">Total: 0 Data</span>
+                <h5 class="mb-0 fw-bold text-white"><i class="bi bi-table me-2"></i>Daftar Harga Pemeriksaan</h5>
+                <span class="badge bg-primary px-3 py-2 fs-2" id="totalBadge">Total: 0 Data</span>
             </div>
             <div class="card-body p-0">
                 <div class="table-responsive">

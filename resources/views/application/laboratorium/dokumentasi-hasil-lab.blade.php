@@ -12,12 +12,16 @@
         transition: all 0.25s ease-in-out;
         cursor: pointer;
         border-left: 4px solid transparent !important;
+        background-color: #ffffff;
     }
 
-    .handling-card:hover {
+    /* Hover State (Hanya berlaku untuk card yang TIDAK aktif) */
+    .handling-card:not(.active-handling):hover {
         transform: translateY(-2px);
         box-shadow: 0 0.5rem 1rem rgba(0, 0, 0, 0.08) !important;
         border-color: #2c7be5 !important;
+        background-color: #ffffff !important;
+        /* Mencegah warna background berubah saat hover */
     }
 
     /* Active State saat diklik */
@@ -25,6 +29,8 @@
         background-color: rgb(19, 28, 42) !important;
         border-left: 4px solid #2c7be5 !important;
         box-shadow: 0 0.125rem 0.25rem rgba(0, 0, 0, 0.075) !important;
+        transform: none !important;
+        /* Opsional: menghentikan efek melayang saat card sudah aktif */
     }
 
     .handling-card.active-handling .patient-name {
@@ -233,8 +239,8 @@
             e.preventDefault();
             var code = $(this).data("code");
 
-            // Toggle Active Class Visual State
-            $(".remove-class").removeClass("active-handling");
+            // Toggle Active Class Visual State (Diubah dari .remove-class ke .handling-card)
+            $(".handling-card").removeClass("active-handling");
             $(this).addClass("active-handling");
 
             // Render Loading Spinner Modern

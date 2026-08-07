@@ -22,13 +22,13 @@
 
                     <!-- Brand & App Label -->
                     <div class="col-lg-7 d-flex align-items-center">
-                        <div class="p-2 bg-opacity-10 rounded-4 shadow-sm me-3 border border-white border-opacity-10 d-flex align-items-center justify-content-center backdrop-blur"
+                        <div class="p-2 bg-opacity-10 rounded-4 shadow-sm me-3 border-opacity-10 d-flex align-items-center justify-content-center backdrop-blur"
                             style="width: 65px; height: 65px; backdrop-filter: blur(10px);">
                             <img src="{{ asset('img/dashboard.png') }}" alt="Logo" class="img-fluid drop-shadow" width="42" />
                         </div>
                         <div>
                             <div class="d-flex align-items-center gap-2 mb-1">
-                                <span class="badge bg-warning text-dark fw-bold px-2 py-1 rounded-pill" style="font-size: 0.68rem; letter-spacing: 0.5px;">
+                                <span class="badge bg-warning text-white fw-bold px-2 py-1 rounded-pill" style="font-size: 0.68rem; letter-spacing: 0.5px;">
                                     <i class="fas fa-bolt me-1"></i> LIVE SYSTEM
                                 </span>
                                 <span class="text-white-50" style="font-size: 0.75rem;">v2.4 Medical Suite</span>
@@ -377,58 +377,78 @@
     });
     $(document).on("click", "#button-save-create-pasien-baru", function(e) {
         e.preventDefault();
+
         var data = $("#form-create-pasien-baru").serialize();
-        var nama = document.getElementById("nama_lengkap").value;
-        var nik = document.getElementById("nik").value;
-        var jk = document.getElementById("jenis_kelamin").value;
-        var tgl = document.getElementById("tgl_lahir").value;
-        var agama = document.getElementById("agama").value;
-        var no_hp = document.getElementById("no_hp").value;
-        var lokasi = document.getElementById("data_city").value;
-        if (nama == '' || nik == '' || jk == '' || tgl == '' || agama == '' || no_hp == '') {
-            Lobibox.notify('warning', {
-                pauseDelayOnHover: true,
-                continueDelayOnInactiveTab: true,
-                position: 'top right',
-                icon: 'fas fa-info-circle',
-                msg: 'Pastikan Data Sudah Terisi'
+        var nama = $("#nama_lengkap").val();
+        var nik = $("#nik").val();
+        var jk = $("#jenis_kelamin").val();
+        var tgl = $("#tgl_lahir").val();
+        var agama = $("#agama").val();
+        var no_hp = $("#no_hp").val();
+
+        // Validasi field wajib
+        if (nama === '' || nik === '' || jk === '' || tgl === '' || agama === '' || no_hp === '') {
+            Swal.fire({
+                title: 'Peringatan!',
+                text: 'Pastikan seluruh data wajib sudah terisi!',
+                icon: 'warning',
+                confirmButtonColor: '#1A73E8',
+                confirmButtonText: 'Mengerti'
             });
-        } else {
-            $('#menu-registrasi-pasien').html(
-                '<div class="spinner-border my-3" style="display: block; margin-left: auto; margin-right: auto;" role="status"><span class="visually-hidden">Loading...</span></div>'
-            );
-            $.ajax({
-                url: "{{ route('registrasi_pasien_create_save') }}",
-                type: "POST",
-                cache: false,
-                data: data,
-                dataType: 'html',
-            }).done(function(data) {
-                if (data == 1) {
-                    Lobibox.notify('success', {
-                        pauseDelayOnHover: true,
-                        continueDelayOnInactiveTab: true,
-                        position: 'top right',
-                        icon: 'fas fa-info-circle',
-                        msg: 'Berhasil Create Pasien'
-                    });
-                    $('#menu-registrasi-pasien').html(data);
-                } else {
-                    Lobibox.notify('error', {
-                        pauseDelayOnHover: true,
-                        continueDelayOnInactiveTab: true,
-                        position: 'top right',
-                        icon: 'fas fa-info-circle',
-                        msg: 'Data NIK Sudah ada'
-                    });
-                    setTimeout(() => {
-                        location.reload();
-                    }, 2000);
-                }
-            }).fail(function() {
-                $('#menu-registrasi-pasien').html('eror');
-            });
+            return;
         }
+
+        // Ubah status tombol jadi loading
+        var $btn = $(this);
+        var btnOriginalText = $btn.html();
+        $btn.prop('disabled', true).html('<i class="fas fa-spinner fa-spin me-2"></i> Menyimpan...');
+
+        $.ajax({
+            url: "{{ route('registrasi_pasien_create_save') }}",
+            type: "POST",
+            cache: false,
+            data: data,
+            dataType: 'json',
+        }).done(function(response) {
+            $btn.prop('disabled', false).html(btnOriginalText);
+
+            if (response.status === 'success') {
+                Swal.fire({
+                    title: 'Berhasil!',
+                    text: response.message,
+                    icon: 'success',
+                    confirmButtonColor: '#1A73E8',
+                    confirmButtonText: 'OK'
+                }).then((result) => {
+                    if (result.isConfirmed || result.dismiss) {
+                        location.reload(); // Reload halaman setelah klik OK
+                    }
+                });
+            } else {
+                Swal.fire({
+                    title: 'Gagal!',
+                    text: response.message,
+                    icon: response.icon || 'warning',
+                    confirmButtonColor: '#d33',
+                    confirmButtonText: 'Tutup'
+                });
+            }
+        }).fail(function(xhr) {
+            $btn.prop('disabled', false).html(btnOriginalText);
+
+            var errorMsg = 'Terjadi kesalahan sistem saat menyimpan data.';
+            if (xhr.responseJSON && xhr.responseJSON.message) {
+                errorMsg = xhr.responseJSON.message;
+            }
+
+            Swal.fire({
+                title: 'Error!',
+                text: errorMsg,
+                icon: 'error',
+                confirmButtonColor: '#d33',
+                confirmButtonText: 'Tutup'
+            });
+        });
     });
     $(document).on("click", "#button-pilih-data-pasien", function(e) {
         e.preventDefault();

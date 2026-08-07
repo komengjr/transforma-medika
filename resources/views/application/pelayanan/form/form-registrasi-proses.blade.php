@@ -37,7 +37,9 @@
                 <div class="tab-pane fade show active" id="pill-tab-home" role="tabpanel" aria-labelledby="home-tab">
                     <div class="card border mt-2">
                         <div class="row g-3 pb-3 rounded-4" style="background: linear-gradient(135deg, #eef2f3 0%, #8e9eab 100%);">
-
+                            <input type="hidden" id="patient_id" name="patient_id" value="{{ $data->id_master_patient  }}">
+                            <input type="hidden" id="patient_code" value="{{ $data->master_patient_code  }}">
+                            <input type="hidden" id="patient_name" value="{{ $data->master_patient_name  }}">
                             <!-- KOLOM KIRI: Profil Utama (Theme Gradient Dark/Navy) -->
                             <div class="col-md-3">
                                 <div class="card border-0 shadow-lg text-center p-3 h-100 rounded-4 text-white position-relative overflow-hidden"

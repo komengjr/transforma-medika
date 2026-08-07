@@ -2,7 +2,9 @@
 
 namespace App\Http\Controllers;
 
+use App\Exports\DoctorTemplateExport;
 use App\Imports\DataHargaPenjualan;
+use App\Imports\DoctorImport;
 use App\Imports\PesertaAllImport;
 use App\Imports\PesertaImport;
 use Illuminate\Http\Request;
@@ -10,6 +12,7 @@ use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Hash;
 use Illuminate\Support\Facades\Redirect;
+use Illuminate\Support\Facades\Validator;
 use Illuminate\Support\Str;
 use League\CommonMark\Extension\CommonMark\Node\Inline\Code;
 use Maatwebsite\Excel\Facades\Excel;
@@ -60,6 +63,26 @@ class MasterDataController extends Controller
             return Redirect::to('dashboard/home');
         }
     }
+    public function master_doctor_data_doctor_import(Request $request)
+    {
+        $request->validate([
+            'file_excel' => 'required|mimes:xlsx,xls,csv|max:5120', // Maks 5MB
+        ]);
+
+        try {
+            Excel::import(new DoctorImport, $request->file('file_excel'));
+
+            return redirect()->back()->with('success', 'Data dokter berhasil di-import dari Excel!');
+        } catch (\Exception $e) {
+            return redirect()->back()->with('error', 'Gagal memproses file Excel: ' . $e->getMessage());
+        }
+    }
+    public function master_doctor_download_template(Request $request)
+    {
+        $fileName = 'Template_Import_Dokter_' . date('Ymd_His') . '.xlsx';
+
+        return Excel::download(new DoctorTemplateExport, $fileName);
+    }
     public function master_doctor_data_doctor_add(Request $request)
     {
         return view('application.master-data.data-doctor.form-add');
@@ -67,7 +90,7 @@ class MasterDataController extends Controller
     public function master_doctor_data_doctor_save(Request $request)
     {
         DB::table('master_doctor')->insert([
-            'master_doctor_code' => str::uuid(),
+            'master_doctor_code' => 'DOC-' . rand(10000, 99999),
             'master_doctor_nik' => $request->nik,
             'master_doctor_title_f' => $request->awal,
             'master_doctor_name' => $request->name,
@@ -88,9 +111,90 @@ class MasterDataController extends Controller
             $layanan = DB::table('t_layanan_data')
                 ->join('t_layanan_cat', 't_layanan_cat.t_layanan_cat_code', '=', 't_layanan_data.t_layanan_cat_code')
                 ->where('t_layanan_cat.t_layanan_cat_name', 'POLIKLINIK')->get();
+
             return view('application.master-data.master-doctor-poliklinik', ['data' => $data, 'layanan' => $layanan, 'akses' => $akses, 'code' => $id]);
         } else {
             return Redirect::to('dashboard/home');
+        }
+    }
+    public function master_doctor_poliklinik_list()
+    {
+        try {
+            // Mengambil data dari tabel m_poli sesuai schema Anda
+            $polis = DB::table('m_poli')
+                ->select('id_m_poli', 'm_poli_code', 'm_poli_name', 'm_poli_type', 'm_poli_status')
+                // Jika ada status non-aktif dan ingin difilter, buka komentar baris di bawah:
+                // ->where('m_poli_status', 'AKTIF')
+                ->orderBy('m_poli_name', 'asc')
+                ->get();
+
+            return response()->json([
+                'status' => 'success',
+                'data'   => $polis
+            ], 200);
+        } catch (\Exception $e) {
+            return response()->json([
+                'status'  => 'error',
+                'message' => 'Gagal mengambil data poliklinik: ' . $e->getMessage()
+            ], 500);
+        }
+    }
+    public function master_doctor_poliklinik_get_doctor(Request $request)
+    {
+        $poliCode = $request->query('m_poli_code');
+
+        if (!$poliCode) {
+            return response()->json([
+                'status'  => 'error',
+                'message' => 'Kode Poliklinik tidak ditemukan.'
+            ], 400);
+        }
+
+        try {
+            // 1. Ambil Dokter yang SUDAH terdaftar di Poli ini
+            $mappedDoctors = DB::table('m_poli_doctor as pd')
+                ->join('master_doctor as d', 'pd.master_doctor_code', '=', 'd.master_doctor_code')
+                ->where('pd.m_poli_code', $poliCode)
+                ->select(
+                    'pd.id',
+                    'd.master_doctor_code',
+                    'd.master_doctor_nik',
+                    'd.master_doctor_name',
+                    'd.master_doctor_title_f',
+                    'd.master_doctor_title_e',
+                    'd.master_doctor_jk',
+                    'd.master_doctor_hp'
+                )
+                ->get();
+
+            // Ambil daftar kode dokter yang sudah terdaftar
+            $assignedDoctorCodes = $mappedDoctors->pluck('master_doctor_code')->toArray();
+
+            // 2. Ambil Dokter yang BELUM terdaftar di Poli ini (untuk Select / Dropdown Modal)
+            $availableDoctors = DB::table('master_doctor')
+                ->whereNotIn('master_doctor_code', $assignedDoctorCodes)
+                ->select(
+                    'master_doctor_code',
+                    'master_doctor_nik',
+                    'master_doctor_name',
+                    'master_doctor_title_f',
+                    'master_doctor_title_e'
+                )
+                ->orderBy('master_doctor_name', 'asc')
+                ->get();
+
+            return response()->json([
+                'status' => 'success',
+                'data'   => [
+                    'mapped_doctors'    => $mappedDoctors,
+                    'available_doctors' => $availableDoctors
+                ]
+            ], 200);
+        } catch (\Exception $e) {
+            return response()->json([
+                'status'  => 'error',
+                'message' => 'Gagal mengambil data dokter: ' . $e->getMessage()
+            ], 500);
         }
     }
     public function master_doctor_poliklinik_add(Request $request)
@@ -99,14 +203,81 @@ class MasterDataController extends Controller
     }
     public function master_doctor_poliklinik_save(Request $request)
     {
-        DB::table('m_poli')->insert([
-            'm_poli_code' => str::uuid(),
-            'm_poli_name' => $request->name,
-            'm_poli_type' => 1,
-            'm_poli_status' => 1,
-            'created_at' => now(),
+        $request->validate([
+            'm_poli_code'        => 'required',
+            'master_doctor_code' => 'required',
         ]);
-        return redirect()->back()->withSuccess('Great! Berhasil Menambahkan Data Poli Dokter');
+
+        try {
+            // Validasi keberadaan Poliklinik
+            $poliExists = DB::table('m_poli')->where('m_poli_code', $request->m_poli_code)->exists();
+            if (!$poliExists) {
+                return response()->json([
+                    'status'  => 'error',
+                    'message' => 'Poliklinik tidak ditemukan.'
+                ], 404);
+            }
+
+            // Cegah Duplikasi Mapping di tabel m_poli_doctor
+            $exists = DB::table('m_poli_doctor')
+                ->where('m_poli_code', $request->m_poli_code)
+                ->where('master_doctor_code', $request->master_doctor_code)
+                ->exists();
+
+            if ($exists) {
+                return response()->json([
+                    'status'  => 'error',
+                    'message' => 'Dokter ini sudah terdaftar pada Poliklinik tersebut.'
+                ], 422);
+            }
+
+            // Insert Mapping ke m_poli_doctor
+            DB::table('m_poli_doctor')->insert([
+                'm_poli_code'        => $request->m_poli_code,
+                'master_doctor_code' => $request->master_doctor_code,
+                'created_at'         => now(),
+                'updated_at'         => now()
+            ]);
+
+            return response()->json([
+                'status'  => 'success',
+                'message' => 'Dokter berhasil ditambahkan ke Poliklinik!'
+            ], 200);
+        } catch (\Exception $e) {
+            return response()->json([
+                'status'  => 'error',
+                'message' => 'Gagal menyimpan data mapping: ' . $e->getMessage()
+            ], 500);
+        }
+    }
+    public function master_doctor_poliklinik_remove(Request $request)
+    {
+        $request->validate([
+            'id' => 'required'
+        ]);
+
+        try {
+            $deleted = DB::table('m_poli_doctor')
+                ->where('id', $request->id)
+                ->delete();
+
+            if ($deleted) {
+                return response()->json([
+                    'status'  => 'success',
+                    'message' => 'Dokter berhasil dikeluarkan dari Poliklinik!'
+                ], 200);
+            }
+
+            return response()->json([
+                'status'  => 'error',
+                'message' => 'Data mapping dokter tidak ditemukan.'
+            ], 404);
+        } catch (\Exception $e) {
+            return response()->json([
+                'status'  => 'error',
+                'message' => 'Gagal menghapus data dokter: ' . $e->getMessage()
+            ], 500);
+        }
     }
     public function master_doctor_poliklinik_pilih_dokter(Request $request)
     {
@@ -132,10 +303,199 @@ class MasterDataController extends Controller
     public function master_jadwal_doctor_poliklinik($akses, $id)
     {
         if ($this->url_akses_sub($akses, $id) == true) {
-            $data = DB::table('m_poli')->get();
-            return view('application.master-data.master-doctor-poli-jadwal', ['akses' => $akses, 'data' => $data, 'code' => $id]);
+            $poliklinik = DB::table('m_poli')
+                ->select('m_poli_code', 'm_poli_name')
+                ->orderBy('m_poli_name', 'asc')
+                ->get();
+            return view('application.master-data.master-doctor-poli-jadwal', ['akses' => $akses, 'poliklinik' => $poliklinik, 'code' => $id]);
         } else {
             return Redirect::to('dashboard/home');
+        }
+    }
+    public function master_jadwal_doctor_poliklinik_getSchedules(Request $request)
+    {
+        try {
+            $query = DB::table('m_poli_doctor_schedule')
+                // Join ke m_poli_doctor menggunakan 'id'
+                ->join('m_poli_doctor', 'm_poli_doctor_schedule.m_poli_doctor_id', '=', 'm_poli_doctor.id')
+                ->join('m_poli', 'm_poli_doctor.m_poli_code', '=', 'm_poli.m_poli_code')
+                ->join('master_doctor', 'm_poli_doctor.id', '=', 'master_doctor.id_master_doctor')
+                ->select(
+                    'm_poli_doctor_schedule.*',
+                    'm_poli.m_poli_name',
+                    'master_doctor.master_doctor_name',
+                    'master_doctor.master_doctor_title_f',
+                    'master_doctor.master_doctor_title_e'
+                );
+
+            // Filter bersifat opsional (jika diisi dari front-end)
+            if ($request->filled('m_poli_code')) {
+                $query->where('m_poli.m_poli_code', $request->m_poli_code);
+            }
+
+            if ($request->filled('day_name')) {
+                $query->where('m_poli_doctor_schedule.day_name', $request->day_name);
+            }
+
+            $schedules = $query->get();
+
+            return response()->json([
+                'status' => 'success',
+                'data'   => $schedules
+            ], 200);
+        } catch (\Exception $e) {
+            return response()->json([
+                'status'  => 'error',
+                'message' => 'Gagal mengambil data jadwal: ' . $e->getMessage(),
+                'data'    => []
+            ], 500);
+        }
+    }
+    public function master_jadwal_doctor_poliklinik_getDoctorsByPoli(Request $request)
+    {
+        try {
+            $query = DB::table('m_poli_doctor')
+                ->join('master_doctor', 'm_poli_doctor.id', '=', 'master_doctor.id_master_doctor')
+                ->join('m_poli', 'm_poli_doctor.m_poli_code', '=', 'm_poli.m_poli_code')
+                ->select(
+                    'm_poli_doctor.id as m_poli_doctor_id',
+                    'm_poli_doctor.m_poli_code',
+                    'master_doctor.id_master_doctor',
+                    'master_doctor.master_doctor_name',
+                    'master_doctor.master_doctor_title_f',
+                    'master_doctor.master_doctor_title_e'
+                );
+
+            if ($request->filled('m_poli_code')) {
+                $query->where('m_poli_doctor.m_poli_code', $request->m_poli_code);
+            }
+
+            $doctors = $query->get();
+
+            return response()->json([
+                'status' => 'success',
+                'data'   => $doctors
+            ], 200);
+        } catch (\Exception $e) {
+            return response()->json([
+                'status'  => 'error',
+                'message' => 'Gagal mengambil data dokter: ' . $e->getMessage(),
+                'data'    => []
+            ], 500);
+        }
+    }
+    public function master_jadwal_doctor_poliklinik_saveSchedule(Request $request)
+    {
+        // Validasi input agar mengembalikan JSON jika error (AJAX friendly)
+        $validator = Validator::make($request->all(), [
+            'm_poli_doctor_id' => 'required|exists:m_poli_doctor,id',
+            'day_name'         => 'required|in:Senin,Selasa,Rabu,Kamis,Jumat,Sabtu,Minggu',
+            'time_start'       => 'required|date_format:H:i',
+            'time_end'         => 'required|date_format:H:i|after:time_start',
+            'quota'            => 'required|integer|min:1',
+        ], [
+            'm_poli_doctor_id.required' => 'Dokter poliklinik wajib dipilih.',
+            'm_poli_doctor_id.exists'   => 'Data dokter poliklinik tidak valid.',
+            'day_name.required'         => 'Hari wajib dipilih.',
+            'time_start.required'       => 'Jam mulai wajib diisi.',
+            'time_end.required'         => 'Jam selesai wajib diisi.',
+            'time_end.after'            => 'Jam selesai harus setelah jam mulai.',
+            'quota.required'            => 'Kuota wajib diisi.',
+            'quota.min'                 => 'Kuota minimal 1 pasien.',
+        ]);
+
+        if ($validator->fails()) {
+            return response()->json([
+                'status'  => 'error',
+                'message' => $validator->errors()->first()
+            ], 422);
+        }
+
+        try {
+            // Ambil data mapping poli & dokter dari m_poli_doctor
+            $mapping = DB::table('m_poli_doctor')
+                ->where('id', $request->m_poli_doctor_id)
+                ->first();
+
+            if (!$mapping) {
+                return response()->json([
+                    'status'  => 'error',
+                    'message' => 'Mapping Dokter Poliklinik tidak ditemukan.'
+                ], 404);
+            }
+
+            // Pengecekan bentrok jadwal (Overlap) untuk dokter yang sama di hari yang sama
+            // Formula overlap: (start_db < end_req) AND (end_db > start_req)
+            $isOverlapping = DB::table('m_poli_doctor_schedule')
+                ->where('m_poli_doctor_id', $request->m_poli_doctor_id)
+                ->where('day_name', $request->day_name)
+                ->where('status', 'AKTIF')
+                ->where(function ($query) use ($request) {
+                    $query->where('time_start', '<', $request->time_end)
+                        ->where('time_end', '>', $request->time_start);
+                })
+                ->exists();
+
+            if ($isOverlapping) {
+                return response()->json([
+                    'status'  => 'error',
+                    'message' => 'Jadwal dokter pada jam tersebut sudah ada yang bentrok.'
+                ], 422);
+            }
+
+            // Simpan Jadwal Baru ke m_poli_doctor_schedule
+            $insertedId = DB::table('m_poli_doctor_schedule')->insertGetId([
+                'm_poli_doctor_id'   => $request->m_poli_doctor_id,
+                'm_poli_code'        => $mapping->m_poli_code,
+                'master_doctor_code' => $mapping->master_doctor_code ?? $mapping->master_doctor_id,
+                'day_name'           => $request->day_name,
+                'time_start'         => $request->time_start,
+                'time_end'           => $request->time_end,
+                'quota'              => $request->quota,
+                'status'             => $request->input('status', 'AKTIF'),
+                'created_at'         => now(),
+                'updated_at'         => now(),
+            ]);
+
+            return response()->json([
+                'status'  => 'success',
+                'message' => 'Jadwal dokter berhasil ditambahkan!',
+                'id'      => $insertedId
+            ], 200);
+        } catch (\Exception $e) {
+            return response()->json([
+                'status'  => 'error',
+                'message' => 'Gagal menyimpan jadwal: ' . $e->getMessage()
+            ], 500);
+        }
+    }
+    public function master_jadwal_doctor_poliklinik_remove(Request $request)
+    {
+        $request->validate([
+            'id_schedule' => 'required'
+        ]);
+
+        try {
+            $deleted = DB::table('m_poli_doctor_schedule')
+                ->where('id_schedule', $request->id_schedule)
+                ->delete();
+
+            if ($deleted) {
+                return response()->json([
+                    'status'  => 'success',
+                    'message' => 'Jadwal berhasil dihapus!'
+                ], 200);
+            }
+
+            return response()->json([
+                'status'  => 'error',
+                'message' => 'Jadwal tidak ditemukan.'
+            ], 404);
+        } catch (\Exception $e) {
+            return response()->json([
+                'status'  => 'error',
+                'message' => 'Gagal menghapus jadwal: ' . $e->getMessage()
+            ], 500);
         }
     }
     // MASTER KATEGORI DOKTER

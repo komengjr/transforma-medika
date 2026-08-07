@@ -250,6 +250,8 @@ class PriceSettingController extends Controller
         $lastRecord = DB::table('p_sales')->count();
         if ($lastRecord) {
             $nextNumber = $lastRecord + 1;
+        } else {
+            $nextNumber = 1;
         }
         $newCode = 'PS-' . date('Y') . '-' . str_pad($nextNumber, 3, '0', STR_PAD_LEFT);
 

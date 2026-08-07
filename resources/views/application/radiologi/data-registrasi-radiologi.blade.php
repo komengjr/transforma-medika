@@ -111,6 +111,7 @@
     .rad-date-input::placeholder {
         color: #cbd5e1 !important;
     }
+
 </style>
 @endsection
 

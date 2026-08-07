@@ -183,15 +183,12 @@
 
                                     @foreach ($sub as $subs)
                                     @php
+                                    // PENCARIAN DIREVISI MENGGUNAKAN COLUMN: order_lab_list_code
                                     $nilai = DB::table('h_reg_lab')
-                                    ->where('d_reg_order_lab_code', $reg)
+                                    ->where('order_lab_list_code', $pem->order_lab_list_code)
                                     ->where('t_pem_list_val_code', $subs->t_pem_list_val_code)
                                     ->first();
 
-                                    // PENGECEKAN PERSISI:
-                                    // Berdasarkan kolom t_pem_list_val_opt_code di DB:
-                                    // Jika t_pem_list_val_opt_code ADA Isinya -> Berarti ini ANAK
-                                    // Jika KOSONG -> Berarti ini BUKAN Anak (Bisa Kepala / Parameter Mandiri)
                                     $is_child = !empty($subs->t_pem_list_val_opt_code);
                                     @endphp
 
@@ -209,11 +206,11 @@
                                         <!-- Parameter Name -->
                                         <td class="{{ $is_child ? 'ps-4' : 'ps-3' }}">
                                             @if($is_child)
-                                            <!-- Jika Anak (Limfosit, Monosit, dll) -->
+                                            <!-- Jika Anak -->
                                             <span class="text-400 me-2 fw-bold">↳</span>
                                             <span class="text-700 fw-medium">{{ $subs->t_pem_list_val_name }}</span>
                                             @else
-                                            <!-- Jika Parameter Mandiri (Trombosit, Hemoglobin, dll) -->
+                                            <!-- Jika Parameter Mandiri -->
                                             <span class="fw-bold text-800">{{ $subs->t_pem_list_val_name }}</span>
                                             @endif
                                         </td>

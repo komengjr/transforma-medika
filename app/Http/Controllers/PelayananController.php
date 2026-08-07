@@ -128,15 +128,27 @@ class PelayananController extends Controller
     }
     public function registrasi_pasien_create_save(Request $request)
     {
-        if ($request->link == "") {
+        // Validasi sederhana (opsional tapi disarankan)
+        $request->validate([
+            'nik' => 'required',
+            'nama' => 'required',
+            'jk' => 'required',
+            'tgl_lahir' => 'required',
+            'no_hp' => 'required',
+        ]);
+
+        if (empty($request->link)) {
             $file = null;
         } else {
-            $file = 'profile/data_pasien/' . auth::user()->access_cabang . '/' . $request->link;
+            $file = 'profile/data_pasien/' . Auth::user()->access_cabang . '/' . $request->link;
         }
+
+        // Cek apakah NIK sudah terdaftar
         $cek = DB::table('master_patient')->where('master_patient_nik', $request->nik)->first();
+
         if (!$cek) {
             DB::table('master_patient')->insert([
-                'master_patient_code' => 'MPP' . date('Ymdhis'),
+                'master_patient_code' => 'MPP' . date('YmdHis'),
                 'master_patient_nik' => $request->nik,
                 'master_patient_name' => $request->nama,
                 'master_patient_jk' => $request->jk,
@@ -150,9 +162,18 @@ class PelayananController extends Controller
                 'master_patient_profile' => $file,
                 'created_at' => now()
             ]);
-            return 1;
+
+            return response()->json([
+                'status' => 'success',
+                'message' => 'Data pasien baru berhasil disimpan!',
+                'icon' => 'success'
+            ]);
         } else {
-            return 0;
+            return response()->json([
+                'status' => 'error',
+                'message' => 'NIK sudah terdaftar dalam sistem!',
+                'icon' => 'warning'
+            ]);
         }
     }
     public function registrasi_pasien_cari_data_pasien(Request $request)
@@ -188,8 +209,8 @@ class PelayananController extends Controller
         $pasien_cat = DB::table('t_pasien_cat')
             ->join('t_pasien_cat_data', 't_pasien_cat_data.t_pasien_cat_code', '=', 't_pasien_cat.t_pasien_cat_code')
             ->where('t_pasien_cat.t_pasien_cat_code', $request->cat)->get();
-        if ($request->id == '14de0404-0c88-4cff-bae1-d28ea75b53ad') {
-            $poli = DB::table('t_layanan_data')->where('t_layanan_cat_code', '14de0404-0c88-4cff-bae1-d28ea75b53ad')->where('t_layanan_data_status', 1)->get();
+        if ($request->id == 'POLI') {
+            $poli = DB::table('m_poli')->get();
             return view('application.pelayanan.form.kebutuhan.form-poliklinik', ['poli' => $poli, 'cat' => $pasien_cat]);
         } elseif ($request->id == 'LAB') {
             $dokter = DB::table('master_doctor')->get();
@@ -291,10 +312,343 @@ class PelayananController extends Controller
     }
     public function registrasi_pasien_pilih_data_pasien_kebutuhan_pilih_poli(Request $request)
     {
-        $data = DB::table('t_layanan_data')->where('t_layanan_data_code', $request->id)->first();
-        $dokter = DB::table('m_doctor_poli')->join('master_doctor', 'master_doctor.master_doctor_code', '=', 'm_doctor_poli.master_doctor_code')
-            ->where('m_doctor_poli.t_layanan_data_code', $request->id)->get();
-        return view('application.pelayanan.form.kebutuhan.data-poliklinik', ['data' => $data, 'dokter' => $dokter]);
+        $poliCode = $request->m_poli_code;
+        $tanggal  = $request->tanggal_periksa;
+
+        // Tentukan nama hari dalam Bahasa Indonesia dari tanggal periksa
+        $dayIndex = Carbon::parse($tanggal)->dayOfWeek;
+        $daysInIndonesian = [
+            0 => 'Minggu',
+            1 => 'Senin',
+            2 => 'Selasa',
+            3 => 'Rabu',
+            4 => 'Kamis',
+            5 => 'Jumat',
+            6 => 'Sabtu'
+        ];
+        $dayName = $daysInIndonesian[$dayIndex];
+
+        // Query Dokter yang memiliki jadwal AKTIF pada hari & poli tersebut
+        $doctors = DB::table('m_poli_doctor_schedule as s')
+            ->join('master_doctor as d', 's.master_doctor_code', '=', 'd.master_doctor_code')
+            ->where('s.m_poli_code', $poliCode)
+            ->where('s.day_name', $dayName)
+            ->where('s.status', 'AKTIF')
+            ->select('d.master_doctor_code', 'd.master_doctor_name', 'd.master_doctor_title_f', 'd.master_doctor_title_e')
+            ->distinct()
+            ->get();
+
+        if ($doctors->isEmpty()) {
+            return response()->json([
+                'status'  => false,
+                'message' => 'Tidak ada dokter yang berpraktik pada hari ' . $dayName,
+                'doctors' => []
+            ]);
+        }
+
+        return response()->json([
+            'status'  => true,
+            'doctors' => $doctors
+        ]);
+    }
+    public function registrasi_pasien_pilih_data_pasien_get_dokter_poli(Request $request)
+    {
+        $poliCode = $request->m_poli_code;
+        $tanggal  = $request->tanggal_periksa;
+
+        // Tentukan nama hari dalam Bahasa Indonesia dari tanggal periksa
+        $dayIndex = Carbon::parse($tanggal)->dayOfWeek;
+        $daysInIndonesian = [
+            0 => 'Minggu',
+            1 => 'Senin',
+            2 => 'Selasa',
+            3 => 'Rabu',
+            4 => 'Kamis',
+            5 => 'Jumat',
+            6 => 'Sabtu'
+        ];
+        $dayName = $daysInIndonesian[$dayIndex];
+
+        // Query Dokter yang memiliki jadwal AKTIF pada hari & poli tersebut
+        $doctors = DB::table('m_poli_doctor_schedule as s')
+            ->join('master_doctor as d', 's.master_doctor_code', '=', 'd.master_doctor_code')
+            ->where('s.m_poli_code', $poliCode)
+            ->where('s.day_name', $dayName)
+            ->where('s.status', 'AKTIF')
+            ->select('d.master_doctor_code', 'd.master_doctor_name', 'd.master_doctor_title_f', 'd.master_doctor_title_e')
+            ->distinct()
+            ->get();
+
+        if ($doctors->isEmpty()) {
+            return response()->json([
+                'status'  => false,
+                'message' => 'Tidak ada dokter yang berpraktik pada hari ' . $dayName,
+                'doctors' => []
+            ]);
+        }
+
+        return response()->json([
+            'status'  => true,
+            'doctors' => $doctors
+        ]);
+    }
+    // 2. Endpoint untuk mendapatkan Detail Kuota & Jam Kerja Dokter
+    public function registrasi_pasien_pilih_data_pasien_get_dokter_quota(Request $request)
+    {
+        $poliCode   = $request->m_poli_code;
+        $doctorCode = $request->master_doctor_code;
+        $tanggal    = $request->tanggal_periksa;
+
+        $dayIndex = Carbon::parse($tanggal)->dayOfWeek;
+        $daysInIndonesian = [
+            0 => 'Minggu',
+            1 => 'Senin',
+            2 => 'Selasa',
+            3 => 'Rabu',
+            4 => 'Kamis',
+            5 => 'Jumat',
+            6 => 'Sabtu'
+        ];
+        $dayName = $daysInIndonesian[$dayIndex];
+
+        // Ambil Jadwal Dokter
+        $schedule = DB::table('m_poli_doctor_schedule')
+            ->where('m_poli_code', $poliCode)
+            ->where('master_doctor_code', $doctorCode)
+            ->where('day_name', $dayName)
+            ->where('status', 'AKTIF')
+            ->first();
+
+        if (!$schedule) {
+            return '<div class="alert alert-warning">Jadwal dokter tidak ditemukan.</div>';
+        }
+
+        // Hitung jumlah pendaftaran aktif yang sudah masuk di t_registrations
+        $terpakai = DB::table('t_registrations')
+            ->where('schedule_id', $schedule->id_schedule)
+            ->where('visit_date', $tanggal)
+            ->where('status', '!=', 'BATAL')
+            ->count();
+
+        $sisaKuota = max(0, $schedule->quota - $terpakai);
+
+        // Return Partial View HTML
+        return view('application.pelayanan.form.kebutuhan.poliklinik.kuota-dokter-poli', compact('schedule', 'terpakai', 'sisaKuota', 'tanggal'));
+    }
+    // 3. Endpoint untuk Menyimpan Pendaftaran ke t_registrations
+    public function registrasi_pasien_pilih_data_pasien_storeRegistration(Request $request)
+    {
+
+        try {
+            return DB::transaction(function () use ($request) {
+                $tglHariIni  = date('Y-m-d');
+                $tglVisit    = $request->d_reg_order_poli_visit ?? $tglHariIni;
+                $userActive  = Auth::user()->id ?? Auth::user()->username ?? 'SYSTEM';
+
+                // -------------------------------------------------------------
+                // 1. INSERT / CEK MASTER REGISTRASI ORDER (d_reg_order)
+                // -------------------------------------------------------------
+                // Cek apakah pasien sudah memiliki pendaftaran order aktif pada hari ini
+                $existingOrder = DB::table('d_reg_order')
+                    ->where('d_reg_order_rm', $request->d_reg_order_rm)
+                    ->whereDate('d_reg_order_date', $tglHariIni)
+                    ->first();
+
+                if ($existingOrder) {
+                    $orderCode = $existingOrder->d_reg_order_code;
+                } else {
+                    // Generate Kode Order Baru
+                    $orderCode = 'ORD-' . date('YmdHis') . '-' . rand(100, 999);
+
+                    DB::table('d_reg_order')->insert([
+                        'd_reg_order_code'     => $orderCode,
+                        'd_reg_order_rm'       => $request->patientCode,
+                        'd_reg_order_date'     => $tglHariIni,
+                        't_layanan_cat_code'   => 'POLI',
+                        't_pasien_cat_code'    => 'UMUM',
+                        'd_reg_order_status'   => 'REGISTERED',
+                        'd_reg_order_cabang'     => Auth::user()->access_cabang,
+                        'd_reg_order_user'     => Auth::user()->userid,
+                        'created_at'           => now(),
+                        'updated_at'           => now(),
+                    ]);
+                }
+
+                // -------------------------------------------------------------
+                // 2. GENERATE NOMOR ANTREAN POLI
+                // -------------------------------------------------------------
+                $lastQueue = DB::table('d_reg_order_poli')
+                    ->where('m_poli_code', $request->m_poli_code)
+                    ->whereDate('d_reg_order_poli_visit', $tglVisit)
+                    ->max('d_reg_order_poli_queue');
+
+                $nextQueueNumber = ($lastQueue ? (int)$lastQueue : 0) + 1;
+                $queueFormatted  = str_pad($nextQueueNumber, 3, '0', STR_PAD_LEFT); // Contoh: 001, 002
+
+                // -------------------------------------------------------------
+                // 3. INSERT DETAIL REGISTRASI POLI (d_reg_order_poli)
+                // -------------------------------------------------------------
+                $codeOrderPoli = 'POLI' . '-' . date('YmdHis') . '-' . rand(100, 999);
+                $dokter = DB::table('m_poli_doctor_schedule')->where('id_schedule', $request->schedule_id)->first();
+                DB::table('d_reg_order_poli')->insert([
+                    'd_reg_order_poli_code'   => $codeOrderPoli,
+                    'd_reg_order_code'        => $orderCode, // Terhubung ke d_reg_order
+                    'master_doctor_code'      => $dokter->master_doctor_code,
+                    'd_reg_order_poli_date'   => now(),
+                    'd_reg_order_poli_status' => 'REGISTRATION',
+                    'd_reg_order_poli_user'   => $userActive,
+                    'd_reg_order_poli_queue'  => $queueFormatted,
+                    'm_poli_code'             => $request->m_poli_code,
+                    'schedule_id'             => $request->schedule_id,
+                    'd_reg_order_poli_visit'  => $tglVisit,
+                    'payment_method'          => $request->payment_method,
+                    'insurance_no'            => ($request->payment_method !== 'UMUM') ? $request->insurance_no : null,
+                    // 'd_reg_order_poli_status' => 'MENUNGGU',
+                    'created_at'              => now(),
+                    'updated_at'              => now(),
+                ]);
+                DB::table('d_reg_order_list')->insert([
+                    'd_reg_order_list_code' => $codeOrderPoli,
+                    'd_reg_order_code' => $orderCode,
+                    't_layanan_cat_code' => 'POLI',
+                    'd_reg_order_list_date' => now(),
+                    'created_at' => now(),
+                ]);
+                return response()->json([
+                    'status'     => 'success',
+                    'message'    => 'Registrasi berhasil disimpan! Nomor Antrean Poli: ' . $queueFormatted,
+                    'order_code' => $orderCode,
+                    'queue'      => $queueFormatted, // <--- Pastikan nama key ini sesuai dengan JavaScript
+                    'icon'       => 'success'
+                ]);
+            });
+        } catch (\Exception $e) {
+            return response()->json([
+                'status'  => 'error',
+                'message' => 'Gagal menyimpan pendaftaran: ' . $e->getMessage(),
+                'icon'    => 'error'
+            ], 500);
+        }
+        // $request->validate([
+        //     'patient_id'     => 'required',
+        //     'm_poli_code'    => 'required',
+        //     'schedule_id'    => 'required',
+        //     'visit_date'     => 'required|date',
+        //     'payment_method' => 'required',
+        // ]);
+
+        // DB::beginTransaction();
+        // try {
+        //     // Check Sisa Kuota
+        //     $schedule = DB::table('m_poli_doctor_schedule')
+        //         ->where('id_schedule', $request->schedule_id)
+        //         ->first();
+
+        //     $existingCount = DB::table('t_registrations')
+        //         ->where('schedule_id', $request->schedule_id)
+        //         ->where('visit_date', $request->visit_date)
+        //         ->where('status', '!=', 'BATAL')
+        //         ->count();
+
+        //     if ($existingCount >= $schedule->quota) {
+        //         return response()->json([
+        //             'status'  => false,
+        //             'message' => 'Kuota pendaftaran untuk jadwal ini sudah penuh.'
+        //         ], 422);
+        //     }
+
+        //     // Generate Nomor Antrean Otomatis (Format: A-001, A-002, dst.)
+        //     $nextQueueNum = $existingCount + 1;
+        //     $queueNumber  = 'A-' . str_pad($nextQueueNum, 3, '0', STR_PAD_LEFT);
+
+        //     // Simpan ke t_registrations
+        //     $registrationId = DB::table('t_registrations')->insertGetId([
+        //         'queue_number'   => $queueNumber,
+        //         'patient_id'     => $request->patient_id,
+        //         'm_poli_code'    => $request->m_poli_code,
+        //         'schedule_id'    => $request->schedule_id,
+        //         'visit_date'     => $request->visit_date,
+        //         'payment_method' => $request->payment_method,
+        //         'insurance_no'   => $request->insurance_no ?? null,
+        //         'status'         => 'MENUNGGU',
+        //         'created_at'     => now(),
+        //         'updated_at'     => now(),
+        //     ]);
+
+        //     DB::commit();
+
+        //     return response()->json([
+        //         'status'  => true,
+        //         'message' => 'Pendaftaran berhasil disimpan.',
+        //         'data'    => [
+        //             'id_registration' => $registrationId,
+        //             'queue_number'    => $queueNumber
+        //         ]
+        //     ]);
+        // } catch (\Exception $e) {
+        //     DB::rollBack();
+        //     return response()->json([
+        //         'status'  => false,
+        //         'message' => 'Gagal menyimpan pendaftaran: ' . $e->getMessage()
+        //     ], 500);
+        // }
+    }
+
+    public function registrasi_pasien_pilih_data_pasien_print_ticket(Request $request)
+    {
+        $validated = $request->validate([
+            'queue_no'     => 'required|string',
+            'poli_name'    => 'required|string',
+            'doctor_name'  => 'required|string',
+            'patient_code' => 'required|string',
+            'patient_name' => 'required|string',
+            'payment'      => 'required|string',
+            'date'         => 'required|string',
+        ]);
+
+        try {
+            // OPTION A: Jika menggunakan printer lokal yang terhubung ke server/PC kasir (Mike42 Escpos)
+            /*
+            $connector = new \Mike42\Escpos\PrintConnectors\WindowsPrintConnector("PRINTER_RECEIPT_NAME");
+            $printer   = new \Mike42\Escpos\Printer($connector);
+
+            $printer->setJustification(\Mike42\Escpos\Printer::JUSTIFY_CENTER);
+            $printer->selectPrintMode(\Mike42\Escpos\Printer::MODE_DOUBLE_HEIGHT | \Mike42\Escpos\Printer::MODE_DOUBLE_WIDTH);
+            $printer->text("RSUD HOSPITAL\n");
+            $printer->selectPrintMode();
+            $printer->text("Bukti Pendaftaran Poliklinik\n");
+            $printer->text("--------------------------------\n");
+            $printer->text("Nomor Antrean:\n");
+            $printer->setTextSize(3, 3);
+            $printer->text($validated['queue_no'] . "\n");
+            $printer->setTextSize(1, 1);
+            $printer->text("--------------------------------\n");
+            $printer->setJustification(\Mike42\Escpos\Printer::JUSTIFY_LEFT);
+            $printer->text("Poli    : " . $validated['poli_name'] . "\n");
+            $printer->text("Dokter  : " . $validated['doctor_name'] . "\n");
+            $printer->text("Kode    : " . $validated['patient_code'] . "\n");
+            $printer->text("Pasien  : " . $validated['patient_name'] . "\n");
+            $printer->text("Penjamin: " . $validated['payment'] . "\n");
+            $printer->text("Tanggal : " . $validated['date'] . "\n");
+            $printer->text("--------------------------------\n");
+            $printer->setJustification(\Mike42\Escpos\Printer::JUSTIFY_CENTER);
+            $printer->text("Harap datang 15 menit\nsebelum jam praktik.\n\n");
+            $printer->cut();
+            $printer->close();
+            */
+
+            // Return response sukses jika tidak ada error
+            return response()->json([
+                'status'  => true,
+                'message' => 'Perintah cetak tiket berhasil dikirim ke printer.',
+                'data'    => $validated
+            ], 200);
+        } catch (Exception $e) {
+            return response()->json([
+                'status'  => false,
+                'message' => 'Gagal mencetak tiket: ' . $e->getMessage()
+            ], 500);
+        }
     }
     public function registrasi_pasien_pilih_data_pasien_kebutuhan_pilih_poli_agrement(Request $request)
     {

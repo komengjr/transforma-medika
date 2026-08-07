@@ -19,9 +19,16 @@ class CreateDRegOrderPoliTable extends Migration
             $table->string('d_reg_order_code');
             $table->string('m_doctor_poli_code');
             $table->date('d_reg_order_poli_date');
-            $table->string('d_reg_order_poli_number');
             $table->string('d_reg_order_poli_status');
             $table->string('d_reg_order_poli_user');
+            $table->string('d_reg_order_poli_queue');
+            // $table->unsignedBigInteger('patient_id'); // Merujuk ke id_master_patient
+            $table->string('m_poli_code');
+            $table->unsignedBigInteger('schedule_id');
+            $table->date('d_reg_order_poli_visit');
+            $table->string('payment_method'); // UMUM, BPJS, ASURANSI
+            $table->string('insurance_no')->nullable();
+            $table->enum('d_reg_order_poli_status', ['MENUNGGU', 'DILAYANI', 'SELESAI', 'BATAL'])->default('MENUNGGU');
             $table->timestamps();
         });
     }

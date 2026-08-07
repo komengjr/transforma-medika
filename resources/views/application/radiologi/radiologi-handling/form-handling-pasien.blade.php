@@ -438,8 +438,9 @@ $payment = DB::table('d_reg_order_payment')->where('d_reg_order_list_code', $cod
                     </div>
                 </div>
             </div>
-            <!-- CARD BODY -->
-            <div class="card-body p-3 bg-light">
+
+            <!-- CARD BODY (DIBERIKAN STYLE SCROLL) -->
+            <div class="card-body p-3 bg-light" style="max-height: 500px; overflow-y: auto;">
                 <!-- ALERT ERROR -->
                 <div id="orthanc-alert" class="alert alert-danger alert-dismissible fade show d-none mb-3 fs--1 p-2 rounded-3 shadow-sm" role="alert">
                     <div class="d-flex align-items-center">

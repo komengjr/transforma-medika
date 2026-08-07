@@ -114,8 +114,9 @@
                         $isParentHeader = ($subs->t_pem_list_val_opt === 'Y');
                         $isChild = !empty($subs->t_pem_list_val_opt_code);
 
+                        // PERBAIKAN: Menggunakan order_lab_list_code milik item pemeriksaan
                         $nilai = DB::table('h_reg_lab')
-                        ->where('d_reg_order_lab_code', $code)
+                        ->where('order_lab_list_code', $pem->order_lab_list_code)
                         ->where('t_pem_list_val_code', $subs->t_pem_list_val_code)
                         ->first();
 
@@ -202,7 +203,11 @@
         $('#button-sinkronisasi-proses-result').on('click', function(e) {
             e.preventDefault();
             let btn = $(this);
-            let codeLab = $('input[name="code"]').val();
+
+            // 1. Ambil order_lab_list_code dari data attribute tombol atau input hidden khusus
+            let orderLabListCode = btn.data('order-lab-list-code') || $('input[name="order_lab_list_code"]').val() || $('input[name="code"]').val();
+
+            console.log(orderLabListCode);
 
             let listCodes = [];
             $('.select-metode').each(function() {
@@ -217,6 +222,11 @@
                 return;
             }
 
+            if (!orderLabListCode) {
+                alert('Kode Order Lab List tidak ditemukan.');
+                return;
+            }
+
             btn.prop('disabled', true).html('<span class="spinner-border spinner-border-sm"></span> Menyinkronkan...');
 
             $.ajax({
@@ -224,12 +234,12 @@
                 type: "POST",
                 data: {
                     _token: "{{ csrf_token() }}",
-                    code: codeLab,
+                    code: orderLabListCode, // Mengirim order_lab_list_code ke Controller
                     list_codes: listCodes
                 },
                 success: function(response) {
                     if (response.status === 'success') {
-                        let updatedData = response.data; // Objek [code => value]
+                        let updatedData = response.data; // Objek [t_pem_list_val_code => value]
 
                         $('.input-hasil').each(function() {
                             let code = $(this).data('code');
@@ -243,7 +253,7 @@
                                 // Isi nilai hasil
                                 inputEl.val(updatedData[code]);
 
-                                // Hanya beri warna/styling tanpa disable agar bisa di-edit manual
+                                // Beri penanda visual bahwa data disinkronkan dari alat
                                 inputEl.addClass('border-success bg-light-success');
                                 selectMetode.addClass('border-success bg-light-success');
                                 selectFlag.addClass('border-success bg-light-success');
