@@ -21,6 +21,8 @@ class HrmKpiMaster extends Migration
             $table->text('hrm_kpi_master_desc');
             $table->string('hrm_kpi_master_bobot');
             $table->string('hrm_kpi_master_target');
+            $table->enum('hrm_kpi_master_type', ['manual', 'kehadiran', 'sistem'])->default('manual')->after('hrm_kpi_master_target');
+            $table->string('hrm_kpi_master_formula')->nullable()->after('hrm_kpi_master_type');
             $table->timestamps();
         });
     }

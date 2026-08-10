@@ -832,6 +832,7 @@ Route::get('/event/register/{id}/{code}', [App\Http\Controllers\Event\RegisterCo
 include 'farmasi.php';
 include 'brodcast.php';
 include 'koperasi.php';
+include 'hrm.php';
 
 Route::post('/upload-sftp', [FileUploadController::class, 'uploadFile'])->name('upload.sftp');
 Route::post('/upload-ftp', [FileUploadController::class, 'uploadFileftp'])->name('upload.ftp');

@@ -29,6 +29,7 @@ class HrmMasterPegawai extends Migration
             $table->string('hrm_m_position_loc');
             $table->text('hrm_m_pegawai_address');
             $table->text('hrm_m_pegawai_img')->nullable();
+            $table->string('hrm_m_jam_kerja_code', 50)->nullable()->after('hrm_m_position_loc');
             $table->timestamps();
         });
     }

@@ -20,7 +20,7 @@
     <script src="{{ asset('asset/js/config.js') }}"></script>
 
     <!-- Stylesheets -->
-    <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
     <link href="{{ asset('vendors/overlayscrollbars/OverlayScrollbars.min.css') }}" rel="stylesheet">
     <link href="{{ asset('asset/css/theme-rtl.min.css') }}" rel="stylesheet" id="style-rtl">
     <link href="{{ asset('asset/css/theme.min.css') }}" rel="stylesheet" id="style-default">
@@ -48,16 +48,17 @@
     </script>
 
     <style>
-        /* Animated Background */
+        /* Bright Beach Coastal Gradient Animation Background */
         body {
             font-family: 'Plus Jakarta Sans', sans-serif;
-            background: linear-gradient(-45deg, #e0e7ff, #f3e8ff, #e0f2fe, #f4f7fe);
+            background: linear-gradient(-45deg, #38bdf8, #7dd3fc, #0284c7, #fef3c7, #fed7aa);
             background-size: 400% 400%;
-            animation: gradientAnimation 15s ease infinite;
+            animation: beachGradientAnimation 14s ease infinite;
             min-height: 100vh;
+            color: #1e293b;
         }
 
-        @keyframes gradientAnimation {
+        @keyframes beachGradientAnimation {
             0% {
                 background-position: 0% 50%;
             }
@@ -71,33 +72,194 @@
             }
         }
 
-        /* Header Fix Layering */
+        /* Executive Modern Header Card Styling */
         .glass-header-container {
             position: relative;
             z-index: 1050;
-            /* Memastikan header & dropdown diatas marquee */
         }
 
-        .glass-header {
-            background: rgba(255, 255, 255, 0.85);
-            backdrop-filter: blur(12px);
-            border-radius: 20px !important;
-            border: 1px solid rgba(255, 255, 255, 0.6) !important;
-            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.05);
+        .office-header-card {
+            background: rgba(255, 255, 255, 0.88);
+            backdrop-filter: blur(24px);
+            -webkit-backdrop-filter: blur(24px);
+            border-radius: 24px !important;
+            border: 1px solid rgba(255, 255, 255, 0.9) !important;
+            box-shadow: 0 20px 40px rgba(2, 132, 199, 0.12), 0 4px 12px rgba(0, 0, 0, 0.03);
+            position: relative;
+            overflow: visible !important;
+            transition: all 0.3s ease;
+        }
+
+        /* Glowing Top Accent Bar */
+        .office-header-card::after {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 24px;
+            right: 24px;
+            height: 4px;
+            background: linear-gradient(90deg, #0284c7, #38bdf8, #f59e0b, #0284c7);
+            background-size: 200% 100%;
+            animation: moveGradient 6s linear infinite;
+            border-radius: 0 0 4px 4px;
+        }
+
+        @keyframes moveGradient {
+            0% {
+                background-position: 0% 0%;
+            }
+
+            100% {
+                background-position: 200% 0%;
+            }
+        }
+
+        .office-logo-box {
+            background: linear-gradient(135deg, #ffffff, #e0f2fe);
+            border: 1px solid #bae6fd;
+            border-radius: 18px;
+            padding: 12px;
+            box-shadow: 0 8px 16px rgba(2, 132, 199, 0.08);
+            transition: transform 0.3s ease;
+        }
+
+        .office-logo-box:hover {
+            transform: scale(1.05) rotate(-2deg);
+        }
+
+        .office-badge {
+            background: linear-gradient(135deg, #0284c7, #0369a1);
+            color: #ffffff;
+            font-size: 0.7rem;
+            font-weight: 700;
+            letter-spacing: 0.5px;
+            padding: 4px 12px;
+            border-radius: 20px;
+            box-shadow: 0 4px 10px rgba(2, 132, 199, 0.25);
+            text-transform: uppercase;
+        }
+
+        .system-status-pill {
+            background: rgba(16, 185, 129, 0.12);
+            color: #047857;
+            font-size: 0.72rem;
+            font-weight: 600;
+            padding: 4px 10px;
+            border-radius: 20px;
+            border: 1px solid rgba(16, 185, 129, 0.25);
+            display: inline-flex;
+            align-items: center;
+        }
+
+        .user-status-dot {
+            display: inline-block;
+            width: 8px;
+            height: 8px;
+            background-color: #10b981;
+            border-radius: 50%;
+            margin-right: 6px;
+            box-shadow: 0 0 0 3px rgba(16, 185, 129, 0.25);
+            animation: pulseDot 2s infinite;
+        }
+
+        @keyframes pulseDot {
+            0% {
+                transform: scale(0.95);
+                box-shadow: 0 0 0 0 rgba(16, 185, 129, 0.7);
+            }
+
+            70% {
+                transform: scale(1);
+                box-shadow: 0 0 0 6px rgba(16, 185, 129, 0);
+            }
+
+            100% {
+                transform: scale(0.95);
+                box-shadow: 0 0 0 0 rgba(16, 185, 129, 0);
+            }
+        }
+
+        .avatar-container {
             position: relative;
         }
 
-        /* Fix Dropdown z-index tertutup marquee & card */
-        .dropdown-menu {
-            z-index: 99999 !important;
-            border-radius: 12px;
-            box-shadow: 0 10px 25px rgba(0, 0, 0, 0.15) !important;
+        .avatar-frame {
+            padding: 3px;
+            background: linear-gradient(135deg, #0284c7, #38bdf8, #f59e0b);
+            border-radius: 50%;
+            box-shadow: 0 6px 16px rgba(2, 132, 199, 0.2);
+            transition: transform 0.3s ease;
         }
 
-        /* Marquee Container Layering */
+        .avatar-frame:hover {
+            transform: scale(1.05);
+        }
+
+        .badge-access-code {
+            background: #f1f5f9;
+            color: #0f172a;
+            border: 1px solid #cbd5e1;
+            font-weight: 700;
+            font-size: 0.72rem;
+            padding: 3px 10px;
+            border-radius: 8px;
+        }
+
+        /* Control Action Buttons */
+        .header-btn-action {
+            width: 42px;
+            height: 42px;
+            border-radius: 12px !important;
+            background: #ffffff !important;
+            border: 1px solid #e2e8f0 !important;
+            color: #475569 !important;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            box-shadow: 0 4px 10px rgba(0, 0, 0, 0.04);
+            transition: all 0.2s ease;
+        }
+
+        .header-btn-action:hover {
+            background: #f0f9ff !important;
+            color: #0284c7 !important;
+            border-color: #bae6fd !important;
+            transform: translateY(-2px);
+        }
+
+        /* Styling Dropdown Menu & Teks Kelihatan Jelas */
+        .dropdown-menu {
+            z-index: 99999 !important;
+            border-radius: 16px !important;
+            padding: 0.6rem !important;
+            background-color: #ffffff !important;
+            border: 1px solid #e2e8f0 !important;
+            box-shadow: 0 20px 40px rgba(15, 23, 42, 0.15) !important;
+        }
+
+        .dropdown-item {
+            border-radius: 10px;
+            font-weight: 600;
+            font-size: 0.875rem;
+            color: #1e293b !important;
+            padding: 9px 16px;
+            transition: all 0.2s ease;
+        }
+
+        .dropdown-item:hover,
+        .dropdown-item:focus {
+            background-color: #e0f2fe !important;
+            color: #0369a1 !important;
+            transform: translateX(3px);
+        }
+
+        /* Marquee Bar Layering */
         .marquee-container {
             position: relative;
             z-index: 10;
+            background: linear-gradient(90deg, #0369a1, #0284c7) !important;
+            border: 1px solid rgba(255, 255, 255, 0.3);
+            box-shadow: 0 10px 25px rgba(2, 132, 199, 0.25);
         }
 
         /* Modern Card Menu UI */
@@ -109,7 +271,7 @@
             height: 220px;
             cursor: pointer;
             transition: all 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275);
-            box-shadow: 0 10px 20px rgba(0, 0, 0, 0.08);
+            box-shadow: 0 12px 24px rgba(15, 23, 42, 0.12);
             z-index: 1;
         }
 
@@ -130,7 +292,7 @@
             left: 0;
             width: 100%;
             height: 100%;
-            background: linear-gradient(180deg, rgba(15, 23, 42, 0.2) 0%, rgba(15, 23, 42, 0.85) 100%);
+            background: linear-gradient(180deg, rgba(15, 23, 42, 0.2) 0%, rgba(15, 23, 42, 0.88) 100%);
             z-index: 2;
             transition: background 0.3s ease;
         }
@@ -151,22 +313,23 @@
             top: 15px;
             right: 15px;
             z-index: 3;
-            width: 42px;
-            height: 42px;
-            background: rgba(255, 255, 255, 0.2);
-            backdrop-filter: blur(8px);
-            border-radius: 12px;
+            width: 44px;
+            height: 44px;
+            background: rgba(255, 255, 255, 0.25);
+            backdrop-filter: blur(10px);
+            border-radius: 14px;
             display: flex;
             align-items: center;
             justify-content: center;
-            font-size: 1.2rem;
+            font-size: 1.25rem;
             color: #fff;
-            border: 1px solid rgba(255, 255, 255, 0.3);
+            border: 1px solid rgba(255, 255, 255, 0.4);
+            box-shadow: 0 4px 10px rgba(0, 0, 0, 0.1);
         }
 
         .menu-card:hover {
             transform: translateY(-8px) scale(1.02);
-            box-shadow: 0 20px 30px rgba(0, 0, 0, 0.18);
+            box-shadow: 0 20px 35px rgba(2, 132, 199, 0.25);
         }
 
         .menu-card:hover .card-bg-img {
@@ -187,9 +350,9 @@
         }
 
         .menu-card .card-text {
-            font-size: 0.78rem;
-            color: rgba(255, 255, 255, 0.8);
-            line-height: 1.35;
+            font-size: 0.8rem;
+            color: rgba(255, 255, 255, 0.85);
+            line-height: 1.4;
             display: -webkit-box;
             -webkit-line-clamp: 2;
             -webkit-box-orient: vertical;
@@ -199,9 +362,9 @@
 
         /* Coming Soon Card Style */
         .coming-soon-card {
-            background: rgba(255, 255, 255, 0.4);
-            backdrop-filter: blur(8px);
-            border: 2px dashed #94a3b8;
+            background: rgba(255, 255, 255, 0.5);
+            backdrop-filter: blur(12px);
+            border: 2px dashed rgba(2, 132, 199, 0.4);
             border-radius: 20px;
             height: 220px;
             display: flex;
@@ -209,11 +372,12 @@
             justify-content: center;
             text-align: center;
             padding: 1.5rem;
+            color: #0369a1;
         }
 
-        /* Modern Bottom Navigation for Mobile */
+        /* Bottom Navigation Bar for Mobile */
         .kaki {
-            background: rgba(15, 23, 42, 0.85);
+            background: rgba(255, 255, 255, 0.9);
             backdrop-filter: blur(16px);
             position: fixed;
             bottom: 15px;
@@ -223,14 +387,14 @@
             width: 90%;
             max-width: 450px;
             height: 65px;
-            border: 1px solid rgba(255, 255, 255, 0.15);
-            box-shadow: 0 10px 25px rgba(0, 0, 0, 0.3);
+            border: 1px solid rgba(255, 255, 255, 0.8);
+            box-shadow: 0 10px 25px rgba(2, 132, 199, 0.2);
             z-index: 99999;
             padding: 0 10px;
         }
 
         .kaki .nav-link-custom {
-            color: #94a3b8;
+            color: #64748b;
             display: flex;
             flex-direction: column;
             align-items: center;
@@ -247,46 +411,68 @@
 
         .kaki .nav-link-custom.active,
         .kaki .nav-link-custom:hover {
-            color: #38bdf8;
+            color: #0284c7;
         }
     </style>
 </head>
 
 <body>
     <main class="main" id="top">
-        <div class="container-fluid py-4">
+        <div class="container-fluid py-4 py-lg-5">
             <div class="row justify-content-center">
                 <div class="col-lg-10 col-xl-9">
 
-                    <!-- Header Card -->
+                    <!-- Executive Office Header Card (Modernized Design) -->
                     <div class="glass-header-container mb-4">
-                        <div class="card glass-header border-0">
+                        <div class="card office-header-card border-0">
                             <div class="card-body p-3 p-md-4">
                                 <div class="row align-items-center justify-content-between g-3">
+
+                                    <!-- Left Section: Logo & Titles -->
                                     <div class="col-auto d-flex align-items-center">
-                                        <img class="me-3" src="{{asset('img/favicon.png')}}" alt="Logo" width="55">
+                                        <div class="office-logo-box me-3 d-flex align-items-center justify-content-center">
+                                            <img src="{{asset('img/logo-pt.png')}}" alt="Logo" width="106" height="46">
+                                        </div>
                                         <div>
-                                            <span class="badge bg-soft-primary text-primary fw-semibold mb-1">Innoventra System</span>
-                                            <h3 class="fw-bold text-dark mb-0 fs-1 fs-sm-2">Dashboard <span class="text-primary">Home</span></h3>
+                                            <div class="d-flex align-items-center gap-2 mb-1">
+                                                <span class="office-badge">Innoventra System</span>
+                                                <span class="system-status-pill d-none d-sm-inline-flex">
+                                                    <span class="user-status-dot"></span>System Active
+                                                </span>
+                                            </div>
+                                            <h3 class="fw-extrabold text-danger mb-0 fs-1 fs-sm-2" style="letter-spacing: -0.5px;">
+                                                Ver.3 <span class="text-primary" style="background: linear-gradient(135deg, #0284c7, #2563eb); -webkit-background-clip: text; -webkit-text-fill-color: transparent;">Dashboard</span>
+                                            </h3>
                                         </div>
                                     </div>
+
+                                    <!-- Right Section: User Info & Actions -->
                                     <div class="col-auto">
                                         <div class="d-flex align-items-center gap-3">
+
+                                            <!-- User Meta Info -->
                                             <div class="text-end d-none d-sm-block">
-                                                <h6 class="mb-0 text-dark fw-bold">Hi, {{Auth::user()->fullname}}</h6>
-                                                <small class="text-muted">{{ ucfirst(Auth::user()->access_code) }}</small>
+                                                <h6 class="mb-1 text-youtube fw-bold fs-0 lh-1">{{Auth::user()->fullname}}</h6>
+                                                <span class="badge-access-code">
+                                                    <i class="fas fa-user-shield me-1 text-primary"></i>{{ strtoupper(Auth::user()->access_code) }}
+                                                </span>
                                             </div>
 
-                                            <div class="avatar avatar-xl position-relative">
-                                                <img class="rounded-circle border border-2 border-primary shadow-sm" src="{{asset('img/pp.png')}}" alt="Profile" />
+                                            <!-- User Avatar -->
+                                            <div class="avatar-container position-relative">
+                                                <div class="avatar avatar-xl">
+                                                    <div class="avatar-frame">
+                                                        <img class="rounded-circle bg-white" src="{{asset('img/pp.png')}}" alt="Profile" />
+                                                    </div>
+                                                </div>
                                             </div>
 
-                                            <!-- Dropdown Menu -->
-                                            <div class="dropdown">
-                                                <button class="btn btn-light rounded-circle p-2 shadow-sm" type="button" id="dropdownUser" data-bs-toggle="dropdown" aria-expanded="false">
-                                                    <i class="fas fa-ellipsis-v text-secondary"></i>
+                                            <!-- Header Dropdown Menu -->
+                                            <div class="dropdown" style="z-index: 1000000;">
+                                                <button class="header-btn-action" type="button" id="dropdownUser" data-bs-toggle="dropdown" aria-expanded="false" title="Menu Opsi">
+                                                    <i class="fas fa-ellipsis-v fs-0"></i>
                                                 </button>
-                                                <ul class="dropdown-menu dropdown-menu-end shadow-lg border-0 rounded-3 mt-2" aria-labelledby="dropdownUser">
+                                                <ul class="dropdown-menu dropdown-menu-end shadow-lg border-0 rounded-3 mt-2 p-2" aria-labelledby="dropdownUser">
                                                     <li>
                                                         <button class="dropdown-item py-2" id="button-menu-utama">
                                                             <i class="fab fa-dashcube me-2 text-primary"></i> Menu Utama
@@ -305,7 +491,7 @@
                                                     </li>
                                                     @endif
                                                     <li>
-                                                        <hr class="dropdown-divider">
+                                                        <hr class="dropdown-divider my-1">
                                                     </li>
                                                     <li>
                                                         <button class="dropdown-item py-2 text-danger" id="button-logout">
@@ -317,15 +503,16 @@
 
                                         </div>
                                     </div>
+
                                 </div>
                             </div>
                         </div>
                     </div>
 
                     <!-- Marquee Announcement -->
-                    <div class="card border-0 shadow-sm rounded-4 mb-4 bg-primary text-white overflow-hidden marquee-container">
+                    <div class="card border-0 shadow-sm rounded-4 mb-4 text-white overflow-hidden marquee-container">
                         <div class="card-body py-2 px-3 d-flex align-items-center">
-                            <i class="fas fa-bullhorn me-3 fs-0"></i>
+                            <i class="fas fa-bullhorn me-3 text-warning fs-0"></i>
                             <marquee class="m-0 fw-medium fs--1" behavior="scroll" direction="left">
                                 Selamat Datang di Innoventra System Management — Solusi Integrasi Sistem Terlengkap untuk Bisnis Anda.
                             </marquee>
@@ -396,9 +583,9 @@
                         <div class="col-sm-6 col-lg-4">
                             <div class="coming-soon-card">
                                 <div>
-                                    <div class="mb-2 text-muted fs-2"><i class="fas fa-rocket"></i></div>
-                                    <h6 class="fw-bold text-secondary mb-1">Fitur Mendatang</h6>
-                                    <small class="text-muted d-block">Modul baru sedang dalam pengembangan.</small>
+                                    <div class="mb-2 fs-2"><i class="fas fa-rocket"></i></div>
+                                    <h6 class="fw-bold mb-1">Fitur Mendatang</h6>
+                                    <small class="d-block opacity-75">Modul baru sedang dalam pengembangan.</small>
                                 </div>
                             </div>
                         </div>
@@ -411,9 +598,9 @@
     </main>
 
     <!-- Footer -->
-    <footer class="py-4 text-center text-muted fs--1">
-        <p class="mb-0">
-            Thank you for creating with <a class="fw-semibold text-dark text-decoration-none" href="https://Innoventra.site">Innoventra</a> &copy; 2025 | v3.4.0
+    <footer class="py-4 text-center text-dark fs--1">
+        <p class="mb-0 fw-medium">
+            Thank you for creating with <a class="fw-bold text-primary text-decoration-underline" href="https://Innoventra.site">Innoventra</a> &copy; 2025 | v3.4.0
         </p>
     </footer>
 
@@ -439,7 +626,7 @@
                 <span>Chat</span>
             </a>
             <div class="avatar avatar-l">
-                <img class="rounded-circle border border-2 border-light" src="{{asset('img/my.jpg')}}" alt="User" />
+                <img class="rounded-circle border border-2 border-primary" src="{{asset('img/my.jpg')}}" alt="User" />
             </div>
         </div>
     </div>
