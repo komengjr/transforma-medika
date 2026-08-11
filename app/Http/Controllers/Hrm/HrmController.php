@@ -347,11 +347,55 @@ class HrmController extends Controller
             return Redirect::to('dashboard/home');
         }
     }
-    // CUTI dan IZIM
-    public function hrm_data_kehadiran_lembur($akses, $id)
+    // DATA LEMBUR
+    public function hrm_data_kehadiran_lembur($akses, $id, Request $request)
     {
         if ($this->url_akses_sub($akses, $id) == true) {
-            return view('app-hrm.data-kehadiran.data-lembur', ['akses' => $akses, 'code' => $id]);
+            // 1. Ambil List Pegawai untuk Dropdown Filter & Modal
+            $list_pegawai = DB::table('hrm_master_pegawai')
+                ->select('id_hrm_m_pegawai', 'hrm_m_pegawai_code', 'hrm_m_pegawai_name')
+                ->orderBy('hrm_m_pegawai_name', 'asc')
+                ->get();
+
+            // 2. Ambil Input Filter (Bulan, Tahun, Pegawai)
+            $bulan = sprintf('%02d', $request->input('bulan', date('m')));
+            $tahun = $request->input('tahun', date('Y'));
+            $pegawai_code = $request->input('pegawai_code');
+
+            // Jika belum pilih pegawai di filter, otomatis ambil pegawai pertama dari list
+            if (empty($pegawai_code) && $list_pegawai->isNotEmpty()) {
+                $pegawai_code = $list_pegawai->first()->hrm_m_pegawai_code;
+            }
+
+            // 3. Query Data Lembur dari Tabel hrm_pengajuan_lembur
+            $query_lembur = DB::table('hrm_pengajuan_lembur')
+                ->whereMonth('hrm_lembur_date', $bulan)
+                ->whereYear('hrm_lembur_date', $tahun);
+
+            if (!empty($pegawai_code)) {
+                $query_lembur->where('hrm_m_pegawai_code', $pegawai_code);
+            }
+
+            $list_lembur = $query_lembur
+                ->orderBy('hrm_lembur_date', 'desc')
+                ->get();
+
+            // 4. Hitung Total Jam Lembur yang Disetujui (Approved)
+            $total_jam_approved = $list_lembur
+                ->where('hrm_lembur_status', 'approved')
+                ->sum('hrm_lembur_total_hours');
+
+            // 5. Return View
+            return view('app-hrm.data-kehadiran.data-lembur', [
+                'akses'              => $akses,
+                'code'               => $id,
+                'list_pegawai'       => $list_pegawai,
+                'list_lembur'        => $list_lembur,
+                'total_jam_approved' => $total_jam_approved,
+                'bulan'              => $bulan,
+                'tahun'              => $tahun,
+                'pegawai_code'       => $pegawai_code
+            ]);
         } else {
             return Redirect::to('dashboard/home');
         }
