@@ -182,6 +182,7 @@ Route::prefix('{akses}/{id}')->group(function (): void {
     // EVENT
     Route::get('menu-event/create-event', [EventController::class, 'menu_event_create'])->name('menu_event_create');
     Route::get('menu-event/data-event', [EventController::class, 'menu_event_data'])->name('menu_event_data');
+    Route::get('master-event/pengiriman-email', [EventController::class, 'master_event_pengiriman_email'])->name('master_event_pengiriman_email');
 
     // KOPERASI
     Route::get('menu-koperasi/registrasi-peserta', [KoperasiController::class, 'menu_koperasi_registrasi_peserta'])->name('menu_koperasi_registrasi_peserta');
@@ -731,25 +732,7 @@ Route::prefix('logistik/')->group(function (): void {
     Route::post('master-logistik/master-product/save-deskripsi-product', [LogistikController::class, 'master_logistik_save_desc_product'])->name('master_logistik_save_desc_product');
 });
 
-// EVENT
-Route::prefix('event/')->group(function (): void {
-    Route::post('menu-event/create-event/save', [EventController::class, 'menu_event_create_save'])->name('menu_event_create_save');
-    Route::post('menu-event/create-event/upload-template', [EventController::class, 'menu_event_data_upload_template'])->name('menu_event_data_upload_template');
-    Route::post('menu-event/create-event/upload-cover', [EventController::class, 'menu_event_data_upload_cover'])->name('menu_event_data_upload_cover');
-    Route::post('menu-event/data-event/add-sub-event', [EventController::class, 'menu_event_data_add_sub_event'])->name('menu_event_data_add_sub_event');
-    Route::post('menu-event/data-event/save-sub-event', [EventController::class, 'menu_event_data_save_sub_event'])->name('menu_event_data_save_sub_event');
-    Route::post('menu-event/data-event/detail-event', [EventController::class, 'menu_event_data_detail_event'])->name('menu_event_data_detail_event');
-    Route::post('menu-event/data-event/detail-event/add-type', [EventController::class, 'menu_event_data_detail_event_add_type'])->name('menu_event_data_detail_event_add_type');
-    Route::post('menu-event/data-event/detail-event/save-class', [EventController::class, 'menu_event_data_detail_event_save_class'])->name('menu_event_data_detail_event_save_class');
-    Route::post('menu-event/data-event/detail-event/save-session', [EventController::class, 'menu_event_data_detail_event_save_session'])->name('menu_event_data_detail_event_save_session');
-    Route::post('menu-event/data-event/form-registrasi-event', [EventController::class, 'menu_event_data_form_registrasi_event'])->name('menu_event_data_form_registrasi_event');
-    Route::post('menu-event/data-event/form-registrasi-event/detail-sub-event', [EventController::class, 'menu_event_data_form_registrasi_event_detail_sub_event'])->name('menu_event_data_form_registrasi_event_detail_sub_event');
-    Route::post('menu-event/data-event/form-registrasi-event/detail-sub-event/add-peserta', [EventController::class, 'menu_event_data_form_registrasi_event_detail_sub_event_add_peserta'])->name('menu_event_data_form_registrasi_event_detail_sub_event_add_peserta');
-    Route::post('menu-event/data-event/test-print', [EventController::class, 'menu_event_data_form_registrasi_event_test_print'])->name('menu_event_data_form_registrasi_event_test_print');
 
-
-    Route::get('menu-event/data-event/self-registrasi-event/{kode}', [EventController::class, 'menu_event_data_form_self_registrasi'])->name('menu_event_data_form_self_registrasi');
-});
 
 Route::prefix('shop')->name('shop.')->group(function () {
     Route::get('/', [ShopController::class, 'index'])->name('index');
@@ -826,13 +809,13 @@ Route::get('/mirror/{id}', [App\Http\Controllers\StreamController::class, 'strea
 Route::get('/stream/pixeldrain/{id}', [App\Http\Controllers\StreamController::class, 'pixeldrain'])->name('pixeldrain');
 Route::get('/stream/tidore', [App\Http\Controllers\StreamController::class, 'tidore_stream'])->name('tidore_stream');
 
-Route::get('/event/register/{id}/{code}', [App\Http\Controllers\Event\RegisterController::class, 'event_registrasi'])->name('event_registrasi');
 
 
 include 'farmasi.php';
 include 'brodcast.php';
 include 'koperasi.php';
 include 'hrm.php';
+include 'event.php';
 
 Route::post('/upload-sftp', [FileUploadController::class, 'uploadFile'])->name('upload.sftp');
 Route::post('/upload-ftp', [FileUploadController::class, 'uploadFileftp'])->name('upload.ftp');

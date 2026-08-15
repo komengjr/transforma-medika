@@ -1,251 +1,381 @@
 @extends('layouts.layouts')
+
 @section('base.css')
 <link rel="stylesheet" href="https://cdn.datatables.net/2.2.2/css/dataTables.bootstrap5.css">
 <link rel="stylesheet" href="https://cdn.datatables.net/responsive/3.0.4/css/responsive.bootstrap5.css">
 <link href="{{ asset('vendors/flatpickr/flatpickr.min.css') }}" rel="stylesheet" />
+
 <style>
-    #button-pick-request {
-        cursor: pointer;
+    /* Styling Hero & Cover Header */
+    .event-hero-card {
+        background: linear-gradient(135deg, #0284c7 0%, #2563eb 50%, #4f46e5 100%);
+        border: none;
+        border-radius: 14px;
+        box-shadow: 0 10px 25px rgba(37, 99, 235, 0.2);
     }
 
-    #button-pick-request:hover {
-        background: rgb(223, 217, 25);
+    .cover-image-container {
+        position: relative;
+        border-radius: 14px;
+        overflow: hidden;
+        max-height: 280px;
+        box-shadow: 0 4px 15px rgba(0, 0, 0, 0.08);
     }
 
-    #button-terima-order-barang-peminjaman:hover {
-        background: rgb(223, 217, 25);
-        cursor: pointer;
+    .cover-image-container img {
+        width: 100%;
+        height: 280px;
+        object-fit: cover;
+        transition: transform 0.3s ease;
     }
 
-    #upload-container {
-        cursor: pointer;
+    .cover-image-container:hover img {
+        transform: scale(1.02);
     }
-</style>
-<style>
+
+    .cover-image-overlay {
+        position: absolute;
+        bottom: 15px;
+        right: 15px;
+        background: rgba(15, 23, 42, 0.75);
+        backdrop-filter: blur(8px);
+        color: #fff;
+        padding: 8px 16px;
+        border-radius: 30px;
+        cursor: pointer;
+        font-size: 0.85rem;
+        font-weight: 600;
+        transition: all 0.2s ease;
+        border: 1px solid rgba(255, 255, 255, 0.2);
+    }
+
+    .cover-image-overlay:hover {
+        background: rgba(15, 23, 42, 0.95);
+        transform: translateY(-2px);
+    }
+
+    /* Custom File Input Upload Box */
+    .custom-upload-box {
+        border: 2px dashed #cbd5e1;
+        border-radius: 12px;
+        padding: 20px;
+        text-align: center;
+        background: #f8fafc;
+        cursor: pointer;
+        transition: all 0.2s ease;
+        display: block;
+    }
+
+    .custom-upload-box:hover {
+        border-color: #2563eb;
+        background: #eff6ff;
+    }
+
+    /* Live Preview Card Styling */
+    .preview-card-sticky {
+        position: sticky;
+        top: 20px;
+    }
+
+    .preview-event-card {
+        border-radius: 12px;
+        overflow: hidden;
+        border: 1px solid #e2e8f0;
+        transition: all 0.3s ease;
+    }
+
+    .preview-event-card:hover {
+        box-shadow: 0 10px 20px rgba(0, 0, 0, 0.08);
+    }
+
+    .preview-event-card img {
+        height: 180px;
+        object-fit: cover;
+    }
+
+    /* Custom Input Controls Styling */
     input[type="file"] {
         display: none;
     }
+
+    .card-section-title {
+        font-size: 1rem;
+        font-weight: 700;
+        color: #1e293b;
+    }
 </style>
 @endsection
+
 @section('content')
-<div class="row mb-3 ">
-    <div class="col">
-        <div class="card bg-200 shadow border border-info bg-info">
-            <div class="row gx-0 flex-between-center" style="color: white !important;">
-                <div class="col-sm-auto d-flex align-items-center border-bottom">
-                    <img class="ms-3 mx-3 m-2" src="{{ asset('img/app.png') }}" alt="" width="50" />
-                    <div>
-                        <h6 class="text-white fs--1 mb-0 pt-2">Welcome to </h6>
-                        <h4 class="text-white fw-bold mb-1">{{env('APP_NAME')}} <span class="text-white fw-medium">Management
-                                System</span></h4>
+<!-- 1. HERO HEADER BANNER -->
+<div class="row mb-3">
+    <div class="col-12">
+        <div class="card event-hero-card text-white overflow-hidden">
+            <div class="card-body p-4 position-relative">
+                <div class="row align-items-center">
+                    <div class="col-md-8 d-flex align-items-center">
+                        <div class="bg-white bg-opacity-20 p-3 rounded-3 me-3 d-none d-sm-block">
+                            <img src="{{ asset('img/app.png') }}" alt="App Logo" width="48" height="48" class="img-fluid" />
+                        </div>
+                        <div>
+                            <span class="badge bg-white bg-opacity-20 text-white rounded-pill px-3 py-1 fs--2 mb-2">
+                                <i class="fas fa-plus-circle me-1"></i> Event Creator
+                            </span>
+                            <h3 class="text-white fw-bold mb-1">
+                                {{env('APP_NAME')}} <span class="fw-normal opacity-75">Management System</span>
+                            </h3>
+                            <p class="mb-0 fs--1 text-white-50">Buat dan publikasikan acara baru lengkap dengan rincian jadwal dan tiket.</p>
+                        </div>
                     </div>
-                    <img class="ms-n4 d-none d-lg-block "
-                        src="{{ asset('asset/img/illustrations/crm-line-chart.png') }}" alt="" width="150" />
-                </div>
-                <div class="col-xl-auto px-3 py-2">
-                    <h6 class="text-white fs--1 mb-0">Menu : </h6>
-                    <h4 class="text-white fw-bold mb-0">Tambah <span class="text-white fw-medium">Event</span>
-                    </h4>
+                    <div class="col-md-4 text-md-end mt-3 mt-md-0 border-start border-white border-opacity-10 ps-md-4">
+                        <span class="text-white-50 fs--2 text-uppercase fw-semibold d-block">Menu Navigasi</span>
+                        <h4 class="text-white fw-bold mb-0">Tambah <span class="fw-normal">Event Baru</span></h4>
+                    </div>
                 </div>
             </div>
         </div>
     </div>
 </div>
-<div class="progress_cover" style="height: 20px; display: none;">
-    <div class="progress-bar progress-bar-striped progress-bar-animated loadings"
+
+<!-- PROGRESS BAR UPLOAD COVER -->
+<div class="progress_cover mb-3" style="height: 10px; display: none; border-radius: 10px; overflow: hidden;">
+    <div class="progress-bar progress-bar-striped progress-bar-animated bg-info loadings"
         role="progressbar" aria-valuenow="0" aria-valuemin="0" aria-valuemax="100"
         style="width: 0%; height: 100%">0%</div>
 </div>
-<div class="card cover-image mb-3"><img class="card-img-top" id="card-img-top" src="{{ asset('asset/img/generic/13.jpg') }}" alt="" />
-    <input class="d-none" id="upload-cover-image" type="file" />
-    <label class="cover-image-file-input" for="upload-cover-image"><span class="fas fa-camera me-2"></span><span>Change cover photo</span></label>
+
+<!-- 2. COVER IMAGE HEADER SECTION -->
+<div class="card mb-4 border-0 shadow-sm overflow-hidden">
+    <div class="cover-image-container">
+        <img id="card-img-top" src="{{ asset('asset/img/generic/13.jpg') }}" alt="Cover Preview" />
+        <input class="d-none" id="upload-cover-image" type="file" />
+        <label class="cover-image-overlay mb-0" for="upload-cover-image">
+            <span class="fas fa-camera me-2"></span>Ganti Foto Sampul
+        </label>
+    </div>
 </div>
+
+<!-- 3. FORM INPUT EVENT -->
 <form id="formEvent" method="post">
     @csrf
-    <div class="row g-0">
-        <div class="col-lg-8 pe-lg-2">
-            <div class="card mb-3">
-                <div class="card-header bg-300">
-                    <h5 class="mb-0">Event Details</h5>
+    <div class="row g-3">
+        <!-- LEFT COLUMN: EVENT DETAILS & SUB SCHEDULE -->
+        <div class="col-lg-8">
+
+            <!-- INFORMASI UTAMA EVENT -->
+            <div class="card border-0 shadow-sm mb-3">
+                <div class="card-header bg-white border-bottom py-3 d-flex align-items-center">
+                    <div class="avatar avatar-md bg-soft-primary text-primary rounded-circle me-2">
+                        <i class="fas fa-info-circle"></i>
+                    </div>
+                    <h5 class="mb-0 card-section-title">Detail Informasi Acara</h5>
                 </div>
-                <div class="card-body bg-light">
-                    <form>
-                        <div class="row gx-2">
-                            <div class="col-12 mb-3">
-                                <label class="form-label" for="event-name">Event Title</label>
-                                <input class="form-control" id="event-name" name="title" type="text" placeholder="Event Title" />
-                                <input type="text" name="data_code" value="{{ date('YmdHis') }}" id="" hidden>
-                            </div>
-                            <div class="col-sm-6 mb-3">
-                                <label class="form-label" for="start-date">Start Date</label>
-                                <input class="form-control datetimepicker" name="start_date" id="datetimepicker" type="text" placeholder="d/m/y H:i" data-options='{"enableTime":true,"dateFormat":"d/m/y H:i","disableMobile":true}' />
-                            </div>
-                            <div class="col-sm-6 mb-3">
-                                <label class="form-label" for="end-date">End Date</label>
-                                <input class="form-control datetimepicker" name="end_date" id="datetimepicker" type="text" placeholder="d/m/y H:i" data-options='{"enableTime":true,"dateFormat":"d/m/y H:i","disableMobile":true}' />
-                            </div>
-                            <div class="col-sm-6 mb-3">
-                                <label class="form-label" for="event-venue">Venue</label>
-                                <input class="form-control" name="venue" id="event-venue" type="text" placeholder="Venue" />
-                                <button class="btn btn-link btn-sm btn p-0" type="button">Online Event</button>
-                            </div>
-                            <div class="col-sm-6 mb-3">
-                                <label class="form-label" for="event-address">Address</label>
-                                <input class="form-control" name="address" id="event-address" type="text" placeholder="Address" />
-                            </div>
-                            <div class="col-sm-4 mb-3">
-                                <label class="form-label" for="event-city">City</label>
-                                <input class="form-control" name="city" id="event-city" type="text" placeholder="City" />
-                            </div>
-                            <div class="col-sm-4 mb-3">
-                                <label class="form-label" for="event-state">State</label>
-                                <input class="form-control" name="state" id="event-state" type="text" placeholder="State" />
-                            </div>
-                            <div class="col-sm-4 mb-3">
-                                <label class="form-label" for="event-country">Country</label>
-                                <input class="form-control" name="country" id="event-country" type="text" placeholder="Country" />
-                            </div>
-                            <div class="col-12">
-                                <label class="form-label" for="event-description">Description</label>
-                                <textarea class="form-control" name="desc" id="event-description" rows="6"></textarea>
+                <div class="card-body p-4">
+                    <div class="row gx-3 gy-3">
+                        <div class="col-12">
+                            <label class="form-label fw-semibold text-800" for="event-name">Judul Event <span class="text-danger">*</span></label>
+                            <input class="form-control form-control-lg fs-0" id="event-name" name="title" type="text" placeholder="Masukkan judul acara menarik..." />
+                            <input type="text" name="data_code" value="{{ date('YmdHis') }}" id="" hidden>
+                        </div>
+
+                        <div class="col-sm-6">
+                            <label class="form-label fw-semibold text-800" for="start-date">Waktu Mulai <span class="text-danger">*</span></label>
+                            <div class="input-group">
+                                <span class="input-group-text bg-100"><i class="far fa-calendar-alt text-600"></i></span>
+                                <input class="form-control datetimepicker" name="start_date" id="datetimepicker" type="text" placeholder="dd/mm/yy H:i" data-options='{"enableTime":true,"dateFormat":"d/m/y H:i","disableMobile":true}' />
                             </div>
                         </div>
-                    </form>
+
+                        <div class="col-sm-6">
+                            <label class="form-label fw-semibold text-800" for="end-date">Waktu Selesai <span class="text-danger">*</span></label>
+                            <div class="input-group">
+                                <span class="input-group-text bg-100"><i class="far fa-calendar-check text-600"></i></span>
+                                <input class="form-control datetimepicker" name="end_date" id="datetimepicker" type="text" placeholder="dd/mm/yy H:i" data-options='{"enableTime":true,"dateFormat":"d/m/y H:i","disableMobile":true}' />
+                            </div>
+                        </div>
+
+                        <div class="col-sm-6">
+                            <div class="d-flex justify-content-between align-items-center mb-1">
+                                <label class="form-label fw-semibold text-800 mb-0" for="event-venue">Lokasi / Tempat</label>
+                                <button class="btn btn-link btn-sm p-0 text-decoration-none fw-semibold" type="button"><i class="fas fa-globe me-1"></i>Online Event</button>
+                            </div>
+                            <input class="form-control" name="venue" id="event-venue" type="text" placeholder="Nama Gedung / Ruangan" />
+                        </div>
+
+                        <div class="col-sm-6">
+                            <label class="form-label fw-semibold text-800" for="event-address">Alamat Lengkap</label>
+                            <input class="form-control" name="address" id="event-address" type="text" placeholder="Jalan, No. Bangunan, RT/RW" />
+                        </div>
+
+                        <div class="col-sm-4">
+                            <label class="form-label fw-semibold text-800" for="event-city">Kota</label>
+                            <input class="form-control" name="city" id="event-city" type="text" placeholder="Nama Kota" />
+                        </div>
+
+                        <div class="col-sm-4">
+                            <label class="form-label fw-semibold text-800" for="event-state">Provinsi</label>
+                            <input class="form-control" name="state" id="event-state" type="text" placeholder="Provinsi" />
+                        </div>
+
+                        <div class="col-sm-4">
+                            <label class="form-label fw-semibold text-800" for="event-country">Negara</label>
+                            <input class="form-control" name="country" id="event-country" type="text" placeholder="Negara" />
+                        </div>
+
+                        <div class="col-12">
+                            <label class="form-label fw-semibold text-800" for="event-description">Deskripsi Lengkap Acara</label>
+                            <textarea class="form-control" name="desc" id="event-description" rows="5" placeholder="Tuliskan gambaran umum, kriteria peserta, atau hal penting lainnya..."></textarea>
+                        </div>
+                    </div>
                 </div>
             </div>
 
-            <div class="card mb-3 bg-300">
-                <div class="card-header">
-                    <h5 class="mb-0">Schedule Sub Event</h5>
-                </div>
-                <div class="card-body bg-light">
-                    <div class="border rounded-1 position-relative bg-white dark__bg-1100 p-3">
-                        <div class="position-absolute end-0 top-0 mt-2 me-3 z-index-1">
-                            <button class="btn btn-link btn-sm p-0" type="button"><span class="fas fa-times-circle text-danger" data-fa-transform="shrink-1"></span></button>
+            <!-- SCHEDULE SUB EVENT -->
+            <div class="card border-0 shadow-sm mb-3">
+                <div class="card-header bg-white border-bottom py-3 d-flex align-items-center justify-content-between">
+                    <div class="d-flex align-items-center">
+                        <div class="avatar avatar-md bg-soft-info text-info rounded-circle me-2">
+                            <i class="fas fa-list-alt"></i>
                         </div>
-                        <div class="row gx-2">
-                            <div class="col-12 mb-3">
-                                <label class="form-label" for="schedule-title">Sub Title</label>
-                                <input class="form-control form-control-sm" id="schedule-title" type="text" placeholder="Title" />
+                        <h5 class="mb-0 card-section-title">Sub Event & Jadwal Sesi</h5>
+                    </div>
+                    <span class="badge bg-soft-info text-info rounded-pill fs--2">Sesi Opsional</span>
+                </div>
+                <div class="card-body p-4">
+                    <div class="border rounded-3 position-relative bg-light p-3 p-sm-4 mb-3">
+                        <div class="position-absolute end-0 top-0 mt-3 me-3 z-index-1">
+                            <button class="btn btn-soft-danger btn-sm rounded-circle p-1" type="button" style="width: 28px; height: 28px;" title="Hapus Sub Event">
+                                <span class="fas fa-times fs--1"></span>
+                            </button>
+                        </div>
+
+                        <div class="row gx-2 gy-3">
+                            <div class="col-12">
+                                <label class="form-label fw-semibold text-800" for="schedule-title">Sub Judul Sesi</label>
+                                <input class="form-control form-control-sm" id="schedule-title" type="text" placeholder="Contoh: Keynote Speech / Workshop UI" />
                             </div>
-                            <div class="col-sm-6 mb-3">
-                                <label class="form-label" for="schedule-start-date">Start Date</label>
-                                <input class="form-control form-control-sm datetimepicker" id="schedule-start-date" type="text" placeholder="d/m/y" data-options='{"dateFormat":"d/m/y","enableTime":false}' />
+
+                            <div class="col-sm-6">
+                                <label class="form-label fw-semibold text-800" for="schedule-start-date">Tanggal Sesi</label>
+                                <input class="form-control form-control-sm datetimepicker" id="schedule-start-date" type="text" placeholder="dd/mm/yy" data-options='{"dateFormat":"d/m/y","enableTime":false}' />
                             </div>
-                            <div class="col-sm-6 mb-3">
-                                <label class="form-label" for="schedule-start-time">Start Time</label>
-                                <input class="form-control form-control-sm datetimepicker" id="schedule-start-time" type="text" placeholder="H:i" data-options='{"enableTime":true,"noCalendar":true,"dateFormat":"H:i"}' />
+
+                            <div class="col-sm-6">
+                                <label class="form-label fw-semibold text-800" for="schedule-start-time">Jam Sesi</label>
+                                <input class="form-control form-control-sm datetimepicker" id="schedule-start-time" type="text" placeholder="HH:mm" data-options='{"enableTime":true,"noCalendar":true,"dateFormat":"H:i"}' />
                             </div>
-                            <div class="col-sm-4 mb-3">
-                                <label class="form-label" for="schedule-start-date">Room</label>
-                                <input class="form-control form-control-sm datetimepicker" id="schedule-start-date" type="text" placeholder="Ballroom" />
+
+                            <div class="col-sm-4">
+                                <label class="form-label fw-semibold text-800">Ruangan / Hall</label>
+                                <input class="form-control form-control-sm" type="text" placeholder="Contoh: Ballroom 1" />
                             </div>
-                            <div class="col-sm-4 mb-3">
-                                <label class="form-label" for="field-type">Type Event</label>
+
+                            <div class="col-sm-4">
+                                <label class="form-label fw-semibold text-800" for="field-type">Tipe Tiket</label>
                                 <select class="form-select form-select-sm" id="field-type">
-                                    <option>Select a type</option>
-                                    <option value="free">Free</option>
-                                    <option value="prabayar">Prabayar</option>
+                                    <option value="" selected disabled>Pilih Tipe</option>
+                                    <option value="free">Gratis (Free)</option>
+                                    <option value="prabayar">Berbayar (Prabayar)</option>
                                 </select>
                             </div>
-                            <div class="col-sm-4 mb-3">
-                                <label class="form-label" for="field-name">Nominal</label>
-                                <input class="form-control form-control-sm" id="field-name" type="text" placeholder="@currency(100000)" />
+
+                            <div class="col-sm-4">
+                                <label class="form-label fw-semibold text-800" for="field-name">Harga Tiket (Rp)</label>
+                                <input class="form-control form-control-sm" id="field-name" type="text" placeholder="100.000" />
                             </div>
+
                             <div class="col-12">
-                                <label class="form-label" for="field-options">Field Options</label>
-                                <textarea class="form-control form-control-sm" id="field-options" rows="3"></textarea>
-                                <div class="form-text fs--1 text-warning">* Separate your options with comma</div>
+                                <label class="form-label fw-semibold text-800" for="field-options">Catatan Tambahan / Opsi</label>
+                                <textarea class="form-control form-control-sm" id="field-options" rows="2" placeholder="Sertakan opsi tambahan jika ada..."></textarea>
+                                <div class="form-text fs--2 text-warning"><i class="fas fa-exclamation-triangle me-1"></i>Pisahkan pilihan opsi dengan tanda koma (,)</div>
                             </div>
                         </div>
                     </div>
-                    <button class="btn btn-falcon-default btn-sm mt-2" type="button"><span class="fas fa-plus fs--2 me-1" data-fa-transform="up-1"></span>Add Item </button>
+
+                    <button class="btn btn-outline-primary btn-sm rounded-pill fw-semibold" type="button">
+                        <span class="fas fa-plus fs--2 me-1"></span>Tambah Sesi Sub Event
+                    </button>
                 </div>
             </div>
 
         </div>
-        <div class="col-lg-4 ps-lg-2">
-            <div class="sticky-sidebar">
-                <div class="card mb-lg-0">
-                    <div class="card-header bg-300">
-                        <h5 class="mb-0">Other Info</h5>
+
+        <!-- RIGHT COLUMN: SIDEBAR UPLOAD & LIVE PREVIEW -->
+        <div class="col-lg-4">
+            <div class="preview-card-sticky">
+                <div class="card border-0 shadow-sm mb-3">
+                    <div class="card-header bg-white border-bottom py-3">
+                        <h5 class="mb-0 card-section-title"><i class="fas fa-image text-primary me-2"></i>Template & Preview</h5>
                     </div>
-                    <div class="card-body bg-light">
+                    <div class="card-body p-3">
+
+                        <!-- UPLOAD TEMPLATE DROPBOX -->
                         <div class="mb-3">
-                            <div class="d-flex flex-between-center">
-                                <label class="custom-file-upload form-control" id="upload-container">
-                                    <input type="file" id="browseFile" class="form-control" />
-                                    <span class="fas fa-cloud-upload-alt"></span> Upload Template Event
-                                </label>
-                            </div>
-                            <div class="progress  mt-3" style="height: 20px; display: none;" id="loading-prgress">
-                                <div class="progress-bar progress-bar-striped progress-bar-animated loading"
+                            <label class="custom-upload-box mb-0" id="upload-container">
+                                <input type="file" id="browseFile" class="form-control" />
+                                <div class="avatar avatar-lg bg-soft-primary text-primary rounded-circle mx-auto mb-2">
+                                    <i class="fas fa-cloud-upload-alt fs-2"></i>
+                                </div>
+                                <span class="fw-bold text-dark d-block">Upload Template Event</span>
+                                <span class="fs--2 text-muted">Format: JPG, JPEG, PNG</span>
+                            </label>
+
+                            <div class="progress mt-3" style="height: 12px; display: none; border-radius: 6px;" id="loading-prgress">
+                                <div class="progress-bar progress-bar-striped progress-bar-animated bg-primary loading"
                                     role="progressbar" aria-valuenow="0" aria-valuemin="0" aria-valuemax="100"
                                     style="width: 0%; height: 100%">0%</div>
                             </div>
+
                             <input id="link" type="text" name="link" class="form-control" hidden>
                             <input id="link_cover" type="text" name="link_cover" class="form-control" hidden>
                         </div>
-                        <div class="mb-3">
-                            <div class="card overflow-hidden">
-                                <div class="card-img-top"><img class="img-fluid" id="videoPreview" src="https://i.pinimg.com/736x/a5/c2/8a/a5c28a83e4929a3f4775287888cd32f9.jpg" alt="Card image cap" /></div>
-                                <div class="card-body">
-                                    <h5 class="card-title">Nama Event</h5>
-                                    <p class="card-text">Nama Sub Event</p>
-                                    <p class="card-text">Some quick example text to build on the card title and make up the bulk of the card's content.</p>
+
+                        <!-- CARD PREVIEW CARD -->
+                        <div class="mb-2">
+                            <span class="text-uppercase text-600 fw-bold fs--2 d-block mb-2"><i class="fas fa-eye me-1"></i>Tampilan Visual Kartu</span>
+                            <div class="preview-event-card bg-white shadow-sm">
+                                <img class="w-100" id="videoPreview" src="https://i.pinimg.com/736x/a5/c2/8a/a5c28a83e4929a3f4775287888cd32f9.jpg" alt="Preview Template" />
+                                <div class="p-3">
+                                    <span class="badge bg-soft-primary text-primary mb-1 fs--2">Live Preview</span>
+                                    <h5 class="card-title text-truncate fw-bold mb-1">Nama Event Utama</h5>
+                                    <p class="card-text text-muted fs--1 mb-2">Sesi Sub Event</p>
+                                    <p class="card-text text-600 fs--2 line-clamp-2">Deskripsi ringkas event akan muncul secara otomatis pada pratinjau kartu ini.</p>
                                 </div>
                             </div>
                         </div>
 
-                        <!-- <div class="mb-3">
-                            <div class="d-flex justify-content-between align-items-center">
-                                <label class="mb-0" for="event-tags">Tags</label>
-                                <button class="btn btn-link btn-sm pe-0" type="button">Add New</button>
-                            </div>
-                            <select class="form-select js-choice" id="event-tags" multiple="multiple" size="1" name="tags" data-options='{"removeItemButton":true,"placeholder":true}'>
-                                <option value="">Select tags...</option>
-                                <option>Concert</option>
-                                <option>New Year</option>
-                                <option>Party</option>
-                            </select>
-                        </div>
-                        <div class="border-dashed-bottom my-3"></div>
-                        <h6>Listing Privacy</h6>
-                        <div class="mb-3 form-check">
-                            <input class="form-check-input" id="customRadio4" type="radio" name="listingPrivacy" checked="checked" />
-                            <label class="form-label mb-0" for="customRadio4"> <strong>Public page:</strong></label>
-                            <div class="form-text mt-0">Discoverable by anyone on Falcon, our distribution partners, and search engines.</div>
-                        </div>
-                        <div class="mb-3 form-check">
-                            <input class="form-check-input" id="customRadio5" type="radio" name="listingPrivacy" />
-                            <label class="form-label mb-0" for="customRadio5"> <strong>Private page:</strong></label>
-                            <div class="form-text mt-0">Accessible only by people you specify. </div>
-                        </div>
-                        <div class="border-dashed-bottom my-3"></div>
-                        <h6>Remaining Tickets</h6>
-                        <div class="form-check custom-checkbox mb-0">
-                            <input class="form-check-input" id="customRadio6" type="checkbox" />
-                            <label class="form-label mb-0" for="customRadio6">Show the number of remaining tickets. </label>
-                        </div> -->
                     </div>
                 </div>
             </div>
         </div>
     </div>
 </form>
-<div class="card mt-3">
-    <div class="card-body">
+
+<!-- 4. BOTTOM SAVE ACTION BAR -->
+<div class="card border-0 shadow-sm mt-3 bg-white">
+    <div class="card-body p-3 p-md-4">
         <div class="row justify-content-between align-items-center">
-            <div class="col-md">
-                <h5 class="mb-2 mb-md-0">Nice Job! You're almost done</h5>
+            <div class="col-md mb-2 mb-md-0">
+                <div class="d-flex align-items-center">
+                    <div class="avatar avatar-md bg-soft-success text-success rounded-circle me-3 d-none d-sm-block">
+                        <i class="fas fa-check-circle fs-1"></i>
+                    </div>
+                    <div>
+                        <h5 class="mb-0 fw-bold text-900">Sudah Selesai Mengisi Data?</h5>
+                        <p class="text-600 fs--1 mb-0">Pastikan seluruh tanggal, informasi lokasi, dan tiket sudah dikonfirmasi.</p>
+                    </div>
+                </div>
             </div>
             <div class="col-auto" id="proses-save-event">
-                <button class="btn btn-falcon-primary btn-sm" id="button-save-event">Make your Event</button>
+                <button class="btn btn-primary px-4 py-2 rounded-pill fw-bold shadow-sm" id="button-save-event">
+                    <i class="fas fa-paper-plane me-2"></i>Simpan & Terbitkan Event
+                </button>
             </div>
         </div>
     </div>
 </div>
 @endsection
+
 @section('base.js')
 <script src="https://cdn.datatables.net/2.2.2/js/dataTables.js"></script>
 <script src="https://cdn.datatables.net/2.2.2/js/dataTables.bootstrap5.js"></script>
@@ -259,12 +389,13 @@
         responsive: true
     });
 </script>
+
 <script>
     $(document).on("click", "#button-save-event", function(e) {
         e.preventDefault();
         var data = $("#formEvent").serialize();
         $('#proses-save-event').html(
-            '<div class="spinner-border" style="display: block; margin-left: auto; margin-right: auto;" role="status"><span class="visually-hidden">Loading...</span></div>'
+            '<div class="spinner-border text-primary" style="display: block; margin-left: auto; margin-right: auto;" role="status"><span class="visually-hidden">Loading...</span></div>'
         );
         $.ajax({
             url: "{{ route('menu_event_create_save') }}",
@@ -288,16 +419,17 @@
                     footer: '<a href="#">Why do I have this issue?</a>'
                 });
                 $('#proses-save-event').html(
-                    '<button class="btn btn-falcon-primary btn-sm" id="button-save-event">Make your Event</button>'
+                    '<button class="btn btn-primary px-4 py-2 rounded-pill fw-bold shadow-sm" id="button-save-event"><i class="fas fa-paper-plane me-2"></i>Simpan & Terbitkan Event</button>'
                 );
             }
             console.log(data);
 
         }).fail(function() {
-            $('#proses-save-event').html('eror');
+            $('#proses-save-event').html('<span class="text-danger fw-bold">Gagal Menyimpan Data</span>');
         });
     });
 </script>
+
 <script type="text/javascript">
     var browseFile = $('#browseFile');
     var resumable = new Resumable({
@@ -355,6 +487,7 @@
         progress.hide();
     }
 </script>
+
 <script type="text/javascript">
     var CoverFile = $('#upload-cover-image');
     var resumableCover = new Resumable({

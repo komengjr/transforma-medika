@@ -3,7 +3,11 @@
 namespace App\Http\Controllers\Event;
 
 use App\Http\Controllers\Controller;
+use App\Mail\ParticipantTicketMail;
+use App\Mail\SendRegistrationTokenMail;
 use App\Models\Event\EventModel;
+use App\Models\Event\EventRegistration;
+use App\Models\Event\Participant;
 use App\Models\Event\SubEventModel;
 use App\Models\Movie;
 use App\Models\NewsCat;
@@ -22,6 +26,7 @@ use Mike42\Escpos\Printer;
 use Pion\Laravel\ChunkUpload\Handler\HandlerFactory;
 use Pion\Laravel\ChunkUpload\Receiver\FileReceiver;
 use App\Services\ZebraPrinterService;
+use Illuminate\Support\Facades\Mail;
 use Svg\Tag\Rect;
 
 class EventController extends Controller
@@ -267,71 +272,493 @@ class EventController extends Controller
     }
     public function menu_event_data_form_self_registrasi($kode)
     {
-        return view('app-event.menu-event.data-event.form-self-resgistrasi');
+        $event = DB::table('event_data')
+            ->where('event_data_code', $kode)
+            ->first();
+
+        if (!$event) {
+            abort(404, 'Event tidak ditemukan');
+        }
+
+        // 2. Ambil data sub event berdasarkan event_data_code
+        $sub_events = DB::table('event_data_sub')
+            ->where('event_data_code', $event->event_data_code)
+            ->orderBy('event_data_sub_start', 'asc')
+            ->get();
+
+        return view('app-event.menu-event.data-event.form-self-resgistrasi', compact('event', 'sub_events'), ['kode' => $kode]);
+    }
+    public function menu_event_data_form_registrasi_event_detail_sub_event_data_peserta(Request $request)
+    {
+        $subEventId = $request->sub_event_id;
+
+        // Mengambil peserta berdasarkan relasi ke sub event / class
+        $participants = DB::table('event_participants')
+            ->join('event_registrations', 'event_participants.id_participant', '=', 'event_registrations.id_participant')
+            ->join('event_registration_classes', 'event_registrations.id_registration', '=', 'event_registration_classes.id_registration')
+            ->where('event_registration_classes.id_event_data_sub_class', $subEventId)
+            ->select(
+                'event_participants.*',
+                'event_registrations.id_registration',
+                'event_registrations.payment_status',
+                'event_registrations.registration_status',
+                'event_registration_classes.qr_code_token',
+                'event_registration_classes.created_at as register_date'
+            )
+            ->get();
+
+        return view('app-event.menu-event.data-event.sub_event_participants_table', compact('participants'))->render();
+    }
+    public function menu_event_data_form_registrasi_sub_event_data_peserta_edit($id)
+    {
+        // Mengambil data registrasi beserta data peserta dan sub-classnya
+        $registration = DB::table('event_registrations')
+            ->join('event_participants', 'event_registrations.id_participant', '=', 'event_participants.id_participant')
+            ->leftJoin('event_registration_classes', 'event_registrations.id_registration', '=', 'event_registration_classes.id_registration')
+            ->where('event_registrations.id_registration', $id)
+            ->select(
+                'event_registrations.*',
+                'event_participants.full_name',
+                'event_participants.email',
+                'event_participants.phone_number',
+                'event_participants.institution',
+                'event_registration_classes.qr_code_token'
+            )
+            ->first();
+
+        if (!$registration) {
+            return redirect()->back()->with('error', 'Data registrasi tidak ditemukan.');
+        }
+        return view('app-event.menu-event.data-event.edit_registration', compact('registration'));
+    }
+    public function menu_event_data_form_registrasi_sub_event_data_peserta_update(Request $request, $id)
+    {
+        $request->validate([
+            'payment_status'      => 'required|in:pending,paid,failed,cancelled',
+            'registration_status' => 'required|in:active,cancelled',
+            'full_name'           => 'required|string|max:255',
+            'email'               => 'required|email',
+            'phone_number'        => 'required|string|max:20',
+        ]);
+
+        DB::beginTransaction();
+        try {
+            // 1. Ambil data registrasi
+            $registration = DB::table('event_registrations')->where('id_registration', $id)->first();
+
+            if (!$registration) {
+                return redirect()->back()->with('error', 'Data tidak ditemukan.');
+            }
+
+            // 2. Update data peserta
+            DB::table('event_participants')
+                ->where('id_participant', $registration->id_participant)
+                ->update([
+                    'full_name'    => $request->full_name,
+                    'email'        => $request->email,
+                    'phone_number' => $request->phone_number,
+                    'institution'  => $request->institution,
+                    'updated_at'   => now(),
+                ]);
+
+            // 3. Update status registrasi dan pembayaran
+            DB::table('event_registrations')
+                ->where('id_registration', $id)
+                ->update([
+                    'payment_status'      => $request->payment_status,
+                    'registration_status' => $request->registration_status,
+                    'updated_at'          => now(),
+                ]);
+
+            DB::commit();
+
+            return redirect()->back()->with('success', 'Data pendaftaran berhasil diperbarui.');
+        } catch (\Exception $e) {
+            DB::rollBack();
+            return redirect()->back()->with('error', 'Gagal memperbarui data: ' . $e->getMessage());
+        }
+    }
+    public function menu_event_data_form_registrasi_sub_event_data_peserta_remove($id)
+    {
+        try {
+            // 1. Cari data peserta
+            $registration = EventRegistration::find($id);
+
+            if (!$registration) {
+                return response()->json([
+                    'status'  => 'error',
+                    'message' => 'Data peserta tidak ditemukan atau sudah dihapus.'
+                ], 404);
+            }
+
+            // 2. Hapus berkas pendukung jika ada (Contoh: Bukti Pembayaran / QR Code)
+            // if ($registration->payment_proof && \Storage::exists($registration->payment_proof)) {
+            //     \Storage::delete($registration->payment_proof);
+            // }
+
+            // 3. Hapus data dari Database
+            $registration->delete();
+
+            return response()->json([
+                'status'  => 'success',
+                'message' => 'Data peserta berhasil dihapus dari sistem.'
+            ], 200);
+        } catch (Exception $e) {
+            return response()->json([
+                'status'  => 'error',
+                'message' => 'Gagal menghapus data peserta: ' . $e->getMessage()
+            ], 500);
+        }
+    }
+    public function menu_event_data_form_registrasi_sub_event_data_peserta_send_email($id)
+    {
+        try {
+            $registration = DB::table('event_registrations as er')
+                ->join('event_participants as ep', 'er.id_participant', '=', 'ep.id_participant')
+                ->leftJoin('event_registration_classes as erc', 'er.id_registration', '=', 'erc.id_registration')
+                ->leftJoin('event_data_sub_class as esc', 'erc.id_event_data_sub_class', '=', 'esc.id_event_data_sub_class')
+                ->where('er.id_registration', $id)
+                ->select(
+                    'er.id_registration',
+                    'er.payment_status',
+                    'erc.qr_code_token',
+                    'ep.full_name',
+                    'ep.email',
+                    'ep.institution',
+                    'ep.phone_number',
+                    'esc.event_data_sub_class_name'
+                )
+                ->first();
+
+            if (!$registration || !$registration->email) {
+                return response()->json(['message' => 'Email peserta tidak ditemukan.'], 400);
+            }
+
+            // 4. Eksekusi Pengiriman Email
+            Mail::to($registration->email)->send(new ParticipantTicketMail($registration));
+
+            return response()->json([
+                'status'  => 'success',
+                'message' => 'Kode booking berhasil dikirim ke email ' . $registration->email
+            ], 200);
+        } catch (\Exception $e) {
+            return response()->json([
+                'status'  => 'error',
+                'message' => 'Gagal mengirim email: ' . $e->getMessage()
+            ], 500);
+        }
     }
 
+    public function menu_event_data_form_registrasi_event_cek_booking(Request $request)
+    {
+        // 1. Validasi Input Data
+        $request->validate([
+            'token' => 'required|string',
+            'code'  => 'required|string'
+        ]);
+
+        $token = trim($request->input('token'));
+        $code  = trim($request->input('code'));
+
+        try {
+            // 2. Query Relasi untuk Mencari Peserta berdasarkan Token & Kode Event
+            $participantData = DB::table('event_registration_classes as erc')
+                ->join('event_registrations as er', 'erc.id_registration', '=', 'er.id_registration')
+                ->join('event_participants as ep', 'er.id_participant', '=', 'ep.id_participant')
+                ->join('event_data as ed', 'er.id_event_data', '=', 'ed.id_event_data')
+                ->leftJoin('event_data_sub_class as esc', 'erc.id_event_data_sub_class', '=', 'esc.id_event_data_sub_class')
+                ->select(
+                    'erc.id_registration_class',
+                    'erc.qr_code_token',
+                    'erc.attendance_status',
+                    'erc.check_in_at',
+                    'er.id_registration',
+                    'er.registration_code',
+                    'er.payment_status',
+                    'ed.id_event_data',
+                    'ed.event_data_code',
+                    'ed.event_data_tittle',
+                    'ep.full_name',
+                    'ep.phone_number',
+                    'ep.email',
+                    'ep.institution', // Ditambahkan jika butuh data instansi
+                    'esc.event_data_sub_class_name'
+                )
+                ->where('erc.qr_code_token', $token)
+                ->where('ed.event_data_code', $code) // Filter ketat berdasarkan Kode Event
+                ->first();
+
+            // 3. Jika Data Tidak Ditemukan
+            if (!$participantData) {
+                return response()->json([
+                    'status'  => 'error',
+                    'message' => 'Kode QR / Tiket tidak ditemukan atau tidak terdaftar pada event ini!'
+                ], 404);
+            }
+
+            // 4. Update Status Presensi jika Belum Check-in
+            if ($participantData->attendance_status !== 'present') {
+                DB::table('event_registration_classes')
+                    ->where('id_registration_class', $participantData->id_registration_class)
+                    ->update([
+                        'attendance_status' => 'present',
+                        'check_in_at'       => now(),
+                        'updated_at'        => now()
+                    ]);
+
+                $participantData->attendance_status = 'present';
+            }
+
+            // 5. Return Response JSON Success
+            return response()->json([
+                'status' => 'success',
+                'data'   => [
+                    'id_registration_class' => $participantData->id_registration_class,
+                    'id_event'              => $participantData->id_event_data,
+                    'event_name'            => $participantData->event_data_tittle ?? 'Event Falcon',
+                    'registration_code'     => $participantData->registration_code,
+                    'qr_code_token'         => $participantData->qr_code_token,
+                    'full_name'             => $participantData->full_name,
+                    'institution'           => $participantData->institution ?? '-',
+                    'phone_number'          => $participantData->phone_number ?? '-',
+                    'email'                 => $participantData->email,
+                    'class_name'            => $participantData->event_data_sub_class_name ?? 'Reguler',
+                    'payment_status'        => ucfirst($participantData->payment_status),
+                    'attendance_status'     => ucfirst($participantData->attendance_status),
+                ]
+            ]);
+        } catch (\Exception $e) {
+            return response()->json([
+                'status'  => 'error',
+                'message' => 'Terjadi kesalahan sistem: ' . $e->getMessage()
+            ], 500);
+        }
+    }
     public function menu_event_data_form_registrasi_event_test_print(Request $request)
     {
-        // 1. Validasi Input Form
+        // 1. Validasi Input Form Sesuai Parameter
         $request->validate([
-            'nama_produk' => 'required|string|max:50',
-            'sku'         => 'required|string|max:20',
-            'harga'       => 'required|numeric',
+            'nama_peserta'      => 'required|string|max:100',
+            'nama_event'        => 'required|string|max:100',
+            'id_event'          => 'required|string|max:50',
+            'kode_booking'      => 'required|string|max:50',
+            'registration_code' => 'required|string|max:50',
+            'class_name'        => 'required|string|max:50',
         ]);
 
         // 2. Desain Label Menggunakan Bahasa ZPL (Zebra Programming Language)
         $zplCode = "^XA";
-        $zplCode .= "^CI28"; // Mendukung UTF-8
+        $zplCode .= "^CI28"; // Support UTF-8
 
         // --- PENGATURAN UKURAN KERTAS (5x3 cm @203 DPI) ---
-        $width = 400;  // Lebar total label (400 dots)
+        $width = 400;  // Lebar label (400 dots)
         $zplCode .= "^PW" . $width;
-        $zplCode .= "^LL240"; // Tinggi total label (240 dots)
+        $zplCode .= "^LL240"; // Tinggi label (240 dots)
         $zplCode .= "^LS0";
 
         // ============================================================
-        // 1. NAMA PRODUK (CENTER + AUTO WRAP)
+        // 1. NAMA PESERTA (BESAR & TEBAL)
         // ============================================================
-        // Perubahan: fungsi substr() dihapus agar teks panjang tidak terpotong di PHP.
-        // Parameter ^FB diubah menjadi: 400 (lebar), 2 (maksimal 2 baris), 0 (spasi), C (Center)
-        // Ukuran font diturunkan sedikit ke 20,20 agar muat jika menjadi 2 baris.
-        $zplCode .= "^FO0,25^FB400,2,0,C^A0N,22,22^FD" . $request->nama_produk . "^FS";
+        $zplCode .= "^FO0,15^FB400,1,0,C^A0N,26,26^FD" . $request->nama_peserta . "^FS";
 
         // ============================================================
-        // 2. NAMA EVENT / HARGA (CENTER + AUTO WRAP)
+        // 2. KELAS / KATEGORI
         // ============================================================
-        // Koordinat Y digeser agak ke bawah (Y=80) memberikan ruang jika Nama Produk di atas menjadi 2 baris.
-        // Menggunakan cara yang sama (^FB 400, 2, 0, C) agar tulisan panjang otomatis ke bawah dan tetap center.
-        $zplCode .= "^FO0,80^FB400,2,0,C^A0N,22,22^FD" . $request->nama_event . "^FS";
+        $zplCode .= "^FO0,45^FB400,1,0,C^A0N,20,20^FD[" . $request->class_name . "]^FS";
 
         // ============================================================
-        // 3. BARCODE CODE 128 (CENTER MANUAL)
+        // 3. NAMA EVENT & ID EVENT
         // ============================================================
-        $skuLength = strlen($request->sku);
-        $barcodeWidth = ($skuLength * 11 * 2) + 50;
+        $eventInfo = $request->nama_event . " (ID: " . $request->id_event . ")";
+        $zplCode .= "^FO0,70^FB400,2,0,C^A0N,18,18^FD" . $eventInfo . "^FS";
 
-        // Hitung koordinat X agar posisi barcode pas di tengah kertas
-        $barcodeX = ($width - $barcodeWidth) / 2;
+        // ============================================================
+        // 4. BARCODE 2D (QR CODE) BERDASARKAN REGISTRATION_CODE
+        // ============================================================
+        // ^FO150,105 = Koordinat X=150, Y=105 (Posisi tengah)
+        // ^BQN,2,4   = QR Code (Model 2, Magnification factor 4)
+        // ^FDHA,     = 'HA' menunjukkan data standar/alphanumeric pada QR ZPL
+        $zplCode .= "^FO150,105^BQN,2,4^FDHA," . $request->registration_code . "^FS";
 
-        // Jika hasil perhitungan minus atau terlalu kecil, kunci di batas aman
-        if ($barcodeX < 20) {
-            $barcodeX = 20;
-        }
-
-        // Koordinat Y barcode diturunkan sedikit ke Y=140 agar aman dari teks di atasnya yang mungkin memanjang.
-        $zplCode .= "^FO" . $barcodeX . ",140^BY2^BCN,60,Y,N,N^FD" . $request->sku . "^FS";
+        // Tampilkan Teks Registration Code di bawah QR Code
+        $zplCode .= "^FO0,205^FB400,1,0,C^A0N,18,18^FD" . $request->registration_code . "^FS";
 
         $zplCode .= "^XZ";
 
-
-        // 3. Eksekusi cetak
+        // 3. Eksekusi cetak via Printer Service
         $printResult = $this->printerService->sendToPrinter($zplCode);
 
-        // 4. Kembalikan respons ke halaman sebelumnya
+        // 4. Kembalikan respons JSON / Redirect
+        if ($request->ajax()) {
+            return response()->json([
+                'status'  => $printResult['status'],
+                'message' => $printResult['message']
+            ]);
+        }
+
         if ($printResult['status']) {
             return redirect()->back()->with('success', $printResult['message']);
         } else {
             return redirect()->back()->with('error', $printResult['message'])->withInput();
         }
+    }
+    // MASTER PENGIRIMAN EMAIL
+    public function master_event_pengiriman_email($akses, $id)
+    {
+        if ($this->url_akses_sub($akses, $id) == true) {
+            $events = DB::table('event_data')
+                ->select('id_event_data', 'event_data_code', 'event_data_tittle', 'event_data_start_date', 'event_data_venue', 'event_data_city')
+                ->orderBy('event_data_start_date', 'desc')
+                ->get();
+
+            // return view('pages.event.email_broadcast', compact('events', 'selectedEvent', 'selectedEventId'));
+            return view('app-event.menu-event.master-event.pengiriman-email', compact('events'), ['akses' => $akses, 'code' => $id]);
+        } else {
+            return Redirect::to('dashboard/home');
+        }
+    }
+    public function getSubEvents($eventId)
+    {
+        $event = DB::table('event_data')->where('id_event_data', $eventId)->first();
+
+        if (!$event) {
+            return response()->json([]);
+        }
+
+        $subEvents = DB::table('event_data_sub')
+            ->where('event_data_code', $event->event_data_code)
+            ->select('id_event_data_sub', 'event_data_sub_code', 'event_data_sub_name')
+            ->get();
+
+        return response()->json($subEvents);
+    }
+
+    /**
+     * AJAX: Ambil Kelas berdasarkan Sub Event Code
+     */
+    public function getClasses($subCode)
+    {
+        $classes = DB::table('event_data_sub_class')
+            ->where('event_data_sub_code', $subCode)
+            ->select('id_event_data_sub_class', 'event_data_sub_class_code', 'event_data_sub_class_name')
+            ->get();
+
+        return response()->json($classes);
+    }
+
+    /**
+     * AJAX: Ambil Daftar Peserta berdasarkan Filter Sub Event / Kelas
+     */
+    public function getParticipants(Request $request)
+    {
+        $subCode = $request->input('sub_code');
+        $classId = $request->input('class_id');
+
+        $query = DB::table('event_registrations as er')
+            ->join('event_participants as ep', 'er.id_participant', '=', 'ep.id_participant')
+            ->leftJoin('event_registration_classes as erc', 'er.id_registration', '=', 'erc.id_registration')
+            ->leftJoin('event_data_sub_class as esc', 'erc.id_event_data_sub_class', '=', 'esc.id_event_data_sub_class')
+            ->select(
+                'er.id_registration',
+                'er.payment_status',
+                'er.email_sent_at',
+                'erc.qr_code_token',
+                'erc.id_event_data_sub_class',
+                'ep.full_name',
+                'ep.full_name as name', // <-- Tambahkan alias ini
+                'ep.institution',
+                'ep.email',
+                'ep.phone_number',
+                'esc.event_data_sub_class_name'
+            )
+            ->where('esc.event_data_sub_code', $subCode);
+
+        // Filter berdasarkan kelas spesifik jika ada
+        if (!empty($classId)) {
+            $query->where('erc.id_event_data_sub_class', $classId);
+        }
+
+        $participants = $query->get();
+
+        return response()->json($participants);
+    }
+    // 2. Kirim Email Satuan
+    public function sendEmailSingle($idRegistration)
+    {
+        $registration = DB::table('event_registrations as er')
+            ->join('event_participants as ep', 'er.id_participant', '=', 'ep.id_participant')
+            ->leftJoin('event_registration_classes as erc', 'er.id_registration', '=', 'erc.id_registration')
+            ->leftJoin('event_data_sub_class as esc', 'erc.id_event_data_sub_class', '=', 'esc.id_event_data_sub_class')
+            ->where('er.id_registration', $idRegistration)
+            ->select(
+                'er.id_registration',
+                'er.payment_status',
+                'erc.qr_code_token',
+                'ep.full_name',
+                'ep.email',
+                'ep.institution',
+                'ep.phone_number',
+                'esc.event_data_sub_class_name'
+            )
+            ->first();
+
+        if (!$registration || !$registration->email) {
+            return response()->json(['message' => 'Email peserta tidak ditemukan.'], 400);
+        }
+
+        try {
+            Mail::to($registration->email)->send(new ParticipantTicketMail($registration));
+
+            // Update timestamp email_sent_at
+            DB::table('event_registrations')
+                ->where('id_registration', $idRegistration)
+                ->update(['email_sent_at' => now()]);
+
+            return response()->json(['message' => 'Email tiket berhasil dikirim ke ' . $registration->full_name]);
+        } catch (\Exception $e) {
+            return response()->json(['message' => 'Gagal mengirim email: ' . $e->getMessage()], 500);
+        }
+    }
+
+    // 3. Kirim Email Massal / Bulk
+    public function sendEmailBulk(Request $request)
+    {
+        $targetIds = $request->input('target_ids', []);
+
+        if (empty($targetIds)) {
+            return response()->json(['message' => 'Tidak ada peserta yang dipilih.'], 400);
+        }
+
+        $successCount = 0;
+        $failedCount = 0;
+
+        foreach ($targetIds as $idRegistration) {
+            try {
+                $registration = DB::table('event_registrations as er')
+                    ->join('event_participants as ep', 'er.id_participant', '=', 'ep.id_participant')
+                    ->leftJoin('event_registration_classes as erc', 'er.id_registration', '=', 'erc.id_registration')
+                    ->where('er.id_registration', $idRegistration)
+                    ->select('er.*', 'erc.qr_code_token', 'ep.email', 'ep.full_name')
+                    ->first();
+
+                if ($registration && $registration->email) {
+                    Mail::to($registration->email)->send(new ParticipantTicketMail($registration));
+
+                    DB::table('event_registrations')
+                        ->where('id_registration', $idRegistration)
+                        ->update(['email_sent_at' => now()]);
+
+                    $successCount++;
+                } else {
+                    $failedCount++;
+                }
+            } catch (\Exception $e) {
+                $failedCount++;
+            }
+        }
+
+        return response()->json([
+            'message' => "Pengiriman selesai. Berhasil: {$successCount}, Gagal: {$failedCount}"
+        ]);
     }
 }

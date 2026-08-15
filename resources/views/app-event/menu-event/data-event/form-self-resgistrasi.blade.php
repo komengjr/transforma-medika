@@ -4,16 +4,23 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Pendaftaran Event - Self Register</title>
+    <title>Pendaftaran Event - {{ $event->event_data_tittle }}</title>
+    <!-- Font Jakarta Sans & Bootstrap 5 -->
+    <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&display=swap" rel="stylesheet">
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
     <link href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.0/font/bootstrap-icons.css" rel="stylesheet">
+
     <style>
         :root {
-            --primary-blue: #2c7be5;
-            --primary-hover: #1a68d1;
-            --success-color: #00d27a;
-            --success-hover: #00b368;
-            --bg-page: #edf2f9;
+            --primary-gradient: linear-gradient(135deg, #2563eb 0%, #1d4ed8 100%);
+            --accent-glow: linear-gradient(135deg, #3b82f6 0%, #8b5cf6 100%);
+            --success-gradient: linear-gradient(135deg, #10b981 0%, #059669 100%);
+            --bg-dark: #0f172a;
+            --bg-glass: rgba(255, 255, 255, 0.88);
+        }
+
+        * {
+            font-family: 'Plus Jakarta Sans', -apple-system, BlinkMacSystemFont, sans-serif;
         }
 
         body,
@@ -21,8 +28,8 @@
             margin: 0;
             padding: 0;
             height: 100%;
-            font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif;
-            background-color: var(--bg-page);
+            background-color: var(--bg-dark);
+            overflow-x: hidden;
         }
 
         .full-page-container {
@@ -30,174 +37,356 @@
             display: flex;
         }
 
-        /* Sisi Kiri: Gambar/Banner Event */
+        /* ================= SISI KIRI: HERO & SUB EVENT ================= */
         .image-side {
-            background: linear-gradient(rgba(44, 123, 229, 0.25), rgba(15, 23, 42, 0.85)),
-                url('https://images.unsplash.com/photo-1540575467063-178a50c2df87?auto=format&fit=crop&w=1200&q=80');
+            background: linear-gradient(135deg, rgba(15, 23, 42, 0.92) 0%, rgba(30, 58, 138, 0.85) 100%),
+            url('{{ $event->event_data_cover ? asset("storage/".$event->event_data_cover) : "https://images.unsplash.com/photo-1540575467063-178a50c2df87?auto=format&fit=crop&w=1200&q=80" }}');
             background-size: cover;
             background-position: center;
             width: 50%;
             position: relative;
-            display: flex;
-            flex-direction: column;
-            justify-content: flex-end;
             padding: 3.5rem;
             color: #ffffff;
+            z-index: 2;
         }
 
         .event-badge {
-            background-color: rgba(255, 255, 255, 0.2);
-            backdrop-filter: blur(8px);
+            background: rgba(255, 255, 255, 0.18);
+            backdrop-filter: blur(12px);
+            -webkit-backdrop-filter: blur(12px);
             border: 1px solid rgba(255, 255, 255, 0.3);
-            padding: 6px 16px;
+            padding: 8px 20px;
             border-radius: 50px;
             font-size: 0.85rem;
-            font-weight: 600;
-            display: inline-block;
-            margin-bottom: 1.5rem;
+            font-weight: 700;
+            letter-spacing: 1px;
+            display: inline-flex;
+            align-items: center;
+            gap: 8px;
+            box-shadow: 0 4px 15px rgba(0, 0, 0, 0.2);
         }
 
-        /* Sisi Kanan: Form Container */
+        .hero-title {
+            font-size: 2.85rem;
+            font-weight: 800;
+            line-height: 1.15;
+            letter-spacing: -1px;
+            color: #ffffff;
+            text-shadow: 0 4px 12px rgba(0, 0, 0, 0.3);
+        }
+
+        /* GRID CARD SUB EVENT (POSISI BOTTOM) */
+        .sub-event-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));
+            gap: 1.75rem;
+            margin-top: 0.75rem;
+            max-height: 200px;
+            overflow-y: auto;
+            padding-right: 4px;
+        }
+
+        .sub-event-grid::-webkit-scrollbar {
+            width: 4px;
+        }
+
+        .sub-event-grid::-webkit-scrollbar-thumb {
+            background: rgba(255, 255, 255, 0.25);
+            border-radius: 4px;
+        }
+
+        .sub-event-card-item {
+            background: rgba(255, 255, 255, 0.1);
+            backdrop-filter: blur(12px);
+            -webkit-backdrop-filter: blur(12px);
+            border: 1px solid rgba(255, 255, 255, 0.18);
+            border-radius: 16px;
+            padding: 1rem;
+            display: flex;
+            flex-direction: column;
+            justify-content: space-between;
+            transition: all 0.25s ease;
+            box-shadow: 0 4px 15px rgba(0, 0, 0, 0.1);
+        }
+
+        .sub-event-card-item:hover {
+            background: rgba(255, 255, 255, 0.18);
+            border-color: rgba(255, 255, 255, 0.35);
+            transform: translateY(-3px);
+            box-shadow: 0 8px 20px rgba(0, 0, 0, 0.2);
+        }
+
+        .sub-event-badge-time {
+            background: linear-gradient(135deg, rgba(59, 130, 246, 0.3) 0%, rgba(139, 92, 246, 0.3) 100%);
+            color: #93c5fd;
+            border: 1px solid rgba(147, 197, 253, 0.3);
+            padding: 4px 10px;
+            border-radius: 20px;
+            font-size: 0.75rem;
+            font-weight: 700;
+            display: inline-flex;
+            align-items: center;
+            gap: 5px;
+            width: fit-content;
+        }
+
+        .sub-event-title-text {
+            color: #ffffff;
+            font-size: 0.95rem;
+            font-weight: 700;
+            line-height: 1.3;
+            margin-top: 0.6rem;
+            margin-bottom: 0.4rem;
+            display: -webkit-box;
+            -webkit-line-clamp: 2;
+            -webkit-box-orient: vertical;
+            overflow: hidden;
+        }
+
+        .feature-list {
+            display: flex;
+            gap: 1.25rem;
+        }
+
+        .feature-item {
+            background: rgba(255, 255, 255, 0.12);
+            backdrop-filter: blur(10px);
+            border-radius: 16px;
+            padding: 1.2rem;
+            border: 1px solid rgba(255, 255, 255, 0.2);
+            flex: 1;
+        }
+
+        /* ================= SISI KANAN: KIOSK & BOUNCING ORBS ================= */
         .form-side {
             width: 50%;
-            background-color: var(--bg-page);
+            background: #f1f5f9;
             display: flex;
-            /* align-items: center; */
+            align-items: center;
             justify-content: center;
             padding: 2.5rem;
-            overflow-y: auto;
-        }
-
-        /* Desain Card Falcon diperlebar */
-        .falcon-card {
-            width: 100%;
-            max-width: 680px;
-            background: #ffffff;
-            border-radius: 12px;
-            box-shadow: 0 15px 35px rgba(0, 0, 0, 0.06);
             overflow: hidden;
-            border: 1px solid #d8e2ef;
-        }
-
-        /* Header Biru Khas Falcon */
-        .falcon-header {
-            background-color: var(--primary-blue);
-            background-image: radial-gradient(circle at top right, rgba(255, 255, 255, 0.15), transparent);
-            padding: 1rem;
-            text-align: center;
             position: relative;
         }
 
-        .falcon-brand {
-            color: #ffffff;
-            font-weight: 800;
-            font-size: 2rem;
-            letter-spacing: -0.5px;
-            margin: 0;
+        /* Bouncing Orbs Animation */
+        .bounce-orb {
+            position: absolute;
+            border-radius: 50%;
+            filter: blur(50px);
+            z-index: 1;
+            opacity: 0.6;
+            animation: bounceMotion 8s infinite alternate ease-in-out;
         }
 
-        .falcon-body {
-            padding: 3.5rem 3rem;
+        .orb-1 {
+            width: 280px;
+            height: 280px;
+            background: linear-gradient(135deg, #3b82f6, #6366f1);
+            top: 10%;
+            left: 10%;
+            animation-duration: 7s;
         }
 
-        /* Custom Input */
-        .form-label-custom {
-            font-weight: 500;
-            color: #4d5969;
-            font-size: 0.95rem;
-            margin-bottom: 0.4rem;
+        .orb-2 {
+            width: 320px;
+            height: 320px;
+            background: linear-gradient(135deg, #a855f7, #ec4899);
+            bottom: 10%;
+            right: 10%;
+            animation-duration: 9s;
+            animation-delay: -3s;
         }
 
-        .form-control-custom {
-            border: 1px solid #d8e2ef;
-            padding: 0.75rem 1rem;
-            border-radius: 6px;
-            color: #2b354e;
-            font-size: 1rem;
+        .orb-3 {
+            width: 200px;
+            height: 200px;
+            background: linear-gradient(135deg, #10b981, #06b6d4);
+            bottom: 30%;
+            left: 20%;
+            animation-duration: 6s;
+            animation-delay: -1.5s;
         }
 
-        .form-control-custom:focus {
-            border-color: var(--primary-blue);
-            box-shadow: 0 0 0 0.25rem rgba(44, 123, 229, 0.15);
-        }
-
-        /* Loading Animation Area */
-        .scan-loading-box {
-            display: none;
-            border: 1px solid #d8e2ef;
-            border-radius: 8px;
-            background-color: #f8fafc;
-            padding: 2rem;
-            text-align: center;
-            margin-top: 1.5rem;
-        }
-
-        .loading-text {
-            color: var(--primary-blue);
-            font-weight: 600;
-            animation: pulseText 1.2s infinite;
-        }
-
-        /* Hasil Scan Section */
-        .result-box {
-            display: none;
-            background-color: #f8fafd;
-            border: 1px dashed var(--primary-blue);
-            border-radius: 8px;
-            padding: 1.5rem;
-            margin-top: 1.5rem;
-        }
-
-        /* Tombol Cetak Registrasi */
-        .btn-print-custom {
-            background-color: var(--success-color);
-            border: none;
-            color: white;
-            font-weight: 600;
-            padding: 0.85rem 1.5rem;
-            border-radius: 6px;
-            font-size: 1rem;
-            transition: all 0.2s ease;
-        }
-
-        .btn-print-custom:hover {
-            background-color: var(--success-hover);
-            color: white;
-        }
-
-        .btn-print-custom:disabled {
-            background-color: #a0aec0;
-            cursor: not-allowed;
-        }
-
-        /* Toast / Notifikasi Sukses Kecil */
-        .print-toast {
-            display: none;
-            background-color: #10b981;
-            color: white;
-            padding: 1rem;
-            border-radius: 6px;
-            text-align: center;
-            font-weight: 600;
-            margin-top: 1rem;
-            animation: pulseText 1s infinite;
-        }
-
-        @keyframes pulseText {
+        @keyframes bounceMotion {
             0% {
-                opacity: 0.6;
+                transform: translateY(0px) scale(1) rotate(0deg);
             }
 
             50% {
+                transform: translateY(-40px) scale(1.1) rotate(10deg);
+            }
+
+            100% {
+                transform: translateY(30px) scale(0.95) rotate(-10deg);
+            }
+        }
+
+        .kiosk-card {
+            width: 100%;
+            max-width: 620px;
+            background: var(--bg-glass);
+            backdrop-filter: blur(25px);
+            -webkit-backdrop-filter: blur(25px);
+            border-radius: 28px;
+            box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.12), 0 0 0 1px rgba(255, 255, 255, 0.6) inset;
+            padding: 3rem;
+            position: relative;
+            z-index: 2;
+        }
+
+        .scan-input-wrapper {
+            position: relative;
+            border-radius: 16px;
+            padding: 6px;
+            background: #ffffff;
+            box-shadow: 0 10px 25px rgba(0, 0, 0, 0.05);
+            border: 2px solid #e2e8f0;
+            transition: all 0.3s ease;
+        }
+
+        .scan-input-wrapper:focus-within {
+            border-color: #3b82f6;
+            box-shadow: 0 0 0 4px rgba(59, 130, 246, 0.2);
+        }
+
+        .form-control-kiosk {
+            border: none !important;
+            box-shadow: none !important;
+            font-size: 1.1rem;
+            padding: 0.85rem 1.25rem;
+            font-weight: 600;
+            color: #1e293b;
+            background: transparent;
+        }
+
+        .btn-scan-trigger {
+            background: var(--primary-gradient);
+            border: none;
+            color: white;
+            font-weight: 700;
+            border-radius: 12px;
+            padding: 0.85rem 1.75rem;
+            transition: all 0.2s ease;
+        }
+
+        .btn-scan-trigger:hover {
+            transform: scale(1.03);
+            box-shadow: 0 8px 20px rgba(37, 99, 235, 0.3);
+            color: white;
+        }
+
+        .scan-loading-box {
+            display: none;
+            background: #ffffff;
+            border-radius: 18px;
+            padding: 2.5rem;
+            text-align: center;
+            margin-top: 1.5rem;
+            border: 1px solid #e2e8f0;
+        }
+
+        .scanner-line {
+            width: 100%;
+            height: 4px;
+            background: var(--accent-glow);
+            border-radius: 4px;
+            animation: scanAnimation 1.5s infinite ease-in-out;
+            margin-bottom: 1.5rem;
+        }
+
+        @keyframes scanAnimation {
+            0% {
+                transform: scaleX(0.1);
+                opacity: 0.3;
+            }
+
+            50% {
+                transform: scaleX(1);
                 opacity: 1;
             }
 
             100% {
-                opacity: 0.6;
+                transform: scaleX(0.1);
+                opacity: 0.3;
             }
         }
 
-        /* Responsif */
+        .result-box {
+            display: none;
+            margin-top: 1.5rem;
+            animation: fadeInUp 0.4s ease-out;
+        }
+
+        .id-badge-card {
+            background: #ffffff;
+            border-radius: 20px;
+            border: 1px solid #cbd5e1;
+            box-shadow: 0 12px 30px rgba(0, 0, 0, 0.06);
+            overflow: hidden;
+        }
+
+        .id-badge-header {
+            background: linear-gradient(135deg, #1e293b 0%, #0f172a 100%);
+            color: white;
+            padding: 1.25rem 1.5rem;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+        }
+
+        .badge-avatar {
+            width: 60px;
+            height: 60px;
+            border-radius: 50%;
+            background: var(--accent-glow);
+            color: white;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 1.5rem;
+            font-weight: 800;
+        }
+
+        .btn-print-custom {
+            background: var(--success-gradient);
+            border: none;
+            color: white;
+            font-weight: 700;
+            padding: 1rem 1.5rem;
+            border-radius: 14px;
+            font-size: 1.05rem;
+            transition: all 0.25s ease;
+        }
+
+        .btn-print-custom:hover {
+            transform: translateY(-2px);
+            color: white;
+        }
+
+        .print-toast {
+            display: none;
+            background: #10b981;
+            color: white;
+            padding: 1rem;
+            border-radius: 12px;
+            text-align: center;
+            font-weight: 700;
+            margin-bottom: 1.5rem;
+        }
+
+        @keyframes fadeInUp {
+            from {
+                opacity: 0;
+                transform: translateY(15px);
+            }
+
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
         @media (max-width: 992px) {
             .full-page-container {
                 flex-direction: column;
@@ -205,99 +394,204 @@
 
             .image-side {
                 width: 100%;
-                min-height: 25vh;
+                min-height: auto;
                 padding: 2rem;
             }
 
             .form-side {
                 width: 100%;
-                padding: 2rem 1rem;
+                padding: 1.5rem;
+            }
+
+            .hero-title {
+                font-size: 2rem;
+            }
+
+            .kiosk-card {
+                padding: 1.75rem;
             }
         }
     </style>
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.7.1/jquery.min.js"
-        integrity="sha512-v2CJ7UaYy4JwqLDIrZUI/4hqeoQieOmAZNXBeQyjo21dadnwR+8ZaIJVT8EE2iyI61OV8e6M8PP2/4hpQINQ/g=="
-        crossorigin="anonymous" referrerpolicy="no-referrer"></script>
+
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.7.1/jquery.min.js"></script>
 </head>
 
 <body>
 
     <div class="full-page-container">
-        <div class="image-side">
+        <!-- Sisi Kiri: Hero Banner & Agenda Sub Event di Posisi Bawah -->
+        <div class="image-side d-flex flex-column justify-content-between">
+
+            <!-- Top Header Badge -->
             <div>
-                <span class="event-badge text-uppercase">Tech Conference 2026</span>
-                <h1 class="display-5 fw-bold mb-3">Falcon Summit 2026</h1>
-                <p class="lead text-white-50 mb-0">Platform masa depan untuk ekosistem integrasi teknologi nirsentuh.</p>
+                <span class="event-badge text-uppercase">
+                    <i class="bi bi-shield-check text-warning"></i> Official Check-in Kiosk
+                </span>
+            </div>
+
+            <!-- Content & Agenda Sub Event Card di Posisi Bawah -->
+            <div class="mt-auto pt-4 pb-2">
+                <h1 class="hero-title mb-2">{{ $event->event_data_tittle }}</h1>
+                <p class="lead text-white-50 mb-3" style="font-size: 0.95rem; max-width: 480px;">
+                    {{ Str::limit(strip_tags($event->event_data_desc ?? 'Platform pendaftaran & presensi event otomatis.'), 100) }}
+                </p>
+
+                <!-- Header Title Sub Event -->
+                <div class="d-flex align-items-center justify-content-between mb-3">
+                    <div class="d-flex align-items-center gap-2">
+                        <i class="bi bi-grid-fill text-warning"></i>
+                        <span class="fw-bold text-white text-uppercase fs-7" style="letter-spacing: 0.5px;">Agenda Sub Event</span>
+                    </div>
+                    @if(count($sub_events) > 0)
+                    <span class="badge bg-white bg-opacity-10 text-white border border-white border-opacity-25 rounded-pill px-2.5 py-1 fs-8">
+                        {{ count($sub_events) }} Sesi
+                    </span>
+                    @endif
+                </div>
+
+                <!-- Grid Card Sub Event -->
+                <div class="sub-event-grid py-2">
+                    @forelse($sub_events as $sub)
+                    <div class="sub-event-card-item">
+                        <div>
+                            <span class="sub-event-badge-time">
+                                <i class="bi bi-clock-fill"></i>
+                                {{ \Carbon\Carbon::parse($sub->event_data_sub_start)->format('H:i') }} - {{ \Carbon\Carbon::parse($sub->event_data_sub_end)->format('H:i') }}
+                            </span>
+
+                            <h6 class="sub-event-title-text" title="{{ $sub->event_data_sub_name }}">
+                                {{ $sub->event_data_sub_name }}
+                            </h6>
+                        </div>
+
+                        <div class="pt-2 border-top border-white border-opacity-10 mt-2 d-flex align-items-center justify-content-between">
+                            <small class="text-white-50 fs-8">
+                                <i class="bi bi-calendar3 me-1 text-info"></i>
+                                {{ \Carbon\Carbon::parse($sub->event_data_sub_start)->translatedFormat('d M Y') }}
+                            </small>
+                            <i class="bi bi-arrow-right-short text-white-50"></i>
+                        </div>
+                    </div>
+                    @empty
+                    <div class="w-100">
+                        <div class="p-3 text-center rounded-4 border border-danger border-opacity-50"
+                            style="background: rgba(220, 53, 69, 0.15); backdrop-filter: blur(10px);">
+                            <i class="bi bi-calendar-x-fill text-danger fs-3 d-block mb-1"></i>
+                            <strong class="d-block text-white fs-6">Sub Event Tidak Ada</strong>
+                            <small class="text-white-50 fs-8">Belum ada agenda atau jadwal sub event yang ditambahkan.</small>
+                        </div>
+                    </div>
+                    @endforelse
+                </div>
+            </div>
+
+            <!-- Bottom Info Footer -->
+            <div class="d-flex align-items-center justify-content-between pt-3 border-top border-secondary border-opacity-25 mt-2">
+                <small class="text-white">
+                    <i class="bi bi-geo-alt-fill text-danger me-1"></i> {{ $event->event_data_venue }}, {{ $event->event_data_city }}
+                </small>
+                <small class="text-white">
+                    <i class="bi bi-calendar-event-fill text-info me-1"></i> {{ \Carbon\Carbon::parse($event->event_data_start_date)->format('d M Y, H:i') }} WIB
+                </small>
             </div>
         </div>
 
+        <!-- Sisi Kanan: Self Register Kiosk -->
         <div class="form-side">
-            <div class="falcon-card">
-                <div class="falcon-header">
-                    <!-- <h2 class="falcon-brand">falcon</h2> -->
+            <!-- Animated Bouncing Orbs -->
+            <div class="bounce-orb orb-1"></div>
+            <div class="bounce-orb orb-2"></div>
+            <div class="bounce-orb orb-3"></div>
+
+            <div class="kiosk-card">
+
+                <div id="printToast" class="print-toast">
+                    <i class="bi bi-check-circle-fill me-2 fs-5"></i> Perintah Cetak Berhasil! Memuat Ulang Kiosk...
                 </div>
 
-                <div class="falcon-body">
+                <div class="text-center mb-4">
+                    <div class="d-inline-flex align-items-center justify-content-center bg-primary bg-opacity-10 text-primary rounded-circle mb-3" style="width: 68px; height: 68px;">
+                        <i class="bi bi-qr-code-scan fs-2"></i>
+                    </div>
+                    <h2 class="fw-bold text-dark m-0">Self Check-In</h2>
+                    <p class="text-muted small mt-1 mb-0">Tempelkan QR Code / Ketik ID Card pada form di bawah lalu tekan <kbd class="bg-light text-dark border">Enter</kbd></p>
+                </div>
+
+                <!-- Alert Error -->
+                <div id="errorAlert" class="alert alert-danger d-none align-items-center rounded-3 mb-3" role="alert">
+                    <i class="bi bi-exclamation-triangle-fill me-2 fs-5"></i>
+                    <span id="errorMessage">Kode QR tidak ditemukan!</span>
+                </div>
+
+                <!-- Form Input Scanner -->
+                <form id="scanForm" onsubmit="event.preventDefault(); startScanProcess();">
                     <div class="mb-3">
-                        <h3 class="fw-bold text-dark m-0" style="font-size: 1.75rem;">Self Register</h3>
-                        <p class="text-muted small mb-0">Silakan pindai kartu identitas, kode tiket Anda, atau tekan Enter setelah mengetik.</p>
-                    </div>
-
-                    <div id="printToast" class="print-toast mb-3">
-                        <i class="bi bi-check-circle-fill me-2"></i> Perintah Cetak Berhasil Dikirim! Form Mereset...
-                    </div>
-
-                    <form id="scanForm" onsubmit="event.preventDefault(); startScanProcess();">
-                        <div class="mb-4">
-                            <label class="form-label form-label-custom">ID Card Code / Ticket Code</label>
-                            <div class="input-group">
-                                <input type="text" id="idInput" class="form-control form-control-custom" placeholder="Scan Barcode atau ketik ID di sini..." required autocomplete="off">
-                                <button class="btn btn-primary px-4" type="submit" style="background-color: var(--primary-blue); border-color: var(--primary-blue);"><i class="bi bi-qr-code-scan"></i> Scan</button>
-                            </div>
+                        <label class="form-label fw-bold text-secondary fs-6 mb-2">Kode Tiket / ID Card</label>
+                        <div class="scan-input-wrapper d-flex align-items-center">
+                            <i class="bi bi-search text-muted fs-5 ms-3"></i>
+                            <input type="text" id="idInput" class="form-control form-control-kiosk" placeholder="Scan Barcode / Ketik ID di sini..." required autocomplete="off" autofocus>
+                            <button class="btn btn-scan-trigger ms-2" type="submit">
+                                Scan <i class="bi bi-arrow-right-short ms-1"></i>
+                            </button>
                         </div>
-
-                        <!-- <div class="mb-4">
-                            <label class="form-label form-label-custom">Verification Token</label>
-                            <input type="password" class="form-control form-control-custom" placeholder="••••••••" value="123456" disabled>
-                        </div> -->
-                    </form>
-
-                    <div class="scan-loading-box" id="loadingContainer">
-                        <div class="spinner-border text-primary mb-3" style="width: 2.5rem; height: 2.5rem;" role="status">
-                            <span class="visually-hidden">Loading...</span>
-                        </div>
-                        <div class="loading-text">Menghubungkan ke Scanner & Membaca Data...</div>
                     </div>
+                </form>
 
-                    <div class="result-box" id="resultContainer">
-                        <div class="d-flex align-items-center gap-2 mb-3 text-success">
-                            <i class="bi bi-check-circle-fill" style="font-size: 1.2rem;"></i>
-                            <strong style="font-size: 1rem;">Data Terbaca & Terverifikasi</strong>
-                        </div>
-                        <div class="bg-white p-4 rounded border border-light-subtle mb-4">
-                            <div class="row g-3 text-dark style-result" style="font-size: 1rem;">
-                                <div class="col-sm-4 text-muted">Nama Lengkap:</div>
-                                <div class="col-sm-8 fw-semibold" id="resName">Raditya Pratama</div>
-                                <div class="col-sm-4 text-muted">Status Kehadiran:</div>
-                                <div class="col-sm-8 fw-semibold text-primary" id="resStatus">VIP Attendee</div>
-                                <div class="col-sm-4 text-muted">Waktu Pindai:</div>
-                                <div class="col-sm-8 text-muted" id="resTime">--:-- WIB</div>
-                            </div>
-                        </div>
-
-                        <button class="btn btn-print-custom w-100 d-flex align-items-center justify-content-center gap-2 shadow-sm mb-2" id="btnPrint" onclick="processBackgroundPrint()">
-                            <i class="bi bi-printer-fill"></i> <span id="printBtnText">Cetak Nomor Registrasi</span>
-                        </button>
-                        <button class="btn btn-link w-100 text-decoration-none text-muted small" id="btnReset" onclick="resetScan()">
-                            <i class="bi bi-arrow-counterclockwise"></i> Scan Ulang
-                        </button>
-                    </div>
-
+                <!-- Loading State -->
+                <div class="scan-loading-box" id="loadingContainer">
+                    <div class="scanner-line"></div>
+                    <div class="spinner-border text-primary mb-2" style="width: 2.2rem; height: 2.2rem;" role="status"></div>
+                    <h6 class="fw-bold text-dark mb-1">Membaca Data Peserta...</h6>
+                    <small class="text-muted">Menghubungkan ke sistem verifikasi tiket</small>
                 </div>
+
+                <!-- Result Box -->
+                <div class="result-box" id="resultContainer">
+                    <div class="id-badge-card mb-4">
+                        <div class="id-badge-header">
+                            <span class="badge bg-success border border-light-subtle rounded-pill px-3 py-2 fs--2 fw-bold">
+                                <i class="bi bi-check-circle-fill me-1"></i> Terverifikasi
+                            </span>
+                            <small class="text-white-50"><i class="bi bi-clock me-1"></i> <span id="resTime">--:-- WIB</span></small>
+                        </div>
+
+                        <div class="p-4">
+                            <div class="d-flex align-items-center gap-3 mb-3">
+                                <div class="badge-avatar" id="avatarLetter">R</div>
+                                <div>
+                                    <small class="text-muted text-uppercase fw-bold fs--2" id="resInstansi">Instansi</small>
+                                    <h4 class="fw-bold text-dark mb-0" id="resName">--</h4>
+                                </div>
+                            </div>
+
+                            <div class="row g-2 bg-light p-3 rounded-3 border">
+                                <div class="col-6">
+                                    <small class="text-muted d-block fs--2">Kategori / Kelas</small>
+                                    <span class="fw-bold text-primary" id="resStatus">--</span>
+                                </div>
+                                <div class="col-6">
+                                    <small class="text-muted d-block fs--2">Status Cetak</small>
+                                    <span class="fw-bold text-success"><i class="bi bi-printer me-1"></i> Ready to Print</span>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <button class="btn btn-print-custom w-100 d-flex align-items-center justify-content-center gap-2 mb-3" id="btnPrint" onclick="processBackgroundPrint()">
+                        <i class="bi bi-printer-fill fs-5"></i> <span id="printBtnText">Cetak Badge Registrasi</span>
+                    </button>
+
+                    <button class="btn btn-light w-100 border text-secondary fw-semibold py-2" id="btnReset" onclick="resetScan()">
+                        <i class="bi bi-arrow-counterclockwise me-1"></i> Scan Ulang / Batal
+                    </button>
+                </div>
+
             </div>
         </div>
     </div>
 
+    <!-- SweetAlert2 JS -->
+    <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
     <script>
         const idInput = document.getElementById('idInput');
         const btnPrint = document.getElementById('btnPrint');
@@ -305,92 +599,154 @@
         const printToast = document.getElementById('printToast');
         const resultBox = document.getElementById('resultContainer');
         const loadingBox = document.getElementById('loadingContainer');
+        const errorAlert = document.getElementById('errorAlert');
 
-        // Mendeteksi Enter di field scan
-        idInput.addEventListener('keydown', function(event) {
-            if (event.key === 'Enter') {
-                event.preventDefault();
-                startScanProcess();
-            }
-        });
+        let currentParticipantData = null;
 
-        // 1. PROSES ANIMASI LOADING SAAT SCAN
+        window.onload = () => {
+            if (idInput) idInput.focus();
+        };
+
+        if (idInput) {
+            idInput.addEventListener('keydown', function(event) {
+                if (event.key === 'Enter') {
+                    event.preventDefault();
+                    startScanProcess();
+                }
+            });
+        }
+
         function startScanProcess() {
-            if (!idInput.value) idInput.value = "FLC-2026-991A";
+            const token = idInput.value.trim();
+            if (!token) return;
 
+            errorAlert.classList.add('d-none');
             resultBox.style.display = 'none';
             loadingBox.style.display = 'block';
-            printToast.style.display = 'none';
 
-            loadingBox.scrollIntoView({
-                behavior: 'smooth'
-            });
-
-            setTimeout(() => {
+            $.ajax({
+                url: "{{ route('menu_event_data_form_registrasi_event_cek_booking') }}",
+                type: "POST",
+                data: {
+                    "_token": "{{ csrf_token() }}",
+                    "token": token,
+                    "code": "{{ $kode }}",
+                },
+                dataType: "json"
+            }).done(function(response) {
                 loadingBox.style.display = 'none';
-                resultBox.style.display = 'block';
 
-                const now = new Date();
-                document.getElementById('resTime').innerText = now.toLocaleTimeString('id-ID') + ' WIB';
+                if (response.status === 'success') {
+                    currentParticipantData = response.data;
 
-                resultBox.scrollIntoView({
-                    behavior: 'smooth'
-                });
-            }, 1200);
+                    document.getElementById('resName').innerText = currentParticipantData.full_name;
+                    document.getElementById('resInstansi').innerText = currentParticipantData.institution;
+                    document.getElementById('resStatus').innerText = currentParticipantData.class_name;
+                    document.getElementById('avatarLetter').innerText = currentParticipantData.full_name.charAt(0).toUpperCase();
+
+                    const now = new Date();
+                    document.getElementById('resTime').innerText = now.toLocaleTimeString('id-ID') + ' WIB';
+
+                    resultBox.style.display = 'block';
+                }
+            }).fail(function(xhr) {
+                loadingBox.style.display = 'none';
+                let msg = 'Kode QR / Token tidak valid atau tidak ditemukan.';
+                if (xhr.responseJSON && xhr.responseJSON.message) {
+                    msg = xhr.responseJSON.message;
+                }
+                document.getElementById('errorMessage').innerText = msg;
+                errorAlert.classList.remove('d-none');
+
+                idInput.select();
+            });
         }
 
-        // 2. PROSES CETAK LEWAT BACKEND / LATAR BELAKANG + AUTO RESET
         function processBackgroundPrint() {
-            // Ubah tombol menjadi status loading proses cetak
-            btnPrint.disabled = true;
-            printBtnText.innerText = "Memproses Cetak Tiket...";
-            btnPrint.innerHTML = `<div class="spinner-border spinner-border-sm text-light" role="status"></div> Menyambungkan ke Printer Latar Belakang...`;
-            setTimeout(() => {
-                // Tampilkan notifikasi sukses singkat
-                printToast.style.display = 'block';
-                printToast.scrollIntoView({
-                    behavior: 'smooth'
-                });
-                $.ajax({
-                    url: "{{ route('menu_event_data_form_registrasi_event_test_print') }}",
-                    type: "POST",
-                    cache: false,
-                    data: {
-                        "_token": "{{ csrf_token() }}",
-                        "nama_produk": 'Agus Prasetyo Raharjo',
-                        "nama_event": 'PDGI KALIMANTAN BAGIAN BARAT DAYA TENGAH MALAM JUMAT',
-                        "sku": 'E102939101923',
-                        "harga": '2000000',
-                    },
-                    dataType: 'html',
-                }).done(function(data) {
+            if (!currentParticipantData) return;
 
-                    // Jeda 1.5 detik ekstra agar user sempat melihat notifikasi sukses, lalu reset form otomatis ke awal
-                    setTimeout(() => {
+            btnPrint.disabled = true;
+            if (printBtnText) printBtnText.innerText = "Memproses Cetak...";
+            btnPrint.innerHTML = `<div class="spinner-border spinner-border-sm text-light" role="status"></div> Mengirim Data ke Printer...`;
+
+            $.ajax({
+                url: "{{ route('menu_event_data_form_registrasi_event_test_print') }}",
+                type: "POST",
+                cache: false,
+                data: {
+                    "_token": "{{ csrf_token() }}",
+                    "nama_peserta": currentParticipantData.full_name,
+                    "nama_event": currentParticipantData.event_name,
+                    "id_event": currentParticipantData.id_event,
+                    "kode_booking": currentParticipantData.qr_code_token,
+                    "registration_code": currentParticipantData.registration_code,
+                    "class_name": currentParticipantData.class_name
+                },
+                dataType: 'json',
+            }).done(function(response) {
+                if (response.status) {
+                    Swal.fire({
+                        icon: 'success',
+                        title: 'Berhasil Dicetak!',
+                        text: response.message || 'Badge registrasi telah berhasil dikirim ke printer.',
+                        timer: 2000,
+                        showConfirmButton: false,
+                        timerProgressBar: true
+                    }).then(() => {
                         resetScan();
-                        printToast.style.display = 'none';
+                    });
+
+                    if (printToast) printToast.style.display = 'block';
+                    setTimeout(() => {
+                        if (printToast) printToast.style.display = 'none';
                     }, 1500);
 
-                }).fail(function() {
-                    $('#menu-detail-seub-event').html('eror');
-                });
-            }, 2000);
-            // Simulasi pengiriman data ke server / printer background (2 detik)
+                } else {
+                    Swal.fire({
+                        icon: 'error',
+                        title: 'Gagal Mencetak!',
+                        text: response.message || 'Terjadi kesalahan saat memproses printer.',
+                        confirmButtonText: 'Tutup',
+                        confirmButtonColor: '#d33'
+                    }).then(() => {
+                        resetScan();
+                    });
+                }
 
+            }).fail(function(xhr) {
+                let errorMessage = 'Gagal menyambungkan ke sistem printer!';
+                if (xhr.responseJSON && xhr.responseJSON.message) {
+                    errorMessage = xhr.responseJSON.message;
+                }
+
+                Swal.fire({
+                    icon: 'error',
+                    title: 'Koneksi Terputus!',
+                    text: errorMessage,
+                    confirmButtonText: 'Coba Lagi',
+                    confirmButtonColor: '#d33'
+                }).then(() => {
+                    resetScan();
+                });
+
+                if (printToast) printToast.style.display = 'none';
+            });
         }
 
-        // 3. FUNGSI RESET FORM KEMBALI KE AWAL
         function resetScan() {
-            idInput.value = "";
-            resultBox.style.display = 'none';
-            loadingBox.style.display = 'none';
+            if (idInput) idInput.value = "";
+            currentParticipantData = null;
 
-            // Kembalikan kondisi bawaan tombol cetak
-            btnPrint.disabled = false;
-            btnPrint.innerHTML = `<i class="bi bi-printer-fill"></i> Cetak Nomor Registrasi`;
+            if (resultBox) resultBox.style.display = 'none';
+            if (loadingBox) loadingBox.style.display = 'none';
+            if (errorAlert) errorAlert.classList.add('d-none');
 
-            // Otomatis arahkan kursor fokus kembali ke input scan
-            idInput.focus();
+            if (btnPrint) {
+                btnPrint.disabled = false;
+                btnPrint.innerHTML = `<i class="bi bi-printer-fill fs-5"></i> Cetak Badge Registrasi`;
+            }
+
+            if (idInput) idInput.focus();
         }
     </script>
 </body>
