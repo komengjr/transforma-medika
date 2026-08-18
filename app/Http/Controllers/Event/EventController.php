@@ -556,28 +556,17 @@ class EventController extends Controller
         $zplCode .= "^LL240"; // Tinggi label (240 dots)
         $zplCode .= "^LS0";
 
-        // ============================================================
-        // 1. NAMA PESERTA (BESAR & TEBAL)
-        // ============================================================
+        // 1. NAMA PESERTA
         $zplCode .= "^FO0,15^FB400,1,0,C^A0N,26,26^FD" . $request->nama_peserta . "^FS";
 
-        // ============================================================
         // 2. KELAS / KATEGORI
-        // ============================================================
         $zplCode .= "^FO0,45^FB400,1,0,C^A0N,20,20^FD[" . $request->class_name . "]^FS";
 
-        // ============================================================
         // 3. NAMA EVENT & ID EVENT
-        // ============================================================
         $eventInfo = $request->nama_event . " (ID: " . $request->id_event . ")";
         $zplCode .= "^FO0,70^FB400,2,0,C^A0N,18,18^FD" . $eventInfo . "^FS";
 
-        // ============================================================
         // 4. BARCODE 2D (QR CODE) BERDASARKAN REGISTRATION_CODE
-        // ============================================================
-        // ^FO150,105 = Koordinat X=150, Y=105 (Posisi tengah)
-        // ^BQN,2,4   = QR Code (Model 2, Magnification factor 4)
-        // ^FDHA,     = 'HA' menunjukkan data standar/alphanumeric pada QR ZPL
         $zplCode .= "^FO150,105^BQN,2,4^FDHA," . $request->registration_code . "^FS";
 
         // Tampilkan Teks Registration Code di bawah QR Code
@@ -585,22 +574,16 @@ class EventController extends Controller
 
         $zplCode .= "^XZ";
 
-        // 3. Eksekusi cetak via Printer Service
-        $printResult = $this->printerService->sendToPrinter($zplCode);
-
-        // 4. Kembalikan respons JSON / Redirect
+        // 3. Kembalikan ZPL ke Client Javascript
         if ($request->ajax()) {
             return response()->json([
-                'status'  => $printResult['status'],
-                'message' => $printResult['message']
+                'status'  => true,
+                'message' => 'ZPL berhasil di-generate oleh server.',
+                'zpl'     => $zplCode
             ]);
         }
 
-        if ($printResult['status']) {
-            return redirect()->back()->with('success', $printResult['message']);
-        } else {
-            return redirect()->back()->with('error', $printResult['message'])->withInput();
-        }
+        return redirect()->back()->with('success', 'ZPL berhasil di-generate.');
     }
     // MASTER PENGIRIMAN EMAIL
     public function master_event_pengiriman_email($akses, $id)

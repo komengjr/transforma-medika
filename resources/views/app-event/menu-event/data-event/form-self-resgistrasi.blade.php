@@ -669,6 +669,7 @@
             if (printBtnText) printBtnText.innerText = "Memproses Cetak...";
             btnPrint.innerHTML = `<div class="spinner-border spinner-border-sm text-light" role="status"></div> Mengirim Data ke Printer...`;
 
+            // STEP 1: Ambil kode ZPL dari Server Cloud Laravel
             $.ajax({
                 url: "{{ route('menu_event_data_form_registrasi_event_test_print') }}",
                 type: "POST",
@@ -684,53 +685,73 @@
                 },
                 dataType: 'json',
             }).done(function(response) {
-                if (response.status) {
-                    Swal.fire({
-                        icon: 'success',
-                        title: 'Berhasil Dicetak!',
-                        text: response.message || 'Badge registrasi telah berhasil dikirim ke printer.',
-                        timer: 2000,
-                        showConfirmButton: false,
-                        timerProgressBar: true
-                    }).then(() => {
-                        resetScan();
-                    });
+                if (response.status && response.zpl) {
 
-                    if (printToast) printToast.style.display = 'block';
-                    setTimeout(() => {
-                        if (printToast) printToast.style.display = 'none';
-                    }, 1500);
+                    // STEP 2: Tembakkan ZPL ke Print Agent Lokal di PC Kasir
+                    $.ajax({
+                        url: "http://localhost:8080/print", // URL Agent lokal PC kasir
+                        type: "POST",
+                        contentType: "application/json",
+                        data: JSON.stringify({
+                            zpl: response.zpl,
+                            printer_name: "Zebra_USB" // Sesuai nama share printer lokal Anda
+                        }),
+                        dataType: 'json'
+                    }).done(function(localResponse) {
+
+                        if (localResponse.status) {
+                            Swal.fire({
+                                icon: 'success',
+                                title: 'Berhasil Dicetak!',
+                                text: localResponse.message || 'Badge registrasi telah berhasil dikirim ke printer.',
+                                timer: 2000,
+                                showConfirmButton: false,
+                                timerProgressBar: true
+                            }).then(() => {
+                                resetScan();
+                            });
+
+                            if (printToast) printToast.style.display = 'block';
+                            setTimeout(() => {
+                                if (printToast) printToast.style.display = 'none';
+                            }, 1500);
+
+                        } else {
+                            showPrintErrorAlert(localResponse.message || 'Agent lokal gagal mencetak ke printer.');
+                        }
+
+                    }).fail(function() {
+                        showPrintErrorAlert('Gagal terhubung ke Print Agent Lokal! Pastikan agent.php sudah berjalan di PC ini.');
+                    });
 
                 } else {
-                    Swal.fire({
-                        icon: 'error',
-                        title: 'Gagal Mencetak!',
-                        text: response.message || 'Terjadi kesalahan saat memproses printer.',
-                        confirmButtonText: 'Tutup',
-                        confirmButtonColor: '#d33'
-                    }).then(() => {
-                        resetScan();
-                    });
+                    showPrintErrorAlert(response.message || 'Terjadi kesalahan saat memproses printer.');
                 }
 
             }).fail(function(xhr) {
-                let errorMessage = 'Gagal menyambungkan ke sistem printer!';
+                let errorMessage = 'Gagal menyambungkan ke server cloud!';
                 if (xhr.responseJSON && xhr.responseJSON.message) {
                     errorMessage = xhr.responseJSON.message;
                 }
-
-                Swal.fire({
-                    icon: 'error',
-                    title: 'Koneksi Terputus!',
-                    text: errorMessage,
-                    confirmButtonText: 'Coba Lagi',
-                    confirmButtonColor: '#d33'
-                }).then(() => {
-                    resetScan();
-                });
-
-                if (printToast) printToast.style.display = 'none';
+                showPrintErrorAlert(errorMessage);
             });
+        }
+
+        // Helper function untuk menampilkan alert error SweetAlert
+        function showPrintErrorAlert(message) {
+            Swal.fire({
+                icon: 'error',
+                title: 'Gagal Mencetak!',
+                text: message,
+                confirmButtonText: 'Coba Lagi',
+                confirmButtonColor: '#d33'
+            }).then(() => {
+                resetScan();
+            });
+
+            if (printToast) printToast.style.display = 'none';
+            btnPrint.disabled = false;
+            if (printBtnText) printBtnText.innerText = "Cetak Badge";
         }
 
         function resetScan() {
