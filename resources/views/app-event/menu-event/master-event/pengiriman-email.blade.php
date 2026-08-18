@@ -1,91 +1,91 @@
 @extends('layouts.layouts')
 
 @section('content')
-<div class="container-fluid py-4">
 
-    <meta name="csrf-token" content="{{ csrf_token() }}">
 
-    <!-- Filter Card -->
-    <div class="card border-0 shadow-sm rounded-4 mb-4">
-        <div class="card-body p-4">
-            <h5 class="fw-bold mb-3 text-dark">
-                <i class="fas fa-filter text-primary me-2"></i> Pengiriman Email Tiket Peserta
-            </h5>
+<meta name="csrf-token" content="{{ csrf_token() }}">
 
-            <div class="row g-3">
-                <div class="col-md-4">
-                    <label class="form-label fw-semibold text-secondary small">1. Pilih Event Utama</label>
-                    <select id="selectEvent" class="form-select form-select-lg rounded-3">
-                        <option value="">-- Pilih Event --</option>
-                        @foreach($events as $event)
-                        <option value="{{ $event->id_event_data }}">{{ $event->event_data_tittle }}</option>
-                        @endforeach
-                    </select>
-                </div>
+<!-- Filter Card -->
+<div class="card border-0 shadow-sm rounded-4 mb-4">
+    <div class="card-body p-4">
+        <h5 class="fw-bold mb-3 text-dark">
+            <i class="fas fa-filter text-primary me-2"></i> Pengiriman Email Tiket Peserta
+        </h5>
 
-                <div class="col-md-4" id="wrapperSubEvent" style="display: none;">
-                    <label class="form-label fw-semibold text-secondary small">2. Pilih Sub Event</label>
-                    <select id="selectSubEvent" class="form-select form-select-lg rounded-3">
-                        <option value="">-- Pilih Sub Event --</option>
-                    </select>
-                </div>
+        <div class="row g-3">
+            <div class="col-md-4">
+                <label class="form-label fw-semibold text-secondary small">1. Pilih Event Utama</label>
+                <select id="selectEvent" class="form-select form-select-lg rounded-3">
+                    <option value="">-- Pilih Event --</option>
+                    @foreach($events as $event)
+                    <option value="{{ $event->id_event_data }}">{{ $event->event_data_tittle }}</option>
+                    @endforeach
+                </select>
+            </div>
 
-                <div class="col-md-4" id="wrapperClass" style="display: none;">
-                    <label class="form-label fw-semibold text-secondary small">3. Pilih Kelas (Opsional)</label>
-                    <select id="selectClass" class="form-select form-select-lg rounded-3">
-                        <option value="">-- Semua Kelas --</option>
-                    </select>
-                </div>
+            <div class="col-md-4" id="wrapperSubEvent" style="display: none;">
+                <label class="form-label fw-semibold text-secondary small">2. Pilih Sub Event</label>
+                <select id="selectSubEvent" class="form-select form-select-lg rounded-3">
+                    <option value="">-- Pilih Sub Event --</option>
+                </select>
+            </div>
+
+            <div class="col-md-4" id="wrapperClass" style="display: none;">
+                <label class="form-label fw-semibold text-secondary small">3. Pilih Kelas (Opsional)</label>
+                <select id="selectClass" class="form-select form-select-lg rounded-3">
+                    <option value="">-- Semua Kelas --</option>
+                </select>
             </div>
         </div>
     </div>
-
-    <!-- Table Card -->
-    <div class="card border-0 shadow-sm rounded-4" id="wrapperTablePeserta" style="display: none;">
-        <div class="card-header bg-white py-3 border-0 d-flex flex-wrap align-items-center justify-content-between gap-2">
-            <div class="d-flex align-items-center gap-2">
-                <h5 class="mb-0 fw-bold text-dark">Daftar Peserta</h5>
-                <span class="badge bg-primary rounded-pill px-3 py-2" id="badgeTotalPeserta">0 Peserta</span>
-            </div>
-
-            <!-- Filter Status Email & Tombol Kirim Massal -->
-            <div class="d-flex align-items-center gap-2 flex-wrap">
-                <div class="btn-group btn-group-sm" role="group" aria-label="Filter Status Email">
-                    <input type="radio" class="btn-check" name="filterStatusEmail" id="filterAll" value="all" checked autocomplete="off">
-                    <label class="btn btn-outline-secondary px-3" for="filterAll">Semua Peserta</label>
-
-                    <input type="radio" class="btn-check" name="filterStatusEmail" id="filterUnsent" value="unsent" autocomplete="off">
-                    <label class="btn btn-outline-warning text-dark fw-semibold px-3" for="filterUnsent">Belum Terkirim</label>
-                </div>
-
-                <button class="btn btn-sm btn-success rounded-3 px-3 py-2 fw-semibold" id="btnKirimSemua" onclick="sendEmailBulk()">
-                    <i class="fas fa-paper-plane me-1"></i> Kirim Semua Email
-                </button>
-            </div>
-        </div>
-
-        <div class="card-body p-3">
-            <div class="table-responsive">
-                <table id="tablePeserta" class="table table-hover align-middle w-100">
-                    <thead class="bg-light">
-                        <tr class="text-uppercase small text-secondary">
-                            <th width="5%">No</th>
-                            <th>QR Token</th>
-                            <th>Nama Peserta</th>
-                            <th>Kelas</th>
-                            <th>Email</th>
-                            <th>Status Email</th>
-                            <th>Status Bayar</th>
-                            <th class="text-center" width="15%">Aksi</th>
-                        </tr>
-                    </thead>
-                    <tbody id="tbodyPeserta"></tbody>
-                </table>
-            </div>
-        </div>
-    </div>
-
 </div>
+
+<!-- Table Card -->
+<div class="card border-0 shadow-sm rounded-4" id="wrapperTablePeserta" style="display: none;">
+    <div class="card-header bg-white py-3 border-0 d-flex flex-wrap align-items-center justify-content-between gap-2">
+        <div class="d-flex align-items-center gap-2">
+            <h5 class="mb-0 fw-bold text-dark">Daftar Peserta</h5>
+            <span class="badge bg-primary rounded-pill px-3 py-2" id="badgeTotalPeserta">0 Peserta</span>
+        </div>
+
+        <!-- Filter Status Email & Tombol Kirim Massal -->
+        <div class="d-flex align-items-center gap-2 flex-wrap">
+            <div class="btn-group btn-group-sm" role="group" aria-label="Filter Status Email">
+                <input type="radio" class="btn-check" name="filterStatusEmail" id="filterAll" value="all" checked autocomplete="off">
+                <label class="btn btn-outline-secondary px-3" for="filterAll">Semua Peserta</label>
+
+                <input type="radio" class="btn-check" name="filterStatusEmail" id="filterUnsent" value="unsent" autocomplete="off">
+                <label class="btn btn-outline-warning text-dark fw-semibold px-3" for="filterUnsent">Belum Terkirim</label>
+            </div>
+
+            <button class="btn btn-sm btn-success rounded-3 px-3 py-2 fw-semibold" id="btnKirimSemua" onclick="sendEmailBulk()">
+                <i class="fas fa-paper-plane me-1"></i> Kirim Semua Email
+            </button>
+        </div>
+    </div>
+
+    <div class="card-body p-3">
+        <div class="table-responsive">
+            <table id="tablePeserta" class="table table-hover align-middle w-100">
+                <thead class="bg-light">
+                    <tr class="text-uppercase small text-secondary">
+                        <th width="5%">No</th>
+                        <th>QR Token</th>
+                        <th>Nama Peserta</th>
+                        <th>Kelas</th>
+                        <th>Email</th>
+                        <th>Status Email</th>
+                        <th>Status Bayar</th>
+                        <th class="text-center" width="15%">Aksi</th>
+                    </tr>
+                </thead>
+                <tbody id="tbodyPeserta"></tbody>
+            </table>
+        </div>
+    </div>
+</div>
+
+
 
 <!-- Scripts -->
 <link rel="stylesheet" href="https://cdn.datatables.net/1.13.7/css/dataTables.bootstrap5.min.css">
