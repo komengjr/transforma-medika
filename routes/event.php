@@ -19,9 +19,13 @@ Route::prefix('event/')->group(function (): void {
     Route::get('menu-event/data-event/form-registrasi-event/detail-sub-event/data-peserta', [EventController::class, 'menu_event_data_form_registrasi_event_detail_sub_event_data_peserta'])->name('menu_event_data_form_registrasi_event_detail_sub_event_data_peserta');
     Route::post('menu-event/data-event/form-registrasi-event/detail-sub-event/data-peserta/send-email/{id}', [EventController::class, 'menu_event_data_form_registrasi_sub_event_data_peserta_send_email'])->name('menu_event_data_form_registrasi_sub_event_data_peserta_send_email');
     Route::delete('menu-event/data-event/form-registrasi-event/detail-sub-event/data-peserta/remove/{id}', [EventController::class, 'menu_event_data_form_registrasi_sub_event_data_peserta_remove'])->name('menu_event_data_form_registrasi_sub_event_data_peserta_remove');
+    Route::post('menu-event/data-event/form-registrasi-event/detail-sub-event/data-peserta/verif/{id}', [EventController::class, 'menu_event_data_form_registrasi_sub_event_data_peserta_verify_payment'])->name('menu_event_data_form_registrasi_sub_event_data_peserta_verify_payment');
     Route::post('menu-event/data-event/cek-booking', [EventController::class, 'menu_event_data_form_registrasi_event_cek_booking'])->name('menu_event_data_form_registrasi_event_cek_booking');
     Route::post('menu-event/data-event/test-print', [EventController::class, 'menu_event_data_form_registrasi_event_test_print'])->name('menu_event_data_form_registrasi_event_test_print');
 
+    Route::get('menu-event/daftar-event/get-detail/{code}', [EventController::class, 'menu_event_daftar_get_detail'])->name('menu_event_daftar_get_detail');
+    Route::get('menu-event/daftar-event/get-session/{code}', [EventController::class, 'menu_event_daftar_get_session'])->name('menu_event_get_session');
+    Route::get('menu-event/daftar-event/get-peserta/{code}', [EventController::class, 'menu_event_daftar_get_peserta'])->name('menu_event_daftar_get_peserta');
 
     Route::get('menu-event/data-event/self-registrasi-event/{kode}', [EventController::class, 'menu_event_data_form_self_registrasi'])->name('menu_event_data_form_self_registrasi');
 });

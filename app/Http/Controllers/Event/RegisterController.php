@@ -90,8 +90,26 @@ class RegisterController extends Controller
                 'updated_at'       => now()
             ]);
 
-            // B. Simpan Master Registrasi Event
-            $regCode = 'REG-' . strtoupper(Str::random(8));
+            $todayPrefix = 'R' . date('Ymd');
+
+            // 2. Cari kode terakhir pada hari/prefix yang sama
+            $lastRegistration = DB::table('event_registrations') // Sesuaikan dengan nama tabel Anda
+                ->where('registration_code', 'LIKE', $todayPrefix . '%')
+                ->orderBy('registration_code', 'desc')
+                ->first();
+
+            if ($lastRegistration) {
+                // Ambil 5 digit terakhir angka urut, lalu tambahkan 1
+                $lastSequence = (int) substr($lastRegistration->registration_code, -5);
+                $newSequence  = $lastSequence + 1;
+            } else {
+                // Jika belum ada transaksi pada hari ini, mulai dari 1
+                $newSequence = 1;
+            }
+
+            // 3. Gabungkan prefix dan nomor urut (pad 5 digit angka dengan nol)
+            $regCode = $todayPrefix . str_pad($newSequence, 5, '0', STR_PAD_LEFT);
+
             $registrationId = DB::table('event_registrations')->insertGetId([
                 'id_event_data'     => $event->id_event_data,
                 'id_participant'    => $participantId,
@@ -104,7 +122,7 @@ class RegisterController extends Controller
             ]);
 
             // C. Simpan Detail Kelas Pendaftaran & Snapshot Price
-            $qrToken = 'QR-' . strtoupper(md5($regCode . time()));
+            $qrToken = 'QR-' . date('Ymd') . sprintf('%05d', mt_rand(0, 99999));
             DB::table('event_registration_classes')->insert([
                 'id_registration'         => $registrationId,
                 'id_event_data_sub_class' => $request->class_id,

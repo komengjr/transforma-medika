@@ -55,11 +55,17 @@
                 $idRegistration = $participant->id_registration ?? ($participant->registration->id_registration ?? null);
                 $tokenCode = $participant->qr_code_token ?? ($participant->registrationClass->qr_code_token ?? '-');
                 $phoneFormatted = preg_replace('/^0/', '62', preg_replace('/[^0-9]/', '', $participant->phone_number));
-                $waText = rawurlencode("Halo " . $participant->full_name . ",\nBerikut adalah Kode Booking / QR Token Anda: *" . $tokenCode . "*.\nTerima kasih!");
+
+                // Pesan WA Kirim Kode
+                $waTextCode = rawurlencode("Halo " . $participant->full_name . ",\nBerikut adalah Kode Booking / QR Token Anda: *" . $tokenCode . "*.\nTerima kasih!");
+
                 $payStatus = $participant->payment_status ?? ($participant->registration->payment_status ?? 'pending');
 
                 $emailRoute = $idRegistration ? route('menu_event_data_form_registrasi_sub_event_data_peserta_send_email', $idRegistration) : '#';
                 $deleteRoute = $idRegistration ? route('menu_event_data_form_registrasi_sub_event_data_peserta_remove', $idRegistration) : '#';
+
+                // Route Verifikasi Pelunasan (Silakan sesuaikan nama route di web.php Anda jika berbeda)
+                $verifyRoute = $idRegistration ? route('menu_event_data_form_registrasi_sub_event_data_peserta_verify_payment', $idRegistration) : '#';
                 @endphp
                 <tr id="row-participant-{{ $idRegistration }}">
                     <td class="ps-3 fw-semibold text-secondary row-number">{{ $index + 1 }}</td>
@@ -79,7 +85,7 @@
                     </td>
                     <td>{{ $participant->email }}</td>
                     <td>{{ $participant->phone_number }}</td>
-                    <td>
+                    <td id="status-badge-{{ $idRegistration }}">
                         @if($payStatus == 'paid')
                         <span class="badge bg-success-subtle text-success rounded-pill px-2 py-1 fs--2"><i class="fas fa-wallet me-1"></i>Paid</span>
                         @elseif($payStatus == 'pending')
@@ -106,11 +112,22 @@
                                     </a>
                                 </li>
                                 <li>
-                                    <a class="dropdown-item d-flex align-items-center gap-2 py-2" href="https://wa.me/{{ $phoneFormatted }}?text={{ $waText }}" target="_blank">
+                                    <a class="dropdown-item d-flex align-items-center gap-2 py-2" href="https://wa.me/{{ $phoneFormatted }}?text={{ $waTextCode }}" target="_blank">
                                         <i class="fab fa-whatsapp text-success width-16"></i>
                                         <span>Kirim Kode via WA</span>
                                     </a>
                                 </li>
+
+                                <!-- Tombol Verifikasi Pelunasan (Hanya muncul jika BELUM PAID) -->
+                                @if($payStatus != 'paid' && $idRegistration)
+                                <li id="verify-opt-{{ $idRegistration }}">
+                                    <a class="dropdown-item d-flex align-items-center gap-2 py-2 text-success fw-medium" href="#" onclick="event.preventDefault(); verifyPaymentAjax('{{ $verifyRoute }}', '{{ $idRegistration }}', '{{ $participant->full_name }}');">
+                                        <i class="fas fa-check-circle text-success width-16"></i>
+                                        <span>Verifikasi Pelunasan</span>
+                                    </a>
+                                </li>
+                                @endif
+
                                 @if($idRegistration)
                                 <li>
                                     <hr class="dropdown-divider opacity-50">
@@ -161,14 +178,9 @@
 </style>
 
 <script>
-    // GANTI INI:
-    // let dataTableInstance;
-
-    // MENJADI INI:
     var dataTableInstance = dataTableInstance || null;
 
     $(document).ready(function() {
-        // Setup Header CSRF Token untuk seluruh AJAX jQuery
         $.ajaxSetup({
             headers: {
                 'X-CSRF-TOKEN': $('meta[name="csrf-token"]').attr('content')
@@ -264,7 +276,99 @@
         });
     }
 
-    // 2. FUNGSI AJAX HAPUS PESERTA
+    // 2. FUNGSI AJAX VERIFIKASI PELUNASAN (BARU)
+    function verifyPaymentAjax(url, id, name) {
+        const executeVerify = () => {
+            if (typeof Swal !== 'undefined') {
+                Swal.fire({
+                    title: 'Memproses...',
+                    text: 'Sedang memverifikasi pelunasan ' + name,
+                    allowOutsideClick: false,
+                    didOpen: () => {
+                        Swal.showLoading();
+                    }
+                });
+            }
+
+            $.ajax({
+                url: url,
+                type: 'POST',
+                data: {
+                    payment_status: 'paid',
+                    _token: $('meta[name="csrf-token"]').attr('content')
+                },
+                dataType: 'json',
+                success: function(response) {
+                    // Update badge status di tabel secara langsung
+                    $('#status-badge-' + id).html('<span class="badge bg-success-subtle text-success rounded-pill px-2 py-1 fs--2"><i class="fas fa-wallet me-1"></i>Paid</span>');
+
+                    // Sembunyikan opsi verifikasi pelunasan
+                    $('#verify-opt-' + id).remove();
+
+                    let msg = response.message || 'Status pembayaran berhasil diubah menjadi Lunas (Paid).';
+                    if (typeof Swal !== 'undefined') {
+                        Swal.fire({
+                            icon: 'success',
+                            title: 'Berhasil Dilunasi!',
+                            text: msg,
+                            timer: 2000,
+                            showConfirmButton: false,
+                            customClass: {
+                                popup: 'rounded-4'
+                            }
+                        });
+                    } else {
+                        alert(msg);
+                    }
+                },
+                error: function(xhr) {
+                    let errorMsg = 'Gagal memverifikasi pelunasan. Silakan coba lagi.';
+                    if (xhr.responseJSON && xhr.responseJSON.message) {
+                        errorMsg = xhr.responseJSON.message;
+                    }
+                    if (typeof Swal !== 'undefined') {
+                        Swal.fire({
+                            icon: 'error',
+                            title: 'Gagal!',
+                            text: errorMsg,
+                            confirmButtonColor: '#ef4444',
+                            customClass: {
+                                popup: 'rounded-4'
+                            }
+                        });
+                    } else {
+                        alert(errorMsg);
+                    }
+                }
+            });
+        };
+
+        if (typeof Swal !== 'undefined') {
+            Swal.fire({
+                title: 'Verifikasi Pelunasan?',
+                text: "Apakah Anda yakin pembayaran dari " + name + " sudah LUNAS?",
+                icon: 'question',
+                showCancelButton: true,
+                confirmButtonColor: '#10b981',
+                cancelButtonColor: '#64748b',
+                confirmButtonText: 'Ya, Tandai Lunas',
+                cancelButtonText: 'Batal',
+                customClass: {
+                    popup: 'rounded-4'
+                }
+            }).then((result) => {
+                if (result.isConfirmed) {
+                    executeVerify();
+                }
+            });
+        } else {
+            if (confirm("Konfirmasi pelunasan untuk " + name + "?")) {
+                executeVerify();
+            }
+        }
+    }
+
+    // 3. FUNGSI AJAX HAPUS PESERTA
     function confirmDeleteParticipant(url, id, name) {
         const executeDelete = () => {
             if (typeof Swal !== 'undefined') {
@@ -287,7 +391,6 @@
                 },
                 dataType: 'json',
                 success: function(response) {
-                    // Hapus baris dari DataTables secara langsung
                     const targetRow = $('#row-participant-' + id);
                     if (dataTableInstance && targetRow.length) {
                         dataTableInstance.row(targetRow).remove().draw(false);
@@ -295,7 +398,6 @@
                         targetRow.remove();
                     }
 
-                    // Update total counter peserta di badge header
                     updateParticipantCount(-1);
 
                     let msg = response.message || 'Data peserta berhasil dihapus.';
@@ -361,7 +463,6 @@
         }
     }
 
-    // Helper untuk update angka di Badge Counter secara dinamis
     function updateParticipantCount(change) {
         const badge = $('#participant-count-badge');
         if (badge.length) {

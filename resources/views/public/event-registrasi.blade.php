@@ -336,7 +336,6 @@
 
                     <!-- CARD UTAMA FORM -->
                     <div class="form-card-container">
-
                         <div class="d-flex align-items-center justify-content-between mb-3 border-bottom pb-2">
                             <div>
                                 <h4 class="fw-bold text-dark m-0" style="letter-spacing: -0.4px;">Form Pendaftaran</h4>
@@ -361,7 +360,6 @@
                             <div>{{ session('error') }}</div>
                         </div>
                         @endif
-
                         <form action="{{ route('event.register.store', $event->event_data_code) }}" method="POST">
                             @csrf
 
@@ -527,7 +525,6 @@
                             </div>
 
                         </form>
-
                     </div>
                     <!-- END FORM CARD CONTAINER -->
 

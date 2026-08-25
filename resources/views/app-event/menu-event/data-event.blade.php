@@ -433,42 +433,7 @@
         });
     });
 
-    $(document).on("click", "#button-add-event-class", function(e) {
-        e.preventDefault();
-        var data = $("#form-sub-event-class").serialize();
-        $('#button-save-event-detail').html(
-            '<div class="spinner-border text-primary my-3" style="display: block; margin-left: auto; margin-right: auto;" role="status"><span class="visually-hidden">Loading...</span></div>'
-        );
-        $.ajax({
-            url: "{{ route('menu_event_data_detail_event_save_class') }}",
-            type: "POST",
-            cache: false,
-            data: data,
-            dataType: 'html',
-        }).done(function(data) {
-            if (data == 0) {
-                Swal.fire({
-                    icon: "error",
-                    title: "Oops...",
-                    text: "Tolong lah Isi dengan Bener!",
-                    footer: '<a href="#">Why do I have this issue?</a>'
-                });
-                $('#button-save-event-detail').html(
-                    '<button class="btn btn-falcon-default btn-sm mt-2" type="button" id="button-add-event-class"> <span class="fas fa-plus"></span> Add </button>'
-                );
-            } else {
-                $('#data-table-event-class').html(data);
-                document.getElementById('nama_class').value = "";
-                document.getElementById('nama_room').value = "";
-                document.getElementById('class_price').value = "";
-                $('#button-save-event-detail').html(
-                    '<button class="btn btn-falcon-default btn-sm mt-2" type="button" id="button-add-event-class"> <span class="fas fa-plus"></span> Add </button>'
-                );
-            }
-        }).fail(function() {
-            $('#data-table-event-class').html('<div class="p-2 text-danger">Gagal menambah kelas</div>');
-        });
-    });
+
 
     $(document).on("click", "#button-add-event-session", function(e) {
         e.preventDefault();

@@ -26,6 +26,7 @@ use Mike42\Escpos\Printer;
 use Pion\Laravel\ChunkUpload\Handler\HandlerFactory;
 use Pion\Laravel\ChunkUpload\Receiver\FileReceiver;
 use App\Services\ZebraPrinterService;
+use Illuminate\Support\Facades\Log;
 use Illuminate\Support\Facades\Mail;
 use Svg\Tag\Rect;
 
@@ -176,6 +177,7 @@ class EventController extends Controller
             'status' => true
         ];
     }
+    //DATA EVENT
     public function menu_event_data($akses, $id)
     {
         if ($this->url_akses($akses, $id) == true) {
@@ -222,22 +224,38 @@ class EventController extends Controller
     }
     public function menu_event_data_detail_event_save_class(Request $request)
     {
+        // Validasi input wajib
+        if (!$request->nama_class || !$request->code_event) {
+            return '0';
+        }
+
         try {
+            // Membersihkan format harga (misal dari "150.000" atau "Rp 150.000" menjadi 150000)
+            $cleanPrice = (int) preg_replace('/[^0-9]/', '', $request->class_price ?? '0');
+
             DB::table('event_data_sub_class')->insert([
-                'event_data_sub_class_code' => Str::uuid(),
-                'event_data_sub_code' => $request->code_event,
-                'event_data_sub_class_name' => $request->nama_class,
-                'event_data_sub_class_room' => $request->nama_room,
-                'event_data_sub_class_price' => $request->class_price,
-                'event_data_sub_class_type' => $request->class_type,
-                'event_data_sub_class_kuota' => 0,
+                'event_data_sub_class_code'   => (string) Str::uuid(),
+                'event_data_sub_code'         => $request->code_event,
+                'event_data_sub_class_name'   => $request->nama_class,
+                'event_data_sub_class_room'   => $request->nama_room ?? '-',
+                'event_data_sub_class_price'  => $cleanPrice,
+                'event_data_sub_class_type'   => $request->class_type ?? 'default',
+                'event_data_sub_class_kuota'  => 0,
                 'event_data_sub_class_status' => 1,
-                'created_at' => now(),
+                'created_at'                  => now(),
+                'updated_at'                  => now(),
             ]);
-            $data = DB::table('event_data_sub_class')->where('event_data_sub_code', $request->code_event)->get();
+
+            // Query ulang data berdasarkan event_data_sub_code
+            $data = DB::table('event_data_sub_class')
+                ->where('event_data_sub_code', $request->code_event)
+                ->get();
+
             return view('app-event.menu-event.data-event.data-table-event-class', compact('data'));
         } catch (\Throwable $e) {
-            return 0;
+            // Cek file storage/logs/laravel.log jika terjadi error database
+            Log::error('Error Save Sub Class: ' . $e->getMessage());
+            return '0';
         }
     }
     public function menu_event_data_detail_event_save_session(Request $request)
@@ -410,6 +428,32 @@ class EventController extends Controller
             ], 500);
         }
     }
+    public function menu_event_data_form_registrasi_sub_event_data_peserta_verify_payment(Request $request, $id)
+    {
+        try {
+            // Cari data pendaftaran berdasarkan ID Registration
+            $registration = EventRegistration::findOrFail($id);
+
+            // Update status pembayaran menjadi 'paid'
+            $registration->payment_status = 'paid';
+
+            // Jika ada field waktu pelunasan di database Anda (Opsional):
+            // $registration->paid_at = now();
+
+            $registration->save();
+
+            // Kembalikan response JSON untuk SweetAlert / AJAX
+            return response()->json([
+                'status'  => 'success',
+                'message' => 'Pembayaran untuk peserta ' . ($registration->full_name ?? '') . ' telah berhasil diverifikasi dan diverifikasi LUNAS!'
+            ], 200);
+        } catch (Exception $e) {
+            return response()->json([
+                'status'  => 'error',
+                'message' => 'Gagal memverifikasi pembayaran: ' . $e->getMessage()
+            ], 500);
+        }
+    }
     public function menu_event_data_form_registrasi_sub_event_data_peserta_send_email($id)
     {
         try {
@@ -448,7 +492,6 @@ class EventController extends Controller
             ], 500);
         }
     }
-
     public function menu_event_data_form_registrasi_event_cek_booking(Request $request)
     {
         // 1. Validasi Input Data
@@ -556,21 +599,21 @@ class EventController extends Controller
         $zplCode .= "^LL240"; // Tinggi label (240 dots)
         $zplCode .= "^LS0";
 
-        // 1. NAMA PESERTA
-        $zplCode .= "^FO0,15^FB400,1,0,C^A0N,26,26^FD" . $request->nama_peserta . "^FS";
+        // 1. NAMA PESERTA (Padding 4mm -> Y = 47, Max 2 Baris)
+        $zplCode .= "^FO0,47^FB400,2,0,C^A0N,22,22^FD" . $request->nama_peserta . "^FS";
 
         // 2. KELAS / KATEGORI
-        $zplCode .= "^FO0,45^FB400,1,0,C^A0N,20,20^FD[" . $request->class_name . "]^FS";
+        $zplCode .= "^FO0,92^FB400,1,0,C^A0N,18,18^FD[" . $request->class_name . "]^FS";
 
         // 3. NAMA EVENT & ID EVENT
         $eventInfo = $request->nama_event . " (ID: " . $request->id_event . ")";
-        $zplCode .= "^FO0,70^FB400,2,0,C^A0N,18,18^FD" . $eventInfo . "^FS";
+        $zplCode .= "^FO0,113^FB400,2,0,C^A0N,16,16^FD" . $eventInfo . "^FS";
 
-        // 4. BARCODE 2D (QR CODE) BERDASARKAN REGISTRATION_CODE
-        $zplCode .= "^FO150,105^BQN,2,4^FDHA," . $request->registration_code . "^FS";
+        // --- PENGATURAN KETEBALAN & TINGGI BARCODE ---
+        $zplCode .= "^BY2,3,50"; // Tinggi barcode disesuaikan 50 dots agar tidak terpotong
 
-        // Tampilkan Teks Registration Code di bawah QR Code
-        $zplCode .= "^FO0,205^FB400,1,0,C^A0N,18,18^FD" . $request->registration_code . "^FS";
+        // 4. BARCODE GARIS 1D (Code 128) RATA TENGAH
+        $zplCode .= "^FT0,205^FB400,1,0,C^BCN,50,Y,N,N^FD" . $request->registration_code . "^FS";
 
         $zplCode .= "^XZ";
 
@@ -584,6 +627,118 @@ class EventController extends Controller
         }
 
         return redirect()->back()->with('success', 'ZPL berhasil di-generate.');
+    }
+    //DATA EVENT
+    public function menu_event_daftar($akses, $id)
+    {
+        if ($this->url_akses($akses, $id) == true) {
+            // Memuat data event beserta sub dan class-nya sekaligus agar ringan saat dirender
+            $data = DB::table('event_data')
+                ->orderBy('created_at', 'desc')
+                ->get();
+
+            return view('app-event.menu-event.daftar-event', [
+                'akses' => $akses,
+                'code' => $id,
+                'data' => $data
+            ]);
+        } else {
+            return Redirect::to('dashboard/home');
+        }
+    }
+    public function menu_event_daftar_get_detail($code)
+    {
+        $event = DB::table('event_data')
+            ->where('event_data_code', $code)
+            ->first();
+
+        if ($event) {
+            return response()->json([
+                'status' => 'success',
+                'data'   => $event
+            ]);
+        }
+
+        return response()->json([
+            'status'  => 'error',
+            'message' => 'Data event tidak ditemukan.'
+        ], 404);
+    }
+
+    // Fetch Sub Event / Session
+    public function menu_event_daftar_get_session($code)
+    {
+        $sessions = DB::table('event_data_sub_session as sess')
+            ->join('event_data_sub as sub', 'sess.event_data_sub_code', '=', 'sub.event_data_sub_code')
+            ->where('sub.event_data_code', $code)
+            ->select(
+                'sess.id_event_data_sub_session',
+                'sess.event_data_sub_session_code',
+                'sess.event_data_sub_session_name',
+                'sub.event_data_sub_code',
+                'sub.event_data_sub_name',
+                'sub.event_data_sub_start',
+                'sub.event_data_sub_end'
+            )
+            ->orderBy('sub.event_data_sub_start', 'asc')
+            ->get();
+
+        return response()->json([
+            'status' => 'success',
+            'data'   => $sessions
+        ]);
+    }
+
+    // Fetch Peserta Event
+    public function menu_event_daftar_get_peserta($code)
+    {
+        // 1. Ambil data peserta beserta detail pendaftaran
+        $peserta = DB::table('event_registrations as er')
+            ->join('event_participants as ep', 'er.id_participant', '=', 'ep.id_participant')
+            ->join('event_data as ed', 'er.id_event_data', '=', 'ed.id_event_data')
+            ->leftJoin('event_registration_classes as erc', 'er.id_registration', '=', 'erc.id_registration')
+            ->leftJoin('event_data_sub_class as edsc', 'erc.id_event_data_sub_class', '=', 'edsc.id_event_data_sub_class')
+            ->leftJoin('event_data_sub as eds', 'edsc.event_data_sub_code', '=', 'eds.event_data_sub_code')
+            ->where('ed.event_data_code', $code)
+            ->select(
+                'er.id_registration',
+                'er.registration_code',
+                'er.payment_status',
+                'er.registration_status',
+                'er.registration_date',
+                'ep.full_name',
+                'ep.email',
+                'ep.phone_number',
+                'ep.institution',
+                'eds.event_data_sub_code',
+                'eds.event_data_sub_name',
+                'edsc.id_event_data_sub_class',
+                'edsc.event_data_sub_class_name',
+                'edsc.event_data_sub_class_room',
+                'erc.qr_code_token',
+                'erc.attendance_status'
+            )
+            ->orderBy('er.registration_date', 'desc')
+            ->get();
+
+        // 2. Ambil master Sub Event & Class untuk opsi dropdown Filter
+        $subEvents = DB::table('event_data_sub')
+            ->where('event_data_code', $code)
+            ->select('event_data_sub_code', 'event_data_sub_name')
+            ->get();
+
+        $classes = DB::table('event_data_sub_class as edsc')
+            ->join('event_data_sub as eds', 'edsc.event_data_sub_code', '=', 'eds.event_data_sub_code')
+            ->where('eds.event_data_code', $code)
+            ->select('edsc.id_event_data_sub_class', 'edsc.event_data_sub_class_name', 'edsc.event_data_sub_code')
+            ->get();
+
+        return response()->json([
+            'status'     => 'success',
+            'data'       => $peserta,
+            'sub_events' => $subEvents,
+            'classes'    => $classes
+        ]);
     }
     // MASTER PENGIRIMAN EMAIL
     public function master_event_pengiriman_email($akses, $id)
