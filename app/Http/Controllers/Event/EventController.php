@@ -26,6 +26,7 @@ use Mike42\Escpos\Printer;
 use Pion\Laravel\ChunkUpload\Handler\HandlerFactory;
 use Pion\Laravel\ChunkUpload\Receiver\FileReceiver;
 use App\Services\ZebraPrinterService;
+use Illuminate\Support\Facades\Http;
 use Illuminate\Support\Facades\Log;
 use Illuminate\Support\Facades\Mail;
 use Svg\Tag\Rect;
@@ -800,6 +801,7 @@ class EventController extends Controller
                 'er.id_registration',
                 'er.payment_status',
                 'er.email_sent_at',
+                'er.wa_sent_at',
                 'erc.qr_code_token',
                 'erc.id_event_data_sub_class',
                 'ep.full_name',
@@ -898,5 +900,150 @@ class EventController extends Controller
         return response()->json([
             'message' => "Pengiriman selesai. Berhasil: {$successCount}, Gagal: {$failedCount}"
         ]);
+    }
+    // MASTER PENGIRIMAN WHATSAPP
+    public function master_event_pengiriman_whatsapp($akses, $id)
+    {
+        if ($this->url_akses_sub($akses, $id) == true) {
+            $events = DB::table('event_data')
+                ->select('id_event_data', 'event_data_code', 'event_data_tittle', 'event_data_start_date', 'event_data_venue', 'event_data_city')
+                ->orderBy('event_data_start_date', 'desc')
+                ->get();
+
+            // return view('pages.event.email_broadcast', compact('events', 'selectedEvent', 'selectedEventId'));
+            return view('app-event.menu-event.master-event.pengiriman-whatsapp', compact('events'), ['akses' => $akses, 'code' => $id]);
+        } else {
+            return Redirect::to('dashboard/home');
+        }
+    }
+
+    public function sendWaSingle($idRegistration)
+    {
+        $registration = DB::table('event_registrations as er')
+            ->join('event_participants as ep', 'er.id_participant', '=', 'ep.id_participant')
+            ->leftJoin('event_registration_classes as erc', 'er.id_registration', '=', 'erc.id_registration')
+            ->leftJoin('event_data_sub_class as esc', 'erc.id_event_data_sub_class', '=', 'esc.id_event_data_sub_class')
+            ->where('er.id_registration', $idRegistration)
+            ->select(
+                'er.id_registration',
+                'er.payment_status',
+                'erc.qr_code_token',
+                'ep.full_name',
+                'ep.email',
+                'ep.institution',
+                'ep.phone_number',
+                'esc.event_data_sub_class_name'
+            )
+            ->first();
+
+        if (!$registration || !$registration->phone_number) {
+            return response()->json(['message' => 'Nomor WhatsApp peserta tidak ditemukan.'], 400);
+        }
+
+        try {
+            // Fungsi pembantu kirim WA ke Gateway
+            $this->sendWaGateway($registration);
+
+            // Update timestamp wa_sent_at
+            DB::table('event_registrations')
+                ->where('id_registration', $idRegistration)
+                ->update(['wa_sent_at' => now()]);
+
+            return response()->json(['message' => 'WhatsApp tiket berhasil dikirim ke ' . $registration->full_name]);
+        } catch (\Exception $e) {
+            return response()->json(['message' => 'Gagal mengirim WhatsApp: ' . $e->getMessage()], 500);
+        }
+    }
+    // 2. Kirim WhatsApp Massal / Bulk
+    public function sendWaBulk(Request $request)
+    {
+        $targetIds = $request->input('target_ids', []);
+
+        if (empty($targetIds)) {
+            return response()->json(['message' => 'Tidak ada peserta yang dipilih.'], 400);
+        }
+
+        $successCount = 0;
+        $failedCount = 0;
+
+        foreach ($targetIds as $idRegistration) {
+            try {
+                $registration = DB::table('event_registrations as er')
+                    ->join('event_participants as ep', 'er.id_participant', '=', 'ep.id_participant')
+                    ->leftJoin('event_registration_classes as erc', 'er.id_registration', '=', 'erc.id_registration')
+                    ->leftJoin('event_data_sub_class as esc', 'erc.id_event_data_sub_class', '=', 'esc.id_event_data_sub_class')
+                    ->where('er.id_registration', $idRegistration)
+                    ->select(
+                        'er.id_registration',
+                        'er.payment_status',
+                        'erc.qr_code_token',
+                        'ep.full_name',
+                        'ep.email',
+                        'ep.institution',
+                        'ep.phone_number',
+                        'esc.event_data_sub_class_name'
+                    )
+                    ->first();
+
+                if ($registration && $registration->phone_number) {
+                    $this->sendWaGateway($registration);
+
+                    DB::table('event_registrations')
+                        ->where('id_registration', $idRegistration)
+                        ->update(['wa_sent_at' => now()]);
+
+                    $successCount++;
+                } else {
+                    $failedCount++;
+                }
+            } catch (\Exception $e) {
+                $failedCount++;
+            }
+        }
+
+        return response()->json([
+            'message' => "Pengiriman selesai. Berhasil: {$successCount}, Gagal: {$failedCount}"
+        ]);
+    }
+
+    /**
+     * Helper Function untuk Pengiriman via WA Gateway
+     */
+    private function sendWaGateway($registration)
+    {
+        $phone = preg_replace('/[^0-9]/', '', $registration->phone_number);
+        if (substr($phone, 0, 1) === '0') {
+            $phone = '62' . substr($phone, 1);
+        } elseif (substr($phone, 0, 2) !== '62') {
+            $phone = '62' . $phone;
+        }
+
+        $message = "*E-TICKET EVENT PESERTA*\n\n";
+        $message .= "Halo *{$registration->full_name}*,\n";
+        $message .= "Berikut adalah rincian tiket Anda:\n\n";
+        $message .= "• *QR Token:* {$registration->qr_code_token}\n";
+        $message .= "• *Kelas:* " . ($registration->event_data_sub_class_name ?? '-') . "\n\n";
+        $message .= "Terima kasih!";
+
+        // Link Gambar QR Code Publik (Langsung menghasilkan PNG)
+        $qrUrl = "https://api.qrserver.com/v1/create-qr-code/?size=300x300&data=" . urlencode($registration->qr_code_token);
+
+        $token = trim(env('WA_GATEWAY_TOKEN', 'CJnxqZ4tb2LLwgxzmnWq'));
+
+        $response = Http::withHeaders([
+            'Authorization' => $token,
+        ])->post('https://api.fonnte.com/send', [
+            'target'      => $phone,
+            'message'     => $message,
+            'url'         => $qrUrl, // Mengirim link gambar publik ke Fonnte
+            'countryCode' => '62',
+        ]);
+
+        $result = $response->json();
+        if (isset($result['status']) && $result['status'] === false) {
+            throw new \Exception('Fonnte Gagal Kirim: ' . ($result['reason'] ?? 'Error tidak diketahui'));
+        }
+
+        return true;
     }
 }

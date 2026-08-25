@@ -40,6 +40,14 @@ Route::prefix('event-email')->name('event.email.')->group(function () {
     Route::post('/send-single/{idRegistration}', [EventController::class, 'sendEmailSingle'])->name('send_single');
     Route::post('/send-bulk', [EventController::class, 'sendEmailBulk'])->name('send_bulk'); // <-- Tambahkan Route Ini
 });
+Route::prefix('event-wa')->group(function () {
+    Route::get('/', [EventController::class, 'index'])->name('event.wa.index');
+    Route::get('/get-sub-events/{eventId}', [EventController::class, 'getSubEvents']);
+    Route::get('/get-classes/{subCode}', [EventController::class, 'getClasses']);
+    Route::get('/get-participants', [EventController::class, 'getParticipants'])->name('event.wa.get_participants');
+    Route::post('/send-single/{id}', [EventController::class, 'sendWaSingle']);
+    Route::post('/send-bulk', [EventController::class, 'sendWaBulk'])->name('event.wa.send_bulk');
+});
 
 Route::get('/event/register/{id}/{code}', [App\Http\Controllers\Event\RegisterController::class, 'event_registrasi'])->name('event_registrasi');
 Route::post('/event/{code}/register', [App\Http\Controllers\Event\RegisterController::class, 'store'])->name('event.register.store');

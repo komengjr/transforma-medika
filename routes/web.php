@@ -184,6 +184,7 @@ Route::prefix('{akses}/{id}')->group(function (): void {
     Route::get('menu-event/data-event', [EventController::class, 'menu_event_data'])->name('menu_event_data');
     Route::get('menu-event/daftar-event', [EventController::class, 'menu_event_daftar'])->name('menu_event_daftar');
     Route::get('master-event/pengiriman-email', [EventController::class, 'master_event_pengiriman_email'])->name('master_event_pengiriman_email');
+    Route::get('master-event/pengiriman-whatsapp', [EventController::class, 'master_event_pengiriman_whatsapp'])->name('master_event_pengiriman_whatsapp');
 
     // KOPERASI
     Route::get('menu-koperasi/registrasi-peserta', [KoperasiController::class, 'menu_koperasi_registrasi_peserta'])->name('menu_koperasi_registrasi_peserta');

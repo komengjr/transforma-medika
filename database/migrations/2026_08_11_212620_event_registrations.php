@@ -24,6 +24,7 @@ class EventRegistrations extends Migration
             $table->decimal('total_amount', 12, 2)->default(0);
             $table->enum('payment_status', ['pending', 'paid', 'failed', 'cancelled'])->default('pending');
             $table->timestamp('email_sent_at')->nullable();
+            $table->timestamp('wa_sent_at')->nullable();
             $table->enum('registration_status', ['active', 'cancelled'])->default('active');
             $table->dateTime('registration_date');
             $table->timestamps();
