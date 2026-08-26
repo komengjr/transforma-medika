@@ -1,6 +1,7 @@
 <?php
 
 use App\Http\Controllers\Event\EventController;
+use App\Http\Controllers\Event\EventSessionExecutionController;
 use Illuminate\Support\Facades\Route;
 // EVENT
 Route::prefix('event/')->group(function (): void {
@@ -51,3 +52,18 @@ Route::prefix('event-wa')->group(function () {
 
 Route::get('/event/register/{id}/{code}', [App\Http\Controllers\Event\RegisterController::class, 'event_registrasi'])->name('event_registrasi');
 Route::post('/event/{code}/register', [App\Http\Controllers\Event\RegisterController::class, 'store'])->name('event.register.store');
+
+Route::get('/event/sub-events/{eventCode}', [EventController::class, 'getSubEventsData']);
+Route::get('/event/sub-classes-by-sub/{subCode}', [EventController::class, 'getSubClassesBySub']);
+// Route proses simpan peserta manual
+Route::post('/peserta/store', [EventController::class, 'storeManualPeserta'])->name('admin.peserta.store-manual');
+Route::post('/peserta/import-excel', [EventController::class, 'importExcelPeserta'])->name('admin.peserta.import-excel');
+Route::get('/peserta/download-template', [EventController::class, 'downloadTemplateExcel'])->name('admin.peserta.download-template');
+
+Route::middleware(['auth'])->prefix('admin')->group(function () {
+    // Page Eksekusi Session
+    Route::get('/session/execute', [EventSessionExecutionController::class, 'index'])->name('admin.session.execute');
+
+    // AJAX Process Scan / Check Session Peserta
+    Route::post('/session/process-check', [EventSessionExecutionController::class, 'processCheck'])->name('admin.session.process-check');
+});

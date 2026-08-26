@@ -2,6 +2,7 @@
 
 namespace App\Http\Controllers\Event;
 
+use App\Exports\ParticipantTemplateExport;
 use App\Http\Controllers\Controller;
 use App\Mail\ParticipantTicketMail;
 use App\Mail\SendRegistrationTokenMail;
@@ -29,6 +30,7 @@ use App\Services\ZebraPrinterService;
 use Illuminate\Support\Facades\Http;
 use Illuminate\Support\Facades\Log;
 use Illuminate\Support\Facades\Mail;
+use Maatwebsite\Excel\Facades\Excel;
 use Svg\Tag\Rect;
 
 class EventController extends Controller
@@ -311,19 +313,25 @@ class EventController extends Controller
     {
         $subEventId = $request->sub_event_id;
 
-        // Mengambil peserta berdasarkan relasi ke sub event / class
+        // Mengambil peserta menggunakan LEFT JOIN agar peserta tetap tampil meskipun relasi kelas belum/tidak lengkap
         $participants = DB::table('event_participants')
             ->join('event_registrations', 'event_participants.id_participant', '=', 'event_registrations.id_participant')
-            ->join('event_registration_classes', 'event_registrations.id_registration', '=', 'event_registration_classes.id_registration')
-            ->where('event_registration_classes.id_event_data_sub_class', $subEventId)
+            ->leftJoin('event_registration_classes', 'event_registrations.id_registration', '=', 'event_registration_classes.id_registration')
+            ->where(function ($query) use ($subEventId) {
+                // Filter berdasarkan ID Sub Class atau ID Event Utama
+                $query->where('event_registration_classes.id_event_data_sub_class', $subEventId)
+                    ->orWhere('event_registrations.id_event_data', $subEventId);
+            })
             ->select(
                 'event_participants.*',
                 'event_registrations.id_registration',
                 'event_registrations.payment_status',
                 'event_registrations.registration_status',
+                'event_registrations.registration_date',
                 'event_registration_classes.qr_code_token',
                 'event_registration_classes.created_at as register_date'
             )
+            ->distinct() // Mencegah data ganda jika peserta mendaftar lebih dari 1 kelas
             ->get();
 
         return view('app-event.menu-event.data-event.sub_event_participants_table', compact('participants'))->render();
@@ -628,6 +636,234 @@ class EventController extends Controller
         }
 
         return redirect()->back()->with('success', 'ZPL berhasil di-generate.');
+    }
+    public function getSubEventsData($eventCode)
+    {
+        $subEvents = DB::table('event_data_sub')
+            ->where('event_data_code', $eventCode)
+            ->select('event_data_sub_code', 'event_data_sub_name')
+            ->get();
+
+        return response()->json(['data' => $subEvents]);
+    }
+
+    // 2. Fetch Sub Event Class berdasarkan event_data_sub_code
+    public function getSubClassesBySub($subCode)
+    {
+        $subClasses = DB::table('event_data_sub_class')
+            ->where('event_data_sub_code', $subCode)
+            ->select(
+                'id_event_data_sub_class',
+                'event_data_sub_class_name',
+                'event_data_sub_class_price',
+                'event_data_sub_class_kuota'
+            )
+            ->get();
+
+        return response()->json(['data' => $subClasses]);
+    }
+
+    // 3. Process Insert Peserta Manual
+    public function storeManualPeserta(Request $request)
+    {
+        $request->validate([
+            'event_data_code'         => 'required|string',
+            'full_name'               => 'required|string|max:255',
+            'email'                   => 'required|email',
+            'phone_number'            => 'required|string|max:20',
+            'gender'                  => 'nullable|in:L,P',
+            'identity_number'         => 'nullable|string',
+            'institution'             => 'nullable|string',
+            'address'                 => 'nullable|string',
+            'id_event_data_sub_class' => 'required',
+            'payment_status'          => 'required|in:paid,pending,cancelled',
+        ]);
+
+        DB::beginTransaction();
+        try {
+            // 1. Ambil data Main Event (id_event_data) berdasarkan event_data_code
+            $eventData = DB::table('event_data')
+                ->where('event_data_code', $request->event_data_code)
+                ->first();
+
+            if (!$eventData) {
+                return response()->json([
+                    'status'  => 'error',
+                    'message' => 'Data Event tidak ditemukan.'
+                ], 404);
+            }
+
+            // 2. Ambil snapshot harga dari Sub Class
+            $subClass = DB::table('event_data_sub_class')
+                ->where('id_event_data_sub_class', $request->id_event_data_sub_class)
+                ->first();
+
+            if (!$subClass) {
+                return response()->json([
+                    'status'  => 'error',
+                    'message' => 'Data Sub Class tidak ditemukan.'
+                ], 404);
+            }
+
+            // Atur total harga (Jika statusnya 'paid' atau 'pending' pakai harga kelas, jika 'FREE' atau gratis bisa di-handle jika perlu)
+            $classPrice = $subClass->event_data_sub_class_price ?? 0;
+            $totalAmount = ($request->payment_status === 'paid') ? $classPrice : $classPrice;
+
+            // 3. Generate participant_code Unik (Format: PRT-YYYYMMDD-XXXX)
+            $participantCode = 'PRT-' . date('Ymd') . '-' . strtoupper(Str::random(4));
+
+            // 4. Insert ke event_participants
+            $participantId = DB::table('event_participants')->insertGetId([
+                'participant_code' => $participantCode,
+                'full_name'        => $request->full_name,
+                'email'            => $request->email,
+                'phone_number'     => $request->phone_number,
+                'gender'           => $request->gender ?? null,
+                'identity_number'  => $request->identity_number ?? null,
+                'institution'      => $request->institution ?? null,
+                'address'          => $request->address ?? null,
+                'created_at'       => now(),
+                'updated_at'       => now(),
+            ]);
+
+            // 5. Generate registration_code Unik (Format: REG-YYYYMMDD-XXXX)
+            $registrationCode = 'REG-' . date('Ymd') . '-' . strtoupper(Str::random(4));
+
+            // 6. Insert ke event_registrations
+            $registrationId = DB::table('event_registrations')->insertGetId([
+                'registration_code'   => $registrationCode,
+                'id_participant'      => $participantId,
+                'id_event_data'       => $eventData->id_event_data,
+                'total_amount'        => $totalAmount,
+                'payment_status'      => $request->payment_status,
+                'registration_status' => 'active',
+                'registration_date'   => now(),
+                'created_at'          => now(),
+                'updated_at'          => now(),
+            ]);
+
+            // 7. Generate Token QR Code Unik (Format: EVT-XXXXXXXX)
+            $qrCodeToken = 'EVT-' . strtoupper(Str::random(8));
+
+            // 8. Insert ke event_registration_classes
+            DB::table('event_registration_classes')->insert([
+                'id_registration'          => $registrationId,
+                'id_event_data_sub_class'  => $request->id_event_data_sub_class,
+                'price'                    => $classPrice, // Snapshot harga kelas saat registrasi
+                'attendance_status'        => 'registered',
+                'qr_code_token'            => $qrCodeToken,
+                'created_at'               => now(),
+                'updated_at'               => now(),
+            ]);
+
+            DB::commit();
+
+            return response()->json([
+                'status'  => 'success',
+                'message' => 'Peserta berhasil ditambahkan secara manual!'
+            ]);
+        } catch (\Exception $e) {
+            DB::rollBack();
+            return response()->json([
+                'status'  => 'error',
+                'message' => 'Gagal menambahkan peserta: ' . $e->getMessage()
+            ], 500);
+        }
+    }
+    // 2. Import Peserta Massal dari File Excel / CSV
+    public function importExcelPeserta(Request $request)
+    {
+        $request->validate([
+            'event_data_code'         => 'required',
+            'id_event_data_sub_class' => 'required',
+            'file_excel'              => 'required|file|mimes:xlsx,xls,csv|max:5120',
+            'default_payment_status'  => 'required|in:paid,pending',
+        ]);
+
+        DB::beginTransaction();
+        try {
+            $eventData = DB::table('event_data')->where('event_data_code', $request->event_data_code)->first();
+            $subClass = DB::table('event_data_sub_class')->where('id_event_data_sub_class', $request->id_event_data_sub_class)->first();
+
+            if (!$eventData || !$subClass) {
+                return response()->json(['status' => 'error', 'message' => 'Event atau Kelas tidak ditemukan.'], 404);
+            }
+
+            // Read data dari file Excel .xlsx
+            $rows = Excel::toArray([], $request->file('file_excel'))[0];
+
+            // Hapus baris pertama (Header)
+            array_shift($rows);
+
+            $importedCount = 0;
+            $classPrice = $subClass->event_data_sub_class_price ?? 0;
+
+            foreach ($rows as $row) {
+                // Kolom Excel: 0: full_name, 1: email, 2: phone_number, 3: gender, 4: identity_number, 5: institution, 6: address
+                $fullName = $row[0] ?? null;
+                $email    = $row[1] ?? null;
+                $phone    = $row[2] ?? null;
+
+                if (empty($fullName) || empty($email) || empty($phone)) {
+                    continue; // Skip jika data utama kosong
+                }
+
+                // 1. Insert Peserta
+                $participantId = DB::table('event_participants')->insertGetId([
+                    'participant_code' => 'PRT-' . date('Ymd') . '-' . strtoupper(Str::random(4)),
+                    'full_name'        => trim($fullName),
+                    'email'            => trim($email),
+                    'phone_number'     => trim($phone),
+                    'gender'           => isset($row[3]) && in_array(strtoupper(trim($row[3])), ['L', 'P']) ? strtoupper(trim($row[3])) : null,
+                    'identity_number'  => $row[4] ?? null,
+                    'institution'      => $row[5] ?? null,
+                    'address'          => $row[6] ?? null,
+                    'created_at'       => now(),
+                    'updated_at'       => now(),
+                ]);
+
+                // 2. Insert Registrasi
+                $registrationId = DB::table('event_registrations')->insertGetId([
+                    'registration_code'   => 'REG-' . date('Ymd') . '-' . strtoupper(Str::random(4)),
+                    'id_participant'      => $participantId,
+                    'id_event_data'       => $eventData->id_event_data,
+                    'total_amount'        => $classPrice,
+                    'payment_status'      => $request->default_payment_status,
+                    'registration_status' => 'active',
+                    'registration_date'   => now(),
+                    'created_at'          => now(),
+                    'updated_at'          => now(),
+                ]);
+
+                // 3. Insert Kelas Registrasi & Token QR Code
+                DB::table('event_registration_classes')->insert([
+                    'id_registration'         => $registrationId,
+                    'id_event_data_sub_class' => $request->id_event_data_sub_class,
+                    'price'                   => $classPrice,
+                    'attendance_status'       => 'registered',
+                    'qr_code_token'           => 'EVT-' . strtoupper(Str::random(8)),
+                    'created_at'              => now(),
+                    'updated_at'              => now(),
+                ]);
+
+                $importedCount++;
+            }
+
+            DB::commit();
+
+            return response()->json([
+                'status'  => 'success',
+                'message' => "Berhasil mengimport {$importedCount} data peserta dari file Excel!"
+            ]);
+        } catch (\Exception $e) {
+            DB::rollBack();
+            return response()->json(['status' => 'error', 'message' => 'Gagal import: ' . $e->getMessage()], 500);
+        }
+    }
+    // Download Template CSV untuk Import Peserta
+    public function downloadTemplateExcel()
+    {
+        return Excel::download(new ParticipantTemplateExport, 'template_import_peserta.xlsx');
     }
     //DATA EVENT
     public function menu_event_daftar($akses, $id)

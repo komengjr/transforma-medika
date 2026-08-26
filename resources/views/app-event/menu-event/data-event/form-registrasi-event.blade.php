@@ -149,12 +149,12 @@
                 Powered by <a class="text-info fw-semibold text-decoration-none" href="#!">{{env('APP_NAME')}}</a>
             </span>
         </div>
-        <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal" aria-label="Close"></button>
+
     </div>
 
-    <div class="p-3 p-md-4">
+    <div class="p-3 p-md-3">
         <!-- Hero Event Card -->
-        <div class="event-main-card mb-4">
+        <div class="event-main-card mb-3">
             <div class="row align-items-center g-3">
                 <div class="col-lg-8">
                     <div class="d-flex align-items-center gap-3">

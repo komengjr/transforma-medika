@@ -165,7 +165,7 @@
 
 @section('content')
 <!-- 1. HERO HEADER BANNER -->
-<div class="row mb-4">
+<div class="row mb-3">
     <div class="col-12">
         <div class="card event-hero-card text-white overflow-hidden">
             <div class="card-body p-4 position-relative">
@@ -175,7 +175,7 @@
                             <img src="{{ asset('img/brodcast.png') }}" alt="Broadcast Icon" width="48" height="48" class="img-fluid" />
                         </div>
                         <div>
-                            <span class="badge bg-white bg-opacity-20 text-white rounded-pill px-3 py-1 fs--2 mb-2">
+                            <span class="badge bg-white bg-opacity-20 text-dark rounded-pill px-3 py-1 fs--2 mb-2">
                                 <i class="fas fa-calendar-alt me-1"></i> System Data Center
                             </span>
                             <h3 class="text-white fw-bold mb-1">
@@ -231,112 +231,114 @@
 
     <!-- p-0 memastikan tabel membentang full hingga ujung card kanan & kiri -->
     <div class="card-body p-0">
-        <div class="table-responsive">
-            <table id="example" class="table table-modern table-hover align-middle" style="width:100%">
-                <thead>
-                    <tr>
-                        <th class="text-center" style="width: 50px;">No</th>
-                        <th class="text-center" style="width: 80px;">Gambar</th>
-                        <th>Nama Event</th>
-                        <th>Lokasi Event</th>
-                        <th>Waktu Mulai</th>
-                        <th>Waktu Berakhir</th>
-                        <th>Sub Event</th>
-                        <th class="text-center">Status</th>
-                        <th class="text-center" style="width: 100px;">Aksi</th>
-                    </tr>
-                </thead>
-                <tbody>
-                    @php
-                    $no = 1;
-                    @endphp
-                    @foreach ($data as $datas)
-                    <tr>
-                        <td class="text-center fw-bold text-600">{{ $no++ }}</td>
-                        <td class="text-center">
-                            <div class="event-thumb-container mx-auto">
-                                @if ($datas->event_data_cover == '')
-                                <img src="{{ asset('img/cover.png') }}" alt="Default Cover" id="videoPreview">
-                                @else
-                                <img src="{{ Storage::url($datas->event_data_cover) }}" alt="Event Cover" />
-                                @endif
-                            </div>
-                        </td>
-                        <td>
-                            <span class="fw-bold text-dark d-block mb-0 fs-0">{{ $datas->event_data_tittle }}</span>
-                            <span class="badge bg-soft-secondary text-secondary fs--2 mt-1"><i class="fas fa-barcode me-1"></i>{{ $datas->event_data_code }}</span>
-                        </td>
-                        <td>
-                            <span class="fs--1 text-800 fw-medium d-flex align-items-center">
-                                <i class="fas fa-map-marker-alt text-danger me-2 fs-0"></i>{{ $datas->event_data_venue }}
-                            </span>
-                        </td>
-                        <td>
-                            <span class="badge bg-soft-success text-success fs--2 rounded-pill px-2 py-1">
-                                <i class="far fa-clock me-1"></i>{{ $datas->event_data_start_date }}
-                            </span>
-                        </td>
-                        <td>
-                            <span class="badge bg-soft-danger text-danger fs--2 rounded-pill px-2 py-1">
-                                <i class="far fa-clock me-1"></i>{{ $datas->event_data_end_date }}
-                            </span>
-                        </td>
-                        <td>
-                            @php
-                            $sub = App\Models\Event\SubEventModel::where('event_data_code',$datas->event_data_code)->get();
-                            @endphp
-                            <ul class="sub-event-list">
-                                @forelse ($sub as $subs)
-                                <li class="sub-event-item">
-                                    <i class="fas fa-angle-right me-1 text-primary"></i>{{ $subs->event_data_sub_name }}
-                                </li>
-                                @empty
-                                <span class="fs--2 text-muted italic"><i class="fas fa-info-circle me-1"></i>Belum ada sub-event</span>
-                                @endforelse
-                            </ul>
-                        </td>
-                        <td class="text-center">
-                            <span class="badge rounded-pill bg-soft-info text-info px-3 py-1 fw-bold">
-                                <i class="fas fa-check-circle me-1"></i>Aktif (0)
-                            </span>
-                        </td>
-                        <td class="text-center">
-                            <div class="btn-group position-relative" role="group">
-                                <button class="btn btn-sm btn-outline-primary dropdown-toggle rounded-pill px-3 fs--1 fw-semibold shadow-sm" id="btnGroupVerticalDrop2"
-                                    type="button" data-bs-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
-                                    <i class="fas fa-cog me-1"></i> Opsi
+        <!-- <div class="table-responsive"> -->
+        <table id="example" class="table table-modern table-hover align-middle" style="width:100%">
+            <thead>
+                <tr>
+                    <th class="text-center" style="width: 50px;">No</th>
+                    <th class="text-center" style="width: 80px;">Gambar</th>
+                    <th>Nama Event</th>
+                    <th>Lokasi Event</th>
+                    <th>Waktu Mulai</th>
+                    <th>Waktu Berakhir</th>
+                    <th>Sub Event</th>
+                    <th class="text-center">Status</th>
+                    <th class="text-center" style="width: 100px;">Aksi</th>
+                </tr>
+            </thead>
+            <tbody>
+                @php
+                $no = 1;
+                @endphp
+                @foreach ($data as $datas)
+                <tr>
+                    <td class="text-center fw-bold text-600">{{ $no++ }}</td>
+                    <td class="text-center">
+                        <div class="event-thumb-container mx-auto">
+                            @if ($datas->event_data_cover == '')
+                            <img src="{{ asset('img/cover.png') }}" alt="Default Cover" id="videoPreview">
+                            @else
+                            <img src="{{ Storage::url($datas->event_data_cover) }}" alt="Event Cover" />
+                            @endif
+                        </div>
+                    </td>
+                    <td>
+                        <span class="fw-bold text-dark d-block mb-0 fs-0">{{ $datas->event_data_tittle }}</span>
+                        <span class="badge bg-soft-secondary text-secondary fs--2 mt-1"><i class="fas fa-barcode me-1"></i>{{ $datas->event_data_code }}</span>
+                    </td>
+                    <td>
+                        <span class="fs--1 text-800 fw-medium d-flex align-items-center">
+                            <i class="fas fa-map-marker-alt text-danger me-2 fs-0"></i>{{ $datas->event_data_venue }}
+                        </span>
+                    </td>
+                    <td>
+                        <span class="badge bg-soft-success text-success fs--2 rounded-pill px-2 py-1">
+                            <i class="far fa-clock me-1"></i>{{ $datas->event_data_start_date }}
+                        </span>
+                    </td>
+                    <td>
+                        <span class="badge bg-soft-danger text-danger fs--2 rounded-pill px-2 py-1">
+                            <i class="far fa-clock me-1"></i>{{ $datas->event_data_end_date }}
+                        </span>
+                    </td>
+                    <td>
+                        @php
+                        $sub = App\Models\Event\SubEventModel::where('event_data_code',$datas->event_data_code)->get();
+                        @endphp
+                        <ul class="sub-event-list">
+                            @forelse ($sub as $subs)
+                            <li class="sub-event-item">
+                                <i class="fas fa-angle-right me-1 text-primary"></i>{{ $subs->event_data_sub_name }}
+                            </li>
+                            @empty
+                            <span class="fs--2 text-muted italic"><i class="fas fa-info-circle me-1"></i>Belum ada sub-event</span>
+                            @endforelse
+                        </ul>
+                    </td>
+                    <td class="text-center">
+                        <span class="badge rounded-pill bg-soft-info text-info px-3 py-1 fw-bold">
+                            <i class="fas fa-check-circle me-1"></i>Aktif (0)
+                        </span>
+                    </td>
+                    <td class="text-center">
+                        <div class="btn-group position-relative" role="group">
+                            <button class="btn btn-sm btn-outline-primary dropdown-toggle rounded-pill px-3 fs--1 fw-semibold shadow-sm" id="btnGroupVerticalDrop2"
+                                type="button" data-bs-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+                                <i class="fas fa-cog me-1"></i> Opsi
+                            </button>
+                            <div class="dropdown-menu dropdown-menu-end dropdown-menu-modern" aria-labelledby="btnGroupVerticalDrop2">
+                                <button class="dropdown-item d-flex align-items-center" data-bs-toggle="modal" data-bs-target="#modal-event-full"
+                                    id="button-detail-event" data-code="{{$datas->event_data_code}}">
+                                    <i class="far fa-edit me-2 text-warning"></i> Setup Event
                                 </button>
-                                <div class="dropdown-menu dropdown-menu-end dropdown-menu-modern" aria-labelledby="btnGroupVerticalDrop2">
-                                    <button class="dropdown-item d-flex align-items-center" data-bs-toggle="modal" data-bs-target="#modal-event-full"
-                                        id="button-detail-event" data-code="{{$datas->event_data_code}}">
-                                        <i class="far fa-edit me-2 text-warning"></i> Setup Event
-                                    </button>
-                                    <button class="dropdown-item d-flex align-items-center" data-bs-toggle="modal" data-bs-target="#modal-brodcast"
-                                        id="button-add-event" data-code="{{$datas->event_data_code}}">
-                                        <i class="fas fa-users me-2 text-info"></i> Peserta Event
-                                    </button>
-                                    <div class="dropdown-divider"></div>
-                                    <button class="dropdown-item d-flex align-items-center" data-bs-toggle="modal" data-bs-target="#modal-event-full"
-                                        id="button-form-registrasi-peserta" data-code="{{$datas->event_data_code}}">
-                                        <i class="fab fa-wpforms me-2 text-success"></i> Form Registrasi Peserta
-                                    </button>
-                                    <div class="dropdown-divider"></div>
-                                    <button class="dropdown-item d-flex align-items-center" data-bs-toggle="modal" data-bs-target="#modal-event"
-                                        id="button-add-sub-event" data-code="{{$datas->event_data_code}}">
-                                        <i class="fas fa-calendar-plus me-2 text-primary"></i> Add Sub Event
-                                    </button>
-                                    <div class="dropdown-divider"></div>
-                                    <button class="dropdown-item d-flex align-items-center" onclick='window.open(`{{ route("menu_event_data_form_self_registrasi",["kode"=>$datas->event_data_code]) }}`, "_blank");'>
-                                        <i class="fas fa-external-link-alt me-2 text-secondary"></i> Self Register
-                                    </button>
-                                </div>
+                                <button class="dropdown-item d-flex align-items-center btn-trigger-add-peserta"
+                                    data-bs-toggle="modal"
+                                    data-bs-target="#modal-add-peserta"
+                                    data-code="{{$datas->event_data_code}}">
+                                    <i class="fas fa-users me-2 text-info"></i> Tambah Peserta Event
+                                </button>
+                                <div class="dropdown-divider"></div>
+                                <button class="dropdown-item d-flex align-items-center" data-bs-toggle="modal" data-bs-target="#modal-event-full"
+                                    id="button-form-registrasi-peserta" data-code="{{$datas->event_data_code}}">
+                                    <i class="fab fa-wpforms me-2 text-success"></i> Form Registrasi Peserta
+                                </button>
+                                <div class="dropdown-divider"></div>
+                                <button class="dropdown-item d-flex align-items-center" data-bs-toggle="modal" data-bs-target="#modal-event"
+                                    id="button-add-sub-event" data-code="{{$datas->event_data_code}}">
+                                    <i class="fas fa-calendar-plus me-2 text-primary"></i> Add Sub Event
+                                </button>
+                                <div class="dropdown-divider"></div>
+                                <button class="dropdown-item d-flex align-items-center" onclick='window.open(`{{ route("menu_event_data_form_self_registrasi",["kode"=>$datas->event_data_code]) }}`, "_blank");'>
+                                    <i class="fas fa-external-link-alt me-2 text-secondary"></i> Self Register
+                                </button>
                             </div>
-                        </td>
-                    </tr>
-                    @endforeach
-                </tbody>
-            </table>
-        </div>
+                        </div>
+                    </td>
+                </tr>
+                @endforeach
+            </tbody>
+        </table>
+        <!-- </div> -->
     </div>
 </div>
 @endsection
@@ -368,7 +370,161 @@
         </div>
     </div>
 </div>
+<!-- Modal Tambah Peserta Event -->
+<div class="modal fade" id="modal-add-peserta" tabindex="-1" aria-labelledby="modalAddPesertaLabel" aria-hidden="true">
+    <div class="modal-dialog modal-lg">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title" id="modalAddPesertaLabel"><i class="fas fa-user-plus me-2 text-primary"></i>Tambah Peserta Event</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
 
+            <div class="modal-body">
+                <!-- Step 1: Pilih Sub Event & Sub Event Class (Berlaku untuk Manual & Excel) -->
+                <div class="card bg-light mb-3">
+                    <div class="card-body">
+                        <h6 class="card-title fw-bold text-dark border-bottom pb-2 mb-3">1. Pilih Kelas Target</h6>
+                        <div class="row g-3">
+                            <!-- Dropdown Pilih Sub Event -->
+                            <div class="col-md-6">
+                                <label class="form-label font-weight-bold">Sub Event <span class="text-danger">*</span></label>
+                                <select class="form-select select-sub-event-target" required>
+                                    <option value="">-- Pilih Sub Event --</option>
+                                </select>
+                            </div>
+
+                            <!-- Dropdown Pilih Sub Event Class -->
+                            <div class="col-md-6">
+                                <label class="form-label font-weight-bold">Sub Event Class <span class="text-danger">*</span></label>
+                                <select class="form-select select-sub-class-target" required disabled>
+                                    <option value="">-- Pilih Sub Event Dahulu --</option>
+                                </select>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Step 2: Tab Navigasi Pilih Metode Input -->
+                <h6 class="fw-bold text-dark mb-2">2. Pilih Metode Input Peserta</h6>
+                <ul class="nav nav-tabs nav-justified mb-3" id="pesertaTab" role="tablist">
+                    <li class="nav-item" role="presentation">
+                        <button class="nav-link active fw-bold" id="manual-tab" data-bs-toggle="tab" data-bs-target="#tab-manual" type="button" role="tab" aria-controls="tab-manual" aria-selected="true">
+                            <i class="fas fa-user-edit me-2 text-info"></i>Input Manual (Per Orang)
+                        </button>
+                    </li>
+                    <li class="nav-item" role="presentation">
+                        <button class="nav-link fw-bold" id="excel-tab" data-bs-toggle="tab" data-bs-target="#tab-excel" type="button" role="tab" aria-controls="tab-excel" aria-selected="false">
+                            <i class="fas fa-file-excel me-2 text-success"></i>Import Excel Massal
+                        </button>
+                    </li>
+                </ul>
+
+                <div class="tab-content" id="pesertaTabContent">
+                    <!-- Tab 1: Form Input Manual -->
+                    <div class="tab-pane fade show active" id="tab-manual" role="tabpanel" aria-labelledby="manual-tab">
+                        <form id="form-add-peserta-manual">
+                            @csrf
+                            <input type="hidden" name="event_data_code" class="input_event_data_code">
+                            <input type="hidden" name="id_event_data_sub_class" class="hidden_id_event_data_sub_class">
+
+                            <div class="row g-3">
+                                <div class="col-md-6">
+                                    <label class="form-label font-weight-bold">Nama Lengkap <span class="text-danger">*</span></label>
+                                    <input type="text" class="form-control" name="full_name" required placeholder="Masukkan nama peserta">
+                                </div>
+                                <div class="col-md-6">
+                                    <label class="form-label font-weight-bold">Email <span class="text-danger">*</span></label>
+                                    <input type="email" class="form-control" name="email" required placeholder="contoh@email.com">
+                                </div>
+                                <div class="col-md-6">
+                                    <label class="form-label font-weight-bold">No. WhatsApp <span class="text-danger">*</span></label>
+                                    <input type="text" class="form-control" name="phone_number" required placeholder="08123456789">
+                                </div>
+                                <div class="col-md-6">
+                                    <label class="form-label font-weight-bold">Jenis Kelamin</label>
+                                    <select class="form-select" name="gender">
+                                        <option value="">-- Pilih --</option>
+                                        <option value="L">Laki-laki</option>
+                                        <option value="P">Perempuan</option>
+                                    </select>
+                                </div>
+                                <div class="col-md-6">
+                                    <label class="form-label font-weight-bold">NIK / No. KTP / Paspor</label>
+                                    <input type="text" class="form-control" name="identity_number" placeholder="Nomor Identitas">
+                                </div>
+                                <div class="col-md-6">
+                                    <label class="form-label font-weight-bold">Instansi / Perusahaan</label>
+                                    <input type="text" class="form-control" name="institution" placeholder="Nama instansi">
+                                </div>
+                                <div class="col-md-6">
+                                    <label class="form-label font-weight-bold">Status Pembayaran <span class="text-danger">*</span></label>
+                                    <select class="form-select" name="payment_status" required>
+                                        <option value="paid" selected>PAID (Lunas)</option>
+                                        <option value="pending">PENDING (Menunggu Pembayaran)</option>
+                                        <option value="cancelled">CANCELLED (Dibatalkan)</option>
+                                    </select>
+                                </div>
+                                <div class="col-md-6">
+                                    <label class="form-label font-weight-bold">Alamat</label>
+                                    <input type="text" class="form-control" name="address" placeholder="Alamat singkat">
+                                </div>
+                            </div>
+
+                            <div class="text-end mt-4">
+                                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Batal</button>
+                                <button type="submit" class="btn btn-primary" id="btn-save-manual">
+                                    <i class="fas fa-save me-1"></i> Simpan Peserta Manual
+                                </button>
+                            </div>
+                        </form>
+                    </div>
+
+                    <!-- Tab 2: Form Import Excel -->
+                    <div class="tab-pane fade" id="tab-excel" role="tabpanel" aria-labelledby="excel-tab">
+                        <form id="form-import-excel" enctype="multipart/form-data">
+                            @csrf
+                            <input type="hidden" name="event_data_code" class="input_event_data_code">
+                            <input type="hidden" name="id_event_data_sub_class" class="hidden_id_event_data_sub_class">
+
+                            <div class="alert alert-info d-flex align-items-center mb-3">
+                                <i class="fas fa-info-circle fa-2x me-3"></i>
+                                <div>
+                                    <strong>Petunjuk Import Excel:</strong><br>
+                                    Unggah file spreadsheet `.xlsx` atau `.csv`. Pastikan menggunakan format template yang sesuai.
+                                    <br>
+                                    <a href="{{ route('admin.peserta.download-template') }}" class="fw-bold text-decoration-underline text-dark me-2">
+                                        <i class="fas fa-download me-1"></i>Download Template Excel
+                                    </a>
+                                </div>
+                            </div>
+
+                            <div class="mb-3">
+                                <label class="form-label font-weight-bold">Pilih File Excel (.xlsx, .xls, .csv) <span class="text-danger">*</span></label>
+                                <input type="file" class="form-control" name="file_excel" accept=".xlsx, .xls, .csv" required>
+                            </div>
+
+                            <div class="mb-3">
+                                <label class="form-label font-weight-bold">Default Status Pembayaran untuk Semua Peserta Import <span class="text-danger">*</span></label>
+                                <select class="form-select" name="default_payment_status" required>
+                                    <option value="paid" selected>PAID (Lunas)</option>
+                                    <option value="pending">PENDING (Menunggu Pembayaran)</option>
+                                </select>
+                            </div>
+
+                            <div class="text-end mt-4">
+                                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Batal</button>
+                                <button type="submit" class="btn btn-success" id="btn-save-excel">
+                                    <i class="fas fa-file-upload me-1"></i> Import Peserta Excel
+                                </button>
+                            </div>
+                        </form>
+                    </div>
+                </div>
+            </div>
+
+        </div>
+    </div>
+</div>
 <script src="https://cdn.datatables.net/2.2.2/js/dataTables.js"></script>
 <script src="https://cdn.datatables.net/2.2.2/js/dataTables.bootstrap5.js"></script>
 <script src="https://cdn.datatables.net/responsive/3.0.4/js/dataTables.responsive.js"></script>
@@ -379,8 +535,18 @@
 <script src="{{ asset('vendors/tinymce/tinymce.min.js') }}"></script>
 
 <script>
-    new DataTable('#example', {
-        responsive: true
+    $(document).ready(function() {
+        new DataTable('#example', {
+            responsive: true,
+            language: {
+                search: "_INPUT_",
+                searchPlaceholder: "Cari data pasien / registrasi..."
+            },
+            pageLength: 10,
+            dom: "<'row p-3'<'col-sm-12 col-md-6'l><'col-sm-12 col-md-6'f>>" +
+                "<'row'<'col-sm-12'tr>>" +
+                "<'row p-3 align-items-center'<'col-sm-12 col-md-5'i><'col-sm-12 col-md-7'p>>"
+        });
     });
 </script>
 
@@ -581,6 +747,143 @@
             $('#show-data-event-all').html(data);
         }).fail(function() {
             $('#show-data-event-all').html('<div class="p-3 text-center text-danger">Gagal menambah peserta event.</div>');
+        });
+    });
+</script>
+<script>
+    $(document).ready(function() {
+        // 1. Saat tombol trigger diklik -> Load Sub Event
+        $(document).on('click', '.btn-trigger-add-peserta', function() {
+            let eventCode = $(this).data('code');
+            $('.input_event_data_code').val(eventCode);
+            $('.hidden_id_event_data_sub_class').val('');
+
+            // Reset dropdowns
+            $('.select-sub-class-target').html('<option value="">-- Pilih Sub Event Dahulu --</option>').prop('disabled', true);
+
+            // Load Sub Event via AJAX
+            $.ajax({
+                url: "{{ url('event/sub-events') }}/" + eventCode,
+                type: "GET",
+                success: function(response) {
+                    let options = '<option value="">-- Pilih Sub Event --</option>';
+                    $.each(response.data, function(key, val) {
+                        options += `<option value="${val.event_data_sub_code}">${val.event_data_sub_name}</option>`;
+                    });
+                    $('.select-sub-event-target').html(options);
+                },
+                error: function() {
+                    alert('Gagal mengambil data Sub Event.');
+                }
+            });
+        });
+
+        // 2. Saat Sub Event dipilih -> Load Sub Event Class
+        $('.select-sub-event-target').on('change', function() {
+            let subCode = $(this).val();
+            $('.hidden_id_event_data_sub_class').val('');
+
+            if (!subCode) {
+                $('.select-sub-class-target').html('<option value="">-- Pilih Sub Event Dahulu --</option>').prop('disabled', true);
+                return;
+            }
+
+            $('.select-sub-class-target').html('<option value="">Loading...</option>').prop('disabled', true);
+
+            $.ajax({
+                url: "{{ url('event/sub-classes-by-sub') }}/" + subCode,
+                type: "GET",
+                success: function(response) {
+                    let options = '<option value="">-- Pilih Sub Event Class --</option>';
+                    $.each(response.data, function(key, val) {
+                        options += `<option value="${val.id_event_data_sub_class}">${val.event_data_sub_class_name} (Rp ${parseInt(val.event_data_sub_class_price).toLocaleString('id-ID')})</option>`;
+                    });
+                    $('.select-sub-class-target').html(options).prop('disabled', false);
+                },
+                error: function() {
+                    alert('Gagal mengambil data Sub Event Class.');
+                    $('.select-sub-class-target').html('<option value="">-- Gagal memuat data --</option>');
+                }
+            });
+        });
+
+        // 3. Sync id_event_data_sub_class yang dipilih ke hidden input form manual & excel
+        $('.select-sub-class-target').on('change', function() {
+            let selectedClassId = $(this).val();
+            $('.hidden_id_event_data_sub_class').val(selectedClassId);
+        });
+
+        // 4. Submit Form Manual
+        $('#form-add-peserta-manual').on('submit', function(e) {
+            e.preventDefault();
+
+            let subClassId = $('.hidden_id_event_data_sub_class').val();
+            if (!subClassId) {
+                Swal.fire('Peringatan', 'Silakan pilih Sub Event dan Sub Event Class terlebih dahulu!', 'warning');
+                return;
+            }
+
+            let btnSave = $('#btn-save-manual');
+            btnSave.prop('disabled', true).html('<i class="fas fa-spinner fa-spin me-1"></i> Menyimpan...');
+
+            $.ajax({
+                url: "{{ route('admin.peserta.store-manual') }}",
+                type: "POST",
+                data: $(this).serialize(),
+                success: function(response) {
+                    btnSave.prop('disabled', false).html('<i class="fas fa-save me-1"></i> Simpan Peserta Manual');
+                    if (response.status === 'success') {
+                        $('#modal-add-peserta').modal('hide');
+                        $('#form-add-peserta-manual')[0].reset();
+                        Swal.fire('Berhasil!', response.message, 'success');
+                        if (typeof table !== 'undefined') table.ajax.reload();
+                        else location.reload();
+                    }
+                },
+                error: function(xhr) {
+                    btnSave.prop('disabled', false).html('<i class="fas fa-save me-1"></i> Simpan Peserta Manual');
+                    let res = xhr.responseJSON;
+                    Swal.fire('Gagal Simpan', res && res.message ? res.message : 'Terjadi kesalahan sistem.', 'error');
+                }
+            });
+        });
+
+        // 5. Submit Form Import Excel
+        $('#form-import-excel').on('submit', function(e) {
+            e.preventDefault();
+
+            let subClassId = $('.hidden_id_event_data_sub_class').val();
+            if (!subClassId) {
+                Swal.fire('Peringatan', 'Silakan pilih Sub Event dan Sub Event Class terlebih dahulu!', 'warning');
+                return;
+            }
+
+            let formData = new FormData(this);
+            let btnSave = $('#btn-save-excel');
+            btnSave.prop('disabled', true).html('<i class="fas fa-spinner fa-spin me-1"></i> Mengimport Data...');
+
+            $.ajax({
+                url: "{{ route('admin.peserta.import-excel') }}",
+                type: "POST",
+                data: formData,
+                contentType: false,
+                processData: false,
+                success: function(response) {
+                    btnSave.prop('disabled', false).html('<i class="fas fa-file-upload me-1"></i> Import Peserta Excel');
+                    if (response.status === 'success') {
+                        $('#modal-add-peserta').modal('hide');
+                        $('#form-import-excel')[0].reset();
+                        Swal.fire('Berhasil!', response.message, 'success');
+                        if (typeof table !== 'undefined') table.ajax.reload();
+                        else location.reload();
+                    }
+                },
+                error: function(xhr) {
+                    btnSave.prop('disabled', false).html('<i class="fas fa-file-upload me-1"></i> Import Peserta Excel');
+                    let res = xhr.responseJSON;
+                    Swal.fire('Gagal Import', res && res.message ? res.message : 'Terjadi kesalahan sistem.', 'error');
+                }
+            });
         });
     });
 </script>

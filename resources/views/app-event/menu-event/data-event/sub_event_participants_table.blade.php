@@ -37,7 +37,7 @@
         @if(count($participants) > 0)
         <table id="tablePeserta" class="table table-hover align-middle mb-0 w-100">
             <thead class="bg-light">
-                <tr class="text-uppercase fs--1 text-secondary">
+                <tr class="text-uppercase fs--2 text-secondary">
                     <th class="ps-3">No</th>
                     <th>Kode Booking / Token</th>
                     <th>Kode Peserta</th>
@@ -49,7 +49,7 @@
                     <th class="pe-3 text-center">Aksi</th>
                 </tr>
             </thead>
-            <tbody>
+            <tbody class="fs--2">
                 @foreach($participants as $index => $participant)
                 @php
                 $idRegistration = $participant->id_registration ?? ($participant->registration->id_registration ?? null);

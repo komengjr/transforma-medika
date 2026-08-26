@@ -25,7 +25,7 @@
 @section('content')
 
 {{-- Header & Input Filter --}}
-<div class="row mb-4 align-items-center">
+<div class="row mb-3 align-items-center">
     <div class="col-md-6 mb-3 mb-md-0">
         <h3 class="fw-bold mb-0">Daftar Event</h3>
         <p class="text-muted mb-0">Kelola dan telusuri event yang tersedia</p>
@@ -41,7 +41,7 @@
 </div>
 
 {{-- Grid Card Event --}}
-<div class="row g-4" id="eventCardGrid">
+<div class="row g-3" id="eventCardGrid">
     @forelse ($data as $item)
     <div class="col-12 col-md-3 col-lg-3 event-item" data-title="{{ strtolower($item->event_data_tittle) }}">
         <div class="card h-100 border-0 shadow-sm event-card overflow-hidden">
@@ -63,7 +63,7 @@
                     @if ($item->event_data_status == 1)
                     <span class="badge bg-success">Aktif</span>
                     @else
-                    <span class="badge bg-secondary">Draft / Non-Aktif</span>
+                    <span class="badge bg-secondary">Draft</span>
                     @endif
                 </div>
 
@@ -320,6 +320,27 @@
                         if (res.status === 'success' && res.data.length > 0) {
                             let rows = '';
                             res.data.forEach((item, idx) => {
+                                const sessionName = item.event_data_sub_session_name || 'Session';
+                                const sessionNameLower = sessionName.toLowerCase();
+
+                                // Penentuan Icon, Warna, dan Label Tombol Dinamis berdasarkan Nama Session
+                                let btnClass = 'btn-outline-primary';
+                                let btnIcon = 'fas fa-external-link-alt';
+
+                                if (sessionNameLower.includes('check in') || sessionNameLower.includes('check-in') || sessionNameLower.includes('masuk')) {
+                                    btnClass = 'btn-outline-success';
+                                    btnIcon = 'fas fa-sign-in-alt';
+                                } else if (sessionNameLower.includes('check out') || sessionNameLower.includes('check-out') || sessionNameLower.includes('keluar')) {
+                                    btnClass = 'btn-outline-danger';
+                                    btnIcon = 'fas fa-sign-out-alt';
+                                } else if (sessionNameLower.includes('doorprize') || sessionNameLower.includes('undian') || sessionNameLower.includes('hadiah')) {
+                                    btnClass = 'btn-outline-warning text-dark';
+                                    btnIcon = 'fas fa-gift';
+                                } else if (sessionNameLower.includes('makan') || sessionNameLower.includes('lunch') || sessionNameLower.includes('snack')) {
+                                    btnClass = 'btn-outline-info text-dark';
+                                    btnIcon = 'fas fa-utensils';
+                                }
+
                                 rows += `
                             <tr>
                                 <td>${idx + 1}</td>
@@ -328,12 +349,22 @@
                                     <small class="text-muted">Sub Code: ${item.event_data_sub_code}</small>
                                 </td>
                                 <td>
-                                    <span class="fw-bold text-dark">${item.event_data_sub_session_name}</span><br>
+                                    <span class="fw-bold text-dark">${sessionName}</span><br>
                                     <small class="text-muted">Sess Code: ${item.event_data_sub_session_code}</small>
                                 </td>
                                 <td>
                                     <i class="far fa-clock text-primary me-1"></i> ${item.event_data_sub_start || '-'}<br>
                                     <small class="text-muted">s/d ${item.event_data_sub_end || '-'}</small>
+                                </td>
+                                <td class="text-center">
+                                    <!-- Single Action Button yang Menyesuaikan Nama Session -->
+                                    <button type="button"
+                                            class="btn btn-sm ${btnClass} btn-execute-session"
+                                            data-session-code="${item.event_data_sub_session_code}"
+                                            data-session-name="${sessionName}"
+                                            data-sub-code="${item.event_data_sub_code}">
+                                        <i class="${btnIcon} me-1"></i> ${sessionName}
+                                    </button>
                                 </td>
                             </tr>
                         `;
@@ -345,9 +376,10 @@
                                 <thead class="table-light">
                                     <tr>
                                         <th width="5%">#</th>
-                                        <th width="35%">Sub Event</th>
-                                        <th width="35%">Nama Session</th>
-                                        <th width="25%">Waktu Sub Event</th>
+                                        <th width="30%">Sub Event</th>
+                                        <th width="25%">Nama Session</th>
+                                        <th width="20%">Waktu Sub Event</th>
+                                        <th width="20%" class="text-center">Aksi Session</th>
                                     </tr>
                                 </thead>
                                 <tbody>${rows}</tbody>
@@ -362,6 +394,19 @@
                         container.innerHTML = `<div class="alert alert-danger mb-0">Gagal mengambil data session dari server.</div>`;
                     });
             });
+        });
+
+        // Event Handler untuk Single Action Button
+        document.getElementById('contentModalSession').addEventListener('click', function(e) {
+            const btnSession = e.target.closest('.btn-execute-session');
+            if (btnSession) {
+                const sessionCode = btnSession.getAttribute('data-session-code');
+                const sessionName = btnSession.getAttribute('data-session-name');
+                const subCode = btnSession.getAttribute('data-sub-code');
+
+                // Arahkan ke route eksekusi session dengan membawa parameter session_code
+                window.location.href = `{{ url('admin/session/execute') }}?session_code=${sessionCode}&sub_code=${subCode}`;
+            }
         });
 
         // Variable global menampung data mentah & status pagination
