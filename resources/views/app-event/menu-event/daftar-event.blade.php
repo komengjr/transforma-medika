@@ -19,6 +19,12 @@
         height: 180px;
         object-fit: cover;
     }
+
+    /* Z-Index Fix untuk Dropdown Aksi Event */
+    .event-action-dropdown {
+        position: relative;
+        z-index: 10;
+    }
 </style>
 @endsection
 
@@ -91,13 +97,13 @@
                     {{ Str::limit(strip_tags($item->event_data_desc), 90, '...') }}
                 </p>
 
-                {{-- Action Dropdown (Trigger Modal) --}}
-                <div class="pt-3 border-top mt-auto d-flex justify-content-between align-items-center">
-                    <div class="dropdown">
+                {{-- Action Dropdown (Trigger Modal - Added Z-INDEX Fix) --}}
+                <div class="pt-3 border-top mt-auto d-flex justify-content-between align-items-center position-relative">
+                    <div class="dropdown event-action-dropdown">
                         <button class="btn btn-outline-primary btn-sm rounded-pill dropdown-toggle" type="button" id="dropdownMenuButton{{ $item->id_event_data }}" data-bs-toggle="dropdown" aria-expanded="false">
                             Aksi Event
                         </button>
-                        <ul class="dropdown-menu shadow-sm" aria-labelledby="dropdownMenuButton{{ $item->id_event_data }}">
+                        <ul class="dropdown-menu shadow-lg border-0" aria-labelledby="dropdownMenuButton{{ $item->id_event_data }}">
                             <li>
                                 <button class="dropdown-item py-2 btn-modal-detail" data-code="{{ $item->event_data_code }}">
                                     <i class="fas fa-info-circle me-2 text-primary"></i> Detail Event
@@ -114,6 +120,11 @@
                             <li>
                                 <button class="dropdown-item py-2 btn-modal-peserta" data-code="{{ $item->event_data_code }}">
                                     <i class="fas fa-users me-2 text-success"></i> Lihat Peserta
+                                </button>
+                            </li>
+                            <li>
+                                <button class="dropdown-item py-2 btn-modal-survey" data-code="{{ $item->event_data_code }}">
+                                    <i class="fas fa-poll-h me-2 text-info"></i> Data Survey Peserta
                                 </button>
                             </li>
                         </ul>
@@ -214,6 +225,29 @@
         </div>
     </div>
 </div>
+
+{{-- Modal 4: Data Survey Peserta --}}
+<div class="modal fade" id="modalSurveyEvent" tabindex="-1" aria-labelledby="modalSurveyEventLabel" aria-hidden="true">
+    <div class="modal-dialog modal-xl modal-dialog-centered">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title fw-bold" id="modalSurveyEventLabel">
+                    <i class="fas fa-poll-h text-info me-2"></i> Data Survey Peserta Event
+                </h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <div class="modal-body" id="contentModalSurvey">
+                <div class="text-center py-4">
+                    <div class="spinner-border text-info" role="status"></div>
+                    <p class="mt-2 text-muted mb-0">Memuat data survey peserta...</p>
+                </div>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-secondary btn-sm" data-bs-dismiss="modal">Tutup</button>
+            </div>
+        </div>
+    </div>
+</div>
 @endsection
 
 @section('base.js')
@@ -249,11 +283,13 @@
         const modalDetail = new bootstrap.Modal(document.getElementById('modalDetailEvent'));
         const modalSession = new bootstrap.Modal(document.getElementById('modalSessionEvent'));
         const modalPeserta = new bootstrap.Modal(document.getElementById('modalPesertaEvent'));
+        const modalSurvey = new bootstrap.Modal(document.getElementById('modalSurveyEvent'));
 
         // URL base dari Route Name Laravel
         const routeDetailUrl = "{{ route('menu_event_daftar_get_detail', ['code' => 'XXX']) }}";
         const routeSessionUrl = "{{ route('menu_event_get_session', ['code' => 'XXX']) }}";
         const routePesertaUrl = "{{ route('menu_event_daftar_get_peserta', ['code' => 'XXX']) }}";
+        const routeSurveyUrl = "{{ route('menu_event_daftar_get_survay', ['code' => 'XXX']) }}";
 
         // --- 3. AJAX DETAIL EVENT ---
         document.querySelectorAll('.btn-modal-detail').forEach(button => {
@@ -299,7 +335,7 @@
             });
         });
 
-        // --- AJAX CHECK SESSION (SESI SAJA) ---
+        // --- AJAX CHECK SESSION ---
         document.querySelectorAll('.btn-modal-session').forEach(button => {
             button.addEventListener('click', function() {
                 const eventCode = this.getAttribute('data-code');
@@ -323,7 +359,6 @@
                                 const sessionName = item.event_data_sub_session_name || 'Session';
                                 const sessionNameLower = sessionName.toLowerCase();
 
-                                // Penentuan Icon, Warna, dan Label Tombol Dinamis berdasarkan Nama Session
                                 let btnClass = 'btn-outline-primary';
                                 let btnIcon = 'fas fa-external-link-alt';
 
@@ -357,7 +392,6 @@
                                     <small class="text-muted">s/d ${item.event_data_sub_end || '-'}</small>
                                 </td>
                                 <td class="text-center">
-                                    <!-- Single Action Button yang Menyesuaikan Nama Session -->
                                     <button type="button"
                                             class="btn btn-sm ${btnClass} btn-execute-session"
                                             data-session-code="${item.event_data_sub_session_code}"
@@ -396,26 +430,21 @@
             });
         });
 
-        // Event Handler untuk Single Action Button
         document.getElementById('contentModalSession').addEventListener('click', function(e) {
             const btnSession = e.target.closest('.btn-execute-session');
             if (btnSession) {
                 const sessionCode = btnSession.getAttribute('data-session-code');
-                const sessionName = btnSession.getAttribute('data-session-name');
                 const subCode = btnSession.getAttribute('data-sub-code');
-
-                // Arahkan ke route eksekusi session dengan membawa parameter session_code
                 window.location.href = `{{ url('admin/session/execute') }}?session_code=${sessionCode}&sub_code=${subCode}`;
             }
         });
 
-        // Variable global menampung data mentah & status pagination
+        // --- AJAX LIHAT PESERTA ---
         let allParticipantsData = [];
         let allClassOptions = [];
         let currentPage = 1;
-        const rowsPerPage = 10; // Jumlah baris per halaman
+        const rowsPerPage = 10;
 
-        // --- AJAX LIHAT PESERTA (TERMASUK FILTER & PAGINATION) ---
         document.querySelectorAll('.btn-modal-peserta').forEach(button => {
             button.addEventListener('click', function() {
                 const eventCode = this.getAttribute('data-code');
@@ -436,9 +465,8 @@
                         if (res.status === 'success' && res.data.length > 0) {
                             allParticipantsData = res.data;
                             allClassOptions = res.classes || [];
-                            currentPage = 1; // Reset ke halaman 1 saat buka modal
+                            currentPage = 1;
 
-                            // Opsi Sub Event
                             let subEventOptions = '<option value="">-- Semua Sub Event --</option>';
                             if (res.sub_events) {
                                 res.sub_events.forEach(sub => {
@@ -446,7 +474,6 @@
                                 });
                             }
 
-                            // Opsi Class
                             let classOptions = '<option value="">-- Semua Class --</option>';
                             if (res.classes) {
                                 res.classes.forEach(c => {
@@ -454,9 +481,7 @@
                                 });
                             }
 
-                            // Render UI Filter Bar, Container Tabel & Pagination
                             container.innerHTML = `
-                        <!-- FILTER BAR -->
                         <div class="card bg-light border-0 mb-3">
                             <div class="card-body p-2">
                                 <div class="row g-2">
@@ -480,7 +505,6 @@
                             </div>
                         </div>
 
-                        <!-- TABEL DATA -->
                         <div class="table-responsive">
                             <table class="table table-striped table-hover align-middle small mb-0">
                                 <thead class="table-light">
@@ -499,7 +523,6 @@
                             </table>
                         </div>
 
-                        <!-- PAGINATION FOOTER -->
                         <div class="d-flex justify-content-between align-items-center mt-3 pt-2 border-top">
                             <div class="small text-muted" id="paginationInfo">Menampilkan 0 data</div>
                             <nav>
@@ -508,12 +531,10 @@
                         </div>
                     `;
 
-                            // Render Pertama Kali
                             renderFilteredPesertaTable();
 
-                            // Event Listener untuk Filter
                             document.getElementById('filterSearchName').addEventListener('input', function() {
-                                currentPage = 1; // Reset ke halaman 1 saat mengetik pencarian
+                                currentPage = 1;
                                 renderFilteredPesertaTable();
                             });
 
@@ -548,7 +569,6 @@
             });
         });
 
-        // Function untuk melakukan Filter + Pagination & Render Tabel
         function renderFilteredPesertaTable() {
             const tbody = document.getElementById('tablePesertaBody');
             const pageInfo = document.getElementById('paginationInfo');
@@ -558,7 +578,6 @@
             const selectedSub = document.getElementById('filterSubEvent')?.value || '';
             const selectedClass = document.getElementById('filterClass')?.value || '';
 
-            // 1. Filter Data Array
             const filtered = allParticipantsData.filter(item => {
                 const matchName = !keyword ||
                     (item.full_name && item.full_name.toLowerCase().includes(keyword)) ||
@@ -578,7 +597,6 @@
                 return;
             }
 
-            // 2. Kalkulasi Halaman Pagination
             const totalData = filtered.length;
             const totalPages = Math.ceil(totalData / rowsPerPage);
             if (currentPage > totalPages) currentPage = totalPages;
@@ -587,7 +605,6 @@
             const endIndex = Math.min(startIndex + rowsPerPage, totalData);
             const paginatedData = filtered.slice(startIndex, endIndex);
 
-            // 3. Render Baris Tabel Sesuai Halaman Aktif
             let rows = '';
             paginatedData.forEach((p, idx) => {
                 let paymentBadge = p.payment_status === 'paid' ? '<span class="badge bg-success">Paid</span>' :
@@ -633,8 +650,6 @@
             });
 
             tbody.innerHTML = rows;
-
-            // 4. Update Info & Tombol Pagination Navigasi
             pageInfo.innerHTML = `Menampilkan <strong>${startIndex + 1}</strong> - <strong>${endIndex}</strong> dari <strong>${totalData}</strong> data`;
 
             let navHtml = `
@@ -657,11 +672,121 @@
             pageNav.innerHTML = navHtml;
         }
 
-        // Global Function untuk Pindah Halaman Pagination
-        function changePage(page) {
+        window.changePage = function(page) {
             currentPage = page;
             renderFilteredPesertaTable();
-        }
+        };
+
+        // --- 4. AJAX DATA SURVEY PESERTA (GROUPED PER PARTICIPANT) ---
+        document.querySelectorAll('.btn-modal-survey').forEach(button => {
+            button.addEventListener('click', function() {
+                const eventCode = this.getAttribute('data-code');
+                const container = document.getElementById('contentModalSurvey');
+
+                container.innerHTML = `
+                    <div class="text-center py-4">
+                        <div class="spinner-border text-info" role="status"></div>
+                        <p class="mt-2 text-muted mb-0">Memuat data survey peserta...</p>
+                    </div>`;
+                modalSurvey.show();
+
+                const url = routeSurveyUrl.replace('XXX', eventCode);
+
+                fetch(url)
+                    .then(response => response.json())
+                    .then(res => {
+                        if (res.status === 'success' && res.data && res.data.length > 0) {
+                            let rows = '';
+
+                            res.data.forEach((participant, idx) => {
+                                let surveyAnswersRows = '';
+
+                                if (participant.surveys && participant.surveys.length > 0) {
+                                    participant.surveys.forEach((s, sIdx) => {
+                                        surveyAnswersRows += `
+                                            <tr>
+                                                <td width="5%" class="text-center fw-bold text-secondary">${sIdx + 1}</td>
+                                                <td width="55%" class="fw-semibold text-dark">${s.survey_question}</td>
+                                                <td width="40%">
+                                                    <span class="badge bg-light text-dark border px-2 py-1">${s.survey_answer}</span>
+                                                </td>
+                                            </tr>
+                                        `;
+                                    });
+                                } else {
+                                    surveyAnswersRows = `<tr><td colspan="3" class="text-center text-muted">Belum ada rincian jawaban.</td></tr>`;
+                                }
+
+                                rows += `
+                                    <tr>
+                                        <td class="text-center">${idx + 1}</td>
+                                        <td>
+                                            <strong class="text-dark">${participant.full_name}</strong><br>
+                                            <small class="text-muted"><i class="fas fa-id-badge me-1"></i> ${participant.participant_code || '-'}</small>
+                                        </td>
+                                        <td>${participant.email || '-'}</td>
+                                        <td>${participant.phone_number || '-'}</td>
+                                        <td class="text-center">
+                                            <span class="badge bg-info-subtle text-info border border-info-subtle rounded-pill px-2 py-1">
+                                                ${participant.total_answers} Pertanyaan Terjawab
+                                            </span>
+                                        </td>
+                                        <td class="text-center">
+                                            <button class="btn btn-sm btn-outline-info rounded-pill px-3" type="button" data-bs-toggle="collapse" data-bs-target="#collapseSurvey${participant.id_participant}" aria-expanded="false">
+                                                <i class="fas fa-list me-1"></i> Lihat Jawaban
+                                            </button>
+                                        </td>
+                                    </tr>
+                                    <tr class="collapse" id="collapseSurvey${participant.id_participant}">
+                                        <td colspan="6" class="p-3 bg-light">
+                                            <div class="card card-body border-0 shadow-sm p-3 rounded-3">
+                                                <h6 class="fw-bold text-info mb-2">
+                                                    <i class="fas fa-clipboard-list me-2"></i> Rincian Jawaban Survey (${participant.full_name})
+                                                </h6>
+                                                <table class="table table-sm table-bordered align-middle mb-0 bg-white">
+                                                    <thead class="table-secondary">
+                                                        <tr>
+                                                            <th class="text-center">No</th>
+                                                            <th>Pertanyaan Survey</th>
+                                                            <th>Jawaban Peserta</th>
+                                                        </tr>
+                                                    </thead>
+                                                    <tbody>
+                                                        ${surveyAnswersRows}
+                                                    </tbody>
+                                                </table>
+                                            </div>
+                                        </td>
+                                    </tr>
+                                `;
+                            });
+
+                            container.innerHTML = `
+                                <div class="table-responsive">
+                                    <table class="table table-striped table-hover align-middle small mb-0">
+                                        <thead class="table-light">
+                                            <tr>
+                                                <th width="4%" class="text-center">#</th>
+                                                <th width="25%">Nama Peserta</th>
+                                                <th width="20%">Email</th>
+                                                <th width="15%">No. WA</th>
+                                                <th width="18%" class="text-center">Status Survey</th>
+                                                <th width="18%" class="text-center">Aksi Rincian</th>
+                                            </tr>
+                                        </thead>
+                                        <tbody>${rows}</tbody>
+                                    </table>
+                                </div>
+                            `;
+                        } else {
+                            container.innerHTML = `<div class="alert alert-info mb-0">Belum ada data survey yang diisi oleh peserta pada event ini.</div>`;
+                        }
+                    })
+                    .catch(err => {
+                        container.innerHTML = `<div class="alert alert-danger mb-0">Gagal mengambil data survey dari server.</div>`;
+                    });
+            });
+        });
     });
 </script>
 @endsection

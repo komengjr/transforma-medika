@@ -234,7 +234,7 @@
                 },
                 columnDefs: [{
                         orderable: false,
-                        targets: [10] // Disesuaikan dengan posisi kolom Aksi (Indeks ke-10)
+                        targets: [10] // Indeks kolom Aksi
                     },
                     {
                         className: "align-middle",
@@ -303,7 +303,7 @@
         });
     }
 
-    // 2. FUNGSI AJAX VERIFIKASI PELUNASAN
+    // 2. FUNGSI AJAX VERIFIKASI PELUNASAN (UPDATED)
     function verifyPaymentAjax(url, id, name) {
         const executeVerify = () => {
             if (typeof Swal !== 'undefined') {
@@ -326,8 +326,21 @@
                 },
                 dataType: 'json',
                 success: function(response) {
-                    $('#status-badge-' + id).html('<span class="badge bg-success-subtle text-success rounded-pill px-2 py-1 fs--2"><i class="fas fa-wallet me-1"></i>Paid</span>');
+                    let newBadgeHtml = '<span class="badge bg-success-subtle text-success rounded-pill px-2 py-1 fs--2"><i class="fas fa-wallet me-1"></i>Paid</span>';
 
+                    // Update UI & DataTables Instance
+                    if (dataTableInstance) {
+                        let cell = dataTableInstance.cell('#status-badge-' + id);
+                        if (cell.length) {
+                            cell.data(newBadgeHtml).draw(false);
+                        } else {
+                            $('#status-badge-' + id).html(newBadgeHtml);
+                        }
+                    } else {
+                        $('#status-badge-' + id).html(newBadgeHtml);
+                    }
+
+                    // Sembunyikan opsi "Verifikasi Pelunasan" di dropdown
                     $('#verify-opt-' + id).remove();
 
                     let msg = response.message || 'Status pembayaran berhasil diubah menjadi Lunas (Paid).';

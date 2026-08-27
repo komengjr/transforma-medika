@@ -28,6 +28,7 @@ Route::prefix('event/')->group(function (): void {
     Route::get('menu-event/daftar-event/get-detail/{code}', [EventController::class, 'menu_event_daftar_get_detail'])->name('menu_event_daftar_get_detail');
     Route::get('menu-event/daftar-event/get-session/{code}', [EventController::class, 'menu_event_daftar_get_session'])->name('menu_event_get_session');
     Route::get('menu-event/daftar-event/get-peserta/{code}', [EventController::class, 'menu_event_daftar_get_peserta'])->name('menu_event_daftar_get_peserta');
+    Route::get('menu-event/daftar-event/get-survay/{code}', [EventController::class, 'menu_event_daftar_get_survay'])->name('menu_event_daftar_get_survay');
 
     Route::get('menu-event/data-event/self-registrasi-event/{kode}', [EventController::class, 'menu_event_data_form_self_registrasi'])->name('menu_event_data_form_self_registrasi');
 });

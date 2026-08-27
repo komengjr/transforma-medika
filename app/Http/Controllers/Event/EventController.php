@@ -994,6 +994,71 @@ class EventController extends Controller
             'classes'    => $classes
         ]);
     }
+    public function menu_event_daftar_get_survay($code)
+    {
+        try {
+            // 1. Ambil data semua survey beserta peserta terkait
+            $rawSurveys = DB::table('event_survey_answers')
+                ->join('event_surveys', 'event_survey_answers.id_event_survey', '=', 'event_surveys.id_event_survey')
+                ->join('event_data', 'event_surveys.id_event_data', '=', 'event_data.id_event_data')
+                ->join('event_participants', 'event_survey_answers.id_participant', '=', 'event_participants.id_participant')
+                ->where('event_data.event_data_code', $code)
+                ->select(
+                    'event_participants.id_participant',
+                    'event_participants.participant_code',
+                    'event_participants.full_name',
+                    'event_participants.email',
+                    'event_participants.phone_number',
+                    'event_surveys.question as survey_question',
+                    'event_survey_answers.answer as survey_answer',
+                    'event_survey_answers.created_at as submitted_at'
+                )
+                ->orderBy('event_participants.id_participant', 'asc')
+                ->orderBy('event_survey_answers.id_event_survey', 'asc')
+                ->get();
+
+            // 2. Kelompokkan (Group) data berdasarkan Peserta
+            $groupedData = [];
+
+            foreach ($rawSurveys as $item) {
+                $participantId = $item->id_participant;
+
+                if (!isset($groupedData[$participantId])) {
+                    $groupedData[$participantId] = [
+                        'id_participant'   => $item->id_participant,
+                        'participant_code' => $item->participant_code,
+                        'full_name'        => $item->full_name,
+                        'email'            => $item->email,
+                        'phone_number'     => $item->phone_number,
+                        'total_answers'    => 0,
+                        'surveys'          => []
+                    ];
+                }
+
+                $groupedData[$participantId]['surveys'][] = [
+                    'survey_question' => $item->survey_question,
+                    'survey_answer'   => $item->survey_answer,
+                    'submitted_at'    => $item->submitted_at
+                ];
+
+                $groupedData[$participantId]['total_answers']++;
+            }
+
+            // Reset keys array agar menjadi indexed array (0, 1, 2, ...)
+            $result = array_values($groupedData);
+
+            return response()->json([
+                'status'  => 'success',
+                'message' => 'Data survey peserta berhasil dimuat.',
+                'data'    => $result
+            ], 200);
+        } catch (\Exception $e) {
+            return response()->json([
+                'status'  => 'error',
+                'message' => 'Gagal mengambil data survey: ' . $e->getMessage()
+            ], 500);
+        }
+    }
     // MASTER PENGIRIMAN EMAIL
     public function master_event_pengiriman_email($akses, $id)
     {
