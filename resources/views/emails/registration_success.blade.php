@@ -14,7 +14,19 @@
         <!-- Header -->
         <tr>
             <td style="background-color: #1e293b; padding: 30px 20px; text-align: center; color: #ffffff;">
-                <h2 style="margin: 0; font-size: 22px; font-weight: 700; tracking-wide: 0.5px;">KONFIRMASI PENDAFTARAN</h2>
+
+                <!-- Sesi Logo & Tulisan Support (Logo Di Atas, Support by Pramita Di Bawahnya) -->
+                <div style="margin-bottom: 20px; text-align: center;">
+                    <!-- Logo Pramita -->
+                    <img src="{{ asset('img/pramita.png') }}" alt="Logo Pramita" style="max-width: 140px; height: auto; display: block; margin: 0 auto;">
+
+                    <!-- Tulisan Support By di Bawah Logo -->
+                    <span style="display: block; font-size: 11px; color: #94a3b8; text-transform: uppercase; letter-spacing: 1px; margin-top: 6px; font-weight: 500;">
+                        Support by Pramita
+                    </span>
+                </div>
+
+                <h2 style="margin: 0; font-size: 22px; font-weight: 700; letter-spacing: 0.5px;">KONFIRMASI PENDAFTARAN</h2>
                 <p style="margin: 5px 0 0 0; font-size: 14px; color: #94a3b8;">{{ $eventName }}</p>
             </td>
         </tr>
@@ -43,7 +55,7 @@
                         </table>
 
                         <!-- Detail Reg Code & QR Token -->
-                        <div style="background-color: #ffffff; border: 1px border-dashed #cbd5e1; border-radius: 6px; padding: 10px; margin-bottom: 10px;">
+                        <div style="background-color: #ffffff; border: 1px dashed #cbd5e1; border-radius: 6px; padding: 10px; margin-bottom: 10px;">
                             <table width="100%" cellspacing="0" cellpadding="2" style="font-size: 13px;">
                                 <tr>
                                     <td style="color: #64748b; width: 120px;">Kode Registrasi:</td>
@@ -63,7 +75,6 @@
                                 <span style="color: #64748b; font-size: 12px;">(Ruang: {{ $cls['room'] }})</span>
                                 @endif
                                 <br>
-                                <!-- <small style="color: #4f46e5; font-family: monospace;">Token Check-in: {{ $cls['qr_token'] }}</small> -->
                             </li>
                             @endforeach
                         </ul>

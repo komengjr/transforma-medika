@@ -15,7 +15,12 @@
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
     <link href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.0/font/bootstrap-icons.css" rel="stylesheet">
 
+    <!-- SweetAlert2 CSS -->
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/sweetalert2@11/dist/sweetalert2.min.css">
+
     <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.7.1/jquery.min.js"></script>
+    <!-- SweetAlert2 JS -->
+    <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
 
     <style>
         :root {
@@ -351,22 +356,7 @@
                             </span>
                         </div>
 
-                        <!-- Flash Messages -->
-                        @if(session('success'))
-                        <div class="alert alert-success border-0 rounded-3 mb-3 py-2 px-3 fs-7 d-flex align-items-center gap-2">
-                            <i class="bi bi-check-circle-fill"></i>
-                            <div>{{ session('success') }}</div>
-                        </div>
-                        @endif
-
-                        @if(session('error'))
-                        <div class="alert alert-danger border-0 rounded-3 mb-3 py-2 px-3 fs-7 d-flex align-items-center gap-2">
-                            <i class="bi bi-exclamation-triangle-fill"></i>
-                            <div>{{ session('error') }}</div>
-                        </div>
-                        @endif
-
-                        <form action="{{ route('event.register.store', $event->event_data_code) }}" method="POST">
+                        <form id="registerForm" action="{{ route('event.register.store', $event->event_data_code) }}" method="POST">
                             @csrf
 
                             <!-- DATA DIRI PESERTA -->
@@ -475,7 +465,6 @@
                                                 <div class="col-12">
                                                     <label class="select-card class-card w-100 mb-0" for="class-{{ $cls->id_event_data_sub_class }}">
                                                         <div class="d-flex align-items-center gap-2.5">
-                                                            {{-- PEMBARUAN PENTING: Pengelompokan array class_ids berdasarkan kode sub event --}}
                                                             <input class="form-check-input class-checkbox m-0" type="checkbox" name="class_ids[{{ $sub->event_data_sub_code }}][]" id="class-{{ $cls->id_event_data_sub_class }}" value="{{ $cls->id_event_data_sub_class }}" data-price="{{ $price }}" style="width: 1.1em; height: 1.1em;">
                                                             <div>
                                                                 <strong class="d-block text-dark fs-7">{{ $cls->event_data_sub_class_name }}</strong>
@@ -534,9 +523,15 @@
                                     </label>
                                 </div>
 
-                                <!-- SUBMIT BUTTON -->
-                                <button class="btn btn-register-submit w-100" type="submit">
-                                    <i class="bi bi-send-check me-2"></i> Daftar Sekarang
+                                <!-- SUBMIT BUTTON WITH LOADING ANIMATION -->
+                                <button class="btn btn-register-submit w-100" type="submit" id="btnSubmit">
+                                    <span id="btnText">
+                                        <i class="bi bi-send-check me-2"></i> Daftar Sekarang
+                                    </span>
+                                    <span id="btnSpinner" class="d-none">
+                                        <span class="spinner-border spinner-border-sm me-2" role="status" aria-hidden="true"></span>
+                                        Memproses Pendaftaran...
+                                    </span>
                                 </button>
                             </div>
 
@@ -554,7 +549,39 @@
     <script>
         $(document).ready(function() {
 
-            // 1. FUNGSI CEK KELENGKAPAN DATA DIRI WAJIB
+            // --- SWEETALERT NOTIFICATION HANDLER ---
+            @if(session('success'))
+            Swal.fire({
+                icon: 'success',
+                title: 'Pendaftaran Berhasil!',
+                html: `
+                        <div class="text-center">
+                            <p class="mb-2">{{ session('success') }}</p>
+                            @if(session('registration_code'))
+                                <div class="alert alert-light border my-2 py-2">
+                                    <small class="text-muted d-block">Nomor Registrasi Anda:</small>
+                                    <strong class="fs-5 text-primary">{{ session('registration_code') }}</strong>
+                                </div>
+                            @endif
+                            <p class="small text-muted mb-0">Silakan cek email Anda untuk informasi lebih detail dan tiket registrasi.</p>
+                        </div>
+                    `,
+                confirmButtonText: 'Saya Mengerti',
+                confirmButtonColor: '#4f46e5'
+            });
+            @endif
+
+            @if(session('error'))
+            Swal.fire({
+                icon: 'error',
+                title: 'Pendaftaran Gagal',
+                text: "{{ session('error') }}",
+                confirmButtonText: 'Tutup',
+                confirmButtonColor: '#ef4444'
+            });
+            @endif
+
+            // --- FUNGSI CEK KELENGKAPAN DATA DIRI WAJIB ---
             function checkParticipantData() {
                 let name = $('#full_name').val().trim();
                 let email = $('#email').val().trim();
@@ -583,7 +610,7 @@
 
             checkParticipantData();
 
-            // 2. KETIKA SUB EVENT CHECKBOX DI-TOGGLE
+            // --- TOGGLE SUB EVENT CHECKBOX ---
             $('.subevent-checkbox').change(function() {
                 let subCode = $(this).val();
                 let container = $('#class-container-' + subCode);
@@ -594,7 +621,6 @@
                 } else {
                     $(this).closest('.subevent-card').removeClass('active');
                     container.addClass('d-none');
-                    // Uncheck semua kelas di subevent yang di-uncheck
                     container.find('.class-checkbox').prop('checked', false);
                     container.find('.class-card').removeClass('active');
                 }
@@ -603,7 +629,7 @@
                 calculateTotal();
             });
 
-            // 3. KETIKA KELAS / TIKET CHECKBOX DI-TOGGLE
+            // --- TOGGLE KELAS CHECKBOX ---
             $(document).on('change', '.class-checkbox', function() {
                 if ($(this).is(':checked')) {
                     $(this).closest('.class-card').addClass('active');
@@ -615,7 +641,7 @@
                 calculateTotal();
             });
 
-            // 4. CEK KAPAN AREA SUBMIT TAMPIL
+            // --- CEK KAPAN AREA SUBMIT TAMPIL ---
             function checkSubmitVisibility() {
                 let anyChecked = $('.subevent-checkbox:checked').length > 0;
                 if (anyChecked) {
@@ -625,7 +651,7 @@
                 }
             }
 
-            // 5. HITUNG TOTAL HARGA SELURUH KELAS YANG DICENTANG
+            // --- HITUNG TOTAL HARGA SELURUH KELAS ---
             function calculateTotal() {
                 let total = 0;
                 $('.class-checkbox:checked').each(function() {
@@ -644,6 +670,14 @@
                     $('#displayTotal').text('Rp 0');
                 }
             }
+
+            // --- HANDLE FORM SUBMIT & LOADING ANIMATION ---
+            $('#registerForm').on('submit', function() {
+                const $btn = $('#btnSubmit');
+                $btn.prop('disabled', true);
+                $('#btnText').addClass('d-none');
+                $('#btnSpinner').removeClass('d-none');
+            });
 
         });
     </script>
