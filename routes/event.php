@@ -2,6 +2,7 @@
 
 use App\Http\Controllers\Event\EventController;
 use App\Http\Controllers\Event\EventSessionExecutionController;
+use App\Http\Controllers\Event\EventSurveyController;
 use Illuminate\Support\Facades\Route;
 // EVENT
 Route::prefix('event/')->group(function (): void {
@@ -75,4 +76,15 @@ Route::prefix('admin/reports/attendance')->name('admin.reports.attendance.')->gr
     Route::get('/get-classes/{sub_code}', [EventController::class, 'getClassesattendance'])->name('get_classes');
     Route::get('/get-sessions/{sub_code}', [EventController::class, 'getSessionsattendance'])->name('get_sessions');
     Route::get('/get-participants', [EventController::class, 'getParticipantsattendance'])->name('get_participants');
+});
+
+Route::prefix('event/survey')->name('event.survey.')->group(function () {
+    // ADMIN: Fetch & Simpan Pertanyaan Custom
+    Route::get('/manage/{eventCode}', [EventSurveyController::class, 'getAdminSurveys'])->name('manage');
+    Route::post('/store-question', [EventSurveyController::class, 'storeQuestion'])->name('store_question');
+    Route::delete('/delete-question/{id}', [EventSurveyController::class, 'deleteQuestion'])->name('delete_question');
+
+    // PESERTA: Halaman Publik Pengisian Survey
+    Route::get('/form/{eventCode}/{registrationCode}', [EventSurveyController::class, 'publicSurveyForm'])->name('public_form');
+    Route::post('/submit-answer', [EventSurveyController::class, 'submitPublicAnswer'])->name('submit_answer');
 });

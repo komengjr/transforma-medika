@@ -2,143 +2,90 @@
 
 @section('content')
 
+
 <meta name="csrf-token" content="{{ csrf_token() }}">
 
-<style>
-    :root {
-        --sea-blue: #0284c7;
-        --bg-beach: #f0f9ff;
-        --card-glass: rgba(255, 255, 255, 0.95);
-        --gradient-ocean: linear-gradient(135deg, #0284c7 0%, #0d9488 100%);
-    }
+<!-- Filter Card -->
+<div class="card border-0 shadow-sm rounded-4 mb-4">
+    <div class="card-body p-4">
+        <h5 class="fw-bold mb-3 text-dark">
+            <i class="fas fa-filter text-primary me-2"></i> Pengiriman Email Tiket Peserta
+        </h5>
 
-    body {
-        background-color: var(--bg-beach);
-        background-image: radial-gradient(#e0f2fe 1px, transparent 1px);
-        background-size: 24px 24px;
-    }
+        <div class="row g-3">
+            <div class="col-md-4">
+                <label class="form-label fw-semibold text-secondary small">1. Pilih Event Utama</label>
+                <select id="selectEvent" class="form-select form-select-lg rounded-3">
+                    <option value="">-- Pilih Event --</option>
+                    @foreach($events as $event)
+                    <option value="{{ $event->id_event_data }}">{{ $event->event_data_tittle }}</option>
+                    @endforeach
+                </select>
+            </div>
 
-    .font-mono {
-        font-family: 'JetBrains Mono', monospace;
-    }
+            <div class="col-md-4" id="wrapperSubEvent" style="display: none;">
+                <label class="form-label fw-semibold text-secondary small">2. Pilih Sub Event</label>
+                <select id="selectSubEvent" class="form-select form-select-lg rounded-3">
+                    <option value="">-- Pilih Sub Event --</option>
+                </select>
+            </div>
 
-    .glass-card-light {
-        background: var(--card-glass);
-        backdrop-filter: blur(16px);
-        border: 1px solid rgba(255, 255, 255, 0.8);
-        border-radius: 1.5rem;
-        box-shadow: 0 10px 30px -5px rgba(14, 165, 233, 0.1);
-    }
-
-    .header-ocean {
-        background: var(--gradient-ocean);
-        border-radius: 1.5rem;
-        box-shadow: 0 12px 35px -10px rgba(2, 132, 199, 0.3);
-    }
-
-    .table-beach {
-        --bs-table-bg: transparent;
-        --bs-table-color: #334155;
-    }
-
-    .table-beach thead th {
-        background: #e0f2fe;
-        color: #0369a1;
-        border-bottom: 2px solid #bae6fd;
-        text-transform: uppercase;
-        font-size: 0.75rem;
-        font-weight: 700;
-    }
-</style>
-
-<!-- Header Banner -->
-<div class="header-ocean p-4 mb-4 text-white d-flex flex-column flex-md-row align-items-md-center justify-content-between gap-3 position-relative overflow-hidden">
-    <i class="fas fa-umbrella-beach position-absolute text-white opacity-10" style="font-size: 10rem; right: -20px; bottom: -30px;"></i>
-    <div class="position-relative z-1">
-        <span class="badge bg-warning text-dark fw-bold mb-2 px-3 py-1 rounded-pill shadow-sm">
-            <i class="fas fa-sun text-danger me-1"></i> Beach Vibe Report
-        </span>
-        <h2 class="fw-extrabold mb-1 text-white">Laporan Kehadiran Peserta</h2>
-        <p class="mb-0 text-white-50">Filter event bertingkat hingga detail eksekusi sesi check-in peserta.</p>
-    </div>
-</div>
-
-<!-- Dynamic Filter Card -->
-<div class="glass-card-light p-4 mb-4">
-    <h5 class="fw-bold mb-3 text-dark">
-        <i class="fas fa-filter text-info me-2"></i> Filter Data Laporan
-    </h5>
-
-    <div class="row g-3">
-        <!-- 1. Event Utama -->
-        <div class="col-md-4">
-            <label class="form-label fw-semibold text-secondary small">1. Pilih Event Utama</label>
-            <select id="selectEvent" class="form-select form-select-lg rounded-3 border-info shadow-sm fw-semibold">
-                <option value="">-- Pilih Event --</option>
-                @foreach($events as $event)
-                <option value="{{ $event->event_data_code }}">{{ $event->event_data_tittle }}</option>
-                @endforeach
-            </select>
-        </div>
-
-        <!-- 2. Sub Event (Hidden Default) -->
-        <div class="col-md-4" id="wrapperSubEvent" style="display: none;">
-            <label class="form-label fw-semibold text-secondary small">2. Pilih Sub Event</label>
-            <select id="selectSubEvent" class="form-select form-select-lg rounded-3 border-info shadow-sm fw-semibold">
-                <option value="">-- Pilih Sub Event --</option>
-            </select>
-        </div>
-
-        <!-- 3. Check Session (Hidden Default) -->
-        <div class="col-md-4" id="wrapperSession" style="display: none;">
-            <label class="form-label fw-semibold text-secondary small">3. Pilih Check Session (Opsional)</label>
-            <select id="selectSession" class="form-select form-select-lg rounded-3 border-info shadow-sm fw-semibold">
-                <option value="">-- Semua Sesi Check-In --</option>
-            </select>
-        </div>
-    </div>
-</div>
-
-<!-- Table Card Container -->
-<div class="glass-card-light p-4" id="wrapperTablePeserta" style="display: none;">
-    <div class="d-flex flex-wrap align-items-center justify-content-between gap-2 mb-3">
-        <div class="d-flex align-items-center gap-2">
-            <h5 class="mb-0 fw-bold text-dark"><i class="fas fa-list-check text-info me-2"></i>Daftar Kehadiran Peserta</h5>
-            <span class="badge bg-info text-white rounded-pill px-3 py-2 font-mono" id="badgeTotalPeserta">0 Peserta</span>
-        </div>
-
-        <!-- Filter Quick Status Radios -->
-        <div class="d-flex align-items-center gap-2 flex-wrap">
-            <div class="btn-group btn-group-sm" role="group">
-                <input type="radio" class="btn-check" name="filterStatusPresence" id="filterAll" value="all" checked autocomplete="off">
-                <label class="btn btn-outline-info px-3 fw-semibold" for="filterAll">Semua</label>
-
-                <input type="radio" class="btn-check" name="filterStatusPresence" id="filterPresent" value="present" autocomplete="off">
-                <label class="btn btn-outline-success px-3 fw-semibold" for="filterPresent">Hadir</label>
-
-                <input type="radio" class="btn-check" name="filterStatusPresence" id="filterAbsent" value="absent" autocomplete="off">
-                <label class="btn btn-outline-warning text-dark px-3 fw-semibold" for="filterAbsent">Belum Hadir</label>
+            <div class="col-md-4" id="wrapperClass" style="display: none;">
+                <label class="form-label fw-semibold text-secondary small">3. Pilih Kelas (Opsional)</label>
+                <select id="selectClass" class="form-select form-select-lg rounded-3">
+                    <option value="">-- Semua Kelas --</option>
+                </select>
             </div>
         </div>
     </div>
+</div>
 
-    <div class="table-responsive">
-        <table id="tablePeserta" class="table table-beach align-middle w-100">
-            <thead>
-                <tr>
-                    <th width="5%">No</th>
-                    <th>Kode Reg</th>
-                    <th>Nama Peserta</th>
-                    <th>Kelas</th>
-                    <th class="text-center">Status Kelas</th>
-                    <th class="text-center">Check-In Sesi</th>
-                    <th class="text-center" width="10%">Aksi</th>
-                </tr>
-            </thead>
-            <tbody id="tbodyPeserta"></tbody>
-        </table>
+<!-- Table Card -->
+<div class="card border-0 shadow-sm rounded-4" id="wrapperTablePeserta" style="display: none;">
+    <div class="card-header bg-white py-3 border-0 d-flex flex-wrap align-items-center justify-content-between gap-2">
+        <div class="d-flex align-items-center gap-2">
+            <h5 class="mb-0 fw-bold text-dark">Daftar Peserta</h5>
+            <span class="badge bg-primary rounded-pill px-3 py-2" id="badgeTotalPeserta">0 Peserta</span>
+        </div>
+
+        <!-- Filter Status Email & Tombol Kirim Massal -->
+        <div class="d-flex align-items-center gap-2 flex-wrap">
+            <div class="btn-group btn-group-sm" role="group" aria-label="Filter Status Email">
+                <input type="radio" class="btn-check" name="filterStatusEmail" id="filterAll" value="all" checked autocomplete="off">
+                <label class="btn btn-outline-secondary px-3" for="filterAll">Semua Peserta</label>
+
+                <input type="radio" class="btn-check" name="filterStatusEmail" id="filterUnsent" value="unsent" autocomplete="off">
+                <label class="btn btn-outline-warning text-dark fw-semibold px-3" for="filterUnsent">Belum Terkirim</label>
+            </div>
+
+            <button class="btn btn-sm btn-success rounded-3 px-3 py-2 fw-semibold" id="btnKirimSemua" onclick="sendEmailBulk()">
+                <i class="fas fa-paper-plane me-1"></i> Kirim Semua Email
+            </button>
+        </div>
+    </div>
+
+    <div class="card-body p-3">
+        <div class="table-responsive">
+            <table id="tablePeserta" class="table table-hover align-middle w-100">
+                <thead class="bg-light">
+                    <tr class="text-uppercase small text-secondary">
+                        <th width="5%">No</th>
+                        <th>QR Token</th>
+                        <th>Nama Peserta</th>
+                        <th>Kelas</th>
+                        <th>Email</th>
+                        <th>Status Email</th>
+                        <th>Status Bayar</th>
+                        <th class="text-center" width="15%">Aksi</th>
+                    </tr>
+                </thead>
+                <tbody id="tbodyPeserta"></tbody>
+            </table>
+        </div>
     </div>
 </div>
+
+
 
 <!-- Scripts -->
 <link rel="stylesheet" href="https://cdn.datatables.net/1.13.7/css/dataTables.bootstrap5.min.css">
@@ -158,19 +105,18 @@
             }
         });
 
-        // 1. On Event Utama Change
         $('#selectEvent').on('change', function() {
-            let eventCode = $(this).val();
+            let eventId = $(this).val();
             resetTableAndData();
             $('#selectSubEvent').html('<option value="">-- Pilih Sub Event --</option>');
-            $('#selectSession').html('<option value="">-- Semua Sesi Check-In --</option>');
+            $('#selectClass').html('<option value="">-- Semua Kelas --</option>');
             $('#wrapperSubEvent').hide();
-            $('#wrapperSession').hide();
+            $('#wrapperClass').hide();
             $('#wrapperTablePeserta').hide();
 
-            if (eventCode) {
+            if (eventId) {
                 $.ajax({
-                    url: `/admin/reports/attendance/get-sub-events/${eventCode}`,
+                    url: `/event-email/get-sub-events/${eventId}`,
                     type: 'GET',
                     success: function(data) {
                         if (data && data.length > 0) {
@@ -184,46 +130,41 @@
             }
         });
 
-        // 2. On Sub Event Change
         $('#selectSubEvent').on('change', function() {
             let subCode = $(this).val();
             resetTableAndData();
-            $('#selectSession').html('<option value="">-- Semua Sesi Check-In --</option>');
-            $('#wrapperSession').hide();
+            $('#selectClass').html('<option value="">-- Semua Kelas --</option>');
+            $('#wrapperClass').hide();
 
             if (subCode) {
-                // Fetch Dropdown Sessions
                 $.ajax({
-                    url: `/admin/reports/attendance/get-sessions/${subCode}`,
+                    url: `/event-email/get-classes/${subCode}`,
                     type: 'GET',
                     success: function(data) {
                         if (data && data.length > 0) {
-                            $.each(data, function(key, sess) {
-                                $('#selectSession').append(`<option value="${sess.event_data_sub_session_code}">${sess.event_data_sub_session_name}</option>`);
+                            $.each(data, function(key, cls) {
+                                $('#selectClass').append(`<option value="${cls.id_event_data_sub_class}">${cls.event_data_sub_class_name}</option>`);
                             });
-                            $('#wrapperSession').fadeIn();
+                            $('#wrapperClass').fadeIn();
                         }
                     }
                 });
 
-                // Load Table Peserta
                 loadParticipants(subCode, null);
             } else {
                 $('#wrapperTablePeserta').hide();
             }
         });
 
-        // 3. On Session Change
-        $('#selectSession').on('change', function() {
+        $('#selectClass').on('change', function() {
             let subCode = $('#selectSubEvent').val();
-            let sessionCode = $(this).val();
+            let classId = $(this).val();
             if (subCode) {
-                loadParticipants(subCode, sessionCode);
+                loadParticipants(subCode, classId);
             }
         });
 
-        // Filter Radio Buttons
-        $('input[name="filterStatusPresence"]').on('change', function() {
+        $('input[name="filterStatusEmail"]').on('change', function() {
             renderTableData();
         });
     });
@@ -237,18 +178,18 @@
         rawParticipantsData = [];
     }
 
-    function loadParticipants(subCode, sessionCode) {
+    function loadParticipants(subCode, classId) {
         resetTableAndData();
 
         $('#wrapperTablePeserta').show();
-        $('#tbodyPeserta').html('<tr><td colspan="7" class="text-center py-4"><div class="spinner-border text-info"></div><div class="mt-2 text-muted">Memuat data kehadiran...</div></td></tr>');
+        $('#tbodyPeserta').html('<tr><td colspan="8" class="text-center py-4"><div class="spinner-border text-primary"></div><div class="mt-2 text-muted">Memuat data peserta...</div></td></tr>');
 
         $.ajax({
-            url: '{{ route("admin.reports.attendance.get_participants") }}',
+            url: '{{ route("event.email.get_participants") }}',
             type: 'GET',
             data: {
                 sub_code: subCode,
-                session_code: sessionCode
+                class_id: classId
             },
             success: function(data) {
                 rawParticipantsData = data || [];
@@ -257,7 +198,7 @@
             },
             error: function() {
                 resetTableAndData();
-                $('#tbodyPeserta').html('<tr><td colspan="7" class="text-center py-4 text-danger">Gagal mengambil data kehadiran.</td></tr>');
+                $('#tbodyPeserta').html('<tr><td colspan="8" class="text-center py-4 text-danger">Gagal mengambil data peserta.</td></tr>');
             }
         });
     }
@@ -268,13 +209,11 @@
             dataTableInstance = null;
         }
 
-        let filterType = $('input[name="filterStatusPresence"]:checked').val();
+        let filterType = $('input[name="filterStatusEmail"]:checked').val();
         let displayData = rawParticipantsData;
 
-        if (filterType === 'present') {
-            displayData = rawParticipantsData.filter(item => item.attendance_status === 'present');
-        } else if (filterType === 'absent') {
-            displayData = rawParticipantsData.filter(item => item.attendance_status !== 'present');
+        if (filterType === 'unsent') {
+            displayData = rawParticipantsData.filter(item => !item.email_sent_at);
         }
 
         $('#badgeTotalPeserta').text(displayData.length + ' Peserta');
@@ -283,32 +222,37 @@
 
         if (displayData.length > 0) {
             $.each(displayData, function(i, item) {
-                let statusKelasBadge = item.attendance_status === 'present' ?
-                    `<span class="badge bg-success bg-opacity-10 text-success border border-success border-opacity-25 rounded-pill px-3 py-2 fw-bold"><i class="fas fa-check me-1"></i> Hadir</span>` :
-                    `<span class="badge bg-warning bg-opacity-10 text-warning border border-warning border-opacity-25 rounded-pill px-3 py-2 fw-bold">Terdaftar</span>`;
+                let paymentBadge = item.payment_status === 'paid' ?
+                    '<span class="badge bg-success-subtle text-success border border-success-subtle px-2 py-1">Paid</span>' :
+                    '<span class="badge bg-warning-subtle text-warning border border-warning-subtle px-2 py-1">' + (item.payment_status || 'Pending') + '</span>';
 
-                let sessionCheckBadge = item.session_check_in_at ?
-                    `<span class="badge bg-info bg-opacity-10 text-info border border-info border-opacity-25 rounded-pill px-3 py-2 fw-bold"><i class="fas fa-qrcode me-1"></i> Executed</span>` :
-                    `<span class="badge bg-secondary bg-opacity-10 text-muted border border-opacity-25 rounded-pill px-3 py-2">Belum Sesi</span>`;
+                // Badge Status Pengiriman Email
+                let emailStatusBadge = item.email_sent_at ?
+                    `<span class="badge bg-success text-white" title="${item.email_sent_at}"><i class="fas fa-check-circle me-1"></i> Terkirim</span>` :
+                    `<span class="badge bg-warning text-dark"><i class="fas fa-clock me-1"></i> Belum</span>`;
 
                 let phoneFormatted = item.phone_number ? item.phone_number.replace(/^0/, '62').replace(/[^0-9]/g, '') : '';
 
                 tbodyHtml += `
                 <tr>
                     <td>${i + 1}</td>
-                    <td><span class="badge bg-light text-primary border border-info font-mono px-2 py-1">${item.registration_code || '-'}</span></td>
+                    <td><span class="badge bg-light text-dark border font-monospace">${item.qr_code_token || '-'}</span></td>
                     <td>
                         <div class="fw-bold text-dark">${item.full_name || '-'}</div>
-                        <small class="text-muted font-mono">${item.participant_code || '-'}</small>
+                        <small class="text-muted">${item.institution || '-'}</small>
                     </td>
-                    <td><span class="badge bg-info bg-opacity-10 text-info border border-info border-opacity-25">${item.event_data_sub_class_name || '-'}</span></td>
-                    <td class="text-center">${statusKelasBadge}</td>
-                    <td class="text-center">${sessionCheckBadge}</td>
+                    <td><span class="badge bg-primary-subtle text-primary">${item.event_data_sub_class_name || '-'}</span></td>
+                    <td>${item.email || '-'}</td>
+                    <td>${emailStatusBadge}</td>
+                    <td>${paymentBadge}</td>
                     <td class="text-center">
+                        <button class="btn btn-sm btn-primary rounded-3 me-1" onclick="sendEmailSingle('${item.id_registration}', '${item.full_name}')">
+                            <i class="fas fa-paper-plane me-1"></i> Email
+                        </button>
                         ${phoneFormatted ? `
-                        <a href="https://wa.me/${phoneFormatted}" target="_blank" class="btn btn-sm btn-success rounded-3 px-3">
-                            <i class="fab fa-whatsapp me-1"></i> Kontak
-                        </a>` : '-'}
+                        <a href="https://wa.me/${phoneFormatted}" target="_blank" class="btn btn-sm btn-success rounded-3">
+                            <i class="fab fa-whatsapp"></i>
+                        </a>` : ''}
                     </td>
                 </tr>
             `;
@@ -323,13 +267,101 @@
                     search: "Cari Peserta:",
                     lengthMenu: "_MENU_",
                     info: "Menampilkan _START_ - _END_ dari _TOTAL_ Peserta",
-                    zeroRecords: "Tidak ada data kehadiran peserta"
+                    zeroRecords: "Tidak ada data peserta"
                 }
             });
 
         } else {
-            $('#tbodyPeserta').html(`<tr><td colspan="7" class="text-center py-4 text-muted">Tidak ada data peserta ditemukan.</td></tr>`);
+            let msg = filterType === 'unsent' ? 'Semua peserta sudah menerima email.' : 'Tidak ada data peserta.';
+            $('#tbodyPeserta').html(`<tr><td colspan="8" class="text-center py-4 text-muted">${msg}</td></tr>`);
         }
+    }
+
+    function sendEmailSingle(idRegistration, name) {
+        Swal.fire({
+            title: 'Kirim Email Tiket?',
+            text: 'Sistem akan mengirimkan tiket ke ' + name,
+            icon: 'question',
+            showCancelButton: true,
+            confirmButtonText: 'Ya, Kirim',
+            cancelButtonText: 'Batal'
+        }).then((result) => {
+            if (result.isConfirmed) {
+                Swal.fire({
+                    title: 'Mengirim Email...',
+                    allowOutsideClick: false,
+                    didOpen: () => {
+                        Swal.showLoading();
+                    }
+                });
+
+                $.ajax({
+                    url: `/event-email/send-single/${idRegistration}`,
+                    type: 'POST',
+                    success: function(res) {
+                        Swal.fire('Berhasil!', res.message, 'success');
+                        loadParticipants($('#selectSubEvent').val(), $('#selectClass').val());
+                    },
+                    error: function(xhr) {
+                        Swal.fire('Gagal!', xhr.responseJSON?.message || 'Gagal mengirim email.', 'error');
+                    }
+                });
+            }
+        });
+    }
+
+    function sendEmailBulk() {
+        let filterType = $('input[name="filterStatusEmail"]:checked').val();
+        let targetList = rawParticipantsData;
+
+        // Hanya kirim ke yang belum terkirim jika filter "Belum Terkirim" aktif atau secara default
+        if (filterType === 'unsent') {
+            targetList = rawParticipantsData.filter(item => !item.email_sent_at);
+        } else {
+            targetList = rawParticipantsData.filter(item => !item.email_sent_at); // Filter otomatis yang belum terkirim
+        }
+
+        if (targetList.length === 0) {
+            Swal.fire('Info', 'Semua peserta pada daftar ini sudah menerima email tiket.', 'info');
+            return;
+        }
+
+        let targetIds = targetList.map(p => p.id_registration);
+
+        Swal.fire({
+            title: 'Kirim Email Massal?',
+            text: `Sistem akan mengirim email ke ${targetIds.length} peserta yang belum terkirim. Lanjutkan?`,
+            icon: 'warning',
+            showCancelButton: true,
+            confirmButtonText: 'Ya, Kirim Semua',
+            cancelButtonText: 'Batal'
+        }).then((result) => {
+            if (result.isConfirmed) {
+                Swal.fire({
+                    title: 'Proses Pengiriman...',
+                    text: 'Mohon tunggu',
+                    allowOutsideClick: false,
+                    didOpen: () => {
+                        Swal.showLoading();
+                    }
+                });
+
+                $.ajax({
+                    url: '{{ route("event.email.send_bulk") }}',
+                    type: 'POST',
+                    data: {
+                        target_ids: targetIds
+                    },
+                    success: function(res) {
+                        Swal.fire('Selesai!', res.message, 'success');
+                        loadParticipants($('#selectSubEvent').val(), $('#selectClass').val());
+                    },
+                    error: function(xhr) {
+                        Swal.fire('Gagal!', xhr.responseJSON?.message || 'Gagal mengirim email massal.', 'error');
+                    }
+                });
+            }
+        });
     }
 </script>
 @endsection

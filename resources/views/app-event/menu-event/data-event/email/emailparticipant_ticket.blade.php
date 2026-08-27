@@ -177,6 +177,29 @@
             font-size: 13px;
         }
 
+        /* Survey Box & Button Style */
+        .survey-box {
+            background-color: #eff6ff;
+            border: 1px solid #bfdbfe;
+            border-radius: 10px;
+            padding: 20px;
+            margin: 25px 0 10px 0;
+            text-align: center;
+        }
+
+        .survey-btn {
+            display: inline-block;
+            background-color: #4f46e5;
+            color: #ffffff !important;
+            text-decoration: none;
+            font-weight: 700;
+            padding: 12px 24px;
+            border-radius: 8px;
+            font-size: 14px;
+            margin-top: 10px;
+            box-shadow: 0 4px 6px -1px rgba(79, 70, 229, 0.2);
+        }
+
         /* Details Table */
         .details-table {
             width: 100%;
@@ -204,11 +227,31 @@
 
         .footer {
             background-color: #f8fafc;
-            padding: 20px;
+            padding: 25px 20px;
             text-align: center;
             font-size: 12px;
             color: #94a3b8;
             border-top: 1px solid #e2e8f0;
+        }
+
+        .brand-support {
+            margin-top: 20px;
+            padding-top: 15px;
+            border-top: 1px dashed #cbd5e1;
+        }
+
+        .brand-support p {
+            font-size: 11px;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+            color: #64748b;
+            margin-bottom: 8px;
+            font-weight: 600;
+        }
+
+        .brand-logo {
+            max-height: 40px;
+            width: auto;
         }
     </style>
 </head>
@@ -217,15 +260,20 @@
     @php
     $status = strtolower($registration->payment_status ?? 'pending');
 
-    // Handling Gelar Depan & Belakang
+    // Handling Gelar
     $frontTitle = !empty($registration->front_title) ? trim($registration->front_title) . ' ' : '';
     $backTitle = !empty($registration->back_title) ? ', ' . trim($registration->back_title) : '';
     $fullNameFormatted = $frontTitle . ($registration->full_name ?? '-') . $backTitle;
 
-    // Format Nomor HP WhatsApp Admin (Ganti 08xx jadi 628xx)
+    // Format WA Admin
     $adminPhone = config('app.admin_whatsapp', '081234567890');
     $adminPhoneFormatted = preg_replace('/^0/', '62', preg_replace('/[^0-9]/', '', $adminPhone));
     $waMessage = rawurlencode("Halo Admin, saya ingin konfirmasi pembayaran atas nama *" . $fullNameFormatted . "*.");
+
+    // Dynamic Survey URL memakai event_data_code dan registration_code
+    $eventCode = $registration->event_data_code ?? '-';
+    $registrationCode = $registration->registration_code ?? '-';
+    $surveyUrl = url("event/survey/form/{$eventCode}/{$registrationCode}");
     @endphp
 
     <div class="wrapper">
@@ -263,14 +311,12 @@
                             Silakan transfer sesuai nominal biaya pendaftaran ke rekening berikut:
                         </p>
 
-                        <!-- Detail Bank (Sesuaikan/Dinamis) -->
                         <div class="bank-card">
                             <div class="bank-name">BANK MANDIRI</div>
                             <div class="account-number">123-00-0987654-3</div>
                             <div class="account-holder">a.n. Panitia Penyelenggara Event</div>
                         </div>
 
-                        <!-- Opsi Bank 2 / BCA (Opsional) -->
                         <div class="bank-card" style="margin-top: 8px;">
                             <div class="bank-name">BANK BCA</div>
                             <div class="account-number">883-098-1234</div>
@@ -301,6 +347,16 @@
                         @endif
 
                         <p style="font-size: 12px; color: #64748b; margin-top: 10px;">Tunjukkan QR Code ini saat proses check-in di lokasi event.</p>
+                    </div>
+
+                    <!-- Button Isi Survey Event -->
+                    <!-- Button Isi Survey Event (Hanya Tampil Jika Lunas) -->
+                    <div class="survey-box">
+                        <strong style="color: #1e40af; font-size: 14px;">Bantu Kami Meningkatkan Layanan</strong>
+                        <p style="font-size: 12px; color: #475569; margin: 5px 0 10px 0;">Mohon luangkan waktu sejenak untuk mengisi survey singkat acara kami.</p>
+                        <a href="{{ $surveyUrl }}" class="survey-btn" target="_blank">
+                            Isi Survey Event
+                        </a>
                     </div>
                     @endif
 
@@ -336,11 +392,18 @@
                 </td>
             </tr>
 
-            <!-- Footer -->
+            <!-- Footer & Support Logo -->
             <tr>
                 <td class="footer">
-                    <p>Pesan ini dikirim secara otomatis oleh sistem. Harap tidak membalas email ini.</p>
-                    <p>&copy; {{ date('Y') }} {{ config('app.name') }}. All rights reserved.</p>
+                    <p style="margin: 0 0 5px 0;">Pesan ini dikirim secara otomatis oleh sistem. Harap tidak membalas email ini.</p>
+                    <p style="margin: 0;">&copy; {{ date('Y') }} {{ config('app.name') }}. All rights reserved.</p>
+
+                    <!-- Branding Support Pramita -->
+                    <div class="brand-support">
+                        <p>Supported by</p>
+                        <!-- Ganti URL src gambar di bawah dengan link/path logo resmi Pramita -->
+                        <img src="{{ asset('img/pramita.png') }}" alt="Pramita Lab" class="brand-logo">
+                    </div>
                 </td>
             </tr>
         </table>

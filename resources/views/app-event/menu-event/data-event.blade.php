@@ -322,6 +322,10 @@
                                     id="button-form-registrasi-peserta" data-code="{{$datas->event_data_code}}">
                                     <i class="fab fa-wpforms me-2 text-success"></i> Form Registrasi Peserta
                                 </button>
+                                <button class="dropdown-item d-flex align-items-center" data-bs-toggle="modal" data-bs-target="#modal-event-full-data"
+                                    id="button-form-survay-peserta" data-code="{{$datas->event_data_code}}">
+                                    <i class="fab fa-wpforms me-2 text-success"></i> Form Survey Peserta
+                                </button>
                                 <div class="dropdown-divider"></div>
                                 <button class="dropdown-item d-flex align-items-center" data-bs-toggle="modal" data-bs-target="#modal-event"
                                     id="button-add-sub-event" data-code="{{$datas->event_data_code}}">
@@ -522,6 +526,72 @@
                 </div>
             </div>
 
+        </div>
+    </div>
+</div>
+
+<div class="modal fade" id="modal-event-full-data" tabindex="-1" aria-hidden="true">
+    <div class="modal-dialog modal-lg modal-dialog-centered">
+        <div class="modal-content border-0 shadow-lg rounded-4">
+            <div class="modal-header bg-dark text-white py-3">
+                <h5 class="modal-title fw-bold" id="adminSurveyModalTitle">Kelola Survey Event</h5>
+                <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <div class="modal-body p-4">
+
+                <!-- Box Copy Link Survey Peserta -->
+                <div class="alert alert-primary d-flex align-items-center justify-content-between mb-4">
+                    <div>
+                        <small class="fw-bold d-block text-uppercase">Link Form Survey Peserta:</small>
+                        <span id="labelSurveyUrl" class="fw-mono text-break small"></span>
+                    </div>
+                    <button class="btn btn-sm btn-light border text-primary fw-bold px-3 ms-2" onclick="copySurveyLink()">
+                        <i class="fas fa-copy me-1"></i> Copy Link
+                    </button>
+                </div>
+
+                <!-- Form Tambah Pertanyaan Baru -->
+                <form id="formAddQuestion" class="card card-body bg-light border-0 mb-4 shadow-sm">
+                    @csrf
+                    <input type="hidden" id="admin_id_event_data" name="id_event_data">
+                    <h6 class="fw-bold mb-3 text-dark"><i class="fas fa-plus-circle me-1 text-success"></i> Tambah Pertanyaan Custom</h6>
+                    <div class="row g-2">
+                        <div class="col-md-8">
+                            <input type="text" name="question" class="form-control" placeholder="Tuliskan Pertanyaan..." required>
+                        </div>
+                        <div class="col-md-4">
+                            <select name="type" class="form-select" required>
+                                <option value="rating">Rating (1-5 Bintang)</option>
+                                <option value="text">Isian Teks / Uraian</option>
+                            </select>
+                        </div>
+                    </div>
+                    <div class="mt-3 text-end">
+                        <button type="submit" class="btn btn-success btn-sm px-3 rounded-2">
+                            <i class="fas fa-save me-1"></i> Simpan Pertanyaan
+                        </button>
+                    </div>
+                </form>
+
+                <!-- List Pertanyaan Yang Ada -->
+                <h6 class="fw-bold mb-2">Daftar Pertanyaan Survey</h6>
+                <div class="table-responsive">
+                    <table class="table table-bordered align-middle">
+                        <thead class="table-dark small">
+                            <tr>
+                                <th width="50">No</th>
+                                <th>Pertanyaan</th>
+                                <th width="120">Tipe Input</th>
+                                <th width="80" class="text-center">Aksi</th>
+                            </tr>
+                        </thead>
+                        <tbody id="surveyQuestionsList" class="small">
+                            <!-- Injected by JS -->
+                        </tbody>
+                    </table>
+                </div>
+
+            </div>
         </div>
     </div>
 </div>
@@ -886,5 +956,90 @@
             });
         });
     });
+</script>
+<script>
+    var currentSurveyUrl = "";
+
+    $(document).on('click', '#button-form-survay-peserta', function(e) {
+        e.preventDefault();
+        let eventCode = $(this).data('code');
+        let fetchUrl = "{{ route('event.survey.manage', ':code') }}".replace(':code', eventCode);
+
+        loadSurveyData(fetchUrl);
+    });
+
+    function loadSurveyData(url) {
+        $.ajax({
+            url: url,
+            type: 'GET',
+            dataType: 'json',
+            success: function(res) {
+                if (res.status === 'success') {
+                    $('#adminSurveyModalTitle').text('Kelola Survey: ' + res.event.event_data_tittle);
+                    $('#admin_id_event_data').val(res.event.id_event_data);
+
+                    currentSurveyUrl = res.survey_url;
+                    $('#labelSurveyUrl').text(res.survey_url);
+
+                    let rows = '';
+                    if (res.surveys.length > 0) {
+                        $.each(res.surveys, function(i, item) {
+                            rows += `<tr>
+                            <td class="text-center">${i + 1}</td>
+                            <td>${item.question}</td>
+                            <td><span class="badge bg-info text-dark">${item.type.toUpperCase()}</span></td>
+                            <td class="text-center">
+                                <button class="btn btn-sm btn-danger py-0 px-2" onclick="deleteQuestion(${item.id_event_survey}, '${url}')">
+                                    <i class="fas fa-trash-alt"></i>
+                                </button>
+                            </td>
+                        </tr>`;
+                        });
+                    } else {
+                        rows = `<tr><td colspan="4" class="text-center text-muted py-3">Belum ada pertanyaan dibuat.</td></tr>`;
+                    }
+                    $('#surveyQuestionsList').html(rows);
+                }
+            }
+        });
+    }
+
+    // Tambah Pertanyaan
+    $('#formAddQuestion').on('submit', function(e) {
+        e.preventDefault();
+        $.ajax({
+            url: "{{ route('event.survey.store_question') }}",
+            type: 'POST',
+            data: $(this).serialize(),
+            success: function(res) {
+                $('#formAddQuestion')[0].reset();
+                let eventCode = $('#button-form-survay-peserta').data('code');
+                loadSurveyData("{{ route('event.survey.manage', ':code') }}".replace(':code', eventCode));
+            }
+        });
+    });
+
+    // Hapus Pertanyaan
+    function deleteQuestion(id, reloadUrl) {
+        if (confirm('Hapus pertanyaan ini?')) {
+            let deleteUrl = "{{ route('event.survey.delete_question', ':id') }}".replace(':id', id);
+            $.ajax({
+                url: deleteUrl,
+                type: 'DELETE',
+                data: {
+                    _token: "{{ csrf_token() }}"
+                },
+                success: function() {
+                    loadSurveyData(reloadUrl);
+                }
+            });
+        }
+    }
+
+    // Copy Link Survey
+    function copySurveyLink() {
+        navigator.clipboard.writeText(currentSurveyUrl);
+        alert('Link survey berhasil disalin!');
+    }
 </script>
 @endsection

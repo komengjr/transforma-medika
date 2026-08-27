@@ -482,12 +482,15 @@ class EventController extends Controller
         try {
             $registration = DB::table('event_registrations as er')
                 ->join('event_participants as ep', 'er.id_participant', '=', 'ep.id_participant')
+                ->join('event_data as ed', 'er.id_event_data', '=', 'ed.id_event_data') // Join ke tabel event_data
                 ->leftJoin('event_registration_classes as erc', 'er.id_registration', '=', 'erc.id_registration')
                 ->leftJoin('event_data_sub_class as esc', 'erc.id_event_data_sub_class', '=', 'esc.id_event_data_sub_class')
                 ->where('er.id_registration', $id)
                 ->select(
                     'er.id_registration',
+                    'er.registration_code',       // Kode registrasi (REG-xxxxx)
                     'er.payment_status',
+                    'ed.event_data_code',         // Kode event (EVENTxxxxx)
                     'erc.qr_code_token',
                     'ep.full_name',
                     'ep.email',
@@ -1077,12 +1080,15 @@ class EventController extends Controller
     {
         $registration = DB::table('event_registrations as er')
             ->join('event_participants as ep', 'er.id_participant', '=', 'ep.id_participant')
+            ->join('event_data as ed', 'er.id_event_data', '=', 'ed.id_event_data')
             ->leftJoin('event_registration_classes as erc', 'er.id_registration', '=', 'erc.id_registration')
             ->leftJoin('event_data_sub_class as esc', 'erc.id_event_data_sub_class', '=', 'esc.id_event_data_sub_class')
             ->where('er.id_registration', $idRegistration)
             ->select(
                 'er.id_registration',
+                'er.registration_code',
                 'er.payment_status',
+                'ed.event_data_code',
                 'erc.qr_code_token',
                 'ep.full_name',
                 'ep.email',
@@ -1126,9 +1132,22 @@ class EventController extends Controller
             try {
                 $registration = DB::table('event_registrations as er')
                     ->join('event_participants as ep', 'er.id_participant', '=', 'ep.id_participant')
+                    ->join('event_data as ed', 'er.id_event_data', '=', 'ed.id_event_data') // Join ke tabel event_data
                     ->leftJoin('event_registration_classes as erc', 'er.id_registration', '=', 'erc.id_registration')
+                    ->leftJoin('event_data_sub_class as esc', 'erc.id_event_data_sub_class', '=', 'esc.id_event_data_sub_class')
                     ->where('er.id_registration', $idRegistration)
-                    ->select('er.*', 'erc.qr_code_token', 'ep.email', 'ep.full_name')
+                    ->select(
+                        'er.id_registration',
+                        'er.registration_code',       // Ambil kode registrasi (REG-xxxxx)
+                        'er.payment_status',
+                        'ed.event_data_code',         // Ambil kode event (EVENTxxxxx)
+                        'erc.qr_code_token',
+                        'ep.full_name',
+                        'ep.email',
+                        'ep.institution',
+                        'ep.phone_number',
+                        'esc.event_data_sub_class_name'
+                    )
                     ->first();
 
                 if ($registration && $registration->email) {
