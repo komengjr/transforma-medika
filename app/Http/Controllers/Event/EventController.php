@@ -540,6 +540,7 @@ class EventController extends Controller
                 ->join('event_participants as ep', 'er.id_participant', '=', 'ep.id_participant')
                 ->join('event_data as ed', 'er.id_event_data', '=', 'ed.id_event_data')
                 ->leftJoin('event_data_sub_class as esc', 'erc.id_event_data_sub_class', '=', 'esc.id_event_data_sub_class')
+                ->leftJoin('event_data_sub as eds', 'esc.event_data_sub_code', '=', 'eds.event_data_sub_code') // Join ke Sub Event
                 ->select(
                     'erc.id_registration_class',
                     'erc.qr_code_token',
@@ -551,10 +552,11 @@ class EventController extends Controller
                     'ed.id_event_data',
                     'ed.event_data_code',
                     'ed.event_data_tittle',
+                    'eds.event_data_sub_name', // Ambil Nama Sub Event
                     'ep.full_name',
                     'ep.phone_number',
                     'ep.email',
-                    'ep.institution', // Ditambahkan jika butuh data instansi
+                    'ep.institution',
                     'esc.event_data_sub_class_name'
                 )
                 ->where('erc.qr_code_token', $token)
@@ -589,6 +591,7 @@ class EventController extends Controller
                     'id_registration_class' => $participantData->id_registration_class,
                     'id_event'              => $participantData->id_event_data,
                     'event_name'            => $participantData->event_data_tittle ?? 'Event Falcon',
+                    'sub_event_name'        => $participantData->event_data_sub_name ?? '-', // Ditambahkan
                     'registration_code'     => $participantData->registration_code,
                     'qr_code_token'         => $participantData->qr_code_token,
                     'full_name'             => $participantData->full_name,

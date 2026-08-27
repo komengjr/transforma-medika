@@ -546,6 +546,7 @@
                 </div>
 
                 <!-- Result Box -->
+                <!-- Result Box -->
                 <div class="result-box" id="resultContainer">
                     <div class="id-badge-card mb-4">
                         <div class="id-badge-header">
@@ -564,7 +565,16 @@
                                 </div>
                             </div>
 
+                            <!-- Detail Event, Sub Event, dan Kelas -->
                             <div class="row g-2 bg-light p-3 rounded-3 border">
+                                <div class="col-12 mb-2 pb-2 border-bottom">
+                                    <small class="text-muted d-block fs--2">Nama Event</small>
+                                    <span class="fw-bold text-dark" id="resEventName">--</span>
+                                </div>
+                                <div class="col-12 mb-2 pb-2 border-bottom">
+                                    <small class="text-muted d-block fs--2">Sub Event</small>
+                                    <span class="fw-bold text-dark" id="resSubEventName">--</span>
+                                </div>
                                 <div class="col-6">
                                     <small class="text-muted d-block fs--2">Kategori / Kelas</small>
                                     <span class="fw-bold text-primary" id="resStatus">--</span>
@@ -639,10 +649,13 @@
                 if (response.status === 'success') {
                     currentParticipantData = response.data;
 
-                    document.getElementById('resName').innerText = currentParticipantData.full_name;
-                    document.getElementById('resInstansi').innerText = currentParticipantData.institution;
-                    document.getElementById('resStatus').innerText = currentParticipantData.class_name;
-                    document.getElementById('avatarLetter').innerText = currentParticipantData.full_name.charAt(0).toUpperCase();
+                    // Mapping Data Peserta & Event ke HTML
+                    document.getElementById('resName').innerText = currentParticipantData.full_name || '-';
+                    document.getElementById('resInstansi').innerText = currentParticipantData.institution || '-';
+                    document.getElementById('resEventName').innerText = currentParticipantData.event_name || '-';
+                    document.getElementById('resSubEventName').innerText = currentParticipantData.sub_event_name || '-';
+                    document.getElementById('resStatus').innerText = currentParticipantData.event_data_sub_class_name || currentParticipantData.class_name || '-';
+                    document.getElementById('avatarLetter').innerText = (currentParticipantData.full_name || 'P').charAt(0).toUpperCase();
 
                     const now = new Date();
                     document.getElementById('resTime').innerText = now.toLocaleTimeString('id-ID') + ' WIB';
