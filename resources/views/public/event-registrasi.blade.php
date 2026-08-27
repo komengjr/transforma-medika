@@ -142,7 +142,7 @@
             font-size: 1rem;
         }
 
-        /* --- SISI KANAN: BACKGROUND EVENT ATMOSPHERE & COMPACT FORM --- */
+        /* --- SISI KANAN: BACKGROUND EVENT ATMOSPHERE & FORM --- */
         .form-right-content {
             background-color: #f1f5f9;
             background-image:
@@ -196,59 +196,138 @@
             outline: none;
         }
 
-        .select-card {
-            border: 1.5px solid var(--border-color);
+        /* --- REDESIGN DESAIN TIKET & PAYMENT UI --- */
+        .ticket-card {
             background: #ffffff;
-            border-radius: 12px;
-            padding: 0.75rem 1rem;
-            cursor: pointer;
-            transition: all 0.2s ease;
-            display: flex;
-            align-items: center;
-            justify-content: space-between;
+            border: 1.5px solid #e2e8f0;
+            border-radius: 14px;
+            overflow: hidden;
+            transition: all 0.25s cubic-bezier(0.16, 1, 0.3, 1);
+            position: relative;
         }
 
-        .select-card:hover:not(.disabled-card) {
-            border-color: #cbd5e1;
+        .ticket-card.disabled-ticket {
+            opacity: 0.55;
             background: #f8fafc;
         }
 
-        .select-card.active {
+        .ticket-card:not(.disabled-ticket):hover {
+            border-color: #cbd5e1;
+            box-shadow: 0 10px 25px -5px rgba(15, 23, 42, 0.05);
+        }
+
+        .ticket-card.active {
             border-color: var(--primary-color);
-            background: rgba(79, 70, 229, 0.03);
+            box-shadow: 0 8px 20px -4px rgba(79, 70, 229, 0.15);
         }
 
-        .select-card.disabled-card {
-            opacity: 0.5;
-            cursor: not-allowed;
-            background-color: #f1f5f9;
+        .ticket-header-label {
+            padding: 1rem 1.15rem;
+            cursor: pointer;
+            margin: 0;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            background: #ffffff;
+            user-select: none;
         }
 
-        .badge-price {
+        .ticket-card.active .ticket-header-label {
+            background: rgba(79, 70, 229, 0.02);
+        }
+
+        .ticket-icon-box {
+            width: 42px;
+            height: 42px;
+            border-radius: 10px;
+            background: #f1f5f9;
+            color: #64748b;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 1.2rem;
+            transition: all 0.2s ease;
+            flex-shrink: 0;
+        }
+
+        .ticket-card.active .ticket-icon-box {
+            background: rgba(79, 70, 229, 0.1);
+            color: var(--primary-color);
+        }
+
+        .ticket-badge-tag {
+            font-size: 0.68rem;
+            font-weight: 700;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+            padding: 3px 8px;
+            border-radius: 6px;
+            background: #f1f5f9;
+            color: #64748b;
+            transition: all 0.2s ease;
+        }
+
+        .ticket-card.active .ticket-badge-tag {
+            background: var(--primary-color);
+            color: #ffffff;
+        }
+
+        .class-accordion-wrapper {
+            background: #f8fafc;
+            border-top: 1px dashed #e2e8f0;
+            padding: 1rem;
+        }
+
+        .class-option-card {
+            background: #ffffff;
+            border: 1px solid #e2e8f0;
+            border-radius: 10px;
+            padding: 0.75rem 0.9rem;
+            margin-bottom: 0.5rem;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            transition: all 0.2s ease;
+        }
+
+        .class-option-card:hover {
+            border-color: #cbd5e1;
+            transform: translateY(-1px);
+        }
+
+        .class-option-card.active {
+            border-color: var(--primary-color);
+            background: #ffffff;
+            box-shadow: 0 4px 12px rgba(79, 70, 229, 0.08);
+        }
+
+        .badge-price-paid {
+            background: #eef2ff;
+            color: var(--primary-color);
+            border: 1px solid #c7d2fe;
             font-weight: 800;
             font-size: 0.8rem;
             padding: 4px 10px;
-            border-radius: 6px;
+            border-radius: 8px;
         }
 
         .badge-price-free {
             background: #ecfdf5;
             color: #059669;
             border: 1px solid #a7f3d0;
-        }
-
-        .badge-price-paid {
-            background: #eef2ff;
-            color: #4f46e5;
-            border: 1px solid #c7d2fe;
+            font-weight: 800;
+            font-size: 0.8rem;
+            padding: 4px 10px;
+            border-radius: 8px;
         }
 
         .btn-register-submit {
             background: var(--primary-color);
             color: #ffffff;
             border: none;
-            border-radius: 10px;
-            padding: 0.8rem 1.25rem;
+            border-radius: 12px;
+            padding: 0.85rem 1.25rem;
             font-weight: 700;
             font-size: 0.95rem;
             transition: all 0.2s ease;
@@ -258,13 +337,6 @@
         .btn-register-submit:hover {
             background: var(--primary-hover);
             color: #ffffff;
-        }
-
-        .subevent-group-box {
-            background: #ffffff;
-            border: 1px solid #e2e8f0;
-            border-radius: 14px;
-            padding: 1rem;
         }
     </style>
 </head>
@@ -349,10 +421,10 @@
                         <div class="d-flex align-items-center justify-content-between mb-3 border-bottom pb-2">
                             <div>
                                 <h4 class="fw-bold text-dark m-0" style="letter-spacing: -0.4px;">Form Pendaftaran</h4>
-                                <small class="text-muted fs-8">Pilih satu atau beberapa Sub Event sekaligus.</small>
+                                <small class="text-muted fs-8">Pilih tiket sub-event yang ingin Anda ikuti.</small>
                             </div>
                             <span class="badge bg-primary-subtle text-primary border border-primary-subtle rounded-pill px-3 py-1 fs-8">
-                                <i class="bi bi-ticket-perforated me-1"></i> Multi-Event Track
+                                <i class="bi bi-ticket-perforated me-1"></i> Event Pass
                             </span>
                         </div>
 
@@ -423,35 +495,46 @@
 
                             <!-- INFORMASI INFO ISI DATA DIRI -->
                             <div id="fillDataWarning" class="alert alert-warning border-0 fs-8 mb-3 rounded-3 py-2 px-3 d-flex align-items-center gap-2">
-                                <i class="bi bi-info-circle-fill"></i>
-                                <span>Silakan isi <strong>Nama Lengkap, Email, dan No. WhatsApp</strong> di atas terlebih dahulu untuk memilih Sub Event & Kelas.</span>
+                                <i class="bi bi-info-circle-fill fs-6"></i>
+                                <span>Silakan isi <strong>Nama Lengkap, Email, dan No. WhatsApp</strong> di atas untuk membuka opsi tiket Sub Event.</span>
                             </div>
 
-                            <!-- SELEKSI SUB EVENT & KELAS (MULTI-SELEKSI) -->
-                            <div class="mb-3">
-                                <label class="custom-form-label d-block mb-1.5">Pilih Sub Event & Kelas / Tiket <span class="text-danger">*</span></label>
-                                <small class="text-muted fs-8 d-block mb-2">Anda dapat mencentang lebih dari 1 Sub Event & Kelas.</small>
+                            <!-- SELEKSI SUB EVENT & KELAS (REDESIGN TIKET CHECKOUT) -->
+                            <div class="mb-4">
+                                <label class="custom-form-label d-block mb-1">Pilihan Tiket Sub Event <span class="text-danger">*</span></label>
+                                <small class="text-muted fs-8 d-block mb-2.5">Centang tiket sub-event yang ingin diikuti, lalu tentukan pilihan sesi/kelas di dalamnya.</small>
 
                                 <div class="d-flex flex-column gap-3">
                                     @forelse ($subevent as $sub)
-                                    <div class="subevent-group-box">
-                                        <!-- Checkbox Sub Event -->
-                                        <label class="select-card subevent-card disabled-card w-100 mb-2" for="sub-{{ $sub->event_data_sub_code }}">
-                                            <div class="d-flex align-items-center gap-2.5">
-                                                <input class="form-check-input subevent-checkbox m-0" type="checkbox" name="sub_event_codes[]" id="sub-{{ $sub->event_data_sub_code }}" value="{{ $sub->event_data_sub_code }}" disabled style="width: 1.1em; height: 1.1em;">
+                                    <div class="ticket-card disabled-ticket" id="ticket-card-{{ $sub->event_data_sub_code }}">
+                                        <!-- Card Header Subevent -->
+                                        <label class="ticket-header-label" for="sub-{{ $sub->event_data_sub_code }}">
+                                            <div class="d-flex align-items-center gap-3">
+                                                <input class="form-check-input subevent-checkbox m-0" type="checkbox" name="sub_event_codes[]" id="sub-{{ $sub->event_data_sub_code }}" value="{{ $sub->event_data_sub_code }}" disabled style="width: 1.25em; height: 1.25em; cursor: pointer;">
+                                                <div class="ticket-icon-box">
+                                                    <i class="bi bi-ticket-perforated"></i>
+                                                </div>
                                                 <div>
-                                                    <strong class="d-block text-dark fs-7">{{ $sub->event_data_sub_name }}</strong>
-                                                    <small class="text-muted fs-8">
-                                                        <i class="bi bi-clock me-1"></i>
+                                                    <div class="d-flex align-items-center gap-2 mb-0.5">
+                                                        <strong class="text-dark fs-7 mb-0">{{ $sub->event_data_sub_name }}</strong>
+                                                        <span class="ticket-badge-tag">Pilihan Tiket</span>
+                                                    </div>
+                                                    <small class="text-muted fs-8 d-block">
+                                                        <i class="bi bi-clock me-1 text-primary"></i>
                                                         {{ \Carbon\Carbon::parse($sub->event_data_sub_start)->format('H:i') }} - {{ \Carbon\Carbon::parse($sub->event_data_sub_end)->format('H:i') }} WIB
                                                     </small>
                                                 </div>
                                             </div>
-                                            <span class="badge bg-light text-secondary border fs-8">Sub Event</span>
+                                            <div class="text-end ms-2">
+                                                <i class="bi bi-chevron-down text-muted icon-chevron transition-transform"></i>
+                                            </div>
                                         </label>
 
-                                        <!-- Daftar Kelas / Tiket Terkait Subevent Ini -->
-                                        <div class="class-wrapper ms-3 ps-2 border-start d-none" id="class-container-{{ $sub->event_data_sub_code }}">
+                                        <!-- Detail Kelas / Sesi Tiket -->
+                                        <div class="class-accordion-wrapper d-none" id="class-container-{{ $sub->event_data_sub_code }}">
+                                            <div class="d-flex align-items-center justify-content-between mb-2 px-1">
+                                                <span class="custom-form-label m-0 text-secondary fs-8 ms-2">Pilih Sesi / Kelas Tiket:</span>
+                                            </div>
                                             <div class="row g-2">
                                                 @php
                                                 $hasClasses = false;
@@ -463,22 +546,26 @@
                                                 $price = $cls->event_data_sub_class_price ?? 0;
                                                 @endphp
                                                 <div class="col-12">
-                                                    <label class="select-card class-card w-100 mb-0" for="class-{{ $cls->id_event_data_sub_class }}">
+                                                    <label class="class-option-card mb-0" for="class-{{ $cls->id_event_data_sub_class }}">
                                                         <div class="d-flex align-items-center gap-2.5">
-                                                            <input class="form-check-input class-checkbox m-0" type="checkbox" name="class_ids[{{ $sub->event_data_sub_code }}][]" id="class-{{ $cls->id_event_data_sub_class }}" value="{{ $cls->id_event_data_sub_class }}" data-price="{{ $price }}" style="width: 1.1em; height: 1.1em;">
+                                                            <input class="form-check-input class-checkbox m-0 me-4" type="checkbox" name="class_ids[{{ $sub->event_data_sub_code }}][]" id="class-{{ $cls->id_event_data_sub_class }}" value="{{ $cls->id_event_data_sub_class }}" data-price="{{ $price }}" style="width: 1.1em; height: 1.1em; cursor: pointer;">
                                                             <div>
-                                                                <strong class="d-block text-dark fs-7">{{ $cls->event_data_sub_class_name }}</strong>
-                                                                <small class="text-muted fs-8">Ruang: {{ $cls->event_data_sub_class_room ?? '-' }} | Kuota: {{ $cls->event_data_sub_class_kuota }}</small>
+                                                                <strong class="d-block text-dark fs-7" style="line-height: 1.2;">{{ $cls->event_data_sub_class_name }}</strong>
+                                                                <small class="text-muted fs-8">
+                                                                    <i class="bi bi-door-open me-1"></i>Ruang: {{ $cls->event_data_sub_class_room ?? '-' }}
+                                                                    <span class="mx-1">•</span>
+                                                                    <i class="bi bi-people me-1"></i>Sisa Kuota: {{ $cls->event_data_sub_class_kuota }}
+                                                                </small>
                                                             </div>
                                                         </div>
-                                                        <div>
+                                                        <div class="ms-2">
                                                             @if($price > 0)
-                                                            <span class="badge-price badge-price-paid">
+                                                            <span class="badge-price-paid">
                                                                 Rp {{ number_format($price, 0, ',', '.') }}
                                                             </span>
                                                             @else
-                                                            <span class="badge-price badge-price-free">
-                                                                Rp 0
+                                                            <span class="badge-price-free">
+                                                                Gratis
                                                             </span>
                                                             @endif
                                                         </div>
@@ -489,8 +576,8 @@
 
                                                 @if(!$hasClasses)
                                                 <div class="col-12">
-                                                    <div class="alert alert-info border-0 fs-8 m-0 rounded-3 py-2 px-3">
-                                                        Tidak ada pilihan kelas khusus untuk Sub Event ini. (Otomatis Terdaftar)
+                                                    <div class="alert alert-light border fs-8 m-0 rounded-3 py-2 px-3 text-muted">
+                                                        <i class="bi bi-check-circle me-1 text-success"></i> Sub Event ini tidak membutuhkan pemilihan kelas (Otomatis Terdaftar).
                                                     </div>
                                                 </div>
                                                 @endif
@@ -507,26 +594,30 @@
                                 </div>
                             </div>
 
-                            <!-- AREA SUBMIT & KETENTUAN -->
+                            <!-- AREA SUBMIT & KETENTUAN (RINGKASAN PEMBAYARAN) -->
                             <div id="submitSection" class="d-none">
-                                <!-- BIAYA TOTAL AKUMULASI -->
-                                <div class="p-2.5 px-3 mb-3 rounded-3 d-flex align-items-center justify-content-between" style="background: #f8fafc; border: 1px dashed #cbd5e1;">
-                                    <span class="fw-bold text-secondary fs-7">Total Biaya Pendaftaran:</span>
-                                    <h4 class="fw-extrabold text-primary m-0" id="displayTotal">Rp 0</h4>
+                                <div class="p-3 mb-3 rounded-3" style="background: #f8fafc; border: 1.5px dashed #cbd5e1;">
+                                    <div class="d-flex align-items-center justify-content-between">
+                                        <div>
+                                            <span class="fw-bold text-secondary fs-7 d-block">Ringkasan Pembayaran</span>
+                                            <small class="text-muted fs-8">Total estimasi biaya tiket yang terpilih</small>
+                                        </div>
+                                        <h3 class="fw-extrabold text-primary m-0" id="displayTotal">Rp 0</h3>
+                                    </div>
                                 </div>
 
                                 <!-- KETENTUAN -->
                                 <div class="form-check mb-3">
                                     <input class="form-check-input" type="checkbox" name="terms" id="termsCheck" required style="cursor: pointer;">
                                     <label class="form-check-label fs-8 text-muted" for="termsCheck">
-                                        Saya menyetujui seluruh ketentuan pendaftaran acara ini.
+                                        Saya menyetujui seluruh syarat & ketentuan pendaftaran acara ini.
                                     </label>
                                 </div>
 
                                 <!-- SUBMIT BUTTON WITH LOADING ANIMATION -->
                                 <button class="btn btn-register-submit w-100" type="submit" id="btnSubmit">
                                     <span id="btnText">
-                                        <i class="bi bi-send-check me-2"></i> Daftar Sekarang
+                                        <i class="bi bi-credit-card-2-front me-2"></i> Selesaikan Pendaftaran
                                     </span>
                                     <span id="btnSpinner" class="d-none">
                                         <span class="spinner-border spinner-border-sm me-2" role="status" aria-hidden="true"></span>
@@ -589,14 +680,14 @@
 
                 if (name !== '' && email !== '' && phone !== '') {
                     $('.subevent-checkbox').prop('disabled', false);
-                    $('.subevent-card').removeClass('disabled-card');
+                    $('.ticket-card').removeClass('disabled-ticket');
                     $('#fillDataWarning').addClass('d-none');
                 } else {
                     $('.subevent-checkbox').prop('disabled', true).prop('checked', false);
-                    $('.subevent-card').addClass('disabled-card').removeClass('active');
+                    $('.ticket-card').addClass('disabled-ticket').removeClass('active');
                     $('.class-checkbox').prop('checked', false);
-                    $('.class-card').removeClass('active');
-                    $('.class-wrapper').addClass('d-none');
+                    $('.class-option-card').removeClass('active');
+                    $('.class-accordion-wrapper').addClass('d-none');
 
                     $('#submitSection').addClass('d-none');
                     $('#fillDataWarning').removeClass('d-none');
@@ -613,16 +704,17 @@
             // --- TOGGLE SUB EVENT CHECKBOX ---
             $('.subevent-checkbox').change(function() {
                 let subCode = $(this).val();
+                let card = $('#ticket-card-' + subCode);
                 let container = $('#class-container-' + subCode);
 
                 if ($(this).is(':checked')) {
-                    $(this).closest('.subevent-card').addClass('active');
+                    card.addClass('active');
                     container.removeClass('d-none');
                 } else {
-                    $(this).closest('.subevent-card').removeClass('active');
+                    card.removeClass('active');
                     container.addClass('d-none');
                     container.find('.class-checkbox').prop('checked', false);
-                    container.find('.class-card').removeClass('active');
+                    container.find('.class-option-card').removeClass('active');
                 }
 
                 checkSubmitVisibility();
@@ -632,9 +724,9 @@
             // --- TOGGLE KELAS CHECKBOX ---
             $(document).on('change', '.class-checkbox', function() {
                 if ($(this).is(':checked')) {
-                    $(this).closest('.class-card').addClass('active');
+                    $(this).closest('.class-option-card').addClass('active');
                 } else {
-                    $(this).closest('.class-card').removeClass('active');
+                    $(this).closest('.class-option-card').removeClass('active');
                 }
 
                 checkSubmitVisibility();

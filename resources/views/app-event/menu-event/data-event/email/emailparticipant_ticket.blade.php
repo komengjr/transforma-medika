@@ -125,6 +125,30 @@
             text-align: center;
         }
 
+        /* Box Nominal Tagihan */
+        .amount-box {
+            background-color: #fef3c7;
+            border: 1px solid #fcd34d;
+            border-radius: 8px;
+            padding: 12px;
+            text-align: center;
+            margin-bottom: 15px;
+        }
+
+        .amount-title {
+            font-size: 12px;
+            color: #92400e;
+            font-weight: 600;
+            text-transform: uppercase;
+        }
+
+        .amount-value {
+            font-size: 24px;
+            font-weight: 800;
+            color: #b45309;
+            margin-top: 2px;
+        }
+
         .bank-card {
             background-color: #ffffff;
             border: 1px dashed #f59e0b;
@@ -138,6 +162,7 @@
             font-size: 13px;
             color: #64748b;
             font-weight: 600;
+            text-transform: uppercase;
         }
 
         .account-number {
@@ -154,13 +179,19 @@
             color: #475569;
         }
 
+        .bank-notes {
+            font-size: 11px;
+            color: #d97706;
+            margin-top: 5px;
+            font-style: italic;
+        }
+
         .contact-box {
             background-color: #f0fdf4;
             border: 1px solid #bbf7d0;
             border-radius: 8px;
             padding: 15px;
             margin-top: 20px;
-            text-align: center;
             font-size: 13px;
             color: #166534;
         }
@@ -171,10 +202,9 @@
             color: #ffffff !important;
             text-decoration: none;
             font-weight: 700;
-            padding: 10px 20px;
+            padding: 6px 14px;
             border-radius: 6px;
-            margin-top: 10px;
-            font-size: 13px;
+            font-size: 12px;
         }
 
         /* Survey Box & Button Style */
@@ -265,15 +295,31 @@
     $backTitle = !empty($registration->back_title) ? ', ' . trim($registration->back_title) : '';
     $fullNameFormatted = $frontTitle . ($registration->full_name ?? '-') . $backTitle;
 
-    // Format WA Admin
-    $adminPhone = config('app.admin_whatsapp', '081234567890');
-    $adminPhoneFormatted = preg_replace('/^0/', '62', preg_replace('/[^0-9]/', '', $adminPhone));
-    $waMessage = rawurlencode("Halo Admin, saya ingin konfirmasi pembayaran atas nama *" . $fullNameFormatted . "*.");
+    // Handling Nominal / Biaya
+    $amountToPay = $registration->event_data_sub_class_price ?? $registration->total_price ?? $registration->price ?? 0;
+    $formattedAmount = 'Rp ' . number_format($amountToPay, 0, ',', '.');
 
-    // Dynamic Survey URL memakai event_data_code dan registration_code
-    $eventCode = $registration->event_data_code ?? '-';
+    // Dynamic Survey URL & Code
+    $eventCode = $registration->event_data_code ?? '';
     $registrationCode = $registration->registration_code ?? '-';
     $surveyUrl = url("event/survey/form/{$eventCode}/{$registrationCode}");
+
+    // Query Data Rekening dan Contact Person langsung via DB Facade di Blade jika Pending
+    $rekeningList = collect();
+    $contactList = collect();
+
+    if ($status == 'pending' && !empty($eventCode)) {
+    $rekeningList = \Illuminate\Support\Facades\DB::table('event_data_rekening')
+    ->where('event_data_code', $eventCode)
+    ->where('is_active', true)
+    ->get();
+
+    $contactList = \Illuminate\Support\Facades\DB::table('event_data_contact')
+    ->where('event_data_code', $eventCode)
+    ->where('is_active', true)
+    ->orderBy('sort_order', 'asc')
+    ->get();
+    }
     @endphp
 
     <div class="wrapper">
@@ -307,32 +353,68 @@
                     @if($status == 'pending')
                     <div class="payment-box">
                         <div class="payment-title">Tujuan Transfer Pembayaran</div>
+
+                        <!-- Highlight Nominal Pembayaran -->
+                        <div class="amount-box">
+                            <div class="amount-title">Total Nominal yang Harus Dibayar</div>
+                            <div class="amount-value">{{ $formattedAmount }}</div>
+                        </div>
+
                         <p style="font-size: 13px; color: #78350f; margin: 0 0 10px 0; text-align: center;">
-                            Silakan transfer sesuai nominal biaya pendaftaran ke rekening berikut:
+                            Silakan transfer sesuai nominal di atas ke salah satu rekening berikut:
                         </p>
 
-                        <div class="bank-card">
-                            <div class="bank-name">BANK MANDIRI</div>
-                            <div class="account-number">123-00-0987654-3</div>
-                            <div class="account-holder">a.n. Panitia Penyelenggara Event</div>
-                        </div>
-
+                        @forelse($rekeningList as $rek)
                         <div class="bank-card" style="margin-top: 8px;">
-                            <div class="bank-name">BANK BCA</div>
-                            <div class="account-number">883-098-1234</div>
-                            <div class="account-holder">a.n. Panitia Penyelenggara Event</div>
+                            <div class="bank-name">{{ $rek->bank_name }} @if($rek->bank_branch) ({{ $rek->bank_branch }}) @endif</div>
+                            <div class="account-number">{{ $rek->account_number }}</div>
+                            <div class="account-holder">a.n. {{ $rek->account_holder }}</div>
+                            @if(!empty($rek->notes))
+                            <div class="bank-notes">*{{ $rek->notes }}</div>
+                            @endif
                         </div>
+                        @empty
+                        <div class="bank-card">
+                            <div class="bank-name">INFORMASI REKENING</div>
+                            <div class="account-holder">Silakan hubungi panitia untuk detail pembayaran.</div>
+                        </div>
+                        @endforelse
                     </div>
 
-                    <!-- Kontak Bantuan Konfirmasi -->
+                    <!-- Kontak Bantuan Konfirmasi Pembayaran -->
+                    @if($contactList->count() > 0)
                     <div class="contact-box">
-                        <strong>Sudah Melakukan Pembayaran?</strong><br>
-                        Kirimkan bukti transfer/pembayaran Anda ke Panitia melalui WhatsApp di bawah ini untuk verifikasi:
-                        <br>
-                        <a href="https://wa.me/{{ $adminPhoneFormatted }}?text={{ $waMessage }}" class="contact-btn" target="_blank">
-                            Hubungi via WhatsApp
-                        </a>
+                        <strong style="display: block; text-align: center; margin-bottom: 8px;">Sudah Melakukan Pembayaran?</strong>
+                        <p style="font-size: 12px; margin: 0 0 12px 0; text-align: center;">
+                            Kirimkan bukti transfer Anda ke salah satu Panitia melalui WhatsApp di bawah ini:
+                        </p>
+
+                        <table width="100%" cellspacing="0" cellpadding="0" border="0">
+                            @foreach($contactList as $cp)
+                            @php
+                            $phone = preg_replace('/[^0-9]/', '', $cp->contact_number);
+                            if (str_starts_with($phone, '0')) {
+                            $phone = '62' . substr($phone, 1);
+                            }
+                            $waMsg = rawurlencode("Halo " . $cp->contact_name . ", saya ingin konfirmasi pembayaran event atas nama *" . $fullNameFormatted . "* sebesar " . $formattedAmount . ".");
+                            @endphp
+                            <tr>
+                                <td style="padding: 6px 0; font-size: 12px; border-bottom: 1px dashed #bbf7d0;">
+                                    <strong>{{ $cp->contact_name }}</strong>
+                                    @if($cp->contact_role)
+                                    <span style="color: #4b5563; font-size: 11px;">({{ $cp->contact_role }})</span>
+                                    @endif
+                                </td>
+                                <td style="padding: 6px 0; text-align: right; border-bottom: 1px dashed #bbf7d0;">
+                                    <a href="https://wa.me/{{ $phone }}?text={{ $waMsg }}" class="contact-btn" target="_blank">
+                                        💬 WhatsApp
+                                    </a>
+                                </td>
+                            </tr>
+                            @endforeach
+                        </table>
                     </div>
+                    @endif
 
                     <!-- PAID / LUNAS STATE: Tampilkan Kode Booking & QR Code -->
                     @else
@@ -349,7 +431,6 @@
                         <p style="font-size: 12px; color: #64748b; margin-top: 10px;">Tunjukkan QR Code ini saat proses check-in di lokasi event.</p>
                     </div>
 
-                    <!-- Button Isi Survey Event -->
                     <!-- Button Isi Survey Event (Hanya Tampil Jika Lunas) -->
                     <div class="survey-box">
                         <strong style="color: #1e40af; font-size: 14px;">Bantu Kami Meningkatkan Layanan</strong>
@@ -362,6 +443,14 @@
 
                     <!-- Detail Pendaftaran -->
                     <table class="details-table">
+                        <tr>
+                            <td class="label">Nama Event</td>
+                            <td class="value">{{ $registration->event_name ?? $registration->event_title ?? '-' }}</td>
+                        </tr>
+                        <tr>
+                            <td class="label">Sub Event</td>
+                            <td class="value">{{ $registration->sub_event_name ?? $registration->sub_event_title ?? '-' }}</td>
+                        </tr>
                         <tr>
                             <td class="label">Nama Peserta</td>
                             <td class="value">{{ $fullNameFormatted }}</td>
@@ -383,6 +472,10 @@
                             <td class="value">{{ $registration->event_data_sub_class_name ?? 'Reguler' }}</td>
                         </tr>
                         <tr>
+                            <td class="label">Total Biaya</td>
+                            <td class="value" style="color: #0f172a; font-weight: 700;">{{ $formattedAmount }}</td>
+                        </tr>
+                        <tr>
                             <td class="label">Status Pembayaran</td>
                             <td class="value" style="color: {{ $status == 'pending' ? '#d97706' : '#16a34a' }}; text-transform: capitalize;">
                                 {{ $status == 'pending' ? 'Belum Bayar (Pending)' : 'Lunas' }}
@@ -401,7 +494,6 @@
                     <!-- Branding Support Pramita -->
                     <div class="brand-support">
                         <p>Supported by</p>
-                        <!-- Ganti URL src gambar di bawah dengan link/path logo resmi Pramita -->
                         <img src="{{ asset('img/pramita.png') }}" alt="Pramita Lab" class="brand-logo">
                     </div>
                 </td>

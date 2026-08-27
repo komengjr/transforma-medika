@@ -12,13 +12,15 @@ class RegistrationSuccessMail extends Mailable
 
     public $participantName;
     public $eventName;
-    public $registrations; // Berisi array detail registrasi (sub event, kelas, kode, token)
+    public $registrations;
+    public $contactPersons; // Menerima data contactPersons dari Controller
 
-    public function __construct($participantName, $eventName, array $registrations)
+    public function __construct($participantName, $eventName, array $registrations, $contactPersons)
     {
         $this->participantName = $participantName;
-        $this->eventName = $eventName;
-        $this->registrations = $registrations;
+        $this->eventName       = $eventName;
+        $this->registrations   = $registrations;
+        $this->contactPersons  = $contactPersons;
     }
 
     public function build()

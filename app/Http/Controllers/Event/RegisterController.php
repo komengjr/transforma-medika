@@ -67,10 +67,21 @@ class RegisterController extends Controller
         try {
             // 3. Simpan Data Peserta Utama
             $participantCode = 'PAR-' . strtoupper(Str::random(8));
+            // 1. Ambil nilai dan hapus spasi berlebih
+            $frontTitle = trim($request->front_title);
+            $fullName   = trim($request->full_name);
+            $backTitle  = trim($request->back_title);
 
+            // 2. Gabungkan Gelar Depan (jika ada)
+            $formattedName = $frontTitle !== '' ? $frontTitle . ' ' . $fullName : $fullName;
+
+            // 3. Gabungkan Gelar Belakang dengan Koma (jika ada)
+            if ($backTitle !== '') {
+                $formattedName .= ', ' . $backTitle;
+            }
             $participantId = DB::table('event_participants')->insertGetId([
                 'participant_code' => $participantCode,
-                'full_name'        => $request->full_name,
+                'full_name'        => $formattedName,
                 'email'            => $request->email,
                 'phone_number'     => $request->phone_number,
                 'gender'           => $request->gender ?? null,
@@ -198,11 +209,17 @@ class RegisterController extends Controller
 
             // 5. Kirim Email Konfirmasi Registrasi ke Peserta
             try {
+                $contactPersons = DB::table('event_data_contact')
+                    ->where('event_data_code', $id)
+                    ->where('is_active', 1)
+                    ->orderBy('sort_order', 'asc')
+                    ->get();
                 Mail::to($request->email)->send(
                     new RegistrationSuccessMail(
-                        $request->full_name,
+                        $formattedName,
                         $event->event_data_tittle ?? 'Event Utama',
-                        $emailRegistrationData
+                        $emailRegistrationData,
+                        $contactPersons
                     )
                 );
             } catch (\Exception $mailEx) {

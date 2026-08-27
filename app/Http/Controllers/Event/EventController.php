@@ -482,21 +482,25 @@ class EventController extends Controller
         try {
             $registration = DB::table('event_registrations as er')
                 ->join('event_participants as ep', 'er.id_participant', '=', 'ep.id_participant')
-                ->join('event_data as ed', 'er.id_event_data', '=', 'ed.id_event_data') // Join ke tabel event_data
                 ->leftJoin('event_registration_classes as erc', 'er.id_registration', '=', 'erc.id_registration')
                 ->leftJoin('event_data_sub_class as esc', 'erc.id_event_data_sub_class', '=', 'esc.id_event_data_sub_class')
+                ->leftJoin('event_data_sub as eds', 'esc.event_data_sub_code', '=', 'eds.event_data_sub_code')
+                ->leftJoin('event_data as ed', 'eds.event_data_code', '=', 'ed.event_data_code')
                 ->where('er.id_registration', $id)
                 ->select(
                     'er.id_registration',
-                    'er.registration_code',       // Kode registrasi (REG-xxxxx)
+                    'er.registration_code',
                     'er.payment_status',
-                    'ed.event_data_code',         // Kode event (EVENTxxxxx)
+                    'ed.event_data_code',
+                    'ed.event_data_tittle as event_name',        // Judul Event Utama
+                    'eds.event_data_sub_name as sub_event_name', // Nama Sub Event
                     'erc.qr_code_token',
-                    'ep.full_name',
+                    'ep.full_name',                              // Nama Lengkap Peserta
                     'ep.email',
                     'ep.institution',
                     'ep.phone_number',
-                    'esc.event_data_sub_class_name'
+                    'esc.event_data_sub_class_name',
+                    'esc.event_data_sub_class_price'
                 )
                 ->first();
 
@@ -662,6 +666,150 @@ class EventController extends Controller
             ->get();
 
         return response()->json(['data' => $subEvents]);
+    }
+    // --- SIMPAN CLASS ---
+    public function saveClass(Request $request)
+    {
+        if (empty($request->nama_class) || empty($request->code_event)) {
+            return response()->json(0);
+        }
+
+        // Generate kode unik untuk class
+        $classCode = 'ESC-' . strtoupper(Str::random(8));
+
+        DB::table('event_data_sub_class')->insert([
+            'event_data_sub_class_code' => $classCode,
+            'event_data_sub_code'       => $request->code_event,
+            'event_data_sub_class_name' => $request->nama_class,
+            'event_data_sub_class_room' => $request->nama_room ?? '-',
+            'event_data_sub_class_price' => $request->class_price ?? 0,
+            'event_data_sub_class_type' => $request->class_type ?? 'default',
+            'event_data_sub_class_kuota' => $request->class_kuota ?? 0,
+            'event_data_sub_class_status' => 1, // Status default: Active (1)
+            'created_at'                => now(),
+            'updated_at'                => now(),
+        ]);
+
+        return $this->renderTableClass($request->code_event);
+    }
+
+    // --- HAPUS CLASS ---
+    public function deleteClass($id, $code)
+    {
+        DB::table('event_data_sub_class')
+            ->where('id_event_data_sub_class', $id)
+            ->delete();
+
+        return $this->renderTableClass($code);
+    }
+
+    // --- SIMPAN SESSION ---
+    public function saveSession(Request $request)
+    {
+        if (empty($request->nama_session) || empty($request->code_event)) {
+            return response()->json(0);
+        }
+
+        // Generate kode unik untuk session (contoh: ESS-ABC12345)
+        $sessionCode = 'ESS-' . strtoupper(Str::random(8));
+
+        DB::table('event_data_sub_session')->insert([
+            'event_data_sub_session_code' => $sessionCode,
+            'event_data_sub_code'         => $request->code_event,
+            'event_data_sub_session_name' => $request->nama_session,
+            'created_at'                  => now(),
+            'updated_at'                  => now(),
+        ]);
+
+        return $this->renderTableSession($request->code_event);
+    }
+
+    // --- HAPUS SESSION ---
+    public function deleteSession($id, $code)
+    {
+        DB::table('event_data_sub_session')
+            ->where('id_event_data_sub_session', $id)
+            ->delete();
+
+        return $this->renderTableSession($code);
+    }
+
+    // Helper Helper Render Partial Table Class
+    private function renderTableClass($code)
+    {
+        $data = DB::table('event_data_sub_class')
+            ->where('event_data_sub_code', $code)
+            ->get();
+
+        $html = '<table class="table table-bordered mt-0 bg-white dark__bg-1100">
+                    <thead>
+                        <tr class="fs--1 bg-300">
+                            <th>Class Name</th>
+                            <th>Room</th>
+                            <th>Price</th>
+                            <th>Kuota</th>
+                            <th>#</th>
+                        </tr>
+                    </thead>
+                    <tbody>';
+
+        foreach ($data as $datas) {
+            $html .= '<tr>
+                <td>' . e($datas->event_data_sub_class_name) . '</td>
+                <td>' . e($datas->event_data_sub_class_room) . '</td>
+                <td class="text-center align-middle">Rp ' . number_format($datas->event_data_sub_class_price, 0, ',', '.') . '</td>
+                <td class="text-center align-middle">' . $datas->event_data_sub_class_kuota . '</td>
+                <td class="text-center">
+                    <button type="button" class="btn btn-link btn-sm text-danger p-0 btn-delete-class" data-id="' . $datas->id_event_data_sub_class . '">
+                        <span class="fas fa-trash"></span>
+                    </button>
+                </td>
+            </tr>';
+        }
+
+        if ($data->isEmpty()) {
+            $html .= '<tr><td colspan="5" class="text-center text-muted">Belum ada class ditambahkan</td></tr>';
+        }
+
+        $html .= '</tbody></table>';
+
+        return response($html);
+    }
+
+    // Helper Helper Render Partial Table Session
+    private function renderTableSession($code)
+    {
+        $session = DB::table('event_data_sub_session')
+            ->where('event_data_sub_code', $code)
+            ->get();
+
+        $html = '<table class="table table-bordered mt-0 bg-white dark__bg-1100">
+                    <thead>
+                        <tr class="fs--1 bg-300">
+                            <th>Session Name</th>
+                            <th>#</th>
+                        </tr>
+                    </thead>
+                    <tbody>';
+
+        foreach ($session as $sessions) {
+            $html .= '<tr>
+                <td>' . e($sessions->event_data_sub_session_name) . '</td>
+                <td class="text-center">
+                    <button type="button" class="btn btn-link btn-sm text-danger p-0 btn-delete-session" data-id="' . $sessions->id_event_data_sub_session . '">
+                        <span class="fas fa-trash"></span>
+                    </button>
+                </td>
+            </tr>';
+        }
+
+        if ($session->isEmpty()) {
+            $html .= '<tr><td colspan="2" class="text-center text-muted fs--1">Belum ada session ditambahkan</td></tr>';
+        }
+
+        $html .= '</tbody></table>';
+
+        return response($html);
     }
 
     // 2. Fetch Sub Event Class berdasarkan event_data_sub_code
@@ -882,7 +1030,7 @@ class EventController extends Controller
     {
         return Excel::download(new ParticipantTemplateExport, 'template_import_peserta.xlsx');
     }
-    //DATA EVENT
+    // DATA EVENT
     public function menu_event_daftar($akses, $id)
     {
         if ($this->url_akses($akses, $id) == true) {
@@ -1145,21 +1293,25 @@ class EventController extends Controller
     {
         $registration = DB::table('event_registrations as er')
             ->join('event_participants as ep', 'er.id_participant', '=', 'ep.id_participant')
-            ->join('event_data as ed', 'er.id_event_data', '=', 'ed.id_event_data')
             ->leftJoin('event_registration_classes as erc', 'er.id_registration', '=', 'erc.id_registration')
             ->leftJoin('event_data_sub_class as esc', 'erc.id_event_data_sub_class', '=', 'esc.id_event_data_sub_class')
+            ->leftJoin('event_data_sub as eds', 'esc.event_data_sub_code', '=', 'eds.event_data_sub_code')
+            ->leftJoin('event_data as ed', 'eds.event_data_code', '=', 'ed.event_data_code')
             ->where('er.id_registration', $idRegistration)
             ->select(
                 'er.id_registration',
                 'er.registration_code',
                 'er.payment_status',
                 'ed.event_data_code',
+                'ed.event_data_tittle as event_name',        // Judul Event Utama
+                'eds.event_data_sub_name as sub_event_name', // Nama Sub Event
                 'erc.qr_code_token',
-                'ep.full_name',
+                'ep.full_name',                              // Nama Lengkap Peserta
                 'ep.email',
                 'ep.institution',
                 'ep.phone_number',
-                'esc.event_data_sub_class_name'
+                'esc.event_data_sub_class_name',
+                'esc.event_data_sub_class_price'
             )
             ->first();
 
@@ -1197,21 +1349,25 @@ class EventController extends Controller
             try {
                 $registration = DB::table('event_registrations as er')
                     ->join('event_participants as ep', 'er.id_participant', '=', 'ep.id_participant')
-                    ->join('event_data as ed', 'er.id_event_data', '=', 'ed.id_event_data') // Join ke tabel event_data
                     ->leftJoin('event_registration_classes as erc', 'er.id_registration', '=', 'erc.id_registration')
                     ->leftJoin('event_data_sub_class as esc', 'erc.id_event_data_sub_class', '=', 'esc.id_event_data_sub_class')
+                    ->leftJoin('event_data_sub as eds', 'esc.event_data_sub_code', '=', 'eds.event_data_sub_code')
+                    ->leftJoin('event_data as ed', 'eds.event_data_code', '=', 'ed.event_data_code')
                     ->where('er.id_registration', $idRegistration)
                     ->select(
                         'er.id_registration',
-                        'er.registration_code',       // Ambil kode registrasi (REG-xxxxx)
+                        'er.registration_code',
                         'er.payment_status',
-                        'ed.event_data_code',         // Ambil kode event (EVENTxxxxx)
+                        'ed.event_data_code',
+                        'ed.event_data_tittle as event_name',        // Judul Event Utama
+                        'eds.event_data_sub_name as sub_event_name', // Nama Sub Event
                         'erc.qr_code_token',
-                        'ep.full_name',
+                        'ep.full_name',                              // Nama Lengkap Peserta
                         'ep.email',
                         'ep.institution',
                         'ep.phone_number',
-                        'esc.event_data_sub_class_name'
+                        'esc.event_data_sub_class_name',
+                        'esc.event_data_sub_class_price'
                     )
                     ->first();
 

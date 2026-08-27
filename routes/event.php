@@ -1,5 +1,6 @@
 <?php
 
+use App\Http\Controllers\Event\EventAddonController;
 use App\Http\Controllers\Event\EventController;
 use App\Http\Controllers\Event\EventSessionExecutionController;
 use App\Http\Controllers\Event\EventSurveyController;
@@ -32,6 +33,13 @@ Route::prefix('event/')->group(function (): void {
 
     Route::get('menu-event/data-event/self-registrasi-event/{kode}', [EventController::class, 'menu_event_data_form_self_registrasi'])->name('menu_event_data_form_self_registrasi');
 });
+Route::get('/event/rekening/{event_code}', [EventAddonController::class, 'getRekening']);
+Route::post('/event/rekening/store', [EventAddonController::class, 'storeRekening']);
+Route::delete('/event/rekening/delete/{id}', [EventAddonController::class, 'destroyRekening']);
+
+Route::get('/event/contact/{event_code}', [EventAddonController::class, 'getContact']);
+Route::post('/event/contact/store', [EventAddonController::class, 'storeContact']);
+Route::delete('/event/contact/delete/{id}', [EventAddonController::class, 'destroyContact']);
 
 Route::prefix('event-email')->name('event.email.')->group(function () {
     // 2. Route Endpoint AJAX Data Filter
@@ -88,4 +96,14 @@ Route::prefix('event/survey')->name('event.survey.')->group(function () {
     // PESERTA: Halaman Publik Pengisian Survey
     Route::get('/form/{eventCode}/{registrationCode}', [EventSurveyController::class, 'publicSurveyForm'])->name('public_form');
     Route::post('/submit-answer', [EventSurveyController::class, 'submitPublicAnswer'])->name('submit_answer');
+});
+
+Route::middleware(['auth'])->group(function () {
+    // Save Class & Session
+    Route::post('/event/sub-class/save', [EventController::class, 'saveClass'])->name('menu_event_data_detail_event_saveClass');
+    Route::post('/event/sub-session/save', [EventController::class, 'saveSession'])->name('menu_event_data_detail_event_save_session');
+
+    // Delete Class & Session
+    Route::delete('/event/sub-class/delete/{id}/{code}', [EventController::class, 'deleteClass'])->name('menu_event_data_detail_event_delete_class');
+    Route::delete('/event/sub-session/delete/{id}/{code}', [EventController::class, 'deleteSession'])->name('menu_event_data_detail_event_delete_session');
 });

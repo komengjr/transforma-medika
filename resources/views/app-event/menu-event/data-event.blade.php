@@ -534,7 +534,7 @@
     <div class="modal-dialog modal-lg modal-dialog-centered">
         <div class="modal-content border-0 shadow-lg rounded-4">
             <div class="modal-header bg-dark text-white py-3">
-                <h5 class="modal-title fw-bold" id="adminSurveyModalTitle">Kelola Survey Event</h5>
+                <h5 class="modal-title fw-bold text-white" id="adminSurveyModalTitle">Kelola Survey Event</h5>
                 <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal" aria-label="Close"></button>
             </div>
             <div class="modal-body p-4">
