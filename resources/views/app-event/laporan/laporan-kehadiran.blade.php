@@ -4,6 +4,10 @@
 
 <meta name="csrf-token" content="{{ csrf_token() }}">
 
+<!-- Include DataTables + Buttons CSS -->
+<link rel="stylesheet" href="https://cdn.datatables.net/1.13.7/css/dataTables.bootstrap5.min.css">
+<link rel="stylesheet" href="https://cdn.datatables.net/buttons/2.4.2/css/buttons.bootstrap5.min.css">
+
 <style>
     :root {
         --sea-blue: #0284c7;
@@ -12,18 +16,18 @@
         --gradient-ocean: linear-gradient(135deg, #0284c7 0%, #0d9488 100%);
     }
 
-    body {
+    /* body {
         background-color: var(--bg-beach);
         background-image: radial-gradient(#e0f2fe 1px, transparent 1px);
         background-size: 24px 24px;
-    }
+    } */
 
     .font-mono {
         font-family: 'JetBrains Mono', monospace;
     }
 
     .glass-card-light {
-        background: var(--card-glass);
+        /* background: var(--card-glass); */
         backdrop-filter: blur(16px);
         border: 1px solid rgba(255, 255, 255, 0.8);
         border-radius: 1.5rem;
@@ -42,7 +46,7 @@
     }
 
     .table-beach thead th {
-        background: #e0f2fe;
+        /* background: #e0f2fe; */
         color: #0369a1;
         border-bottom: 2px solid #bae6fd;
         text-transform: uppercase;
@@ -51,28 +55,28 @@
     }
 </style>
 
-<!-- Header Banner -->
-<div class="header-ocean p-4 mb-4 text-white d-flex flex-column flex-md-row align-items-md-center justify-content-between gap-3 position-relative overflow-hidden">
+<!-- Header Banner Beach Vibe -->
+<div class="header-ocean p-4 mb-3 text-white d-flex flex-column flex-md-row align-items-md-center justify-content-between gap-3 position-relative overflow-hidden">
     <i class="fas fa-umbrella-beach position-absolute text-white opacity-10" style="font-size: 10rem; right: -20px; bottom: -30px;"></i>
     <div class="position-relative z-1">
         <span class="badge bg-warning text-dark fw-bold mb-2 px-3 py-1 rounded-pill shadow-sm">
             <i class="fas fa-sun text-danger me-1"></i> Beach Vibe Report
         </span>
         <h2 class="fw-extrabold mb-1 text-white">Laporan Kehadiran Peserta</h2>
-        <p class="mb-0 text-white-50">Filter event bertingkat hingga detail eksekusi sesi check-in peserta.</p>
+        <p class="mb-0 text-white-50">Filter bertingkat Event &rarr; Sub Event &rarr; Kelas &rarr; Sesi Check-In.</p>
     </div>
 </div>
 
-<!-- Dynamic Filter Card -->
-<div class="glass-card-light p-4 mb-4">
+<!-- Filter Card -->
+<div class="glass-card-light p-4 mb-3">
     <h5 class="fw-bold mb-3 text-dark">
         <i class="fas fa-filter text-info me-2"></i> Filter Data Laporan
     </h5>
 
     <div class="row g-3">
         <!-- 1. Event Utama -->
-        <div class="col-md-4">
-            <label class="form-label fw-semibold text-secondary small">1. Pilih Event Utama</label>
+        <div class="col-md-3">
+            <label class="form-label fw-semibold text-secondary small">1. Event Utama</label>
             <select id="selectEvent" class="form-select form-select-lg rounded-3 border-info shadow-sm fw-semibold">
                 <option value="">-- Pilih Event --</option>
                 @foreach($events as $event)
@@ -81,25 +85,33 @@
             </select>
         </div>
 
-        <!-- 2. Sub Event (Hidden Default) -->
-        <div class="col-md-4" id="wrapperSubEvent" style="display: none;">
-            <label class="form-label fw-semibold text-secondary small">2. Pilih Sub Event</label>
+        <!-- 2. Sub Event -->
+        <div class="col-md-3" id="wrapperSubEvent" style="display: none;">
+            <label class="form-label fw-semibold text-secondary small">2. Sub Event</label>
             <select id="selectSubEvent" class="form-select form-select-lg rounded-3 border-info shadow-sm fw-semibold">
                 <option value="">-- Pilih Sub Event --</option>
             </select>
         </div>
 
-        <!-- 3. Check Session (Hidden Default) -->
-        <div class="col-md-4" id="wrapperSession" style="display: none;">
-            <label class="form-label fw-semibold text-secondary small">3. Pilih Check Session (Opsional)</label>
+        <!-- 3. Kelas (Opsional) -->
+        <div class="col-md-3" id="wrapperClass" style="display: none;">
+            <label class="form-label fw-semibold text-secondary small">3. Kelas (Opsional)</label>
+            <select id="selectClass" class="form-select form-select-lg rounded-3 border-info shadow-sm fw-semibold">
+                <option value="">-- Semua Kelas --</option>
+            </select>
+        </div>
+
+        <!-- 4. Session Check (Opsional) -->
+        <div class="col-md-3" id="wrapperSession" style="display: none;">
+            <label class="form-label fw-semibold text-secondary small">4. Sesi Check-In (Opsional)</label>
             <select id="selectSession" class="form-select form-select-lg rounded-3 border-info shadow-sm fw-semibold">
-                <option value="">-- Semua Sesi Check-In --</option>
+                <option value="">-- Semua Sesi --</option>
             </select>
         </div>
     </div>
 </div>
 
-<!-- Table Card Container -->
+<!-- Table Container -->
 <div class="glass-card-light p-4" id="wrapperTablePeserta" style="display: none;">
     <div class="d-flex flex-wrap align-items-center justify-content-between gap-2 mb-3">
         <div class="d-flex align-items-center gap-2">
@@ -107,9 +119,9 @@
             <span class="badge bg-info text-white rounded-pill px-3 py-2 font-mono" id="badgeTotalPeserta">0 Peserta</span>
         </div>
 
-        <!-- Filter Quick Status Radios -->
+        <!-- Quick Status Filters & Container Tombol Export -->
         <div class="d-flex align-items-center gap-2 flex-wrap">
-            <div class="btn-group btn-group-sm" role="group">
+            <div class="btn-group btn-group-sm me-2" role="group">
                 <input type="radio" class="btn-check" name="filterStatusPresence" id="filterAll" value="all" checked autocomplete="off">
                 <label class="btn btn-outline-info px-3 fw-semibold" for="filterAll">Semua</label>
 
@@ -119,6 +131,9 @@
                 <input type="radio" class="btn-check" name="filterStatusPresence" id="filterAbsent" value="absent" autocomplete="off">
                 <label class="btn btn-outline-warning text-dark px-3 fw-semibold" for="filterAbsent">Belum Hadir</label>
             </div>
+
+            <!-- Wadah Tombol Export Excel & PDF DataTables -->
+            <div id="exportButtonsContainer"></div>
         </div>
     </div>
 
@@ -129,10 +144,10 @@
                     <th width="5%">No</th>
                     <th>Kode Reg</th>
                     <th>Nama Peserta</th>
+                    <th>Instansi</th>
                     <th>Kelas</th>
                     <th class="text-center">Status Kelas</th>
                     <th class="text-center">Check-In Sesi</th>
-                    <th class="text-center" width="10%">Aksi</th>
                 </tr>
             </thead>
             <tbody id="tbodyPeserta"></tbody>
@@ -140,12 +155,19 @@
     </div>
 </div>
 
-<!-- Scripts -->
-<link rel="stylesheet" href="https://cdn.datatables.net/1.13.7/css/dataTables.bootstrap5.min.css">
+<!-- Scripts Library -->
 <script src="https://code.jquery.com/jquery-3.7.0.min.js"></script>
 <script src="https://cdn.datatables.net/1.13.7/js/jquery.dataTables.min.js"></script>
 <script src="https://cdn.datatables.net/1.13.7/js/dataTables.bootstrap5.min.js"></script>
-<script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+
+<!-- Scripts Export DataTables (JSZip, pdfmake, Buttons) -->
+<script src="https://cdn.datatables.net/buttons/2.4.2/js/dataTables.buttons.min.js"></script>
+<script src="https://cdn.datatables.net/buttons/2.4.2/js/buttons.bootstrap5.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/jszip/3.10.1/jszip.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/pdfmake/0.1.53/pdfmake.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/pdfmake/0.1.53/vfs_fonts.js"></script>
+<script src="https://cdn.datatables.net/buttons/2.4.2/js/buttons.html5.min.js"></script>
+<script src="https://cdn.datatables.net/buttons/2.4.2/js/buttons.print.min.js"></script>
 
 <script>
     let dataTableInstance = null;
@@ -158,13 +180,16 @@
             }
         });
 
-        // 1. On Event Utama Change
+        // 1. Event Utama Change
         $('#selectEvent').on('change', function() {
             let eventCode = $(this).val();
             resetTableAndData();
             $('#selectSubEvent').html('<option value="">-- Pilih Sub Event --</option>');
-            $('#selectSession').html('<option value="">-- Semua Sesi Check-In --</option>');
+            $('#selectClass').html('<option value="">-- Semua Kelas --</option>');
+            $('#selectSession').html('<option value="">-- Semua Sesi --</option>');
+
             $('#wrapperSubEvent').hide();
+            $('#wrapperClass').hide();
             $('#wrapperSession').hide();
             $('#wrapperTablePeserta').hide();
 
@@ -184,15 +209,32 @@
             }
         });
 
-        // 2. On Sub Event Change
+        // 2. Sub Event Change
         $('#selectSubEvent').on('change', function() {
             let subCode = $(this).val();
             resetTableAndData();
-            $('#selectSession').html('<option value="">-- Semua Sesi Check-In --</option>');
+            $('#selectClass').html('<option value="">-- Semua Kelas --</option>');
+            $('#selectSession').html('<option value="">-- Semua Sesi --</option>');
+
+            $('#wrapperClass').hide();
             $('#wrapperSession').hide();
 
             if (subCode) {
-                // Fetch Dropdown Sessions
+                // Dropdown Kelas
+                $.ajax({
+                    url: `/admin/reports/attendance/get-classes/${subCode}`,
+                    type: 'GET',
+                    success: function(data) {
+                        if (data && data.length > 0) {
+                            $.each(data, function(key, cls) {
+                                $('#selectClass').append(`<option value="${cls.id_event_data_sub_class}">${cls.event_data_sub_class_name}</option>`);
+                            });
+                            $('#wrapperClass').fadeIn();
+                        }
+                    }
+                });
+
+                // Dropdown Sessions
                 $.ajax({
                     url: `/admin/reports/attendance/get-sessions/${subCode}`,
                     type: 'GET',
@@ -206,23 +248,35 @@
                     }
                 });
 
-                // Load Table Peserta
-                loadParticipants(subCode, null);
+                loadParticipants(subCode, null, null);
             } else {
                 $('#wrapperTablePeserta').hide();
             }
         });
 
-        // 3. On Session Change
-        $('#selectSession').on('change', function() {
+        // 3. Kelas Change
+        $('#selectClass').on('change', function() {
             let subCode = $('#selectSubEvent').val();
-            let sessionCode = $(this).val();
+            let classId = $(this).val();
+            let sessionCode = $('#selectSession').val();
+
             if (subCode) {
-                loadParticipants(subCode, sessionCode);
+                loadParticipants(subCode, classId, sessionCode);
             }
         });
 
-        // Filter Radio Buttons
+        // 4. Session Change
+        $('#selectSession').on('change', function() {
+            let subCode = $('#selectSubEvent').val();
+            let classId = $('#selectClass').val();
+            let sessionCode = $(this).val();
+
+            if (subCode) {
+                loadParticipants(subCode, classId, sessionCode);
+            }
+        });
+
+        // Radio Status Filter
         $('input[name="filterStatusPresence"]').on('change', function() {
             renderTableData();
         });
@@ -234,10 +288,11 @@
             dataTableInstance = null;
         }
         $('#tbodyPeserta').empty();
+        $('#exportButtonsContainer').empty();
         rawParticipantsData = [];
     }
 
-    function loadParticipants(subCode, sessionCode) {
+    function loadParticipants(subCode, classId, sessionCode) {
         resetTableAndData();
 
         $('#wrapperTablePeserta').show();
@@ -248,6 +303,7 @@
             type: 'GET',
             data: {
                 sub_code: subCode,
+                class_id: classId,
                 session_code: sessionCode
             },
             success: function(data) {
@@ -267,6 +323,7 @@
             dataTableInstance.destroy();
             dataTableInstance = null;
         }
+        $('#exportButtonsContainer').empty();
 
         let filterType = $('input[name="filterStatusPresence"]:checked').val();
         let displayData = rawParticipantsData;
@@ -284,14 +341,12 @@
         if (displayData.length > 0) {
             $.each(displayData, function(i, item) {
                 let statusKelasBadge = item.attendance_status === 'present' ?
-                    `<span class="badge bg-success bg-opacity-10 text-success border border-success border-opacity-25 rounded-pill px-3 py-2 fw-bold"><i class="fas fa-check me-1"></i> Hadir</span>` :
-                    `<span class="badge bg-warning bg-opacity-10 text-warning border border-warning border-opacity-25 rounded-pill px-3 py-2 fw-bold">Terdaftar</span>`;
+                    `<span class="badge bg-success bg-opacity-10 text-white border border-success border-opacity-25 rounded-pill px-3 py-2 fw-bold">Hadir</span>` :
+                    `<span class="badge bg-warning bg-opacity-10 text-white border border-warning border-opacity-25 rounded-pill px-3 py-2 fw-bold">Terdaftar</span>`;
 
                 let sessionCheckBadge = item.session_check_in_at ?
-                    `<span class="badge bg-info bg-opacity-10 text-info border border-info border-opacity-25 rounded-pill px-3 py-2 fw-bold"><i class="fas fa-qrcode me-1"></i> Executed</span>` :
+                    `<span class="badge bg-info bg-opacity-10 text-white border border-info border-opacity-25 rounded-pill px-3 py-2 fw-bold">Executed</span>` :
                     `<span class="badge bg-secondary bg-opacity-10 text-muted border border-opacity-25 rounded-pill px-3 py-2">Belum Sesi</span>`;
-
-                let phoneFormatted = item.phone_number ? item.phone_number.replace(/^0/, '62').replace(/[^0-9]/g, '') : '';
 
                 tbodyHtml += `
                 <tr>
@@ -301,24 +356,36 @@
                         <div class="fw-bold text-dark">${item.full_name || '-'}</div>
                         <small class="text-muted font-mono">${item.participant_code || '-'}</small>
                     </td>
-                    <td><span class="badge bg-info bg-opacity-10 text-info border border-info border-opacity-25">${item.event_data_sub_class_name || '-'}</span></td>
+                    <td>${item.institution || '-'}</td>
+                    <td><span class="badge bg-info bg-opacity-10 text-dark border border-info border-opacity-25">${item.event_data_sub_class_name || '-'}</span></td>
                     <td class="text-center">${statusKelasBadge}</td>
                     <td class="text-center">${sessionCheckBadge}</td>
-                    <td class="text-center">
-                        ${phoneFormatted ? `
-                        <a href="https://wa.me/${phoneFormatted}" target="_blank" class="btn btn-sm btn-success rounded-3 px-3">
-                            <i class="fab fa-whatsapp me-1"></i> Kontak
-                        </a>` : '-'}
-                    </td>
                 </tr>
             `;
             });
 
             $('#tbodyPeserta').html(tbodyHtml);
 
+            // Inisialisasi DataTables beserta Tombol Export
             dataTableInstance = $('#tablePeserta').DataTable({
                 responsive: true,
                 autoWidth: false,
+                dom: 'Bfrtip',
+                buttons: [{
+                        extend: 'excelHtml5',
+                        text: '<i class="fas fa-file-excel me-1"></i> Export Excel',
+                        className: 'btn btn-sm btn-success rounded-3 fw-semibold shadow-sm',
+                        title: 'Laporan Kehadiran Peserta'
+                    },
+                    {
+                        extend: 'pdfHtml5',
+                        text: '<i class="fas fa-file-pdf me-1"></i> Export PDF',
+                        className: 'btn btn-sm btn-danger rounded-3 fw-semibold shadow-sm ms-1',
+                        title: 'Laporan Kehadiran Peserta',
+                        orientation: 'portrait',
+                        pageSize: 'A4'
+                    }
+                ],
                 language: {
                     search: "Cari Peserta:",
                     lengthMenu: "_MENU_",
@@ -326,6 +393,9 @@
                     zeroRecords: "Tidak ada data kehadiran peserta"
                 }
             });
+
+            // Pindahkan posisi tombol export ke wadah khusus di atas tabel
+            dataTableInstance.buttons().container().appendTo('#exportButtonsContainer');
 
         } else {
             $('#tbodyPeserta').html(`<tr><td colspan="7" class="text-center py-4 text-muted">Tidak ada data peserta ditemukan.</td></tr>`);

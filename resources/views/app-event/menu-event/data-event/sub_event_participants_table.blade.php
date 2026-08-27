@@ -42,6 +42,8 @@
                     <th>Kode Booking / Token</th>
                     <th>Kode Peserta</th>
                     <th>Nama Lengkap</th>
+                    <th>Sub Event</th>
+                    <th>Kelas / Tiket</th>
                     <th>Email</th>
                     <th>No. WhatsApp</th>
                     <th>Status</th>
@@ -64,7 +66,7 @@
                 $emailRoute = $idRegistration ? route('menu_event_data_form_registrasi_sub_event_data_peserta_send_email', $idRegistration) : '#';
                 $deleteRoute = $idRegistration ? route('menu_event_data_form_registrasi_sub_event_data_peserta_remove', $idRegistration) : '#';
 
-                // Route Verifikasi Pelunasan (Silakan sesuaikan nama route di web.php Anda jika berbeda)
+                // Route Verifikasi Pelunasan
                 $verifyRoute = $idRegistration ? route('menu_event_data_form_registrasi_sub_event_data_peserta_verify_payment', $idRegistration) : '#';
                 @endphp
                 <tr id="row-participant-{{ $idRegistration }}">
@@ -83,6 +85,31 @@
                         <div class="fw-bold text-dark">{{ $participant->full_name }}</div>
                         <div class="small text-muted">{{ $participant->institution ?? '-' }}</div>
                     </td>
+
+                    <!-- DATA SUB EVENT -->
+                    <td>
+                        <span class="fw-bold text-dark">{{ $participant->event_data_sub_name ?? '-' }}</span>
+                        @if(isset($participant->event_data_sub_code))
+                        <br><small class="text-muted fw-mono">{{ $participant->event_data_sub_code }}</small>
+                        @endif
+                    </td>
+
+                    <!-- DATA KELAS / TIKET -->
+                    <td>
+                        @if(!empty($participant->event_data_sub_class_name))
+                        <span class="badge bg-info-subtle text-info border border-info-subtle rounded-pill px-2 py-1">
+                            <i class="fas fa-door-open me-1"></i>{{ $participant->event_data_sub_class_name }}
+                        </span>
+                        @if(!empty($participant->event_data_sub_class_room))
+                        <div class="small text-muted mt-0.5"><i class="fas fa-map-marker-alt me-1"></i>Ruang: {{ $participant->event_data_sub_class_room }}</div>
+                        @endif
+                        @else
+                        <span class="badge bg-light text-secondary border rounded-pill px-2 py-1">
+                            Otomatis / Tanpa Kelas
+                        </span>
+                        @endif
+                    </td>
+
                     <td>{{ $participant->email }}</td>
                     <td>{{ $participant->phone_number }}</td>
                     <td id="status-badge-{{ $idRegistration }}">
@@ -207,7 +234,7 @@
                 },
                 columnDefs: [{
                         orderable: false,
-                        targets: [8]
+                        targets: [10] // Disesuaikan dengan posisi kolom Aksi (Indeks ke-10)
                     },
                     {
                         className: "align-middle",
@@ -276,7 +303,7 @@
         });
     }
 
-    // 2. FUNGSI AJAX VERIFIKASI PELUNASAN (BARU)
+    // 2. FUNGSI AJAX VERIFIKASI PELUNASAN
     function verifyPaymentAjax(url, id, name) {
         const executeVerify = () => {
             if (typeof Swal !== 'undefined') {
@@ -299,10 +326,8 @@
                 },
                 dataType: 'json',
                 success: function(response) {
-                    // Update badge status di tabel secara langsung
                     $('#status-badge-' + id).html('<span class="badge bg-success-subtle text-success rounded-pill px-2 py-1 fs--2"><i class="fas fa-wallet me-1"></i>Paid</span>');
 
-                    // Sembunyikan opsi verifikasi pelunasan
                     $('#verify-opt-' + id).remove();
 
                     let msg = response.message || 'Status pembayaran berhasil diubah menjadi Lunas (Paid).';

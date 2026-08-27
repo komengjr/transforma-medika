@@ -57,12 +57,10 @@
                 top: 0;
                 left: 0;
                 width: 41.666667%;
-                /* col-lg-5 */
             }
 
             .form-right-content {
                 margin-left: 41.666667%;
-                /* Shift area kanan */
             }
         }
 
@@ -256,6 +254,13 @@
             background: var(--primary-hover);
             color: #ffffff;
         }
+
+        .subevent-group-box {
+            background: #ffffff;
+            border: 1px solid #e2e8f0;
+            border-radius: 14px;
+            padding: 1rem;
+        }
     </style>
 </head>
 
@@ -329,7 +334,7 @@
 
             </div>
 
-            <!-- ================= SISI KANAN: FORM TERPENUHI ATMOSFER EVENT ================= -->
+            <!-- ================= SISI KANAN: FORM MULTI-REGISTRASI EVENT ================= -->
             <div class="col-lg-7 form-right-content p-3 p-md-4 d-flex flex-column justify-content-center">
 
                 <div class="mx-auto style-form-wrapper" style="max-width: 680px; width: 100%;">
@@ -339,10 +344,10 @@
                         <div class="d-flex align-items-center justify-content-between mb-3 border-bottom pb-2">
                             <div>
                                 <h4 class="fw-bold text-dark m-0" style="letter-spacing: -0.4px;">Form Pendaftaran</h4>
-                                <small class="text-muted fs-8">Lengkapi identitas Anda untuk pendaftaran tiket.</small>
+                                <small class="text-muted fs-8">Pilih satu atau beberapa Sub Event sekaligus.</small>
                             </div>
                             <span class="badge bg-primary-subtle text-primary border border-primary-subtle rounded-pill px-3 py-1 fs-8">
-                                <i class="bi bi-ticket-perforated me-1"></i> Fast Track
+                                <i class="bi bi-ticket-perforated me-1"></i> Multi-Event Track
                             </span>
                         </div>
 
@@ -360,6 +365,7 @@
                             <div>{{ session('error') }}</div>
                         </div>
                         @endif
+
                         <form action="{{ route('event.register.store', $event->event_data_code) }}" method="POST">
                             @csrf
 
@@ -428,19 +434,21 @@
                             <!-- INFORMASI INFO ISI DATA DIRI -->
                             <div id="fillDataWarning" class="alert alert-warning border-0 fs-8 mb-3 rounded-3 py-2 px-3 d-flex align-items-center gap-2">
                                 <i class="bi bi-info-circle-fill"></i>
-                                <span>Silakan isi <strong>Nama Lengkap, Email, dan No. WhatsApp</strong> di atas terlebih dahulu untuk memilih Sub Event.</span>
+                                <span>Silakan isi <strong>Nama Lengkap, Email, dan No. WhatsApp</strong> di atas terlebih dahulu untuk memilih Sub Event & Kelas.</span>
                             </div>
 
-                            <!-- 1. PILIH SUB EVENT -->
+                            <!-- SELEKSI SUB EVENT & KELAS (MULTI-SELEKSI) -->
                             <div class="mb-3">
-                                <label class="custom-form-label d-block mb-1.5">1. Pilih Sub Event / Sesi <span class="text-danger">*</span></label>
+                                <label class="custom-form-label d-block mb-1.5">Pilih Sub Event & Kelas / Tiket <span class="text-danger">*</span></label>
+                                <small class="text-muted fs-8 d-block mb-2">Anda dapat mencentang lebih dari 1 Sub Event & Kelas.</small>
 
-                                <div class="row g-2">
+                                <div class="d-flex flex-column gap-3">
                                     @forelse ($subevent as $sub)
-                                    <div class="col-12">
-                                        <label class="select-card subevent-card disabled-card w-100 mb-0" for="sub-{{ $sub->event_data_sub_code }}">
+                                    <div class="subevent-group-box">
+                                        <!-- Checkbox Sub Event -->
+                                        <label class="select-card subevent-card disabled-card w-100 mb-2" for="sub-{{ $sub->event_data_sub_code }}">
                                             <div class="d-flex align-items-center gap-2.5">
-                                                <input class="form-check-input subevent-radio m-0" type="radio" name="sub_event_code" id="sub-{{ $sub->event_data_sub_code }}" value="{{ $sub->event_data_sub_code }}" required disabled style="width: 1.1em; height: 1.1em;">
+                                                <input class="form-check-input subevent-checkbox m-0" type="checkbox" name="sub_event_codes[]" id="sub-{{ $sub->event_data_sub_code }}" value="{{ $sub->event_data_sub_code }}" disabled style="width: 1.1em; height: 1.1em;">
                                                 <div>
                                                     <strong class="d-block text-dark fs-7">{{ $sub->event_data_sub_name }}</strong>
                                                     <small class="text-muted fs-8">
@@ -449,8 +457,56 @@
                                                     </small>
                                                 </div>
                                             </div>
-                                            <span class="badge bg-light text-secondary border fs-8">Pilih</span>
+                                            <span class="badge bg-light text-secondary border fs-8">Sub Event</span>
                                         </label>
+
+                                        <!-- Daftar Kelas / Tiket Terkait Subevent Ini -->
+                                        <div class="class-wrapper ms-3 ps-2 border-start d-none" id="class-container-{{ $sub->event_data_sub_code }}">
+                                            <div class="row g-2">
+                                                @php
+                                                $hasClasses = false;
+                                                @endphp
+                                                @foreach($classes as $cls)
+                                                @if($cls->event_data_sub_code == $sub->event_data_sub_code && ($cls->event_data_sub_class_type ?? '') !== 'hide')
+                                                @php
+                                                $hasClasses = true;
+                                                $price = $cls->event_data_sub_class_price ?? 0;
+                                                @endphp
+                                                <div class="col-12">
+                                                    <label class="select-card class-card w-100 mb-0" for="class-{{ $cls->id_event_data_sub_class }}">
+                                                        <div class="d-flex align-items-center gap-2.5">
+                                                            {{-- PEMBARUAN PENTING: Pengelompokan array class_ids berdasarkan kode sub event --}}
+                                                            <input class="form-check-input class-checkbox m-0" type="checkbox" name="class_ids[{{ $sub->event_data_sub_code }}][]" id="class-{{ $cls->id_event_data_sub_class }}" value="{{ $cls->id_event_data_sub_class }}" data-price="{{ $price }}" style="width: 1.1em; height: 1.1em;">
+                                                            <div>
+                                                                <strong class="d-block text-dark fs-7">{{ $cls->event_data_sub_class_name }}</strong>
+                                                                <small class="text-muted fs-8">Ruang: {{ $cls->event_data_sub_class_room ?? '-' }} | Kuota: {{ $cls->event_data_sub_class_kuota }}</small>
+                                                            </div>
+                                                        </div>
+                                                        <div>
+                                                            @if($price > 0)
+                                                            <span class="badge-price badge-price-paid">
+                                                                Rp {{ number_format($price, 0, ',', '.') }}
+                                                            </span>
+                                                            @else
+                                                            <span class="badge-price badge-price-free">
+                                                                Rp 0
+                                                            </span>
+                                                            @endif
+                                                        </div>
+                                                    </label>
+                                                </div>
+                                                @endif
+                                                @endforeach
+
+                                                @if(!$hasClasses)
+                                                <div class="col-12">
+                                                    <div class="alert alert-info border-0 fs-8 m-0 rounded-3 py-2 px-3">
+                                                        Tidak ada pilihan kelas khusus untuk Sub Event ini. (Otomatis Terdaftar)
+                                                    </div>
+                                                </div>
+                                                @endif
+                                            </div>
+                                        </div>
                                     </div>
                                     @empty
                                     <div class="col-12">
@@ -462,49 +518,9 @@
                                 </div>
                             </div>
 
-                            <!-- 2. PILIH CLASS (DINAMIS DARI SUB EVENT) -->
-                            <div class="mb-3 d-none" id="classSection">
-                                <label class="custom-form-label d-block mb-1.5">2. Pilih Kelas / Tiket <span class="text-danger">*</span></label>
-
-                                <div class="row g-2">
-                                    @foreach($classes as $cls)
-                                    @if(($cls->event_data_sub_class_type ?? '') !== 'hide')
-                                    @php
-                                    $price = $cls->event_data_sub_class_price ?? 0;
-                                    @endphp
-                                    <div class="col-12 class-item-wrapper d-none" data-subcode="{{ $cls->event_data_sub_code }}">
-                                        <label class="select-card class-card w-100 mb-0" for="class-{{ $cls->id_event_data_sub_class }}">
-                                            <div class="d-flex align-items-center gap-2.5">
-                                                <input class="form-check-input class-radio m-0" type="radio" name="class_id" id="class-{{ $cls->id_event_data_sub_class }}" value="{{ $cls->id_event_data_sub_class }}" data-price="{{ $price }}" style="width: 1.1em; height: 1.1em;">
-                                                <div>
-                                                    <strong class="d-block text-dark fs-7">{{ $cls->event_data_sub_class_name }}</strong>
-                                                    <small class="text-muted fs-8">Ruang: {{ $cls->event_data_sub_class_room ?? '-' }} | Kuota: {{ $cls->event_data_sub_class_kuota }}</small>
-                                                </div>
-                                            </div>
-                                            <div>
-                                                @if($price > 0)
-                                                <span class="badge-price badge-price-paid">
-                                                    Rp {{ number_format($price, 0, ',', '.') }}
-                                                </span>
-                                                @else
-                                                <span class="badge-price badge-price-free">
-                                                    Rp 0
-                                                </span>
-                                                @endif
-                                            </div>
-                                        </label>
-                                    </div>
-                                    @endif
-                                    @endforeach
-                                </div>
-                                <div id="noClassAlert" class="alert alert-info border-0 fs-8 mt-2 mb-0 rounded-3 py-2 px-3 d-none">
-                                    Tidak ada kelas yang tersedia untuk Sub Event ini.
-                                </div>
-                            </div>
-
                             <!-- AREA SUBMIT & KETENTUAN -->
                             <div id="submitSection" class="d-none">
-                                <!-- BIAYA TOTAL -->
+                                <!-- BIAYA TOTAL AKUMULASI -->
                                 <div class="p-2.5 px-3 mb-3 rounded-3 d-flex align-items-center justify-content-between" style="background: #f8fafc; border: 1px dashed #cbd5e1;">
                                     <span class="fw-bold text-secondary fs-7">Total Biaya Pendaftaran:</span>
                                     <h4 class="fw-extrabold text-primary m-0" id="displayTotal">Rp 0</h4>
@@ -534,30 +550,30 @@
         </div>
     </div>
 
-    <!-- JS LOGIC ENABLE/DISABLE SUB EVENT & PRICING -->
+    <!-- JS LOGIC MULTI-SELEKSI SUB EVENT & KALKULASI HARGA -->
     <script>
         $(document).ready(function() {
 
-            // FUNGSI CEK KELENGKAPAN DATA DIRI WAJIB
+            // 1. FUNGSI CEK KELENGKAPAN DATA DIRI WAJIB
             function checkParticipantData() {
                 let name = $('#full_name').val().trim();
                 let email = $('#email').val().trim();
                 let phone = $('#phone_number').val().trim();
 
                 if (name !== '' && email !== '' && phone !== '') {
-                    $('.subevent-radio').prop('disabled', false);
+                    $('.subevent-checkbox').prop('disabled', false);
                     $('.subevent-card').removeClass('disabled-card');
                     $('#fillDataWarning').addClass('d-none');
                 } else {
-                    $('.subevent-radio').prop('disabled', true).prop('checked', false);
+                    $('.subevent-checkbox').prop('disabled', true).prop('checked', false);
                     $('.subevent-card').addClass('disabled-card').removeClass('active');
-
-                    $('#classSection').addClass('d-none');
-                    $('#submitSection').addClass('d-none');
-                    $('.class-radio').prop('checked', false);
+                    $('.class-checkbox').prop('checked', false);
                     $('.class-card').removeClass('active');
+                    $('.class-wrapper').addClass('d-none');
 
+                    $('#submitSection').addClass('d-none');
                     $('#fillDataWarning').removeClass('d-none');
+                    calculateTotal();
                 }
             }
 
@@ -567,54 +583,67 @@
 
             checkParticipantData();
 
-            // 1. KETIKA SUB EVENT DIKLIK
-            $('.subevent-radio').change(function() {
-                if ($(this).is(':disabled')) return;
+            // 2. KETIKA SUB EVENT CHECKBOX DI-TOGGLE
+            $('.subevent-checkbox').change(function() {
+                let subCode = $(this).val();
+                let container = $('#class-container-' + subCode);
 
-                let selectedSubCode = $(this).val();
-
-                $('.subevent-card').removeClass('active');
-                $(this).closest('.subevent-card').addClass('active');
-
-                $('#classSection').removeClass('d-none');
-
-                $('.class-item-wrapper').addClass('d-none');
-                $('.class-radio').prop('checked', false);
-                $('.class-card').removeClass('active');
-
-                $('#submitSection').addClass('d-none');
-                $('#displayTotal').text('Rp 0');
-
-                let matchingClasses = $('.class-item-wrapper[data-subcode="' + selectedSubCode + '"]');
-
-                if (matchingClasses.length > 0) {
-                    matchingClasses.removeClass('d-none');
-                    $('#noClassAlert').addClass('d-none');
+                if ($(this).is(':checked')) {
+                    $(this).closest('.subevent-card').addClass('active');
+                    container.removeClass('d-none');
                 } else {
-                    $('#noClassAlert').removeClass('d-none');
+                    $(this).closest('.subevent-card').removeClass('active');
+                    container.addClass('d-none');
+                    // Uncheck semua kelas di subevent yang di-uncheck
+                    container.find('.class-checkbox').prop('checked', false);
+                    container.find('.class-card').removeClass('active');
                 }
+
+                checkSubmitVisibility();
+                calculateTotal();
             });
 
-            // 2. KETIKA KELAS / TIKET DIKLIK
-            $(document).on('change', '.class-radio', function() {
-                $('.class-card').removeClass('active');
-                $(this).closest('.class-card').addClass('active');
+            // 3. KETIKA KELAS / TIKET CHECKBOX DI-TOGGLE
+            $(document).on('change', '.class-checkbox', function() {
+                if ($(this).is(':checked')) {
+                    $(this).closest('.class-card').addClass('active');
+                } else {
+                    $(this).closest('.class-card').removeClass('active');
+                }
 
-                $('#submitSection').removeClass('d-none');
+                checkSubmitVisibility();
+                calculateTotal();
+            });
 
-                let price = parseFloat($(this).data('price')) || 0;
+            // 4. CEK KAPAN AREA SUBMIT TAMPIL
+            function checkSubmitVisibility() {
+                let anyChecked = $('.subevent-checkbox:checked').length > 0;
+                if (anyChecked) {
+                    $('#submitSection').removeClass('d-none');
+                } else {
+                    $('#submitSection').addClass('d-none');
+                }
+            }
 
-                if (price > 0) {
+            // 5. HITUNG TOTAL HARGA SELURUH KELAS YANG DICENTANG
+            function calculateTotal() {
+                let total = 0;
+                $('.class-checkbox:checked').each(function() {
+                    let price = parseFloat($(this).data('price')) || 0;
+                    total += price;
+                });
+
+                if (total > 0) {
                     let formatted = new Intl.NumberFormat('id-ID', {
                         style: 'currency',
                         currency: 'IDR',
                         maximumFractionDigits: 0
-                    }).format(price);
+                    }).format(total);
                     $('#displayTotal').text(formatted);
                 } else {
                     $('#displayTotal').text('Rp 0');
                 }
-            });
+            }
 
         });
     </script>

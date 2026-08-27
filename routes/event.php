@@ -67,3 +67,12 @@ Route::middleware(['auth'])->prefix('admin')->group(function () {
     // AJAX Process Scan / Check Session Peserta
     Route::post('/session/process-check', [EventSessionExecutionController::class, 'processCheck'])->name('admin.session.process-check');
 });
+
+use App\Http\Controllers\EventAttendanceReportController;
+
+Route::prefix('admin/reports/attendance')->name('admin.reports.attendance.')->group(function () {
+    Route::get('/get-sub-events/{event_code}', [EventController::class, 'getSubEventsattendance'])->name('get_sub_events');
+    Route::get('/get-classes/{sub_code}', [EventController::class, 'getClassesattendance'])->name('get_classes');
+    Route::get('/get-sessions/{sub_code}', [EventController::class, 'getSessionsattendance'])->name('get_sessions');
+    Route::get('/get-participants', [EventController::class, 'getParticipantsattendance'])->name('get_participants');
+});

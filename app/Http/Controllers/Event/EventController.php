@@ -311,27 +311,41 @@ class EventController extends Controller
     }
     public function menu_event_data_form_registrasi_event_detail_sub_event_data_peserta(Request $request)
     {
-        $subEventId = $request->sub_event_id;
+        $subEventId = $request->sub_event_id; // Dapat berisi id_event_data_sub / sub_code
 
-        // Mengambil peserta menggunakan LEFT JOIN agar peserta tetap tampil meskipun relasi kelas belum/tidak lengkap
+        // Mengambil peserta berdasarkan Sub Event beserta detail Kelas-nya
         $participants = DB::table('event_participants')
             ->join('event_registrations', 'event_participants.id_participant', '=', 'event_registrations.id_participant')
             ->leftJoin('event_registration_classes', 'event_registrations.id_registration', '=', 'event_registration_classes.id_registration')
+            ->leftJoin('event_data_sub_class', 'event_registration_classes.id_event_data_sub_class', '=', 'event_data_sub_class.id_event_data_sub_class')
+            ->leftJoin('event_data_sub', function ($join) {
+                // Relasi ke Sub Event: bisa via master class atau langsung dari registration bila tanpa class
+                $join->on('event_data_sub_class.event_data_sub_code', '=', 'event_data_sub.event_data_sub_code');
+            })
             ->where(function ($query) use ($subEventId) {
-                // Filter berdasarkan ID Sub Class atau ID Event Utama
-                $query->where('event_registration_classes.id_event_data_sub_class', $subEventId)
-                    ->orWhere('event_registrations.id_event_data', $subEventId);
+                // Filter berdasarkan ID Sub Event, Kode Sub Event, atau ID Sub Class
+                $query->where('event_data_sub.id_event_data_sub', $subEventId)
+                    ->orWhere('event_data_sub.event_data_sub_code', $subEventId)
+                    ->orWhere('event_registration_classes.id_event_data_sub_class', $subEventId);
             })
             ->select(
                 'event_participants.*',
                 'event_registrations.id_registration',
+                'event_registrations.registration_code',
                 'event_registrations.payment_status',
                 'event_registrations.registration_status',
                 'event_registrations.registration_date',
                 'event_registration_classes.qr_code_token',
-                'event_registration_classes.created_at as register_date'
+                'event_registration_classes.attendance_status',
+                'event_registration_classes.created_at as register_date',
+                // Data Sub Event & Class yang dimunculkan
+                'event_data_sub.event_data_sub_name',
+                'event_data_sub.event_data_sub_code',
+                'event_data_sub_class.event_data_sub_class_name',
+                'event_data_sub_class.event_data_sub_class_room',
+                'event_data_sub_class.event_data_sub_class_price'
             )
-            ->distinct() // Mencegah data ganda jika peserta mendaftar lebih dari 1 kelas
+            ->distinct()
             ->get();
 
         return view('app-event.menu-event.data-event.sub_event_participants_table', compact('participants'))->render();
@@ -1281,5 +1295,97 @@ class EventController extends Controller
         }
 
         return true;
+    }
+
+    // DATA KEHADIRAN
+    public function laporan_event_daftar_kehadiran($akses, $id, Request $request)
+    {
+        if ($this->url_akses($akses, $id) == true) {
+            // Get semua Event Utama
+            $events = DB::table('event_data')
+                ->select('event_data_code', 'event_data_tittle')
+                ->get();
+
+            return view('app-event.laporan.laporan-kehadiran', compact(
+                'events'
+            ), [
+                'akses' => $akses,
+                'code' => $id,
+
+            ]);
+        } else {
+            return Redirect::to('dashboard/home');
+        }
+    }
+    public function getSubEventsattendance($event_code)
+    {
+        $subEvents = DB::table('event_data_sub')
+            ->where('event_data_code', $event_code)
+            ->get();
+
+        return response()->json($subEvents);
+    }
+    public function getClassesattendance($sub_code)
+    {
+        $classes = DB::table('event_data_sub_class')
+            ->where('event_data_sub_code', $sub_code)
+            ->get();
+
+        return response()->json($classes);
+    }
+    public function getSessionsattendance($sub_code)
+    {
+        $sessions = DB::table('event_data_sub_session')
+            ->where('event_data_sub_code', $sub_code)
+            ->get();
+
+        return response()->json($sessions);
+    }
+
+    public function getParticipantsattendance(Request $request)
+    {
+        $subCode = $request->query('sub_code');
+        $classId = $request->query('class_id');
+        $sessionCode = $request->query('session_code');
+
+        $query = DB::table('event_participants')
+            ->join('event_registrations', 'event_participants.id_participant', '=', 'event_registrations.id_participant')
+            ->join('event_registration_classes', 'event_registrations.id_registration', '=', 'event_registration_classes.id_registration')
+            ->join('event_data_sub_class', 'event_registration_classes.id_event_data_sub_class', '=', 'event_data_sub_class.id_event_data_sub_class')
+            ->join('event_data_sub', 'event_data_sub_class.event_data_sub_code', '=', 'event_data_sub.event_data_sub_code')
+            ->join('event_data', 'event_data_sub.event_data_code', '=', 'event_data.event_data_code')
+            ->where('event_data_sub.event_data_sub_code', $subCode);
+
+        // Filter Opsional: Kelas
+        if ($classId) {
+            $query->where('event_data_sub_class.id_event_data_sub_class', $classId);
+        }
+
+        // Filter Opsional: Sesi Check-In
+        if ($sessionCode) {
+            $session = DB::table('event_data_sub_session')->where('event_data_sub_session_code', $sessionCode)->first();
+            if ($session) {
+                $query->leftJoin('event_session_logs', function ($join) use ($session) {
+                    $join->on('event_registration_classes.id_registration_class', '=', 'event_session_logs.id_registration_class')
+                        ->where('event_session_logs.id_event_data_sub_session', '=', $session->id_event_data_sub_session);
+                });
+            }
+        } else {
+            $query->leftJoin('event_session_logs', 'event_registration_classes.id_registration_class', '=', 'event_session_logs.id_registration_class');
+        }
+
+        $participants = $query->select(
+            'event_participants.full_name',
+            'event_participants.participant_code',
+            'event_participants.institution',
+            'event_participants.phone_number',
+            'event_registrations.registration_code',
+            'event_data_sub_class.event_data_sub_class_name',
+            'event_registration_classes.attendance_status',
+            'event_registration_classes.check_in_at',
+            'event_session_logs.created_at as session_check_in_at'
+        )->distinct()->get();
+
+        return response()->json($participants);
     }
 }
