@@ -183,6 +183,7 @@ Route::prefix('{akses}/{id}')->group(function (): void {
     Route::get('menu-event/create-event', [EventController::class, 'menu_event_create'])->name('menu_event_create');
     Route::get('menu-event/data-event', [EventController::class, 'menu_event_data'])->name('menu_event_data');
     Route::get('menu-event/daftar-event', [EventController::class, 'menu_event_daftar'])->name('menu_event_daftar');
+    Route::get('menu-event/e-sertifikat-event', [EventController::class, 'menu_event_e_sertifikat_event'])->name('menu_event_e_sertifikat_event');
     Route::get('laporan-event/laporan-kehadiran', [EventController::class, 'laporan_event_daftar_kehadiran'])->name('laporan_event_daftar_kehadiran');
     Route::get('master-event/pengiriman-email', [EventController::class, 'master_event_pengiriman_email'])->name('master_event_pengiriman_email');
     Route::get('master-event/pengiriman-whatsapp', [EventController::class, 'master_event_pengiriman_whatsapp'])->name('master_event_pengiriman_whatsapp');

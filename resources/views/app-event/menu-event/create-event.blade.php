@@ -118,7 +118,7 @@
                             <img src="{{ asset('img/app.png') }}" alt="App Logo" width="48" height="48" class="img-fluid" />
                         </div>
                         <div>
-                            <span class="badge bg-white bg-opacity-20 text-white rounded-pill px-3 py-1 fs--2 mb-2">
+                            <span class="badge bg-white bg-opacity-20 text-dark rounded-pill px-3 py-1 fs--2 mb-2">
                                 <i class="fas fa-plus-circle me-1"></i> Event Creator
                             </span>
                             <h3 class="text-white fw-bold mb-1">
@@ -145,7 +145,7 @@
 </div>
 
 <!-- 2. COVER IMAGE HEADER SECTION -->
-<div class="card mb-4 border-0 shadow-sm overflow-hidden">
+<div class="card mb-3 border-0 shadow-sm overflow-hidden">
     <div class="cover-image-container">
         <img id="card-img-top" src="{{ asset('asset/img/generic/13.jpg') }}" alt="Cover Preview" />
         <input class="d-none" id="upload-cover-image" type="file" />
@@ -231,7 +231,7 @@
             </div>
 
             <!-- SCHEDULE SUB EVENT -->
-            <div class="card border-0 shadow-sm mb-3">
+            <!-- <div class="card border-0 shadow-sm mb-3">
                 <div class="card-header bg-white border-bottom py-3 d-flex align-items-center justify-content-between">
                     <div class="d-flex align-items-center">
                         <div class="avatar avatar-md bg-soft-info text-info rounded-circle me-2">
@@ -296,7 +296,7 @@
                         <span class="fas fa-plus fs--2 me-1"></span>Tambah Sesi Sub Event
                     </button>
                 </div>
-            </div>
+            </div> -->
 
         </div>
 

@@ -108,3 +108,40 @@ Route::middleware(['auth'])->group(function () {
     Route::delete('/event/sub-class/delete/{id}/{code}', [EventController::class, 'deleteClass'])->name('menu_event_data_detail_event_delete_class');
     Route::delete('/event/sub-session/delete/{id}/{code}', [EventController::class, 'deleteSession'])->name('menu_event_data_detail_event_delete_session');
 });
+
+use App\Http\Controllers\Event\EventCertificateController;
+
+Route::prefix('admin/events/certificates')->name('admin.events.certificates.')->group(function () {
+    // Route Tampilan Utama E-Sertifikat
+    // Route::get('/', [EventCertificateController::class, 'index'])->name('index');
+
+    // Route Cetak Single / Modal Preview PDF
+    Route::get('/print/{regCode}', [EventCertificateController::class, 'printSingle'])->name('print_single');
+
+    // Route Cetak Massal (Bulk Print)
+    Route::get('/bulk-print', [EventCertificateController::class, 'bulkPrint'])->name('bulk_print');
+
+    // Route AJAX Kirim Email Sertifikat
+    Route::post('/send-email/{regCode}', [EventCertificateController::class, 'sendEmail'])->name('send_email');
+});
+
+// use App\Http\Controllers\Admin\EventCertificateController;
+
+Route::middleware(['auth'])->prefix('admin')->name('admin.')->group(function () {
+
+    // Group Route Sertifikat
+    Route::prefix('events/certificates')->name('events.certificates.')->group(function () {
+
+        // 1. Tampilan Builder / Form Upload Template Sertifikat
+        Route::get('/builder', [EventCertificateController::class, 'builder'])
+            ->name('builder');
+
+        // 2. Proses Upload File Background Template Sertifikat (POST)
+        Route::post('/upload-template', [EventCertificateController::class, 'uploadTemplate'])
+            ->name('upload_template');
+
+        // 3. Print / Stream Sertifikat Tunggal berdasarkan Kode Registrasi (PDF)
+        Route::get('/print/{regCode}', [EventCertificateController::class, 'printSingle'])
+            ->name('print_single');
+    });
+});

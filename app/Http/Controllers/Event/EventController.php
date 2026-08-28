@@ -1435,6 +1435,24 @@ class EventController extends Controller
             'message' => "Pengiriman selesai. Berhasil: {$successCount}, Gagal: {$failedCount}"
         ]);
     }
+    // DATA EVENT
+    public function menu_event_e_sertifikat_event($akses, $id)
+    {
+        if ($this->url_akses($akses, $id) == true) {
+            // Get semua Event Utama
+            $events = DB::table('event_data')
+                ->select('event_data_code', 'event_data_tittle')
+                ->get();
+
+            return view('app-event.menu-event.e-sertifikat-event', [
+                'akses' => $akses,
+                'code' => $id,
+                'events' => $events
+            ]);
+        } else {
+            return Redirect::to('dashboard/home');
+        }
+    }
     // MASTER PENGIRIMAN WHATSAPP
     public function master_event_pengiriman_whatsapp($akses, $id)
     {
