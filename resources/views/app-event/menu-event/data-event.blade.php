@@ -5,7 +5,10 @@
 <link rel="stylesheet" href="https://cdn.datatables.net/responsive/3.0.4/css/responsive.bootstrap5.css">
 <link href="{{ asset('vendors/flatpickr/flatpickr.min.css') }}" rel="stylesheet" />
 <link href="{{ asset('vendors/choices/choices.min.css') }}" rel="stylesheet" />
-
+<!-- 2. Select2 CSS -->
+<link href="https://cdn.jsdelivr.net/npm/select2@4.1.0-rc.0/dist/css/select2.min.css" rel="stylesheet" />
+<!-- (Optional) Select2 Bootstrap 5 Theme -->
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/select2-bootstrap-5-theme@1.3.0/dist/select2-bootstrap-5-theme.min.css" />
 <style>
     /* Hero Banner Modern */
     .event-hero-card {
@@ -384,7 +387,7 @@
             </div>
 
             <div class="modal-body">
-                <!-- Step 1: Pilih Sub Event & Sub Event Class (Berlaku untuk Manual & Excel) -->
+                <!-- Step 1: Pilih Sub Event & Sub Event Class -->
                 <div class="card bg-light mb-3">
                     <div class="card-body">
                         <h6 class="card-title fw-bold text-dark border-bottom pb-2 mb-3">1. Pilih Kelas Target</h6>
@@ -413,7 +416,7 @@
                 <ul class="nav nav-tabs nav-justified mb-3" id="pesertaTab" role="tablist">
                     <li class="nav-item" role="presentation">
                         <button class="nav-link active fw-bold" id="manual-tab" data-bs-toggle="tab" data-bs-target="#tab-manual" type="button" role="tab" aria-controls="tab-manual" aria-selected="true">
-                            <i class="fas fa-user-edit me-2 text-info"></i>Input Manual (Per Orang)
+                            <i class="fas fa-user-edit me-2 text-info"></i>Input Manual / Pilih Peserta
                         </button>
                     </li>
                     <li class="nav-item" role="presentation">
@@ -424,25 +427,66 @@
                 </ul>
 
                 <div class="tab-content" id="pesertaTabContent">
-                    <!-- Tab 1: Form Input Manual -->
+                    <!-- Tab 1: Form Input Manual / Pilih Existing -->
                     <div class="tab-pane fade show active" id="tab-manual" role="tabpanel" aria-labelledby="manual-tab">
                         <form id="form-add-peserta-manual">
                             @csrf
                             <input type="hidden" name="event_data_code" class="input_event_data_code">
                             <input type="hidden" name="id_event_data_sub_class" class="hidden_id_event_data_sub_class">
 
-                            <div class="row g-3">
+                            <!-- Radio Selection Mode Peserta -->
+                            <div class="card border mb-3">
+                                <div class="card-body p-3 bg-light">
+                                    <label class="form-label fw-bold mb-2">Sumber Data Peserta:</label>
+                                    <div class="d-flex gap-4">
+                                        <div class="form-check">
+                                            <input class="form-check-input" type="radio" name="participant_mode" id="mode_existing" value="existing" checked>
+                                            <label class="form-check-label fw-bold text-primary" for="mode_existing">
+                                                <i class="fas fa-database me-1"></i> Pilih dari Database (Terdaftar)
+                                            </label>
+                                        </div>
+                                        <div class="form-check">
+                                            <input class="form-check-input" type="radio" name="participant_mode" id="mode_new" value="new">
+                                            <label class="form-check-label fw-bold text-success" for="mode_new">
+                                                <i class="fas fa-user-plus me-1"></i> Input Peserta Baru
+                                            </label>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+
+                            <!-- SECTION A: PILIH PESERTA DARI DATABASE (EXISTING) -->
+                            <div id="wrapper-existing-participant" class="row g-3">
+                                <div class="col-md-12">
+                                    <label class="form-label font-weight-bold">Cari Data Peserta <span class="text-danger">*</span></label>
+                                    <select class="form-select select2-existing-participant" name="id_participant" style="width: 100%;">
+                                        <option value="">-- Cari Nama / Email / No. HP Peserta --</option>
+                                    </select>
+                                    <small class="text-muted">Ketikkan nama, email, atau nomor HP peserta yang sudah tersimpan di database.</small>
+                                </div>
+                                <div class="col-md-12">
+                                    <label class="form-label font-weight-bold">Status Pembayaran <span class="text-danger">*</span></label>
+                                    <select class="form-select" name="payment_status_existing" required>
+                                        <option value="paid" selected>PAID (Lunas)</option>
+                                        <option value="pending">PENDING (Menunggu Pembayaran)</option>
+                                        <option value="cancelled">CANCELLED (Dibatalkan)</option>
+                                    </select>
+                                </div>
+                            </div>
+
+                            <!-- SECTION B: INPUT PESERTA BARU (NEW) -->
+                            <div id="wrapper-new-participant" class="row g-3 d-none">
                                 <div class="col-md-6">
                                     <label class="form-label font-weight-bold">Nama Lengkap <span class="text-danger">*</span></label>
-                                    <input type="text" class="form-control" name="full_name" required placeholder="Masukkan nama peserta">
+                                    <input type="text" class="form-control" name="full_name" placeholder="Masukkan nama peserta">
                                 </div>
                                 <div class="col-md-6">
                                     <label class="form-label font-weight-bold">Email <span class="text-danger">*</span></label>
-                                    <input type="email" class="form-control" name="email" required placeholder="contoh@email.com">
+                                    <input type="email" class="form-control" name="email" placeholder="contoh@email.com">
                                 </div>
                                 <div class="col-md-6">
                                     <label class="form-label font-weight-bold">No. WhatsApp <span class="text-danger">*</span></label>
-                                    <input type="text" class="form-control" name="phone_number" required placeholder="08123456789">
+                                    <input type="text" class="form-control" name="phone_number" placeholder="08123456789">
                                 </div>
                                 <div class="col-md-6">
                                     <label class="form-label font-weight-bold">Jenis Kelamin</label>
@@ -462,7 +506,7 @@
                                 </div>
                                 <div class="col-md-6">
                                     <label class="form-label font-weight-bold">Status Pembayaran <span class="text-danger">*</span></label>
-                                    <select class="form-select" name="payment_status" required>
+                                    <select class="form-select" name="payment_status">
                                         <option value="paid" selected>PAID (Lunas)</option>
                                         <option value="pending">PENDING (Menunggu Pembayaran)</option>
                                         <option value="cancelled">CANCELLED (Dibatalkan)</option>
@@ -603,7 +647,8 @@
 <script src="{{ asset('vendors/choices/choices.min.js') }}"></script>
 <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
 <script src="{{ asset('vendors/tinymce/tinymce.min.js') }}"></script>
-
+<!-- 2. Select2 JS (WAJIB SETELAH JQUERY) -->
+<script src="https://cdn.jsdelivr.net/npm/select2@4.1.0-rc.0/dist/js/select2.min.js"></script>
 <script>
     $(document).ready(function() {
         new DataTable('#example', {
@@ -822,13 +867,63 @@
 </script>
 <script>
     $(document).ready(function() {
-        // 1. Saat tombol trigger diklik -> Load Sub Event
+        // Inisialisasi Select2 untuk Pencarian Peserta Existing via AJAX
+        function initParticipantSelect2() {
+            $('.select2-existing-participant').select2({
+                dropdownParent: $('#modal-add-peserta'),
+                placeholder: '-- Cari Nama / Email / No HP --',
+                allowClear: true,
+                ajax: {
+                    url: "{{ url('peserta/search-json') }}", // Sesuaikan dengan route pencarian peserta kamu
+                    dataType: 'json',
+                    delay: 250,
+                    data: function(params) {
+                        return {
+                            q: params.term // keyword pencarian
+                        };
+                    },
+                    processResults: function(data) {
+                        return {
+                            results: $.map(data, function(item) {
+                                return {
+                                    text: `${item.full_name} (${item.email} - ${item.phone_number || 'No HP -'})`,
+                                    id: item.id_participant
+                                }
+                            })
+                        };
+                    },
+                    cache: true
+                }
+            });
+        }
+
+        // Toggle tampilan antara Pilih Peserta Ada vs Peserta Baru
+        $('input[name="participant_mode"]').on('change', function() {
+            let mode = $(this).val();
+            if (mode === 'existing') {
+                $('#wrapper-existing-participant').removeClass('d-none');
+                $('#wrapper-new-participant').addClass('d-none');
+            } else {
+                $('#wrapper-existing-participant').addClass('d-none');
+                $('#wrapper-new-participant').removeClass('d-none');
+            }
+        });
+
+        // 1. Saat tombol trigger diklik -> Load Sub Event & Reset Form
         $(document).on('click', '.btn-trigger-add-peserta', function() {
             let eventCode = $(this).data('code');
             $('.input_event_data_code').val(eventCode);
             $('.hidden_id_event_data_sub_class').val('');
 
-            // Reset dropdowns
+            // Reset radio ke existing & reset form
+            $('#mode_existing').prop('checked', true).trigger('change');
+            $('#form-add-peserta-manual')[0].reset();
+            $('.select2-existing-participant').val(null).trigger('change');
+
+            // Init/Re-init Select2
+            initParticipantSelect2();
+
+            // Reset dropdown sub event
             $('.select-sub-class-target').html('<option value="">-- Pilih Sub Event Dahulu --</option>').prop('disabled', true);
 
             // Load Sub Event via AJAX
@@ -877,7 +972,7 @@
             });
         });
 
-        // 3. Sync id_event_data_sub_class yang dipilih ke hidden input form manual & excel
+        // 3. Sync id_event_data_sub_class
         $('.select-sub-class-target').on('change', function() {
             let selectedClassId = $(this).val();
             $('.hidden_id_event_data_sub_class').val(selectedClassId);
@@ -893,6 +988,12 @@
                 return;
             }
 
+            let mode = $('input[name="participant_mode"]:checked').val();
+            if (mode === 'existing' && !$('.select2-existing-participant').val()) {
+                Swal.fire('Peringatan', 'Silakan pilih peserta terdaftar terlebih dahulu!', 'warning');
+                return;
+            }
+
             let btnSave = $('#btn-save-manual');
             btnSave.prop('disabled', true).html('<i class="fas fa-spinner fa-spin me-1"></i> Menyimpan...');
 
@@ -901,17 +1002,18 @@
                 type: "POST",
                 data: $(this).serialize(),
                 success: function(response) {
-                    btnSave.prop('disabled', false).html('<i class="fas fa-save me-1"></i> Simpan Peserta Manual');
+                    btnSave.prop('disabled', false).html('<i class="fas fa-save me-1"></i> Simpan Peserta');
                     if (response.status === 'success') {
                         $('#modal-add-peserta').modal('hide');
                         $('#form-add-peserta-manual')[0].reset();
+                        $('.select2-existing-participant').val(null).trigger('change');
                         Swal.fire('Berhasil!', response.message, 'success');
                         if (typeof table !== 'undefined') table.ajax.reload();
                         else location.reload();
                     }
                 },
                 error: function(xhr) {
-                    btnSave.prop('disabled', false).html('<i class="fas fa-save me-1"></i> Simpan Peserta Manual');
+                    btnSave.prop('disabled', false).html('<i class="fas fa-save me-1"></i> Simpan Peserta');
                     let res = xhr.responseJSON;
                     Swal.fire('Gagal Simpan', res && res.message ? res.message : 'Terjadi kesalahan sistem.', 'error');
                 }

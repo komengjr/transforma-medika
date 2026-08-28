@@ -45,6 +45,17 @@ class EventController extends Controller
         $this->middleware('auth');
         $this->printerService = $printerService;
     }
+    private function generateRegistrationCode()
+    {
+        $todayPrefix = 'R' . date('Ymd');
+        $lastRegistration = DB::table('event_registrations')
+            ->where('registration_code', 'LIKE', $todayPrefix . '%')
+            ->orderBy('registration_code', 'desc')
+            ->first();
+
+        $newSequence = $lastRegistration ? ((int) substr($lastRegistration->registration_code, -5) + 1) : 1;
+        return $todayPrefix . str_pad($newSequence, 5, '0', STR_PAD_LEFT);
+    }
     public function url_akses($akses, $id)
     {
         $data = DB::table('z_menu_user')
@@ -695,7 +706,20 @@ class EventController extends Controller
 
         return $this->renderTableClass($request->code_event);
     }
+    public function searchParticipantsJson(Request $request)
+    {
+        $search = $request->get('q');
 
+        $participants = DB::table('event_participants')
+            ->select('id_participant', 'full_name', 'email', 'phone_number')
+            ->where('full_name', 'LIKE', "%{$search}%")
+            ->orWhere('email', 'LIKE', "%{$search}%")
+            ->orWhere('phone_number', 'LIKE', "%{$search}%")
+            ->limit(20)
+            ->get();
+
+        return response()->json($participants);
+    }
     // --- HAPUS CLASS ---
     public function deleteClass($id, $code)
     {
@@ -834,22 +858,32 @@ class EventController extends Controller
     // 3. Process Insert Peserta Manual
     public function storeManualPeserta(Request $request)
     {
-        $request->validate([
+        // 1. Validasi Dinamis berdasarkan participant_mode
+        $rules = [
             'event_data_code'         => 'required|string',
-            'full_name'               => 'required|string|max:255',
-            'email'                   => 'required|email',
-            'phone_number'            => 'required|string|max:20',
-            'gender'                  => 'nullable|in:L,P',
-            'identity_number'         => 'nullable|string',
-            'institution'             => 'nullable|string',
-            'address'                 => 'nullable|string',
             'id_event_data_sub_class' => 'required',
-            'payment_status'          => 'required|in:paid,pending,cancelled',
-        ]);
+            'participant_mode'        => 'required|in:existing,new',
+        ];
+
+        if ($request->participant_mode === 'existing') {
+            $rules['id_participant']          = 'required|exists:event_participants,id_participant';
+            $rules['payment_status_existing'] = 'required|in:paid,pending,cancelled';
+        } else {
+            $rules['full_name']       = 'required|string|max:255';
+            $rules['email']           = 'required|email';
+            $rules['phone_number']    = 'required|string|max:20';
+            $rules['gender']          = 'nullable|in:L,P';
+            $rules['identity_number'] = 'nullable|string';
+            $rules['institution']     = 'nullable|string';
+            $rules['address']         = 'nullable|string';
+            $rules['payment_status']   = 'required|in:paid,pending,cancelled';
+        }
+
+        $request->validate($rules);
 
         DB::beginTransaction();
         try {
-            // 1. Ambil data Main Event (id_event_data) berdasarkan event_data_code
+            // 2. Ambil data Main Event (id_event_data) berdasarkan event_data_code
             $eventData = DB::table('event_data')
                 ->where('event_data_code', $request->event_data_code)
                 ->first();
@@ -861,7 +895,7 @@ class EventController extends Controller
                 ], 404);
             }
 
-            // 2. Ambil snapshot harga dari Sub Class
+            // 3. Ambil snapshot harga dari Sub Class
             $subClass = DB::table('event_data_sub_class')
                 ->where('id_event_data_sub_class', $request->id_event_data_sub_class)
                 ->first();
@@ -873,37 +907,44 @@ class EventController extends Controller
                 ], 404);
             }
 
-            // Atur total harga (Jika statusnya 'paid' atau 'pending' pakai harga kelas, jika 'FREE' atau gratis bisa di-handle jika perlu)
             $classPrice = $subClass->event_data_sub_class_price ?? 0;
-            $totalAmount = ($request->payment_status === 'paid') ? $classPrice : $classPrice;
 
-            // 3. Generate participant_code Unik (Format: PRT-YYYYMMDD-XXXX)
-            $participantCode = 'PRT-' . date('Ymd') . '-' . strtoupper(Str::random(4));
+            // 4. Tentukan ID Participant & Status Pembayaran berdasarkan mode
+            if ($request->participant_mode === 'existing') {
+                $participantId = $request->id_participant;
+                $paymentStatus = $request->payment_status_existing;
+            } else {
+                // Murni Insert Peserta Baru (Tanpa pengecekan email/duplikasi)
+                $participantCode = 'PRT-' . date('Ymd') . '-' . strtoupper(Str::random(4));
 
-            // 4. Insert ke event_participants
-            $participantId = DB::table('event_participants')->insertGetId([
-                'participant_code' => $participantCode,
-                'full_name'        => $request->full_name,
-                'email'            => $request->email,
-                'phone_number'     => $request->phone_number,
-                'gender'           => $request->gender ?? null,
-                'identity_number'  => $request->identity_number ?? null,
-                'institution'      => $request->institution ?? null,
-                'address'          => $request->address ?? null,
-                'created_at'       => now(),
-                'updated_at'       => now(),
-            ]);
+                $participantId = DB::table('event_participants')->insertGetId([
+                    'participant_code' => $participantCode,
+                    'full_name'        => $request->full_name,
+                    'email'            => $request->email,
+                    'phone_number'     => $request->phone_number,
+                    'gender'           => $request->gender ?? null,
+                    'identity_number'  => $request->identity_number ?? null,
+                    'institution'      => $request->institution ?? null,
+                    'address'          => $request->address ?? null,
+                    'created_at'       => now(),
+                    'updated_at'       => now(),
+                ]);
+
+                $paymentStatus = $request->payment_status;
+            }
+
+            $totalAmount = $classPrice;
 
             // 5. Generate registration_code Unik (Format: REG-YYYYMMDD-XXXX)
             $registrationCode = 'REG-' . date('Ymd') . '-' . strtoupper(Str::random(4));
-
+            $regCode = $this->generateRegistrationCode();
             // 6. Insert ke event_registrations
             $registrationId = DB::table('event_registrations')->insertGetId([
-                'registration_code'   => $registrationCode,
+                'registration_code'   => $regCode,
                 'id_participant'      => $participantId,
                 'id_event_data'       => $eventData->id_event_data,
                 'total_amount'        => $totalAmount,
-                'payment_status'      => $request->payment_status,
+                'payment_status'      => $paymentStatus,
                 'registration_status' => 'active',
                 'registration_date'   => now(),
                 'created_at'          => now(),
@@ -915,20 +956,20 @@ class EventController extends Controller
 
             // 8. Insert ke event_registration_classes
             DB::table('event_registration_classes')->insert([
-                'id_registration'          => $registrationId,
-                'id_event_data_sub_class'  => $request->id_event_data_sub_class,
-                'price'                    => $classPrice, // Snapshot harga kelas saat registrasi
-                'attendance_status'        => 'registered',
-                'qr_code_token'            => $qrCodeToken,
-                'created_at'               => now(),
-                'updated_at'               => now(),
+                'id_registration'         => $registrationId,
+                'id_event_data_sub_class' => $request->id_event_data_sub_class,
+                'price'                   => $classPrice,
+                'attendance_status'       => 'registered',
+                'qr_code_token'           => $qrCodeToken,
+                'created_at'              => now(),
+                'updated_at'              => now(),
             ]);
 
             DB::commit();
 
             return response()->json([
                 'status'  => 'success',
-                'message' => 'Peserta berhasil ditambahkan secara manual!'
+                'message' => 'Peserta berhasil ditambahkan!'
             ]);
         } catch (\Exception $e) {
             DB::rollBack();
@@ -989,10 +1030,10 @@ class EventController extends Controller
                     'created_at'       => now(),
                     'updated_at'       => now(),
                 ]);
-
+                $regCode = $this->generateRegistrationCode();
                 // 2. Insert Registrasi
                 $registrationId = DB::table('event_registrations')->insertGetId([
-                    'registration_code'   => 'REG-' . date('Ymd') . '-' . strtoupper(Str::random(4)),
+                    'registration_code'   => $regCode,
                     'id_participant'      => $participantId,
                     'id_event_data'       => $eventData->id_event_data,
                     'total_amount'        => $classPrice,

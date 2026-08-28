@@ -65,6 +65,7 @@ Route::post('/event/{code}/register', [App\Http\Controllers\Event\RegisterContro
 
 Route::get('/event/sub-events/{eventCode}', [EventController::class, 'getSubEventsData']);
 Route::get('/event/sub-classes-by-sub/{subCode}', [EventController::class, 'getSubClassesBySub']);
+Route::get('/peserta/search-json', [EventController::class, 'searchParticipantsJson'])->name('peserta.search-json');
 // Route proses simpan peserta manual
 Route::post('/peserta/store', [EventController::class, 'storeManualPeserta'])->name('admin.peserta.store-manual');
 Route::post('/peserta/import-excel', [EventController::class, 'importExcelPeserta'])->name('admin.peserta.import-excel');
