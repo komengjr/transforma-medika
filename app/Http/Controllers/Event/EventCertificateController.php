@@ -26,60 +26,92 @@ class EventCertificateController extends Controller
     public function uploadTemplate(Request $request)
     {
         $request->validate([
-            'template_image'      => 'nullable|image|mimes:jpeg,png,jpg|max:5120',
+            'template_image'      => 'nullable|image|mimes:jpeg,png,jpg|max:4096',
             'signer_mode'         => 'required|in:1,2',
+
+            // Posisi & Ukuran Nama Peserta
             'pos_name_top'        => 'required|numeric',
             'font_name_size'      => 'required|numeric',
-            'align_name'          => 'required|in:left,center,right',
+            'align_name'          => 'required|string',
+
+            // Posisi & Ukuran Event Utama
             'pos_event_top'       => 'required|numeric',
             'font_event_size'     => 'required|numeric',
-            'align_event'         => 'required|in:left,center,right',
+            'align_event'         => 'required|string',
+
+            // Posisi & Ukuran Sub Event
             'pos_sub_event_top'   => 'required|numeric',
             'font_sub_event_size' => 'required|numeric',
-            'align_sub_event'     => 'required|in:left,center,right',
+            'align_sub_event'     => 'required|string',
+
+            // Pengesah 1
+            'signer1_name'        => 'nullable|string',
+            'signer1_title'       => 'nullable|string',
+            'pos_signer1_left'    => 'required|numeric',
+            'pos_signer1_top'     => 'required|numeric',
+            'font_signer1_size'   => 'required|numeric',
+
+            // Pengesah 2
+            'signer2_name'        => 'nullable|string',
+            'signer2_title'       => 'nullable|string',
+            'pos_signer2_left'    => 'required|numeric',
+            'pos_signer2_top'     => 'required|numeric',
+            'font_signer2_size'   => 'required|numeric',
+
+            'qr_signer1_size' => 'required|numeric',
+            'qr_signer2_size' => 'required|numeric',
         ]);
 
+        // Handle upload gambar jika ada background baru yang diunggah
         if ($request->hasFile('template_image')) {
-            $request->file('template_image')->storeAs('public/certificate_templates', 'background.jpg');
+            $file = $request->file('template_image');
+            $file->storeAs('public/certificate_templates', 'background.jpg');
         }
 
-        // Ambil data konfigurasi lengkap
+        // Ambil seluruh input konfigurasi
         $configData = [
-            'signer_mode'        => $request->signer_mode,
+            'signer_mode'         => $request->input('signer_mode', '1'),
 
-            // Peserta
-            'pos_name_top'       => $request->pos_name_top,
-            'font_name_size'     => $request->font_name_size,
-            'align_name'         => $request->align_name,
+            'pos_name_top'        => $request->input('pos_name_top', 75),
+            'font_name_size'      => $request->input('font_name_size', 26),
+            'align_name'          => $request->input('align_name', 'center'),
 
-            // Event Utama
-            'pos_event_top'      => $request->pos_event_top,
-            'font_event_size'    => $request->font_event_size,
-            'align_event'        => $request->align_event,
+            'pos_event_top'       => $request->input('pos_event_top', 105),
+            'font_event_size'     => $request->input('font_event_size', 20),
+            'align_event'         => $request->input('align_event', 'center'),
 
-            // Sub Event & Class
-            'pos_sub_event_top'  => $request->pos_sub_event_top,
-            'font_sub_event_size' => $request->font_sub_event_size,
-            'align_sub_event'    => $request->align_sub_event,
+            'pos_sub_event_top'   => $request->input('pos_sub_event_top', 125),
+            'font_sub_event_size' => $request->input('font_sub_event_size', 13),
+            'align_sub_event'     => $request->input('align_sub_event', 'center'),
 
-            // Pengesah 1 (Kanan)
-            'signer1_name'       => $request->signer1_name ?? 'Dr. John Doe, M.Pd',
-            'signer1_title'      => $request->signer1_title ?? 'Ketua Panitia Pelaksana',
-            'pos_signer1_top'    => $request->pos_signer1_top ?? 160,
-            'font_signer1_size'  => $request->font_signer1_size ?? 12,
-            'align_signer1'      => $request->align_signer1 ?? 'right',
+            // Pengesah 1 (Koordinat Left X, Top Y, Font & QR Size)
+            'signer1_name'        => $request->input('signer1_name'),
+            'signer1_title'       => $request->input('signer1_title'),
+            'pos_signer1_left'    => $request->input('pos_signer1_left', 180),
+            'pos_signer1_top'     => $request->input('pos_signer1_top', 160),
+            'font_signer1_size'   => $request->input('font_signer1_size', 12),
+            'qr_signer1_size'     => $request->input('qr_signer1_size', 60),
 
-            // Pengesah 2 (Kiri - Pastikan Data Tersimpan)
-            'signer2_name'       => $request->signer2_name ?? 'Prof. Jane Smith, Ph.D',
-            'signer2_title'      => $request->signer2_title ?? 'Ketua Umum Organisasi',
-            'pos_signer2_top'    => $request->pos_signer2_top ?? 160,
-            'font_signer2_size'  => $request->font_signer2_size ?? 12,
-            'align_signer2'      => $request->align_signer2 ?? 'left',
+            // Pengesah 2 (Koordinat Left X, Top Y, Font & QR Size)
+            'signer2_name'        => $request->input('signer2_name'),
+            'signer2_title'       => $request->input('signer2_title'),
+            'pos_signer2_left'    => $request->input('pos_signer2_left', 30),
+            'pos_signer2_top'     => $request->input('pos_signer2_top', 160),
+            'font_signer2_size'   => $request->input('font_signer2_size', 12),
+            'qr_signer2_size'     => $request->input('qr_signer2_size', 60),
         ];
 
-        Storage::put('public/certificate_templates/config.json', json_encode($configData));
+        // Simpan ke file JSON
+        $jsonPath = storage_path('app/public/certificate_templates/config.json');
 
-        return redirect()->back()->with('success', 'Konfigurasi sertifikat berhasil diperbarui!');
+        // Pastikan direktori ada
+        if (!file_exists(dirname($jsonPath))) {
+            mkdir(dirname($jsonPath), 0755, true);
+        }
+
+        file_put_contents($jsonPath, json_encode($configData, JSON_PRETTY_PRINT));
+
+        return redirect()->back()->with('success', 'Konfigurasi tata letak sertifikat berhasil disimpan.');
     }
     public function index()
     {
@@ -247,31 +279,50 @@ class EventCertificateController extends Controller
     }
     private function getCertificateConfig()
     {
-        if (Storage::exists('public/certificate_templates/config.json')) {
-            return json_decode(Storage::get('public/certificate_templates/config.json'), true);
+        $jsonPath = storage_path('app/public/certificate_templates/config.json');
+
+        // Default nilai jika file config.json belum tersedia
+        $defaultConfig = [
+            'signer_mode'         => '1',
+
+            'pos_name_top'        => 75,
+            'font_name_size'      => 26,
+            'align_name'          => 'center',
+
+            'pos_event_top'       => 105,
+            'font_event_size'     => 20,
+            'align_event'         => 'center',
+
+            'pos_sub_event_top'   => 125,
+            'font_sub_event_size' => 13,
+            'align_sub_event'     => 'center',
+
+            'signer1_name'        => 'Dr. John Doe, M.Pd',
+            'signer1_title'       => 'Ketua Panitia Pelaksana',
+            'pos_signer1_left'    => 180,
+            'pos_signer1_top'     => 160,
+            'font_signer1_size'   => 12,
+
+            'signer2_name'        => 'Prof. Jane Smith, Ph.D',
+            'signer2_title'       => 'Ketua Umum Organisasi',
+            'pos_signer2_left'    => 30,
+            'pos_signer2_top'     => 160,
+            'font_signer2_size'   => 12,
+
+            'qr_signer1_size' => 60,
+            'qr_signer2_size' => 60,
+        ];
+
+        if (file_exists($jsonPath)) {
+            $jsonContent = file_get_contents($jsonPath);
+            $savedConfig = json_decode($jsonContent, true);
+
+            if (is_array($savedConfig)) {
+                // Gabungkan data tersimpan dengan default (menjaga kunci baru tetap ada jika file JSON lama)
+                return array_merge($defaultConfig, $savedConfig);
+            }
         }
 
-        return [
-            'signer_mode'        => '2',
-            'pos_name_top'       => 75,
-            'font_name_size'     => 26,
-            'align_name'         => 'center',
-            'pos_event_top'      => 105,
-            'font_event_size'    => 20,
-            'align_event'        => 'center',
-            'pos_sub_event_top'  => 125,
-            'font_sub_event_size' => 13,
-            'align_sub_event'    => 'center',
-            'signer1_name'       => 'Dr. John Doe, M.Pd',
-            'signer1_title'      => 'Ketua Panitia Pelaksana',
-            'pos_signer1_top'    => 160,
-            'font_signer1_size'  => 12,
-            'align_signer1'      => 'right',
-            'signer2_name'       => 'Prof. Jane Smith, Ph.D',
-            'signer2_title'      => 'Ketua Umum Organisasi',
-            'pos_signer2_top'    => 160,
-            'font_signer2_size'  => 12,
-            'align_signer2'      => 'left',
-        ];
+        return $defaultConfig;
     }
 }

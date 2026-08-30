@@ -1,5 +1,6 @@
 <?php
 
+use App\Http\Controllers\Event\CertificateController;
 use App\Http\Controllers\Event\EventAddonController;
 use App\Http\Controllers\Event\EventController;
 use App\Http\Controllers\Event\EventSessionExecutionController;
@@ -145,3 +146,5 @@ Route::middleware(['auth'])->prefix('admin')->name('admin.')->group(function () 
             ->name('print_single');
     });
 });
+Route::get('/verify-certificate/{code}', [CertificateController::class, 'verify'])
+    ->name('certificate.verify');

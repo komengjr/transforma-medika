@@ -26,8 +26,8 @@
                     <div class="mb-3 bg-light p-2 border rounded">
                         <label class="form-label fw-bold text-dark mb-1">Jumlah Penandatangan / Pengesah:</label>
                         <select name="signer_mode" class="form-select form-select-sm" required>
-                            <option value="1" {{ ($config['signer_mode'] ?? '1') == '1' ? 'selected' : '' }}>1 Pengesah (Kanan)</option>
-                            <option value="2" {{ ($config['signer_mode'] ?? '1') == '2' ? 'selected' : '' }}>2 Pengesah (Kiri & Kanan)</option>
+                            <option value="1" {{ ($config['signer_mode'] ?? '1') == '1' ? 'selected' : '' }}>1 Pengesah</option>
+                            <option value="2" {{ ($config['signer_mode'] ?? '1') == '2' ? 'selected' : '' }}>2 Pengesah</option>
                         </select>
                     </div>
 
@@ -99,52 +99,52 @@
                     <hr>
 
                     <!-- 4. PENGESAH 1 -->
-                    <h6 class="fw-bold text-secondary">4. Pengesah 1 (Kanan)</h6>
+                    <h6 class="fw-bold text-secondary">4. Pengesah 1</h6>
                     <div class="mb-2">
                         <input type="text" name="signer1_name" class="form-control form-control-sm mb-1" placeholder="Nama Pengesah 1" value="{{ $config['signer1_name'] ?? 'Dr. John Doe, M.Pd' }}">
                         <input type="text" name="signer1_title" class="form-control form-control-sm" placeholder="Jabatan Pengesah 1" value="{{ $config['signer1_title'] ?? 'Ketua Panitia Pelaksana' }}">
                     </div>
                     <div class="row g-2 mb-3">
-                        <div class="col-4">
+                        <div class="col-3">
+                            <label class="small fw-bold">Left X (mm):</label>
+                            <input type="number" name="pos_signer1_left" class="form-control form-control-sm" value="{{ $config['pos_signer1_left'] ?? 180 }}">
+                        </div>
+                        <div class="col-3">
                             <label class="small fw-bold">Top Y (mm):</label>
                             <input type="number" name="pos_signer1_top" class="form-control form-control-sm" value="{{ $config['pos_signer1_top'] ?? 160 }}">
                         </div>
-                        <div class="col-4">
-                            <label class="small fw-bold">Ukuran (pt):</label>
+                        <div class="col-3">
+                            <label class="small fw-bold">Font (pt):</label>
                             <input type="number" name="font_signer1_size" class="form-control form-control-sm" value="{{ $config['font_signer1_size'] ?? 12 }}">
                         </div>
-                        <div class="col-4">
-                            <label class="small fw-bold">Rata Teks:</label>
-                            <select name="align_signer1" class="form-select form-select-sm">
-                                <option value="right" {{ ($config['align_signer1'] ?? 'right') == 'right' ? 'selected' : '' }}>Kanan</option>
-                                <option value="center" {{ ($config['align_signer1'] ?? '') == 'center' ? 'selected' : '' }}>Tengah</option>
-                                <option value="left" {{ ($config['align_signer1'] ?? '') == 'left' ? 'selected' : '' }}>Kiri</option>
-                            </select>
+                        <div class="col-3">
+                            <label class="small fw-bold">QR Size (px):</label>
+                            <input type="number" name="qr_signer1_size" class="form-control form-control-sm" value="{{ $config['qr_signer1_size'] ?? 60 }}">
                         </div>
                     </div>
 
                     <!-- 5. PENGESAH 2 -->
-                    <h6 class="fw-bold text-secondary">5. Pengesah 2 (Kiri)</h6>
+                    <h6 class="fw-bold text-secondary">5. Pengesah 2</h6>
                     <div class="mb-2">
                         <input type="text" name="signer2_name" class="form-control form-control-sm mb-1" placeholder="Nama Pengesah 2" value="{{ $config['signer2_name'] ?? 'Prof. Jane Smith, Ph.D' }}">
                         <input type="text" name="signer2_title" class="form-control form-control-sm" placeholder="Jabatan Pengesah 2" value="{{ $config['signer2_title'] ?? 'Ketua Umum Organisasi' }}">
                     </div>
                     <div class="row g-2 mb-3">
-                        <div class="col-4">
+                        <div class="col-3">
+                            <label class="small fw-bold">Left X (mm):</label>
+                            <input type="number" name="pos_signer2_left" class="form-control form-control-sm" value="{{ $config['pos_signer2_left'] ?? 30 }}">
+                        </div>
+                        <div class="col-3">
                             <label class="small fw-bold">Top Y (mm):</label>
                             <input type="number" name="pos_signer2_top" class="form-control form-control-sm" value="{{ $config['pos_signer2_top'] ?? 160 }}">
                         </div>
-                        <div class="col-4">
-                            <label class="small fw-bold">Ukuran (pt):</label>
+                        <div class="col-3">
+                            <label class="small fw-bold">Font (pt):</label>
                             <input type="number" name="font_signer2_size" class="form-control form-control-sm" value="{{ $config['font_signer2_size'] ?? 12 }}">
                         </div>
-                        <div class="col-4">
-                            <label class="small fw-bold">Rata Teks:</label>
-                            <select name="align_signer2" class="form-select form-select-sm">
-                                <option value="left" {{ ($config['align_signer2'] ?? 'left') == 'left' ? 'selected' : '' }}>Kiri</option>
-                                <option value="center" {{ ($config['align_signer2'] ?? '') == 'center' ? 'selected' : '' }}>Tengah</option>
-                                <option value="right" {{ ($config['align_signer2'] ?? '') == 'right' ? 'selected' : '' }}>Kanan</option>
-                            </select>
+                        <div class="col-3">
+                            <label class="small fw-bold">QR Size (px):</label>
+                            <input type="number" name="qr_signer2_size" class="form-control form-control-sm" value="{{ $config['qr_signer2_size'] ?? 60 }}">
                         </div>
                     </div>
 
@@ -171,23 +171,58 @@
                         </div>
 
                         <!-- Pengesah 1 -->
-                        <div style="position: absolute; top: {{ $config['pos_signer1_top'] ?? 160 }}mm; right: 8%; width: 35%; text-align: {{ $config['align_signer1'] ?? 'right' }};">
+                        <div style="position: absolute; top: {{ $config['pos_signer1_top'] ?? 160 }}mm; left: {{ $config['pos_signer1_left'] ?? 180 }}mm; width: 90mm; text-align: center;">
+
+                            <!-- Barcode / QR Code Pengesah 1 -->
+                            @php
+                            $signer1Name = !empty($config['signer1_name']) ? $config['signer1_name'] : 'Dr. John Doe, M.Pd';
+                            $qrSize1 = $config['qr_signer1_size'] ?? 60;
+
+                            // Menggunakan URL Verifikasi Resmi (Sample Code untuk Preview Builder)
+                            $sampleCode = 'REG-SAMPLE-12345';
+                            $verifyUrl1 = route('certificate.verify', ['code' => $sampleCode]);
+                            $qrApiUrl1 = "https://api.qrserver.com/v1/create-qr-code/?size={$qrSize1}x{$qrSize1}&data=" . urlencode($verifyUrl1);
+                            @endphp
+
+                            <div style="margin-bottom: 8px;">
+                                <img src="{{ $qrApiUrl1 }}"
+                                    alt="QR TTE"
+                                    style="width: {{ $qrSize1 }}px; height: {{ $qrSize1 }}px;">
+                            </div>
+
                             <div style="font-size: {{ $config['font_signer1_size'] ?? 12 }}pt; font-weight: bold; color: #0f172a; text-decoration: underline;">
-                                {{ $config['signer1_name'] ?? 'Dr. John Doe, M.Pd' }}
+                                {{ $signer1Name }}
                             </div>
                             <div style="font-size: 10pt; color: #475569;">
-                                {{ $config['signer1_title'] ?? 'Ketua Panitia Pelaksana' }}
+                                {{ !empty($config['signer1_title']) ? $config['signer1_title'] : 'Ketua Panitia Pelaksana' }}
                             </div>
                         </div>
 
                         <!-- Pengesah 2 -->
                         @if(($config['signer_mode'] ?? '1') == '2')
-                        <div style="position: absolute; top: {{ $config['pos_signer2_top'] ?? 160 }}mm; left: 8%; width: 35%; text-align: {{ $config['align_signer2'] ?? 'left' }};">
+                        <div style="position: absolute; top: {{ $config['pos_signer2_top'] ?? 160 }}mm; left: {{ $config['pos_signer2_left'] ?? 30 }}mm; width: 90mm; text-align: center;">
+
+                            <!-- Barcode / QR Code Pengesah 2 -->
+                            @php
+                            $signer2Name = !empty($config['signer2_name']) ? $config['signer2_name'] : 'Prof. Jane Smith, Ph.D';
+                            $qrSize2 = $config['qr_signer2_size'] ?? 60;
+
+                            // Menggunakan URL Verifikasi Resmi (Sample Code untuk Preview Builder)
+                            $verifyUrl2 = route('certificate.verify', ['code' => $sampleCode]);
+                            $qrApiUrl2 = "https://api.qrserver.com/v1/create-qr-code/?size={$qrSize2}x{$qrSize2}&data=" . urlencode($verifyUrl2);
+                            @endphp
+
+                            <div style="margin-bottom: 8px;">
+                                <img src="{{ $qrApiUrl2 }}"
+                                    alt="QR TTE"
+                                    style="width: {{ $qrSize2 }}px; height: {{ $qrSize2 }}px;">
+                            </div>
+
                             <div style="font-size: {{ $config['font_signer2_size'] ?? 12 }}pt; font-weight: bold; color: #0f172a; text-decoration: underline;">
-                                {{ $config['signer2_name'] ?? 'Prof. Jane Smith, Ph.D' }}
+                                {{ $signer2Name }}
                             </div>
                             <div style="font-size: 10pt; color: #475569;">
-                                {{ $config['signer2_title'] ?? 'Ketua Umum Organisasi' }}
+                                {{ !empty($config['signer2_title']) ? $config['signer2_title'] : 'Ketua Umum Organisasi' }}
                             </div>
                         </div>
                         @endif

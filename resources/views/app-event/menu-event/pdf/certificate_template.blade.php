@@ -66,26 +66,25 @@
             color: #475569;
         }
 
-        /* Pengesah 1 (Kanan) */
+        /* Pengesah 1 */
         .signer1-box {
             position: absolute;
             top: {{ $config['pos_signer1_top'] ?? 160 }}mm;
-            right: 8%;
-            width: 38%;
-            text-align: {{ $config['align_signer1'] ?? 'right' }};
+            left: {{ $config['pos_signer1_left'] ?? 180 }}mm;
+            width: 90mm;
+            text-align: center;
         }
 
-        /* Pengesah 2 (Kiri) */
+        /* Pengesah 2 */
         .signer2-box {
             position: absolute;
             top: {{ $config['pos_signer2_top'] ?? 160 }}mm;
-            left: 8%;
-            width: 38%;
-            text-align: {{ $config['align_signer2'] ?? 'left' }};
+            left: {{ $config['pos_signer2_left'] ?? 30 }}mm;
+            width: 90mm;
+            text-align: center;
         }
 
         .signer-name {
-            font-size: {{ $config['font_signer1_size'] ?? 12 }}pt;
             font-weight: bold;
             color: #0f172a;
             border-bottom: 1px solid #0f172a;
@@ -97,6 +96,10 @@
             font-size: 10pt;
             color: #475569;
             margin-top: 3px;
+        }
+
+        .qr-container {
+            margin-bottom: 6px;
         }
     </style>
 </head>
@@ -122,21 +125,47 @@
         </div>
         @endif
 
-        <!-- Pengesah 1 (Kanan) -->
+        <!-- Pengesah 1 -->
         <div class="signer1-box">
+            @php
+                $signer1Name = $config['signer1_name'] ?? 'Dr. John Doe, M.Pd';
+                $qrSize1     = $config['qr_signer1_size'] ?? 60;
+
+                // Dynamic verification URL
+                $verifyUrl1  = route('certificate.verify', ['code' => $participant->registration_code]);
+                $qrApiUrl1   = "https://api.qrserver.com/v1/create-qr-code/?size={$qrSize1}x{$qrSize1}&data=" . urlencode($verifyUrl1);
+            @endphp
+
+            <div class="qr-container">
+                <img src="{{ $qrApiUrl1 }}" alt="QR TTE" style="width: {{ $qrSize1 }}px; height: {{ $qrSize1 }}px;">
+            </div>
+
             <div class="signer-name" style="font-size: {{ $config['font_signer1_size'] ?? 12 }}pt;">
-                {{ $config['signer1_name'] ?? 'Dr. John Doe, M.Pd' }}
+                {{ $signer1Name }}
             </div>
             <div class="signer-title">
                 {{ $config['signer1_title'] ?? 'Ketua Panitia Pelaksana' }}
             </div>
         </div>
 
-        <!-- Pengesah 2 (Kiri) - Tampil jika mode == 2 ATAU jika variabel signer2_name terisi -->
-        @if(($config['signer_mode'] ?? '1') == '2' || !empty($config['signer2_name']))
+        <!-- Pengesah 2 (Tampil HANYA jika mode signer_mode == '2') -->
+        @if(($config['signer_mode'] ?? '1') == '2')
         <div class="signer2-box">
+            @php
+                $signer2Name = $config['signer2_name'] ?? 'Prof. Jane Smith, Ph.D';
+                $qrSize2     = $config['qr_signer2_size'] ?? 60;
+
+                // Dynamic verification URL
+                $verifyUrl2  = route('certificate.verify', ['code' => $participant->registration_code]);
+                $qrApiUrl2   = "https://api.qrserver.com/v1/create-qr-code/?size={$qrSize2}x{$qrSize2}&data=" . urlencode($verifyUrl2);
+            @endphp
+
+            <div class="qr-container">
+                <img src="{{ $qrApiUrl2 }}" alt="QR TTE" style="width: {{ $qrSize2 }}px; height: {{ $qrSize2 }}px;">
+            </div>
+
             <div class="signer-name" style="font-size: {{ $config['font_signer2_size'] ?? 12 }}pt;">
-                {{ $config['signer2_name'] ?? 'Prof. Jane Smith, Ph.D' }}
+                {{ $signer2Name }}
             </div>
             <div class="signer-title">
                 {{ $config['signer2_title'] ?? 'Ketua Umum Organisasi' }}
