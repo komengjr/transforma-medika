@@ -353,15 +353,13 @@
                         if (res.status === 'success') {
                             document.getElementById('sound-success').play();
 
+                            // Alert Swal Berhasil
                             Swal.fire({
-                                toast: true,
-                                position: 'top-end',
                                 icon: 'success',
-                                title: res.message,
-                                showConfirmButton: false,
-                                timer: 2500,
-                                background: '#ffffff',
-                                color: '#0f172a'
+                                title: 'Berhasil Check-In!',
+                                html: res.message,
+                                timer: 2000,
+                                showConfirmButton: false
                             });
 
                             let targetRow = $(`#row-reg-${registrationCode}`);
@@ -374,25 +372,24 @@
                             if (targetRow.length) {
                                 targetRow.addClass('row-just-checked');
                                 targetRow.find('.status-col').html(`
-                            <span class="badge bg-success bg-opacity-10 text-success border border-success border-opacity-25 rounded-pill px-3 py-2 fw-bold">
-                                <i class="fas fa-circle-check me-1"></i> ${nowTime}
-                            </span>
-                        `);
+                                <span class="badge bg-success bg-opacity-10 text-success border border-success border-opacity-25 rounded-pill px-3 py-2 fw-bold">
+                                    <i class="fas fa-circle-check me-1"></i> ${nowTime}
+                                </span>
+                            `);
                             }
 
                             let counterElem = $('#counter-hadir');
                             counterElem.text((parseInt(counterElem.text()) || 0) + 1);
                         } else {
                             document.getElementById('sound-error').play();
+
+                            // Alert Swal Peringatan / Gagal Logical
                             Swal.fire({
-                                toast: true,
-                                position: 'top-end',
                                 icon: 'warning',
-                                title: res.message,
-                                showConfirmButton: false,
-                                timer: 3000,
-                                background: '#ffffff',
-                                color: '#0f172a'
+                                title: 'Gagal Check-In',
+                                html: res.message,
+                                confirmButtonText: 'OK',
+                                confirmButtonColor: '#0284c7'
                             });
                         }
                     },
@@ -402,15 +399,15 @@
                         document.getElementById('sound-error').play();
 
                         let res = xhr.responseJSON;
+                        let errorMessage = (res && res.message) ? res.message : 'Registration Code Tidak Valid atau Gangguan Sistem!';
+
+                        // Alert Swal Gagal / Error System
                         Swal.fire({
-                            toast: true,
-                            position: 'top-end',
                             icon: 'error',
-                            title: res && res.message ? res.message : 'Registration Code Tidak Valid!',
-                            showConfirmButton: false,
-                            timer: 3000,
-                            background: '#ffffff',
-                            color: '#0f172a'
+                            title: 'Scan Gagal',
+                            html: errorMessage,
+                            confirmButtonText: 'Coba Lagi',
+                            confirmButtonColor: '#d33'
                         });
                     }
                 });
@@ -441,7 +438,11 @@
                             submitSessionCheck(decodedText);
                         }
                     ).catch(err => {
-                        Swal.fire('Kamera Error', 'Akses kamera ditolak atau tidak tersedia.', 'error');
+                        Swal.fire({
+                            icon: 'error',
+                            title: 'Kamera Error',
+                            text: 'Akses kamera ditolak atau tidak tersedia.'
+                        });
                         container.addClass('d-none');
                     });
 
@@ -457,7 +458,6 @@
             });
         });
     </script>
-
 </body>
 
 </html>
