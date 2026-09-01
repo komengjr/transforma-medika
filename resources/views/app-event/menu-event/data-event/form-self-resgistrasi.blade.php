@@ -700,6 +700,7 @@
                     "_token": "{{ csrf_token() }}",
                     "nama_peserta": currentParticipantData.full_name,
                     "nama_event": currentParticipantData.event_name,
+                    "nama_sub_event": currentParticipantData.sub_event_name,
                     "id_event": currentParticipantData.id_event,
                     "kode_booking": currentParticipantData.qr_code_token,
                     "registration_code": currentParticipantData.registration_code,

@@ -34,6 +34,9 @@ Route::prefix('event/')->group(function (): void {
     Route::post('menu-event/daftar-event/verifikasi-pelunasan-survay/{code}', [EventController::class, 'menu_event_daftar_verifikasi_pelunasan'])->name('menu_event_daftar_verifikasi_pelunasan');
 
     Route::get('menu-event/data-event/self-registrasi-event/{kode}', [EventController::class, 'menu_event_data_form_self_registrasi'])->name('menu_event_data_form_self_registrasi');
+
+    Route::post('master-event/event-access', [EventController::class, 'storeaccess'])->name('event.access.store');
+    Route::delete('master-event/event-access/{id}', [EventController::class, 'destroyaccess'])->name('event.access.destroy');
 });
 Route::get('/event/rekening/{event_code}', [EventAddonController::class, 'getRekening']);
 Route::post('/event/rekening/store', [EventAddonController::class, 'storeRekening']);
@@ -149,3 +152,5 @@ Route::middleware(['auth'])->prefix('admin')->name('admin.')->group(function () 
 });
 Route::get('/verify-certificate/{code}', [CertificateController::class, 'verify'])
     ->name('certificate.verify');
+
+use App\Http\Controllers\EventAccessController;

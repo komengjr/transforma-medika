@@ -624,10 +624,10 @@ class EventController extends Controller
     }
     public function menu_event_data_form_registrasi_event_test_print(Request $request)
     {
-        // 1. Validasi Input Form Sesuai Parameter
         $request->validate([
             'nama_peserta'      => 'required|string|max:100',
             'nama_event'        => 'required|string|max:100',
+            'nama_sub_event'    => 'required|string|max:100',
             'id_event'          => 'required|string|max:50',
             'kode_booking'      => 'required|string|max:50',
             'registration_code' => 'required|string|max:50',
@@ -648,20 +648,23 @@ class EventController extends Controller
         // Posisi Y = 5 (Tetap di bagian atas)
         $zplCode .= "^FO10,5^BQN,2,6^FDHA," . $request->registration_code . "^FS";
 
-        // --- SISI KANAN: TEKS INFORMASI (POSISI TURUN 3 MM / 24 DOTS) ---
+        // --- SISI KANAN: TEKS INFORMASI (DITURUNKAN 4 MM / +32 DOTS) ---
 
-        // 1. NAMA PESERTA (Posisi Y naik dari 20 ke 44)
-        $zplCode .= "^FO195,44^FB200,2,0,L^A0N,22,22^FD" . $request->nama_peserta . "^FS";
+        // 1. NAMA PESERTA (Posisi Y: 20 + 32 = 52)
+        $zplCode .= "^FO195,52^FB200,2,0,L^A0N,22,22^FD" . $request->nama_peserta . "^FS";
 
-        // 2. KELAS / KATEGORI (Posisi Y naik dari 80 ke 104)
-        $zplCode .= "^FO195,104^FB200,1,0,L^A0N,18,18^FD[" . $request->class_name . "]^FS";
+        // 2. KELAS / KATEGORI (Posisi Y: 70 + 32 = 102)
+        $zplCode .= "^FO195,102^FB200,1,0,L^A0N,18,18^FD[" . $request->class_name . "]^FS";
 
-        // 3. NAMA EVENT & ID EVENT (Posisi Y naik dari 110 ke 134)
+        // 3. NAMA EVENT & ID EVENT (Posisi Y: 105 + 32 = 137)
         $eventInfo = $request->nama_event . " (ID: " . $request->id_event . ")";
-        $zplCode .= "^FO195,134^FB200,2,0,L^A0N,16,16^FD" . $eventInfo . "^FS";
+        $zplCode .= "^FO195,137^FB200,1,0,L^A0N,16,16^FD" . $eventInfo . "^FS";
 
-        // 4. KODE REGISTRASI TEKS (Posisi Y naik dari 160 ke 184)
-        $zplCode .= "^FO195,184^FB200,1,0,L^A0N,18,18^FDKode: " . $request->registration_code . "^FS";
+        // 4. NAMA SUB EVENT (Posisi Y: 140 + 32 = 172)
+        $zplCode .= "^FO195,172^FB200,1,0,L^A0N,15,15^FDSub: " . $request->nama_sub_event . "^FS";
+
+        // 5. KODE REGISTRASI TEKS (Posisi Y: 180 + 32 = 212)
+        $zplCode .= "^FO195,212^FB200,1,0,L^A0N,16,16^FDKode: " . $request->registration_code . "^FS";
 
         $zplCode .= "^XZ";
 
@@ -1082,15 +1085,32 @@ class EventController extends Controller
     public function menu_event_daftar($akses, $id)
     {
         if ($this->url_akses($akses, $id) == true) {
-            // Memuat data event beserta sub dan class-nya sekaligus agar ringan saat dirender
-            $data = DB::table('event_data')
-                ->orderBy('created_at', 'desc')
-                ->get();
+            // Ambil data user yang sedang login (sesuaikan dengan cara kamu mengambil data user)
+            $user = auth()->user(); // Atau Session::get('user_mains') / DB::table('user_mains')->where(...)->first()
+
+            // Ambil userid dan access_code dari tabel user_mains
+            $userid      = $user->userid;
+            $access_code = $user->access_code;
+
+            // Inisialisasi query utama
+            $query = DB::table('event_data');
+
+            // Jika access_code BUKAN 'master', filter data menggunakan tabel event_data_access
+            if ($access_code !== 'master') {
+                $query->join('event_data_access', 'event_data.id_event_data', '=', 'event_data_access.event_data_id')
+                    ->where('event_data_access.userid', $userid)
+                    ->where('event_data_access.status', 1) // Memastikan status akses user aktif
+                    ->select('event_data.*');
+            }
+
+            // Eksekusi query dengan urutan terbaru
+            $data = $query->orderBy('event_data.created_at', 'desc')->get();
 
             return view('app-event.menu-event.daftar-event', [
                 'akses' => $akses,
-                'code' => $id,
-                'data' => $data
+                'access_code' => $access_code,
+                'code'        => $id,
+                'data'        => $data
             ]);
         } else {
             return Redirect::to('dashboard/home');
@@ -1680,17 +1700,30 @@ class EventController extends Controller
     public function laporan_event_daftar_kehadiran($akses, $id, Request $request)
     {
         if ($this->url_akses($akses, $id) == true) {
-            // Get semua Event Utama
-            $events = DB::table('event_data')
-                ->select('event_data_code', 'event_data_tittle')
+            // Ambil data user yang sedang login
+            $user = auth()->user(); // Atau Session::get('user_mains')
+
+            $userid      = $user->userid;
+            $access_code = $user->access_code;
+
+            // Inisialisasi query utama
+            $query = DB::table('event_data');
+
+            // Jika access_code BUKAN 'master', filter event berdasarkan tabel event_data_access
+            if ($access_code !== 'master') {
+                $query->join('event_data_access', 'event_data.id_event_data', '=', 'event_data_access.event_data_id')
+                    ->where('event_data_access.userid', $userid)
+                    ->where('event_data_access.status', 1);
+            }
+
+            // Ambil kolom event_data_code dan event_data_tittle
+            $events = $query->select('event_data.event_data_code', 'event_data.event_data_tittle')
                 ->get();
 
-            return view('app-event.laporan.laporan-kehadiran', compact(
-                'events'
-            ), [
+            return view('app-event.laporan.laporan-kehadiran', compact('events'), [
                 'akses' => $akses,
-                'code' => $id,
-
+                'access_code' => $access_code,
+                'code'        => $id,
             ]);
         } else {
             return Redirect::to('dashboard/home');
@@ -1766,5 +1799,72 @@ class EventController extends Controller
         )->distinct()->get();
 
         return response()->json($participants);
+    }
+    // DATA KEHADIRAN
+    public function master_event_access_event($akses, $id, Request $request)
+    {
+        if ($this->url_akses($akses, $id) == true) {
+            // Ambil semua daftar akses + Join data event & user_mains berdasarkan 'userid'
+            $accesses = DB::table('event_data_access')
+                ->leftJoin('event_data', 'event_data_access.event_data_id', '=', 'event_data.id_event_data')
+                ->leftJoin('user_mains', 'event_data_access.userid', '=', 'user_mains.userid') // Disesuaikan ke user_mains & userid
+                ->select(
+                    'event_data_access.*',
+                    'event_data.event_data_tittle',
+                    'event_data.event_data_code',
+                    'user_mains.fullname as user_name', // Ambil kolom fullname
+                    'user_mains.username'
+                )
+                ->get();
+
+            // Data untuk Dropdown di Modal Tambah Akses
+            $events = DB::table('event_data')->get();
+            $users  = DB::table('user_mains')->get(); // Diambil dari user_mains
+
+            return view('app-event.master-event.event-access', compact('accesses', 'events', 'users'), [
+                'akses' => $akses,
+                'code' => $id,
+
+            ]);
+        } else {
+            return Redirect::to('dashboard/home');
+        }
+    }
+    // Simpan Akses (event_data_id dikirim dari form modal)
+    public function storeaccess(Request $request)
+    {
+        $request->validate([
+            'event_data_id' => 'required',
+            'userid'        => 'required|string',
+            'role'          => 'required|string',
+        ]);
+
+        // Cek duplikasi
+        $exists = DB::table('event_data_access')
+            ->where('event_data_id', $request->event_data_id)
+            ->where('userid', $request->userid)
+            ->exists();
+
+        if ($exists) {
+            return redirect()->back()->with('error', 'User tersebut sudah memiliki akses pada event ini.');
+        }
+
+        DB::table('event_data_access')->insert([
+            'event_data_id' => $request->event_data_id,
+            'userid'        => $request->userid,
+            'role'          => $request->role,
+            'status'        => 1,
+            'created_at'    => now(),
+            'updated_at'    => now(),
+        ]);
+
+        return redirect()->back()->with('success', 'Akses user berhasil ditambahkan.');
+    }
+
+    // Hapus Akses
+    public function destroyaccess($id)
+    {
+        DB::table('event_data_access')->where('id_event_data_access', $id)->delete();
+        return redirect()->back()->with('success', 'Akses user berhasil dihapus.');
     }
 }
