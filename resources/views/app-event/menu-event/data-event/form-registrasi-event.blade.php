@@ -176,15 +176,38 @@
                     </div>
                 </div>
                 <div class="col-lg-4 text-lg-end d-flex align-items-center justify-content-lg-end gap-2">
-                    <button class="btn btn-share-action btn-sm d-inline-flex align-items-center gap-1" type="button">
+                    <button class="btn btn-share-action btn-sm d-inline-flex align-items-center gap-1" type="button"
+                        onclick="copyToClipboard('{{ route('event_registrasi', ['id' => $data->event_data_code, 'code' => \Illuminate\Support\Str::random(12)]) }}', this)">
                         <svg class="svg-inline--fa fa-share-alt" aria-hidden="true" focusable="false" data-prefix="fas" data-icon="share-alt" role="img" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 448 512" width="12">
                             <path fill="currentColor" d="M352 320c-22.608 0-43.387 7.819-59.79 20.895l-102.486-64.054a96.551 96.551 0 0 0 0-41.683l102.486-64.054C308.613 184.181 329.392 192 352 192c53.019 0 96-42.981 96-96S405.019 0 352 0s-96 42.981-96 96c0 7.158.79 14.13 2.276 20.841L155.79 180.895C139.387 167.819 118.608 160 96 160c-53.019 0-96 42.981-96 96s42.981 96 96 96c22.608 0 43.387-7.819 59.79-20.895l102.486 64.054A96.301 96.301 0 0 0 256 416c0 53.019 42.981 96 96 96s96-42.981 96-96-42.981-96-96-96z"></path>
                         </svg>
-                        Share
+                        <span class="share-text">Copy Link</span>
                     </button>
-                    <button class="btn btn-register-action btn-sm" type="button" onclick='window.open("{{ route("event_registrasi",["id"=>$data->event_data_code,"code"=>123]) }}", "_blank");'>
+
+                    <button class="btn btn-register-action btn-sm" type="button" onclick='window.open("{{ route("event_registrasi", ["id" => $data->event_data_code, "code" => \Illuminate\Support\Str::random(12)]) }}", "_blank");'>
                         Register
                     </button>
+
+                    {{-- Tambahkan script ini di bagian bawah blade kamu --}}
+                    <script>
+                        function copyToClipboard(url, button) {
+                            navigator.clipboard.writeText(url).then(function() {
+                                // Efek ubah teks tombol sementara saat berhasil disalin
+                                let textSpan = button.querySelector('.share-text');
+                                let originalText = textSpan.innerText;
+
+                                textSpan.innerText = 'Copied!';
+                                button.classList.add('btn-success');
+
+                                setTimeout(function() {
+                                    textSpan.innerText = originalText;
+                                    button.classList.remove('btn-success');
+                                }, 2000);
+                            }).catch(function(err) {
+                                alert('Gagal menyalin link');
+                            });
+                        }
+                    </script>
                 </div>
             </div>
         </div>

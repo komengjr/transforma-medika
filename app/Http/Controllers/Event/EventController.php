@@ -197,7 +197,6 @@ class EventController extends Controller
     {
         if ($this->url_akses($akses, $id) == true) {
             $data = EventModel::latest()->get();
-
             return view('app-event.menu-event.data-event', ['akses' => $akses, 'code' => $id, 'data' => $data]);
         } else {
             return Redirect::to('dashboard/home');
