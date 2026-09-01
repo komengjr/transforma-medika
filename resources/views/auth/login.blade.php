@@ -28,7 +28,6 @@
             position: relative;
         }
 
-        /* Lottie Animation Container */
         #lottie-background {
             position: absolute;
             inset: 0;
@@ -37,7 +36,6 @@
             pointer-events: none;
         }
 
-        /* Floating gradient shapes */
         .gradient-shape {
             position: absolute;
             border-radius: 50%;
@@ -76,7 +74,6 @@
             }
         }
 
-        /* Login Card */
         .login-card {
             position: relative;
             z-index: 2;
@@ -125,7 +122,6 @@
 
         .brand-text {
             font-size: 1.3rem;
-            /* font-weight: 600; */
             color: #2e64c2;
         }
 
@@ -170,25 +166,49 @@
             color: #2e64c2;
         }
 
+        .otp-input-container {
+            display: flex;
+            justify-content: center;
+            gap: 10px;
+        }
+
+        .otp-input {
+            width: 50px;
+            height: 55px;
+            text-align: center;
+            font-size: 1.5rem;
+            font-weight: 600;
+            border-radius: 0.5rem;
+            border: 2px solid #d0d9e2;
+        }
+
+        .otp-input:focus {
+            border-color: #39c46a;
+            box-shadow: 0 0 0 0.2rem rgba(57, 196, 106, 0.25);
+            outline: none;
+        }
+
         @media (max-width: 576px) {
             .login-card {
                 padding: 2rem 1.5rem;
+            }
+
+            .otp-input {
+                width: 40px;
+                height: 48px;
+                font-size: 1.2rem;
             }
         }
     </style>
 </head>
 
 <body>
-    <!-- Gradient Shapes -->
     <div class="gradient-shape one"></div>
     <div class="gradient-shape two"></div>
 
-    <!-- Lottie Animation -->
     <div id="lottie-background"></div>
 
-    <!-- Login Card -->
     <div class="login-card">
-
         <div class="logo">
             <img src="{{ asset('img/logo-pt.png') }}" alt="Innoventra Logo">
         </div>
@@ -211,7 +231,7 @@
                     <input type="checkbox" class="form-check-input" id="rememberMe">
                     <label for="rememberMe" class="form-check-label">Ingat saya</label>
                 </div>
-                <a href="#" class="text-decoration-none text-primary">Lupa Password?</a>
+                <a href="#" class="text-decoration-none text-primary" data-bs-toggle="modal" data-bs-target="#modalLupaPassword">Lupa Password?</a>
             </div>
 
             <button type="submit" class="btn btn-primary w-100">
@@ -224,14 +244,110 @@
         </div>
     </div>
 
+    <!-- ================= MODAL LUPA & RESET PASSWORD ================= -->
+    <div class="modal fade" id="modalLupaPassword" tabindex="-1" aria-labelledby="modalLupaPasswordLabel" aria-hidden="true" data-bs-backdrop="static">
+        <div class="modal-dialog modal-dialog-centered">
+            <div class="modal-content border-0 shadow-lg" style="border-radius: 1.5rem; overflow: hidden;">
+
+                <div class="modal-header border-0 text-center flex-column pb-0 pt-4" style="background: linear-gradient(135deg, rgba(46, 100, 194, 0.08), rgba(57, 196, 106, 0.08));">
+                    <button type="button" class="btn-close position-absolute top-0 end-0 m-3" data-bs-dismiss="modal" aria-label="Close"></button>
+
+                    <div class="p-3 bg-white rounded-circle shadow-sm mb-2 d-inline-flex align-items-center justify-content-center" style="width: 70px; height: 70px;">
+                        <i id="modalHeaderIcon" class="bi bi-shield-lock-fill text-primary display-6"></i>
+                    </div>
+                    <h5 class="modal-title fw-bold text-dark mt-2" id="modalTitleText">Reset Password</h5>
+                    <p class="text-muted small px-3" id="modalSubTitleText">Masukkan email terdaftar untuk menerima kode verifikasi OTP.</p>
+                </div>
+
+                <div class="modal-body p-4 text-center">
+
+                    <!-- STEP 1: Form Input Email -->
+                    <div id="step-email">
+                        <form id="formKirimOtp">
+                            <div class="mb-3 text-start">
+                                <label for="email" class="form-label fw-semibold">Alamat Email</label>
+                                <div class="input-group">
+                                    <span class="input-group-text bg-light border-end-0" style="border-radius: 0.75rem 0 0 0.75rem;">
+                                        <i class="bi bi-envelope text-secondary"></i>
+                                    </span>
+                                    <input type="email" id="email" class="form-control border-start-0" placeholder="contoh@email.com" style="border-radius: 0 0.75rem 0.75rem 0;" required>
+                                </div>
+                            </div>
+                            <button type="submit" id="btnKirimOtp" class="btn btn-primary w-100 mt-2">
+                                <i class="bi bi-send me-2"></i>Kirim Kode OTP
+                            </button>
+                        </form>
+                    </div>
+
+                    <!-- STEP 2: Input 6 Digit OTP -->
+                    <div id="step-otp" style="display: none;">
+                        <p class="text-muted small mb-2">Kode OTP 6 digit telah dikirim ke email <strong id="displayEmailText" class="text-dark"></strong>.</p>
+
+                        <form id="formVerifikasiOtp">
+                            <div class="otp-input-container my-4">
+                                <input type="text" class="form-control otp-input" maxlength="1" pattern="[0-9]" inputmode="numeric" required>
+                                <input type="text" class="form-control otp-input" maxlength="1" pattern="[0-9]" inputmode="numeric" required>
+                                <input type="text" class="form-control otp-input" maxlength="1" pattern="[0-9]" inputmode="numeric" required>
+                                <input type="text" class="form-control otp-input" maxlength="1" pattern="[0-9]" inputmode="numeric" required>
+                                <input type="text" class="form-control otp-input" maxlength="1" pattern="[0-9]" inputmode="numeric" required>
+                                <input type="text" class="form-control otp-input" maxlength="1" pattern="[0-9]" inputmode="numeric" required>
+                            </div>
+
+                            <button type="submit" id="btnVerifikasiOtp" class="btn btn-primary w-100">
+                                <i class="bi bi-patch-check me-2"></i>Verifikasi OTP
+                            </button>
+                        </form>
+
+                        <div class="mt-3">
+                            <small class="text-muted">Tidak menerima kode?
+                                <a href="javascript:void(0)" id="btnKirimUlangOtp" class="text-decoration-none fw-semibold">Kirim Ulang</a>
+                            </small>
+                        </div>
+                    </div>
+
+                    <!-- STEP 3: Form Input Password Baru -->
+                    <div id="step-reset" style="display: none;">
+                        <form id="formResetPassword">
+                            <div class="mb-3 text-start">
+                                <label for="new_password" class="form-label fw-semibold">Password Baru</label>
+                                <div class="input-group">
+                                    <span class="input-group-text bg-light border-end-0" style="border-radius: 0.75rem 0 0 0.75rem;">
+                                        <i class="bi bi-key text-secondary"></i>
+                                    </span>
+                                    <input type="password" id="new_password" class="form-control border-start-0" placeholder="Masukkan password baru" style="border-radius: 0 0.75rem 0.75rem 0;" required>
+                                </div>
+                            </div>
+
+                            <div class="mb-3 text-start">
+                                <label for="confirm_password" class="form-label fw-semibold">Konfirmasi Password</label>
+                                <div class="input-group">
+                                    <span class="input-group-text bg-light border-end-0" style="border-radius: 0.75rem 0 0 0.75rem;">
+                                        <i class="bi bi-check2-circle text-secondary"></i>
+                                    </span>
+                                    <input type="password" id="confirm_password" class="form-control border-start-0" placeholder="Ulangi password baru" style="border-radius: 0 0.75rem 0.75rem 0;" required>
+                                </div>
+                            </div>
+
+                            <button type="submit" id="btnSimpanPassword" class="btn btn-primary w-100 mt-2">
+                                <i class="bi bi-box-arrow-in-down me-2"></i>Simpan Password Baru
+                            </button>
+                        </form>
+                    </div>
+
+                    <span id="notifikasi-otp" class="d-block mt-3"></span>
+
+                </div>
+            </div>
+        </div>
+    </div>
+
     <!-- Bootstrap JS -->
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.7.1/jquery.min.js"
         integrity="sha512-v2CJ7UaYy4JwqLDIrZUI/4hqeoQieOmAZNXBeQyjo21dadnwR+8ZaIJVT8EE2iyI61OV8e6M8PP2/4hpQINQ/g=="
         crossorigin="anonymous" referrerpolicy="no-referrer"></script>
-    <!-- Lottie Animation Script -->
+
     <script>
-        // Background animation (digital transformation theme)
         if (window.innerWidth >= 768) {
             lottie.loadAnimation({
                 container: document.getElementById('lottie-background'),
@@ -242,10 +358,9 @@
             });
         }
 
-
-        // Login Form Handler
+        // Login Handler
         const form = document.getElementById('loginForm');
-        form.addEventListener('submit', function (e) {
+        form.addEventListener('submit', function(e) {
             e.preventDefault();
             const username = document.getElementById('username').value.trim();
             const password = document.getElementById('password').value.trim();
@@ -263,14 +378,190 @@
                     "password": password
                 },
                 dataType: 'html',
-            }).done(function (data) {
+            }).done(function(data) {
                 $('#notifikasi-login').html(data);
                 btn.innerHTML = '<i class="bi bi-box-arrow-in-right me-2"></i>Masuk Sekarang';
                 btn.disabled = false;
-            }).fail(function () {
+            }).fail(function() {
                 btn.innerHTML = '<i class="bi bi-box-arrow-in-right me-2"></i>Masuk Sekarang';
                 btn.disabled = false;
             });
+        });
+
+        // OTP Box Navigation
+        const otpInputs = document.querySelectorAll('.otp-input');
+        otpInputs.forEach((input, index) => {
+            input.addEventListener('keyup', (e) => {
+                if (e.key >= 0 && e.key <= 9) {
+                    if (index < otpInputs.length - 1) {
+                        otpInputs[index + 1].focus();
+                    }
+                } else if (e.key === 'Backspace') {
+                    if (index > 0) {
+                        otpInputs[index - 1].focus();
+                    }
+                }
+            });
+
+            input.addEventListener('paste', (e) => {
+                const pasteData = e.clipboardData.getData('text').trim();
+                if (pasteData.length === 6 && /^\d+$/.test(pasteData)) {
+                    pasteData.split('').forEach((char, i) => {
+                        otpInputs[i].value = char;
+                    });
+                    otpInputs[5].focus();
+                }
+                e.preventDefault();
+            });
+        });
+
+        // Step 1: Send OTP Email
+        $('#formKirimOtp').on('submit', function(e) {
+            e.preventDefault();
+            const email = $('#email').val().trim();
+            const btn = $('#btnKirimOtp');
+
+            btn.html('<span class="spinner-border spinner-border-sm me-2"></span>Mengirim...').prop('disabled', true);
+
+            $.ajax({
+                url: "{{ route('verifikasi_send_email') }}",
+                type: "POST",
+                data: {
+                    "_token": "{{ csrf_token() }}",
+                    "email": email
+                },
+                dataType: 'json',
+            }).done(function(res) {
+                $('#modalHeaderIcon').attr('class', 'bi bi-phone-vibrate-fill text-success display-6');
+                $('#modalTitleText').text('Verifikasi Kode OTP');
+                $('#modalSubTitleText').text('Masukkan 6 digit angka yang dikirim ke email Anda.');
+
+                $('#displayEmailText').text(email);
+                $('#step-email').hide();
+                $('#step-otp').fadeIn();
+                $('#notifikasi-otp').html('');
+                $('.otp-input').first().focus();
+            }).fail(function(xhr) {
+                let msg = 'Gagal mengirim OTP. Pastikan email terdaftar!';
+                if (xhr.responseJSON && xhr.responseJSON.message) {
+                    msg = xhr.responseJSON.message;
+                }
+                $('#notifikasi-otp').html('<div class="alert alert-danger p-2 small mt-2">' + msg + '</div>');
+            }).always(function() {
+                btn.html('<i class="bi bi-send me-2"></i>Kirim Kode OTP').prop('disabled', false);
+            });
+        });
+
+        $('#btnKirimUlangOtp').on('click', function() {
+            $('#formKirimOtp').submit();
+        });
+
+        // Step 2: Cek Validasi OTP via AJAX
+        $('#formVerifikasiOtp').on('submit', function(e) {
+            e.preventDefault();
+
+            let otpValue = '';
+            $('.otp-input').each(function() {
+                otpValue += $(this).val();
+            });
+
+            if (otpValue.length < 6) {
+                $('#notifikasi-otp').html('<div class="alert alert-warning p-2 small">Masukkan 6 digit kode OTP secara lengkap!</div>');
+                return;
+            }
+
+            const btn = $('#btnVerifikasiOtp');
+            btn.html('<span class="spinner-border spinner-border-sm me-2"></span>Memeriksa OTP...').prop('disabled', true);
+
+            $.ajax({
+                url: "{{ route('verifikasi_otp_check') }}",
+                type: "POST",
+                data: {
+                    "_token": "{{ csrf_token() }}",
+                    "email": $('#email').val().trim(),
+                    "otp": otpValue
+                },
+                dataType: 'json',
+            }).done(function(res) {
+                $('#modalHeaderIcon').attr('class', 'bi bi-lock-fill text-primary display-6');
+                $('#modalTitleText').text('Password Baru');
+                $('#modalSubTitleText').text('Buat kata sandi baru untuk akun Anda.');
+
+                $('#step-otp').hide();
+                $('#step-reset').fadeIn();
+                $('#notifikasi-otp').html('');
+            }).fail(function(xhr) {
+                let msg = 'Kode OTP yang Anda masukkan salah!';
+                if (xhr.responseJSON && xhr.responseJSON.message) {
+                    msg = xhr.responseJSON.message;
+                }
+                $('#notifikasi-otp').html('<div class="alert alert-danger p-2 small mt-2">' + msg + '</div>');
+
+                $('.otp-input').val('');
+                $('.otp-input').first().focus();
+            }).always(function() {
+                btn.html('<i class="bi bi-patch-check me-2"></i>Verifikasi OTP').prop('disabled', false);
+            });
+        });
+
+        // Step 3: Simpan Password Baru
+        $('#formResetPassword').on('submit', function(e) {
+            e.preventDefault();
+            const pass = $('#new_password').val();
+            const confirmPass = $('#confirm_password').val();
+
+            let otpValue = '';
+            $('.otp-input').each(function() {
+                otpValue += $(this).val();
+            });
+
+            if (pass !== confirmPass) {
+                $('#notifikasi-otp').html('<div class="alert alert-danger p-2 small">Konfirmasi password tidak cocok!</div>');
+                return;
+            }
+
+            const btn = $('#btnSimpanPassword');
+            btn.html('<span class="spinner-border spinner-border-sm me-2"></span>Menyimpan...').prop('disabled', true);
+
+            $.ajax({
+                url: "{{ route('verifikasi_reset_pass') }}",
+                type: "POST",
+                data: {
+                    "_token": "{{ csrf_token() }}",
+                    "email": $('#email').val().trim(),
+                    "otp": otpValue,
+                    "password": pass,
+                    "password_confirmation": confirmPass
+                },
+                dataType: 'json',
+            }).done(function(res) {
+                $('#notifikasi-otp').html('<div class="alert alert-success p-2 small">Password berhasil diubah! Silakan login.</div>');
+                setTimeout(function() {
+                    $('#modalLupaPassword').modal('hide');
+                }, 2000);
+            }).fail(function(xhr) {
+                let msg = 'Gagal mereset password!';
+                if (xhr.responseJSON && xhr.responseJSON.message) {
+                    msg = xhr.responseJSON.message;
+                }
+                $('#notifikasi-otp').html('<div class="alert alert-danger p-2 small">' + msg + '</div>');
+            }).always(function() {
+                btn.html('<i class="bi bi-box-arrow-in-down me-2"></i>Simpan Password Baru').prop('disabled', false);
+            });
+        });
+
+        // Reset Modal ke Semula Saat Ditutup
+        $('#modalLupaPassword').on('hidden.bs.modal', function() {
+            $('#modalHeaderIcon').attr('class', 'bi bi-shield-lock-fill text-primary display-6');
+            $('#modalTitleText').text('Reset Password');
+            $('#modalSubTitleText').text('Masukkan email terdaftar untuk menerima kode verifikasi OTP.');
+
+            $('#step-otp, #step-reset').hide();
+            $('#step-email').show();
+            $('#formKirimOtp')[0].reset();
+            $('#formVerifikasiOtp')[0].reset();
+            $('#formResetPassword')[0].reset();
+            $('#notifikasi-otp').html('');
         });
     </script>
 </body>

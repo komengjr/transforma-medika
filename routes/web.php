@@ -55,6 +55,9 @@ Route::controller(AuthController::class)->group(function () {
     Route::post('post-registration', 'postRegistration')->name('register.post');
     Route::post('post-login', 'postLogin')->name('login.post');
     Route::post('verifikasi-Login', 'verifikasi_Login')->name('verifikasi_Login');
+    Route::post('verifikasi-send-email', 'verifikasi_send_email')->name('verifikasi_send_email');
+    Route::post('verifikasi-reset-pass', 'verifikasi_reset_pass')->name('verifikasi_reset_pass');
+    Route::post('verifikasi-otp-check', 'verifikasi_otp_check')->name('verifikasi_otp_check');
     // Route::get('dashboard', [AuthController::class, 'dashboard']);
 });
 Route::controller(PageController::class)->group(function () {
