@@ -16,6 +16,11 @@
         box-shadow: 0 8px 16px rgba(0, 0, 0, 0.1);
     }
 
+    .event-card.event-disabled {
+        opacity: 0.75;
+        background-color: #f8f9fa;
+    }
+
     .event-cover {
         height: 180px;
         object-fit: cover;
@@ -69,8 +74,13 @@
 {{-- Grid Card Event --}}
 <div class="row g-3 mb-3" id="eventCardGrid">
     @forelse ($data as $item)
+    @php
+    // Cek apakah tanggal deadline registrasi sudah lewat hari ini
+    $isExpired = \Carbon\Carbon::parse($item->event_data_reg_deadline)->endOfDay()->isPast();
+    @endphp
+
     <div class="col-12 col-md-3 col-lg-3 event-item" data-title="{{ strtolower($item->event_data_tittle) }}">
-        <div class="card h-100 border-0 shadow-sm event-card overflow-hidden">
+        <div class="card h-100 border-0 shadow-sm event-card {{ $isExpired ? 'event-disabled' : '' }} overflow-hidden">
             {{-- Cover Image --}}
             @if ($item->event_data_cover)
             <img src="{{ asset('storage/' . $item->event_data_cover) }}" class="card-img-top event-cover" alt="{{ $item->event_data_tittle }}">
@@ -86,7 +96,9 @@
                     <span class="badge bg-light text-dark fw-normal border">
                         Code: {{ $item->event_data_code }}
                     </span>
-                    @if ($item->event_data_status == 1)
+                    @if ($isExpired)
+                    <span class="badge bg-danger"><i class="fas fa-lock me-1"></i> Disabled / Expired</span>
+                    @elseif ($item->event_data_status == 1)
                     <span class="badge bg-success">Aktif</span>
                     @else
                     <span class="badge bg-secondary">Draft</span>
@@ -107,7 +119,7 @@
                         {{ \Carbon\Carbon::parse($item->event_data_start_date)->translatedFormat('d M Y, H:i') }}
                     </div>
                     <div>
-                        <i class="far fa-clock text-warning me-2"></i>
+                        <i class="far fa-clock {{ $isExpired ? 'text-danger' : 'text-warning' }} me-2"></i>
                         Reg Deadline: {{ \Carbon\Carbon::parse($item->event_data_reg_deadline)->translatedFormat('d M Y') }}
                     </div>
                 </div>
@@ -120,20 +132,20 @@
                 {{-- Action Dropdown --}}
                 <div class="pt-3 border-top mt-auto d-flex justify-content-between align-items-center position-relative">
                     <div class="dropdown event-action-dropdown">
-                        <button class="btn btn-outline-primary btn-sm rounded-pill px-3 shadow-sm d-inline-flex align-items-center gap-2 dropdown-toggle" type="button" id="dropdownMenuButton{{ $item->id_event_data }}" data-bs-toggle="dropdown" aria-expanded="false">
-                            <i class="fas fa-cog text-primary"></i>
+                        <button class="btn {{ $isExpired ? 'btn-outline-secondary' : 'btn-outline-primary' }} btn-sm rounded-pill px-3 shadow-sm d-inline-flex align-items-center gap-2 dropdown-toggle" type="button" id="dropdownMenuButton{{ $item->id_event_data }}" data-bs-toggle="dropdown" aria-expanded="false">
+                            <i class="fas fa-cog {{ $isExpired ? 'text-secondary' : 'text-primary' }}"></i>
                             <span class="fw-semibold">Aksi Event</span>
                         </button>
 
                         <ul class="dropdown-menu shadow-lg border-0 rounded-3 p-2 mt-2" aria-labelledby="dropdownMenuButton{{ $item->id_event_data }}" style="min-width: 220px;">
                             <li>
-                                <button class="dropdown-item d-flex align-items-center rounded-2 py-2 px-3 btn-modal-detail" data-code="{{ $item->event_data_code }}">
+                                <button class="dropdown-item d-flex align-items-center rounded-2 py-2 px-3 btn-modal-detail {{ $isExpired ? 'disabled text-muted' : '' }}" data-code="{{ $item->event_data_code }}" {{ $isExpired ? 'disabled' : '' }}>
                                     <i class="fas fa-info-circle fa-fw me-2 text-primary fs--2"></i>
                                     <span class="fw-medium">Detail Event</span>
                                 </button>
                             </li>
                             <li>
-                                <button class="dropdown-item d-flex align-items-center rounded-2 py-2 px-3 btn-modal-session" data-code="{{ $item->event_data_code }}">
+                                <button class="dropdown-item d-flex align-items-center rounded-2 py-2 px-3 btn-modal-session {{ $isExpired ? 'disabled text-muted' : '' }}" data-code="{{ $item->event_data_code }}" {{ $isExpired ? 'disabled' : '' }}>
                                     <i class="fas fa-clock fa-fw me-2 text-warning fs--2"></i>
                                     <span class="fw-medium">Check Session</span>
                                 </button>
@@ -141,6 +153,7 @@
                             <li>
                                 <hr class="dropdown-divider my-2 opacity-50">
                             </li>
+                            {{-- Hanya 2 menu ini yang SELALU BISA DIAKSES --}}
                             <li>
                                 <button class="dropdown-item d-flex align-items-center rounded-2 py-2 px-3 btn-modal-peserta" data-code="{{ $item->event_data_code }}">
                                     <i class="fas fa-users fa-fw me-2 text-success fs--2"></i>
@@ -154,15 +167,18 @@
                                 </button>
                             </li>
                             <li>
-                                <button class="dropdown-item d-flex align-items-center rounded-2 py-2 px-3 btn-modal-verifikasi" data-code="{{ $item->event_data_code }}">
+                                <hr class="dropdown-divider my-2 opacity-50">
+                            </li>
+                            <li>
+                                <button class="dropdown-item d-flex align-items-center rounded-2 py-2 px-3 btn-modal-verifikasi {{ $isExpired ? 'disabled text-muted' : '' }}" data-code="{{ $item->event_data_code }}" {{ $isExpired ? 'disabled' : '' }}>
                                     <i class="fas fa-check-circle fa-fw me-2 text-emerald text-success fs--2"></i>
                                     <span class="fw-medium">Verifikasi Pelunasan</span>
                                 </button>
                             </li>
                         </ul>
                     </div>
-                    {{-- Penggantian ID User dengan Icon Event --}}
-                    <div class="text-primary">
+
+                    <div class="{{ $isExpired ? 'text-secondary' : 'text-primary' }}">
                         <i class="fas fa-calendar-alt fa-lg"></i>
                     </div>
                 </div>
@@ -186,7 +202,6 @@
         </div>
     </div>
 </div>
-
 
 {{-- ==================== MODAL CONTAINERS ==================== --}}
 
@@ -327,7 +342,7 @@
         const routeSurveyUrl = "{{ route('menu_event_daftar_get_survay', ['code' => 'XXX']) }}";
 
         // --- 3. AJAX DETAIL EVENT ---
-        document.querySelectorAll('.btn-modal-detail').forEach(button => {
+        document.querySelectorAll('.btn-modal-detail:not([disabled])').forEach(button => {
             button.addEventListener('click', function() {
                 const eventCode = this.getAttribute('data-code');
                 const container = document.getElementById('contentModalDetail');
@@ -371,7 +386,7 @@
         });
 
         // --- AJAX CHECK SESSION ---
-        document.querySelectorAll('.btn-modal-session').forEach(button => {
+        document.querySelectorAll('.btn-modal-session:not([disabled])').forEach(button => {
             button.addEventListener('click', function() {
                 const eventCode = this.getAttribute('data-code');
                 const container = document.getElementById('contentModalSession');
@@ -825,7 +840,7 @@
     });
 </script>
 <script>
-    document.querySelectorAll('.btn-modal-verifikasi').forEach(button => {
+    document.querySelectorAll('.btn-modal-verifikasi:not([disabled])').forEach(button => {
         button.addEventListener('click', function() {
             const eventCode = this.getAttribute('data-code');
 

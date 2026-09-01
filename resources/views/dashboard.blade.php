@@ -1080,6 +1080,7 @@
         </div>
     </div>
     <!-- Modal Reset Password Multi-step -->
+    <!-- Modal Reset Password Multi-step -->
     <div class="modal fade" id="modal-keuangan" tabindex="-1" aria-hidden="true" data-bs-backdrop="static">
         <div class="modal-dialog modal-dialog-centered modal-sm-custom">
             <div class="modal-content glass-reset-modal border-0 shadow-lg">
@@ -1087,69 +1088,96 @@
                 <!-- Close Button -->
                 <button type="button" class="btn-close btn-close-custom" data-bs-dismiss="modal" aria-label="Close"></button>
 
-                <!-- STEP 1: Request OTP / Email Input -->
+                <!-- STEP 1: Input Email -->
                 <div id="reset-step-1" class="reset-step-container">
                     <div class="text-center mb-4">
                         <div class="reset-icon-badge bg-warning-subtle text-warning mx-auto mb-3">
-                            <i class="fas fa-shield-alt fs-3"></i>
+                            <i class="fas fa-envelope fs-3"></i>
                         </div>
                         <h5 class="fw-bold text-dark mb-1">Reset Password</h5>
-                        <p class="text-muted fs--2 mb-0">Masukkan email/username terdaftar untuk menerima kode verifikasi.</p>
+                        <p class="text-muted fs--2 mb-0">Masukkan email terdaftar untuk menerima kode verifikasi OTP.</p>
                     </div>
 
                     <form id="form-request-otp">
                         <div class="mb-3">
-                            <label class="form-label text-secondary fw-semibold fs--2">EMAIL / USERNAME</label>
+                            <label class="form-label text-secondary fw-semibold fs--2">EMAIL TERDAFTAR</label>
                             <div class="input-group">
                                 <span class="input-group-text border-end-0 bg-transparent text-muted">
-                                    <i class="fas fa-envelope"></i>
+                                    <i class="fas fa-at"></i>
                                 </span>
-                                <input type="text" class="form-control custom-input border-start-0" id="reset-identity" placeholder="nama@email.com" required>
+                                <input type="email" class="form-control custom-input border-start-0" id="reset-email" placeholder="nama@email.com" required>
                             </div>
                         </div>
-                        <button type="submit" class="btn btn-primary-gradient w-100 rounded-pill py-2 fw-semibold text-white">
+                        <button type="submit" class="btn btn-primary-gradient w-100 rounded-pill py-2 fw-semibold text-white" id="btn-send-otp">
                             <span>Kirim Kode Verifikasi</span> <i class="fas fa-arrow-right ms-2 fs--2"></i>
                         </button>
                     </form>
                 </div>
 
-                <!-- STEP 2: Input OTP & New Password (Hidden by default) -->
+                <!-- STEP 2: Input 6 Digit OTP -->
                 <div id="reset-step-2" class="reset-step-container d-none">
                     <div class="text-center mb-3">
                         <div class="reset-icon-badge bg-info-subtle text-info mx-auto mb-2">
-                            <i class="fas fa-lock-open fs-4"></i>
+                            <i class="fas fa-shield-alt fs-4"></i>
                         </div>
-                        <h5 class="fw-bold text-dark mb-1">Verifikasi & Ubah</h5>
-                        <p class="text-muted fs--2 mb-0">Masukkan 4 digit kode yang dikirim dan buat kata sandi baru.</p>
+                        <h5 class="fw-bold text-dark mb-1">Verifikasi OTP</h5>
+                        <p class="text-muted fs--2 mb-0">Masukkan 6 digit kode OTP yang dikirim ke email Anda.</p>
                     </div>
 
-                    <form id="form-submit-reset">
-                        <!-- OTP Input Box -->
+                    <form id="form-verify-otp">
                         <div class="mb-3">
                             <label class="form-label text-secondary fw-semibold fs--2 text-center d-block">KODE VERIFIKASI (OTP)</label>
-                            <div class="d-flex justify-content-center gap-2 otp-group mb-2">
-                                <input type="text" maxlength="1" class="form-control otp-input text-center" required>
-                                <input type="text" maxlength="1" class="form-control otp-input text-center" required>
-                                <input type="text" maxlength="1" class="form-control otp-input text-center" required>
-                                <input type="text" maxlength="1" class="form-control otp-input text-center" required>
+                            <div class="d-flex justify-content-center gap-1 otp-group mb-2">
+                                <input type="text" maxlength="1" class="form-control otp-input text-center px-1" required>
+                                <input type="text" maxlength="1" class="form-control otp-input text-center px-1" required>
+                                <input type="text" maxlength="1" class="form-control otp-input text-center px-1" required>
+                                <input type="text" maxlength="1" class="form-control otp-input text-center px-1" required>
+                                <input type="text" maxlength="1" class="form-control otp-input text-center px-1" required>
+                                <input type="text" maxlength="1" class="form-control otp-input text-center px-1" required>
                             </div>
                             <div class="text-center">
                                 <small class="text-muted fs--2">Belum terima kode? <a href="#" id="btn-resend-otp" class="text-primary fw-bold text-decoration-none">Kirim Ulang</a></small>
                             </div>
                         </div>
 
+                        <button type="submit" class="btn btn-primary-gradient w-100 rounded-pill py-2 fw-semibold text-white mt-2" id="btn-check-otp">
+                            <i class="fas fa-check-circle me-1"></i> Verifikasi Kode OTP
+                        </button>
+                    </form>
+                </div>
+
+                <!-- STEP 3: Input Password Baru -->
+                <div id="reset-step-3" class="reset-step-container d-none">
+                    <div class="text-center mb-3">
+                        <div class="reset-icon-badge bg-success-subtle text-success mx-auto mb-2">
+                            <i class="fas fa-lock fs-4"></i>
+                        </div>
+                        <h5 class="fw-bold text-dark mb-1">Password Baru</h5>
+                        <p class="text-muted fs--2 mb-0">Buat kata sandi baru untuk akun Anda.</p>
+                    </div>
+
+                    <form id="form-reset-password">
                         <!-- New Password Input -->
                         <div class="mb-3">
                             <label class="form-label text-secondary fw-semibold fs--2">KATA SANDI BARU</label>
                             <div class="input-group">
                                 <span class="input-group-text border-end-0 bg-transparent text-muted"><i class="fas fa-key"></i></span>
-                                <input type="password" class="form-control custom-input border-start-0" id="new-password" placeholder="••••••••" required>
+                                <input type="password" class="form-control custom-input border-start-0" id="new-password" placeholder="••••••••" minlength="6" required>
                                 <button class="btn border border-start-0 text-muted btn-toggle-pass" type="button"><i class="fas fa-eye"></i></button>
                             </div>
                         </div>
 
-                        <button type="submit" class="btn btn-success-gradient w-100 rounded-pill py-2 fw-semibold text-white mt-2">
-                            <i class="fas fa-check-circle me-1"></i> Simpan Password Baru
+                        <!-- Confirm Password Input -->
+                        <div class="mb-3">
+                            <label class="form-label text-secondary fw-semibold fs--2">KONFIRMASI KATA SANDI</label>
+                            <div class="input-group">
+                                <span class="input-group-text border-end-0 bg-transparent text-muted"><i class="fas fa-key"></i></span>
+                                <input type="password" class="form-control custom-input border-start-0" id="confirm-password" placeholder="••••••••" minlength="6" required>
+                            </div>
+                        </div>
+
+                        <button type="submit" class="btn btn-success-gradient w-100 rounded-pill py-2 fw-semibold text-white mt-2" id="btn-save-password">
+                            <i class="fas fa-save me-1"></i> Simpan Password Baru
                         </button>
                     </form>
                 </div>
@@ -1157,6 +1185,228 @@
             </div>
         </div>
     </div>
+
+    <script>
+        document.addEventListener("DOMContentLoaded", function() {
+            const step1 = document.getElementById("reset-step-1");
+            const step2 = document.getElementById("reset-step-2");
+            const step3 = document.getElementById("reset-step-3");
+
+            const formReq = document.getElementById("form-request-otp");
+            const formVerifyOtp = document.getElementById("form-verify-otp");
+            const formResetPass = document.getElementById("form-reset-password");
+
+            const otpInputs = document.querySelectorAll(".otp-input");
+
+            let userEmail = "";
+            let verifiedOtp = "";
+
+            // Auto Focus Next/Prev pada 6 Kotak OTP
+            otpInputs.forEach((input, index) => {
+                input.addEventListener("input", (e) => {
+                    if (e.target.value.length === 1 && index < otpInputs.length - 1) {
+                        otpInputs[index + 1].focus();
+                    }
+                });
+
+                input.addEventListener("keydown", (e) => {
+                    if (e.key === "Backspace" && !e.target.value && index > 0) {
+                        otpInputs[index - 1].focus();
+                    }
+                });
+            });
+
+            // Toggle Lihat Password
+            document.querySelector(".btn-toggle-pass").addEventListener("click", function() {
+                const passInput = document.getElementById("new-password");
+                const icon = this.querySelector("i");
+                if (passInput.type === "password") {
+                    passInput.type = "text";
+                    icon.classList.replace("fa-eye", "fa-eye-slash");
+                } else {
+                    passInput.type = "password";
+                    icon.classList.replace("fa-eye-slash", "fa-eye");
+                }
+            });
+
+            /// STEP 1: Send OTP Email (Pengecekan Email)
+            formReq.addEventListener("submit", function(e) {
+                e.preventDefault();
+                e.stopImmediatePropagation(); // Hentikan event lain yang mungkin berjalan
+
+                const emailInput = document.getElementById("reset-email");
+                userEmail = emailInput.value;
+                const btn = $("#btn-send-otp");
+
+                // Loading State
+                btn.prop("disabled", true).html('<i class="fas fa-spinner fa-spin"></i> Memeriksa Email...');
+
+                $.ajax({
+                    url: "{{ route('verifikasi_send_email') }}",
+                    type: "POST",
+                    data: {
+                        _token: "{{ csrf_token() }}",
+                        email: userEmail
+                    },
+                    dataType: "json"
+                }).done(function(res) {
+                    // Restore Button State
+                    btn.prop("disabled", false).html('<span>Kirim Kode Verifikasi</span> <i class="fas fa-arrow-right ms-2 fs--2"></i>');
+
+                    // CEK STATUS: Harus benar-benar 'success'
+                    if (res.status === 'success') {
+                        // EMAIL BENAR -> Baru pindah ke Step 2 (OTP)
+                        Swal.fire({
+                            icon: 'success',
+                            title: 'Email Ditemukan!',
+                            text: res.message,
+                            timer: 1500,
+                            showConfirmButton: false
+                        });
+
+                        step1.classList.add("d-none");
+                        step2.classList.remove("d-none");
+                        step3.classList.add("d-none");
+                        otpInputs[0].focus();
+                    } else {
+                        // EMAIL SALAH/GAGAL -> KUNCI TETAP DI STEP 1
+                        step1.classList.remove("d-none");
+                        step2.classList.add("d-none");
+                        step3.classList.add("d-none");
+
+                        Swal.fire({
+                            icon: 'error',
+                            title: 'Email Tidak Ditemukan!',
+                            text: res.message || 'Silakan periksa kembali email yang Anda masukkan.'
+                        }).then(() => {
+                            emailInput.focus();
+                            emailInput.select();
+                        });
+                    }
+                }).fail(function(xhr) {
+                    // Restore Button State jika HTTP status 404 / 500
+                    btn.prop("disabled", false).html('<span>Kirim Kode Verifikasi</span> <i class="fas fa-arrow-right ms-2 fs--2"></i>');
+
+                    // KUNCI PAKSA TETAP DI STEP 1
+                    step1.classList.remove("d-none");
+                    step2.classList.add("d-none");
+                    step3.classList.add("d-none");
+
+                    const res = xhr.responseJSON;
+                    const errorMsg = (res && res.message) ? res.message : "Email tidak terdaftar atau terjadi kesalahan server.";
+
+                    Swal.fire({
+                        icon: 'error',
+                        title: 'Gagal Memeriksa Email',
+                        text: errorMsg
+                    }).then(() => {
+                        emailInput.focus();
+                        emailInput.select();
+                    });
+                });
+            });
+
+            // Kirim Ulang OTP
+            document.getElementById("btn-resend-otp").addEventListener("click", function(e) {
+                e.preventDefault();
+                formReq.dispatchEvent(new Event('submit'));
+            });
+
+            // STEP 2: Verifikasi Kode OTP
+            formVerifyOtp.addEventListener("submit", function(e) {
+                e.preventDefault();
+
+                let otpCode = "";
+                otpInputs.forEach(input => otpCode += input.value);
+                const btn = $("#btn-check-otp");
+
+                if (otpCode.length < 6) {
+                    Swal.fire("Peringatan", "Harap masukkan 6 digit kode OTP secara lengkap!", "warning");
+                    return;
+                }
+
+                btn.prop("disabled", true).html('<i class="fas fa-spinner fa-spin"></i> Memverifikasi...');
+
+                $.ajax({
+                    url: "{{ route('verifikasi_otp_check') }}",
+                    type: "POST",
+                    data: {
+                        _token: "{{ csrf_token() }}",
+                        email: userEmail,
+                        otp: otpCode
+                    },
+                    dataType: "json"
+                }).done(function(res) {
+                    btn.prop("disabled", false).html('<i class="fas fa-check-circle me-1"></i> Verifikasi Kode OTP');
+                    if (res.status === 'success') {
+                        verifiedOtp = otpCode; // Simpan OTP yang valid
+                        Swal.fire({
+                            icon: 'success',
+                            title: 'OTP Valid!',
+                            text: 'Silakan masukkan password baru Anda.',
+                            timer: 1500,
+                            showConfirmButton: false
+                        });
+                        step2.classList.add("d-none");
+                        step3.classList.remove("d-none");
+                        document.getElementById("new-password").focus();
+                    } else {
+                        Swal.fire("OTP Salah", res.message, "error");
+                    }
+                }).fail(function(xhr) {
+                    btn.prop("disabled", false).html('<i class="fas fa-check-circle me-1"></i> Verifikasi Kode OTP');
+                    const res = xhr.responseJSON;
+                    Swal.fire("Error", res && res.message ? res.message : "Gagal memverifikasi OTP.", "error");
+                });
+            });
+
+            // STEP 3: Reset Password Baru
+            formResetPass.addEventListener("submit", function(e) {
+                e.preventDefault();
+
+                const password = document.getElementById("new-password").value;
+                const confirmPassword = document.getElementById("confirm-password").value;
+                const btn = $("#btn-save-password");
+
+                if (password !== confirmPassword) {
+                    Swal.fire("Perhatian", "Konfirmasi kata sandi tidak cocok!", "warning");
+                    return;
+                }
+
+                btn.prop("disabled", true).html('<i class="fas fa-spinner fa-spin"></i> Menyimpan...');
+
+                $.ajax({
+                    url: "{{ route('verifikasi_reset_pass') }}",
+                    type: "POST",
+                    data: {
+                        _token: "{{ csrf_token() }}",
+                        email: userEmail,
+                        otp: verifiedOtp,
+                        password: password,
+                        password_confirmation: confirmPassword
+                    },
+                    dataType: "json"
+                }).done(function(res) {
+                    btn.prop("disabled", false).html('<i class="fas fa-save me-1"></i> Simpan Password Baru');
+                    if (res.status === 'success') {
+                        Swal.fire({
+                            icon: 'success',
+                            title: 'Berhasil!',
+                            text: res.message
+                        }).then(() => {
+                            location.reload();
+                        });
+                    } else {
+                        Swal.fire("Gagal", res.message, "error");
+                    }
+                }).fail(function(xhr) {
+                    btn.prop("disabled", false).html('<i class="fas fa-save me-1"></i> Simpan Password Baru');
+                    const res = xhr.responseJSON;
+                    Swal.fire("Error", res && res.message ? res.message : "Gagal mengubah password.", "error");
+                });
+            });
+        });
+    </script>
     <!-- JavaScripts -->
     <script src="{{ asset('vendors/popper/popper.min.js') }}"></script>
     <script src="{{ asset('vendors/bootstrap/bootstrap.min.js') }}"></script>
