@@ -32,7 +32,7 @@
 @section('content')
 
 {{-- Header & Input Filter --}}
-<div class="card border-0 shadow-sm rounded-4 mb-3 overflow-hidden" style="background: linear-gradient(135deg, #1e293b 0%, #0f172a 100%);">
+<div class="card border-0 shadow-sm rounded-4 mb-3 overflow-hidden" style="background: linear-gradient(135deg, #023b96 0%, #064df1 100%);">
     <div class="card-body p-3 text-white">
         <div class="row align-items-center g-3">
             <!-- Left Side: Title & Info -->
