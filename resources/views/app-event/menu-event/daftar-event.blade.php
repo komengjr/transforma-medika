@@ -32,23 +32,42 @@
 @section('content')
 
 {{-- Header & Input Filter --}}
-<div class="row mb-3 align-items-center">
-    <div class="col-md-6 mb-3 mb-md-0">
-        <h3 class="fw-bold mb-0">Daftar Event</h3>
-        <p class="text-muted mb-0">Kelola dan telusuri event yang tersedia</p>
-    </div>
-    <div class="col-md-6">
-        <div class="input-group input-group-lg shadow-sm">
-            <span class="input-group-text bg-white border-end-0">
-                <i class="fas fa-search text-muted"></i>
-            </span>
-            <input type="text" id="filterTitle" class="form-control border-start-0 ps-0" placeholder="Cari nama event...">
+<div class="card border-0 shadow-sm rounded-4 mb-3 overflow-hidden" style="background: linear-gradient(135deg, #1e293b 0%, #0f172a 100%);">
+    <div class="card-body p-3 text-white">
+        <div class="row align-items-center g-3">
+            <!-- Left Side: Title & Info -->
+            <div class="col-lg-6">
+                <div class="d-flex align-items-center gap-3">
+                    <div class="icon-shape bg-primary bg-opacity-25 text-primary rounded-3 p-3 d-flex align-items-center justify-content-center" style="width: 54px; height: 54px;">
+                        <i class="fas fa-calendar-alt fa-2x text-white"></i>
+                    </div>
+                    <div>
+                        <div class="d-flex align-items-center gap-2 mb-1">
+                            <h4 class="fw-bold mb-0 text-white tracking-tight">Daftar Event</h4>
+                            <span class="badge bg-primary rounded-pill fs--2 px-3 py-1">Management</span>
+                        </div>
+                        <p class="text-white-50 mb-0 fs--2">Kelola, telusuri, dan verifikasi pendaftaran event secara akurat</p>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Right Side: Search Bar & Actions -->
+            <div class="col-lg-6">
+                <div class="d-flex flex-column flex-sm-row gap-2 justify-content-lg-end">
+                    <div class="input-group input-group-lg shadow-sm">
+                        <span class="input-group-text bg-white border-0 ps-3 pe-2">
+                            <i class="fas fa-search text-secondary opacity-75"></i>
+                        </span>
+                        <input type="text" id="filterTitle" class="form-control border-0 ps-2 fs-2" placeholder="Cari nama event..." style="box-shadow: none;">
+                    </div>
+                </div>
+            </div>
         </div>
     </div>
 </div>
 
 {{-- Grid Card Event --}}
-<div class="row g-3" id="eventCardGrid">
+<div class="row g-3 mb-3" id="eventCardGrid">
     @forelse ($data as $item)
     <div class="col-12 col-md-3 col-lg-3 event-item" data-title="{{ strtolower($item->event_data_tittle) }}">
         <div class="card h-100 border-0 shadow-sm event-card overflow-hidden">
@@ -101,37 +120,43 @@
                 {{-- Action Dropdown --}}
                 <div class="pt-3 border-top mt-auto d-flex justify-content-between align-items-center position-relative">
                     <div class="dropdown event-action-dropdown">
-                        <button class="btn btn-outline-primary btn-sm rounded-pill dropdown-toggle" type="button" id="dropdownMenuButton{{ $item->id_event_data }}" data-bs-toggle="dropdown" aria-expanded="false">
-                            Aksi Event
+                        <button class="btn btn-outline-primary btn-sm rounded-pill px-3 shadow-sm d-inline-flex align-items-center gap-2 dropdown-toggle" type="button" id="dropdownMenuButton{{ $item->id_event_data }}" data-bs-toggle="dropdown" aria-expanded="false">
+                            <i class="fas fa-cog text-primary"></i>
+                            <span class="fw-semibold">Aksi Event</span>
                         </button>
-                        <ul class="dropdown-menu shadow-lg border-0" aria-labelledby="dropdownMenuButton{{ $item->id_event_data }}">
+
+                        <ul class="dropdown-menu shadow-lg border-0 rounded-3 p-2 mt-2" aria-labelledby="dropdownMenuButton{{ $item->id_event_data }}" style="min-width: 220px;">
                             <li>
-                                <button class="dropdown-item py-2 btn-modal-detail" data-code="{{ $item->event_data_code }}">
-                                    <i class="fas fa-info-circle me-2 text-primary"></i> Detail Event
+                                <button class="dropdown-item d-flex align-items-center rounded-2 py-2 px-3 btn-modal-detail" data-code="{{ $item->event_data_code }}">
+                                    <i class="fas fa-info-circle fa-fw me-2 text-primary fs--2"></i>
+                                    <span class="fw-medium">Detail Event</span>
                                 </button>
                             </li>
                             <li>
-                                <button class="dropdown-item py-2 btn-modal-session" data-code="{{ $item->event_data_code }}">
-                                    <i class="fas fa-clock me-2 text-warning"></i> Check Session
+                                <button class="dropdown-item d-flex align-items-center rounded-2 py-2 px-3 btn-modal-session" data-code="{{ $item->event_data_code }}">
+                                    <i class="fas fa-clock fa-fw me-2 text-warning fs--2"></i>
+                                    <span class="fw-medium">Check Session</span>
                                 </button>
                             </li>
                             <li>
-                                <hr class="dropdown-divider">
+                                <hr class="dropdown-divider my-2 opacity-50">
                             </li>
                             <li>
-                                <button class="dropdown-item py-2 btn-modal-peserta" data-code="{{ $item->event_data_code }}">
-                                    <i class="fas fa-users me-2 text-success"></i> Lihat Peserta
+                                <button class="dropdown-item d-flex align-items-center rounded-2 py-2 px-3 btn-modal-peserta" data-code="{{ $item->event_data_code }}">
+                                    <i class="fas fa-users fa-fw me-2 text-success fs--2"></i>
+                                    <span class="fw-medium">Lihat Peserta</span>
                                 </button>
                             </li>
                             <li>
-                                <button class="dropdown-item py-2 btn-modal-survey" data-code="{{ $item->event_data_code }}">
-                                    <i class="fas fa-poll-h me-2 text-info"></i> Data Survey Peserta
+                                <button class="dropdown-item d-flex align-items-center rounded-2 py-2 px-3 btn-modal-survey" data-code="{{ $item->event_data_code }}">
+                                    <i class="fas fa-poll-h fa-fw me-2 text-info fs--2"></i>
+                                    <span class="fw-medium">Data Survey Peserta</span>
                                 </button>
                             </li>
-                            {{-- Button Tambahan: Verifikasi Pelunasan --}}
                             <li>
-                                <button class="dropdown-item py-2 btn-modal-verifikasi" data-code="{{ $item->event_data_code }}">
-                                    <i class="fas fa-check-circle me-2 text-success"></i> Verifikasi Pelunasan
+                                <button class="dropdown-item d-flex align-items-center rounded-2 py-2 px-3 btn-modal-verifikasi" data-code="{{ $item->event_data_code }}">
+                                    <i class="fas fa-check-circle fa-fw me-2 text-emerald text-success fs--2"></i>
+                                    <span class="fw-medium">Verifikasi Pelunasan</span>
                                 </button>
                             </li>
                         </ul>
