@@ -30,6 +30,7 @@ use App\Services\ZebraPrinterService;
 use Illuminate\Support\Facades\Http;
 use Illuminate\Support\Facades\Log;
 use Illuminate\Support\Facades\Mail;
+use Illuminate\Support\Facades\Validator;
 use Maatwebsite\Excel\Facades\Excel;
 use Svg\Tag\Rect;
 
@@ -1112,6 +1113,79 @@ class EventController extends Controller
             'status'  => 'error',
             'message' => 'Data event tidak ditemukan.'
         ], 404);
+    }
+    public function menu_event_daftar_verifikasi_pelunasan(Request $request)
+    {
+        // 1. Validasi Input Request
+        $validator = Validator::make($request->all(), [
+            'event_code'        => 'required|string',
+            'registration_code' => 'required|string',
+        ]);
+
+        if ($validator->fails()) {
+            return response()->json([
+                'status'  => false,
+                'message' => $validator->errors()->first()
+            ], 422);
+        }
+
+        try {
+            // 2. Cari Registrasi dengan Join ke Event Data dan Participant
+            $registration = DB::table('event_registrations as er')
+                ->join('event_data as ed', 'ed.id_event_data', '=', 'er.id_event_data')
+                ->join('event_participants as ep', 'ep.id_participant', '=', 'er.id_participant')
+                ->where('ed.event_data_code', $request->event_code)
+                ->where('er.registration_code', $request->registration_code)
+                ->select(
+                    'er.id_registration',
+                    'er.payment_status',
+                    'er.registration_status',
+                    'ep.full_name'
+                )
+                ->first();
+
+            // 3. Validasi Keberadaan Data
+            if (!$registration) {
+                return response()->json([
+                    'status'  => false,
+                    'message' => 'Nomor registrasi tidak ditemukan pada event ini.'
+                ]);
+            }
+
+            // 4. Cek Status Registrasi Aktif/Batal
+            if ($registration->registration_status === 'cancelled') {
+                return response()->json([
+                    'status'  => false,
+                    'message' => 'Registrasi ini sudah dibatalkan (Cancelled).'
+                ]);
+            }
+
+            // 5. Cek Jika Pembayaran Sudah Lunas
+            if ($registration->payment_status === 'paid') {
+                return response()->json([
+                    'status'  => false,
+                    'message' => 'Status registrasi ini sudah LUNAS (Paid).'
+                ]);
+            }
+
+            // 6. Update Status Pembayaran Menjadi Paid
+            DB::table('event_registrations')
+                ->where('id_registration', $registration->id_registration)
+                ->update([
+                    'payment_status' => 'paid',
+                    'updated_at'     => now(),
+                ]);
+
+            return response()->json([
+                'status'  => true,
+                'message' => 'Verifikasi pelunasan untuk ' . $registration->full_name . ' (' . $request->registration_code . ') berhasil disimpan.'
+            ]);
+        } catch (\Exception $e) {
+            return response()->json([
+                'status'  => false,
+                'message' => 'Terjadi kesalahan server: ' . $e->getMessage()
+            ], 500);
+        }
     }
 
     // Fetch Sub Event / Session

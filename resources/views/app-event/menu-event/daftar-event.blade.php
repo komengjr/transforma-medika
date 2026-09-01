@@ -5,6 +5,7 @@
 <link rel="stylesheet" href="https://cdn.datatables.net/responsive/3.0.4/css/responsive.bootstrap5.css">
 <link href="{{ asset('vendors/flatpickr/flatpickr.min.css') }}" rel="stylesheet" />
 <link href="{{ asset('vendors/choices/choices.min.css') }}" rel="stylesheet" />
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/sweetalert2@11/dist/sweetalert2.min.css">
 <style>
     .event-card {
         transition: transform 0.2s ease, box-shadow 0.2s ease;
@@ -97,7 +98,7 @@
                     {{ Str::limit(strip_tags($item->event_data_desc), 90, '...') }}
                 </p>
 
-                {{-- Action Dropdown (Trigger Modal - Added Z-INDEX Fix) --}}
+                {{-- Action Dropdown --}}
                 <div class="pt-3 border-top mt-auto d-flex justify-content-between align-items-center position-relative">
                     <div class="dropdown event-action-dropdown">
                         <button class="btn btn-outline-primary btn-sm rounded-pill dropdown-toggle" type="button" id="dropdownMenuButton{{ $item->id_event_data }}" data-bs-toggle="dropdown" aria-expanded="false">
@@ -127,11 +128,18 @@
                                     <i class="fas fa-poll-h me-2 text-info"></i> Data Survey Peserta
                                 </button>
                             </li>
+                            {{-- Button Tambahan: Verifikasi Pelunasan --}}
+                            <li>
+                                <button class="dropdown-item py-2 btn-modal-verifikasi" data-code="{{ $item->event_data_code }}">
+                                    <i class="fas fa-check-circle me-2 text-success"></i> Verifikasi Pelunasan
+                                </button>
+                            </li>
                         </ul>
                     </div>
-                    <small class="text-muted">
-                        ID User: {{ $item->event_data_user_id }}
-                    </small>
+                    {{-- Penggantian ID User dengan Icon Event --}}
+                    <div class="text-primary">
+                        <i class="fas fa-calendar-alt fa-lg"></i>
+                    </div>
                 </div>
             </div>
         </div>
@@ -248,9 +256,11 @@
         </div>
     </div>
 </div>
+
 @endsection
 
 @section('base.js')
+<script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
 <script>
     document.addEventListener('DOMContentLoaded', function() {
         // --- 1. SEARCH FILTER ---
@@ -785,6 +795,88 @@
                     .catch(err => {
                         container.innerHTML = `<div class="alert alert-danger mb-0">Gagal mengambil data survey dari server.</div>`;
                     });
+            });
+        });
+    });
+</script>
+<script>
+    document.querySelectorAll('.btn-modal-verifikasi').forEach(button => {
+        button.addEventListener('click', function() {
+            const eventCode = this.getAttribute('data-code');
+
+            Swal.fire({
+                title: 'Verifikasi Pelunasan',
+                text: 'Masukkan Nomor Registrasi Peserta:',
+                input: 'text',
+                inputPlaceholder: 'Contoh: REG-123456',
+                showCancelButton: true,
+                confirmButtonText: '<i class="fas fa-check me-1"></i> Verifikasi',
+                cancelButtonText: 'Batal',
+                confirmButtonColor: '#198754',
+                cancelButtonColor: '#6c757d',
+                inputValidator: (value) => {
+                    if (!value) {
+                        return 'Nomor registrasi wajib diisi!';
+                    }
+                }
+            }).then((result) => {
+                if (result.isConfirmed) {
+                    const noRegistrasi = result.value;
+
+                    Swal.fire({
+                        title: 'Memproses...',
+                        text: 'Sedang memverifikasi pelunasan...',
+                        allowOutsideClick: false,
+                        didOpen: () => {
+                            Swal.showLoading();
+                        }
+                    });
+
+                    // 1. Definisikan Route dengan dummy parameter 'XXX'
+                    const rawRoute = "{{ route('menu_event_daftar_verifikasi_pelunasan', ['code' => 'XXX']) }}";
+
+                    // 2. Ganti 'XXX' dengan eventCode asli
+                    const finalUrl = rawRoute.replace('XXX', eventCode);
+
+                    fetch(finalUrl, {
+                            method: 'POST',
+                            headers: {
+                                'Content-Type': 'application/json',
+                                'X-CSRF-TOKEN': '{{ csrf_token() }}'
+                            },
+                            body: JSON.stringify({
+                                event_code: eventCode,
+                                registration_code: noRegistrasi
+                            })
+                        })
+                        .then(response => response.json())
+                        .then(res => {
+                            if (res.status === true) {
+                                Swal.fire({
+                                    icon: 'success',
+                                    title: 'Berhasil!',
+                                    text: res.message,
+                                    timer: 1800,
+                                    showConfirmButton: false
+                                }).then(() => {
+                                    location.reload();
+                                });
+                            } else {
+                                Swal.fire({
+                                    icon: 'error',
+                                    title: 'Gagal!',
+                                    text: res.message
+                                });
+                            }
+                        })
+                        .catch(err => {
+                            Swal.fire({
+                                icon: 'error',
+                                title: 'Terjadi Kesalahan',
+                                text: 'Gagal menghubungkan ke server.'
+                            });
+                        });
+                }
             });
         });
     });
