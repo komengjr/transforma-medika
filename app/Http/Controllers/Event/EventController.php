@@ -643,21 +643,24 @@ class EventController extends Controller
         $zplCode .= "^LL240"; // Tinggi label (240 dots)
         $zplCode .= "^LS0";
 
-        // 1. NAMA PESERTA (Padding 4mm -> Y = 47, Max 2 Baris)
-        $zplCode .= "^FO0,47^FB400,2,0,C^A0N,22,22^FD" . $request->nama_peserta . "^FS";
+        // --- SISI KIRI: QR CODE ---
+        // Posisi Y = 5 (Tetap di bagian atas)
+        $zplCode .= "^FO10,5^BQN,2,6^FDHA," . $request->registration_code . "^FS";
 
-        // 2. KELAS / KATEGORI
-        $zplCode .= "^FO0,92^FB400,1,0,C^A0N,18,18^FD[" . $request->class_name . "]^FS";
+        // --- SISI KANAN: TEKS INFORMASI (POSISI TURUN 3 MM / 24 DOTS) ---
 
-        // 3. NAMA EVENT & ID EVENT
+        // 1. NAMA PESERTA (Posisi Y naik dari 20 ke 44)
+        $zplCode .= "^FO195,44^FB200,2,0,L^A0N,22,22^FD" . $request->nama_peserta . "^FS";
+
+        // 2. KELAS / KATEGORI (Posisi Y naik dari 80 ke 104)
+        $zplCode .= "^FO195,104^FB200,1,0,L^A0N,18,18^FD[" . $request->class_name . "]^FS";
+
+        // 3. NAMA EVENT & ID EVENT (Posisi Y naik dari 110 ke 134)
         $eventInfo = $request->nama_event . " (ID: " . $request->id_event . ")";
-        $zplCode .= "^FO0,113^FB400,2,0,C^A0N,16,16^FD" . $eventInfo . "^FS";
+        $zplCode .= "^FO195,134^FB200,2,0,L^A0N,16,16^FD" . $eventInfo . "^FS";
 
-        // --- PENGATURAN KETEBALAN & TINGGI BARCODE ---
-        $zplCode .= "^BY2,3,50"; // Tinggi barcode disesuaikan 50 dots agar tidak terpotong
-
-        // 4. BARCODE GARIS 1D (Code 128) RATA TENGAH
-        $zplCode .= "^FT0,205^FB400,1,0,C^BCN,50,Y,N,N^FD" . $request->registration_code . "^FS";
+        // 4. KODE REGISTRASI TEKS (Posisi Y naik dari 160 ke 184)
+        $zplCode .= "^FO195,184^FB200,1,0,L^A0N,18,18^FDKode: " . $request->registration_code . "^FS";
 
         $zplCode .= "^XZ";
 
