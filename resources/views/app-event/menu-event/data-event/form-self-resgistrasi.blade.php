@@ -39,19 +39,19 @@
 
         /* ================= SISI KIRI: HERO & SUB EVENT ================= */
         .image-side {
-            background: linear-gradient(135deg, rgba(15, 23, 42, 0.92) 0%, rgba(30, 58, 138, 0.85) 100%),
-            url('{{ $event->event_data_cover ? asset("storage/".$event->event_data_template) : "https://images.unsplash.com/photo-1540575467063-178a50c2df87?auto=format&fit=crop&w=1200&q=80" }}');
+            /* Latar belakang diperjelas tanpa overlay gradien/opacity gelap */
+            background-image: url('{{ $event->event_data_cover ? asset("storage/".$event->event_data_template) : "https://images.unsplash.com/photo-1540575467063-178a50c2df87?auto=format&fit=crop&w=1200&q=80" }}');
             background-size: cover;
             background-position: center;
+            background-repeat: no-repeat;
             width: 50%;
             position: relative;
             padding: 3.5rem;
             color: #ffffff;
-            z-index: 2;
         }
 
         .event-badge {
-            background: rgba(255, 255, 255, 0.18);
+            background: rgba(0, 0, 0, 0.4);
             backdrop-filter: blur(12px);
             -webkit-backdrop-filter: blur(12px);
             border: 1px solid rgba(255, 255, 255, 0.3);
@@ -72,7 +72,7 @@
             line-height: 1.15;
             letter-spacing: -1px;
             color: #ffffff;
-            text-shadow: 0 4px 12px rgba(0, 0, 0, 0.3);
+            text-shadow: 0 4px 12px rgba(0, 0, 0, 0.8);
         }
 
         /* GRID CARD SUB EVENT (POSISI BOTTOM) */
@@ -96,30 +96,30 @@
         }
 
         .sub-event-card-item {
-            background: rgba(255, 255, 255, 0.1);
+            background: rgba(15, 23, 42, 0.65);
             backdrop-filter: blur(12px);
             -webkit-backdrop-filter: blur(12px);
-            border: 1px solid rgba(255, 255, 255, 0.18);
+            border: 1px solid rgba(255, 255, 255, 0.2);
             border-radius: 16px;
             padding: 1rem;
             display: flex;
             flex-direction: column;
             justify-content: space-between;
             transition: all 0.25s ease;
-            box-shadow: 0 4px 15px rgba(0, 0, 0, 0.1);
+            box-shadow: 0 4px 15px rgba(0, 0, 0, 0.3);
         }
 
         .sub-event-card-item:hover {
-            background: rgba(255, 255, 255, 0.18);
-            border-color: rgba(255, 255, 255, 0.35);
+            background: rgba(15, 23, 42, 0.85);
+            border-color: rgba(255, 255, 255, 0.4);
             transform: translateY(-3px);
-            box-shadow: 0 8px 20px rgba(0, 0, 0, 0.2);
+            box-shadow: 0 8px 20px rgba(0, 0, 0, 0.4);
         }
 
         .sub-event-badge-time {
-            background: linear-gradient(135deg, rgba(59, 130, 246, 0.3) 0%, rgba(139, 92, 246, 0.3) 100%);
-            color: #93c5fd;
-            border: 1px solid rgba(147, 197, 253, 0.3);
+            background: linear-gradient(135deg, rgba(59, 130, 246, 0.5) 0%, rgba(139, 92, 246, 0.5) 100%);
+            color: #ffffff;
+            border: 1px solid rgba(147, 197, 253, 0.4);
             padding: 4px 10px;
             border-radius: 20px;
             font-size: 0.75rem;
@@ -141,6 +141,7 @@
             -webkit-line-clamp: 2;
             -webkit-box-orient: vertical;
             overflow: hidden;
+            text-shadow: 0 2px 4px rgba(0, 0, 0, 0.5);
         }
 
         .feature-list {
@@ -149,7 +150,7 @@
         }
 
         .feature-item {
-            background: rgba(255, 255, 255, 0.12);
+            background: rgba(15, 23, 42, 0.65);
             backdrop-filter: blur(10px);
             border-radius: 16px;
             padding: 1.2rem;
@@ -425,25 +426,30 @@
             <!-- Top Header Badge -->
             <div>
                 <span class="event-badge text-uppercase">
-                    <i class="bi bi-shield-check text-warning"></i> Official Check-in Kiosk
+                    <i class="bi bi-shield-check text-warning"></i> Official Event
                 </span>
             </div>
 
             <!-- Content & Agenda Sub Event Card di Posisi Bawah -->
             <div class="mt-auto pt-4 pb-2">
+
                 <h1 class="hero-title mb-2">{{ $event->event_data_tittle }}</h1>
-                <p class="lead text-white-50 mb-3" style="font-size: 0.95rem; max-width: 480px;">
+                <p class="lead text-white mb-3" style="font-size: 0.95rem; max-width: 480px; text-shadow: 0 2px 4px rgba(0,0,0,0.8);">
                     {{ Str::limit(strip_tags($event->event_data_desc ?? 'Platform pendaftaran & presensi event otomatis.'), 100) }}
                 </p>
 
                 <!-- Header Title Sub Event -->
                 <div class="d-flex align-items-center justify-content-between mb-3">
                     <div class="d-flex align-items-center gap-2">
-                        <i class="bi bi-grid-fill text-warning"></i>
-                        <span class="fw-bold text-white text-uppercase fs-7" style="letter-spacing: 0.5px;">Agenda Sub Event</span>
+                        <span class="event-badge text-uppercase">
+                            <i class="bi bi-grid-fill text-warning"></i>
+                            <span class="fw-bold text-white text-uppercase fs-7" style="letter-spacing: 0.5px; text-shadow: 0 2px 4px rgba(0,0,0,0.8);">
+                                Agenda Sub Event
+                            </span>
+                        </span>
                     </div>
                     @if(count($sub_events) > 0)
-                    <span class="badge bg-white bg-opacity-10 text-white border border-white border-opacity-25 rounded-pill px-2.5 py-1 fs-8">
+                    <span class="badge bg-dark bg-opacity-50 text-white border border-white border-opacity-25 rounded-pill px-2.5 py-1 fs-8">
                         {{ count($sub_events) }} Sesi
                     </span>
                     @endif
@@ -464,18 +470,18 @@
                             </h6>
                         </div>
 
-                        <div class="pt-2 border-top border-white border-opacity-10 mt-2 d-flex align-items-center justify-content-between">
-                            <small class="text-white-50 fs-8">
+                        <div class="pt-2 border-top border-white border-opacity-20 mt-2 d-flex align-items-center justify-content-between">
+                            <small class="text-white fs-8" style="text-shadow: 0 1px 2px rgba(0,0,0,0.8);">
                                 <i class="bi bi-calendar3 me-1 text-info"></i>
                                 {{ \Carbon\Carbon::parse($sub->event_data_sub_start)->translatedFormat('d M Y') }}
                             </small>
-                            <i class="bi bi-arrow-right-short text-white-50"></i>
+                            <i class="bi bi-arrow-right-short text-white"></i>
                         </div>
                     </div>
                     @empty
                     <div class="w-100">
                         <div class="p-3 text-center rounded-4 border border-danger border-opacity-50"
-                            style="background: rgba(220, 53, 69, 0.15); backdrop-filter: blur(10px);">
+                            style="background: rgba(15, 23, 42, 0.75); backdrop-filter: blur(10px);">
                             <i class="bi bi-calendar-x-fill text-danger fs-3 d-block mb-1"></i>
                             <strong class="d-block text-white fs-6">Sub Event Tidak Ada</strong>
                             <small class="text-white-50 fs-8">Belum ada agenda atau jadwal sub event yang ditambahkan.</small>
@@ -486,13 +492,17 @@
             </div>
 
             <!-- Bottom Info Footer -->
-            <div class="d-flex align-items-center justify-content-between pt-3 border-top border-secondary border-opacity-25 mt-2">
-                <small class="text-white">
-                    <i class="bi bi-geo-alt-fill text-danger me-1"></i> {{ $event->event_data_venue }}, {{ $event->event_data_city }}
-                </small>
-                <small class="text-white">
-                    <i class="bi bi-calendar-event-fill text-info me-1"></i> {{ \Carbon\Carbon::parse($event->event_data_start_date)->format('d M Y, H:i') }} WIB
-                </small>
+            <div class="d-flex align-items-center justify-content-between pt-3 border-top border-white border-opacity-25 mt-2">
+                <span class="event-badge text-uppercase">
+                    <small class="text-white fw-semibold" style="text-shadow: 0 1px 3px rgba(0,0,0,0.9);">
+                        <i class="bi bi-geo-alt-fill text-danger me-1"></i> {{ $event->event_data_venue }}, {{ $event->event_data_city }}
+                    </small>
+                </span>
+                <span class="event-badge text-uppercase">
+                    <small class="text-white fw-semibold" style="text-shadow: 0 1px 3px rgba(0,0,0,0.9);">
+                        <i class="bi bi-calendar-event-fill text-info me-1"></i> {{ \Carbon\Carbon::parse($event->event_data_start_date)->format('d M Y, H:i') }} WIB
+                    </small>
+                </span>
             </div>
         </div>
 
@@ -545,7 +555,6 @@
                     <small class="text-muted">Menghubungkan ke sistem verifikasi tiket</small>
                 </div>
 
-                <!-- Result Box -->
                 <!-- Result Box -->
                 <div class="result-box" id="resultContainer">
                     <div class="id-badge-card mb-4">
