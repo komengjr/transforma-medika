@@ -61,21 +61,57 @@ class MovieController extends Controller
     }
     public function master_data_movie_save(Request $request)
     {
+        // 1. Validasi Input Data
+        $validator = Validator::make($request->all(), [
+            'title'        => 'required|string|max:255',
+            'description'  => 'nullable|string',
+            'poster'       => 'nullable|string',
+            'triler'       => 'nullable|string',
+            'video'        => 'nullable|string',
+            'type_link'    => 'nullable|string|in:online,local',
+            'genre'        => 'nullable|string|max:255',
+            'release_date' => 'nullable|date',
+            'rating'       => 'nullable|string|max:50',
+            'subtitle'     => 'nullable|string|max:255',
+        ]);
+
+        if ($validator->fails()) {
+            return response()->json([
+                'status'  => false,
+                'message' => 'Validasi gagal',
+                'errors'  => $validator->errors()
+            ], 422);
+        }
+
+        // 2. Insert Direct ke Database menggunakan DB Facade
         try {
-            Movie::insert([
-                'title' => $request->nama,
-                'description' => $request->desc,
-                'poster' => $request->poster,
-                'video' => $request->video,
-                'type_link' => $request->type,
-                'genre' => $request->genre,
+            DB::table('movies')->insert([
+                'title'        => $request->title,
+                'description'  => $request->description,
+                'poster'       => $request->poster,
+                'triler'       => $request->triler,
+                'video'        => $request->video,
+                'type_link'    => $request->type_link,
+                'genre'        => $request->genre,
                 'release_date' => $request->release_date,
-                'rating' => $request->rating,
-                'created_at' => now()
+                'rating'       => $request->rating,
+                'subtitle'     => $request->subtitle,
+                'created_at'   => now(),
+                'updated_at'   => now(),
             ]);
-            return 1;
+
+            return response()->json([
+                'status'  => true,
+                'message' => 'Data movie berhasil disimpan!'
+            ], 200);
         } catch (\Throwable $e) {
-            return 0;
+            // Log error jika terjadi kesalahan query
+            Log::error('Error insert movie DB: ' . $e->getMessage());
+
+            return response()->json([
+                'status'  => false,
+                'message' => 'Terjadi kesalahan saat menyimpan data: ' . $e->getMessage()
+            ], 500);
         }
     }
 }

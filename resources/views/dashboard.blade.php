@@ -1088,7 +1088,6 @@
                 <button type="button" class="btn-close btn-close-custom" data-bs-dismiss="modal" aria-label="Close"></button>
 
                 <!-- STEP 1: Request OTP / Email Input -->
-                <!-- STEP 1: Request OTP / Email Input -->
                 <div id="reset-step-1" class="reset-step-container">
                     <div class="text-center mb-4">
                         <div class="reset-icon-badge bg-warning-subtle text-warning mx-auto mb-3">

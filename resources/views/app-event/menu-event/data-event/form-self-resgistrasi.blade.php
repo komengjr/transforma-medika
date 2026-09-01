@@ -40,7 +40,7 @@
         /* ================= SISI KIRI: HERO & SUB EVENT ================= */
         .image-side {
             background: linear-gradient(135deg, rgba(15, 23, 42, 0.92) 0%, rgba(30, 58, 138, 0.85) 100%),
-            url('{{ $event->event_data_cover ? asset("storage/".$event->event_data_cover) : "https://images.unsplash.com/photo-1540575467063-178a50c2df87?auto=format&fit=crop&w=1200&q=80" }}');
+            url('{{ $event->event_data_cover ? asset("storage/".$event->event_data_template) : "https://images.unsplash.com/photo-1540575467063-178a50c2df87?auto=format&fit=crop&w=1200&q=80" }}');
             background-size: cover;
             background-position: center;
             width: 50%;
