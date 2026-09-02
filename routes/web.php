@@ -297,6 +297,7 @@ Route::prefix('{akses}/{id}/application')->group(function () {
     Route::get('master-medical/interface-architec', [MasterMedController::class, 'master_medical_interface_architec'])->name('master_medical_interface_architec');
     Route::get('master-medical/xn-500', [MasterMedController::class, 'master_medical_interface_xn_500'])->name('master_medical_interface_xn_500');
 
+    Route::get('master-medical/update-tat', [MasterMedController::class, 'master_medical_update_tat'])->name('master_medical_update_tat');
 
     Route::get('master-perusahaan/data-perusahaan', [MasterDataController::class, 'master_perusahaan_data'])->name('master_perusahaan_data');
     Route::get('master-perusahaan/mou-perusahaan', [MasterDataController::class, 'master_perusahaan_mou'])->name('master_perusahaan_mou');
@@ -825,6 +826,7 @@ include 'brodcast.php';
 include 'koperasi.php';
 include 'hrm.php';
 include 'event.php';
+include 'medica.php';
 
 Route::post('/upload-sftp', [FileUploadController::class, 'uploadFile'])->name('upload.sftp');
 Route::post('/upload-ftp', [FileUploadController::class, 'uploadFileftp'])->name('upload.ftp');

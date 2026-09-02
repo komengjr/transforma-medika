@@ -90,6 +90,19 @@ return [
             'prefix' => '',
             'prefix_indexes' => true,
         ],
+        'mysql_external' => [
+            'driver'    => 'mysql',
+            'host'      => env('DB_EXTERNAL_HOST', '127.0.0.1'),
+            'port'      => env('DB_EXTERNAL_PORT', '3306'),
+            'database'  => env('DB_EXTERNAL_DATABASE', 'forge'),
+            'username'  => env('DB_EXTERNAL_USERNAME', 'forge'),
+            'password'  => env('DB_EXTERNAL_PASSWORD', ''),
+            'charset'   => 'latin1', // Sesuai charset di SQL dump Anda (latin1/utf8mb4)
+            'collation' => 'latin1_swedish_ci',
+            'prefix'    => '',
+            'strict'    => false,
+            'engine'    => null,
+        ],
 
     ],
 
@@ -123,7 +136,7 @@ return [
 
         'options' => [
             'cluster' => env('REDIS_CLUSTER', 'redis'),
-            'prefix' => env('REDIS_PREFIX', Str::slug(env('APP_NAME', 'laravel'), '_').'_database_'),
+            'prefix' => env('REDIS_PREFIX', Str::slug(env('APP_NAME', 'laravel'), '_') . '_database_'),
         ],
 
         'default' => [

@@ -213,4 +213,13 @@ class MasterMedController extends Controller
             'data'            => $formattedData,
         ]);
     }
+    // MASTER UPDATE TAT
+    public function master_medical_update_tat($akses, $id)
+    {
+        if ($this->url_akses($akses, $id) == true) {
+            return view('app-medical.update-tat.update', ['akses' => $akses, 'code' => $id]);
+        } else {
+            return Redirect::to('dashboard/home');
+        }
+    }
 }
