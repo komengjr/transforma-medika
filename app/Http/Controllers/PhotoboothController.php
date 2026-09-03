@@ -24,8 +24,8 @@ class PhotoboothController extends Controller
     {
         $validator = Validator::make($request->all(), [
             'name'          => 'required|string|max:255',
-            'phone'         => 'required|string|max:20',
-            'email'         => 'required|email|max:255',
+            // 'phone'         => 'required|string|max:20',
+            // 'email'         => 'required|email|max:255',
             'image_data'    => 'required|string', // Foto Gabungan
             'single_images' => 'required|array|min:1', // Array Foto Satuan
         ]);
