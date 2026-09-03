@@ -791,6 +791,7 @@ Route::prefix('news/')->group(function (): void {
 use App\Http\Controllers\MovieController;
 use App\Http\Controllers\News\NewsController;
 use App\Http\Controllers\OrthancController;
+
 use App\Http\Controllers\PrivateDocumentController;
 use Illuminate\Support\Facades\Storage;
 
@@ -828,20 +829,11 @@ include 'koperasi.php';
 include 'hrm.php';
 include 'event.php';
 include 'medica.php';
+include 'photoboot.php';
 
 Route::post('/upload-sftp', [FileUploadController::class, 'uploadFile'])->name('upload.sftp');
 Route::post('/upload-ftp', [FileUploadController::class, 'uploadFileftp'])->name('upload.ftp');
-// Route::get('/uploads', function () {
-//     return view('upload');
-// });
-// Route::get('/test-ftp', function () {
-//     try {
-//         Storage::disk('ftp')->files('/');
-//         dd('FTP CONNECTED');
-//     } catch (\Exception $e) {
-//         dd($e->getMessage());
-//     }
-// });
+
 Route::get('/orthanc/viewer', [OrthancController::class, 'showViewer'])->name('orthanc.viewer');
 Route::get('/orthanc/get-data', [OrthancController::class, 'getStudies'])->name('orthanc.getStudies');
 
@@ -866,3 +858,6 @@ Route::get('/printer', [PrinterController::class, 'index'])->name('printer.index
 
 // Route API (AJAX) untuk mengambil string ZPL
 Route::get('/printer/get-zpl', [PrinterController::class, 'getZplData'])->name('printer.get-zpl');
+
+
+
