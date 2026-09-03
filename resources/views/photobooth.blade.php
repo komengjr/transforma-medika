@@ -36,6 +36,21 @@
             padding: 10px 20px;
             text-align: center;
             flex-shrink: 0;
+            display: flex;
+            flex-direction: column;
+            /* Mengatur susunan dari atas ke bawah */
+            align-items: center;
+            justify-content: center;
+            gap: 8px;
+            /* Jarak antara logo dan tulisan */
+        }
+
+        .header-logo {
+            height: 50px;
+            /* Ukuran tinggi logo (bisa disesuaikan) */
+            width: auto;
+            object-fit: contain;
+            filter: drop-shadow(0 2px 4px rgba(0, 0, 0, 0.3));
         }
 
         h1 {
@@ -43,6 +58,7 @@
             font-weight: bold;
             text-shadow: 0 4px 10px rgba(0, 0, 0, 0.5);
             color: #ffffff;
+            margin: 0;
         }
 
         .fs-banner {
@@ -380,7 +396,10 @@
     </div>
 
     <header>
-        <h1>📸 Web Photobooth</h1>
+        <!-- Logo Pramita Lab (Di atas) -->
+        <img src="{{ asset('img/pramita.png') }}" alt="Logo Pramita Lab" class="header-logo">
+        <!-- Judul (Di bawah) -->
+        <h1>Pramita Photobooth</h1>
     </header>
 
     <div class="main-container">
@@ -903,7 +922,6 @@
                                 });
                             }
                         }).then((result) => {
-                            // MERESET APLIKASI TANPA RELOAD SUPAYA FULLSCREEN TETAP AKTIF
                             if (result.isConfirmed || result.dismiss) {
                                 resetAppToStep1();
                             }
@@ -934,23 +952,18 @@
                 });
         }
 
-        /* FUNGSI UNTUK RESET KE STEP 1 TANPA PUTUS FULLSCREEN */
         function resetAppToStep1() {
-            // 1. Kosongkan Form Input
             document.getElementById('user-name').value = '';
             document.getElementById('user-phone').value = '';
             document.getElementById('user-email').value = '';
 
-            // 2. Matikan Koneksi Kamera & Reset State Booth
             stopCamera();
             resetBoothState();
 
-            // 3. Kembalikan Tampilan ke Step 1
             stepBooth.style.display = 'none';
             step2Frame.style.display = 'none';
             step1Form.style.display = 'block';
 
-            // 4. Bersihkan Tabel QR Code Sementara
             tableContainer.style.display = 'none';
             userTableBody.innerHTML = '';
         }
