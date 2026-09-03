@@ -12,10 +12,16 @@ class PhotoboothResult extends Model
     protected $table = 'photobooth_results';
 
     protected $fillable = [
-        'code',       // <-- Pastikan ini ada!
+        'code',
         'name',
         'phone',
         'email',
         'image_path',
+        'single_images',
+    ];
+
+    // Otomatis mengubah JSON menjadi Array PHP
+    protected $casts = [
+        'single_images' => 'array',
     ];
 }

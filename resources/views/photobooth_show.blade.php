@@ -7,25 +7,58 @@
     <title>Hasil Foto - {{ $result->name }}</title>
     <style>
         body {
-            font-family: sans-serif;
+            font-family: 'Segoe UI', sans-serif;
             background: #121212;
             color: #fff;
             text-align: center;
-            padding: 30px;
+            padding: 20px;
         }
 
         .container {
-            max-width: 500px;
+            max-width: 600px;
             margin: 0 auto;
             background: #1e1e1e;
-            padding: 20px;
+            padding: 25px;
+            border-radius: 16px;
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.5);
+        }
+
+        h2 {
+            color: #ff4081;
+            margin-bottom: 5px;
+        }
+
+        .merged-box {
+            margin: 20px 0;
+            padding: 15px;
+            background: #2a2a2a;
             border-radius: 12px;
         }
 
-        img {
+        .merged-box img {
             width: 100%;
+            max-width: 350px;
             border-radius: 8px;
-            margin: 15px 0;
+            border: 2px solid #fff;
+        }
+
+        .singles-grid {
+            display: grid;
+            grid-template-columns: repeat(2, 1fr);
+            gap: 15px;
+            margin-top: 20px;
+        }
+
+        .single-item {
+            background: #2a2a2a;
+            padding: 10px;
+            border-radius: 10px;
+            text-align: center;
+        }
+
+        .single-item img {
+            width: 100%;
+            border-radius: 6px;
         }
 
         .btn {
@@ -33,9 +66,16 @@
             background: #ff4081;
             color: #fff;
             text-decoration: none;
-            padding: 12px 24px;
-            border-radius: 25px;
+            padding: 8px 16px;
+            border-radius: 20px;
+            font-size: 0.85rem;
             font-weight: bold;
+            margin-top: 8px;
+        }
+
+        .btn-main {
+            padding: 12px 24px;
+            font-size: 1rem;
         }
     </style>
 </head>
@@ -43,14 +83,28 @@
 <body>
     <div class="container">
         <h2>Hasil Foto Photobooth</h2>
-        <p><strong>Nama:</strong> {{ $result->name }}</p>
-        <p style="font-size: 0.8rem; color: #888;">Kode Akses: {{ $result->code }}</p>
+        <p style="color: #aaa;">Nama: <strong>{{ $result->name }}</strong> | Kode: <strong>{{ $result->code }}</strong></p>
 
-        <!-- Gambar diakses via route image berdasarkan 'code' -->
-        <img src="{{ route('photobooth.image', $result->code) }}" alt="Hasil Foto">
+        <!-- FOTO GABUNGAN (PHOTO STRIP) -->
+        <div class="merged-box">
+            <h3 style="margin-bottom: 10px; font-size: 1.1rem;">Foto Strip Gabungan</h3>
+            <img src="{{ route('photobooth.image', ['code' => $result->code, 'type' => 'merged']) }}" alt="Foto Strip">
+            <br><br>
+            <a href="{{ route('photobooth.image', ['code' => $result->code, 'type' => 'merged']) }}" download="Photobooth_Strip_{{ $result->code }}.png" class="btn btn-main">Unduh Foto Strip</a>
+        </div>
 
-        <br>
-        <a href="{{ route('photobooth.image', $result->code) }}" download="photobooth_{{ $result->code }}.png" class="btn">Unduh Gambar</a>
+        <!-- FOTO SATUAN (POSE 1 - 4) -->
+        <h3 style="margin-top: 30px; text-align: left; color: #ff4081;">Foto Satuan (Per Pose):</h3>
+        <div class="singles-grid">
+            @if($result->single_images && is_array($result->single_images))
+            @foreach($result->single_images as $index => $single)
+            <div class="single-item">
+                <img src="{{ route('photobooth.image', ['code' => $result->code, 'type' => 'single', 'index' => $index]) }}" alt="Pose {{ $index + 1 }}">
+                <a href="{{ route('photobooth.image', ['code' => $result->code, 'type' => 'single', 'index' => $index]) }}" download="Pose_{{ $index + 1 }}_{{ $result->code }}.png" class="btn">Unduh Pose {{ $index + 1 }}</a>
+            </div>
+            @endforeach
+            @endif
+        </div>
     </div>
 </body>
 

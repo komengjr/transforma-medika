@@ -7,9 +7,7 @@
     <meta name="csrf-token" content="{{ csrf_token() }}">
     <title>Web Photobooth Laravel</title>
 
-    <!-- SweetAlert2 CSS & JS -->
     <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
-    <!-- QRCode.js Library -->
     <script src="https://cdnjs.cloudflare.com/ajax/libs/qrcodejs/1.0.0/qrcode.min.js"></script>
 
     <style>
@@ -368,7 +366,6 @@
 
     <h1>📸 Web Photobooth</h1>
 
-    <!-- LANGKAH 1: ISI FORM DATA DIRI -->
     <div id="step-1-form" class="step-box">
         <h3 style="margin-bottom: 20px; color: #ff4081; text-align: center;">Langkah 1: Isi Data Diri</h3>
         <div class="form-group">
@@ -386,17 +383,14 @@
         <button class="btn" onclick="submitFormStep1()">Submit Data Diri</button>
     </div>
 
-    <!-- LANGKAH 2: PILIH FRAME, FILTER, & KAMERA PREVIEW FULL -->
     <div id="step-2-frame" class="step-box" style="display: none;">
         <h3 style="margin-bottom: 15px; color: #ff4081; text-align: center;">Langkah 2: Pilih Frame & Filter</h3>
 
-        <!-- PREVIEW KAMERA FULL -->
         <div class="camera-container" style="max-width: 100%;">
             <video id="webcam-preview" class="filter-normal" autoplay playsinline></video>
             <img id="frame-preview-overlay" class="frame-overlay" src="" alt="Frame Overlay">
         </div>
 
-        <!-- FITUR PILIHAN FILTER KAMERA -->
         <div class="form-group" style="margin-bottom: 15px;">
             <label for="camera-filter">Pilih Filter Kamera:</label>
             <select id="camera-filter" onchange="applyFilter(this.value)">
@@ -409,7 +403,6 @@
             </select>
         </div>
 
-        <!-- PILIHAN FRAME -->
         <div class="frame-options">
             @foreach($frames as $key => $frame)
             <div class="frame-card {{ $key === 0 ? 'active' : '' }}"
@@ -425,9 +418,7 @@
         <button class="btn btn-secondary" onclick="backToStep1()">Kembali ke Form</button>
     </div>
 
-    <!-- LANGKAH 3: PEMOTRETAN -->
     <div id="step-booth">
-        <!-- KOLOM KIRI: KAMERA UTAMA -->
         <div class="booth-column">
             <div class="camera-container">
                 <video id="webcam" class="filter-normal" autoplay playsinline></video>
@@ -442,7 +433,6 @@
             </div>
         </div>
 
-        <!-- KOLOM KANAN: PREVIEW 4 POSE & TABEL HASIL -->
         <div class="booth-column">
             <div class="preview-section">
                 <h4 style="margin-bottom: 12px; color: #ff4081;">Hasil Jepretan (4 Pose)</h4>
@@ -454,10 +444,8 @@
                 </div>
             </div>
 
-            <!-- CANVAS TERSEMBUNYI -->
             <canvas id="photo-strip"></canvas>
 
-            <!-- TABEL HASIL DENGAN QR CODE -->
             <div id="table-container" class="table-container">
                 <h4 style="margin-bottom: 12px; color: #ff4081;">Daftar Barcode Link Foto</h4>
                 <table>
@@ -551,13 +539,11 @@
         /* LOGIKA AKSI FILTER */
         function applyFilter(filterClass) {
             currentFilterClass = filterClass;
-
-            // Update class filter pada element video
             videoPreview.className = filterClass;
             videoMain.className = filterClass;
         }
 
-        /* STEP 1 LOGIC (DENGAN LOADING SWAL ALERT) */
+        /* STEP 1 LOGIC (WITH SWAL LOADING) */
         async function submitFormStep1() {
             const name = document.getElementById('user-name').value.trim();
             const phone = document.getElementById('user-phone').value.trim();
@@ -573,7 +559,6 @@
                 return;
             }
 
-            // Tampilkan Swal Loading saat memuat kamera & pindah ke Langkah 2
             Swal.fire({
                 title: 'Memuat Kamera...',
                 text: 'Mohon izinkan akses kamera pada browser Anda.',
@@ -586,11 +571,8 @@
 
             try {
                 await startCamera();
-
-                // Sembunyikan Swal Loading
                 Swal.close();
 
-                // Pindah ke Langkah 2
                 step1Form.style.display = 'none';
                 step2Frame.style.display = 'block';
 
@@ -726,17 +708,14 @@
             tempCanvas.height = photoHeight;
             const tempCtx = tempCanvas.getContext('2d');
 
-            // Terapkan Filter CSS terpilih ke konteks Canvas
             const filterStyles = getComputedStyle(videoMain).filter;
             tempCtx.filter = filterStyles !== 'none' ? filterStyles : 'none';
 
-            // Mirroring & Gambar Video
             tempCtx.translate(photoWidth, 0);
             tempCtx.scale(-1, 1);
             tempCtx.drawImage(videoMain, 0, 0, photoWidth, photoHeight);
             tempCtx.restore();
 
-            // Reset filter untuk frame agar frame tidak kena imbas filter
             tempCtx.filter = 'none';
             tempCtx.drawImage(frameImageObj, 0, 0, photoWidth, photoHeight);
 
@@ -775,7 +754,7 @@
             });
         }
 
-        /* LOGIKA SIMPAN VIA SWAL LOADING & QRCODE */
+        /* MENGIRIM DUA DATA: FOTO GABUNGAN & ARRAY FOTO SATUAN */
         function saveToDatabase(base64Image) {
             const name = document.getElementById('user-name').value;
             const phone = document.getElementById('user-phone').value;
@@ -799,10 +778,11 @@
                         'X-CSRF-TOKEN': csrfToken
                     },
                     body: JSON.stringify({
-                        name,
-                        phone,
-                        email,
-                        image_data: base64Image
+                        name: name,
+                        phone: phone,
+                        email: email,
+                        image_data: base64Image, // Foto Strip Gabungan
+                        single_images: framedPhotos // Array Foto Satuan
                     })
                 })
                 .then(response => response.json())
