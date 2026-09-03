@@ -44,7 +44,20 @@ return [
             'timeout' => null,
             'auth_mode' => null,
         ],
-
+        // Tambahkan Akun Email Kedua di sini
+        'smtp_second' => [
+            'transport' => 'smtp',
+            'host' => env('MAIL_HOST_SECOND', 'smtp.gmail.com'),
+            'port' => env('MAIL_PORT_SECOND', 587),
+            'encryption' => env('MAIL_ENCRYPTION_SECOND', 'tls'),
+            'username' => env('MAIL_USERNAME_SECOND'),
+            'password' => env('MAIL_PASSWORD_SECOND'),
+            'timeout' => null,
+            'from' => [
+                'address' => env('MAIL_FROM_ADDRESS_SECOND', 'emailkedua@gmail.com'),
+                'name' => env('MAIL_FROM_NAME_SECOND', 'Broadcast System'),
+            ],
+        ],
         'ses' => [
             'transport' => 'ses',
         ],

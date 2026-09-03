@@ -161,6 +161,7 @@ Route::prefix('{akses}/{id}')->group(function (): void {
     Route::get('menu-brodcast/history-whatsapp', [BrodcastController::class, 'menu_brodcast_history_whatsapp'])->name('menu_brodcast_history_whatsapp');
     Route::get('master-brodcast/master-contact', [BrodcastController::class, 'master_brodcast_contact'])->name('master_brodcast_contact');
     Route::get('master-brodcast/configure-whatsapp', [BrodcastController::class, 'master_brodcast_configure_whatsapp'])->name('master_brodcast_configure_whatsapp');
+    Route::get('menu-brodcast/brodcast-email', [BrodcastController::class, 'menu_brodcast_email'])->name('menu_brodcast_email');
 
     // FARMASI
     Route::get('penjualan/penjualan-non-resep', [FarmasiController::class, 'penjualan_non_resep'])->name('penjualan_non_resep');

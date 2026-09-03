@@ -24,4 +24,10 @@ Route::prefix('brodcast/')->group(function (): void {
     Route::post('master-brodcast/configure-whatsapp/buy-kuota', [BrodcastController::class, 'master_brodcast_configure_whatsapp_buy_kuota'])->name('master_brodcast_configure_whatsapp_buy_kuota');
     Route::post('master-brodcast/configure-whatsapp/get-token-payment', [BrodcastController::class, 'master_brodcast_configure_whatsapp_token_payment'])->name('master_brodcast_configure_whatsapp_token_payment');
     Route::post('master-brodcast/configure-whatsapp/confrim-token-payment', [BrodcastController::class, 'master_brodcast_configure_whatsapp_confrim_payment'])->name('master_brodcast_configure_whatsapp_confrim_payment');
+
+    Route::post('menu-brodcast/brodcast-email/send', [BrodcastController::class, 'menu_brodcast_email_send'])->name('menu_brodcast_email_send');
+    // Endpoint AJAX Tambahan untuk Peforma
+    Route::get('menu-brodcast/brodcast-email/contacts-ajax', [BrodcastController::class, 'get_contacts_ajax'])->name('menu_brodcast_email.contacts_ajax');
+    Route::get('menu-brodcast/brodcast-email/history-ajax', [BrodcastController::class, 'get_history_datatables'])->name('menu_brodcast_email.history_ajax');
+    Route::get('menu-brodcast/brodcast-email/progress/{batch_id}', [BrodcastController::class, 'check_progress'])->name('menu_brodcast_email.progress');
 });

@@ -5,12 +5,16 @@ namespace App\Http\Controllers\Brodcast;
 use App\Http\Controllers\Controller;
 use App\Imports\Brodcast\ContactImport;
 use App\Imports\PesertaEventImport;
+use App\Jobs\SendBroadcastEmailJob;
+use Exception;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Hash;
+use Illuminate\Support\Facades\Mail;
 use Illuminate\Support\Facades\Redirect;
 use Illuminate\Support\Facades\Storage;
+use Illuminate\Support\Facades\Validator;
 use Illuminate\Support\Str;
 use League\CommonMark\Extension\CommonMark\Node\Inline\Code;
 use Maatwebsite\Excel\Facades\Excel;
@@ -347,6 +351,157 @@ class BrodcastController extends Controller
             return Redirect::to('dashboard/home');
         }
     }
+    // BRODCAST EMAIL
+    public function menu_brodcast_email($akses, $id)
+    {
+        if ($this->url_akses($akses, $id) == true) {
+
+            return view('app-brodcast.menu.brodcast-email',  ['akses' => $akses, 'code' => $id]);
+        } else {
+            return Redirect::to('dashboard/home');
+        }
+    }
+    // AJAX Endpoint Search Select2 Kontak (Lazy Load)
+    public function get_contacts_ajax(Request $request)
+    {
+        $search = $request->term;
+        $query = DB::table('b_master_contact')
+            ->where('b_master_contact_status', '1');
+
+        if (!empty($search)) {
+            $query->where(function ($q) use ($search) {
+                $q->where('b_master_contact_name', 'LIKE', "%{$search}%")
+                    ->orWhere('b_master_contact_email', 'LIKE', "%{$search}%");
+            });
+        }
+
+        $contacts = $query->limit(30)->get(['id_b_master_contact as id', 'b_master_contact_name', 'b_master_contact_email']);
+
+        $results = [];
+        foreach ($contacts as $c) {
+            $results[] = [
+                'id'   => $c->id,
+                'text' => $c->b_master_contact_name . ' (' . $c->b_master_contact_email . ')'
+            ];
+        }
+
+        return response()->json(['results' => $results]);
+    }
+
+    // Dispatch Job dengan Batch ID unik
+    public function menu_brodcast_email_send(Request $request)
+    {
+        $validator = Validator::make($request->all(), [
+            'subject'     => 'required|string|max:255',
+            'message'     => 'required|string',
+            'attachment'  => 'nullable|file|mimes:pdf,docx,doc,xlsx,xls,jpg,jpeg,png,zip|max:10240',
+        ]);
+
+        if ($validator->fails()) {
+            return response()->json(['status' => false, 'message' => 'Validasi gagal.'], 422);
+        }
+
+        if ($request->has('select_all') && $request->select_all == '1') {
+            $contactIds = DB::table('b_master_contact')
+                ->where('b_master_contact_status', 'active')
+                ->pluck('id_b_master_contact')
+                ->toArray();
+        } else {
+            if (!$request->has('contact_ids') || empty($request->contact_ids)) {
+                return response()->json(['status' => false, 'message' => 'Pilih kontak terlebih dahulu!'], 422);
+            }
+            $contactIds = $request->contact_ids;
+        }
+
+        $filePath = null;
+        $fileName = null;
+        if ($request->hasFile('attachment')) {
+            $file = $request->file('attachment');
+            $fileName = time() . '_' . $file->getClientOriginalName();
+            $filePath = $file->storeAs('public/attachments', $fileName);
+        }
+
+        // Buat Batch ID Unik
+        $batchId = uniqid('batch_', true);
+
+        // Jalankan Job
+        SendBroadcastEmailJob::dispatch($batchId, $contactIds, $request->subject, $request->message, $filePath, $fileName);
+
+        return response()->json([
+            'status'   => true,
+            'batch_id' => $batchId,
+            'total'    => count($contactIds)
+        ]);
+    }
+
+    // Endpoint untuk Check Progress Real-time via AJAX
+    public function check_progress($batch_id)
+    {
+        $progress = \Illuminate\Support\Facades\Cache::get("broadcast_progress_{$batch_id}", [
+            'processed'  => 0,
+            'total'      => 0,
+            'percentage' => 0,
+            'status'     => 'running'
+        ]);
+
+        return response()->json($progress);
+    }
+
+    // DataTables Server-Side Processing untuk History Email
+    public function get_history_datatables(Request $request)
+    {
+        $totalData = DB::table('b_email_histories')->count();
+
+        $limit = $request->input('length', 10);
+        $start = $request->input('start', 0);
+        $searchValue = $request->input('search.value');
+
+        $query = DB::table('b_email_histories');
+
+        if (!empty($searchValue)) {
+            $query->where(function ($q) use ($searchValue) {
+                $q->where('recipient_name', 'LIKE', "%{$searchValue}%")
+                    ->orWhere('recipient_email', 'LIKE', "%{$searchValue}%")
+                    ->orWhere('subject', 'LIKE', "%{$searchValue}%");
+            });
+        }
+
+        $totalFiltered = $query->count();
+
+        $histories = $query->offset($start)
+            ->limit($limit)
+            ->orderBy('created_at', 'desc')
+            ->get();
+
+        $data = [];
+        foreach ($histories as $key => $h) {
+            $nestedData = [];
+            $nestedData['no'] = $start + $key + 1;
+            $nestedData['recipient'] = '<strong>' . e($h->recipient_name) . '</strong><br><small class="text-muted">' . e($h->recipient_email) . '</small>';
+
+            $subjectCol = '<div class="fw-semibold">' . e($h->subject) . '</div>';
+            if ($h->attachment) {
+                $subjectCol .= '<small class="text-primary"><i class="fas fa-paperclip me-1"></i>' . e($h->attachment) . '</small>';
+            }
+            $nestedData['subject'] = $subjectCol;
+
+            if ($h->status == 'success') {
+                $nestedData['status'] = '<span class="badge bg-success"><i class="fas fa-check-circle me-1"></i>Sukses</span>';
+            } else {
+                $nestedData['status'] = '<span class="badge bg-danger" data-bs-toggle="tooltip" title="' . e($h->error_message) . '"><i class="fas fa-times-circle me-1"></i>Gagal</span>';
+            }
+
+            $nestedData['created_at'] = date('d M Y H:i', strtotime($h->created_at));
+            $data[] = $nestedData;
+        }
+
+        return response()->json([
+            "draw"            => intval($request->input('draw')),
+            "recordsTotal"    => intval($totalData),
+            "recordsFiltered" => intval($totalFiltered),
+            "data"            => $data
+        ]);
+    }
     // BRODCAST MASTER CONTACT
     public function master_brodcast_contact($akses, $id)
     {
@@ -434,7 +589,8 @@ class BrodcastController extends Controller
         // return view('app-brodcast.master.form.form-payment', compact('snapToken'));
         return $snapToken;
     }
-    public function master_brodcast_configure_whatsapp_confrim_payment(Request $request){
+    public function master_brodcast_configure_whatsapp_confrim_payment(Request $request)
+    {
         return 123;
     }
 }

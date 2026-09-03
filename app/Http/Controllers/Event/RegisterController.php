@@ -11,6 +11,7 @@ use App\Models\Event\EventData;
 use App\Models\Event\EventRegistration;
 use Exception;
 use Illuminate\Http\Request;
+use Illuminate\Support\Carbon;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Mail;
 use Illuminate\Support\Str;
@@ -22,6 +23,13 @@ class RegisterController extends Controller
         $event = EventModel::where('event_data_code', $id)->first();
 
         if ($event) {
+            // Pengecekan apakah deadline registrasi sudah lewat (sampai akhir hari deadline tersebut)
+            $isExpired = Carbon::parse($event->event_data_reg_deadline)->endOfDay()->isPast();
+
+            if ($isExpired) {
+                return view('public.error.500');
+            }
+
             // Ambil sub event
             $subevent = SubEventModel::where('event_data_code', $id)->get();
 
