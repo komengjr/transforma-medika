@@ -5,12 +5,12 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <meta name="csrf-token" content="{{ csrf_token() }}">
-    <title>Web Photobooth Laravel</title>
+    <title>Pramita Photobooth</title>
 
     <!-- SweetAlert2 CSS & JS -->
     <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
     <!-- QRCode.js Library -->
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/qrcodejs/1.0.0/qrcode.min.js"></script>
+    <script src="{{asset('asset/js/qr.js')}}"></script>
 
     <style>
         * {
@@ -38,16 +38,13 @@
             flex-shrink: 0;
             display: flex;
             flex-direction: column;
-            /* Mengatur susunan dari atas ke bawah */
             align-items: center;
             justify-content: center;
             gap: 8px;
-            /* Jarak antara logo dan tulisan */
         }
 
         .header-logo {
             height: 50px;
-            /* Ukuran tinggi logo (bisa disesuaikan) */
             width: auto;
             object-fit: contain;
             filter: drop-shadow(0 2px 4px rgba(0, 0, 0, 0.3));
@@ -81,7 +78,7 @@
             align-items: center;
             justify-content: center;
             padding: 10px 20px 20px 20px;
-            height: calc(100vh - 60px);
+            height: calc(100vh - 100px);
         }
 
         .step-box-small {
@@ -147,11 +144,61 @@
             font-size: 0.9rem;
         }
 
+        /* Layout Cards Selector CSS */
+        .layout-options {
+            display: grid;
+            grid-template-columns: repeat(3, 1fr);
+            gap: 10px;
+            margin-top: 4px;
+        }
+
+        .layout-card {
+            padding: 8px 4px;
+            border: 2px solid #e0e0e0;
+            border-radius: 8px;
+            cursor: pointer;
+            background: #fff;
+            text-align: center;
+            color: #333;
+            font-weight: 600;
+            font-size: 0.75rem;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            gap: 6px;
+            transition: all 0.2s ease;
+        }
+
+        .layout-card:hover {
+            border-color: #ff4081;
+        }
+
+        .layout-card.active {
+            border-color: #ff4081;
+            background: #fff0f5;
+        }
+
+        .layout-card.disabled {
+            opacity: 0.4;
+            cursor: not-allowed;
+            border-color: #ddd !important;
+            background: #f5f5f5 !important;
+        }
+
+        .layout-icon {
+            width: 42px;
+            height: 42px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+
         .frame-options {
             display: grid;
             grid-template-columns: repeat(2, 1fr);
             gap: 10px;
-            max-height: 160px;
+            max-height: 120px;
             overflow-y: auto;
             padding-right: 5px;
             margin-bottom: 10px;
@@ -171,7 +218,7 @@
 
         .frame-card img {
             width: 100%;
-            height: 60px;
+            height: 50px;
             object-fit: contain;
             border-radius: 4px;
             margin-bottom: 4px;
@@ -392,13 +439,12 @@
 <body onclick="triggerFullscreen()">
 
     <div class="fs-banner" id="fs-banner">
-        📱 Klik di mana saja pada layar untuk mengaktifkan Mode **Full Screen** | Drag Bookmarklet: <a href="javascript:(function(){var el=document.documentElement;var rfs=el.requestFullscreen||el.webkitRequestFullScreen||el.mozRequestFullScreen||el.msRequestFullscreen;if(rfs){rfs.call(el);}})();" style="color:#ffeb3b" onclick="event.stopPropagation();">Photobooth Fullscreen</a>
+        📱 Klik di mana saja pada layar untuk mengaktifkan Mode **Full Screen**
     </div>
 
     <header>
-        <!-- Logo Pramita Lab (Di atas) -->
+        <!-- Logo Pramita Lab -->
         <img src="{{ asset('img/pramita.png') }}" alt="Logo Pramita Lab" class="header-logo">
-        <!-- Judul (Di bawah) -->
         <h1>Pramita Photobooth</h1>
     </header>
 
@@ -422,7 +468,7 @@
             <button class="btn" onclick="submitFormStep1()">Lanjut ke Pengaturan</button>
         </div>
 
-        <!-- STEP 2: SPLIT SCREEN (FOTO KIRI, CONTROL KANAN) -->
+        <!-- STEP 2: SPLIT SCREEN (PREVIEW KIRI, OPIS KANAN) -->
         <div id="step-2-frame">
             <!-- SISI KIRI: KAMERA PREVIEW -->
             <div class="split-left">
@@ -453,6 +499,49 @@
                             <option value="3">3 Jepretan</option>
                             <option value="4" selected>4 Jepretan (Photo Strip)</option>
                         </select>
+                    </div>
+
+                    <!-- KARTU PILIHAN LAYOUT DENGAN IKON SVG -->
+                    <div class="form-group" id="layout-group">
+                        <label>Tata Letak Hasil Gabungan:</label>
+                        <div class="layout-options">
+                            <!-- Option 1: Vertical (Atas - Bawah) -->
+                            <div class="layout-card active" data-layout="vertical" onclick="selectLayout(this)">
+                                <div class="layout-icon">
+                                    <svg width="30" height="38" viewBox="0 0 30 38" fill="none">
+                                        <rect x="2" y="2" width="26" height="10" rx="2" fill="#ff4081" stroke="#333" stroke-width="1.5" />
+                                        <rect x="2" y="14" width="26" height="10" rx="2" fill="#ff4081" stroke="#333" stroke-width="1.5" />
+                                        <rect x="2" y="26" width="26" height="10" rx="2" fill="#ff4081" stroke="#333" stroke-width="1.5" />
+                                    </svg>
+                                </div>
+                                <span>Atas - Bawah</span>
+                            </div>
+
+                            <!-- Option 2: Horizontal (Kiri - Kanan) -->
+                            <div class="layout-card" data-layout="horizontal" onclick="selectLayout(this)">
+                                <div class="layout-icon">
+                                    <svg width="40" height="28" viewBox="0 0 40 28" fill="none">
+                                        <rect x="2" y="2" width="10" height="24" rx="2" fill="#2196F3" stroke="#333" stroke-width="1.5" />
+                                        <rect x="15" y="2" width="10" height="24" rx="2" fill="#2196F3" stroke="#333" stroke-width="1.5" />
+                                        <rect x="28" y="2" width="10" height="24" rx="2" fill="#2196F3" stroke="#333" stroke-width="1.5" />
+                                    </svg>
+                                </div>
+                                <span>Kiri - Kanan</span>
+                            </div>
+
+                            <!-- Option 3: Grid 2x2 -->
+                            <div class="layout-card" data-layout="grid" id="layout-grid-card" onclick="selectLayout(this)">
+                                <div class="layout-icon">
+                                    <svg width="34" height="34" viewBox="0 0 34 34" fill="none">
+                                        <rect x="2" y="2" width="13" height="13" rx="2" fill="#4CAF50" stroke="#333" stroke-width="1.5" />
+                                        <rect x="19" y="2" width="13" height="13" rx="2" fill="#4CAF50" stroke="#333" stroke-width="1.5" />
+                                        <rect x="2" y="19" width="13" height="13" rx="2" fill="#4CAF50" stroke="#333" stroke-width="1.5" />
+                                        <rect x="19" y="19" width="13" height="13" rx="2" fill="#4CAF50" stroke="#333" stroke-width="1.5" />
+                                    </svg>
+                                </div>
+                                <span>Grid (2x2)</span>
+                            </div>
+                        </div>
                     </div>
 
                     <div class="form-group">
@@ -573,6 +662,7 @@
 
         let currentOrientation = 'landscape';
         let totalPhotos = 4;
+        let selectedLayout = 'vertical';
         let photoWidth = 600,
             photoHeight = 450;
         const PADDING = 20,
@@ -642,9 +732,29 @@
             }
         }
 
+        function selectLayout(element) {
+            if (element.classList.contains('disabled')) return;
+
+            document.querySelectorAll('.layout-card').forEach(card => card.classList.remove('active'));
+            element.classList.add('active');
+            selectedLayout = element.getAttribute('data-layout');
+        }
+
         function updateTotalPhotos(val) {
             totalPhotos = parseInt(val);
             renderPreviewSlots();
+
+            const gridCard = document.getElementById('layout-grid-card');
+            const verticalCard = document.querySelector('.layout-card[data-layout="vertical"]');
+
+            if (totalPhotos < 4) {
+                gridCard.classList.add('disabled');
+                if (selectedLayout === 'grid') {
+                    selectLayout(verticalCard);
+                }
+            } else {
+                gridCard.classList.remove('disabled');
+            }
         }
 
         function renderPreviewSlots() {
@@ -846,8 +956,22 @@
         function mergePhotos() {
             if (framedPhotos.length < totalPhotos) return;
 
-            canvas.width = photoWidth + (PADDING * 2);
-            canvas.height = (photoHeight * totalPhotos) + (PADDING * (totalPhotos + 1));
+            let cols = 1;
+            let rows = totalPhotos;
+
+            if (selectedLayout === 'horizontal') {
+                cols = totalPhotos;
+                rows = 1;
+            } else if (selectedLayout === 'grid' && totalPhotos >= 4) {
+                cols = 2;
+                rows = Math.ceil(totalPhotos / 2);
+            } else {
+                cols = 1;
+                rows = totalPhotos;
+            }
+
+            canvas.width = (photoWidth * cols) + (PADDING * (cols + 1));
+            canvas.height = (photoHeight * rows) + (PADDING * (rows + 1));
 
             ctx.fillStyle = '#ffffff';
             ctx.fillRect(0, 0, canvas.width, canvas.height);
@@ -858,11 +982,16 @@
                 const img = new Image();
                 img.src = src;
                 img.onload = () => {
-                    const yOffset = PADDING + index * (photoHeight + PADDING);
-                    ctx.drawImage(img, PADDING, yOffset, photoWidth, photoHeight);
+                    const colIndex = index % cols;
+                    const rowIndex = Math.floor(index / cols);
+
+                    const xOffset = PADDING + colIndex * (photoWidth + PADDING);
+                    const yOffset = PADDING + rowIndex * (photoHeight + PADDING);
+
+                    ctx.drawImage(img, xOffset, yOffset, photoWidth, photoHeight);
                     ctx.strokeStyle = BORDER_COLOR;
                     ctx.lineWidth = BORDER_WIDTH;
-                    ctx.strokeRect(PADDING, yOffset, photoWidth, photoHeight);
+                    ctx.strokeRect(xOffset, yOffset, photoWidth, photoHeight);
 
                     loadedCount++;
                     if (loadedCount === totalPhotos) {
