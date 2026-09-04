@@ -1031,6 +1031,7 @@
                     method: 'POST',
                     headers: {
                         'Content-Type': 'application/json',
+                        'Accept': 'application/json', // Tambahkan baris ini
                         'X-CSRF-TOKEN': csrfToken
                     },
                     body: JSON.stringify({
@@ -1050,10 +1051,10 @@
                         Swal.fire({
                             title: 'Berhasil Disimpan!',
                             html: `
-                              <p style="font-size:0.85rem; color:#555;">Scan QR Code untuk ambil foto:</p>
-                              <div class="qrcode-swal-container"><div id="swal-qrcode"></div></div>
-                              <p style="margin-top:10px;"><a href="${shareUrl}" target="_blank" style="color:#2196F3;">Buka Link Direct</a></p>
-                            `,
+                      <p style="font-size:0.85rem; color:#555;">Scan QR Code untuk ambil foto:</p>
+                      <div class="qrcode-swal-container"><div id="swal-qrcode"></div></div>
+                      <p style="margin-top:10px;"><a href="${shareUrl}" target="_blank" style="color:#2196F3;">Buka Link Direct</a></p>
+                    `,
                             icon: 'success',
                             confirmButtonText: 'OK / Selesai',
                             didOpen: () => {
@@ -1072,9 +1073,9 @@
                         const tr = document.createElement('tr');
                         const qrContainerId = `qr-table-${Date.now()}`;
                         tr.innerHTML = `
-                            <td>${escapeHtml(data.data.name)}</td>
-                            <td><div id="${qrContainerId}"></div></td>
-                        `;
+                    <td>${escapeHtml(data.data.name)}</td>
+                    <td><div id="${qrContainerId}"></div></td>
+                `;
 
                         userTableBody.appendChild(tr);
                         tableContainer.style.display = 'block';
@@ -1090,7 +1091,8 @@
                     }
                 })
                 .catch(error => {
-                    Swal.fire('Error!', 'Gagal menghubungkan ke server.', 'error');
+                    console.error('Error Detail:', error);
+                    Swal.fire('Error!', 'Gagal menghubungkan ke server: ' + error.message, 'error');
                 });
         }
 

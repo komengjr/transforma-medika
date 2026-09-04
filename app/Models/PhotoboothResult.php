@@ -2,6 +2,7 @@
 
 namespace App\Models;
 
+use App\Models\Photobooth\PhotoboothData;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 
@@ -12,6 +13,7 @@ class PhotoboothResult extends Model
     protected $table = 'photobooth_results';
 
     protected $fillable = [
+        'org_code',
         'code',
         'name',
         'phone',
@@ -20,8 +22,15 @@ class PhotoboothResult extends Model
         'single_images',
     ];
 
-    // Otomatis mengubah JSON menjadi Array PHP
     protected $casts = [
         'single_images' => 'array',
     ];
+
+    /**
+     * Relasi ke model Photobooth / Organization
+     */
+    public function photobooth()
+    {
+        return $this->belongsTo(PhotoboothData::class, 'org_code', 'org_code');
+    }
 }

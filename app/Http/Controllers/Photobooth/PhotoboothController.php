@@ -142,15 +142,20 @@ class PhotoboothController extends Controller
     public function store(Request $request)
     {
         $validator = Validator::make($request->all(), [
+            'org_code'      => 'required|string', // Hanya validasi bahwa org_code terisi
             'name'          => 'required|string|max:255',
-            // 'phone'         => 'required|string|max:20',
-            // 'email'         => 'required|email|max:255',
-            'image_data'    => 'required|string', // Foto Gabungan
-            'single_images' => 'required|array|min:1', // Array Foto Satuan
+            'phone'         => 'required|string|max:20',
+            'email'         => 'required|email|max:255',
+            'image_data'    => 'required|string',
+            'single_images' => 'required|array|min:1',
         ]);
 
         if ($validator->fails()) {
-            return response()->json(['success' => false, 'message' => 'Validasi gagal', 'errors' => $validator->errors()], 422);
+            return response()->json([
+                'success' => false,
+                'message' => 'Validasi gagal',
+                'errors'  => $validator->errors()
+            ], 422);
         }
 
         try {
@@ -175,8 +180,9 @@ class PhotoboothController extends Controller
                 $savedSinglePaths[] = $singlePath;
             }
 
-            // 3. Simpan ke DB
+            // 3. Simpan ke DB dengan org_code
             $result = PhotoboothResult::create([
+                'org_code'      => $request->org_code,
                 'code'          => $uniqueCode,
                 'name'          => $request->name,
                 'phone'         => $request->phone,
@@ -192,7 +198,10 @@ class PhotoboothController extends Controller
                 'share_url' => route('photobooth.show', $result->code)
             ], 200);
         } catch (\Exception $e) {
-            return response()->json(['success' => false, 'message' => 'Gagal menyimpan: ' . $e->getMessage()], 500);
+            return response()->json([
+                'success' => false,
+                'message' => 'Gagal menyimpan: ' . $e->getMessage()
+            ], 500);
         }
     }
 
@@ -220,5 +229,35 @@ class PhotoboothController extends Controller
         }
 
         return response()->file(storage_path('app/' . $path));
+    }
+
+    // DATA PHOTOBOOTH
+    public function menu_photobooth_data($akses, $id)
+    {
+        if ($this->url_akses($akses, $id) == true) {
+            $photobooths = PhotoboothData::with(['frames'])->withCount('results')->latest()->get();
+            return view('app-photobooth.menu-photobooth.data-photobooth', compact('photobooths'), ['akses' => $akses, 'code' => $id]);
+        } else {
+            return Redirect::to('dashboard/home');
+        }
+    }
+    public function showResults($org_code)
+    {
+        $photobooth = PhotoboothData::where('org_code', $org_code)->firstOrFail();
+        $results = PhotoboothResult::where('org_code', $org_code)->latest()->get();
+
+        return view('app-photobooth.menu-photobooth.data-photobooth-result', compact('photobooth', 'results'));
+    }
+    // Mengambil data JSON hasil photobooth untuk Modal Detail
+    public function getResultsJson($org_code)
+    {
+        $photobooth = PhotoboothData::where('org_code', $org_code)->firstOrFail();
+        $results = PhotoboothResult::where('org_code', $org_code)->latest()->get();
+
+        return response()->json([
+            'success'    => true,
+            'photobooth' => $photobooth,
+            'results'    => $results
+        ]);
     }
 }

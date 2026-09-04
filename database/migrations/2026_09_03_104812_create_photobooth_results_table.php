@@ -15,6 +15,7 @@ class CreatePhotoboothResultsTable extends Migration
     {
         Schema::create('photobooth_results', function (Blueprint $table) {
             $table->id();
+            $table->string('org_code'); // Relasi ke organisasi
             $table->string('code')->unique();
             $table->string('name');
             $table->string('phone');
