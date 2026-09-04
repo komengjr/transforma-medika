@@ -152,7 +152,7 @@
             }
         });
 
-        // Toggle Switch Pilih Semua
+        // Toggle Switch Pilih Semua Kontak
         $('#switch-select-all').on('change', function() {
             if ($(this).is(':checked')) {
                 $('#wrapper-select-contact').addClass('d-none');
@@ -167,14 +167,26 @@
             e.preventDefault();
 
             let formElement = $('#form-broadcast-email')[0];
-            let formData = new FormData(formElement);
-            let btn = $(this);
+            let isSelectAll = $('#switch-select-all').is(':checked');
+            let selectedContacts = $('#contact_ids').val();
 
-            if (!$('#switch-select-all').is(':checked') && (!$('#contact_ids').val() || $('#contact_ids').val().length === 0)) {
-                Swal.fire('Peringatan', 'Silahkan pilih minimal satu kontak!', 'warning');
+            // Validasi Sisi Klien
+            if (!isSelectAll && (!selectedContacts || selectedContacts.length === 0)) {
+                Swal.fire('Peringatan', 'Silahkan centang "Kirim ke Semua" atau pilih minimal satu kontak!', 'warning');
                 return;
             }
 
+            if (!$('input[name="subject"]').val().trim() || !$('textarea[name="message"]').val().trim()) {
+                Swal.fire('Peringatan', 'Subjek dan Pesan email wajib diisi!', 'warning');
+                return;
+            }
+
+            let formData = new FormData(formElement);
+
+            // Pastikan parameter select_all terkirim secara eksplisit sebagai boolean/string
+            formData.set('select_all', isSelectAll ? '1' : '0');
+
+            let btn = $(this);
             btn.html('<i class="fas fa-spinner fa-spin me-1"></i> Memproses...').prop('disabled', true);
 
             // Step 1: Submit Form & Dapatkan Batch ID
@@ -188,52 +200,62 @@
             }).done(function(res) {
                 if (res.status) {
                     let batchId = res.batch_id;
+                    let totalCount = res.total || 0;
 
                     // Step 2: Tampilkan SweetAlert dengan Progress Bar
                     Swal.fire({
                         title: 'Mengirim Broadcast Email...',
                         html: `
-                    <div class="mb-2 fw-semibold text-secondary" id="swal-progress-text">Menyiapkan antrean (0 / ${res.total})...</div>
-                    <div class="progress style-1 style-3" style="height: 20px;">
-                        <div id="swal-progress-bar" class="progress-bar progress-bar-striped progress-bar-animated bg-primary"
-                             role="progressbar" style="width: 0%;" aria-valuenow="0" aria-valuemin="0" aria-valuemax="100">0%</div>
-                    </div>
-                `,
+                            <div class="mb-2 fw-semibold text-secondary" id="swal-progress-text">Menyiapkan antrean (0 / ${totalCount})...</div>
+                            <div class="progress style-1 style-3" style="height: 20px;">
+                                <div id="swal-progress-bar" class="progress-bar progress-bar-striped progress-bar-animated bg-primary"
+                                     role="progressbar" style="width: 0%;" aria-valuenow="0" aria-valuemin="0" aria-valuemax="100">0%</div>
+                            </div>
+                        `,
                         allowOutsideClick: false,
                         allowEscapeKey: false,
                         showConfirmButton: false
                     });
 
-                    // Step 3: Polling Real-time setiap 1 detik
+                    // Step 3: Polling Real-time
                     let timer = setInterval(function() {
                         $.ajax({
                             url: "{{ url('brodcast/menu-brodcast/brodcast-email/progress') }}/" + batchId,
                             type: "GET",
                             dataType: "json"
                         }).done(function(p) {
-                            // Update tampilan persentase di Swal
-                            $('#swal-progress-bar').css('width', p.percentage + '%').text(p.percentage + '%');
-                            $('#swal-progress-text').text(`Terkirim ${p.processed} dari ${p.total} email...`);
+                            let percentage = parseInt(p.percentage || 0);
+                            let processed = p.processed || 0;
+                            let total = p.total || totalCount;
 
-                            // Jika pengiriman selesai
-                            if (p.percentage >= 100 || p.status === 'completed') {
+                            // Update tampilan persentase & text
+                            $('#swal-progress-bar').css('width', percentage + '%').text(percentage + '%');
+                            $('#swal-progress-text').text(`Terkirim ${processed} dari ${total} email...`);
+
+                            // Jika pengiriman selesai atau kondisi terlampaui
+                            if (percentage >= 100 || p.status === 'completed' || (total > 0 && processed >= total)) {
                                 clearInterval(timer);
                                 btn.html('<i class="fas fa-paper-plane me-1"></i> Kirim Broadcast').prop('disabled', false);
 
                                 Swal.fire({
                                     icon: 'success',
                                     title: 'Pengiriman Selesai!',
-                                    text: `Berhasil memproses total ${p.total} email.`,
+                                    text: `Berhasil memproses total ${total} email.`,
                                     confirmButtonText: 'OK'
                                 }).then(() => {
                                     formElement.reset();
                                     $('#contact_ids').val(null).trigger('change');
-                                    $('#switch-select-all').trigger('change');
+                                    $('#switch-select-all').prop('checked', false).trigger('change');
                                     historyTable.ajax.reload();
                                 });
                             }
+                        }).fail(function() {
+                            // Abaikan error jaringan sementara saat polling, tetap lanjutkan loop
                         });
                     }, 1000);
+                } else {
+                    btn.html('<i class="fas fa-paper-plane me-1"></i> Kirim Broadcast').prop('disabled', false);
+                    Swal.fire('Gagal', res.message || 'Gagal memproses antrean email.', 'error');
                 }
             }).fail(function(xhr) {
                 btn.html('<i class="fas fa-paper-plane me-1"></i> Kirim Broadcast').prop('disabled', false);

@@ -392,43 +392,72 @@ class BrodcastController extends Controller
     public function menu_brodcast_email_send(Request $request)
     {
         $validator = Validator::make($request->all(), [
-            'subject'     => 'required|string|max:255',
-            'message'     => 'required|string',
-            'attachment'  => 'nullable|file|mimes:pdf,docx,doc,xlsx,xls,jpg,jpeg,png,zip|max:10240',
+            'subject'    => 'required|string|max:255',
+            'message'    => 'required|string',
+            'attachment' => 'nullable|file|mimes:pdf,docx,doc,xlsx,xls,jpg,jpeg,png,zip|max:10240',
         ]);
 
         if ($validator->fails()) {
-            return response()->json(['status' => false, 'message' => 'Validasi gagal.'], 422);
+            return response()->json([
+                'status'  => false,
+                'message' => 'Validasi gagal: ' . implode(', ', $validator->errors()->all())
+            ], 422);
         }
 
-        if ($request->has('select_all') && $request->select_all == '1') {
+        // 1. Cek apakah opsi "Kirim ke Semua" diaktifkan
+        $isSelectAll = $request->boolean('select_all');
+
+        if ($isSelectAll) {
+            // Ambil seluruh ID kontak yang aktif dari database
             $contactIds = DB::table('b_master_contact')
-                ->where('b_master_contact_status', 'active')
+                ->whereIn('b_master_contact_status', ['active', 'ACTIVE', '1'])
                 ->pluck('id_b_master_contact')
                 ->toArray();
         } else {
-            if (!$request->has('contact_ids') || empty($request->contact_ids)) {
-                return response()->json(['status' => false, 'message' => 'Pilih kontak terlebih dahulu!'], 422);
+            // Jika tidak kirim semua, pastikan array contact_ids ada dan tidak kosong
+            $contactIds = $request->input('contact_ids', []);
+
+            // Pastikan nilai berbentuk array
+            if (is_string($contactIds)) {
+                $contactIds = explode(',', $contactIds);
             }
-            $contactIds = $request->contact_ids;
         }
 
+        // 2. Validasi jika tidak ada kontak yang ditemukan/terpilih
+        if (empty($contactIds) || count($contactIds) === 0) {
+            return response()->json([
+                'status'  => false,
+                'message' => 'Tidak ada kontak aktif yang ditemukan atau terpilih!'
+            ], 422);
+        }
+
+        // 3. Handling Upload File Attachment
         $filePath = null;
         $fileName = null;
+
         if ($request->hasFile('attachment')) {
             $file = $request->file('attachment');
             $fileName = time() . '_' . $file->getClientOriginalName();
             $filePath = $file->storeAs('public/attachments', $fileName);
         }
 
-        // Buat Batch ID Unik
+        // 4. Buat Batch ID Unik
         $batchId = uniqid('batch_', true);
 
-        // Jalankan Job
-        SendBroadcastEmailJob::dispatch($batchId, $contactIds, $request->subject, $request->message, $filePath, $fileName);
+        // 5. Jalankan Job Queue
+        SendBroadcastEmailJob::dispatch(
+            $batchId,
+            $contactIds,
+            $request->subject,
+            $request->message,
+            $filePath,
+            $fileName
+        );
 
+        // 6. Return Response JSON ke AJAX Frontend
         return response()->json([
             'status'   => true,
+            'message'  => 'Proses broadcast email berhasil dimulai.',
             'batch_id' => $batchId,
             'total'    => count($contactIds)
         ]);
