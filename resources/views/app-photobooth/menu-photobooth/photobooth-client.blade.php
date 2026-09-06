@@ -442,7 +442,7 @@
             display: none;
         }
 
-        /* --- PERBAIKAN STYLES UNTUK QR CODE DI MOBILE --- */
+        /* --- STYLES UNTUK QR CODE DI MOBILE & CEGAH DOUBLE --- */
         .qrcode-swal-container {
             display: flex;
             justify-content: center;
@@ -456,15 +456,6 @@
             box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
         }
 
-        .qrcode-swal-container img,
-        .qrcode-swal-container canvas {
-            display: block !important;
-            margin: 0 auto !important;
-            max-width: 100% !important;
-            height: auto !important;
-        }
-
-        /* Mencegah Double QR Code (Canvas & Img) */
         .qrcode-swal-container canvas,
         [id^="qr-table-"] canvas {
             display: none !important;
@@ -967,6 +958,7 @@
             });
         }
 
+        /* PERBAIKAN DI BAGIAN INI: Menghapus translate & scaleX(-1) */
         function captureFramedPhoto(index) {
             playShutterSound();
 
@@ -978,10 +970,8 @@
             const filterStyles = getComputedStyle(videoMain).filter;
             tempCtx.filter = filterStyles !== 'none' ? filterStyles : 'none';
 
-            tempCtx.translate(photoWidth, 0);
-            tempCtx.scale(-1, 1);
+            // Gambar video langsung dalam kondisi normal (sesuai posisi asli/aslinya)
             tempCtx.drawImage(videoMain, 0, 0, photoWidth, photoHeight);
-            tempCtx.restore();
 
             tempCtx.filter = 'none';
             if (selectedFrameSrc) {
@@ -1091,7 +1081,7 @@
                             didOpen: () => {
                                 const qrContainer = document.getElementById("swal-qrcode");
                                 if (qrContainer) {
-                                    qrContainer.innerHTML = ''; // Pastikan bersih
+                                    qrContainer.innerHTML = '';
                                     new QRCode(qrContainer, {
                                         text: shareUrl,
                                         width: 160,
