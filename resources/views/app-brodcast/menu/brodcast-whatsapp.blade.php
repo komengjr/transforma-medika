@@ -1,233 +1,268 @@
 @extends('layouts.layouts')
+
 @section('base.css')
-    <link rel="stylesheet" href="https://cdn.datatables.net/2.2.2/css/dataTables.bootstrap5.css">
-    <link rel="stylesheet" href="https://cdn.datatables.net/responsive/3.0.4/css/responsive.bootstrap5.css">
-    <link href="{{ asset('vendors/flatpickr/flatpickr.min.css') }}" rel="stylesheet" />
-    <link href="{{ asset('vendors/choices/choices.min.css') }}" rel="stylesheet" />
+<link href="https://cdn.jsdelivr.net/npm/select2@4.1.0-rc.0/dist/css/select2.min.css" rel="stylesheet" />
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/select2-bootstrap-5-theme@1.3.0/dist/select2-bootstrap-5-theme.min.css" />
+<link rel="stylesheet" href="https://cdn.datatables.net/1.13.7/css/dataTables.bootstrap5.min.css">
 @endsection
+
 @section('content')
-    <div class="row mb-3 ">
-        <div class="col">
-            <div class="card bg-200 shadow border border-primary bg-primary">
-                <div class="row gx-0 flex-between-center">
-                    <div class="col-sm-auto d-flex align-items-center border-bottom">
-                        <img class="ms-3 mx-3 m-2" src="{{ asset('img/wa.png') }}" alt="" width="50" />
-                        <div>
-                            <h6 class="text-white fs--1 mb-0 pt-2" style="color: white !important;">Welcome to </h6>
-                            <h4 class="text-white fw-bold mb-1" style="color: white !important;">{{ Env('APP_LABEL') }}
-                                <span class="text-white fw-medium" style="color: white !important;">Management
-                                    System</span>
-                            </h4>
+<div class="row g-3">
+    <!-- Form Send Broadcast WhatsApp -->
+    <div class="col-lg-5">
+        <div class="card border-0 shadow-sm rounded-3">
+            <div class="card-header bg-success text-white py-3">
+                <h5 class="card-title text-white mb-0 fw-bold"><i class="fab fa-whatsapp me-2"></i>Broadcast Message WhatsApp</h5>
+            </div>
+            <div class="card-body p-4">
+                <form id="form-broadcast-wa" enctype="multipart/form-data">
+                    @csrf
+
+                    <!-- Checkbox Pilih Semua Kontak -->
+                    <div class="mb-3 p-3 bg-light rounded-3 border">
+                        <div class="form-check form-switch">
+                            <input class="form-check-input" type="checkbox" name="select_all" value="1" id="switch-select-all">
+                            <label class="form-check-label fw-bold text-dark" for="switch-select-all">
+                                Kirim ke Semua Kontak (2000++ Kontak)
+                            </label>
                         </div>
-                        <img class="ms-n4 d-none d-lg-block "
-                            src="{{ asset('asset/img/illustrations/crm-line-chart.png') }}" alt="" width="150" />
+                        <small class="text-muted fs--2 d-block mt-1">Aktifkan untuk mengirim pesan sekaligus ke seluruh daftar kontak yang aktif.</small>
                     </div>
-                    <div class="col-xl-auto px-3 py-2">
-                        <h6 class="text-white fs--1 mb-0" style="color: white !important;">Menu : </h6>
-                        <h4 class="text-white fw-bold mb-0" style="color: white !important;">Brodcast <span
-                                class="text-white fw-medium" style="color: white !important;">Whatsapp</span>
-                        </h4>
+
+                    <!-- Dropdown Select2 Async Search -->
+                    <div class="mb-3" id="wrapper-select-contact">
+                        <label class="form-label fw-semibold text-secondary">Atau Cari & Pilih Kontak Spesifik</label>
+                        <select name="contact_ids[]" id="contact_ids" class="form-select select2-ajax" multiple="multiple">
+                        </select>
                     </div>
+
+                    <!-- Subject / Judul Broadcast -->
+                    <div class="mb-3">
+                        <label class="form-label fw-semibold text-secondary">Subjek / Judul Pesan</label>
+                        <input type="text" name="subject" class="form-control" placeholder="Masukkan subjek pesan..." required>
+                    </div>
+
+                    <!-- Pesan WhatsApp -->
+                    <div class="mb-3">
+                        <label class="form-label fw-semibold text-secondary">Pesan WhatsApp</label>
+                        <textarea name="message" class="form-control" rows="4" placeholder="Tuliskan pesan WhatsApp di sini..." required></textarea>
+                    </div>
+
+                    <!-- Input Attach File -->
+                    <div class="mb-3">
+                        <label class="form-label fw-semibold text-secondary"><i class="fas fa-paperclip me-1"></i>Lampirkan File / Gambar (Opsional)</label>
+                        <input type="file" name="attachment" class="form-control" id="attachment">
+                        <small class="text-muted fs--2">Format: JPG, PNG, PDF, DOCX (Max: 10MB)</small>
+                    </div>
+
+                    <button type="button" id="btn-submit-broadcast" class="btn btn-success w-100 fw-bold py-2">
+                        <i class="fas fa-paper-plane me-1"></i> Kirim Broadcast WhatsApp
+                    </button>
+                </form>
+            </div>
+        </div>
+    </div>
+
+    <!-- Table History Pengiriman WhatsApp -->
+    <div class="col-lg-7">
+        <div class="card border-0 shadow-sm rounded-3">
+            <div class="card-header bg-dark text-white py-3 d-flex justify-content-between align-items-center">
+                <h5 class="card-title text-white mb-0 fw-bold"><i class="fas fa-history me-2"></i>Riwayat Broadcast WhatsApp</h5>
+                <button class="btn btn-sm btn-outline-light" id="btn-refresh-history"><i class="fas fa-sync-alt me-1"></i>Refresh Data</button>
+            </div>
+            <div class="card-body p-3">
+                <div class="table-responsive">
+                    <table class="table table-hover align-middle w-100 fs--1" id="table-wa-history">
+                        <thead class="table-light">
+                            <tr>
+                                <th>#</th>
+                                <th>Penerima</th>
+                                <th>Subjek & Lampiran</th>
+                                <th>Status</th>
+                                <th>Waktu</th>
+                            </tr>
+                        </thead>
+                        <tbody></tbody>
+                    </table>
                 </div>
             </div>
         </div>
     </div>
-    <form class="card">
-        <div class="card-header bg-300">
-            <h5 class="mb-0">New message</h5>
-        </div>
-        <div class="card-body p-0">
-            <div class="border border-top-0 border-200 m-2">
-                <div class="row">
-                    <div class="col-md-4">
-                        <select name="tipe_pengiriman" id="tipe_pengiriman" class="form-control">
-                            <option value="personal">Personal</option>
-                            <option value="all">All Contact</option>
-                        </select>
-                    </div>
-                    <div class="col-md-8">
-                        <input class="form-control border-0 rounded-0 outline-none px-card" id="number" type="text"
-                            aria-describedby="email-to" placeholder="Nomor Whatsapp . Ex. 0828829xxxx" />
-                    </div>
-                </div>
-            </div>
-            <div class="border border-y-0 border-200">
-                <input class="form-control border-0 rounded-0 outline-none px-card" id="subject" type="text"
-                    aria-describedby="email-subject" placeholder="Subject" />
-            </div>
-            <div class="min-vh-50">
-                <textarea class="form-control" rows="15" name="content" id="pesan-wa"></textarea>
-            </div>
-            <div class="bg-light px-card py-3">
-                <div class="d-inline-flex flex-column">
-                    <div style="display: none !important; "
-                        class="border px-2 rounded-3 d-flex flex-between-center bg-white dark__bg-1000 my-1 fs--1"
-                        id="status-file-attachment">
-                        <input id="link" type="text" name="link" class="form-control d-none">
-                        <span class="fs-1 far fa-file-archive"></span>
-                        <span class="ms-2" id="link_name">file.example </span>
-                        <a class="text-300 p-1 ms-6" href="#!" data-bs-toggle="tooltip" data-bs-placement="right"
-                            id="button-clear-data" title="Detach">
-                            <span class="fas fa-times"></span>
-                        </a>
-                    </div>
-                </div>
-            </div>
-        </div>
-        <div class="card-footer border-top border-200 d-flex flex-between-center">
-            <div class="d-flex align-items-center">
-                <div id="loading-button">
-                    <button class="btn btn-primary btn-sm px-5 me-2" type="button" id="button-send-messages">Send</button>
-                </div>
-                <input class="d-none" id="file-attachment" type="file" />
-                <label class="me-2 btn btn-sm mb-0 cursor-pointer" for="file-attachment" data-bs-toggle="tooltip"
-                    data-bs-placement="top" title="Attach files"><span class="fas fa-image fs-1"
-                        data-fa-transform="down-2"></span></label>
-            </div>
-            <div class="d-flex align-items-center">
-
-                <button class="btn btn-danger btn-sm" type="button" data-bs-toggle="tooltip" data-bs-placement="top"
-                    onclick="location.reload()" title="Reset"> <span class="fas fa-trash"></span></button>
-            </div>
-        </div>
-    </form>
+</div>
 @endsection
+
 @section('base.js')
-    <script src="https://cdn.datatables.net/2.2.2/js/dataTables.js"></script>
-    <script src="https://cdn.datatables.net/2.2.2/js/dataTables.bootstrap5.js"></script>
-    <script src="https://cdn.datatables.net/responsive/3.0.4/js/dataTables.responsive.js"></script>
-    <script src="https://cdn.datatables.net/responsive/3.0.4/js/responsive.bootstrap5.js"></script>
-    <script src="{{ asset('asset/js/flatpickr.js') }}"></script>
-    <script src="{{ asset('vendors/choices/choices.min.js') }}"></script>
-    <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
-    <script src="{{ asset('vendors/tinymce/tinymce.min.js') }}"></script>
-    <script>
-        $('#tipe_pengiriman').on("change", function () {
-            var dataid = document.getElementById("tipe_pengiriman").value;
-            if (dataid == "personal") {
-                document.getElementById('number').value = '';
-            } else {
-                document.getElementById('number').value = 'From Master Contact';
-            }
-        });
-        $(document).on("click", "#button-send-messages", function (e) {
-            e.preventDefault();
-            var number = document.getElementById("number").value;
-            var subject = document.getElementById("subject").value;
-            var editorContent = document.getElementById("pesan-wa").value;
-            var link = document.getElementById("link").value;
-            var tipe_pengiriman = document.getElementById("tipe_pengiriman").value;
-            if (number == "" || editorContent == "" || subject == "") {
-                Swal.fire({
-                    icon: "error",
-                    title: "Oops...",
-                    text: "Hal Yang Kosong Itu Tidak Bagus",
-                    footer: '<a href="#">Why do I have this issue?</a>'
-                });
-            } else {
-                $('#loading-button').html(
-                    '<div class="spinner-border my-3" style="display: block; margin-left: auto; margin-right: auto;" role="status"><span class="visually-hidden">Loading...</span></div>'
-                );
-                $.ajax({
-                    url: "{{ route('menu_brodcast_whatsapp_send') }}",
-                    type: "POST",
-                    cache: false,
-                    data: {
-                        "_token": "{{ csrf_token() }}",
-                        "number": number,
-                        "subject": subject,
-                        "text": editorContent,
-                        "link": link,
-                        "tipe_pengiriman": tipe_pengiriman,
-                    },
-                    dataType: 'html',
-                }).done(function (data) {
-                    $('#loading-button').html(data);
-                    location.reload();
-                }).fail(function () {
-                    $('#loading-button').html('eror');
-                });
-            }
-        });
-        $(document).on("click", "#button-clear-data", function (e) {
-            e.preventDefault();
-            var link = document.getElementById("link").value;
-            $('#menu-product-xl').html(
-                '<div class="spinner-border my-3" style="display: block; margin-left: auto; margin-right: auto;" role="status"><span class="visually-hidden">Loading...</span></div>'
-            );
-            $.ajax({
-                url: "{{ route('menu_brodcast_whatsapp_remove_file') }}",
-                type: "POST",
-                cache: false,
-                data: {
-                    "_token": "{{ csrf_token() }}",
-                    "link": link
+<script src="https://code.jquery.com/jquery-3.7.1.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/select2@4.1.0-rc.0/dist/js/select2.min.js"></script>
+<script src="https://cdn.datatables.net/1.13.7/js/jquery.dataTables.min.js"></script>
+<script src="https://cdn.datatables.net/1.13.7/js/dataTables.bootstrap5.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+
+<script>
+    $(document).ready(function() {
+        // DataTables Server-Side Initialization
+        let historyTable = $('#table-wa-history').DataTable({
+            processing: true,
+            serverSide: true,
+            ajax: "{{ route('menu_brodcast_whatsapp.history_ajax') }}",
+            columns: [{
+                    data: 'no',
+                    orderable: false,
+                    searchable: false
                 },
-                dataType: 'html',
-            }).done(function (data) {
-                $('#menu-product-xl').html(data);
-                location.reload();
-            }).fail(function () {
-                $('#menu-product-xl').html('eror');
+                {
+                    data: 'recipient'
+                },
+                {
+                    data: 'subject'
+                },
+                {
+                    data: 'status'
+                },
+                {
+                    data: 'created_at'
+                }
+            ]
+        });
+
+        $('#btn-refresh-history').on('click', function() {
+            historyTable.ajax.reload(null, false);
+        });
+
+        // Initialize Select2 Async Search
+        $('.select2-ajax').select2({
+            theme: 'bootstrap-5',
+            placeholder: "Cari nama / nomor WA...",
+            allowClear: true,
+            ajax: {
+                url: "{{ route('menu_brodcast_whatsapp.contacts_ajax') }}",
+                dataType: 'json',
+                delay: 300,
+                data: function(params) {
+                    return {
+                        term: params.term
+                    };
+                },
+                processResults: function(data) {
+                    return {
+                        results: data.results
+                    };
+                },
+                cache: true
+            }
+        });
+
+        // Toggle Switch Pilih Semua Kontak
+        $('#switch-select-all').on('change', function() {
+            if ($(this).is(':checked')) {
+                $('#wrapper-select-contact').addClass('d-none');
+                $('#contact_ids').val(null).trigger('change');
+            } else {
+                $('#wrapper-select-contact').removeClass('d-none');
+            }
+        });
+
+        // Submit Form via AJAX
+        $('#btn-submit-broadcast').on('click', function(e) {
+            e.preventDefault();
+
+            let formElement = $('#form-broadcast-wa')[0];
+            let isSelectAll = $('#switch-select-all').is(':checked');
+            let selectedContacts = $('#contact_ids').val();
+
+            // Validasi Sisi Klien
+            if (!isSelectAll && (!selectedContacts || selectedContacts.length === 0)) {
+                Swal.fire('Peringatan', 'Silahkan centang "Kirim ke Semua" atau pilih minimal satu kontak!', 'warning');
+                return;
+            }
+
+            if (!$('input[name="subject"]').val().trim() || !$('textarea[name="message"]').val().trim()) {
+                Swal.fire('Peringatan', 'Subjek dan Pesan WhatsApp wajib diisi!', 'warning');
+                return;
+            }
+
+            let formData = new FormData(formElement);
+
+            // Pastikan parameter select_all terkirim secara eksplisit sebagai boolean/string
+            formData.set('select_all', isSelectAll ? '1' : '0');
+
+            let btn = $(this);
+            btn.html('<i class="fas fa-spinner fa-spin me-1"></i> Memproses...').prop('disabled', true);
+
+            // Step 1: Submit Form & Dapatkan Batch ID
+            $.ajax({
+                url: "{{ route('menu_brodcast_whatsapp_send') }}",
+                type: "POST",
+                data: formData,
+                processData: false,
+                contentType: false,
+                dataType: "json"
+            }).done(function(res) {
+                if (res.status) {
+                    let batchId = res.batch_id;
+                    let totalCount = res.total || 0;
+
+                    // Step 2: Tampilkan SweetAlert dengan Progress Bar
+                    Swal.fire({
+                        title: 'Mengirim Broadcast WhatsApp...',
+                        html: `
+                            <div class="mb-2 fw-semibold text-secondary" id="swal-progress-text">Menyiapkan antrean (0 / ${totalCount})...</div>
+                            <div class="progress style-1 style-3" style="height: 20px;">
+                                <div id="swal-progress-bar" class="progress-bar progress-bar-striped progress-bar-animated bg-success"
+                                     role="progressbar" style="width: 0%;" aria-valuenow="0" aria-valuemin="0" aria-valuemax="100">0%</div>
+                            </div>
+                        `,
+                        allowOutsideClick: false,
+                        allowEscapeKey: false,
+                        showConfirmButton: false
+                    });
+
+                    // Step 3: Polling Real-time
+                    let timer = setInterval(function() {
+                        $.ajax({
+                            url: "{{ url('brodcast/menu-brodcast/brodcast-whatsapp/progress') }}/" + batchId,
+                            type: "GET",
+                            dataType: "json"
+                        }).done(function(p) {
+                            let percentage = parseInt(p.percentage || 0);
+                            let processed = p.processed || 0;
+                            let total = p.total || totalCount;
+
+                            // Update tampilan persentase & text
+                            $('#swal-progress-bar').css('width', percentage + '%').text(percentage + '%');
+                            $('#swal-progress-text').text(`Terkirim ${processed} dari ${total} pesan WA...`);
+
+                            // Jika pengiriman selesai atau kondisi terlampaui
+                            if (percentage >= 100 || p.status === 'completed' || (total > 0 && processed >= total)) {
+                                clearInterval(timer);
+                                btn.html('<i class="fas fa-paper-plane me-1"></i> Kirim Broadcast WhatsApp').prop('disabled', false);
+
+                                Swal.fire({
+                                    icon: 'success',
+                                    title: 'Pengiriman Selesai!',
+                                    text: `Berhasil memproses total ${total} pesan WhatsApp.`,
+                                    confirmButtonText: 'OK'
+                                }).then(() => {
+                                    formElement.reset();
+                                    $('#contact_ids').val(null).trigger('change');
+                                    $('#switch-select-all').prop('checked', false).trigger('change');
+                                    historyTable.ajax.reload();
+                                });
+                            }
+                        }).fail(function() {
+                            // Abaikan error jaringan sementara saat polling, tetap lanjutkan loop
+                        });
+                    }, 1000);
+                } else {
+                    btn.html('<i class="fas fa-paper-plane me-1"></i> Kirim Broadcast WhatsApp').prop('disabled', false);
+                    Swal.fire('Gagal', res.message || 'Gagal memproses antrean WhatsApp.', 'error');
+                }
+            }).fail(function(xhr) {
+                btn.html('<i class="fas fa-paper-plane me-1"></i> Kirim Broadcast WhatsApp').prop('disabled', false);
+                let message = xhr.responseJSON?.message || 'Terjadi kesalahan sistem.';
+                Swal.fire('Error', message, 'error');
             });
         });
-    </script>
-    <script type="text/javascript">
-        var browseFile = $('#file-attachment');
-        var resumable = new Resumable({
-            target: "{{ route('menu_brodcast_whatsapp_upload_file') }}",
-            query: {
-                _token: '{{ csrf_token() }}'
-            }, // CSRF token
-            fileType: ['jpg', 'jpeg', 'png'],
-            headers: {
-                'Accept': 'application/json'
-            },
-            testChunks: false,
-            throttleProgressCallbacks: 1,
-        });
-
-        resumable.assignBrowse(browseFile[0]);
-
-        resumable.on('fileAdded', function (file) { // trigger when file picked
-            showProgress();
-            resumable.upload() // to actually start uploading.
-        });
-
-        resumable.on('fileProgress', function (file) { // trigger when file progress update
-            updateProgress(Math.floor(file.progress() * 100));
-        });
-
-        resumable.on('fileSuccess', function (file, response) { // trigger when file upload complete
-            response = JSON.parse(response)
-            $('#videoPreview').attr('src', response.path);
-            $('#link').attr('value', response.filename);
-            $('#link_name').html(response.filename);
-            document.getElementById('status-file-attachment').style.display = 'block';
-            // $('#status-file-attachment').show();
-            $('#browseFile').hide();
-        });
-
-        resumable.on('fileError', function (file, response) { // trigger when there is any error
-            alert('file uploading error.')
-        });
-
-        var progress = $('.progress');
-
-        function showProgress() {
-            progress.find('.loading').css('width', '0%');
-            progress.find('.loading').html('0%');
-            progress.find('.loading').removeClass('bg-info');
-            progress.show();
-        }
-
-        function updateProgress(value) {
-            progress.find('.loading').css('width', ` ${value}%`)
-            progress.find('.loading').html(`${value}%`)
-        }
-
-        function hideProgress() {
-            progress.hide();
-        }
-    </script>
+    });
+</script>
 @endsection

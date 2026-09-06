@@ -1,6 +1,7 @@
 <?php
 
 use App\Http\Controllers\Brodcast\BrodcastController;
+use App\Http\Controllers\Brodcast\WhatsappBroadcastController;
 use Illuminate\Support\Facades\Route;
 
 // BRODCAST
@@ -30,4 +31,23 @@ Route::prefix('brodcast/')->group(function (): void {
     Route::get('menu-brodcast/brodcast-email/contacts-ajax', [BrodcastController::class, 'get_contacts_ajax'])->name('menu_brodcast_email.contacts_ajax');
     Route::get('menu-brodcast/brodcast-email/history-ajax', [BrodcastController::class, 'get_history_datatables'])->name('menu_brodcast_email.history_ajax');
     Route::get('menu-brodcast/brodcast-email/progress/{batch_id}', [BrodcastController::class, 'check_progress'])->name('menu_brodcast_email.progress');
+});
+
+
+
+Route::prefix('brodcast/menu-brodcast/brodcast-whatsapp')->group(function () {
+    // Route Tampilan Utama Blade
+    Route::get('/', [WhatsappBroadcastController::class, 'index'])->name('menu_brodcast_whatsapp');
+
+    // Route Ajax DataTables History
+    Route::get('/history-ajax', [WhatsappBroadcastController::class, 'historyAjax'])->name('menu_brodcast_whatsapp.history_ajax');
+
+    // Route Ajax Select2 Contact Search
+    Route::get('/contacts-ajax', [WhatsappBroadcastController::class, 'contactsAjax'])->name('menu_brodcast_whatsapp.contacts_ajax');
+
+    // Route Send Broadcast
+    Route::post('/send', [WhatsappBroadcastController::class, 'send'])->name('menu_brodcast_whatsapp_send');
+
+    // Route Polling Progress Bar
+    Route::get('/progress/{batchId}', [WhatsappBroadcastController::class, 'progress'])->name('menu_brodcast_whatsapp.progress');
 });

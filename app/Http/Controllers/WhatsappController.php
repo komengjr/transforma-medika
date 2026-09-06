@@ -8,7 +8,7 @@ use Illuminate\Support\Facades\Http;
 
 class WhatsappController extends Controller
 {
-    private $waServerUrl = 'http://localhost:3000';
+    private $waServerUrl = 'http://127.0.0.1:3000';
 
     // Halaman Menu Device WA
     public function index()
