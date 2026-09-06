@@ -348,6 +348,7 @@
             max-height: 80vh;
         }
 
+        /* Dibuat layout vertikal (atas ke bawah) secara konsisten */
         .preview-gallery {
             display: flex;
             flex-direction: column;
@@ -442,40 +443,10 @@
             display: none;
         }
 
-        /* --- PERBAIKAN STYLES UNTUK QR CODE DI MOBILE --- */
         .qrcode-swal-container {
             display: flex;
             justify-content: center;
-            align-items: center;
-            margin: 15px auto;
-            padding: 10px;
-            background: #fff;
-            border-radius: 10px;
-            width: 180px;
-            height: 180px;
-            box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
-        }
-
-        .qrcode-swal-container img,
-        .qrcode-swal-container canvas {
-            display: block !important;
-            margin: 0 auto !important;
-            max-width: 100% !important;
-            height: auto !important;
-        }
-
-        /* Mencegah Double QR Code (Canvas & Img) */
-        .qrcode-swal-container canvas,
-        [id^="qr-table-"] canvas {
-            display: none !important;
-        }
-
-        .qrcode-swal-container img,
-        [id^="qr-table-"] img {
-            display: block !important;
-            margin: 0 auto !important;
-            max-width: 100% !important;
-            height: auto !important;
+            margin-top: 10px;
         }
     </style>
 </head>
@@ -1060,7 +1031,7 @@
                     method: 'POST',
                     headers: {
                         'Content-Type': 'application/json',
-                        'Accept': 'application/json',
+                        'Accept': 'application/json', // Tambahkan baris ini
                         'X-CSRF-TOKEN': csrfToken
                     },
                     body: JSON.stringify({
@@ -1080,25 +1051,18 @@
                         Swal.fire({
                             title: 'Berhasil Disimpan!',
                             html: `
-                                <p style="font-size:0.85rem; color:#555;">Scan QR Code untuk ambil foto:</p>
-                                <div class="qrcode-swal-container">
-                                    <div id="swal-qrcode"></div>
-                                </div>
-                                <p style="margin-top:10px;"><a href="${shareUrl}" target="_blank" style="color:#2196F3; font-weight:bold;">Buka Link Direct</a></p>
-                            `,
+                      <p style="font-size:0.85rem; color:#555;">Scan QR Code untuk ambil foto:</p>
+                      <div class="qrcode-swal-container"><div id="swal-qrcode"></div></div>
+                      <p style="margin-top:10px;"><a href="${shareUrl}" target="_blank" style="color:#2196F3;">Buka Link Direct</a></p>
+                    `,
                             icon: 'success',
                             confirmButtonText: 'OK / Selesai',
                             didOpen: () => {
-                                const qrContainer = document.getElementById("swal-qrcode");
-                                if (qrContainer) {
-                                    qrContainer.innerHTML = ''; // Pastikan bersih
-                                    new QRCode(qrContainer, {
-                                        text: shareUrl,
-                                        width: 160,
-                                        height: 160,
-                                        correctLevel: QRCode.CorrectLevel.H
-                                    });
-                                }
+                                new QRCode(document.getElementById("swal-qrcode"), {
+                                    text: shareUrl,
+                                    width: 160,
+                                    height: 160
+                                });
                             }
                         }).then((result) => {
                             if (result.isConfirmed || result.dismiss) {
@@ -1106,26 +1070,21 @@
                             }
                         });
 
-                        // Tabel Riwayat Hasil
                         const tr = document.createElement('tr');
                         const qrContainerId = `qr-table-${Date.now()}`;
                         tr.innerHTML = `
-                            <td>${escapeHtml(data.data.name)}</td>
-                            <td><div id="${qrContainerId}"></div></td>
-                        `;
+                    <td>${escapeHtml(data.data.name)}</td>
+                    <td><div id="${qrContainerId}"></div></td>
+                `;
 
                         userTableBody.appendChild(tr);
                         tableContainer.style.display = 'block';
 
-                        const tableQrContainer = document.getElementById(qrContainerId);
-                        if (tableQrContainer) {
-                            tableQrContainer.innerHTML = '';
-                            new QRCode(tableQrContainer, {
-                                text: shareUrl,
-                                width: 50,
-                                height: 50
-                            });
-                        }
+                        new QRCode(document.getElementById(qrContainerId), {
+                            text: shareUrl,
+                            width: 50,
+                            height: 50
+                        });
 
                     } else {
                         Swal.fire('Gagal!', data.message || 'Gagal menyimpan.', 'error');
