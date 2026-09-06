@@ -27,14 +27,15 @@ class WhatsappController extends Controller
     {
         $userId = Auth::user()->userid ?? Auth::id();
 
-        // Pastikan URL mengarah ke loopback IP 127.0.0.1 untuk menghindari 403 Forbidden
+        // Mengarahkan ke IP loopback 127.0.0.1
         $serverUrl = str_replace('localhost', '127.0.0.1', $this->waServerUrl ?? 'http://127.0.0.1:3000');
 
         try {
-            $response = Http::timeout(5) // Set timeout 5 detik agar request tidak menggantung
+            $response = Http::timeout(5)
                 ->acceptJson()
                 ->withHeaders([
-                    'User-Agent' => 'Laravel-WA-Client/1.0',
+                    // Gunakan User-Agent browser standar untuk keamanan ekstra dari blokir Nginx/WAF
+                    'User-Agent' => 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36',
                 ])
                 ->get("{$serverUrl}/status/{$userId}");
 
@@ -42,19 +43,19 @@ class WhatsappController extends Controller
                 return response()->json($response->json());
             }
 
-            // Handling jika server Node.js memberikan response HTTP error (misal 403, 500, 404)
+            // Respon jika Node.js merespon selain status HTTP 200 (misal 500 / 404)
             return response()->json([
                 'status' => 'DISCONNECTED',
                 'qr'     => '',
                 'error'  => 'HTTP Error: ' . $response->status()
-            ]);
+            ], $response->status());
         } catch (\Exception $e) {
-            // Handling jika Node.js mati / offline / Connection Refused
+            // Respon jika service Node.js mati / Port 3000 tidak merespon (Connection Refused)
             return response()->json([
                 'status' => 'OFFLINE',
                 'qr'     => '',
-                'error'  => $e->getMessage()
-            ]);
+                'error'  => 'Node.js Server Offline: ' . $e->getMessage()
+            ], 503);
         }
     }
 
