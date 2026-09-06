@@ -36,8 +36,6 @@ Route::prefix('brodcast/')->group(function (): void {
 
 
 Route::prefix('brodcast/menu-brodcast/brodcast-whatsapp')->group(function () {
-    // Route Tampilan Utama Blade
-    Route::get('/', [WhatsappBroadcastController::class, 'index'])->name('menu_brodcast_whatsapp');
 
     // Route Ajax DataTables History
     Route::get('/history-ajax', [WhatsappBroadcastController::class, 'historyAjax'])->name('menu_brodcast_whatsapp.history_ajax');

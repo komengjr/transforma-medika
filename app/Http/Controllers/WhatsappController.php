@@ -25,13 +25,36 @@ class WhatsappController extends Controller
     // Endpoint AJAX untuk auto-refresh QR Code / Status
     public function getStatus()
     {
-        $userId = Auth::user()->userid; // Mengambil ID user yang sedang login
+        $userId = Auth::user()->userid ?? Auth::id();
+
+        // Pastikan URL mengarah ke loopback IP 127.0.0.1 untuk menghindari 403 Forbidden
+        $serverUrl = str_replace('localhost', '127.0.0.1', $this->waServerUrl ?? 'http://127.0.0.1:3000');
 
         try {
-            $response = Http::get("{$this->waServerUrl}/status/{$userId}")->json();
-            return response()->json($response);
+            $response = Http::timeout(5) // Set timeout 5 detik agar request tidak menggantung
+                ->acceptJson()
+                ->withHeaders([
+                    'User-Agent' => 'Laravel-WA-Client/1.0',
+                ])
+                ->get("{$serverUrl}/status/{$userId}");
+
+            if ($response->successful()) {
+                return response()->json($response->json());
+            }
+
+            // Handling jika server Node.js memberikan response HTTP error (misal 403, 500, 404)
+            return response()->json([
+                'status' => 'DISCONNECTED',
+                'qr'     => '',
+                'error'  => 'HTTP Error: ' . $response->status()
+            ]);
         } catch (\Exception $e) {
-            return response()->json(['status' => 'OFFLINE', 'qr' => '']);
+            // Handling jika Node.js mati / offline / Connection Refused
+            return response()->json([
+                'status' => 'OFFLINE',
+                'qr'     => '',
+                'error'  => $e->getMessage()
+            ]);
         }
     }
 
