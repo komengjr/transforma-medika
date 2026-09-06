@@ -65,7 +65,7 @@
 </div>
 @endif
 
-<div class="row g-4">
+<div class="row g-3 pt-3">
     <!-- KARTU STATUS DEVICE & QR CODE -->
     <div class="col-lg-5 col-md-6">
         <div class="card wa-card shadow-lg h-100">

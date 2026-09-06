@@ -1569,18 +1569,29 @@ class EventController extends Controller
     {
         $registration = DB::table('event_registrations as er')
             ->join('event_participants as ep', 'er.id_participant', '=', 'ep.id_participant')
+            ->join('event_data as ed', 'er.id_event_data', '=', 'ed.id_event_data')
             ->leftJoin('event_registration_classes as erc', 'er.id_registration', '=', 'erc.id_registration')
             ->leftJoin('event_data_sub_class as esc', 'erc.id_event_data_sub_class', '=', 'esc.id_event_data_sub_class')
+            ->leftJoin('event_data_sub as es', 'esc.event_data_sub_code', '=', 'es.event_data_sub_code')
             ->where('er.id_registration', $idRegistration)
             ->select(
                 'er.id_registration',
                 'er.payment_status',
+                'er.total_amount',
+                'er.registration_code',
                 'erc.qr_code_token',
                 'ep.full_name',
                 'ep.email',
-                'ep.institution',
                 'ep.phone_number',
-                'esc.event_data_sub_class_name'
+                'ed.event_data_tittle',
+                'ed.event_data_user_id',
+                'ed.event_data_venue',
+                'ed.event_data_code',
+                'es.event_data_sub_name',
+                'es.event_data_sub_start',
+                'es.event_data_sub_end',
+                'esc.event_data_sub_class_name',
+                'esc.event_data_sub_class_room'
             )
             ->first();
 
@@ -1618,18 +1629,29 @@ class EventController extends Controller
             try {
                 $registration = DB::table('event_registrations as er')
                     ->join('event_participants as ep', 'er.id_participant', '=', 'ep.id_participant')
+                    ->join('event_data as ed', 'er.id_event_data', '=', 'ed.id_event_data')
                     ->leftJoin('event_registration_classes as erc', 'er.id_registration', '=', 'erc.id_registration')
                     ->leftJoin('event_data_sub_class as esc', 'erc.id_event_data_sub_class', '=', 'esc.id_event_data_sub_class')
+                    ->leftJoin('event_data_sub as es', 'esc.event_data_sub_code', '=', 'es.event_data_sub_code')
                     ->where('er.id_registration', $idRegistration)
                     ->select(
                         'er.id_registration',
                         'er.payment_status',
+                        'er.total_amount',
+                        'er.registration_code',
                         'erc.qr_code_token',
                         'ep.full_name',
                         'ep.email',
-                        'ep.institution',
                         'ep.phone_number',
-                        'esc.event_data_sub_class_name'
+                        'ed.event_data_tittle',
+                        'ed.event_data_user_id',
+                        'ed.event_data_venue',
+                        'ed.event_data_code',
+                        'es.event_data_sub_name',
+                        'es.event_data_sub_start',
+                        'es.event_data_sub_end',
+                        'esc.event_data_sub_class_name',
+                        'esc.event_data_sub_class_room'
                     )
                     ->first();
 
@@ -1659,6 +1681,19 @@ class EventController extends Controller
      */
     private function sendWaGateway($registration)
     {
+        // Fetch Rekening Aktif
+        $rekenings = DB::table('event_data_rekening')
+            ->where('event_data_code', $registration->event_data_code)
+            ->where('is_active', true)
+            ->get();
+
+        // Fetch Contact Person Aktif
+        $contacts = DB::table('event_data_contact')
+            ->where('event_data_code', $registration->event_data_code)
+            ->where('is_active', true)
+            ->orderBy('sort_order', 'asc')
+            ->get();
+
         // 1. Format Nomor Telepon
         $phone = preg_replace('/[^0-9]/', '', $registration->phone_number);
         if (substr($phone, 0, 1) === '0') {
@@ -1667,38 +1702,111 @@ class EventController extends Controller
             $phone = '62' . $phone;
         }
 
-        // 2. Susun Pesan WhatsApp
-        $message = "*E-TICKET EVENT PESERTA*\n\n";
-        $message .= "Halo *{$registration->full_name}*,\n";
-        $message .= "Berikut adalah rincian tiket Anda:\n\n";
-        $message .= "• *QR Token:* {$registration->qr_code_token}\n";
-        $message .= "• *Kelas:* " . ($registration->event_data_sub_class_name ?? '-') . "\n\n";
-        $message .= "Terima kasih!";
+        // 2. Tentukan Status Pembayaran & Waktu Event
+        $isPaid = ($registration->payment_status === 'paid');
 
-        // 3. Buat Gambar QR Code Otomatis di Laravel (Format PNG)
-        $qrImageContent = \SimpleSoftwareIO\QrCode\Facades\QrCode::format('png')
-            ->size(300)
-            ->margin(1)
-            ->generate($registration->qr_code_token);
+        $eventTime = !empty($registration->event_data_sub_start)
+            ? date('d M Y, H:i', strtotime($registration->event_data_sub_start)) . ' WIB'
+            : '-';
 
-        // 4. URL Server Node.js WhatsApp JS milik Anda
         $nodeServerUrl = env('WA_NODE_SERVER_URL', 'http://localhost:3000/send-message');
 
         try {
-            // 5. Kirim HTTP Post dengan Form-Data (File QR Code JPG)
-            $response = Http::attach(
-                'attachment',            // Nama field file yang diterima Multer di Node.js
-                $qrImageContent,         // Binary data gambar JPG
-                'qrcode_ticket.jpg'      // Nama file dengan ekstensi .jpg
-            )->post($nodeServerUrl, [
-                'userId'  => Auth::user()->userid, // Gunakan 'userId' (camelCase) agar sesuai req.body.userId
-                'number'  => $phone,
-                'message' => $message,
-            ]);
+            if (!$isPaid) {
+                // ================= SKENARIO 1: BELUM BAYAR (PENDING) =================
+                $message = "*TAGIHAN PEMBAYARAN EVENT*\n\n";
+                $message .= "Halo *{$registration->full_name}*,\n";
+                $message .= "Pendaftaran Anda telah kami terima. Silakan selesaikan pembayaran untuk mengonfirmasi E-Ticket Anda.\n\n";
+                $message .= "• *Kode Reg:* {$registration->registration_code}\n";
+                $message .= "• *Nama Event:* " . ($registration->event_data_tittle ?? '-') . "\n";
+                $message .= "• *Sub Event:* " . ($registration->event_data_sub_name ?? '-') . "\n";
+                $message .= "• *Kelas:* " . ($registration->event_data_sub_class_name ?? '-') . "\n";
+                $message .= "• *Ruangan:* " . ($registration->event_data_sub_class_room ?? '-') . "\n";
+                $message .= "• *Jadwal:* {$eventTime}\n";
+                $message .= "• *Total Bayar:* Rp " . number_format($registration->total_amount ?? 0, 0, ',', '.') . "\n\n";
+
+                // Append Rekening Pembayaran
+                if (isset($rekenings) && $rekenings->count() > 0) {
+                    $message .= "*REKENING PEMBAYARAN:*\n";
+                    foreach ($rekenings as $rek) {
+                        $message .= "💳 *{$rek->bank_name}*\n";
+                        $message .= "   • No. Rek: *{$rek->account_number}*\n";
+                        $message .= "   • a.n: {$rek->account_holder}\n";
+                        if (!empty($rek->notes)) {
+                            $message .= "   • Catatan: _{$rek->notes}_\n";
+                        }
+                    }
+                    $message .= "\n";
+                }
+
+                // Append Informasi Kontak Konfirmasi
+                $message .= "Setelah melakukan pembayaran, mohon konfirmasi ke kontak berikut:\n";
+                if (isset($contacts) && $contacts->count() > 0) {
+                    foreach ($contacts as $contact) {
+                        $role = !empty($contact->contact_role) ? " ({$contact->contact_role})" : "";
+                        $message .= "• *{$contact->contact_name}*{$role}: {$contact->contact_number}\n";
+                    }
+                } else {
+                    $message .= "• Silakan hubungi Panitia Event.\n";
+                }
+
+                $message .= "\nTerima kasih!";
+
+                // Kirim hanya pesan teks tanpa attachment
+                $response = Http::asForm()->post($nodeServerUrl, [
+                    'userId'  => $registration->event_data_user_id ?? Auth::user()->userid,
+                    'number'  => $phone,
+                    'message' => $message,
+                ]);
+            } else {
+                // ================= SKENARIO 2: SUDAH BAYAR (PAID) =================
+                $message = "*E-TICKET EVENT PESERTA*\n\n";
+                $message .= "Halo *{$registration->full_name}*,\n";
+                $message .= "Pembayaran Anda telah dikonfirmasi! Berikut adalah rincian E-Ticket Anda:\n\n";
+                $message .= "• *Kode Reg:* {$registration->registration_code}\n";
+                $message .= "• *Nama Event:* " . ($registration->event_data_tittle ?? '-') . "\n";
+                $message .= "• *Sub Event:* " . ($registration->event_data_sub_name ?? '-') . "\n";
+                $message .= "• *Kelas:* " . ($registration->event_data_sub_class_name ?? '-') . "\n";
+                $message .= "• *Ruangan:* " . ($registration->event_data_sub_class_room ?? '-') . "\n";
+                $message .= "• *Jadwal:* {$eventTime}\n";
+                $message .= "• *Lokasi:* " . ($registration->event_data_venue ?? '-') . "\n";
+                $message .= "• *QR Token:* " . ($registration->qr_code_token ?? '-') . "\n\n";
+                $message .= "Tunjukkan QR Code terlampir saat presensi masuk kelas.\n\n";
+
+                // Append Kontak Panitia (Jika Ada Pertanyaan)
+                $message .= "Jika ada pertanyaan seputar acara, silakan hubungi kami:\n";
+                if (isset($contacts) && $contacts->count() > 0) {
+                    foreach ($contacts as $contact) {
+                        $role = !empty($contact->contact_role) ? " ({$contact->contact_role})" : "";
+                        $message .= "• *{$contact->contact_name}*{$role}: {$contact->contact_number}\n";
+                    }
+                } else {
+                    $message .= "• Hubungi Panitia Event melalui kontak resmi.\n";
+                }
+
+                $message .= "\nTerima kasih!";
+
+                // Buat QR Code Native (PNG)
+                $qrImageContent = \SimpleSoftwareIO\QrCode\Facades\QrCode::format('png')
+                    ->size(300)
+                    ->margin(1)
+                    ->generate($registration->qr_code_token ?? $registration->registration_code);
+
+                // Kirim pesan dengan lampiran QR Code
+                $response = Http::attach(
+                    'attachment',
+                    $qrImageContent,
+                    'qrcode_ticket.png'
+                )->post($nodeServerUrl, [
+                    'userId'  => $registration->event_data_user_id ?? Auth::user()->userid,
+                    'number'  => $phone,
+                    'message' => $message,
+                ]);
+            }
 
             $result = $response->json();
 
-            // 6. Validasi Response dari Node.js
+            // 3. Validasi Response dari Node.js
             if ($response->failed() || (isset($result['status']) && $result['status'] === false)) {
                 $errorMessage = $result['message'] ?? $result['error'] ?? 'Gagal terhubung ke WhatsApp JS Server';
                 throw new \Exception('WhatsApp JS Gagal Kirim: ' . $errorMessage);
@@ -1886,24 +1994,7 @@ class EventController extends Controller
     public function master_event_master_whatsapp($akses, $id, Request $request)
     {
         if ($this->url_akses($akses, $id) == true) {
-            // Ambil semua daftar akses + Join data event & user_mains berdasarkan 'userid'
-            $accesses = DB::table('event_data_access')
-                ->leftJoin('event_data', 'event_data_access.event_data_id', '=', 'event_data.id_event_data')
-                ->leftJoin('user_mains', 'event_data_access.userid', '=', 'user_mains.userid') // Disesuaikan ke user_mains & userid
-                ->select(
-                    'event_data_access.*',
-                    'event_data.event_data_tittle',
-                    'event_data.event_data_code',
-                    'user_mains.fullname as user_name', // Ambil kolom fullname
-                    'user_mains.username'
-                )
-                ->get();
-
-            // Data untuk Dropdown di Modal Tambah Akses
-            $events = DB::table('event_data')->get();
-            $users  = DB::table('user_mains')->get(); // Diambil dari user_mains
-
-            return view('app-event.master-event.master-whatsapp', compact('accesses', 'events', 'users'), [
+            return view('app-event.master-event.master-whatsapp', [
                 'akses' => $akses,
                 'code' => $id,
 
