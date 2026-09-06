@@ -27,8 +27,8 @@ class WhatsappController extends Controller
     {
         $userId = Auth::user()->userid ?? Auth::id();
 
-        // Mengarahkan ke IP loopback 127.0.0.1
-        $serverUrl = str_replace('localhost', '127.0.0.1', $this->waServerUrl ?? 'http://127.0.0.1:3000');
+        // Mengarahkan ke IP loopback 127.0.0.1 dengan Port 8000
+        $serverUrl = str_replace(['localhost', ':3000'], ['127.0.0.1', ':8000'], $this->waServerUrl ?? 'http://127.0.0.1:8000');
 
         try {
             $response = Http::timeout(5)
@@ -50,7 +50,7 @@ class WhatsappController extends Controller
                 'error'  => 'HTTP Error: ' . $response->status()
             ], $response->status());
         } catch (\Exception $e) {
-            // Respon jika service Node.js mati / Port 3000 tidak merespon (Connection Refused)
+            // Respon jika service Node.js mati / Port 8000 tidak merespon (Connection Refused)
             return response()->json([
                 'status' => 'OFFLINE',
                 'qr'     => '',
