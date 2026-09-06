@@ -153,4 +153,9 @@ Route::middleware(['auth'])->prefix('admin')->name('admin.')->group(function () 
 Route::get('/verify-certificate/{code}', [CertificateController::class, 'verify'])
     ->name('certificate.verify');
 
-use App\Http\Controllers\EventAccessController;
+
+use App\Http\Controllers\WhatsappController;
+
+Route::get('/whatsapp', [WhatsappController::class, 'index'])->name('whatsapp.index');
+Route::get('/whatsapp/status', [WhatsappController::class, 'getStatus'])->name('whatsapp.status');
+Route::post('/whatsapp/send', [WhatsappController::class, 'sendMessage'])->name('whatsapp.send');

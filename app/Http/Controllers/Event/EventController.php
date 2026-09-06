@@ -1659,6 +1659,7 @@ class EventController extends Controller
      */
     private function sendWaGateway($registration)
     {
+        // 1. Format Nomor Telepon
         $phone = preg_replace('/[^0-9]/', '', $registration->phone_number);
         if (substr($phone, 0, 1) === '0') {
             $phone = '62' . substr($phone, 1);
@@ -1666,6 +1667,7 @@ class EventController extends Controller
             $phone = '62' . $phone;
         }
 
+        // 2. Susun Pesan WhatsApp
         $message = "*E-TICKET EVENT PESERTA*\n\n";
         $message .= "Halo *{$registration->full_name}*,\n";
         $message .= "Berikut adalah rincian tiket Anda:\n\n";
@@ -1673,26 +1675,40 @@ class EventController extends Controller
         $message .= "• *Kelas:* " . ($registration->event_data_sub_class_name ?? '-') . "\n\n";
         $message .= "Terima kasih!";
 
-        // Link Gambar QR Code Publik (Langsung menghasilkan PNG)
-        $qrUrl = "https://api.qrserver.com/v1/create-qr-code/?size=300x300&data=" . urlencode($registration->qr_code_token);
+        // 3. Buat Gambar QR Code Otomatis di Laravel (Format PNG)
+        $qrImageContent = \SimpleSoftwareIO\QrCode\Facades\QrCode::format('png')
+            ->size(300)
+            ->margin(1)
+            ->generate($registration->qr_code_token);
 
-        $token = trim(env('WA_GATEWAY_TOKEN', 'CJnxqZ4tb2LLwgxzmnWq'));
+        // 4. URL Server Node.js WhatsApp JS milik Anda
+        $nodeServerUrl = env('WA_NODE_SERVER_URL', 'http://localhost:3000/send-message');
 
-        $response = Http::withHeaders([
-            'Authorization' => $token,
-        ])->post('https://api.fonnte.com/send', [
-            'target'      => $phone,
-            'message'     => $message,
-            'url'         => $qrUrl, // Mengirim link gambar publik ke Fonnte
-            'countryCode' => '62',
-        ]);
+        try {
+            // 5. Kirim HTTP Post dengan Form-Data (File QR Code JPG)
+            $response = Http::attach(
+                'attachment',            // Nama field file yang diterima Multer di Node.js
+                $qrImageContent,         // Binary data gambar JPG
+                'qrcode_ticket.jpg'      // Nama file dengan ekstensi .jpg
+            )->post($nodeServerUrl, [
+                'userId'  => Auth::user()->userid, // Gunakan 'userId' (camelCase) agar sesuai req.body.userId
+                'number'  => $phone,
+                'message' => $message,
+            ]);
 
-        $result = $response->json();
-        if (isset($result['status']) && $result['status'] === false) {
-            throw new \Exception('Fonnte Gagal Kirim: ' . ($result['reason'] ?? 'Error tidak diketahui'));
+            $result = $response->json();
+
+            // 6. Validasi Response dari Node.js
+            if ($response->failed() || (isset($result['status']) && $result['status'] === false)) {
+                $errorMessage = $result['message'] ?? $result['error'] ?? 'Gagal terhubung ke WhatsApp JS Server';
+                throw new \Exception('WhatsApp JS Gagal Kirim: ' . $errorMessage);
+            }
+
+            return true;
+        } catch (\Exception $e) {
+            Log::error('Error WA Gateway: ' . $e->getMessage());
+            throw $e;
         }
-
-        return true;
     }
 
     // DATA KEHADIRAN
@@ -1865,5 +1881,35 @@ class EventController extends Controller
     {
         DB::table('event_data_access')->where('id_event_data_access', $id)->delete();
         return redirect()->back()->with('success', 'Akses user berhasil dihapus.');
+    }
+    // MASTER WHATSAPP
+    public function master_event_master_whatsapp($akses, $id, Request $request)
+    {
+        if ($this->url_akses($akses, $id) == true) {
+            // Ambil semua daftar akses + Join data event & user_mains berdasarkan 'userid'
+            $accesses = DB::table('event_data_access')
+                ->leftJoin('event_data', 'event_data_access.event_data_id', '=', 'event_data.id_event_data')
+                ->leftJoin('user_mains', 'event_data_access.userid', '=', 'user_mains.userid') // Disesuaikan ke user_mains & userid
+                ->select(
+                    'event_data_access.*',
+                    'event_data.event_data_tittle',
+                    'event_data.event_data_code',
+                    'user_mains.fullname as user_name', // Ambil kolom fullname
+                    'user_mains.username'
+                )
+                ->get();
+
+            // Data untuk Dropdown di Modal Tambah Akses
+            $events = DB::table('event_data')->get();
+            $users  = DB::table('user_mains')->get(); // Diambil dari user_mains
+
+            return view('app-event.master-event.master-whatsapp', compact('accesses', 'events', 'users'), [
+                'akses' => $akses,
+                'code' => $id,
+
+            ]);
+        } else {
+            return Redirect::to('dashboard/home');
+        }
     }
 }

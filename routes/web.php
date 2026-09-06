@@ -192,6 +192,7 @@ Route::prefix('{akses}/{id}')->group(function (): void {
     Route::get('master-event/pengiriman-email', [EventController::class, 'master_event_pengiriman_email'])->name('master_event_pengiriman_email');
     Route::get('master-event/pengiriman-whatsapp', [EventController::class, 'master_event_pengiriman_whatsapp'])->name('master_event_pengiriman_whatsapp');
     Route::get('master-event/event-access', [EventController::class, 'master_event_access_event'])->name('master_event_access_event');
+    Route::get('master-event/master-whatsapp', [EventController::class, 'master_event_master_whatsapp'])->name('master_event_master_whatsapp');
 
     // KOPERASI
     Route::get('menu-koperasi/registrasi-peserta', [KoperasiController::class, 'menu_koperasi_registrasi_peserta'])->name('menu_koperasi_registrasi_peserta');
