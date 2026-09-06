@@ -1,6 +1,7 @@
 <?php
 
 use App\Http\Controllers\Photobooth\PhotoboothController;
+use App\Http\Controllers\Photobooth\ViewPhotoboothController;
 use Illuminate\Support\Facades\Route;
 
 Route::prefix('{akses}/{id}')->group(function (): void {
@@ -17,7 +18,7 @@ Route::get('photobooth/{org_code}/results', [PhotoboothController::class, 'showR
 Route::get('photobooth/{org_code}/results-json', [PhotoboothController::class, 'getResultsJson'])->name('photobooth.results.json');
 Route::get('/setup-photo', [PhotoboothController::class, 'index'])->name('photobooth.index');
 Route::post('/photobooth/store', [PhotoboothController::class, 'store'])->name('photobooth.store');
-Route::get('/photobooth/result/{code}', [PhotoboothController::class, 'show'])->name('photobooth.show');
+Route::get('/photobooth/result/{code}', [ViewPhotoboothController::class, 'show'])->name('photobooth.show');
 // Route::get('/photobooth/{id}', [PhotoboothController::class, 'show'])->name('photobooth.show');
 Route::get('/photobooth/{code}/image', [PhotoboothController::class, 'getImage'])->name('photobooth.image');
 
