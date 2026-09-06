@@ -28,7 +28,7 @@ class WhatsappController extends Controller
         $userId = Auth::user()->userid ?? Auth::id();
 
         // Mengarahkan ke IP loopback 127.0.0.1
-        $serverUrl = str_replace('localhost', '127.0.0.1', $this->waServerUrl ?? 'http://127.0.0.1:3000');
+        $serverUrl = str_replace('localhost', '127.0.0.1', $this->waServerUrl ?? 'http://127.0.0.1:80');
 
         try {
             $response = Http::timeout(5)
