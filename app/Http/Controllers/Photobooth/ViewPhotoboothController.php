@@ -3,6 +3,7 @@
 namespace App\Http\Controllers\Photobooth;
 
 use App\Http\Controllers\Controller;
+use App\Models\PhotoboothResult;
 use Illuminate\Http\Request;
 
 class ViewPhotoboothController extends Controller
