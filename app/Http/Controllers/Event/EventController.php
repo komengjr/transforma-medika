@@ -1676,9 +1676,6 @@ class EventController extends Controller
         ]);
     }
 
-    /**
-     * Helper Function untuk Pengiriman via WA Gateway
-     */
     private function sendWaGateway($registration)
     {
         // Fetch Rekening Aktif
@@ -1709,113 +1706,140 @@ class EventController extends Controller
             ? date('d M Y, H:i', strtotime($registration->event_data_sub_start)) . ' WIB'
             : '-';
 
-        $nodeServerUrl = env('WA_NODE_SERVER_URL', 'http://localhost:3000/send-message');
+        $nodeServerUrl = 'http://127.0.0.1:3000/send-message';
+        $userId = $registration->event_data_user_id ?? Auth::user()->userid ?? null;
 
-        try {
-            if (!$isPaid) {
-                // ================= SKENARIO 1: BELUM BAYAR (PENDING) =================
-                $message = "*TAGIHAN PEMBAYARAN EVENT*\n\n";
-                $message .= "Halo *{$registration->full_name}*,\n";
-                $message .= "Pendaftaran Anda telah kami terima. Silakan selesaikan pembayaran untuk mengonfirmasi E-Ticket Anda.\n\n";
-                $message .= "• *Kode Reg:* {$registration->registration_code}\n";
-                $message .= "• *Nama Event:* " . ($registration->event_data_tittle ?? '-') . "\n";
-                $message .= "• *Sub Event:* " . ($registration->event_data_sub_name ?? '-') . "\n";
-                $message .= "• *Kelas:* " . ($registration->event_data_sub_class_name ?? '-') . "\n";
-                $message .= "• *Ruangan:* " . ($registration->event_data_sub_class_room ?? '-') . "\n";
-                $message .= "• *Jadwal:* {$eventTime}\n";
-                $message .= "• *Total Bayar:* Rp " . number_format($registration->total_amount ?? 0, 0, ',', '.') . "\n\n";
+        // Persiapan variabel payload
+        $message = '';
+        $payload = [];
 
-                // Append Rekening Pembayaran
-                if (isset($rekenings) && $rekenings->count() > 0) {
-                    $message .= "*REKENING PEMBAYARAN:*\n";
-                    foreach ($rekenings as $rek) {
-                        $message .= "💳 *{$rek->bank_name}*\n";
-                        $message .= "   • No. Rek: *{$rek->account_number}*\n";
-                        $message .= "   • a.n: {$rek->account_holder}\n";
-                        if (!empty($rek->notes)) {
-                            $message .= "   • Catatan: _{$rek->notes}_\n";
-                        }
+        if (!$isPaid) {
+            // ================= SKENARIO 1: BELUM BAYAR (PENDING) =================
+            $message = "*TAGIHAN PEMBAYARAN EVENT*\n\n";
+            $message .= "Halo *{$registration->full_name}*,\n";
+            $message .= "Pendaftaran Anda telah kami terima. Silakan selesaikan pembayaran untuk mengonfirmasi E-Ticket Anda.\n\n";
+            $message .= "• *Kode Reg:* {$registration->registration_code}\n";
+            $message .= "• *Nama Event:* " . ($registration->event_data_tittle ?? '-') . "\n";
+            $message .= "• *Sub Event:* " . ($registration->event_data_sub_name ?? '-') . "\n";
+            $message .= "• *Kelas:* " . ($registration->event_data_sub_class_name ?? '-') . "\n";
+            $message .= "• *Ruangan:* " . ($registration->event_data_sub_class_room ?? '-') . "\n";
+            $message .= "• *Jadwal:* {$eventTime}\n";
+            $message .= "• *Total Bayar:* Rp " . number_format($registration->total_amount ?? 0, 0, ',', '.') . "\n\n";
+
+            // Append Rekening Pembayaran
+            if (isset($rekenings) && $rekenings->count() > 0) {
+                $message .= "*REKENING PEMBAYARAN:*\n";
+                foreach ($rekenings as $rek) {
+                    $message .= "💳 *{$rek->bank_name}*\n";
+                    $message .= "   • No. Rek: *{$rek->account_number}*\n";
+                    $message .= "   • a.n: {$rek->account_holder}\n";
+                    if (!empty($rek->notes)) {
+                        $message .= "   • Catatan: _{$rek->notes}_\n";
                     }
-                    $message .= "\n";
                 }
-
-                // Append Informasi Kontak Konfirmasi
-                $message .= "Setelah melakukan pembayaran, mohon konfirmasi ke kontak berikut:\n";
-                if (isset($contacts) && $contacts->count() > 0) {
-                    foreach ($contacts as $contact) {
-                        $role = !empty($contact->contact_role) ? " ({$contact->contact_role})" : "";
-                        $message .= "• *{$contact->contact_name}*{$role}: {$contact->contact_number}\n";
-                    }
-                } else {
-                    $message .= "• Silakan hubungi Panitia Event.\n";
-                }
-
-                $message .= "\nTerima kasih!";
-
-                // Kirim hanya pesan teks tanpa attachment
-                $response = Http::asForm()->post($nodeServerUrl, [
-                    'userId'  => $registration->event_data_user_id ?? Auth::user()->userid,
-                    'number'  => $phone,
-                    'message' => $message,
-                ]);
-            } else {
-                // ================= SKENARIO 2: SUDAH BAYAR (PAID) =================
-                $message = "*E-TICKET EVENT PESERTA*\n\n";
-                $message .= "Halo *{$registration->full_name}*,\n";
-                $message .= "Pembayaran Anda telah dikonfirmasi! Berikut adalah rincian E-Ticket Anda:\n\n";
-                $message .= "• *Kode Reg:* {$registration->registration_code}\n";
-                $message .= "• *Nama Event:* " . ($registration->event_data_tittle ?? '-') . "\n";
-                $message .= "• *Sub Event:* " . ($registration->event_data_sub_name ?? '-') . "\n";
-                $message .= "• *Kelas:* " . ($registration->event_data_sub_class_name ?? '-') . "\n";
-                $message .= "• *Ruangan:* " . ($registration->event_data_sub_class_room ?? '-') . "\n";
-                $message .= "• *Jadwal:* {$eventTime}\n";
-                $message .= "• *Lokasi:* " . ($registration->event_data_venue ?? '-') . "\n";
-                $message .= "• *QR Token:* " . ($registration->qr_code_token ?? '-') . "\n\n";
-                $message .= "Tunjukkan QR Code terlampir saat presensi masuk kelas.\n\n";
-
-                // Append Kontak Panitia (Jika Ada Pertanyaan)
-                $message .= "Jika ada pertanyaan seputar acara, silakan hubungi kami:\n";
-                if (isset($contacts) && $contacts->count() > 0) {
-                    foreach ($contacts as $contact) {
-                        $role = !empty($contact->contact_role) ? " ({$contact->contact_role})" : "";
-                        $message .= "• *{$contact->contact_name}*{$role}: {$contact->contact_number}\n";
-                    }
-                } else {
-                    $message .= "• Hubungi Panitia Event melalui kontak resmi.\n";
-                }
-
-                $message .= "\nTerima kasih!";
-
-                // Buat QR Code Native (PNG)
-                $qrImageContent = \SimpleSoftwareIO\QrCode\Facades\QrCode::format('png')
-                    ->size(300)
-                    ->margin(1)
-                    ->generate($registration->qr_code_token ?? $registration->registration_code);
-
-                // Kirim pesan dengan lampiran QR Code
-                $response = Http::attach(
-                    'attachment',
-                    $qrImageContent,
-                    'qrcode_ticket.png'
-                )->post($nodeServerUrl, [
-                    'userId'  => $registration->event_data_user_id ?? Auth::user()->userid,
-                    'number'  => $phone,
-                    'message' => $message,
-                ]);
+                $message .= "\n";
             }
 
+            // Append Informasi Kontak Konfirmasi
+            $message .= "Setelah melakukan pembayaran, mohon konfirmasi ke kontak berikut:\n";
+            if (isset($contacts) && $contacts->count() > 0) {
+                foreach ($contacts as $contact) {
+                    $role = !empty($contact->contact_role) ? " ({$contact->contact_role})" : "";
+                    $message .= "• *{$contact->contact_name}*{$role}: {$contact->contact_number}\n";
+                }
+            } else {
+                $message .= "• Silakan hubungi Panitia Event.\n";
+            }
+
+            $message .= "\nTerima kasih!";
+
+            $payload = [
+                'userId'  => $userId,
+                'number'  => $phone,
+                'message' => $message,
+            ];
+        } else {
+            // ================= SKENARIO 2: SUDAH BAYAR (PAID) =================
+            $message = "*E-TICKET EVENT PESERTA*\n\n";
+            $message .= "Halo *{$registration->full_name}*,\n";
+            $message .= "Pembayaran Anda telah dikonfirmasi! Berikut adalah rincian E-Ticket Anda:\n\n";
+            $message .= "• *Kode Reg:* {$registration->registration_code}\n";
+            $message .= "• *Nama Event:* " . ($registration->event_data_tittle ?? '-') . "\n";
+            $message .= "• *Sub Event:* " . ($registration->event_data_sub_name ?? '-') . "\n";
+            $message .= "• *Kelas:* " . ($registration->event_data_sub_class_name ?? '-') . "\n";
+            $message .= "• *Ruangan:* " . ($registration->event_data_sub_class_room ?? '-') . "\n";
+            $message .= "• *Jadwal:* {$eventTime}\n";
+            $message .= "• *Lokasi:* " . ($registration->event_data_venue ?? '-') . "\n";
+            $message .= "• *QR Token:* " . ($registration->qr_code_token ?? '-') . "\n\n";
+            $message .= "Tunjukkan QR Code terlampir saat presensi masuk kelas.\n\n";
+
+            // Append Kontak Panitia
+            $message .= "Jika ada pertanyaan seputar acara, silakan hubungi kami:\n";
+            if (isset($contacts) && $contacts->count() > 0) {
+                foreach ($contacts as $contact) {
+                    $role = !empty($contact->contact_role) ? " ({$contact->contact_role})" : "";
+                    $message .= "• *{$contact->contact_name}*{$role}: {$contact->contact_number}\n";
+                }
+            } else {
+                $message .= "• Hubungi Panitia Event melalui kontak resmi.\n";
+            }
+
+            $message .= "\nTerima kasih!";
+
+            // Generate QR Code Native (PNG Raw Data)
+            $qrImageContent = \SimpleSoftwareIO\QrCode\Facades\QrCode::format('png')
+                ->size(300)
+                ->margin(1)
+                ->generate($registration->qr_code_token ?? $registration->registration_code);
+
+            $payload = [
+                'userId'     => $userId,
+                'number'     => $phone,
+                'message'    => $message,
+                'attachment' => [
+                    'filename' => 'qrcode_ticket.png',
+                    'mimetype' => 'image/png',
+                    'base64'   => base64_encode($qrImageContent)
+                ]
+            ];
+        }
+
+        try {
+            // Coba kirim langsung melalui Server Express.js
+            $response = Http::timeout(10)->post($nodeServerUrl, $payload);
             $result = $response->json();
 
-            // 3. Validasi Response dari Node.js
+            // Validasi jika HTTP response gagal atau status dari Node.js false
             if ($response->failed() || (isset($result['status']) && $result['status'] === false)) {
-                $errorMessage = $result['message'] ?? $result['error'] ?? 'Gagal terhubung ke WhatsApp JS Server';
-                throw new \Exception('WhatsApp JS Gagal Kirim: ' . $errorMessage);
+                $errorMessage = $result['message'] ?? $result['error'] ?? 'Gagal terhubung ke WhatsApp Server';
+                throw new \Exception('WhatsApp Direct Send Failed: ' . $errorMessage);
             }
 
             return true;
         } catch (\Exception $e) {
-            Log::error('Error WA Gateway: ' . $e->getMessage());
-            throw $e;
+            // Jika gagal (Timeout / Server Node Down / WA Disconnected / Error Kirim),
+            // fallback memasukkan ke tabel antrean `event_data_sends`
+            Log::warning('Pengiriman WA Langsung Gagal, Masuk Antrean Database. Error: ' . $e->getMessage());
+
+            try {
+                DB::table('event_data_sends')->insert([
+                    'user_id'             => $userId,
+                    'phone_number'        => $phone,
+                    'message'             => $message,
+                    'attachment_base64'   => $payload['attachment']['base64'] ?? null,
+                    'attachment_mimetype' => $payload['attachment']['mimetype'] ?? null,
+                    'attachment_filename' => $payload['attachment']['filename'] ?? null,
+                    'status'              => 'pending',
+                    'error_message'       => 'Fallback queue: ' . $e->getMessage(),
+                    'created_at'          => now(),
+                    'updated_at'          => now(),
+                ]);
+
+                return true; // Mengembalikan true agar aplikasi utama tidak terhenti (crash)
+            } catch (\Exception $dbException) {
+                Log::error('Gagal Menyimpan Ke Antrean WA: ' . $dbException->getMessage());
+                throw $dbException;
+            }
         }
     }
 

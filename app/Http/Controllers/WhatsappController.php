@@ -27,15 +27,14 @@ class WhatsappController extends Controller
     {
         $userId = Auth::user()->userid ?? Auth::id();
 
-        // Mengarahkan ke IP loopback 127.0.0.1 dengan Port 8000
-        $serverUrl = str_replace(['localhost', ':3000'], ['127.0.0.1', ':8000'], $this->waServerUrl ?? 'http://127.0.0.1:8000');
+        // Pastikan URL mengarah ke loopback IP 127.0.0.1 untuk menghindari 403 Forbidden
+        $serverUrl = str_replace('localhost', '127.0.0.1', $this->waServerUrl ?? 'http://127.0.0.1:3000');
 
         try {
-            $response = Http::timeout(5)
+            $response = Http::timeout(5) // Set timeout 5 detik agar request tidak menggantung
                 ->acceptJson()
                 ->withHeaders([
-                    // Gunakan User-Agent browser standar untuk keamanan ekstra dari blokir Nginx/WAF
-                    'User-Agent' => 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36',
+                    'User-Agent' => 'Laravel-WA-Client/1.0',
                 ])
                 ->get("{$serverUrl}/status/{$userId}");
 
@@ -43,19 +42,19 @@ class WhatsappController extends Controller
                 return response()->json($response->json());
             }
 
-            // Respon jika Node.js merespon selain status HTTP 200 (misal 500 / 404)
+            // Handling jika server Node.js memberikan response HTTP error (misal 403, 500, 404)
             return response()->json([
                 'status' => 'DISCONNECTED',
                 'qr'     => '',
                 'error'  => 'HTTP Error: ' . $response->status()
-            ], $response->status());
+            ]);
         } catch (\Exception $e) {
-            // Respon jika service Node.js mati / Port 8000 tidak merespon (Connection Refused)
+            // Handling jika Node.js mati / offline / Connection Refused
             return response()->json([
                 'status' => 'OFFLINE',
                 'qr'     => '',
-                'error'  => 'Node.js Server Offline: ' . $e->getMessage()
-            ], 503);
+                'error'  => $e->getMessage()
+            ]);
         }
     }
 

@@ -65,3 +65,7 @@ Route::prefix('lab')->group(function () {
     Route::post('/sync-sysmex', [LabRegistrationController::class, 'syncSysmex']);
     Route::put('/pendaftaran/{id}/hasil', [LabRegistrationController::class, 'updateHasil']);
 });
+
+use App\Http\Controllers\Api\WaQueueController;
+
+Route::post('/wa/queue-message', [WaQueueController::class, 'enqueue']);
