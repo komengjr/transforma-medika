@@ -69,3 +69,10 @@ Route::prefix('lab')->group(function () {
 use App\Http\Controllers\Api\WaQueueController;
 
 Route::post('/wa/queue-message', [WaQueueController::class, 'enqueue']);
+
+use App\Http\Controllers\Api\WaGatewayController;
+
+Route::prefix('wa-gateway')->group(function () {
+    Route::get('/get-pending', [WaGatewayController::class, 'getPending']);
+    Route::post('/update-status', [WaGatewayController::class, 'updateStatus']);
+});
