@@ -204,7 +204,12 @@ $bgUrl = $pb->bg_path
                     ? asset('storage/' . $frame->frame_path)
                     : asset('storage/photobooth/' . $frame->frame_path);
                     @endphp
-                    <div class="pb-frame-item card border-0 shadow-sm rounded-3 overflow-hidden pb-checkerboard" style="width: 110px;">
+                    <div class="pb-frame-item card border-0 shadow-sm rounded-3 overflow-hidden pb-checkerboard position-relative" style="width: 120px;">
+                        <!-- Badge Indikator Orientasi -->
+                        <span class="position-absolute top-0 start-0 m-1 badge {{ ($frame->orientation ?? 'portrait') === 'portrait' ? 'bg-primary' : 'bg-success' }}" style="font-size: 10px; opacity: 0.9;">
+                            {{ ucfirst($frame->orientation ?? 'portrait') }}
+                        </span>
+
                         <div class="p-2 text-center d-flex align-items-center justify-content-center" style="height: 90px;">
                             <img src="{{ $frameUrl }}" class="img-fluid" style="max-height: 80px; object-fit: contain;">
                         </div>
@@ -228,10 +233,17 @@ $bgUrl = $pb->bg_path
                     <form action="{{ route('photobooth.setup.frame.store', $pb->id) }}" method="POST" enctype="multipart/form-data">
                         @csrf
                         <div class="row g-2 align-items-center">
-                            <div class="col-md-5">
+                            <div class="col-md-3">
                                 <input type="text" name="frame_name" class="form-control form-control-sm" placeholder="Nama/Judul Frame" required>
                             </div>
-                            <div class="col-md-5">
+                            <div class="col-md-3">
+                                <!-- Input Pilihan Orientasi -->
+                                <select name="orientation" class="form-select form-select-sm" required>
+                                    <option value="portrait" selected>📱 Portrait</option>
+                                    <option value="landscape">🖥️ Landscape</option>
+                                </select>
+                            </div>
+                            <div class="col-md-4">
                                 <input type="file" name="frame_image" class="form-control form-control-sm" accept="image/png" required>
                             </div>
                             <div class="col-md-2">

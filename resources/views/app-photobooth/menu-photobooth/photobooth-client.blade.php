@@ -128,7 +128,16 @@
             justify-content: space-between;
             height: 100%;
             box-shadow: 0 10px 30px rgba(0, 0, 0, 0.3);
-            overflow-y: auto;
+            overflow: hidden;
+            /* Ubah dari auto ke hidden agar scroll fokus di frame-options */
+        }
+
+        .split-right>div:first-child {
+            display: flex;
+            flex-direction: column;
+            flex: 1;
+            /* Mengisi sisa tinggi di dalam split-right */
+            overflow: hidden;
         }
 
         .form-group {
@@ -207,8 +216,14 @@
             display: grid;
             grid-template-columns: repeat(2, 1fr);
             gap: 10px;
-            max-height: 120px;
+            flex: 1;
+            /* Mengambil seluruh sisa ruang kosong di bawah */
+            min-height: 120px;
+            /* Batas tinggi minimal */
+            max-height: 100%;
+            /* Mencegah meluap melebihi container */
             overflow-y: auto;
+            /* Scrollbar baru muncul jika item melebihi ruang yang tersedia */
             padding-right: 5px;
             margin-bottom: 10px;
         }
@@ -223,6 +238,7 @@
             color: #333;
             font-weight: 600;
             font-size: 0.8rem;
+            position: relative;
         }
 
         .frame-card img {
@@ -516,14 +532,6 @@
                     <h3 style="margin-bottom: 10px; color: #ff4081; text-align: center;">Langkah 2: Pengaturan</h3>
 
                     <div class="form-group">
-                        <label for="camera-orientation">Orientasi Kamera / Foto:</label>
-                        <select id="camera-orientation" onchange="updateOrientation(this.value)">
-                            <option value="landscape" selected>Landscape (4:3)</option>
-                            <option value="portrait">Portrait (3:4)</option>
-                        </select>
-                    </div>
-
-                    <div class="form-group">
                         <label for="photo-count">Jumlah Pose / Jepretan:</label>
                         <select id="photo-count" onchange="updateTotalPhotos(this.value)">
                             <option value="1">1 Jepretan (Single Photo)</option>
@@ -594,6 +602,7 @@
                         @endphp
                         <div class="frame-card {{ $key === 0 ? 'active' : '' }}"
                             data-src="{{ $frameUrl }}"
+                            data-orientation="{{ $frame->orientation ?? 'portrait' }}"
                             onclick="selectFrame(this)">
                             <img src="{{ $frameUrl }}" alt="{{ $frame->frame_name }}">
                             <span>{{ $frame->frame_name }}</span>
@@ -703,7 +712,8 @@
             BORDER_WIDTH = 6;
 
         let mediaStream = null;
-        let selectedFrameSrc = document.querySelector('.frame-card.active')?.getAttribute('data-src') || '';
+        let activeFrameCard = document.querySelector('.frame-card.active');
+        let selectedFrameSrc = activeFrameCard?.getAttribute('data-src') || '';
         let currentFilterClass = 'filter-normal';
         let frameImageObj = new Image();
         let framedPhotos = [];
@@ -841,8 +851,16 @@
                 step2Frame.style.display = 'flex';
 
                 videoPreview.srcObject = mediaStream;
-                updateOrientation(currentOrientation);
-                updateFrameOverlay();
+
+                // Set orientasi awal sesuai frame yang aktif
+                const activeCard = document.querySelector('.frame-card.active');
+                if (activeCard) {
+                    selectFrame(activeCard);
+                } else {
+                    updateOrientation(currentOrientation);
+                    updateFrameOverlay();
+                }
+
                 renderPreviewSlots();
 
             } catch (err) {
@@ -863,7 +881,12 @@
         function selectFrame(element) {
             document.querySelectorAll('.frame-card').forEach(card => card.classList.remove('active'));
             element.classList.add('active');
+
             selectedFrameSrc = element.getAttribute('data-src');
+            const frameOrientation = element.getAttribute('data-orientation') || 'portrait';
+
+            // Otomatis ubah mode orientasi kamera berdasarkan data frame
+            updateOrientation(frameOrientation);
             updateFrameOverlay();
         }
 
@@ -958,7 +981,6 @@
             });
         }
 
-        /* PERBAIKAN DI BAGIAN INI: Menghapus translate & scaleX(-1) */
         function captureFramedPhoto(index) {
             playShutterSound();
 
@@ -967,13 +989,48 @@
             tempCanvas.height = photoHeight;
             const tempCtx = tempCanvas.getContext('2d');
 
+            // 1. Ambil filter dari video webcam
             const filterStyles = getComputedStyle(videoMain).filter;
             tempCtx.filter = filterStyles !== 'none' ? filterStyles : 'none';
 
-            // Gambar video langsung dalam kondisi normal (sesuai posisi asli/aslinya)
-            tempCtx.drawImage(videoMain, 0, 0, photoWidth, photoHeight);
+            // 2. Hitung Crop (Object-Fit: Cover) agar foto tidak gepeng di mode Portrait
+            const videoWidth = videoMain.videoWidth || photoWidth;
+            const videoHeight = videoMain.videoHeight || photoHeight;
 
+            const videoAspect = videoWidth / videoHeight;
+            const canvasAspect = photoWidth / photoHeight;
+
+            let sx, sy, sWidth, sHeight;
+
+            if (videoAspect > canvasAspect) {
+                // Video terlalu lebar (potong sisi kiri & kanan)
+                sHeight = videoHeight;
+                sWidth = videoHeight * canvasAspect;
+                sx = (videoWidth - sWidth) / 2;
+                sy = 0;
+            } else {
+                // Video terlalu tinggi (potong sisi atas & bawah)
+                sWidth = videoWidth;
+                sHeight = videoWidth / canvasAspect;
+                sx = 0;
+                sy = (videoHeight - sHeight) / 2;
+            }
+
+            // 3. Mirroring Horizontal (agar hasil foto sesuai tampilan cermin kamera)
+            tempCtx.translate(photoWidth, 0);
+            tempCtx.scale(-1, 1);
+
+            // 4. Gambar potongan video (Crop Center) ke Canvas
+            tempCtx.drawImage(
+                videoMain,
+                sx, sy, sWidth, sHeight, // Sumber video yang dipotong
+                0, 0, photoWidth, photoHeight // Ukuran tujuan di canvas
+            );
+
+            // 5. Reset Transformasi & Filter untuk menempelkan Frame PNG bawaan
+            tempCtx.setTransform(1, 0, 0, 1, 0, 0);
             tempCtx.filter = 'none';
+
             if (selectedFrameSrc) {
                 tempCtx.drawImage(frameImageObj, 0, 0, photoWidth, photoHeight);
             }
@@ -1096,7 +1153,6 @@
                             }
                         });
 
-                        // Tabel Riwayat Hasil
                         const tr = document.createElement('tr');
                         const qrContainerId = `qr-table-${Date.now()}`;
                         tr.innerHTML = `

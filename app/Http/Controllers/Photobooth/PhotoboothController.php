@@ -98,8 +98,10 @@ class PhotoboothController extends Controller
 
     public function storeFrame(Request $request, $id)
     {
+        // 1. Tambahkan validasi untuk orientation
         $request->validate([
-            'frame_name' => 'required',
+            'frame_name'  => 'required|string|max:255',
+            'orientation' => 'required|in:portrait,landscape',
             'frame_image' => 'required|image|mimes:png|max:4096',
         ]);
 
@@ -111,10 +113,12 @@ class PhotoboothController extends Controller
         $frameFileName = 'frame_' . $orgCodeSlug . '_' . Str::slug($request->frame_name) . '_' . time() . '.' . $frameExtension;
         $framePath = $request->file('frame_image')->storeAs('frames', $frameFileName, 'photobooth');
 
+        // 2. Simpan data frame beserta orientation
         PhotoboothDataFrame::create([
             'photobooth_data_id' => $id,
-            'frame_name' => $request->frame_name,
-            'frame_path' => $framePath,
+            'frame_name'         => $request->frame_name,
+            'orientation'        => $request->orientation, // Value: 'portrait' atau 'landscape'
+            'frame_path'         => $framePath,
         ]);
 
         return redirect()->back()->with('success', 'Frame berhasil ditambahkan!');

@@ -28,6 +28,8 @@ class PhotoboothData extends Migration
             $table->foreignId('photobooth_data_id')->constrained('photobooth_data')->onDelete('cascade');
             $table->string('frame_name');  // Nama Frame
             $table->string('frame_path');  // Path Image Frame PNG Transparan
+            // Tambahan kolom orientation
+            $table->enum('orientation', ['portrait', 'landscape'])->default('portrait');
             $table->boolean('is_active')->default(true);
             $table->timestamps();
         });
