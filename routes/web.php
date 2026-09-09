@@ -359,6 +359,10 @@ Route::prefix('application')->group(function () {
     Route::post('registrasi-pasien/pilih-data-pasien/preview-pdf', [PelayananController::class, 'registrasi_pasien_pilih_data_pasien_preview_pdf'])->name('registrasi_pasien_pilih_data_pasien_preview_pdf');
     // ANTRIAN
     Route::post('registrasi-pasien/list-que', [PelayananController::class, 'registrasi_pasien_list_que'])->name('registrasi_pasien_list_que');
+    Route::get('registrasi-pasien/proses-registrasi-pasien', [PelayananController::class, 'registrasi_pasien_poses_registrasi_pasien'])->name('registrasi_pasien_poses_registrasi_pasien');
+    Route::get('registrasi-pasien/find-data-pasien', [PelayananController::class, 'registrasi_pasien_find_data_pasien'])->name('registrasi_pasien_find_data_pasien');
+    Route::get('registrasi-pasien/find-data-pasien-bpjs', [PelayananController::class, 'registrasi_pasien_find_bpjs'])->name('registrasi_pasien_find_bpjs');
+    Route::get('registrasi-pasien/save-data-pasien', [PelayananController::class, 'registrasi_pasien_save_data_pasien'])->name('registrasi_pasien_save_data_pasien');
     Route::post('registrasi-pasien/choose-data-que', [PelayananController::class, 'registrasi_pasien_choose_data_que'])->name('registrasi_pasien_choose_data_que');
     // DATA REGISTRASI
     Route::post('data-registrasi/data-table', [PelayananController::class, 'data_registrasi_data_table'])->name('data_registrasi_data_table');
@@ -774,6 +778,23 @@ Route::prefix('v3')->group(function (): void {
     Route::get('data-persetujuan-form', [PublicKoperasiController::class, 'data_persetujuan_form'])->name('data_persetujuan_form');
     Route::get('data-persetujuan-form/get-data/{id}', [PublicKoperasiController::class, 'data_persetujuan_form_get_data'])->name('data_persetujuan_form_get_data');
     Route::post('data-persetujuan-form/proses', [PublicKoperasiController::class, 'data_persetujuan_form_proses'])->name('data_persetujuan_form_proses');
+
+    // Route Tampilan
+    Route::get('/antrian', [AntrianController::class, 'index'])->name('antrian.index');
+    // Page Petugas
+    Route::get('/antrian/petugas', [AntrianController::class, 'indexPetugas'])->name('antrian.petugas');
+
+    // API Akses Petugas
+    Route::get('/api/antrian/petugas-data', [AntrianController::class, 'getPetugasData'])->name('antrian.petugas.data');
+    Route::post('/api/antrian/panggil', [AntrianController::class, 'panggilAntrian'])->name('antrian.panggil');
+    Route::post('/api/antrian/panggil-ulang', [AntrianController::class, 'panggilUlang'])->name('antrian.panggil.ulang');
+    Route::post('/api/antrian/update-status', [AntrianController::class, 'updateStatus'])->name('antrian.update.status');
+
+    // Route API/POST Cetak Antrian
+    Route::post('/api/antrian/cetak', [AntrianController::class, 'store'])->name('antrian.cetak');
+    // Route Layar Display Utama & Akses Petugas (Baru)
+    Route::get('api/antrian/display', [AntrianController::class, 'getDisplayData'])->name('antrian.display.data');
+    Route::post('/api/antrian/panggil', [AntrianController::class, 'panggilAntrian'])->name('antrian.panggil');
 });
 
 // MOVIE
@@ -859,6 +880,3 @@ Route::get('/printer', [PrinterController::class, 'index'])->name('printer.index
 
 // Route API (AJAX) untuk mengambil string ZPL
 Route::get('/printer/get-zpl', [PrinterController::class, 'getZplData'])->name('printer.get-zpl');
-
-
-

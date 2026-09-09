@@ -20,6 +20,7 @@ use Pion\Laravel\ChunkUpload\Handler\HandlerFactory;
 use Pion\Laravel\ChunkUpload\Receiver\FileReceiver;
 use Session;
 use Svg\Tag\Rect;
+use Illuminate\Support\Facades\File;
 
 class PelayananController extends Controller
 {
@@ -57,23 +58,27 @@ class PelayananController extends Controller
         }
     }
     // REGISTRASI
-    public function registrasi_pasien($akses, $id)
+    public function registrasi_pasien($akses, $id, Request $request)
     {
         if ($this->url_akses($akses, $id) == true) {
+            $ipClient = $request->ip(); // Mengambil IP Client/PC
+
             $total = DB::table('d_reg_order')->where('d_reg_order_cabang', Auth::user()->access_cabang)->count();
             $reject = DB::table('d_reg_order')->where('d_reg_order_cabang', Auth::user()->access_cabang)
                 ->where('d_reg_order_status', -1)->count();
-            // $data = DB::select("CALL get_pasien_today(?)", [Auth::user()->access_cabang]);
+
             $data = DB::table('d_reg_order')
                 ->join('master_patient', 'master_patient.master_patient_code', '=', 'd_reg_order.d_reg_order_rm')
                 ->join('t_pasien_cat', 't_pasien_cat.t_pasien_cat_code', '=', 'd_reg_order.t_pasien_cat_code')
                 ->where("d_reg_order_cabang", Auth::user()->access_cabang)->get();
+
             return view('application.pelayanan.registrasi-pasien', [
                 'akses' => $akses,
                 'code' => $id,
                 'total' => $total,
                 'reject' => $reject,
-                'data' => $data
+                'data' => $data,
+                'ipClient' => $ipClient // Pass IP ke View Utama
             ]);
         } else {
             return Redirect::to('dashboard/home');
@@ -1034,7 +1039,160 @@ class PelayananController extends Controller
     }
     public function registrasi_pasien_list_que(Request $request)
     {
-        return view('application.pelayanan.antrian.list-antrian');
+        $clientIp = $request->ip();
+
+        // Ambil data counter berdasarkan IP PC
+        $assignedCounter = DB::table('medical_loket_counters')
+            ->where('ip_address', $clientIp)
+            ->first();
+
+        // Ambil daftar loket pendukung
+        $loketList = DB::table('medical_loket')->get();
+
+        return view('application.pelayanan.antrian.list-antrian', compact('clientIp', 'assignedCounter', 'loketList'));
+    }
+    public function registrasi_pasien_poses_registrasi_pasien(Request $request)
+    {
+        // Tangkap parameter query dari AJAX modal
+        $nomorAntrian = $request->query('nomor_antrian');
+        $logId = $request->query('log_id');
+
+        // (Opsional) Ambil data tambahan dari DB jika diperlukan
+        // $antrianLog = AntrianLog::find($logId);
+
+        // Renderpartial view form registrasi
+        return view('application.pelayanan.antrian.form-proses-registrasi-pasien', compact('nomorAntrian', 'logId'));
+    }
+    public function registrasi_pasien_find_data_pasien(Request $request)
+    {
+        $keyword = $request->query('keyword');
+
+        $pasien = DB::table('master_patient')
+            ->where('master_patient_nik', 'LIKE', "%{$keyword}%")
+            ->orWhere('master_patient_code', 'LIKE', "%{$keyword}%")
+            ->orWhere('master_patient_name', 'LIKE', "%{$keyword}%")
+            ->limit(10)
+            ->get();
+
+        return response()->json([
+            'success' => true,
+            'data' => $pasien
+        ]);
+    }
+    public function registrasi_pasien_find_bpjs(Request $request)
+    {
+        $keyword = $request->query('keyword');
+
+        if (!$keyword) {
+            return response()->json(['success' => false, 'message' => 'Kata kunci pencarian tidak boleh kosong.']);
+        }
+
+        try {
+            // --- CONTOH SIMULASI INTEGRASI API BPJS / VCLAIM ---
+            // Gantikan blok ini dengan HTTP Client / Service Bridging VClaim BPJS Anda
+            // $response = Http::withHeaders(...)->get("url_vclaim_bpjs/Peserta/nokartu/$keyword");
+
+            // Contoh Data Response yang Berhasil Ditarik dari BPJS:
+            $dataBpjs = [
+                'no_kartu' => '0001234567890',
+                'nik' => '6171012304950001',
+                'nama' => 'Ahmad Subagja',
+                'sex' => 'L',
+                'tgl_lahir' => '1995-04-23',
+                'no_telepon' => '081234567890',
+                'alamat' => 'Jl. Merdeka No. 45, Kota Pontianak',
+                'status_peserta' => 'AKTIF',
+                'faskes_1' => 'Puskesmas Perdana'
+            ];
+
+            return response()->json([
+                'success' => true,
+                'data' => $dataBpjs
+            ]);
+        } catch (\Exception $e) {
+            return response()->json([
+                'success' => false,
+                'message' => 'Gagal menghubungkan ke Server BPJS: ' . $e->getMessage()
+            ], 500);
+        }
+    }
+    public function registrasi_pasien_save_data_pasien(Request $request)
+    {
+        $request->validate([
+            'master_patient_nik' => 'required|unique:master_patient,master_patient_nik',
+            'master_patient_name' => 'required|string',
+            'master_patient_jk' => 'required',
+            'master_patient_tgl_lahir' => 'required|date',
+        ]);
+
+        try {
+            // 1. Proses Pengolahan Foto Base64 dari Kamera
+            $fileNamePath = null;
+
+            if ($request->filled('foto_pasien_base64')) {
+                $base64Image = $request->foto_pasien_base64;
+
+                // Extract format data base64
+                @list($type, $fileData) = explode(';', $base64Image);
+                @list(, $fileData) = explode(',', $fileData);
+
+                if ($fileData) {
+                    // Tentukan lokasi direktori penyimpanan
+                    $destinationFolder = public_path('profile/data_pasien/PA');
+
+                    // Buat direktori jika belum tersedia
+                    if (!File::exists($destinationFolder)) {
+                        File::makeDirectory($destinationFolder, 0755, true);
+                    }
+
+                    // Generate nama file sesuai format
+                    $dateStr = date('Y-m-d');
+                    $timeStr = date('H.i.s');
+                    $hash = Str::random(16);
+                    $fileName = "WhatsApp Image {$dateStr} at {$timeStr}_{$hash}.jpeg";
+
+                    // Simpan gambar fisik ke folder
+                    File::put($destinationFolder . '/' . $fileName, base64_decode($fileData));
+
+                    // Simpan relatif path untuk dimasukkan ke database
+                    $fileNamePath = 'profile/data_pasien/PA/' . $fileName;
+                }
+            }
+
+            // 2. Generate Kode Pasien Otomatis (Contoh: RM-202609001)
+            $latestId = DB::table('master_patient')->max('id_master_patient') + 1;
+            $generatedCode = 'RM-' . date('Ym') . sprintf('%04d', $latestId);
+
+            // 3. Simpan ke Database
+            $idPasien = DB::table('master_patient')->insertGetId([
+                'master_patient_code' => $generatedCode,
+                'master_patient_nik' => $request->master_patient_nik,
+                'master_patient_name' => $request->master_patient_name,
+                'master_patient_jk' => $request->master_patient_jk,
+                'master_patient_tgl_lahir' => $request->master_patient_tgl_lahir,
+                'master_patient_tempat_lahir' => $request->master_patient_tempat_lahir ?? '-',
+                'master_patient_agama' => $request->master_patient_agama ?? '-',
+                'master_patient_no_hp' => $request->master_patient_no_hp,
+                'master_patient_email' => $request->master_patient_email,
+                'master_patient_alamat' => $request->master_patient_alamat,
+                'master_patient_foto' => $fileNamePath, // Path foto yang berhasil disimpan
+                'created_at' => now(),
+                'updated_at' => now(),
+            ]);
+
+            return response()->json([
+                'success' => true,
+                'message' => 'Pasien baru berhasil didaftarkan.',
+                'id_master_patient' => $idPasien,
+                'master_patient_code' => $generatedCode,
+                'foto_path' => $fileNamePath
+            ]);
+        } catch (\Exception $e) {
+            return response()->json([
+                'success' => false,
+                'message' => 'Gagal menyimpan data: ' . $e->getMessage()
+            ], 500);
+        }
     }
     public function registrasi_pasien_choose_data_que(Request $request)
     {

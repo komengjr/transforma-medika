@@ -6,7 +6,7 @@ use Illuminate\Support\Facades\Route;
 
 // BRODCAST
 Route::prefix('brodcast/')->group(function (): void {
-    Route::post('menu-brodcast/brodcast-whatsapp/send', [BrodcastController::class, 'menu_brodcast_whatsapp_send'])->name('menu_brodcast_whatsapp_send');
+    // Route::post('menu-brodcast/brodcast-whatsapp/send', [BrodcastController::class, 'menu_brodcast_whatsapp_send'])->name('menu_brodcast_whatsapp_send');
     Route::post('menu-brodcast/brodcast-whatsapp/upload-file', [BrodcastController::class, 'menu_brodcast_whatsapp_upload_file'])->name('menu_brodcast_whatsapp_upload_file');
     Route::post('menu-brodcast/brodcast-whatsapp/remove-file', [BrodcastController::class, 'menu_brodcast_whatsapp_remove_file'])->name('menu_brodcast_whatsapp_remove_file');
     Route::post('menu-brodcast/brodcast-management/add', [BrodcastController::class, 'menu_brodcast_management_add'])->name('menu_brodcast_management_add');

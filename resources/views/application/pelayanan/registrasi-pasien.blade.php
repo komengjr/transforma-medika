@@ -149,7 +149,7 @@
                                 <span class="text-body-secondary" style="font-size: 0.75rem;">Menunggu instruksi panggilan antrian kasir</span>
                             </div>
                         </div>
-                        <button class="btn btn-warning btn-sm text-dark rounded-pill px-3 shadow-sm fw-bold transition-all"
+                        <button class="btn btn-warning btn-sm text-white rounded-pill px-3 shadow-sm fw-bold transition-all"
                             data-bs-toggle="modal" data-bs-target="#modal-registrasi-xl" id="button-call-antrian" style="font-size: 0.78rem;">
                             <i class="fas fa-satellite-dish me-1"></i> Panggil Antrian
                         </button>
@@ -659,7 +659,6 @@
 <script>
     $(document).on("click", "#button-call-antrian", function(e) {
         e.preventDefault();
-        // var code = $(this).data("code");
         $('#menu-registrasi-xl').html(
             '<div class="spinner-border my-3" style="display: block; margin-left: auto; margin-right: auto;" role="status"><span class="visually-hidden">Loading...</span></div>'
         );
@@ -669,7 +668,8 @@
             cache: false,
             data: {
                 "_token": "{{ csrf_token() }}",
-                "code": 1
+                "code": 1,
+                "ip_client": "{{ $ipClient }}"
             },
             dataType: 'html',
         }).done(function(data) {

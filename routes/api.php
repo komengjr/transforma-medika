@@ -76,3 +76,11 @@ Route::prefix('wa-gateway')->group(function () {
     Route::get('/get-pending', [WaGatewayController::class, 'getPending']);
     Route::post('/update-status', [WaGatewayController::class, 'updateStatus']);
 });
+
+use App\Http\Controllers\Api\WhatsAppPendingApiController;
+
+Route::prefix('wa-gateway')->group(function () {
+    Route::get('/wa/pending', [WhatsAppPendingApiController::class, 'getPendingMessages']);
+    Route::post('/wa/pending/fetch-and-lock', [WhatsAppPendingApiController::class, 'fetchAndLockPending']);
+    Route::post('/wa/update-status', [WhatsAppPendingApiController::class, 'updateStatus']);
+});
