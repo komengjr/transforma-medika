@@ -1116,6 +1116,49 @@ class PelayananController extends Controller
             ], 500);
         }
     }
+    public function getPoliSchedules(Request $request)
+    {
+        // Mengambil nama hari dalam bahasa Indonesia
+        $daysMap = [
+            'Monday'    => 'Senin',
+            'Tuesday'   => 'Selasa',
+            'Wednesday' => 'Rabu',
+            'Thursday'  => 'Kamis',
+            'Friday'    => 'Jumat',
+            'Saturday'  => 'Sabtu',
+            'Sunday'    => 'Minggu'
+        ];
+        $todayName = $daysMap[Carbon::now()->format('l')];
+
+        $schedules = DB::table('m_poli_doctor_schedule as s')
+            ->join('m_poli_doctor as pd', 's.m_poli_doctor_id', '=', 'pd.id')
+            ->join('m_poli as p', 's.m_poli_code', '=', 'p.m_poli_code')
+            ->join('master_doctor as d', 's.master_doctor_code', '=', 'd.master_doctor_code')
+            ->select(
+                'p.m_poli_code',
+                'p.m_poli_name',
+                'd.master_doctor_code',
+                'd.master_doctor_title_f',
+                'd.master_doctor_name',
+                'd.master_doctor_title_e',
+                's.id_schedule',
+                's.day_name',
+                's.time_start',
+                's.time_end',
+                's.quota',
+                's.status'
+            )
+            ->where('p.m_poli_status', '1')
+            ->where('s.status', 'AKTIF')
+            ->where('s.day_name', $todayName)
+            ->get();
+
+        return response()->json([
+            'success' => true,
+            'today'   => $todayName,
+            'data'    => $schedules
+        ]);
+    }
     public function registrasi_pasien_save_data_pasien(Request $request)
     {
         $request->validate([
@@ -1191,6 +1234,42 @@ class PelayananController extends Controller
             return response()->json([
                 'success' => false,
                 'message' => 'Gagal menyimpan data: ' . $e->getMessage()
+            ], 500);
+        }
+    }
+    public function savePemeriksaanLayanan(Request $request)
+    {
+        $request->validate([
+            'id_master_patient' => 'required',
+            'tujuan_layanan' => 'required',
+        ]);
+
+        try {
+            // Logika simpan pendaftaran (Contoh ke tabel pendaftaran / rekam medis)
+            // $pendaftaran = Pendaftaran::create([
+            //     'id_master_patient' => $request->id_master_patient,
+            //     'jenis_penjamin'    => $request->jenis_penjamin,
+            //     'nama_perusahaan'   => $request->nama_perusahaan,
+            //     'tujuan_layanan'    => $request->tujuan_layanan,
+            //     'poli_id'           => $request->poli_id,
+            //     'dokter_id'         => $request->dokter_id ?? $request->dokter_igd_id,
+            //     'triase_level'      => $request->triase_level,
+            //     'pengantar_nama'    => $request->pengantar_nama,
+            //     'td'                => $request->td,
+            //     'suhu'              => $request->suhu,
+            //     'nadi'              => $request->nadi,
+            //     'respirasi'         => $request->respirasi,
+            //     'keluhan_utama'     => $request->keluhan_utama,
+            // ]);
+
+            return response()->json([
+                'success' => true,
+                'message' => 'Pendaftaran layanan medis berhasil disimpan!'
+            ]);
+        } catch (\Exception $e) {
+            return response()->json([
+                'success' => false,
+                'message' => 'Terjadi kesalahan: ' . $e->getMessage()
             ], 500);
         }
     }

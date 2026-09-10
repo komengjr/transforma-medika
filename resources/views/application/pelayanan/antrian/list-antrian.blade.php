@@ -148,10 +148,10 @@
     <div class="modal-dialog modal-fullscreen">
         <div class="modal-content">
             <div class="modal-header bg-primary text-white py-2 px-3">
-                <h5 class="modal-title fw-bold text-white fs-5">
+                <h5 class="modal-title fw-bold text-white fs-3">
                     <i class="fa-solid fa-user-plus me-2"></i> Form Registrasi Pasien - Antrian <span id="labelNomorAntrianReg" class="badge bg-warning text-dark fs--1">---</span>
                 </h5>
-                <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal" aria-label="Close"></button>
+                <button class="btn-close btn-circle d-flex flex-center transition-base fs--2 btn-sm p-1" data-bs-dismiss="modal" aria-label="Close"></button>
             </div>
             <div class="modal-body p-0" id="contentModalFullRegistrasi">
                 <div class="d-flex justify-content-center align-items-center h-100">

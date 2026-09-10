@@ -362,7 +362,12 @@ Route::prefix('application')->group(function () {
     Route::get('registrasi-pasien/proses-registrasi-pasien', [PelayananController::class, 'registrasi_pasien_poses_registrasi_pasien'])->name('registrasi_pasien_poses_registrasi_pasien');
     Route::get('registrasi-pasien/find-data-pasien', [PelayananController::class, 'registrasi_pasien_find_data_pasien'])->name('registrasi_pasien_find_data_pasien');
     Route::get('registrasi-pasien/find-data-pasien-bpjs', [PelayananController::class, 'registrasi_pasien_find_bpjs'])->name('registrasi_pasien_find_bpjs');
+    Route::get('registrasi-pasien/get-poli-schedules', [PelayananController::class, 'getPoliSchedules'])->name('registrasi_pasien_get_poli_schedules');
+
     Route::get('registrasi-pasien/save-data-pasien', [PelayananController::class, 'registrasi_pasien_save_data_pasien'])->name('registrasi_pasien_save_data_pasien');
+    // TAMBAHKAN ROUTE BARU INI:
+    Route::post('/registrasi-pasien/save-pemeriksaan-layanan', [PelayananController::class, 'savePemeriksaanLayanan'])->name('registrasi_pasien_save_pemeriksaan_layanan');
+
     Route::post('registrasi-pasien/choose-data-que', [PelayananController::class, 'registrasi_pasien_choose_data_que'])->name('registrasi_pasien_choose_data_que');
     // DATA REGISTRASI
     Route::post('data-registrasi/data-table', [PelayananController::class, 'data_registrasi_data_table'])->name('data_registrasi_data_table');
