@@ -38,7 +38,6 @@
             overflow: hidden;
             z-index: 1;
             pointer-events: none;
-            /* Garis-garis diagonal latar belakang */
             background-image:
                 repeating-linear-gradient(45deg, rgba(255, 255, 255, 0.05) 0, rgba(255, 255, 255, 0.05) 1px, transparent 0, transparent 50px),
                 repeating-linear-gradient(-45deg, rgba(255, 255, 255, 0.03) 0, rgba(255, 255, 255, 0.03) 1px, transparent 0, transparent 40px);
@@ -364,19 +363,22 @@
             display: none;
         }
 
-        /* === MOBILE STYLING DENGAN WARNA DINAMIS, ANIMASI & GARIS LATAR BELAKANG === */
+        /* === MOBILE STYLING (FULL DI ATAS TANPA SPACE KOSONG) === */
         @media (max-width: 992px) {
             body {
                 background: linear-gradient(135deg, #3b82f6 0%, #8b5cf6 50%, #ec4899 100%) !important;
                 height: 100vh;
+                height: 100dvh;
+                /* Menyesuaikan tinggi dinamis browser mobile */
                 width: 100vw;
+                margin: 0;
+                padding: 0;
                 display: flex;
                 align-items: center;
                 justify-content: center;
                 overflow: hidden !important;
                 position: fixed;
                 inset: 0;
-                padding: 0;
             }
 
             .login-wrapper {
@@ -387,34 +389,32 @@
                 display: flex;
                 flex-direction: column;
                 width: 100%;
-                max-width: 410px;
                 height: 100vh;
-                max-height: 840px;
+                height: 100dvh;
+                max-width: 100%;
+                max-height: 100%;
                 position: absolute;
+                top: 0;
+                left: 0;
+                right: 0;
+                bottom: 0;
                 background: #ffffff;
                 overflow-y: auto;
-                box-shadow: 0 25px 50px rgba(0, 0, 0, 0.3);
+                box-shadow: none;
                 border-radius: 0px;
-                animation: slideScreen 0.4s cubic-bezier(0.16, 1, 0.3, 1) forwards;
+                /* Full layar merapat */
+                animation: slideScreen 0.3s cubic-bezier(0.16, 1, 0.3, 1) forwards;
             }
 
             @keyframes slideScreen {
                 0% {
                     opacity: 0;
-                    transform: scale(0.95) translateY(20px);
+                    transform: translateY(15px);
                 }
 
                 100% {
                     opacity: 1;
-                    transform: scale(1) translateY(0);
-                }
-            }
-
-            @media (min-height: 750px) {
-                .mobile-screen {
-                    border-radius: 36px;
-                    border: 6px solid rgba(255, 255, 255, 0.4);
-                    height: 88vh;
+                    transform: translateY(0);
                 }
             }
 
@@ -422,7 +422,7 @@
                 display: none !important;
             }
 
-            /* Header Ilustrasi Mobile dengan Pola Garis-Garis Diagonal Keren & Berwarna */
+            /* Header Ilustrasi Mobile menempel rapat di atas */
             .m-header-mockup {
                 background: linear-gradient(135deg, #1e1b4b 0%, #312e81 100%);
                 padding: 2.2rem 1.5rem 1.2rem 1.5rem;
@@ -430,6 +430,8 @@
                 position: relative;
                 color: #ffffff;
                 overflow: hidden;
+                border-top-left-radius: 0;
+                border-top-right-radius: 0;
             }
 
             /* Garis-garis dekoratif di header mobile */
@@ -504,7 +506,7 @@
                 align-items: center;
                 text-align: center;
                 color: #94a3b8;
-                font-size: 0.75srem;
+                font-size: 0.75rem;
                 margin: 0.75rem 0;
             }
 
@@ -660,7 +662,7 @@
                     <label class="form-label small fw-bold">Email Account</label>
                     <div class="input-group">
                         <span class="input-group-text bg-transparent border-0 text-primary"><i class="bi bi-envelope"></i></span>
-                        <input type="text" id="username_mob" class="form-control" placeholder="name@example.com" required autocomplete="username">
+                        <input type="email" id="username_mob" class="form-control" placeholder="name@example.com" required autocomplete="username">
                     </div>
                 </div>
 
@@ -815,7 +817,7 @@
                 </div>
             </div>
             <h4 class="fw-bold text-white mt-2 mb-1" style="font-size: 1.35rem;">Verify Account</h4>
-            <p class="text-white-50 mb-0" style="font-size: 0.74rem; padding: 0 1rem;">Verifikasi nomor telepon atau email Anda untuk aktivasi akun penuh[cite: 9].</p>
+            <p class="text-white-50 mb-0" style="font-size: 0.74rem; padding: 0 1rem;">Verifikasi nomor telepon atau email Anda untuk aktivasi akun penuh.</p>
         </div>
 
         <div class="m-content-body">
