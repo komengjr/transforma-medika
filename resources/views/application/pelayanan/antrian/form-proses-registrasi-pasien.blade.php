@@ -103,7 +103,7 @@
         </div>
         <div class="text-end">
             <span class="text-muted fs--2 d-block text-uppercase fw-semibold">Nomor Antrian</span>
-            <span class="badge bg-primary fs-6 px-3 py-1 rounded-pill shadow-sm"><i class="fas fa-hashtag me-1"></i>{{ $nomorAntrian }}</span>
+            <span class="badge bg-primary fs-3 px-3 py-1 rounded-pill shadow-sm"><i class="fas fa-hashtag me-1"></i>{{ $nomorAntrian }}</span>
         </div>
     </div>
 
@@ -576,9 +576,8 @@
 </div>
 
 <script>
-    document.addEventListener("DOMContentLoaded", function() {
-        loadPoliSchedules();
-    });
+    loadPoliSchedules();
+
     let selectedKategori = '';
     let selectedPerusahaan = '';
     let selectedPatientData = null;

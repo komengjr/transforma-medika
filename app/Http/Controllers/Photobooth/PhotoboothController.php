@@ -133,6 +133,16 @@ class PhotoboothController extends Controller
         // Direct ke view tampilan photobooth client
         return view('app-photobooth.menu-photobooth.photobooth-client', compact('photobooth'));
     }
+    public function clientView_v2($org_code)
+    {
+        // Cari data photobooth berdasarkan org_code beserta relasi frames-nya
+        $photobooth = PhotoboothData::with('frames')
+            ->where('org_code', $org_code)
+            ->firstOrFail();
+
+        // Direct ke view tampilan photobooth client
+        return view('app-photobooth.menu-photobooth.photobooth-client-v2', compact('photobooth'));
+    }
     public function index()
     {
         $frames = [

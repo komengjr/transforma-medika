@@ -12,6 +12,7 @@ use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Hash;
 use Illuminate\Support\Facades\Redirect;
 use Illuminate\Support\Facades\Storage;
+use Illuminate\Support\Facades\Validator;
 use Illuminate\Support\Str;
 use League\CommonMark\Extension\CommonMark\Node\Inline\Code;
 use Maatwebsite\Excel\Facades\Excel;
@@ -1040,20 +1041,156 @@ class HrmController extends Controller
     }
     public function master_data_pegawai_data(Request $request)
     {
-        $data = DB::table('hrm_master_pegawai')->select('hrm_m_pegawai_code', 'hrm_m_pegawai_name', 'hrm_m_position_code', 'hrm_m_pegawai_email', 'hrm_m_pegawai_img', 'hrm_m_pegawai_hp')
+        $data = DB::table('hrm_master_pegawai')
+            ->select(
+                'hrm_m_pegawai_code',
+                'hrm_m_pegawai_name',
+                'hrm_m_position_code',
+                'hrm_m_pegawai_email',
+                'hrm_m_pegawai_img',
+                'hrm_m_pegawai_hp',
+                'hrm_m_pegawai_status'
+            )
             ->get()
             ->map(function ($item) {
+                // Cek path foto agar url valid
+                $fotoUrl = asset('img/default-avatar.png');
+                if (!empty($item->hrm_m_pegawai_img)) {
+                    // Jika tersimpan hanya nama file/path relatif di storage
+                    $fotoUrl = str_contains($item->hrm_m_pegawai_img, 'http')
+                        ? $item->hrm_m_pegawai_img
+                        : asset('storage/pegawai/profile/PA/' . $item->hrm_m_pegawai_img); // Sesuaikan lokasi storage Anda
+                }
+
                 return [
-                    "code"   => $item->hrm_m_pegawai_code,
-                    "nama"   => $item->hrm_m_pegawai_name,
-                    "jabatan" => $item->hrm_m_position_code,
-                    "divisi" => $item->hrm_m_position_code,
-                    "foto"   => $item->hrm_m_pegawai_img,
-                    "kontak" => $item->hrm_m_pegawai_hp,
+                    "code"    => $item->hrm_m_pegawai_code,
+                    "nama"    => $item->hrm_m_pegawai_name,
+                    "jabatan" => $item->hrm_m_position_code ?? '-',
+                    "divisi"  => $item->hrm_m_position_code ?? '-',
+                    "foto"    => $fotoUrl,
+                    "kontak"  => $item->hrm_m_pegawai_hp ?? '-',
+                    "email"   => $item->hrm_m_pegawai_email ?? '-',
+                    "status"  => $item->hrm_m_pegawai_status ?? 'Aktif',
                 ];
             });
 
-        return response()->json($data);
+        // Mengembalikan data JSON yang siap digunakan oleh DataTables/AJAX
+        return response()->json([
+            'success' => true,
+            'data'    => $data
+        ]);
+    }
+    public function master_data_pegawai_create_login(Request $request)
+    {
+        $code = $request->code;
+
+        // 1. Ambil data pegawai
+        $pegawai = DB::table('hrm_master_pegawai')
+            ->where('hrm_m_pegawai_code', $code)
+            ->first();
+
+        if (!$pegawai) {
+            return response()->html('<div class="alert alert-danger p-3">Data pegawai tidak ditemukan.</div>');
+        }
+
+        // 2. Cek apakah user sudah memiliki akses login di tabel `user_mains` (via userid / email)
+        $user = DB::table('user_mains')
+            ->where('userid', $pegawai->hrm_m_pegawai_code)
+            ->first();
+
+        // 3. Render Blade View berdasarkan kondisi akun
+        if ($user) {
+            // SUDAH ADA: Tampilkan informasi detail akun
+            return view('app-hrm.master-pegawai.form.detail-akses-login', [
+                'pegawai'  => $pegawai,
+                'user'     => $user,
+                'is_exist' => true
+            ]);
+        } else {
+            // BELUM ADA: Tampilkan form untuk buat akun baru
+            return view('app-hrm.master-pegawai.form.form-akses-login', [
+                'pegawai'  => $pegawai,
+                'is_exist' => false
+            ]);
+        }
+    }
+    public function master_data_pegawai_save_login(Request $request)
+    {
+        // Validasi sesuai skema tabel user_mains
+        $request->validate([
+            'pegawai_code'     => 'required',
+            'username'         => 'required|unique:user_mains,username',
+            'email'            => 'required|email|unique:user_mains,email',
+            'password'         => 'required|min:6',
+            'access_cabang'    => 'required',
+            'access_code'      => 'required',
+        ]);
+
+        try {
+            DB::beginTransaction();
+
+            // Cek ganda keamanan untuk mencegah duplikasi
+            $isExist = DB::table('user_mains')
+                ->where('userid', $request->pegawai_code)
+                ->exists();
+
+            if ($isExist) {
+                return response()->json([
+                    'status'  => 'warning',
+                    'message' => 'Pegawai ini sudah memiliki akses login!'
+                ], 400);
+            }
+
+            // Insert data ke tabel user_mains
+            DB::table('user_mains')->insert([
+                'fullname'         => $request->fullname,
+                'username'         => $request->username,
+                'userid'           => $request->pegawai_code,
+                'email'            => $request->email,
+                'number_handphone' => $request->number_handphone ?? '-',
+                'password'         => Hash::make($request->password),
+                'access_cabang'    => $request->access_cabang,
+                'access_code'      => $request->access_code,
+                'access_status'    => 1, // 1 = Aktif, 0 = Tidak Aktif
+                'created_at'       => now(),
+                'updated_at'       => now(),
+            ]);
+
+            DB::commit();
+
+            return response()->json([
+                'status'  => 'success',
+                'message' => 'Akses login berhasil dibuat!'
+            ]);
+        } catch (\Exception $e) {
+            DB::rollBack();
+
+            return response()->json([
+                'status'  => 'error',
+                'message' => 'Gagal membuat akses login: ' . $e->getMessage()
+            ], 500);
+        }
+    }
+    public function master_data_pegawai_reset_password(Request $request)
+    {
+        try {
+            DB::table('user_mains')
+                ->where('userid', $request->userid)
+                ->update([
+                    'password'   => Hash::make('12345678'), // Default password baru
+                    'updated_at' => now(),
+                ]);
+
+            return response()->json([
+                'status'  => 'success',
+                'message' => 'Password berhasil di-reset menjadi: 12345678'
+            ]);
+        } catch (\Exception $e) {
+            return response()->json([
+                'status'  => 'error',
+                'message' => 'Gagal mereset password: ' . $e->getMessage()
+            ], 500);
+        }
     }
     public function master_data_pegawai_upload_profile(Request $request)
     {
@@ -1091,45 +1228,251 @@ class HrmController extends Controller
     }
     public function master_data_pegawai_save(Request $request)
     {
-        $count = DB::table('hrm_master_pegawai')->count();
+        // 1. Validasi Input sesuai nama tabel hrm_master_pegawai
+        $validator = Validator::make($request->all(), [
+            'name'      => 'required|string|max:255',
+            'nik'       => 'required|numeric|digits:16|unique:hrm_master_pegawai,hrm_m_pegawai_nik',
+            'nip'       => 'required|string|max:50|unique:hrm_master_pegawai,hrm_m_pegawai_nip',
+            'jk'        => 'required|in:l,p',
+            'posisi'    => 'required|string',
+            'hp'        => 'required|numeric',
+            'email'     => 'nullable|email|max:255',
+            'place'     => 'nullable|string|max:255',
+            'dob'       => 'nullable|date',
+            'agama'     => 'nullable|string|max:100',
+            'alamat'    => 'nullable|string',
+            'link'      => 'nullable|string', // Foto dari Resumable.js
+        ], [
+            'name.required'   => 'Nama lengkap wajib diisi.',
+            'nik.required'    => 'NIK wajib diisi.',
+            'nik.digits'      => 'NIK harus berjumlah 16 digit.',
+            'nik.unique'      => 'NIK sudah terdaftar dalam sistem.',
+            'nip.required'    => 'NIP wajib diisi.',
+            'nip.unique'      => 'NIP sudah terdaftar.',
+            'jk.required'     => 'Jenis kelamin wajib dipilih.',
+            'posisi.required' => 'Departemen/Jabatan wajib dipilih.',
+            'hp.required'     => 'Nomor handphone wajib diisi.',
+            'email.email'     => 'Format email tidak valid.'
+        ]);
+
+        if ($validator->fails()) {
+            return response()->json([
+                'status' => 'error',
+                'errors' => $validator->errors()
+            ], 422);
+        }
+
+        DB::beginTransaction();
         try {
-            if ($request->link == "") {
-                $gambar = "";
-            } else {
-                $gambar = Storage::url('pegawai/profile/' . auth::user()->access_cabang . '/' . $request->link);
+            // 2. Pemindahan Foto dari Folder Temp ke Storage Permanen
+            $fotoPath = null;
+            if ($request->filled('link')) {
+                $tempPath = 'public/tmp/' . $request->link;
+                $newPath  = 'public/pegawai/foto/' . $request->link;
+
+                if (Storage::exists($tempPath)) {
+                    Storage::move($tempPath, $newPath);
+                    $fotoPath = 'storage/pegawai/foto/' . $request->link;
+                } else {
+                    $fotoPath = $request->link;
+                }
             }
 
+            // 3. Generate Kode Pegawai Otomatis (Contoh: PEG-202609-001)
+            $codePegawai = 'PEG-' . date('Ym') . '-' . Str::random(5);
+
+            // 4. Direct Insert ke Database menggunakan Query Builder DB::table
             DB::table('hrm_master_pegawai')->insert([
-                'hrm_m_pegawai_code' => 'PEG' . date('Ymd') . str_pad($count + 1, 4, '0', STR_PAD_LEFT),
-                'hrm_m_pegawai_nip' => $request->nip,
-                'hrm_m_pegawai_nik' => $request->nik,
-                'hrm_m_pegawai_name' => $request->name,
-                'hrm_master_pegawai_dob' => $request->dob,
-                'hrm_m_pegawai_sex' => $request->jk,
-                'hrm_master_pegawai_dop' => $request->place,
-                'hrm_m_pegawai_agama' => $request->agama,
-                'hrm_m_pegawai_hp' => $request->hp,
-                'hrm_m_pegawai_email' => $request->email,
-                'hrm_m_position_code' => 123,
-                'hrm_m_position_loc' => 123,
-                'hrm_m_pegawai_address' => 123,
-                'hrm_m_pegawai_img' => $gambar,
-                'created_at' => now(),
+                'hrm_m_pegawai_code'    => $codePegawai,
+                'hrm_m_pegawai_nip'     => $request->nip,
+                'hrm_m_pegawai_nik'     => $request->nik,
+                'hrm_m_pegawai_name'    => $request->name,
+                'hrm_master_pegawai_dob' => $request->dob ?? date('Y-m-d'),
+                'hrm_master_pegawai_dop' => $request->place ?? '-',
+                'hrm_m_pegawai_agama'   => $request->agama ?? '-',
+                'hrm_m_pegawai_sex'     => $request->jk,
+                'hrm_m_pegawai_hp'      => $request->hp,
+                'hrm_m_pegawai_email'   => $request->email ?? '-',
+                'hrm_m_position_code'   => $request->posisi,
+                'hrm_m_position_loc'    => $request->kota ?? '-',
+                'hrm_m_jam_kerja_code'  => null, // Sesuaikan jika ada input jam kerja
+                'hrm_m_pegawai_address' => $request->alamat ?? '-',
+                'hrm_m_pegawai_img'     => $fotoPath,
+                'created_at'            => now(),
+                'updated_at'            => now(),
             ]);
-            return '<script>location.reload();</script>';
-        } catch (\Throwable $th) {
-            return '0';
+
+            DB::commit();
+
+            return response()->json([
+                'status'  => 'success',
+                'message' => 'Data pegawai berhasil disimpan!'
+            ], 200);
+        } catch (\Exception $e) {
+            DB::rollBack();
+
+            return response()->json([
+                'status'  => 'error',
+                'message' => 'Gagal menyimpan data: ' . $e->getMessage()
+            ], 500);
         }
     }
     public function master_data_pegawai_update(Request $request)
     {
         $data = DB::table('hrm_master_pegawai')->where('hrm_m_pegawai_code', $request->code)->first();
-        return view('app-hrm.master-pegawai.form.form-update-pegawai', compact('data'));
+        $departemen = DB::table('hrm_departemen')->get(); // Diperlukan untuk dropdown departemen
+
+        return view('app-hrm.master-pegawai.form.form-update-pegawai', compact('data', 'departemen'));
+    }
+    // Method Simpan Perubahan Data
+    public function master_data_pegawai_update_store(Request $request)
+    {
+        try {
+            $dataToUpdate = [
+                'hrm_m_pegawai_name'      => $request->name,
+                'hrm_m_pegawai_gender'    => $request->jk,
+                'hrm_m_pegawai_nik'       => $request->nik,
+                'hrm_m_pegawai_nip'       => $request->nip,
+                'hrm_m_pegawai_dob'       => $request->dob,
+                'hrm_m_pegawai_pob'       => $request->place,
+                'hrm_m_pegawai_religion'  => $request->agama,
+                'hrm_m_pegawai_phone'     => $request->hp,
+                'hrm_m_pegawai_email'     => $request->email,
+                'hrm_m_pegawai_dept_code' => $request->posisi,
+                'hrm_m_pegawai_provinsi'  => $request->provinsi,
+                'hrm_m_pegawai_kota'      => $request->kota,
+                'hrm_m_pegawai_kecamatan' => $request->kecamatan,
+                'hrm_m_pegawai_address'   => $request->alamat,
+                'updated_at'              => now(),
+            ];
+
+            // Hanya perbarui foto jika ada file foto baru yang diunggah
+            if (!empty($request->link)) {
+                $dataToUpdate['hrm_m_pegawai_image'] = $request->link;
+            }
+
+            DB::table('hrm_master_pegawai')
+                ->where('hrm_m_pegawai_code', $request->code)
+                ->update($dataToUpdate);
+
+            return response()->json([
+                'status'  => 'success',
+                'message' => 'Data pegawai berhasil diperbarui.'
+            ]);
+        } catch (\Exception $e) {
+            return response()->json([
+                'status'  => 'error',
+                'message' => 'Gagal memperbarui data: ' . $e->getMessage()
+            ], 500);
+        }
     }
     public function master_data_pegawai_detail(Request $request)
     {
-        $data = DB::table('hrm_master_pegawai')->where('hrm_m_pegawai_code', $request->code)->first();
-        return view('app-hrm.master-pegawai.form.form-detail-pegawai', compact('data'));
+        $code = $request->code;
+        $currentMonth = Carbon::now()->month;
+        $currentYear = Carbon::now()->year;
+        $periodeSaatIni = Carbon::now()->format('Y-m'); // Format: 2026-09
+
+        // 1. Data Pegawai + Departemen
+        $data = DB::table('hrm_master_pegawai as p')
+            ->leftJoin('hrm_departemen as d', 'p.hrm_m_position_code', '=', 'd.hrm_departemen_code')
+            ->leftJoin('hrm_master_pegawai as kepala', 'd.hrm_departemen_kepala', '=', 'kepala.hrm_m_pegawai_code')
+            ->select(
+                'p.*',
+                'd.hrm_departemen_name',
+                'd.hrm_departemen_lokasi',
+                'kepala.hrm_m_pegawai_name as nama_kepala_departemen'
+            )
+            ->where('p.hrm_m_pegawai_code', $code)
+            ->first();
+
+        if (!$data) {
+            return response()->json(['message' => 'Data pegawai tidak ditemukan.'], 404);
+        }
+
+        // 2. Data KPI Pegawai (Rekap + Detail Item KPI)
+        $kpiRekap = DB::table('hrm_kpi_rekap')
+            ->where('hrm_m_pegawai_code', $code)
+            ->orderBy('hrm_kpi_rekap_periode', 'desc')
+            ->first();
+
+        $totalSkorKpi = $kpiRekap->hrm_kpi_rekap_total ?? 0;
+        $kategoriKpi  = $kpiRekap->hrm_kpi_rekap_cat ?? 'Belum Dievaluasi';
+
+        // Item Detail KPI Pegawai
+        $kpiItems = DB::table('hrm_kpi_pegawai as kp')
+            ->join('hrm_kpi_master as km', 'kp.hrm_kpi_master_code', '=', 'km.hrm_kpi_master_code')
+            ->select(
+                'km.hrm_kpi_master_name',
+                'km.hrm_kpi_master_desc',
+                'km.hrm_kpi_master_target',
+                'km.hrm_kpi_master_bobot',
+                'km.hrm_kpi_master_type',
+                'kp.hrm_kpi_pegawai_value',
+                'kp.hrm_kpi_pegawai_score',
+                'kp.hrm_kpi_pegawai_status',
+                'kp.hrm_kpi_pegawai_catatan'
+            )
+            ->where('kp.hrm_m_pegawai_code', $code)
+            ->where('kp.hrm_kpi_pegawai_periode', $kpiRekap->hrm_kpi_rekap_periode ?? $periodeSaatIni)
+            ->get();
+
+        // 3. Summary Quick KPI Top Cards
+        $totalHadir = DB::table('hrm_absensi')
+            ->where('hrm_m_pegawai_code', $code)
+            ->whereMonth('hrm_absensi_date', $currentMonth)
+            ->whereYear('hrm_absensi_date', $currentYear)
+            ->whereIn('hrm_absensi_status', ['hadir', 'terlambat', 'dinas_luar'])
+            ->count();
+
+        $totalTerlambat = DB::table('hrm_absensi')
+            ->where('hrm_m_pegawai_code', $code)
+            ->whereMonth('hrm_absensi_date', $currentMonth)
+            ->whereYear('hrm_absensi_date', $currentYear)
+            ->where('hrm_absensi_status', 'terlambat')
+            ->count();
+
+        $totalLembur = DB::table('hrm_absensi')
+            ->where('hrm_m_pegawai_code', $code)
+            ->whereMonth('hrm_absensi_date', $currentMonth)
+            ->whereYear('hrm_absensi_date', $currentYear)
+            ->sum('hrm_absensi_overtime_hours');
+
+        $kpiSummary = [
+            'skor_total'     => $totalSkorKpi,
+            'kategori'       => $kategoriKpi,
+            'tepat_waktu'    => max(0, $totalHadir - $totalTerlambat),
+            'terlambat'      => $totalTerlambat,
+            'overtime_hours' => number_format($totalLembur, 1)
+        ];
+
+        // 4. Riwayat Absensi
+        $absensi = DB::table('hrm_absensi')
+            ->where('hrm_m_pegawai_code', $code)
+            ->orderBy('hrm_absensi_date', 'desc')
+            ->limit(10)
+            ->get();
+
+        // 5. Data Master Gaji & Payroll
+        $gajiPokok = DB::table('hrm_m_gaji_pokok')
+            ->where('hrm_m_pegawai_code', $code)
+            ->first();
+
+        $payrollSlip = DB::table('hrm_payroll_slip')
+            ->where('hrm_m_pegawai_code', $code)
+            ->orderBy('id', 'desc')
+            ->limit(6)
+            ->get();
+
+        return view('app-hrm.master-pegawai.form.form-detail-pegawai', compact(
+            'data',
+            'kpiSummary',
+            'kpiRekap',
+            'kpiItems',
+            'absensi',
+            'gajiPokok',
+            'payrollSlip'
+        ));
     }
     // MASTER Jabatan
     public function master_data_jabatan($akses, $id)

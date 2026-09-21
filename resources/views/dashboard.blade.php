@@ -52,7 +52,7 @@
         /* BACKGROUND SMART CITY TEKNOLOGI DENGAN EFEK BLUR           */
         /* ========================================================= */
         body {
-            font-family: 'Plus Jakarta Sans', sans-serif;
+            font-family: 'Plus Jakarta Sans', sans-serif !important;
             margin: 0;
             padding: 0;
             color: #1e293b;
@@ -88,6 +88,26 @@
             height: 100vh;
             background: linear-gradient(135deg, rgba(15, 23, 42, 0.45) 0%, rgba(2, 132, 199, 0.25) 100%);
             z-index: -1;
+        }
+
+        /* Memastikan seluruh elemen teks dan komponen ikut menggunakan Plus Jakarta Sans */
+        input,
+        button,
+        select,
+        textarea,
+        .dropdown-menu,
+        .modal,
+        h1,
+        h2,
+        h3,
+        h4,
+        h5,
+        h6,
+        p,
+        span,
+        a,
+        badge {
+            font-family: 'Plus Jakarta Sans', sans-serif !important;
         }
 
         /* ========================================================= */
@@ -180,7 +200,6 @@
                 z-index: 1;
                 background: #0f172a;
                 padding: 2px;
-                /* Memberikan ruang untuk border gradien */
             }
 
             /* Lapisan Border Gradien (Pseudo Element) */
@@ -190,7 +209,6 @@
                 inset: 0;
                 border-radius: 16px;
                 padding: 2px;
-                /* Ketebalan border gradien */
                 background: linear-gradient(135deg, rgba(56, 189, 248, 0.8), rgba(99, 102, 241, 0.2), rgba(236, 72, 153, 0.8));
                 -webkit-mask: linear-gradient(#fff 0 0) content-box, linear-gradient(#fff 0 0);
                 -webkit-mask-composite: xor;
@@ -365,7 +383,6 @@
                 backdrop-filter: blur(20px) saturate(180%);
                 -webkit-backdrop-filter: blur(20px) saturate(180%);
                 border-radius: 35px;
-                /* Super Rounded Oval */
                 display: flex;
                 align-items: center;
                 justify-content: space-around;
@@ -375,7 +392,6 @@
                 z-index: 10000;
             }
 
-            /* Nav Button Item */
             .android-nav-btn {
                 display: flex;
                 flex-direction: column;
@@ -391,7 +407,6 @@
                 border-radius: 20px;
             }
 
-            /* Icon Wrapper/Badge Berwarna & Besar */
             .nav-icon-wrapper {
                 width: 38px;
                 height: 38px;
@@ -405,7 +420,6 @@
                 box-shadow: 0 4px 10px rgba(0, 0, 0, 0.08);
             }
 
-            /* Skema Warna Gradient Tiap Icon */
             .nav-icon-home {
                 background: linear-gradient(135deg, #3b82f6, #1d4ed8);
                 color: #fff;
@@ -426,7 +440,6 @@
                 color: #fff;
             }
 
-            /* Active State & Press Effect */
             .android-nav-btn.active .nav-icon-wrapper {
                 transform: translateY(-6px) scale(1.12);
                 box-shadow: 0 8px 18px rgba(2, 132, 199, 0.35);
@@ -443,10 +456,6 @@
             .android-nav-btn i {
                 font-size: 1.15rem;
                 margin-bottom: 2px;
-            }
-
-            .android-nav-btn.active {
-                color: #0284c7;
             }
         }
 
@@ -475,7 +484,6 @@
             }
         }
 
-        /* Header Mini Profil di Atas Menu */
         .dropdown-profile-header {
             background: linear-gradient(135deg, rgba(2, 132, 199, 0.08), rgba(59, 130, 246, 0.05));
             border-radius: 12px;
@@ -483,7 +491,6 @@
             margin-bottom: 0.4rem;
         }
 
-        /* Item Menu Hover Effect */
         .glass-dropdown-item {
             border-radius: 10px !important;
             padding: 0.55rem 0.75rem !important;
@@ -507,7 +514,6 @@
             color: #ef4444 !important;
         }
 
-        /* Icon Badge Styling */
         .item-icon-box {
             width: 30px;
             height: 30px;
@@ -524,7 +530,6 @@
             transform: scale(1.1);
         }
 
-        /* Chevron panah kecil di sisi kanan menu */
         .item-arrow {
             font-size: 0.65rem;
             opacity: 0;
@@ -537,7 +542,6 @@
             transform: translateX(0);
         }
 
-        /* Trigger Button */
         .btn-dropdown-trigger {
             width: 40px;
             height: 40px;
@@ -559,7 +563,6 @@
             box-shadow: 0 4px 12px rgba(2, 132, 199, 0.3) !important;
         }
 
-        /* Mobile Glassmorphism Dropdown */
         .glass-dropdown-mobile {
             background: rgba(255, 255, 255, 0.96) !important;
             backdrop-filter: blur(20px) saturate(180%);
@@ -585,7 +588,6 @@
             }
         }
 
-        /* Item Dropdown Mobile */
         .mobile-dropdown-item {
             border-radius: 10px !important;
             padding: 0.6rem 0.75rem !important;
@@ -607,7 +609,6 @@
             background-color: #fef2f2 !important;
         }
 
-        /* Icon Box Mobile */
         .mobile-icon-box {
             width: 28px;
             height: 28px;
@@ -619,7 +620,6 @@
             margin-right: 10px;
         }
 
-        /* Trigger Button Mobile */
         .btn-mobile-trigger {
             width: 36px;
             height: 36px;
@@ -640,7 +640,6 @@
             border-color: #0284c7 !important;
         }
 
-        /* Glassmorphism Reset Modal */
         .modal-sm-custom {
             max-width: 380px;
         }
@@ -672,7 +671,6 @@
             justify-content: center;
         }
 
-        /* Form Input Styling */
         .custom-input {
             border-radius: 0 12px 12px 0 !important;
             font-size: 0.85rem;
@@ -691,7 +689,6 @@
             background: #f8fafc !important;
         }
 
-        /* OTP Boxes Styling */
         .otp-input {
             width: 48px;
             height: 52px;
@@ -711,7 +708,6 @@
             outline: none;
         }
 
-        /* Gradient Buttons */
         .btn-primary-gradient {
             background: linear-gradient(135deg, #0284c7, #2563eb);
             border: none;
@@ -1079,7 +1075,7 @@
             </div>
         </div>
     </div>
-    <!-- Modal Reset Password Multi-step -->
+
     <!-- Modal Reset Password Multi-step -->
     <div class="modal fade" id="modal-keuangan" tabindex="-1" aria-hidden="true" data-bs-backdrop="static">
         <div class="modal-dialog modal-dialog-centered modal-sm-custom">
@@ -1186,6 +1182,13 @@
         </div>
     </div>
 
+    <!-- JavaScripts -->
+    <script src="{{ asset('vendors/popper/popper.min.js') }}"></script>
+    <script src="{{ asset('vendors/bootstrap/bootstrap.min.js') }}"></script>
+    <script src="{{ asset('vendors/fontawesome/all.min.js') }}"></script>
+    <script src="{{ asset('asset/js/theme.js') }}"></script>
+    <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+
     <script>
         document.addEventListener("DOMContentLoaded", function() {
             const step1 = document.getElementById("reset-step-1");
@@ -1201,7 +1204,6 @@
             let userEmail = "";
             let verifiedOtp = "";
 
-            // Auto Focus Next/Prev pada 6 Kotak OTP
             otpInputs.forEach((input, index) => {
                 input.addEventListener("input", (e) => {
                     if (e.target.value.length === 1 && index < otpInputs.length - 1) {
@@ -1216,7 +1218,6 @@
                 });
             });
 
-            // Toggle Lihat Password
             document.querySelector(".btn-toggle-pass").addEventListener("click", function() {
                 const passInput = document.getElementById("new-password");
                 const icon = this.querySelector("i");
@@ -1229,16 +1230,14 @@
                 }
             });
 
-            /// STEP 1: Send OTP Email (Pengecekan Email)
             formReq.addEventListener("submit", function(e) {
                 e.preventDefault();
-                e.stopImmediatePropagation(); // Hentikan event lain yang mungkin berjalan
+                e.stopImmediatePropagation();
 
                 const emailInput = document.getElementById("reset-email");
                 userEmail = emailInput.value;
                 const btn = $("#btn-send-otp");
 
-                // Loading State
                 btn.prop("disabled", true).html('<i class="fas fa-spinner fa-spin"></i> Memeriksa Email...');
 
                 $.ajax({
@@ -1250,12 +1249,9 @@
                     },
                     dataType: "json"
                 }).done(function(res) {
-                    // Restore Button State
                     btn.prop("disabled", false).html('<span>Kirim Kode Verifikasi</span> <i class="fas fa-arrow-right ms-2 fs--2"></i>');
 
-                    // CEK STATUS: Harus benar-benar 'success'
                     if (res.status === 'success') {
-                        // EMAIL BENAR -> Baru pindah ke Step 2 (OTP)
                         Swal.fire({
                             icon: 'success',
                             title: 'Email Ditemukan!',
@@ -1269,7 +1265,6 @@
                         step3.classList.add("d-none");
                         otpInputs[0].focus();
                     } else {
-                        // EMAIL SALAH/GAGAL -> KUNCI TETAP DI STEP 1
                         step1.classList.remove("d-none");
                         step2.classList.add("d-none");
                         step3.classList.add("d-none");
@@ -1284,10 +1279,8 @@
                         });
                     }
                 }).fail(function(xhr) {
-                    // Restore Button State jika HTTP status 404 / 500
                     btn.prop("disabled", false).html('<span>Kirim Kode Verifikasi</span> <i class="fas fa-arrow-right ms-2 fs--2"></i>');
 
-                    // KUNCI PAKSA TETAP DI STEP 1
                     step1.classList.remove("d-none");
                     step2.classList.add("d-none");
                     step3.classList.add("d-none");
@@ -1306,13 +1299,11 @@
                 });
             });
 
-            // Kirim Ulang OTP
             document.getElementById("btn-resend-otp").addEventListener("click", function(e) {
                 e.preventDefault();
                 formReq.dispatchEvent(new Event('submit'));
             });
 
-            // STEP 2: Verifikasi Kode OTP
             formVerifyOtp.addEventListener("submit", function(e) {
                 e.preventDefault();
 
@@ -1339,7 +1330,7 @@
                 }).done(function(res) {
                     btn.prop("disabled", false).html('<i class="fas fa-check-circle me-1"></i> Verifikasi Kode OTP');
                     if (res.status === 'success') {
-                        verifiedOtp = otpCode; // Simpan OTP yang valid
+                        verifiedOtp = otpCode;
                         Swal.fire({
                             icon: 'success',
                             title: 'OTP Valid!',
@@ -1360,7 +1351,6 @@
                 });
             });
 
-            // STEP 3: Reset Password Baru
             formResetPass.addEventListener("submit", function(e) {
                 e.preventDefault();
 
@@ -1406,15 +1396,7 @@
                 });
             });
         });
-    </script>
-    <!-- JavaScripts -->
-    <script src="{{ asset('vendors/popper/popper.min.js') }}"></script>
-    <script src="{{ asset('vendors/bootstrap/bootstrap.min.js') }}"></script>
-    <script src="{{ asset('vendors/fontawesome/all.min.js') }}"></script>
-    <script src="{{ asset('asset/js/theme.js') }}"></script>
-    <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
 
-    <script>
         $(document).on("click", "#menu", function(e) {
             e.preventDefault();
             var code = $(this).data("code");
@@ -1472,59 +1454,6 @@
         $(document).on("click", "#button-menu-utama", function(e) {
             e.preventDefault();
             window.location.href = "{{route('/')}}";
-        });
-    </script>
-    <script>
-        document.addEventListener("DOMContentLoaded", function() {
-            const step1 = document.getElementById("reset-step-1");
-            const step2 = document.getElementById("reset-step-2");
-            const formReq = document.getElementById("form-request-otp");
-            const formSubmit = document.getElementById("form-submit-reset");
-            const otpInputs = document.querySelectorAll(".otp-input");
-
-            // 1. Pindah dari Step 1 ke Step 2 (Kirim OTP)
-            formReq.addEventListener("submit", function(e) {
-                e.preventDefault();
-                step1.classList.add("d-none");
-                step2.classList.remove("d-none");
-                otpInputs[0].focus(); // Auto focus ke kotak OTP pertama
-            });
-
-            // 2. Auto Focus Next/Prev Input pada Kotak OTP
-            otpInputs.forEach((input, index) => {
-                input.addEventListener("input", (e) => {
-                    if (e.target.value.length === 1 && index < otpInputs.length - 1) {
-                        otpInputs[index + 1].focus();
-                    }
-                });
-
-                input.addEventListener("keydown", (e) => {
-                    if (e.key === "Backspace" && !e.target.value && index > 0) {
-                        otpInputs[index - 1].focus();
-                    }
-                });
-            });
-
-            // 3. Toggle Lihat Password
-            document.querySelector(".btn-toggle-pass").addEventListener("click", function() {
-                const passInput = document.getElementById("new-password");
-                const icon = this.querySelector("i");
-                if (passInput.type === "password") {
-                    passInput.type = "text";
-                    icon.classList.replace("fa-eye", "fa-eye-slash");
-                } else {
-                    passInput.type = "password";
-                    icon.classList.replace("fa-eye-slash", "fa-eye");
-                }
-            });
-
-            // 4. Submit Reset Form Akhir
-            formSubmit.addEventListener("submit", function(e) {
-                e.preventDefault();
-                alert("Password berhasil diperbarui!");
-                // Reset Form & Tutup Modal
-                location.reload();
-            });
         });
     </script>
 </body>

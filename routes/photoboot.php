@@ -14,6 +14,7 @@ Route::post('/photobooth/setup/{id}/frame', [PhotoboothController::class, 'store
 
 // Route Photobooth Client (Akses per Organisasi via Kode)
 Route::get('/photobooth/{org_code}', [PhotoboothController::class, 'clientView'])->name('photobooth.client');
+Route::get('/photobooth_v2/{org_code}', [PhotoboothController::class, 'clientView_v2'])->name('photobooth.client_v2');
 Route::get('photobooth/{org_code}/results', [PhotoboothController::class, 'showResults'])->name('photobooth.results');
 Route::get('photobooth/{org_code}/results-json', [PhotoboothController::class, 'getResultsJson'])->name('photobooth.results.json');
 Route::get('/setup-photo', [PhotoboothController::class, 'index'])->name('photobooth.index');

@@ -661,9 +661,13 @@ Route::prefix('hrm/')->group(function (): void {
     Route::post('data-kehadiran/absensi/search', [HrmController::class, 'data_kehadiran_search'])->name('data_kehadiran_search');
 
     Route::get('master-data/data-pegawai/data', [HrmController::class, 'master_data_pegawai_data'])->name('master_data_pegawai_data');
+    Route::post('master-data/data-pegawai/create-login', [HrmController::class, 'master_data_pegawai_create_login'])->name('master_data_pegawai_create_login');
+    Route::post('master-data/data-pegawai/save-login', [HrmController::class, 'master_data_pegawai_save_login'])->name('master_data_pegawai_save_login');
+    Route::post('master-data/data-pegawai/reset-password', [HrmController::class, 'master_data_pegawai_reset_password'])->name('master_data_pegawai_reset_password');
     Route::post('master-data/data-pegawai/add', [HrmController::class, 'master_data_pegawai_add'])->name('master_data_pegawai_add');
     Route::post('master-data/data-pegawai/save', [HrmController::class, 'master_data_pegawai_save'])->name('master_data_pegawai_save');
     Route::post('master-data/data-pegawai/update', [HrmController::class, 'master_data_pegawai_update'])->name('master_data_pegawai_update');
+    Route::post('master-data/data-pegawai/update-store', [HrmController::class, 'master_data_pegawai_update_store'])->name('master_data_pegawai_update_store');
     Route::post('master-data/data-pegawai/detail', [HrmController::class, 'master_data_pegawai_detail'])->name('master_data_pegawai_detail');
     Route::post('master-data/data-pegawai/upload_profile', [HrmController::class, 'master_data_pegawai_upload_profile'])->name('master_data_pegawai_upload_profile');
 
