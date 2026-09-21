@@ -128,7 +128,7 @@
             max-width: 1100px;
             height: 640px;
             margin: 1.5rem;
-            background: linear-gradient(135deg, #1e3a8a 0%, #031e69 60%, #085276 100%);
+            background: linear-gradient(135deg, #1e3a8a 0%, #122761 60%, #0284c7 100%);
             backdrop-filter: blur(25px);
             border-radius: 2.5rem;
             box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.4);
@@ -176,7 +176,7 @@
         .form-card-box {
             background: transparent;
             border-radius: 1rem;
-            padding: 0.5rem 0;
+            padding: 0.2rem 0;
             width: 100%;
             margin: 0;
         }
@@ -229,7 +229,7 @@
         .form-control {
             font-family: 'Plus Jakarta Sans', sans-serif;
             border: none;
-            padding: 0.7rem 0.75rem;
+            padding: 0.6rem 0.75rem;
             font-size: 0.85rem;
             background-color: transparent !important;
             box-shadow: none !important;
@@ -250,7 +250,7 @@
             background: #ffffff !important;
             border: none;
             border-radius: 50rem !important;
-            padding: 0.75rem;
+            padding: 0.65rem;
             font-weight: 700;
             font-size: 0.9rem;
             color: #1e3a8a !important;
@@ -271,8 +271,8 @@
             justify-content: center;
             gap: 6px;
             width: 100%;
-            margin-top: 0.75rem;
-            padding: 0.6rem;
+            margin-top: 0.5rem;
+            padding: 0.5rem;
             font-size: 0.78rem;
             font-weight: 600;
             color: #ffffff;
@@ -428,16 +428,20 @@
             display: none;
         }
 
-        /* === MOBILE STYLING (Smooth Dark Ocean Gradient) === */
+        /* === MOBILE STYLING (Fixed Full Screen, No Scroll) === */
         @media (max-width: 992px) {
             body {
                 background: linear-gradient(135deg, #0d1b2a 0%, #1b263b 50%, #1d4ed8 100%) !important;
                 height: 100vh;
+                width: 100vw;
                 display: flex;
                 flex-direction: column;
                 align-items: stretch;
                 justify-content: flex-start;
-                overflow-y: auto;
+                overflow: hidden !important;
+                /* Mencegah scroll sama sekali */
+                position: fixed;
+                inset: 0;
                 padding: 0;
             }
 
@@ -454,7 +458,7 @@
                 flex-direction: column !important;
                 justify-content: flex-start !important;
                 border: none !important;
-                overflow-y: auto !important;
+                overflow: hidden !important;
             }
 
             .login-banner-side {
@@ -464,14 +468,16 @@
             .mobile-top-banner {
                 display: block;
                 width: 100%;
-                height: 230px;
+                height: 160px;
+                /* Diperkecil sedikit agar pas tanpa scroll */
                 background-image: url('https://images.unsplash.com/photo-1522071820081-009f0129c71c?auto=format&fit=crop&w=800&q=80');
                 background-size: cover;
                 background-position: center;
                 position: relative;
-                border-bottom-left-radius: 45px;
-                border-bottom-right-radius: 45px;
+                border-bottom-left-radius: 35px;
+                border-bottom-right-radius: 35px;
                 overflow: hidden;
+                flex-shrink: 0;
             }
 
             .mobile-top-banner::after {
@@ -485,10 +491,14 @@
                 flex: 1 !important;
                 width: 100%;
                 background: transparent !important;
-                padding: 1.5rem 2rem 2rem 2rem !important;
+                padding: 1.25rem 1.75rem 1.5rem 1.75rem !important;
                 box-shadow: none !important;
                 margin-top: 0 !important;
                 border-radius: 0 !important;
+                overflow: hidden !important;
+                display: flex;
+                flex-direction: column;
+                justify-content: space-between;
             }
 
             .login-form-side>div:first-child,
@@ -502,17 +512,18 @@
                 display: flex;
                 justify-content: space-between;
                 align-items: center;
-                margin-bottom: 1.5rem;
+                margin-bottom: 1rem;
                 padding: 0 0.5rem;
+                flex-shrink: 0;
             }
 
             .auth-tab {
-                font-size: 1.25rem;
+                font-size: 1.15rem;
                 font-weight: 700;
                 color: rgba(255, 255, 255, 0.6);
                 text-decoration: none;
                 position: relative;
-                padding-bottom: 4px;
+                padding-bottom: 2px;
                 transition: color 0.2s;
             }
 
@@ -525,7 +536,7 @@
                 position: absolute;
                 bottom: 0;
                 left: 0;
-                width: 35px;
+                width: 30px;
                 height: 3px;
                 background-color: #ffffff;
                 border-radius: 2px;
@@ -565,7 +576,7 @@
             <!-- Bagian Atas Desktop: Logo & Sambutan -->
             <div>
                 <div class="mb-3">
-                    <span class="brand-badge-pill">Innoventra Solusi Digital</span>
+                    <span class="brand-badge-pill">Innoventra</span>
                 </div>
                 <div class="brand-title">Welcome Back</div>
                 <div class="subtitle">Sila masukkan akses akaun anda untuk meneruskan</div>
@@ -578,9 +589,9 @@
             </div>
 
             <!-- BAGIAN CARD FORM -->
-            <div class="form-card-box my-2">
+            <div class="form-card-box my-1">
                 <form id="loginForm">
-                    <div class="mb-3 text-start">
+                    <div class="mb-2 text-start">
                         <label for="username" class="form-label d-none d-lg-block">Username</label>
                         <div class="input-group">
                             <span class="input-group-text"><i class="bi bi-envelope-fill"></i></span>
@@ -588,7 +599,7 @@
                         </div>
                     </div>
 
-                    <div class="mb-3 text-start">
+                    <div class="mb-2 text-start">
                         <label for="password" class="form-label d-none d-lg-block">Kata Sandi</label>
                         <div class="input-group">
                             <span class="input-group-text"><i class="bi bi-lock-fill"></i></span>
@@ -596,7 +607,7 @@
                         </div>
                     </div>
 
-                    <div class="d-flex justify-content-between align-items-center mb-4 px-1">
+                    <div class="d-flex justify-content-between align-items-center mb-3 px-1">
                         <div class="form-check">
                             <input type="checkbox" class="form-check-input" id="rememberMe">
                             <label for="rememberMe" class="form-check-label text-white text-lg-white small fw-medium" style="font-size: 0.78rem;">Ingat saya</label>
@@ -616,9 +627,9 @@
             </div>
 
             <!-- Bagian Bawah: Footer -->
-            <div class="text-center mt-3">
+            <div class="text-center mt-2">
                 <span id="notifikasi-login" class="d-none"></span>
-                <span class="text-white opacity-75" style="font-size: 0.72rem;">&copy; 2026 Innoventra by Transforma &middot; Syarat & Ketentuan</span>
+                <span class="text-white opacity-75" style="font-size: 0.7rem;">&copy; 2026 Innoventra by Transforma &middot; Syarat & Ketentuan</span>
             </div>
         </div>
 
