@@ -410,7 +410,7 @@
             display: none;
         }
 
-        /* === MOBILE STYLING (Fixed Bottom Footer & No Scroll Layout) === */
+        /* === MOBILE STYLING (Posisi Button Pas Antara Tengah & Bawah Tanpa Scroll) === */
         @media (max-width: 992px) {
             body {
                 background: linear-gradient(135deg, #09111e 0%, #0f1c3f 50%, #1e3a8a 100%) !important;
@@ -447,7 +447,7 @@
 
             .m-top-banner {
                 width: 100%;
-                height: 160px;
+                height: 140px;
                 background: linear-gradient(135deg, #091736 0%, #15326e 100%);
                 position: relative;
                 border-bottom-left-radius: 25px;
@@ -481,24 +481,27 @@
 
             .m-content-body {
                 flex: 1;
-                padding: 1rem 1.5rem 5.5rem 1.5rem;
-                /* Padding bawah dilebihkan agar tidak tertutup footer fixed */
+                padding: 1rem 1.5rem;
                 display: flex;
                 flex-direction: column;
                 justify-content: center;
+                /* Konten form berada di area tengah layar */
                 overflow: hidden;
             }
 
-            /* Footer Fixed Absolut di Bawah untuk Mobile (Tombol & Copyright menyatu tanpa scroll) */
-            .mobile-footer-fixed {
-                position: absolute;
-                bottom: 0;
-                left: 0;
+            /* Area Tombol & Footer diatur agar berada proporsional di antara tengah dan bawah */
+            .mobile-action-area {
                 width: 100%;
-                padding: 1rem 1.55rem 1.25rem 1.55rem;
-                background: linear-gradient(to top, #09111e 80%, rgba(9, 17, 30, 0));
-                z-index: 10;
-                text-align: center;
+                padding: 0.5rem 1.5rem 2rem 1.5rem;
+                display: flex;
+                flex-direction: column;
+                justify-content: flex-end;
+                align-items: center;
+                flex-shrink: 0;
+                margin-top: auto;
+                /* Mendorong area aksi ke posisi bawah secara fleksibel */
+                margin-bottom: 1.5rem;
+                /* Jarak pas agar tidak terlalu mentok ke bawah layar/navigasi HP */
             }
         }
     </style>
@@ -603,24 +606,24 @@
 
 
     <!-- ========================================================== -->
-    <!-- TAMPILAN MOBILE (Multi-Screen dengan Fixed Bottom Footer) -->
+    <!-- TAMPILAN MOBILE (Multi-Screen dengan Posisi Tombol Tengah-Bawah) -->
     <!-- ========================================================== -->
 
     <!-- SCREEN 1: WELCOME SCREEN (Mobile) -->
     <div id="mobileWelcomeScreen" class="mobile-screen active-screen d-lg-none">
-        <div class="m-top-banner" style="height: 220px;">
+        <div class="m-top-banner" style="height: 180px;">
             <div>
                 <span class="brand-badge-pill mb-2"><i class="bi bi-hexagon-fill text-info"></i> Innoventra</span>
-                <h1 class="text-white fw-bold mb-1" style="font-size: 2rem;">Welcome :)</h1>
-                <p class="text-info small mb-0 fw-semibold" style="font-size: 0.75rem;">Convert Your Smart Idea to The Great Business</p>
+                <h1 class="text-white fw-bold mb-1" style="font-size: 1.8rem;">Welcome :)</h1>
+                <p class="text-info small mb-0 fw-semibold" style="font-size: 0.72rem;">Convert Your Smart Idea to The Great Business</p>
             </div>
         </div>
         <div class="m-content-body text-center">
             <p class="text-white-50 small px-2 mb-0" style="font-size: 0.8rem;">Join over 50 million members from around the globe to manage your digital enterprise.</p>
         </div>
-        <!-- Footer Fixed Mobile (Welcome) -->
-        <div class="mobile-footer-fixed d-lg-none">
-            <div class="w-100 mb-2">
+        <!-- Action Area (Antara Tengah & Bawah) -->
+        <div class="mobile-action-area d-lg-none">
+            <div class="w-100 mb-3">
                 <button type="button" id="btnGoLogin" class="btn btn-primary w-100 mb-2 py-2">
                     LOGIN
                 </button>
@@ -628,17 +631,17 @@
                     SIGN UP
                 </button>
             </div>
-            <span class="text-white opacity-75" style="font-size: 0.68rem;">&copy; 2026 Innoventra by Transforma</span>
+            <span class="text-white opacity-75 text-center" style="font-size: 0.68rem;">&copy; 2026 Innoventra by Transforma</span>
         </div>
     </div>
 
     <!-- SCREEN 2: LOGIN SCREEN (Mobile) -->
     <div id="mobileLoginScreen" class="mobile-screen d-lg-none">
-        <div class="m-top-banner" style="height: 130px;">
+        <div class="m-top-banner" style="height: 120px;">
             <a href="javascript:void(0)" class="m-back-btn btnBackToWelcome"><i class="bi bi-chevron-left"></i></a>
             <div>
                 <span class="brand-badge-pill mb-1" style="font-size: 0.7rem;"><i class="bi bi-hexagon-fill text-info"></i> Innoventra</span>
-                <h5 class="text-white fw-bold mb-0" style="font-size: 1rem;">Sign in to continue</h5>
+                <h5 class="text-white fw-bold mb-0" style="font-size: 0.95rem;">Sign in to continue</h5>
             </div>
         </div>
         <div class="m-content-body">
@@ -659,7 +662,7 @@
                     </div>
                 </div>
 
-                <div class="d-flex justify-content-between align-items-center mb-2 px-1">
+                <div class="d-flex justify-content-between align-items-center mb-1 px-1">
                     <div class="form-check">
                         <input type="checkbox" class="form-check-input" id="rememberMeMob">
                         <label for="rememberMeMob" class="form-check-label text-white small" style="font-size: 0.72rem;">Remember me</label>
@@ -668,25 +671,25 @@
                 </div>
             </form>
         </div>
-        <!-- Footer Fixed Mobile (Login) -->
-        <div class="mobile-footer-fixed d-lg-none">
+        <!-- Action Area (Antara Tengah & Bawah) -->
+        <div class="mobile-action-area d-lg-none">
             <button type="submit" form="loginFormMobile" class="btn btn-primary w-100 mb-2 py-2">
                 Login
             </button>
             <div class="text-center mb-2">
                 <span class="text-white-50 small" style="font-size: 0.72rem;">Don't have an account? <a href="javascript:void(0)" id="linkSwitchToRegister" class="text-white fw-bold text-decoration-underline">Sign up</a></span>
             </div>
-            <span class="text-white opacity-75" style="font-size: 0.68rem;">&copy; 2026 Innoventra by Transforma</span>
+            <span class="text-white opacity-75 text-center" style="font-size: 0.68rem;">&copy; 2026 Innoventra by Transforma</span>
         </div>
     </div>
 
     <!-- SCREEN 3: REGISTER SCREEN (Mobile) -->
     <div id="mobileRegisterScreen" class="mobile-screen d-lg-none">
-        <div class="m-top-banner" style="height: 120px;">
+        <div class="m-top-banner" style="height: 110px;">
             <a href="javascript:void(0)" class="m-back-btn btnBackToWelcome"><i class="bi bi-chevron-left"></i></a>
             <div>
                 <span class="brand-badge-pill mb-1" style="font-size: 0.7rem;"><i class="bi bi-hexagon-fill text-info"></i> Innoventra</span>
-                <h5 class="text-white fw-bold mb-0" style="font-size: 1rem;">Sign up to continue</h5>
+                <h5 class="text-white fw-bold mb-0" style="font-size: 0.95rem;">Sign up to continue</h5>
             </div>
         </div>
         <div class="m-content-body">
@@ -723,15 +726,15 @@
                 </div>
             </form>
         </div>
-        <!-- Footer Fixed Mobile (Register) -->
-        <div class="mobile-footer-fixed d-lg-none">
+        <!-- Action Area (Antara Tengah & Bawah) -->
+        <div class="mobile-action-area d-lg-none">
             <button type="submit" form="registerFormMobile" class="btn btn-primary w-100 mb-2 py-2">
                 Sign Up
             </button>
             <div class="text-center mb-2">
                 <span class="text-white-50 small" style="font-size: 0.72rem;">Already a member? <a href="javascript:void(0)" id="linkSwitchToLogin" class="text-white fw-bold text-decoration-underline">Login</a></span>
             </div>
-            <span class="text-white opacity-75" style="font-size: 0.68rem;">&copy; 2026 Innoventra by Transforma</span>
+            <span class="text-white opacity-75 text-center" style="font-size: 0.68rem;">&copy; 2026 Innoventra by Transforma</span>
         </div>
     </div>
 
