@@ -124,8 +124,8 @@
             position: relative;
             z-index: 2;
             width: 100%;
-            max-width: 1050px;
-            height: 600px;
+            max-width: 1150px;
+            height: 650px;
             margin: 1.5rem;
             background: linear-gradient(135deg, #0b1c3d 0%, #0d2356 100%);
             backdrop-filter: blur(25px);
@@ -149,17 +149,26 @@
             }
         }
 
-        /* === SISI KIRI: Panel Ilustrasi & "Welcome :)" === */
+        /* === SISI KIRI: Panel Profil & Detail Perusahaan (Scrollable) === */
         .login-banner-side {
-            flex: 1.1;
+            flex: 1.25;
             background: linear-gradient(135deg, #091736 0%, #15326e 100%);
             position: relative;
             display: flex;
             flex-direction: column;
             justify-content: space-between;
-            padding: 3rem;
-            overflow: hidden;
+            padding: 2.5rem;
+            overflow-y: auto;
             border-right: 1px solid rgba(255, 255, 255, 0.1);
+        }
+
+        .login-banner-side::-webkit-scrollbar {
+            width: 5px;
+        }
+
+        .login-banner-side::-webkit-scrollbar-thumb {
+            background: rgba(255, 255, 255, 0.2);
+            border-radius: 10px;
         }
 
         .login-banner-side::before {
@@ -167,29 +176,31 @@
             position: absolute;
             inset: 0;
             background: url('https://images.unsplash.com/photo-1618005182384-a83a8bd57fbe?auto=format&fit=crop&w=1000&q=80') center/cover no-repeat;
-            opacity: 0.15;
-        }
-
-        .banner-content-overlay {
-            position: relative;
-            z-index: 2;
-            color: #fff;
-            margin: auto 0;
+            opacity: 0.12;
+            pointer-events: none;
         }
 
         .welcome-big-text {
-            font-size: 3.2rem;
+            font-size: 2.6rem;
             font-weight: 800;
             letter-spacing: -1px;
             color: #ffffff;
-            margin-bottom: 0.5rem;
+            margin-bottom: 0.2rem;
             text-shadow: 0 4px 12px rgba(0, 0, 0, 0.3);
+        }
+
+        .company-info-card {
+            background: rgba(255, 255, 255, 0.05);
+            border: 1px solid rgba(255, 255, 255, 0.12);
+            border-radius: 1rem;
+            padding: 1rem 1.2rem;
+            backdrop-filter: blur(5px);
         }
 
         /* === SISI KANAN: Form Input & Branding === */
         .login-form-side {
-            flex: 1.1;
-            padding: 2.5rem 3rem;
+            flex: 1;
+            padding: 2.5rem 2.8rem;
             display: flex;
             flex-direction: column;
             justify-content: space-between;
@@ -202,16 +213,16 @@
             align-items: center;
             gap: 6px;
             font-weight: 700;
-            font-size: 0.85rem;
+            font-size: 0.8rem;
             border: 1px solid rgba(255, 255, 255, 0.2);
-            padding: 0.3rem 1rem;
+            padding: 0.25rem 0.9rem;
             border-radius: 50rem;
             color: #ffffff;
             background: rgba(255, 255, 255, 0.08);
         }
 
         .brand-title {
-            font-size: 1.5rem;
+            font-size: 1.4rem;
             font-weight: 800;
             color: #ffffff;
             letter-spacing: -0.5px;
@@ -220,15 +231,15 @@
 
         .subtitle {
             color: rgba(255, 255, 255, 0.7);
-            font-size: 0.8rem;
+            font-size: 0.78rem;
             font-weight: 500;
         }
 
         .form-label {
             font-weight: 600;
             color: #ffffff;
-            font-size: 0.78rem;
-            margin-bottom: 0.25rem;
+            font-size: 0.76rem;
+            margin-bottom: 0.2rem;
         }
 
         .input-group {
@@ -248,16 +259,16 @@
             background-color: transparent;
             border: none;
             color: #666;
-            padding-left: 1rem;
-            padding-right: 0.5rem;
-            font-size: 0.9rem;
+            padding-left: 0.9rem;
+            padding-right: 0.4rem;
+            font-size: 0.85rem;
         }
 
         .form-control {
             font-family: 'Plus Jakarta Sans', sans-serif;
             border: none;
-            padding: 0.55rem 0.75rem;
-            font-size: 0.9rem;
+            padding: 0.5rem 0.7rem;
+            font-size: 0.86rem;
             background-color: transparent !important;
             box-shadow: none !important;
             color: #222 !important;
@@ -271,23 +282,59 @@
             resize: none;
         }
 
+        /* === EFEK ANIMASI KLIK TOMBOL YANG KEREN (RIPPLE & SMOOTH TRANSITION) === */
+        .btn-primary,
+        .btn-dark,
+        .contact-admin-link,
+        .m-back-btn {
+            position: relative;
+            overflow: hidden;
+            transition: all 0.25s cubic-bezier(0.4, 0, 0.2, 1) !important;
+            cursor: pointer;
+        }
+
+        /* Efek Active / Saat Diklik (Mengecil & Mengkilap) */
+        .btn-primary:active,
+        .btn-dark:active,
+        .contact-admin-link:active,
+        .m-back-btn:active {
+            transform: scale(0.95) !important;
+            box-shadow: 0 2px 8px rgba(37, 99, 235, 0.3) !important;
+        }
+
+        /* Efek Ripple Dinamis saat Tombol Diklik via JS */
+        .ripple-effect {
+            position: absolute;
+            border-radius: 50%;
+            background: rgba(255, 255, 255, 0.6);
+            transform: scale(0);
+            animation: ripple-animation 0.6s linear;
+            pointer-events: none;
+        }
+
+        @keyframes ripple-animation {
+            to {
+                transform: scale(4);
+                opacity: 0;
+            }
+        }
+
         .btn-primary {
             font-family: 'Plus Jakarta Sans', sans-serif;
             background: #2563eb !important;
             border: none;
             border-radius: 50rem !important;
-            padding: 0.6rem;
+            padding: 0.55rem;
             font-weight: 700;
-            font-size: 0.88rem;
+            font-size: 0.85rem;
             color: #ffffff !important;
-            transition: all 0.2s ease;
             box-shadow: 0 4px 15px rgba(37, 99, 235, 0.4);
         }
 
         .btn-primary:hover {
             background: #1d4ed8 !important;
-            transform: translateY(-1px);
-            box-shadow: 0 6px 18px rgba(37, 99, 235, 0.6);
+            transform: translateY(-2px);
+            box-shadow: 0 6px 20px rgba(37, 99, 235, 0.6);
         }
 
         .contact-admin-link {
@@ -296,22 +343,22 @@
             justify-content: center;
             gap: 6px;
             width: 100%;
-            margin-top: 0.4rem;
-            padding: 0.45rem;
-            font-size: 0.75rem;
+            margin-top: 0.3rem;
+            padding: 0.4rem;
+            font-size: 0.72rem;
             font-weight: 600;
             color: #ffffff;
             background: rgba(255, 255, 255, 0.08);
             border: 1px dashed rgba(255, 255, 255, 0.3);
             border-radius: 0.75rem;
             text-decoration: none;
-            transition: all 0.2s ease;
         }
 
         .contact-admin-link:hover {
             background: #ffffff;
             color: #1e3a8a;
             border-color: #ffffff;
+            transform: translateY(-1px);
         }
 
         .otp-input-container {
@@ -330,6 +377,7 @@
             border-radius: 0.5rem;
             border: 2px solid #cbd5e1;
             background-color: #f8fafc;
+            transition: all 0.2s ease;
         }
 
         .otp-input:focus {
@@ -337,6 +385,7 @@
             box-shadow: 0 0 0 0.2rem rgba(37, 99, 235, 0.25);
             background-color: #fff;
             outline: none;
+            transform: scale(1.05);
         }
 
         /* === LOADING OVERLAY === */
@@ -405,12 +454,11 @@
             margin-bottom: 0.2rem;
         }
 
-        /* Elemen khusus mobile */
         .mobile-screen {
             display: none;
         }
 
-        /* === MOBILE STYLING (Header Bergelombang & Tombol di Tengah-Bawah) === */
+        /* === MOBILE STYLING === */
         @media (max-width: 992px) {
             body {
                 background: linear-gradient(135deg, #09111e 0%, #0f1c3f 50%, #1e3a8a 100%) !important;
@@ -445,10 +493,9 @@
                 display: none !important;
             }
 
-            /* Header Bergelombang (Wave Header) */
             .m-top-banner {
                 width: 100%;
-                height: 170px;
+                height: 155px;
                 background: linear-gradient(135deg, #091736 0%, #15326e 100%);
                 position: relative;
                 flex-shrink: 0;
@@ -456,7 +503,7 @@
                 align-items: center;
                 justify-content: center;
                 text-align: center;
-                padding: 1rem 1rem 2rem 1rem;
+                padding: 1rem;
             }
 
             .m-wave-svg {
@@ -464,7 +511,7 @@
                 bottom: -1px;
                 left: 0;
                 width: 100%;
-                height: 35px;
+                height: 30px;
                 pointer-events: none;
             }
 
@@ -488,25 +535,18 @@
 
             .m-content-body {
                 flex: 1;
-                padding: 1rem 1.5rem;
-                display: flex;
-                flex-direction: column;
-                justify-content: center;
-                /* Konten di area tengah layar */
-                overflow: hidden;
+                padding: 1rem 1.2rem;
+                overflow-y: auto;
             }
 
-            /* Area Tombol & Footer diatur agar berada tepat di antara tengah dan bawah */
             .mobile-action-area {
                 width: 100%;
-                padding: 0.5rem 1.5rem 2rem 1.5rem;
+                padding: 0.5rem 1.2rem 1.5rem 1.2rem;
                 display: flex;
                 flex-direction: column;
                 justify-content: flex-end;
                 align-items: center;
                 flex-shrink: 0;
-                margin-top: auto;
-                margin-bottom: 1.5rem;
             }
         }
     </style>
@@ -533,30 +573,49 @@
     </div>
 
     <!-- ========================================================== -->
-    <!-- TAMPILAN DESKTOP (Split Screen) -->
+    <!-- TAMPILAN DESKTOP (Split Screen dengan Profil Perusahaan Detail) -->
     <!-- ========================================================== -->
     <div class="login-wrapper">
-        <!-- SISI KIRI: Panel Ilustrasi & Welcome -->
+        <!-- SISI KIRI: Panel Profil & Detail Perusahaan -->
         <div class="login-banner-side d-none d-md-flex">
             <div>
-                <span class="brand-badge-pill">
-                    <i class="bi bi-hexagon-fill text-info"></i> Innoventra
+                <span class="brand-badge-pill mb-3">
+                    <i class="bi bi-hexagon-fill text-info"></i> PT Innoventra Solusi Digital
                 </span>
-            </div>
-            <div class="banner-content-overlay">
                 <div class="welcome-big-text">Welcome :)</div>
-                <h5 class="fw-bold mb-2" style="font-size: 1.1rem; color: #38bdf8;">PT Innoventra Solusi Digital</h5>
-                <p class="text-white-50 mb-0" style="font-size: 0.8rem; line-height: 1.4;">Penyedia layanan pengembangan perangkat lunak terkemuka, spesialis web application development, REST API design, dan integrasi sistem enterprise.</p>
+                <p class="text-white-50 mb-3" style="font-size: 0.78rem; line-height: 1.4;">
+                    Perusahaan teknologi informasi dan komunikasi (TIK) inovatif yang berfokus pada penyediaan solusi digital terintegrasi untuk akselerasi transformasi digital bisnis dan kesehatan.
+                </p>
             </div>
-            <div>
-                <span class="text-white-50" style="font-size: 0.7rem;">&copy; 2026 Innoventra by Transforma &middot; All Rights Reserved</span>
+
+            <div class="d-flex flex-column gap-2 my-2">
+                <div class="company-info-card">
+                    <div class="text-info fw-bold mb-1" style="font-size: 0.78rem;"><i class="bi bi-eye-fill me-1"></i> Visi Kami</div>
+                    <p class="text-white-50 mb-0" style="font-size: 0.72rem; line-height: 1.35;">
+                        Menjadi mitra solusi digital dan integrasi teknologi terdepan di Indonesia yang dipercaya dalam menghadirkan inovasi terapan yang kreatif, adaptif, dan berdampak nyata bagi pertumbuhan ekosistem bisnis digital dan kesehatan.
+                    </p>
+                </div>
+
+                <div class="company-info-card">
+                    <div class="text-info fw-bold mb-1" style="font-size: 0.78rem;"><i class="bi bi-rocket-takeoff-fill me-1"></i> Misi Kami</div>
+                    <ul class="text-white-50 ps-3 mb-0" style="font-size: 0.71rem; line-height: 1.3;">
+                        <li>Mengembangkan website & aplikasi enterprise berkualitas tinggi.</li>
+                        <li>Menyediakan layanan integrasi sistem medis (SIMRS/LIS/PACS) & alat kesehatan terstandar.</li>
+                        <li>Memberikan konsultasi teknologi digital yang solutif & adaptif.</li>
+                        <li>Menerapkan standar keamanan data & enkripsi medis terbaik.</li>
+                    </ul>
+                </div>
+            </div>
+
+            <div class="mt-2">
+                <span class="text-white-50" style="font-size: 0.68rem;">&copy; 2026 Innoventra by Transforma &middot; All Rights Reserved</span>
             </div>
         </div>
 
         <!-- SISI KANAN: Form Input & Login -->
         <div class="login-form-side">
             <div>
-                <div class="d-flex justify-content-between align-items-center mb-2">
+                <div class="d-flex justify-content-between align-items-center mb-1">
                     <span class="brand-badge-pill d-md-none">Innoventra</span>
                     <span class="subtitle">Secure Enterprise Portal</span>
                 </div>
@@ -584,16 +643,16 @@
                     <div class="d-flex justify-content-between align-items-center mb-3 px-1">
                         <div class="form-check">
                             <input type="checkbox" class="form-check-input" id="rememberMeDesk">
-                            <label for="rememberMeDesk" class="form-check-label text-white small fw-medium" style="font-size: 0.75rem;">Remember me</label>
+                            <label for="rememberMeDesk" class="form-check-label text-white small fw-medium" style="font-size: 0.73rem;">Remember me</label>
                         </div>
-                        <a href="#" class="text-decoration-none text-white fw-semibold" style="font-size: 0.75rem;" data-bs-toggle="modal" data-bs-target="#modalLupaPassword">Forgot password?</a>
+                        <a href="#" class="text-decoration-none text-white fw-semibold" style="font-size: 0.73rem;" data-bs-toggle="modal" data-bs-target="#modalLupaPassword">Forgot password?</a>
                     </div>
 
                     <button type="submit" id="btnSubmitDesk" class="btn btn-primary w-100 mb-2">
                         Login
                     </button>
 
-                    <a href="javascript:void(0)" class="contact-admin-link mt-2" data-bs-toggle="modal" data-bs-target="#modalHubungiAdmin">
+                    <a href="javascript:void(0)" class="contact-admin-link mt-1" data-bs-toggle="modal" data-bs-target="#modalHubungiAdmin">
                         <i class="bi bi-headset text-info"></i> Hubungi Admin Sistem
                     </a>
                 </form>
@@ -607,35 +666,54 @@
 
 
     <!-- ========================================================== -->
-    <!-- TAMPILAN MOBILE (Tanpa Sign Up, Header Gelombang, Info Innoventra) -->
+    <!-- TAMPILAN MOBILE (Dilengkapi Info Profil Perusahaan Lengkap) -->
     <!-- ========================================================== -->
 
     <!-- SCREEN 1: WELCOME SCREEN (Mobile) -->
     <div id="mobileWelcomeScreen" class="mobile-screen active-screen d-lg-none">
         <div class="m-top-banner">
             <div>
-                <span class="brand-badge-pill mb-1" style="font-size: 0.7rem;"><i class="bi bi-hexagon-fill text-info"></i> Innoventra Digital Solusi</span>
-                <h1 class="text-white fw-bold mb-0" style="font-size: 1.6rem;">Welcome :)</h1>
+                <span class="brand-badge-pill mb-1" style="font-size: 0.68rem;"><i class="bi bi-hexagon-fill text-info"></i> Innoventra Digital Solusi</span>
+                <h1 class="text-white fw-bold mb-0" style="font-size: 1.5rem;">Welcome :)</h1>
             </div>
             <!-- SVG Wave Header -->
             <svg class="m-wave-svg" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1440 120" preserveAspectRatio="none">
                 <path fill="#09111e" fill-opacity="1" d="M0,32L48,42.7C96,53,192,75,288,80C384,85,480,75,576,58.7C672,43,768,21,864,21.3C960,21,1056,43,1152,53.3C1248,64,1344,64,1392,64L1440,64L1440,120L1392,120C1344,120,1248,120,1152,120C1056,120,960,120,864,120C768,120,672,120,576,120C480,120,384,120,288,120C192,120,96,120,48,120L0,120Z"></path>
             </svg>
         </div>
-        <div class="m-content-body text-center">
+        <div class="m-content-body text-start">
             <div class="p-3 rounded-4 mb-2" style="background: rgba(255, 255, 255, 0.05); border: 1px solid rgba(255, 255, 255, 0.1);">
-                <h6 class="text-info fw-bold mb-1" style="font-size: 0.85rem;">PT Innoventra Solusi Digital</h6>
-                <p class="text-white-50 mb-0" style="font-size: 0.75rem; line-height: 1.4;">Penyedia solusi digital terintegrasi: Web Application, REST API, Database System, dan Infrastruktur Teknologi Enterprise.</p>
+                <h6 class="text-info fw-bold mb-1" style="font-size: 0.8rem;"><i class="bi bi-info-circle-fill me-1"></i> Tentang Kami</h6>
+                <p class="text-white-50 mb-0" style="font-size: 0.72rem; line-height: 1.4;">
+                    PT INNOVENTRA SOLUSI DIGITAL adalah perusahaan TIK inovatif yang berfokus pada penyedia solusi digital terintegrasi untuk UMKM, startup, korporasi, hingga fasilitas pelayanan kesehatan (Faskes, Rumah Sakit, dan Klinik).
+                </p>
+            </div>
+
+            <div class="p-3 rounded-4 mb-2" style="background: rgba(255, 255, 255, 0.05); border: 1px solid rgba(255, 255, 255, 0.1);">
+                <h6 class="text-info fw-bold mb-1" style="font-size: 0.8rem;"><i class="bi bi-eye-fill me-1"></i> Visi Kami</h6>
+                <p class="text-white-50 mb-0" style="font-size: 0.72rem; line-height: 1.4;">
+                    Menjadi mitra solusi digital dan integrasi teknologi terdepan di Indonesia yang dipercaya dalam menghadirkan inovasi terapan yang kreatif, adaptif, dan berdampak nyata.
+                </p>
+            </div>
+
+            <div class="p-3 rounded-4 mb-2" style="background: rgba(255, 255, 255, 0.05); border: 1px solid rgba(255, 255, 255, 0.1);">
+                <h6 class="text-info fw-bold mb-1" style="font-size: 0.8rem;"><i class="bi bi-rocket-takeoff-fill me-1"></i> Misi Kami</h6>
+                <ul class="text-white-50 ps-3 mb-0" style="font-size: 0.71rem; line-height: 1.35;">
+                    <li>Mengembangkan website & aplikasi enterprise berkualitas tinggi.</li>
+                    <li>Menyediakan layanan integrasi sistem medis (SIMRS/LIS/PACS) & alat kesehatan.</li>
+                    <li>Memberikan konsultasi teknologi digital yang solutif & adaptif.</li>
+                    <li>Menerapkan standar keamanan data & enkripsi medis terbaik.</li>
+                </ul>
             </div>
         </div>
-        <!-- Action Area (Antara Tengah & Bawah) -->
+        <!-- Action Area -->
         <div class="mobile-action-area d-lg-none">
-            <div class="w-100 mb-3">
+            <div class="w-100 mb-2">
                 <button type="button" id="btnGoLogin" class="btn btn-primary w-100 py-2">
                     MASUK KE PORTAL
                 </button>
             </div>
-            <span class="text-white opacity-75 text-center" style="font-size: 0.68rem;">&copy; 2026 Innoventra by Transforma</span>
+            <span class="text-white opacity-75 text-center" style="font-size: 0.65rem;">&copy; 2026 Innoventra by Transforma</span>
         </div>
     </div>
 
@@ -644,8 +722,8 @@
         <div class="m-top-banner">
             <a href="javascript:void(0)" class="m-back-btn btnBackToWelcome"><i class="bi bi-chevron-left"></i></a>
             <div>
-                <span class="brand-badge-pill mb-1" style="font-size: 0.7rem;"><i class="bi bi-hexagon-fill text-info"></i> Innoventra Digital Solusi</span>
-                <h5 class="text-white fw-bold mb-0" style="font-size: 0.95rem;">Sign In to Portal</h5>
+                <span class="brand-badge-pill mb-1" style="font-size: 0.68rem;"><i class="bi bi-hexagon-fill text-info"></i> Innoventra Digital Solusi</span>
+                <h5 class="text-white fw-bold mb-0" style="font-size: 0.9rem;">Sign In to Portal</h5>
             </div>
             <!-- SVG Wave Header -->
             <svg class="m-wave-svg" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1440 120" preserveAspectRatio="none">
@@ -679,7 +757,7 @@
                 </div>
             </form>
         </div>
-        <!-- Action Area (Antara Tengah & Bawah) -->
+        <!-- Action Area -->
         <div class="mobile-action-area d-lg-none">
             <button type="submit" id="btnSubmitMob" form="loginFormMobile" class="btn btn-primary w-100 mb-2 py-2">
                 Login
@@ -689,7 +767,7 @@
                     <i class="bi bi-headset text-info"></i> Hubungi Admin Sistem
                 </a>
             </div>
-            <span class="text-white opacity-75 text-center" style="font-size: 0.68rem;">&copy; 2026 Innoventra by Transforma</span>
+            <span class="text-white opacity-75 text-center" style="font-size: 0.65rem;">&copy; 2026 Innoventra by Transforma</span>
         </div>
     </div>
 
@@ -797,6 +875,26 @@
         const statusText = document.getElementById('encryptionStatus');
         const overlaySpinner = document.getElementById('overlaySpinner');
         const overlayTitle = document.getElementById('overlayTitle');
+
+        // === EFEK RIPPLE DINAMIS PADA KLIK TOMBOL ===
+        document.querySelectorAll('button, .contact-admin-link, .m-back-btn').forEach(button => {
+            button.addEventListener('click', function(e) {
+                const rect = this.getBoundingClientRect();
+                const x = e.clientX - rect.left;
+                const y = e.clientY - rect.top;
+
+                const ripple = document.createElement('span');
+                ripple.classList.add('ripple-effect');
+                ripple.style.left = `${x}px`;
+                ripple.style.top = `${y}px`;
+
+                this.appendChild(ripple);
+
+                setTimeout(() => {
+                    ripple.remove();
+                }, 600);
+            });
+        });
 
         // Navigasi antar screen khusus Mobile
         document.getElementById('btnGoLogin').addEventListener('click', () => {
