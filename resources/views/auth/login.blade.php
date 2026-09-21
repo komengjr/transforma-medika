@@ -731,7 +731,7 @@
                 <div class="mb-2 text-start">
                     <label class="form-label" style="font-size: 0.72rem;">Email Account</label>
                     <div class="input-group">
-                        <input type="email" id="reg_email" class="form-control form-control-sm" placeholder="Email address" required>
+                        <input type="text" id="reg_email" class="form-control form-control-sm" placeholder="Email address" required>
                     </div>
                 </div>
 
