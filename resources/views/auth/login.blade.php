@@ -10,8 +10,8 @@
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet">
     <!-- Bootstrap Icons -->
     <link href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.1/font/bootstrap-icons.css" rel="stylesheet">
-    <!-- Google Fonts -->
-    <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&family=Fira+Code:wght@400;500&display=swap" rel="stylesheet">
+    <!-- Google Fonts: Plus Jakarta Sans, Outfit & Fira Code -->
+    <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@400;500;600;700;800&family=Plus+Jakarta+Sans:wght@400;500;600;700;800&family=Fira+Code:wght@400;500&display=swap" rel="stylesheet">
     <!-- SweetAlert2 -->
     <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
 
@@ -384,11 +384,13 @@
             display: none;
         }
 
-        /* === MOBILE STYLING SESUAI REFERENSI GAMBAR (KUNING & KARTU PUTIH) === */
+        /* === MOBILE STYLING (GRADASI WARNA KUNING DINAMIS & ANIMASI KEREN) === */
         @media (max-width: 992px) {
             body {
-                background: #ffcc4d !important;
-                /* Warna latar belakang kuning persis seperti gambar */
+                /* Gradasi warna latar belakang mobile yang dinamis & elegan */
+                background: linear-gradient(135deg, #fce38a 0%, #f38181 100%) !important;
+                background-size: 200% 200%;
+                animation: gradientBG 10s ease infinite;
                 height: 100vh;
                 width: 100vw;
                 display: flex;
@@ -400,9 +402,22 @@
                 padding: 0;
             }
 
+            @keyframes gradientBG {
+                0% {
+                    background-position: 0% 50%;
+                }
+
+                50% {
+                    background-position: 100% 50%;
+                }
+
+                100% {
+                    background-position: 0% 50%;
+                }
+            }
+
             .login-wrapper {
                 display: none !important;
-                /* Sembunyikan desktop wrapper */
             }
 
             .mobile-screen {
@@ -411,7 +426,7 @@
                 width: 100vw;
                 min-height: 100vh;
                 position: relative;
-                background: #ffcc4d;
+                background: transparent;
                 overflow-y: auto;
             }
 
@@ -419,108 +434,139 @@
                 display: none !important;
             }
 
-            /* Bagian Header Teks "Hello / Welcome Back!" */
+            /* Header Teks dengan Font Eksklusif 'Outfit' & Animasi Masuk */
             .m-yellow-header {
                 text-align: center;
-                padding: 2.5rem 1.5rem 1.5rem 1.5rem;
+                padding: 2.2rem 1.5rem 1.2rem 1.5rem;
+                animation: fadeInDownMobile 0.8s cubic-bezier(0.16, 1, 0.3, 1) forwards;
+            }
+
+            @keyframes fadeInDownMobile {
+                0% {
+                    opacity: 0;
+                    transform: translateY(-20px);
+                }
+
+                100% {
+                    opacity: 1;
+                    transform: translateY(0);
+                }
             }
 
             .m-yellow-header h1 {
-                font-size: 2.5rem;
+                font-family: 'Outfit', sans-serif;
+                font-size: 2.75rem;
                 font-weight: 800;
-                color: #111111;
-                margin-bottom: 0.1rem;
-                letter-spacing: -0.5px;
+                color: #1a1a1a;
+                margin-bottom: 0;
+                letter-spacing: -1px;
+                text-shadow: 0 2px 10px rgba(255, 255, 255, 0.4);
             }
 
             .m-yellow-header p {
-                font-size: 1.15rem;
-                font-weight: 600;
-                color: #222222;
+                font-family: 'Outfit', sans-serif;
+                font-size: 1.2rem;
+                font-weight: 700;
+                color: #2c2c2c;
                 margin-bottom: 0;
+                letter-spacing: -0.3px;
             }
 
-            /* Kotak Kartu Putih Melengkung di Bawah */
+            /* Kartu Putih dengan Animasi Slide Up */
             .m-white-card-container {
                 background: #ffffff;
-                border-top-left-radius: 2rem;
-                border-top-right-radius: 2rem;
-                border-bottom-left-radius: 0;
-                border-bottom-right-radius: 0;
-                padding: 2rem 1.75rem 3rem 1.75rem;
-                box-shadow: 0 -10px 25px rgba(0, 0, 0, 0.05);
+                border-top-left-radius: 2.5rem;
+                border-top-right-radius: 2.5rem;
+                padding: 2.2rem 1.75rem 3rem 1.75rem;
+                box-shadow: 0 -15px 35px rgba(0, 0, 0, 0.1);
                 flex: 1;
                 display: flex;
                 flex-direction: column;
                 justify-content: space-between;
+                animation: slideUpMobile 0.8s cubic-bezier(0.16, 1, 0.3, 1) forwards;
             }
 
-            /* Styling Input Khusus Mobile (Icon di sebelah kanan) */
+            @keyframes slideUpMobile {
+                0% {
+                    opacity: 0;
+                    transform: translateY(40px);
+                }
+
+                100% {
+                    opacity: 1;
+                    transform: translateY(0);
+                }
+            }
+
+            /* Input Group dengan Efek Transisi Fokus yang Halus */
             .mobile-input-group {
-                border: 1px solid #e2e8f0;
-                border-radius: 0.85rem;
-                background-color: #ffffff;
-                padding: 0.35rem 0.75rem;
-                box-shadow: 0 2px 6px rgba(0, 0, 0, 0.02);
+                border: 1.5px solid #e2e8f0;
+                border-radius: 1rem;
+                background-color: #f8fafc;
+                padding: 0.3rem 0.75rem;
+                transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
             }
 
             .mobile-input-group:focus-within {
-                border-color: #ffcc4d;
-                box-shadow: 0 0 0 3px rgba(255, 204, 77, 0.25);
+                border-color: #f38181;
+                background-color: #ffffff;
+                box-shadow: 0 0 0 4px rgba(243, 129, 129, 0.15);
+                transform: translateY(-2px);
             }
 
             .mobile-input-group .form-control {
                 border: none;
-                padding: 0.4rem 0.2rem;
-                font-size: 0.9rem;
-                color: #333 !important;
+                padding: 0.45rem 0.2rem;
+                font-size: 0.92rem;
+                color: #1e293b !important;
                 background: transparent !important;
+                font-family: 'Plus Jakarta Sans', sans-serif;
             }
 
             .mobile-input-group .input-group-text {
                 background: transparent;
                 border: none;
-                color: #718096;
-                font-size: 1rem;
+                color: #64748b;
+                font-size: 1.05rem;
+                transition: color 0.3s ease;
             }
 
-            /* Label Form Hitam Pekat */
+            .mobile-input-group:focus-within .input-group-text {
+                color: #f38181;
+            }
+
             .m-label {
-                font-size: 0.85rem;
+                font-family: 'Outfit', sans-serif;
+                font-size: 0.88rem;
                 font-weight: 700;
-                color: #1a202c;
-                margin-bottom: 0.3rem;
+                color: #334155;
+                margin-bottom: 0.35rem;
             }
 
-            /* Tombol Utama Kuning Solid */
+            /* Tombol Utama dengan Efek Gradient & Hover Interaktif */
             .btn-mobile-primary {
-                background: #ffcc4d !important;
+                font-family: 'Outfit', sans-serif;
+                background: linear-gradient(135deg, #ffca28 0%, #ff6f61 100%) !important;
                 border: none;
                 border-radius: 50rem !important;
-                padding: 0.75rem;
+                padding: 0.8rem;
                 font-weight: 800;
-                font-size: 0.95rem;
-                color: #111111 !important;
-                box-shadow: 0 4px 12px rgba(255, 204, 77, 0.4);
+                font-size: 1rem;
+                color: #ffffff !important;
+                box-shadow: 0 6px 20px rgba(255, 111, 97, 0.4);
                 width: 100%;
-                transition: all 0.2s ease;
+                transition: all 0.3s ease;
             }
 
-            .btn-mobile-primary:hover {
-                background: #f6b93b !important;
-            }
-
-            /* Checkbox Custom Hijau Persis Gambar */
-            .form-check-input:checked {
-                background-color: #27ae60;
-                border-color: #27ae60;
+            .btn-mobile-primary:active {
+                transform: scale(0.97);
             }
         }
     </style>
 </head>
 
 <body>
-    <!-- Elemen Balon-balon Melayang di Background (Desktop) -->
+    <!-- Elemen Balon-balon Melayang (Desktop) -->
     <div class="bubble-bg d-none d-lg-block">
         <div class="bubble"></div>
         <div class="bubble"></div>
@@ -606,23 +652,23 @@
 
 
     <!-- ========================================================== -->
-    <!-- TAMPILAN MOBILE (Persis Seperti Desain Referensi Gambar) -->
+    <!-- TAMPILAN MOBILE (Gradasi Dinamis & Animasi Interaktif) -->
     <!-- ========================================================== -->
 
-    <!-- SCREEN 1: WELCOME SCREEN (Halaman Awal Mobile) -->
+    <!-- SCREEN 1: WELCOME SCREEN -->
     <div id="mobileWelcomeScreen" class="mobile-screen active-screen d-lg-none">
-        <div class="m-yellow-header pt-5">
+        <div class="m-yellow-header pt-4">
             <h1 class="mt-4">Hello</h1>
             <p>Welcome Back!</p>
         </div>
         <div class="m-white-card-container text-center">
-            <div class="my-auto py-4">
-                <h3 class="fw-bold text-dark mb-2" style="font-size: 1.5rem;">Innoventra</h3>
-                <p class="text-muted small px-2 mb-4" style="font-size: 0.82rem;">Solusi sistem manajemen digital terpadu perusahaan Anda. Sila pilih akses untuk meneruskan.</p>
+            <div class="my-auto py-3">
+                <h3 class="fw-bold text-dark mb-2" style="font-family: 'Outfit', sans-serif; font-size: 1.6rem;">Innoventra</h3>
+                <p class="text-muted small px-2 mb-4" style="font-size: 0.83rem;">Solusi sistem manajemen digital terpadu perusahaan Anda. Sila pilih akses untuk meneruskan.</p>
                 <button type="button" id="btnGoLogin" class="btn-mobile-primary mb-3">
                     LOGIN ACCOUNT
                 </button>
-                <button type="button" id="btnGoRegister" class="btn w-100 py-2.5 fw-bold text-dark" style="background: #f1f2f6; border-radius: 50rem; border: none; font-size: 0.9rem;">
+                <button type="button" id="btnGoRegister" class="btn w-100 py-2.5 fw-bold text-dark" style="background: #f1f5f9; border-radius: 50rem; border: none; font-size: 0.9rem; font-family: 'Outfit', sans-serif;">
                     CREATE NEW ACCOUNT
                 </button>
             </div>
@@ -632,7 +678,7 @@
         </div>
     </div>
 
-    <!-- SCREEN 2: LOGIN SCREEN (Form Login Mobile Persis Gambar) -->
+    <!-- SCREEN 2: LOGIN SCREEN -->
     <div id="mobileLoginScreen" class="mobile-screen d-lg-none">
         <div class="m-yellow-header">
             <h1>Hello</h1>
@@ -641,13 +687,13 @@
         <div class="m-white-card-container">
             <div>
                 <div class="text-center mb-4">
-                    <h3 class="fw-bold text-dark mb-1" style="font-size: 1.55rem; letter-spacing: -0.5px;">Login Account</h3>
-                    <p class="text-muted" style="font-size: 0.75rem; line-height: 1.3;">Lorem ipsum dolor sit amet, consectetuer adipiscing sed diam nonummy nibh euismod tincidunt.</p>
+                    <h3 class="fw-bold text-dark mb-1" style="font-family: 'Outfit', sans-serif; font-size: 1.6rem;">Login Account</h3>
+                    <p class="text-muted" style="font-size: 0.76rem; line-height: 1.3;">Masukkan kredensial akun Anda untuk mengakses sistem.</p>
                 </div>
 
                 <form id="loginFormMobile">
                     <div class="mb-3 text-start">
-                        <label class="m-label">Email Address</label>
+                        <label class="m-label">Email Address / Username</label>
                         <div class="input-group mobile-input-group">
                             <input type="text" id="username_mob" class="form-control" placeholder="Your Email Address" required autocomplete="username">
                             <span class="input-group-text"><i class="bi bi-person-fill"></i></span>
@@ -675,7 +721,7 @@
                     </button>
 
                     <div class="text-center mt-2">
-                        <a href="javascript:void(0)" id="linkSwitchToRegister" class="text-dark fw-bold text-decoration-none" style="font-size: 0.85rem;">Create New Account</a>
+                        <a href="javascript:void(0)" id="linkSwitchToRegister" class="text-dark fw-bold text-decoration-none" style="font-size: 0.85rem; font-family: 'Outfit', sans-serif;">Create New Account</a>
                     </div>
                 </form>
             </div>
@@ -686,11 +732,11 @@
         </div>
     </div>
 
-    <!-- SCREEN 3: REGISTER SCREEN (Form Register Mobile) -->
+    <!-- SCREEN 3: REGISTER SCREEN -->
     <div id="mobileRegisterScreen" class="mobile-screen d-lg-none">
-        <div class="m-yellow-header py-4">
-            <h1 style="font-size: 2rem;">Register</h1>
-            <p style="font-size: 1rem;">Create new account</p>
+        <div class="m-yellow-header py-3">
+            <h1 style="font-size: 2.2rem;">Register</h1>
+            <p style="font-size: 1.05rem;">Create new account</p>
         </div>
         <div class="m-white-card-container">
             <div>
