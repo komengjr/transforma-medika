@@ -662,7 +662,7 @@
                     <label class="form-label small fw-bold">Email Account</label>
                     <div class="input-group">
                         <span class="input-group-text bg-transparent border-0 text-primary"><i class="bi bi-envelope"></i></span>
-                        <input type="email" id="username_mob" class="form-control" placeholder="name@example.com" required autocomplete="username">
+                        <input type="text" id="username_mob" class="form-control" placeholder="name@example.com" required autocomplete="username">
                     </div>
                 </div>
 
