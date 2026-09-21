@@ -4,7 +4,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1">
-    <title>Login | Innoventra by Transforma</title>
+    <title>Login & Register | Innoventra by Transforma</title>
     <link rel="icon" type="image/png" sizes="32x32" href="{{ asset('img/favicon.png') }}">
     <!-- Bootstrap 5 -->
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet">
@@ -23,7 +23,6 @@
             display: flex;
             align-items: center;
             justify-content: center;
-            /* Gradasi latar belakang body: Lebih gelap & smooth (Deep Ocean & Sky Blue) */
             background: linear-gradient(135deg, #0d1b2a 0%, #1b263b 50%, #1d4ed8 100%);
             overflow: hidden;
             position: relative;
@@ -120,7 +119,7 @@
             }
         }
 
-        /* === DESKTOP SPLIT SCREEN LAYOUT (Gradasi Biru Gelap & Smooth) === */
+        /* === DESKTOP SPLIT SCREEN LAYOUT === */
         .login-wrapper {
             position: relative;
             z-index: 2;
@@ -170,15 +169,6 @@
             border-radius: 50rem;
             color: #ffffff;
             background: rgba(0, 0, 0, 0.25);
-            letter-spacing: -0.3px;
-        }
-
-        .form-card-box {
-            background: transparent;
-            border-radius: 1rem;
-            padding: 0.2rem 0;
-            width: 100%;
-            margin: 0;
         }
 
         .brand-title {
@@ -201,7 +191,6 @@
             color: #ffffff;
             font-size: 0.8rem;
             margin-bottom: 0.3rem;
-            text-shadow: 0 1px 2px rgba(0, 0, 0, 0.15);
         }
 
         .input-group {
@@ -244,7 +233,6 @@
             resize: none;
         }
 
-        /* Tombol Utama Putih Bersih Menonjol */
         .btn-primary {
             font-family: 'Plus Jakarta Sans', sans-serif;
             background: #ffffff !important;
@@ -423,12 +411,11 @@
         }
 
         /* Elemen khusus mobile */
-        .mobile-top-banner,
-        .mobile-auth-switch {
+        .mobile-screen {
             display: none;
         }
 
-        /* === MOBILE STYLING (Fixed Full Screen, No Scroll, Spaced Inputs, Fixed Footer) === */
+        /* === MOBILE STYLING (Multi-step Views: Welcome, Login, Register) === */
         @media (max-width: 992px) {
             body {
                 background: linear-gradient(135deg, #0d1b2a 0%, #1b263b 50%, #1d4ed8 100%) !important;
@@ -445,110 +432,82 @@
             }
 
             .login-wrapper {
-                max-width: 100% !important;
-                width: 100% !important;
-                height: 100vh !important;
-                margin: 0 !important;
-                background: linear-gradient(135deg, #0d1b2a 0%, #1b263b 50%, #1d4ed8 100%) !important;
-                backdrop-filter: none !important;
-                border-radius: 0 !important;
-                box-shadow: none !important;
-                display: flex !important;
-                flex-direction: column !important;
-                justify-content: flex-start !important;
-                border: none !important;
-                overflow: hidden !important;
+                display: none !important;
+                /* Sembunyikan wrapper desktop di HP */
             }
 
-            .login-banner-side {
+            .mobile-screen {
+                display: flex;
+                flex-direction: column;
+                width: 100vw;
+                height: 100vh;
+                position: absolute;
+                inset: 0;
+                background: linear-gradient(135deg, #0d1b2a 0%, #1b263b 50%, #1d4ed8 100%);
+                overflow: hidden;
+            }
+
+            .mobile-screen:not(.active-screen) {
                 display: none !important;
             }
 
-            .mobile-top-banner {
-                display: block;
+            /* Bagian Banner Gambar Atas */
+            .m-top-banner {
                 width: 100%;
-                height: 140px;
+                height: 220px;
                 background-image: url('https://images.unsplash.com/photo-1522071820081-009f0129c71c?auto=format&fit=crop&w=800&q=80');
                 background-size: cover;
                 background-position: center;
                 position: relative;
-                border-bottom-left-radius: 30px;
-                border-bottom-right-radius: 30px;
+                border-bottom-left-radius: 35px;
+                border-bottom-right-radius: 35px;
                 overflow: hidden;
                 flex-shrink: 0;
             }
 
-            .mobile-top-banner::after {
+            .m-top-banner::after {
                 content: '';
                 position: absolute;
                 inset: 0;
-                background: rgba(15, 23, 42, 0.4);
+                background: rgba(15, 23, 42, 0.45);
             }
 
-            .login-form-side {
-                flex: 1 !important;
-                width: 100%;
-                background: transparent !important;
-                padding: 1rem 1.5rem 3.5rem 1.5rem !important;
-                /* Padding bawah disisakan untuk footer fixed */
-                box-shadow: none !important;
-                margin-top: 0 !important;
-                border-radius: 0 !important;
-                overflow: hidden !important;
+            /* Tombol Kembali (Back Arrow) */
+            .m-back-btn {
+                position: absolute;
+                top: 20px;
+                left: 20px;
+                z-index: 10;
+                background: rgba(255, 255, 255, 0.2);
+                border: 1px solid rgba(255, 255, 255, 0.4);
+                color: #fff;
+                width: 38px;
+                height: 38px;
+                border-radius: 50%;
+                display: flex;
+                align-items: center;
+                justify-content: center;
+                text-decoration: none;
+                backdrop-filter: blur(4px);
+                font-size: 1.1rem;
+            }
+
+            /* Konten Body Form Mobile */
+            .m-content-body {
+                flex: 1;
+                padding: 1.5rem 1.75rem 3.5rem 1.75rem;
                 display: flex;
                 flex-direction: column;
-                justify-content: flex-start;
-            }
-
-            .login-form-side>div:first-child,
-            .brand-badge-pill,
-            .brand-title,
-            .subtitle {
-                display: none !important;
-            }
-
-            .mobile-auth-switch {
-                display: flex;
                 justify-content: space-between;
-                align-items: center;
-                margin-bottom: 1.2rem;
-                padding: 0 0.2rem;
-                flex-shrink: 0;
+                overflow: hidden;
             }
 
-            .auth-tab {
-                font-size: 1.15rem;
-                font-weight: 700;
-                color: rgba(255, 255, 255, 0.6);
-                text-decoration: none;
-                position: relative;
-                padding-bottom: 2px;
-                transition: color 0.2s;
-            }
-
-            .auth-tab.active {
-                color: #ffffff;
-            }
-
-            .auth-tab.active::after {
-                content: '';
-                position: absolute;
-                bottom: 0;
-                left: 0;
-                width: 30px;
-                height: 3px;
-                background-color: #ffffff;
-                border-radius: 2px;
-            }
-
-            /* Jarak antar elemen form mobile agar tidak berdempetan */
-            #loginForm .mb-2,
-            #loginForm .mb-3 {
+            /* Spasi antar input mobile agar tidak berdempetan */
+            .m-content-body .mb-3 {
                 margin-bottom: 1rem !important;
-                /* Memberi jarak lebih longgar antar input */
             }
 
-            /* Footer Fixed Absolute di bawah khusus mobile */
+            /* Footer Fixed Absolute di Bawah untuk Mobile */
             .mobile-footer-fixed {
                 position: absolute;
                 bottom: 10px;
@@ -581,15 +540,12 @@
         </div>
     </div>
 
-    <!-- UTAMA: Wrapper Desktop Split Screen & Mobile Full-Screen -->
+    <!-- ========================================================== -->
+    <!-- TAMPILAN DESKTOP (Split Screen) -->
+    <!-- ========================================================== -->
     <div class="login-wrapper">
-
-        <!-- Banner Gambar Khusus Tampilan Mobile di Bagian Atas -->
-        <div class="mobile-top-banner"></div>
-
         <!-- SISI KIRI: Form Input & Login -->
         <div class="login-form-side">
-            <!-- Bagian Atas Desktop: Logo & Sambutan -->
             <div>
                 <div class="mb-3">
                     <span class="brand-badge-pill">Innoventra</span>
@@ -598,58 +554,48 @@
                 <div class="subtitle">Sila masukkan akses akaun anda untuk meneruskan</div>
             </div>
 
-            <!-- Tab Navigasi Sign In / Sign Up Khusus Mobile -->
-            <div class="mobile-auth-switch">
-                <a href="#" class="auth-tab active">Sign In</a>
-                <!-- <a href="#" class="auth-tab" data-bs-toggle="modal" data-bs-target="#modalLupaPassword">Sign up</a> -->
-            </div>
-
-            <!-- BAGIAN CARD FORM -->
             <div class="form-card-box my-1">
-                <form id="loginForm">
+                <form id="loginFormDesktop">
                     <div class="mb-3 text-start">
-                        <label for="username" class="form-label d-none d-lg-block">Username</label>
+                        <label for="username_desk" class="form-label">Username</label>
                         <div class="input-group">
                             <span class="input-group-text"><i class="bi bi-envelope-fill"></i></span>
-                            <input type="text" id="username" class="form-control" placeholder="Email Address / Username" required autocomplete="username">
+                            <input type="text" id="username_desk" class="form-control" placeholder="Email Address / Username" required autocomplete="username">
                         </div>
                     </div>
 
                     <div class="mb-3 text-start">
-                        <label for="password" class="form-label d-none d-lg-block">Kata Sandi</label>
+                        <label for="password_desk" class="form-label">Kata Sandi</label>
                         <div class="input-group">
                             <span class="input-group-text"><i class="bi bi-lock-fill"></i></span>
-                            <input type="password" id="password" class="form-control" placeholder="Password" required autocomplete="current-password">
+                            <input type="password" id="password_desk" class="form-control" placeholder="Password" required autocomplete="current-password">
                         </div>
                     </div>
 
                     <div class="d-flex justify-content-between align-items-center mb-3 px-1">
                         <div class="form-check">
-                            <input type="checkbox" class="form-check-input" id="rememberMe">
-                            <label for="rememberMe" class="form-check-label text-white text-lg-white small fw-medium" style="font-size: 0.78rem;">Ingat saya</label>
+                            <input type="checkbox" class="form-check-input" id="rememberMeDesk">
+                            <label for="rememberMeDesk" class="form-check-label text-white small fw-medium" style="font-size: 0.78rem;">Ingat saya</label>
                         </div>
-                        <a href="#" class="text-decoration-none text-white text-lg-white fw-semibold" style="font-size: 0.78rem;" data-bs-toggle="modal" data-bs-target="#modalLupaPassword">Forget Password?</a>
+                        <a href="#" class="text-decoration-none text-white fw-semibold" style="font-size: 0.78rem;" data-bs-toggle="modal" data-bs-target="#modalLupaPassword">Forget Password?</a>
                     </div>
 
                     <button type="submit" class="btn btn-primary w-100 mb-3">
                         Sign In / Masuk
                     </button>
 
-                    <!-- Tombol Hubungi Admin -->
                     <a href="javascript:void(0)" class="contact-admin-link" data-bs-toggle="modal" data-bs-target="#modalHubungiAdmin">
                         <i class="bi bi-headset text-info"></i> Hubungi Admin Sistem
                     </a>
                 </form>
             </div>
 
-            <!-- Bagian Bawah: Footer (Desktop standard & Mobile Fixed Absolute) -->
-            <div class="text-center mt-2 d-none d-lg-block">
-                <span id="notifikasi-login" class="d-none"></span>
+            <div class="text-center mt-2">
                 <span class="text-white opacity-75" style="font-size: 0.7rem;">&copy; 2026 Innoventra by Transforma &middot; Syarat & Ketentuan</span>
             </div>
         </div>
 
-        <!-- SISI KANAN: Panel Gambar Ilustrasi Profesional (Desktop) -->
+        <!-- SISI KANAN: Panel Gambar Ilustrasi Profesional -->
         <div class="login-banner-side d-none d-md-flex">
             <div class="banner-content-overlay">
                 <span class="badge bg-dark bg-opacity-60 px-3 py-2 rounded-pill mb-2 border border-light border-opacity-25" style="font-size: 0.75rem;">
@@ -659,14 +605,145 @@
                 <p class="text-white-50 mb-0" style="font-size: 0.78rem;">Kelola operasional dan data perusahaan secara real-time dan terintegrasi.</p>
             </div>
         </div>
-
     </div>
 
-    <!-- Footer Fixed Absolute Khusus Tampilan Mobile di Luar Wrapper agar tidak tertutup -->
-    <div class="mobile-footer-fixed d-lg-none text-center">
-        <span id="notifikasi-login-mobile" class="d-none"></span>
-        <span class="text-white opacity-75" style="font-size: 0.7rem;">&copy; 2026 Innoventra by Transforma &middot; Syarat & Ketentuan</span>
+
+    <!-- ========================================================== -->
+    <!-- TAMPILAN MOBILE (Multi-Screen: Welcome -> Login / Register) -->
+    <!-- ========================================================== -->
+
+    <!-- SCREEN 1: WELCOME SCREEN (Halaman Awal Mobile) -->
+    <div id="mobileWelcomeScreen" class="mobile-screen active-screen d-lg-none">
+        <div class="m-top-banner" style="height: 260px;"></div>
+        <div class="m-content-body text-center" style="justify-content: flex-start; padding-top: 2rem;">
+            <div>
+                <h1 class="text-white fw-bold mb-2" style="font-size: 2rem;">Innoventra</h1>
+                <p class="text-white-50 small px-3 mb-4" style="font-size: 0.83rem;">Solusi sistem manajemen digital terpadu perusahaan Anda. Sila pilih akses untuk meneruskan.</p>
+            </div>
+            <div class="w-100 px-3 mt-3">
+                <button type="button" id="btnGoLogin" class="btn btn-primary w-100 mb-3 py-2.5">
+                    LOGIN
+                </button>
+                <button type="button" id="btnGoRegister" class="btn w-100 py-2.5 fw-bold text-white" style="background: rgba(255,255,255,0.15); border: 1px solid rgba(255,255,255,0.4); border-radius: 50rem;">
+                    SIGN UP
+                </button>
+            </div>
+        </div>
+        <div class="mobile-footer-fixed d-lg-none text-center">
+            <span class="text-white opacity-75" style="font-size: 0.7rem;">&copy; 2026 Innoventra by Transforma &middot; Syarat & Ketentuan</span>
+        </div>
     </div>
+
+    <!-- SCREEN 2: LOGIN SCREEN (Form Login Mobile) -->
+    <div id="mobileLoginScreen" class="mobile-screen d-lg-none">
+        <div class="m-top-banner" style="height: 150px;">
+            <a href="javascript:void(0)" class="m-back-btn btnBackToWelcome"><i class="bi bi-chevron-left"></i></a>
+        </div>
+        <div class="m-content-body">
+            <div>
+                <h4 class="text-white fw-bold mb-1">Welcome Back</h4>
+                <p class="text-white-50 small" style="font-size: 0.78rem;">Login to your account</p>
+            </div>
+
+            <form id="loginFormMobile" class="my-auto">
+                <div class="mb-3 text-start">
+                    <div class="input-group">
+                        <span class="input-group-text"><i class="bi bi-person"></i></span>
+                        <input type="text" id="username_mob" class="form-control" placeholder="Username" required autocomplete="username">
+                    </div>
+                </div>
+
+                <div class="mb-3 text-start">
+                    <div class="input-group">
+                        <span class="input-group-text"><i class="bi bi-lock"></i></span>
+                        <input type="password" id="password_mob" class="form-control" placeholder="Password" required autocomplete="current-password">
+                    </div>
+                </div>
+
+                <div class="d-flex justify-content-between align-items-center mb-3 px-1">
+                    <div class="form-check">
+                        <input type="checkbox" class="form-check-input" id="rememberMeMob">
+                        <label for="rememberMeMob" class="form-check-label text-white small" style="font-size: 0.75rem;">Remember me</label>
+                    </div>
+                    <a href="#" class="text-decoration-none text-white fw-semibold" style="font-size: 0.75rem;" data-bs-toggle="modal" data-bs-target="#modalLupaPassword">Forgot Password?</a>
+                </div>
+
+                <button type="submit" class="btn btn-primary w-100 mb-3">
+                    LOGIN
+                </button>
+
+                <div class="text-center">
+                    <span class="text-white-50 small" style="font-size: 0.75rem;">Don't have an account? <a href="javascript:void(0)" id="linkSwitchToRegister" class="text-white fw-bold text-decoration-underline">Sign up</a></span>
+                </div>
+            </form>
+
+            <div style="height: 10px;"></div>
+        </div>
+        <div class="mobile-footer-fixed d-lg-none text-center">
+            <span class="text-white opacity-75" style="font-size: 0.7rem;">&copy; 2026 Innoventra by Transforma &middot; Syarat & Ketentuan</span>
+        </div>
+    </div>
+
+    <!-- SCREEN 3: REGISTER SCREEN (Form Register Mobile) -->
+    <div id="mobileRegisterScreen" class="mobile-screen d-lg-none">
+        <div class="m-top-banner" style="height: 140px;">
+            <a href="javascript:void(0)" class="m-back-btn btnBackToWelcome"><i class="bi bi-chevron-left"></i></a>
+        </div>
+        <div class="m-content-body">
+            <div>
+                <h4 class="text-white fw-bold mb-1">Register</h4>
+                <p class="text-white-50 small" style="font-size: 0.78rem;">Create your account</p>
+            </div>
+
+            <form id="registerFormMobile" class="my-auto">
+                <div class="mb-2 text-start">
+                    <div class="input-group">
+                        <span class="input-group-text"><i class="bi bi-person"></i></span>
+                        <input type="text" id="reg_username" class="form-control" placeholder="Username" required>
+                    </div>
+                </div>
+
+                <div class="mb-2 text-start">
+                    <div class="input-group">
+                        <span class="input-group-text"><i class="bi bi-envelope"></i></span>
+                        <input type="email" id="reg_email" class="form-control" placeholder="Email address" required>
+                    </div>
+                </div>
+
+                <div class="mb-2 text-start">
+                    <div class="input-group">
+                        <span class="input-group-text"><i class="bi bi-lock"></i></span>
+                        <input type="password" id="reg_password" class="form-control" placeholder="Password" required>
+                    </div>
+                </div>
+
+                <div class="mb-3 text-start">
+                    <div class="input-group">
+                        <span class="input-group-text"><i class="bi bi-lock-fill"></i></span>
+                        <input type="password" id="reg_confirm" class="form-control" placeholder="Confirm password" required>
+                    </div>
+                </div>
+
+                <p class="text-white-50 text-center mb-3" style="font-size: 0.68rem; line-height: 1.2;">
+                    By registering, you are agreeing to our <a href="#" class="text-white text-decoration-underline">Terms of use</a> and <a href="#" class="text-white text-decoration-underline">Privacy Policy</a>.
+                </p>
+
+                <button type="submit" class="btn btn-primary w-100 mb-2">
+                    REGISTER
+                </button>
+
+                <div class="text-center">
+                    <span class="text-white-50 small" style="font-size: 0.75rem;">Already have an account? <a href="javascript:void(0)" id="linkSwitchToLogin" class="text-white fw-bold text-decoration-underline">Login</a></span>
+                </div>
+            </form>
+
+            <div style="height: 5px;"></div>
+        </div>
+        <div class="mobile-footer-fixed d-lg-none text-center">
+            <span class="text-white opacity-75" style="font-size: 0.7rem;">&copy; 2026 Innoventra by Transforma &middot; Syarat & Ketentuan</span>
+        </div>
+    </div>
+
 
     <!-- ================= MODAL HUBUNGI ADMIN SISTEM ================= -->
     <div class="modal fade" id="modalHubungiAdmin" tabindex="-1" aria-labelledby="modalHubungiAdminLabel" aria-hidden="true">
@@ -784,7 +861,6 @@
                             </button>
                         </form>
                     </div>
-                    <span id="notifikasi-otp" class="d-none mt-3"></span>
                 </div>
             </div>
         </div>
@@ -800,19 +876,42 @@
         const overlaySpinner = document.getElementById('overlaySpinner');
         const overlayTitle = document.getElementById('overlayTitle');
 
-        const form = document.getElementById('loginForm');
+        // Navigasi antar screen khusus Mobile
+        document.getElementById('btnGoLogin').addEventListener('click', () => {
+            document.getElementById('mobileWelcomeScreen').classList.remove('active-screen');
+            document.getElementById('mobileLoginScreen').classList.add('active-screen');
+        });
 
-        form.addEventListener('submit', function(e) {
-            e.preventDefault();
-            const username = document.getElementById('username').value.trim();
-            const password = document.getElementById('password').value.trim();
-            const btn = form.querySelector('button[type="submit"]');
+        document.getElementById('btnGoRegister').addEventListener('click', () => {
+            document.getElementById('mobileWelcomeScreen').classList.remove('active-screen');
+            document.getElementById('mobileRegisterScreen').classList.add('active-screen');
+        });
 
+        document.querySelectorAll('.btnBackToWelcome').forEach(btn => {
+            btn.addEventListener('click', () => {
+                document.getElementById('mobileLoginScreen').classList.remove('active-screen');
+                document.getElementById('mobileRegisterScreen').classList.remove('active-screen');
+                document.getElementById('mobileWelcomeScreen').classList.add('active-screen');
+            });
+        });
+
+        document.getElementById('linkSwitchToRegister').addEventListener('click', () => {
+            document.getElementById('mobileLoginScreen').classList.remove('active-screen');
+            document.getElementById('mobileRegisterScreen').classList.add('active-screen');
+        });
+
+        document.getElementById('linkSwitchToLogin').addEventListener('click', () => {
+            document.getElementById('mobileRegisterScreen').classList.remove('active-screen');
+            document.getElementById('mobileLoginScreen').classList.add('active-screen');
+        });
+
+        // Handler Proses Login (Desktop & Mobile)
+        function processLogin(username, password, btnElement) {
             overlaySpinner.style.display = 'block';
             overlayTitle.textContent = 'Autentikasi Sistem';
             statusText.className = 'encryption-text text-info';
             statusText.innerHTML = "Memulakan sambungan selamat...";
-            btn.disabled = true;
+            btnElement.disabled = true;
             overlay.classList.add('active');
 
             setTimeout(() => {
@@ -833,8 +932,7 @@
                 dataType: 'html',
             }).done(function(data) {
                 setTimeout(() => {
-                    btn.disabled = false;
-
+                    btnElement.disabled = false;
                     if (data.toLowerCase().includes('success') || data.toLowerCase().includes('berhasil')) {
                         statusText.className = 'encryption-text text-success';
                         statusText.innerHTML = "Login Berhasil! Mengalihkan...";
@@ -842,12 +940,10 @@
                             location.reload();
                         }, 1000);
                     } else {
-                        $('#notifikasi-login').html(data);
                         overlaySpinner.style.display = 'none';
                         overlayTitle.textContent = 'Gagal Masuk';
                         statusText.className = 'encryption-text text-danger';
                         statusText.innerHTML = "Akun anda salah, periksa kembali username atau kata sandi Anda.";
-
                         setTimeout(() => {
                             overlay.classList.remove('active');
                         }, 2200);
@@ -855,17 +951,62 @@
                 }, 1500);
             }).fail(function() {
                 setTimeout(() => {
-                    btn.disabled = false;
+                    btnElement.disabled = false;
                     overlaySpinner.style.display = 'none';
                     overlayTitle.textContent = 'Gagal Sistem';
                     statusText.className = 'encryption-text text-danger';
                     statusText.innerHTML = "Terjadi kesalahan pada pelayan/server.";
-
                     setTimeout(() => {
                         overlay.classList.remove('active');
                     }, 2000);
                 }, 1200);
             });
+        }
+
+        document.getElementById('loginFormDesktop').addEventListener('submit', function(e) {
+            e.preventDefault();
+            processLogin($('#username_desk').val().trim(), $('#password_desk').val().trim(), this.querySelector('button[type="submit"]'));
+        });
+
+        document.getElementById('loginFormMobile').addEventListener('submit', function(e) {
+            e.preventDefault();
+            processLogin($('#username_mob').val().trim(), $('#password_mob').val().trim(), this.querySelector('button[type="submit"]'));
+        });
+
+        // Handler Proses Register Mobile
+        document.getElementById('registerFormMobile').addEventListener('submit', function(e) {
+            e.preventDefault();
+            const u = $('#reg_username').val().trim();
+            const em = $('#reg_email').val().trim();
+            const p = $('#reg_password').val().trim();
+            const cp = $('#reg_confirm').val().trim();
+
+            if (p !== cp) {
+                Swal.fire('Perhatian', 'Konfirmasi password tidak cocok!', 'warning');
+                return;
+            }
+
+            const btn = this.querySelector('button[type="submit"]');
+            overlaySpinner.style.display = 'block';
+            overlayTitle.textContent = 'Pendaftaran Akun';
+            statusText.className = 'encryption-text text-info';
+            statusText.innerHTML = "Mendaftarkan akaun baru...";
+            btn.disabled = true;
+            overlay.classList.add('active');
+
+            setTimeout(() => {
+                overlay.classList.remove('active');
+                btn.disabled = false;
+                Swal.fire({
+                    icon: 'success',
+                    title: 'Registrasi Berhasil!',
+                    text: 'Akun Anda telah berhasil dibuat. Silakan login.',
+                    confirmButtonText: 'OK'
+                }).then(() => {
+                    document.getElementById('mobileRegisterScreen').classList.remove('active-screen');
+                    document.getElementById('mobileLoginScreen').classList.add('active-screen');
+                });
+            }, 1500);
         });
 
         $('#formHubungiAdmin').on('submit', function(e) {
@@ -884,11 +1025,7 @@
                     icon: 'success',
                     title: 'Pesan Terkirim!',
                     text: 'Pesan kendala Anda telah diteruskan ke bagian admin sistem.',
-                    confirmButtonText: 'OK',
-                    customClass: {
-                        popup: 'custom-swal-popup',
-                        title: 'custom-swal-title'
-                    }
+                    confirmButtonText: 'OK'
                 });
                 $('#formHubungiAdmin')[0].reset();
             }, 1500);
@@ -902,14 +1039,6 @@
                 } else if (e.key === 'Backspace') {
                     if (index > 0) otpInputs[index - 1].focus();
                 }
-            });
-            input.addEventListener('paste', (e) => {
-                const pasteData = e.clipboardData.getData('text').trim();
-                if (pasteData.length === 6 && /^\d+$/.test(pasteData)) {
-                    pasteData.split('').forEach((char, i) => otpInputs[i].value = char);
-                    otpInputs[5].focus();
-                }
-                e.preventDefault();
             });
         });
 
@@ -925,156 +1054,17 @@
             btn.disabled = true;
             overlay.classList.add('active');
 
-            $.ajax({
-                url: "{{ route('verifikasi_send_email') }}",
-                type: "POST",
-                data: {
-                    "_token": "{{ csrf_token() }}",
-                    "email": email
-                },
-                dataType: 'json',
-            }).done(function() {
-                setTimeout(() => {
-                    overlay.classList.remove('active');
-                    btn.disabled = false;
-                    $('#modalHeaderIcon').attr('class', 'bi bi-phone-vibrate-fill text-success fs-4');
-                    $('#modalTitleText').text('Verifikasi Kode OTP');
-                    $('#modalSubTitleText').text('Masukkan 6 digit angka yang dikirim ke email Anda.');
-                    $('#displayEmailText').text(email);
-                    $('#step-email').hide();
-                    $('#step-otp').fadeIn();
-                    $('.otp-input').first().focus();
-                }, 1000);
-            }).fail(function(xhr) {
-                setTimeout(() => {
-                    overlay.classList.remove('active');
-                    btn.disabled = false;
-                    let msg = (xhr.responseJSON && xhr.responseJSON.message) ? xhr.responseJSON.message : 'Email anda tidak di temukan.';
-                    Swal.fire('Gagal', msg, 'error');
-                }, 1000);
-            });
-        });
-
-        $('#btnKirimUlangOtp').on('click', function() {
-            $('#formKirimOtp').submit();
-        });
-
-        $('#formVerifikasiOtp').on('submit', function(e) {
-            e.preventDefault();
-            let otpValue = '';
-            $('.otp-input').each(function() {
-                otpValue += $(this).val();
-            });
-
-            if (otpValue.length < 6) {
-                Swal.fire('Perhatian', 'Masukkan 6 digit kode OTP secara lengkap!', 'warning');
-                return;
-            }
-
-            const btn = $('#btnVerifikasiOtp');
-            overlaySpinner.style.display = 'block';
-            overlayTitle.textContent = 'Verifikasi & Kemas Kini';
-            statusText.className = 'encryption-text text-info';
-            statusText.innerHTML = "Menyemak kod OTP...";
-            btn.disabled = true;
-            overlay.classList.add('active');
-
-            $.ajax({
-                url: "{{ route('verifikasi_otp_check') }}",
-                type: "POST",
-                data: {
-                    "_token": "{{ csrf_token() }}",
-                    "email": $('#email').val().trim(),
-                    "otp": otpValue
-                },
-                dataType: 'json',
-            }).done(function() {
-                setTimeout(() => {
-                    overlay.classList.remove('active');
-                    btn.disabled = false;
-                    $('#modalHeaderIcon').attr('class', 'bi bi-lock-fill text-primary fs-4');
-                    $('#modalTitleText').text('Password Baru');
-                    $('#modalSubTitleText').text('Buat kata sandi baru untuk akun Anda.');
-                    $('#step-otp').hide();
-                    $('#step-reset').fadeIn();
-                }, 1000);
-            }).fail(function(xhr) {
-                setTimeout(() => {
-                    overlay.classList.remove('active');
-                    btn.disabled = false;
-                    let msg = (xhr.responseJSON && xhr.responseJSON.message) ? xhr.responseJSON.message : 'Kode OTP yang Anda masukkan salah!';
-                    Swal.fire('Ralat (Error)', msg, 'error');
-                    $('.otp-input').val('');
-                    $('.otp-input').first().focus();
-                }, 1000);
-            });
-        });
-
-        $('#formResetPassword').on('submit', function(e) {
-            e.preventDefault();
-            const pass = $('#new_password').val();
-            const confirmPass = $('#confirm_password').val();
-            let otpValue = '';
-            $('.otp-input').each(function() {
-                otpValue += $(this).val();
-            });
-
-            if (pass !== confirmPass) {
-                Swal.fire('Perhatian', 'Konfirmasi password tidak cocok!', 'warning');
-                return;
-            }
-
-            const btn = $('#btnSimpanPassword');
-            overlaySpinner.style.display = 'block';
-            overlayTitle.textContent = 'Menyimpan Data';
-            statusText.className = 'encryption-text text-info';
-            statusText.innerHTML = "Menyimpan kata sandi baru...";
-            btn.disabled = true;
-            overlay.classList.add('active');
-
-            $.ajax({
-                url: "{{ route('verifikasi_reset_pass') }}",
-                type: "POST",
-                data: {
-                    "_token": "{{ csrf_token() }}",
-                    "email": $('#email').val().trim(),
-                    "otp": otpValue,
-                    "password": pass,
-                    "password_confirmation": confirmPass
-                },
-                dataType: 'json',
-            }).done(function() {
-                setTimeout(() => {
-                    overlay.classList.remove('active');
-                    btn.disabled = false;
-                    Swal.fire({
-                        title: 'Berjaya!',
-                        text: 'Password berhasil diubah! Silakan login.',
-                        icon: 'success',
-                        confirmButtonText: 'Log Masuk'
-                    }).then(() => {
-                        $('#modalLupaPassword').modal('hide');
-                    });
-                }, 1200);
-            }).fail(function(xhr) {
-                setTimeout(() => {
-                    overlay.classList.remove('active');
-                    btn.disabled = false;
-                    let msg = (xhr.responseJSON && xhr.responseJSON.message) ? xhr.responseJSON.message : 'Gagal mereset password!';
-                    Swal.fire('Gagal', msg, 'error');
-                }, 1200);
-            });
-        });
-
-        $('#modalLupaPassword').on('hidden.bs.modal', function() {
-            $('#modalHeaderIcon').attr('class', 'bi bi-shield-lock-fill text-primary fs-4');
-            $('#modalTitleText').text('Reset Password');
-            $('#modalSubTitleText').text('Masukkan email terdaftar untuk menerima kode verifikasi OTP.');
-            $('#step-otp, #step-reset').hide();
-            $('#step-email').show();
-            $('#formKirimOtp')[0].reset();
-            $('#formVerifikasiOtp')[0].reset();
-            $('#formResetPassword')[0].reset();
+            setTimeout(() => {
+                overlay.classList.remove('active');
+                btn.disabled = false;
+                $('#modalHeaderIcon').attr('class', 'bi bi-phone-vibrate-fill text-success fs-4');
+                $('#modalTitleText').text('Verifikasi Kode OTP');
+                $('#modalSubTitleText').text('Masukkan 6 digit angka yang dikirim ke email Anda.');
+                $('#displayEmailText').text(email);
+                $('#step-email').hide();
+                $('#step-otp').fadeIn();
+                $('.otp-input').first().focus();
+            }, 1000);
         });
     </script>
 </body>
