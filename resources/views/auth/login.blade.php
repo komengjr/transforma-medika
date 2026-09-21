@@ -119,7 +119,7 @@
             }
         }
 
-        /* === DESKTOP SPLIT SCREEN LAYOUT (Sesuai Referensi Gambar) === */
+        /* === DESKTOP SPLIT SCREEN LAYOUT === */
         .login-wrapper {
             position: relative;
             z-index: 2;
@@ -149,7 +149,7 @@
             }
         }
 
-        /* === SISI KIRI: Panel Ilustrasi & "Welcome :)" (Merujuk Gambar Kiri) === */
+        /* === SISI KIRI: Panel Ilustrasi & "Welcome :)" === */
         .login-banner-side {
             flex: 1.1;
             background: linear-gradient(135deg, #091736 0%, #15326e 100%);
@@ -410,7 +410,7 @@
             display: none;
         }
 
-        /* === MOBILE STYLING === */
+        /* === MOBILE STYLING (Fixed Bottom Footer & No Scroll Layout) === */
         @media (max-width: 992px) {
             body {
                 background: linear-gradient(135deg, #09111e 0%, #0f1c3f 50%, #1e3a8a 100%) !important;
@@ -447,11 +447,11 @@
 
             .m-top-banner {
                 width: 100%;
-                height: 200px;
+                height: 160px;
                 background: linear-gradient(135deg, #091736 0%, #15326e 100%);
                 position: relative;
-                border-bottom-left-radius: 30px;
-                border-bottom-right-radius: 30px;
+                border-bottom-left-radius: 25px;
+                border-bottom-right-radius: 25px;
                 overflow: hidden;
                 flex-shrink: 0;
                 display: flex;
@@ -463,14 +463,14 @@
 
             .m-back-btn {
                 position: absolute;
-                top: 20px;
-                left: 20px;
+                top: 15px;
+                left: 15px;
                 z-index: 10;
                 background: rgba(255, 255, 255, 0.15);
                 border: 1px solid rgba(255, 255, 255, 0.3);
                 color: #fff;
-                width: 36px;
-                height: 36px;
+                width: 34px;
+                height: 34px;
                 border-radius: 50%;
                 display: flex;
                 align-items: center;
@@ -481,20 +481,24 @@
 
             .m-content-body {
                 flex: 1;
-                padding: 1.5rem 1.75rem 3rem 1.75rem;
+                padding: 1rem 1.5rem 5.5rem 1.5rem;
+                /* Padding bawah dilebihkan agar tidak tertutup footer fixed */
                 display: flex;
                 flex-direction: column;
-                justify-content: space-between;
-                overflow-y: auto;
+                justify-content: center;
+                overflow: hidden;
             }
 
+            /* Footer Fixed Absolut di Bawah untuk Mobile (Tombol & Copyright menyatu tanpa scroll) */
             .mobile-footer-fixed {
                 position: absolute;
-                bottom: 8px;
+                bottom: 0;
                 left: 0;
                 width: 100%;
-                text-align: center;
+                padding: 1rem 1.55rem 1.25rem 1.55rem;
+                background: linear-gradient(to top, #09111e 80%, rgba(9, 17, 30, 0));
                 z-index: 10;
+                text-align: center;
             }
         }
     </style>
@@ -521,14 +525,14 @@
     </div>
 
     <!-- ========================================================== -->
-    <!-- TAMPILAN DESKTOP (Split Screen - Mengikuti Referensi Gambar) -->
+    <!-- TAMPILAN DESKTOP (Split Screen) -->
     <!-- ========================================================== -->
     <div class="login-wrapper">
         <!-- SISI KIRI: Panel Ilustrasi & Welcome -->
         <div class="login-banner-side d-none d-md-flex">
             <div>
                 <span class="brand-badge-pill">
-                    <i class="bi bi-hexagon-fill text-info"></i> COMPANY
+                    <i class="bi bi-hexagon-fill text-info"></i> Innoventra
                 </span>
             </div>
             <div class="banner-content-overlay">
@@ -537,7 +541,7 @@
                 <p class="text-white-50 mb-0" style="font-size: 0.8rem; line-height: 1.4;">Lorem ipsum dolor sit amet, consectetuer adipiscing elit, sed diam nonummy nibh euismod tincidunt ut laoreet dolore magna aliquam erat volutpat.</p>
             </div>
             <div>
-                <span class="text-white-50" style="font-size: 0.7rem;">&copy; 2026 Company &middot; All Rights Reserved</span>
+                <span class="text-white-50" style="font-size: 0.7rem;">&copy; 2026 Innoventra by Transforma &middot; All Rights Reserved</span>
             </div>
         </div>
 
@@ -599,46 +603,47 @@
 
 
     <!-- ========================================================== -->
-    <!-- TAMPILAN MOBILE (Multi-Screen: Welcome -> Login / Register) -->
+    <!-- TAMPILAN MOBILE (Multi-Screen dengan Fixed Bottom Footer) -->
     <!-- ========================================================== -->
 
     <!-- SCREEN 1: WELCOME SCREEN (Mobile) -->
     <div id="mobileWelcomeScreen" class="mobile-screen active-screen d-lg-none">
-        <div class="m-top-banner" style="height: 320px;">
+        <div class="m-top-banner" style="height: 220px;">
             <div>
-                <span class="brand-badge-pill mb-3"><i class="bi bi-hexagon-fill text-info"></i> COMPANY</span>
-                <h1 class="text-white fw-bold mb-1" style="font-size: 2.5rem;">Welcome :)</h1>
-                <p class="text-info small mb-0 fw-semibold" style="font-size: 0.8rem;">Convert Your Smart Idea to The Great Business</p>
+                <span class="brand-badge-pill mb-2"><i class="bi bi-hexagon-fill text-info"></i> Innoventra</span>
+                <h1 class="text-white fw-bold mb-1" style="font-size: 2rem;">Welcome :)</h1>
+                <p class="text-info small mb-0 fw-semibold" style="font-size: 0.75rem;">Convert Your Smart Idea to The Great Business</p>
             </div>
         </div>
-        <div class="m-content-body text-center" style="justify-content: flex-start; padding-top: 1.5rem;">
-            <p class="text-white-50 small px-2 mb-4" style="font-size: 0.8rem;">Join over 50 million members from around the globe to manage your digital enterprise.</p>
-            <div class="w-100 px-2 mt-auto">
-                <button type="button" id="btnGoLogin" class="btn btn-primary w-100 mb-3 py-2.5">
+        <div class="m-content-body text-center">
+            <p class="text-white-50 small px-2 mb-0" style="font-size: 0.8rem;">Join over 50 million members from around the globe to manage your digital enterprise.</p>
+        </div>
+        <!-- Footer Fixed Mobile (Welcome) -->
+        <div class="mobile-footer-fixed d-lg-none">
+            <div class="w-100 mb-2">
+                <button type="button" id="btnGoLogin" class="btn btn-primary w-100 mb-2 py-2">
                     LOGIN
                 </button>
-                <button type="button" id="btnGoRegister" class="btn w-100 py-2.5 fw-bold text-white" style="background: rgba(255,255,255,0.15); border: 1px solid rgba(255,255,255,0.3); border-radius: 50rem;">
+                <button type="button" id="btnGoRegister" class="btn w-100 py-2 fw-bold text-white" style="background: rgba(255,255,255,0.15); border: 1px solid rgba(255,255,255,0.3); border-radius: 50rem;">
                     SIGN UP
                 </button>
             </div>
-        </div>
-        <div class="mobile-footer-fixed d-lg-none text-center">
             <span class="text-white opacity-75" style="font-size: 0.68rem;">&copy; 2026 Innoventra by Transforma</span>
         </div>
     </div>
 
     <!-- SCREEN 2: LOGIN SCREEN (Mobile) -->
     <div id="mobileLoginScreen" class="mobile-screen d-lg-none">
-        <div class="m-top-banner" style="height: 160px;">
+        <div class="m-top-banner" style="height: 130px;">
             <a href="javascript:void(0)" class="m-back-btn btnBackToWelcome"><i class="bi bi-chevron-left"></i></a>
             <div>
-                <span class="brand-badge-pill mb-1" style="font-size: 0.75rem;"><i class="bi bi-hexagon-fill text-info"></i> COMPANY</span>
-                <h5 class="text-white fw-bold mb-0" style="font-size: 1.1rem;">Sign in to continue</h5>
+                <span class="brand-badge-pill mb-1" style="font-size: 0.7rem;"><i class="bi bi-hexagon-fill text-info"></i> Innoventra</span>
+                <h5 class="text-white fw-bold mb-0" style="font-size: 1rem;">Sign in to continue</h5>
             </div>
         </div>
         <div class="m-content-body">
-            <form id="loginFormMobile" class="my-auto">
-                <div class="mb-3 text-start">
+            <form id="loginFormMobile">
+                <div class="mb-2 text-start">
                     <label class="form-label">Username</label>
                     <div class="input-group">
                         <span class="input-group-text"><i class="bi bi-person"></i></span>
@@ -646,7 +651,7 @@
                     </div>
                 </div>
 
-                <div class="mb-3 text-start">
+                <div class="mb-2 text-start">
                     <label class="form-label">Password</label>
                     <div class="input-group">
                         <span class="input-group-text"><i class="bi bi-lock"></i></span>
@@ -654,80 +659,78 @@
                     </div>
                 </div>
 
-                <div class="d-flex justify-content-between align-items-center mb-3 px-1">
+                <div class="d-flex justify-content-between align-items-center mb-2 px-1">
                     <div class="form-check">
                         <input type="checkbox" class="form-check-input" id="rememberMeMob">
-                        <label for="rememberMeMob" class="form-check-label text-white small" style="font-size: 0.75rem;">Remember me</label>
+                        <label for="rememberMeMob" class="form-check-label text-white small" style="font-size: 0.72rem;">Remember me</label>
                     </div>
-                    <a href="#" class="text-decoration-none text-white fw-semibold" style="font-size: 0.75rem;" data-bs-toggle="modal" data-bs-target="#modalLupaPassword">Forgot password?</a>
-                </div>
-
-                <button type="submit" class="btn btn-primary w-100 mb-3">
-                    Login
-                </button>
-
-                <div class="text-center">
-                    <span class="text-white-50 small" style="font-size: 0.75rem;">Don't have an account? <a href="javascript:void(0)" id="linkSwitchToRegister" class="text-white fw-bold text-decoration-underline">Sign up</a></span>
+                    <a href="#" class="text-decoration-none text-white fw-semibold" style="font-size: 0.72rem;" data-bs-toggle="modal" data-bs-target="#modalLupaPassword">Forgot password?</a>
                 </div>
             </form>
         </div>
-        <div class="mobile-footer-fixed d-lg-none text-center">
+        <!-- Footer Fixed Mobile (Login) -->
+        <div class="mobile-footer-fixed d-lg-none">
+            <button type="submit" form="loginFormMobile" class="btn btn-primary w-100 mb-2 py-2">
+                Login
+            </button>
+            <div class="text-center mb-2">
+                <span class="text-white-50 small" style="font-size: 0.72rem;">Don't have an account? <a href="javascript:void(0)" id="linkSwitchToRegister" class="text-white fw-bold text-decoration-underline">Sign up</a></span>
+            </div>
             <span class="text-white opacity-75" style="font-size: 0.68rem;">&copy; 2026 Innoventra by Transforma</span>
         </div>
     </div>
 
     <!-- SCREEN 3: REGISTER SCREEN (Mobile) -->
     <div id="mobileRegisterScreen" class="mobile-screen d-lg-none">
-        <div class="m-top-banner" style="height: 150px;">
+        <div class="m-top-banner" style="height: 120px;">
             <a href="javascript:void(0)" class="m-back-btn btnBackToWelcome"><i class="bi bi-chevron-left"></i></a>
             <div>
-                <span class="brand-badge-pill mb-1" style="font-size: 0.75rem;"><i class="bi bi-hexagon-fill text-info"></i> COMPANY</span>
-                <h5 class="text-white fw-bold mb-0" style="font-size: 1.1rem;">Sign up to continue</h5>
+                <span class="brand-badge-pill mb-1" style="font-size: 0.7rem;"><i class="bi bi-hexagon-fill text-info"></i> Innoventra</span>
+                <h5 class="text-white fw-bold mb-0" style="font-size: 1rem;">Sign up to continue</h5>
             </div>
         </div>
         <div class="m-content-body">
-            <form id="registerFormMobile" class="my-auto">
+            <form id="registerFormMobile">
                 <div class="mb-2 text-start">
-                    <label class="form-label">Email Address</label>
+                    <label class="form-label" style="font-size: 0.72rem;">Email Address</label>
                     <div class="input-group">
-                        <span class="input-group-text"><i class="bi bi-envelope"></i></span>
-                        <input type="email" id="reg_email" class="form-control" placeholder="Email Address" required>
+                        <span class="input-group-text py-1"><i class="bi bi-envelope"></i></span>
+                        <input type="email" id="reg_email" class="form-control py-1" placeholder="Email Address" required>
                     </div>
                 </div>
 
                 <div class="mb-2 text-start">
-                    <label class="form-label">Username</label>
+                    <label class="form-label" style="font-size: 0.72rem;">Username</label>
                     <div class="input-group">
-                        <span class="input-group-text"><i class="bi bi-person"></i></span>
-                        <input type="text" id="reg_username" class="form-control" placeholder="Username" required>
+                        <span class="input-group-text py-1"><i class="bi bi-person"></i></span>
+                        <input type="text" id="reg_username" class="form-control py-1" placeholder="Username" required>
                     </div>
                 </div>
 
-                <div class="mb-3 text-start">
-                    <label class="form-label">Password</label>
+                <div class="mb-2 text-start">
+                    <label class="form-label" style="font-size: 0.72rem;">Password</label>
                     <div class="input-group">
-                        <span class="input-group-text"><i class="bi bi-lock"></i></span>
-                        <input type="password" id="reg_password" class="form-control" placeholder="Password" required>
+                        <span class="input-group-text py-1"><i class="bi bi-lock"></i></span>
+                        <input type="password" id="reg_password" class="form-control py-1" placeholder="Password" required>
                     </div>
                 </div>
 
-                <div class="form-check mb-3 text-start px-1">
+                <div class="form-check text-start px-1">
                     <input type="checkbox" class="form-check-input" id="agreeTerms" required>
-                    <label for="agreeTerms" class="form-check-label text-white-50" style="font-size: 0.7rem;">
-                        I agree to all statements included in <a href="#" class="text-white text-decoration-underline">Terms of Use</a>
+                    <label for="agreeTerms" class="form-check-label text-white-50" style="font-size: 0.65rem;">
+                        I agree to all statements in <a href="#" class="text-white text-decoration-underline">Terms of Use</a>
                     </label>
-                </div>
-
-                <button type="submit" class="btn btn-primary w-100 mb-2">
-                    Sign Up
-                </button>
-
-                <div class="text-center">
-                    <span class="text-white-50 small" style="font-size: 0.75rem;">Already a member? <a href="javascript:void(0)" id="linkSwitchToLogin" class="text-white fw-bold text-decoration-underline">Login</a></span>
                 </div>
             </form>
         </div>
-        <div class="mobile-footer-fixed d-lg-none text-center">
+        <!-- Footer Fixed Mobile (Register) -->
+        <div class="mobile-footer-fixed d-lg-none">
+            <button type="submit" form="registerFormMobile" class="btn btn-primary w-100 mb-2 py-2">
+                Sign Up
+            </button>
+            <div class="text-center mb-2">
+                <span class="text-white-50 small" style="font-size: 0.72rem;">Already a member? <a href="javascript:void(0)" id="linkSwitchToLogin" class="text-white fw-bold text-decoration-underline">Login</a></span>
+            </div>
             <span class="text-white opacity-75" style="font-size: 0.68rem;">&copy; 2026 Innoventra by Transforma</span>
         </div>
     </div>
