@@ -23,7 +23,7 @@
             display: flex;
             align-items: center;
             justify-content: center;
-            background: linear-gradient(135deg, #0d1b2a 0%, #1b263b 50%, #1d4ed8 100%);
+            background: linear-gradient(135deg, #09111e 0%, #0f1c3f 50%, #1e3a8a 100%);
             overflow: hidden;
             position: relative;
         }
@@ -43,12 +43,12 @@
         .bubble {
             position: absolute;
             bottom: -150px;
-            background: rgba(255, 255, 255, 0.1);
+            background: rgba(255, 255, 255, 0.05);
             border-radius: 50%;
             animation: rise 15s infinite ease-in-out;
             box-shadow: 0 8px 32px 0 rgba(0, 0, 0, 0.2);
             backdrop-filter: blur(2px);
-            border: 1px solid rgba(255, 255, 255, 0.2);
+            border: 1px solid rgba(255, 255, 255, 0.1);
         }
 
         .bubble:nth-child(1) {
@@ -106,11 +106,11 @@
             }
 
             20% {
-                opacity: 0.7;
+                opacity: 0.5;
             }
 
             80% {
-                opacity: 0.7;
+                opacity: 0.5;
             }
 
             100% {
@@ -119,21 +119,21 @@
             }
         }
 
-        /* === DESKTOP SPLIT SCREEN LAYOUT === */
+        /* === DESKTOP SPLIT SCREEN LAYOUT (Sesuai Referensi Gambar) === */
         .login-wrapper {
             position: relative;
             z-index: 2;
             width: 100%;
-            max-width: 1100px;
-            height: 640px;
+            max-width: 1050px;
+            height: 600px;
             margin: 1.5rem;
-            background: linear-gradient(135deg, #1e3a8a 0%, #0c2361 60%, #0284c7 100%);
+            background: linear-gradient(135deg, #0b1c3d 0%, #0d2356 100%);
             backdrop-filter: blur(25px);
-            border-radius: 2.5rem;
-            box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.4);
+            border-radius: 2rem;
+            box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.5);
             display: flex;
             overflow: hidden;
-            border: 1px solid rgba(255, 255, 255, 0.25);
+            border: 1px solid rgba(255, 255, 255, 0.15);
             animation: fadeInUp 1s cubic-bezier(0.16, 1, 0.3, 1) forwards;
         }
 
@@ -149,9 +149,46 @@
             }
         }
 
-        /* === SISI KIRI: Form Input & Branding === */
+        /* === SISI KIRI: Panel Ilustrasi & "Welcome :)" (Merujuk Gambar Kiri) === */
+        .login-banner-side {
+            flex: 1.1;
+            background: linear-gradient(135deg, #091736 0%, #15326e 100%);
+            position: relative;
+            display: flex;
+            flex-direction: column;
+            justify-content: space-between;
+            padding: 3rem;
+            overflow: hidden;
+            border-right: 1px solid rgba(255, 255, 255, 0.1);
+        }
+
+        .login-banner-side::before {
+            content: '';
+            position: absolute;
+            inset: 0;
+            background: url('https://images.unsplash.com/photo-1618005182384-a83a8bd57fbe?auto=format&fit=crop&w=1000&q=80') center/cover no-repeat;
+            opacity: 0.15;
+        }
+
+        .banner-content-overlay {
+            position: relative;
+            z-index: 2;
+            color: #fff;
+            margin: auto 0;
+        }
+
+        .welcome-big-text {
+            font-size: 3.2rem;
+            font-weight: 800;
+            letter-spacing: -1px;
+            color: #ffffff;
+            margin-bottom: 0.5rem;
+            text-shadow: 0 4px 12px rgba(0, 0, 0, 0.3);
+        }
+
+        /* === SISI KANAN: Form Input & Branding === */
         .login-form-side {
-            flex: 1;
+            flex: 1.1;
             padding: 2.5rem 3rem;
             display: flex;
             flex-direction: column;
@@ -161,41 +198,42 @@
         }
 
         .brand-badge-pill {
-            display: inline-block;
+            display: inline-flex;
+            align-items: center;
+            gap: 6px;
             font-weight: 700;
-            font-size: 0.95rem;
-            border: 1px solid rgba(255, 255, 255, 0.4);
-            padding: 0.3rem 1.25rem;
+            font-size: 0.85rem;
+            border: 1px solid rgba(255, 255, 255, 0.2);
+            padding: 0.3rem 1rem;
             border-radius: 50rem;
             color: #ffffff;
-            background: rgba(0, 0, 0, 0.25);
+            background: rgba(255, 255, 255, 0.08);
         }
 
         .brand-title {
-            font-size: 1.75rem;
+            font-size: 1.5rem;
             font-weight: 800;
             color: #ffffff;
             letter-spacing: -0.5px;
-            margin-bottom: 0.2rem;
-            text-shadow: 0 2px 4px rgba(0, 0, 0, 0.2);
+            margin-bottom: 0.1rem;
         }
 
         .subtitle {
-            color: rgba(255, 255, 255, 0.9);
-            font-size: 0.82rem;
+            color: rgba(255, 255, 255, 0.7);
+            font-size: 0.8rem;
             font-weight: 500;
         }
 
         .form-label {
             font-weight: 600;
             color: #ffffff;
-            font-size: 0.8rem;
-            margin-bottom: 0.3rem;
+            font-size: 0.78rem;
+            margin-bottom: 0.25rem;
         }
 
         .input-group {
             border: none;
-            border-radius: 0.85rem;
+            border-radius: 0.75rem;
             overflow: hidden;
             background-color: #ffffff;
             box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
@@ -203,30 +241,30 @@
         }
 
         .input-group:focus-within {
-            box-shadow: 0 0 0 4px rgba(255, 255, 255, 0.35);
+            box-shadow: 0 0 0 3px rgba(37, 99, 235, 0.4);
         }
 
         .input-group-text {
             background-color: transparent;
             border: none;
-            color: #555;
+            color: #666;
             padding-left: 1rem;
             padding-right: 0.5rem;
-            font-size: 0.95rem;
+            font-size: 0.9rem;
         }
 
         .form-control {
             font-family: 'Plus Jakarta Sans', sans-serif;
             border: none;
-            padding: 0.6rem 0.75rem;
-            font-size: 0.95rem;
+            padding: 0.55rem 0.75rem;
+            font-size: 0.9rem;
             background-color: transparent !important;
             box-shadow: none !important;
             color: #222 !important;
         }
 
         .form-control::placeholder {
-            color: #999 !important;
+            color: #aaa !important;
         }
 
         textarea.form-control {
@@ -235,22 +273,21 @@
 
         .btn-primary {
             font-family: 'Plus Jakarta Sans', sans-serif;
-            background: #ffffff !important;
+            background: #2563eb !important;
             border: none;
             border-radius: 50rem !important;
-            padding: 0.65rem;
+            padding: 0.6rem;
             font-weight: 700;
-            font-size: 0.9rem;
-            color: #1e3a8a !important;
+            font-size: 0.88rem;
+            color: #ffffff !important;
             transition: all 0.2s ease;
-            box-shadow: 0 4px 15px rgba(0, 0, 0, 0.15);
+            box-shadow: 0 4px 15px rgba(37, 99, 235, 0.4);
         }
 
         .btn-primary:hover {
-            background: #f8f9fa !important;
-            color: #1d4ed8 !important;
+            background: #1d4ed8 !important;
             transform: translateY(-1px);
-            box-shadow: 0 6px 18px rgba(0, 0, 0, 0.25);
+            box-shadow: 0 6px 18px rgba(37, 99, 235, 0.6);
         }
 
         .contact-admin-link {
@@ -259,14 +296,14 @@
             justify-content: center;
             gap: 6px;
             width: 100%;
-            margin-top: 0.5rem;
-            padding: 0.5rem;
-            font-size: 0.78rem;
+            margin-top: 0.4rem;
+            padding: 0.45rem;
+            font-size: 0.75rem;
             font-weight: 600;
             color: #ffffff;
-            background: rgba(255, 255, 255, 0.15);
-            border: 1px dashed rgba(255, 255, 255, 0.5);
-            border-radius: 0.85rem;
+            background: rgba(255, 255, 255, 0.08);
+            border: 1px dashed rgba(255, 255, 255, 0.3);
+            border-radius: 0.75rem;
             text-decoration: none;
             transition: all 0.2s ease;
         }
@@ -275,36 +312,6 @@
             background: #ffffff;
             color: #1e3a8a;
             border-color: #ffffff;
-        }
-
-        /* === SISI KANAN: Panel Gambar Ilustrasi === */
-        .login-banner-side {
-            flex: 1.15;
-            background-image: url('https://images.unsplash.com/photo-1522071820081-009f0129c71c?auto=format&fit=crop&w=1000&q=80');
-            background-size: cover;
-            background-position: center;
-            border-radius: 2rem;
-            margin: 12px;
-            position: relative;
-            display: flex;
-            flex-direction: column;
-            justify-content: flex-end;
-            padding: 2rem;
-            overflow: hidden;
-        }
-
-        .login-banner-side::before {
-            content: '';
-            position: absolute;
-            inset: 0;
-            background: linear-gradient(to top, rgba(15, 23, 42, 0.6) 0%, transparent 60%);
-            border-radius: 2rem;
-        }
-
-        .banner-content-overlay {
-            position: relative;
-            z-index: 2;
-            color: #fff;
         }
 
         .otp-input-container {
@@ -326,8 +333,8 @@
         }
 
         .otp-input:focus {
-            border-color: #1d4ed8;
-            box-shadow: 0 0 0 0.2rem rgba(29, 78, 216, 0.25);
+            border-color: #2563eb;
+            box-shadow: 0 0 0 0.2rem rgba(37, 99, 235, 0.25);
             background-color: #fff;
             outline: none;
         }
@@ -336,7 +343,7 @@
         #login-overlay {
             position: fixed;
             inset: 0;
-            background: rgba(15, 23, 42, 0.85);
+            background: rgba(9, 17, 30, 0.85);
             backdrop-filter: blur(8px);
             z-index: 9999;
             display: flex;
@@ -354,8 +361,8 @@
         }
 
         .encryption-box {
-            background: rgba(30, 41, 59, 0.95);
-            border: 1px solid rgba(29, 78, 216, 0.5);
+            background: rgba(15, 28, 63, 0.95);
+            border: 1px solid rgba(37, 99, 235, 0.5);
             border-radius: 1rem;
             padding: 2rem;
             text-align: center;
@@ -367,7 +374,7 @@
         .encryption-spinner {
             width: 40px;
             height: 40px;
-            border: 3px solid rgba(29, 78, 216, 0.2);
+            border: 3px solid rgba(37, 99, 235, 0.2);
             border-top: 3px solid #38bdf8;
             border-radius: 50%;
             animation: spin 1s linear infinite;
@@ -388,7 +395,6 @@
             font-family: 'Fira Code', monospace;
             font-size: 0.75rem;
             color: #38bdf8;
-            letter-spacing: -0.5px;
             min-height: 24px;
         }
 
@@ -399,26 +405,15 @@
             margin-bottom: 0.2rem;
         }
 
-        .custom-swal-popup {
-            font-family: 'Plus Jakarta Sans', sans-serif !important;
-            border-radius: 1.5rem !important;
-            padding: 2rem !important;
-        }
-
-        .custom-swal-title {
-            font-weight: 800 !important;
-            color: #0f172a !important;
-        }
-
         /* Elemen khusus mobile */
         .mobile-screen {
             display: none;
         }
 
-        /* === MOBILE STYLING (Multi-step Views: Welcome, Login, Register) === */
+        /* === MOBILE STYLING === */
         @media (max-width: 992px) {
             body {
-                background: linear-gradient(135deg, #0d1b2a 0%, #1b263b 50%, #1d4ed8 100%) !important;
+                background: linear-gradient(135deg, #09111e 0%, #0f1c3f 50%, #1e3a8a 100%) !important;
                 height: 100vh;
                 width: 100vw;
                 display: flex;
@@ -433,7 +428,6 @@
 
             .login-wrapper {
                 display: none !important;
-                /* Sembunyikan wrapper desktop di HP */
             }
 
             .mobile-screen {
@@ -443,7 +437,7 @@
                 height: 100vh;
                 position: absolute;
                 inset: 0;
-                background: linear-gradient(135deg, #0d1b2a 0%, #1b263b 50%, #1d4ed8 100%);
+                background: linear-gradient(135deg, #09111e 0%, #0f1c3f 50%, #1e3a8a 100%);
                 overflow: hidden;
             }
 
@@ -451,66 +445,52 @@
                 display: none !important;
             }
 
-            /* Bagian Banner Gambar Atas */
             .m-top-banner {
                 width: 100%;
-                height: 220px;
-                background-image: url('https://images.unsplash.com/photo-1522071820081-009f0129c71c?auto=format&fit=crop&w=800&q=80');
-                background-size: cover;
-                background-position: center;
+                height: 200px;
+                background: linear-gradient(135deg, #091736 0%, #15326e 100%);
                 position: relative;
-                border-bottom-left-radius: 35px;
-                border-bottom-right-radius: 35px;
+                border-bottom-left-radius: 30px;
+                border-bottom-right-radius: 30px;
                 overflow: hidden;
                 flex-shrink: 0;
+                display: flex;
+                align-items: center;
+                justify-content: center;
+                text-align: center;
+                padding: 1rem;
             }
 
-            .m-top-banner::after {
-                content: '';
-                position: absolute;
-                inset: 0;
-                background: rgba(15, 23, 42, 0.45);
-            }
-
-            /* Tombol Kembali (Back Arrow) */
             .m-back-btn {
                 position: absolute;
                 top: 20px;
                 left: 20px;
                 z-index: 10;
-                background: rgba(255, 255, 255, 0.2);
-                border: 1px solid rgba(255, 255, 255, 0.4);
+                background: rgba(255, 255, 255, 0.15);
+                border: 1px solid rgba(255, 255, 255, 0.3);
                 color: #fff;
-                width: 38px;
-                height: 38px;
+                width: 36px;
+                height: 36px;
                 border-radius: 50%;
                 display: flex;
                 align-items: center;
                 justify-content: center;
                 text-decoration: none;
                 backdrop-filter: blur(4px);
-                font-size: 1.1rem;
             }
 
-            /* Konten Body Form Mobile */
             .m-content-body {
                 flex: 1;
-                padding: 1.5rem 1.75rem 3.5rem 1.75rem;
+                padding: 1.5rem 1.75rem 3rem 1.75rem;
                 display: flex;
                 flex-direction: column;
                 justify-content: space-between;
-                overflow: hidden;
+                overflow-y: auto;
             }
 
-            /* Spasi antar input mobile agar tidak berdempetan */
-            .m-content-body .mb-3 {
-                margin-bottom: 1rem !important;
-            }
-
-            /* Footer Fixed Absolute di Bawah untuk Mobile */
             .mobile-footer-fixed {
                 position: absolute;
-                bottom: 10px;
+                bottom: 8px;
                 left: 0;
                 width: 100%;
                 text-align: center;
@@ -541,31 +521,48 @@
     </div>
 
     <!-- ========================================================== -->
-    <!-- TAMPILAN DESKTOP (Split Screen) -->
+    <!-- TAMPILAN DESKTOP (Split Screen - Mengikuti Referensi Gambar) -->
     <!-- ========================================================== -->
     <div class="login-wrapper">
-        <!-- SISI KIRI: Form Input & Login -->
+        <!-- SISI KIRI: Panel Ilustrasi & Welcome -->
+        <div class="login-banner-side d-none d-md-flex">
+            <div>
+                <span class="brand-badge-pill">
+                    <i class="bi bi-hexagon-fill text-info"></i> COMPANY
+                </span>
+            </div>
+            <div class="banner-content-overlay">
+                <div class="welcome-big-text">Welcome :)</div>
+                <h5 class="fw-bold mb-2" style="font-size: 1.1rem; color: #38bdf8;">Convert Your Smart Idea to The Great Business</h5>
+                <p class="text-white-50 mb-0" style="font-size: 0.8rem; line-height: 1.4;">Lorem ipsum dolor sit amet, consectetuer adipiscing elit, sed diam nonummy nibh euismod tincidunt ut laoreet dolore magna aliquam erat volutpat.</p>
+            </div>
+            <div>
+                <span class="text-white-50" style="font-size: 0.7rem;">&copy; 2026 Company &middot; All Rights Reserved</span>
+            </div>
+        </div>
+
+        <!-- SISI KANAN: Form Input & Login -->
         <div class="login-form-side">
             <div>
-                <div class="mb-3">
-                    <span class="brand-badge-pill">Innoventra Solusi Digital</span>
+                <div class="d-flex justify-content-between align-items-center mb-2">
+                    <span class="brand-badge-pill d-md-none">Innoventra</span>
+                    <span class="subtitle">Join over 50 million members from around the globe</span>
                 </div>
-                <div class="brand-title">Welcome Back</div>
-                <div class="subtitle">Sila masukkan akses akaun anda untuk meneruskan</div>
+                <div class="brand-title">Sign In to Continue</div>
             </div>
 
-            <div class="form-card-box my-1">
+            <div class="form-card-box my-2">
                 <form id="loginFormDesktop">
-                    <div class="mb-3 text-start">
-                        <label for="username_desk" class="form-label">Username</label>
+                    <div class="mb-2 text-start">
+                        <label for="username_desk" class="form-label">Username / Email</label>
                         <div class="input-group">
-                            <span class="input-group-text"><i class="bi bi-envelope-fill"></i></span>
-                            <input type="text" id="username_desk" class="form-control" placeholder="Email Address / Username" required autocomplete="username">
+                            <span class="input-group-text"><i class="bi bi-person-fill"></i></span>
+                            <input type="text" id="username_desk" class="form-control" placeholder="Username" required autocomplete="username">
                         </div>
                     </div>
 
-                    <div class="mb-3 text-start">
-                        <label for="password_desk" class="form-label">Kata Sandi</label>
+                    <div class="mb-2 text-start">
+                        <label for="password_desk" class="form-label">Password</label>
                         <div class="input-group">
                             <span class="input-group-text"><i class="bi bi-lock-fill"></i></span>
                             <input type="password" id="password_desk" class="form-control" placeholder="Password" required autocomplete="current-password">
@@ -575,34 +572,27 @@
                     <div class="d-flex justify-content-between align-items-center mb-3 px-1">
                         <div class="form-check">
                             <input type="checkbox" class="form-check-input" id="rememberMeDesk">
-                            <label for="rememberMeDesk" class="form-check-label text-white small fw-medium" style="font-size: 0.78rem;">Ingat saya</label>
+                            <label for="rememberMeDesk" class="form-check-label text-white small fw-medium" style="font-size: 0.75rem;">Remember me</label>
                         </div>
-                        <a href="#" class="text-decoration-none text-white fw-semibold" style="font-size: 0.78rem;" data-bs-toggle="modal" data-bs-target="#modalLupaPassword">Forget Password?</a>
+                        <a href="#" class="text-decoration-none text-white fw-semibold" style="font-size: 0.75rem;" data-bs-toggle="modal" data-bs-target="#modalLupaPassword">Forgot password?</a>
                     </div>
 
-                    <button type="submit" class="btn btn-primary w-100 mb-3">
-                        Sign In / Masuk
+                    <button type="submit" class="btn btn-primary w-100 mb-2">
+                        Login
                     </button>
 
-                    <a href="javascript:void(0)" class="contact-admin-link" data-bs-toggle="modal" data-bs-target="#modalHubungiAdmin">
+                    <div class="text-center mt-2">
+                        <span class="text-white-50" style="font-size: 0.75rem;">Don't have an account? <a href="#" class="text-white fw-bold text-decoration-underline" data-bs-toggle="modal" data-bs-target="#modalHubungiAdmin">Create Account</a></span>
+                    </div>
+
+                    <a href="javascript:void(0)" class="contact-admin-link mt-2" data-bs-toggle="modal" data-bs-target="#modalHubungiAdmin">
                         <i class="bi bi-headset text-info"></i> Hubungi Admin Sistem
                     </a>
                 </form>
             </div>
 
-            <div class="text-center mt-2">
-                <span class="text-white opacity-75" style="font-size: 0.7rem;">&copy; 2026 Innoventra by Transforma &middot; Syarat & Ketentuan</span>
-            </div>
-        </div>
-
-        <!-- SISI KANAN: Panel Gambar Ilustrasi Profesional -->
-        <div class="login-banner-side d-none d-md-flex">
-            <div class="banner-content-overlay">
-                <span class="badge bg-dark bg-opacity-60 px-3 py-2 rounded-pill mb-2 border border-light border-opacity-25" style="font-size: 0.75rem;">
-                    <i class="bi bi-shield-check-fill text-info"></i> Secure Enterprise Portal v2.6
-                </span>
-                <h5 class="fw-bold mb-1" style="font-size: 1.15rem;">Transformasi Digital Perusahaan</h5>
-                <p class="text-white-50 mb-0" style="font-size: 0.78rem;">Kelola operasional dan data perusahaan secara real-time dan terintegrasi.</p>
+            <div class="text-center">
+                <span class="text-white opacity-50" style="font-size: 0.68rem;">&copy; 2026 Innoventra by Transforma</span>
             </div>
         </div>
     </div>
@@ -612,41 +602,44 @@
     <!-- TAMPILAN MOBILE (Multi-Screen: Welcome -> Login / Register) -->
     <!-- ========================================================== -->
 
-    <!-- SCREEN 1: WELCOME SCREEN (Halaman Awal Mobile) -->
+    <!-- SCREEN 1: WELCOME SCREEN (Mobile) -->
     <div id="mobileWelcomeScreen" class="mobile-screen active-screen d-lg-none">
-        <div class="m-top-banner" style="height: 260px;"></div>
-        <div class="m-content-body text-center" style="justify-content: flex-start; padding-top: 2rem;">
+        <div class="m-top-banner" style="height: 320px;">
             <div>
-                <h1 class="text-white fw-bold mb-2" style="font-size: 2rem;">Innoventra</h1>
-                <p class="text-white-50 small px-3 mb-4" style="font-size: 0.83rem;">Solusi sistem manajemen digital terpadu perusahaan Anda. Sila pilih akses untuk meneruskan.</p>
+                <span class="brand-badge-pill mb-3"><i class="bi bi-hexagon-fill text-info"></i> COMPANY</span>
+                <h1 class="text-white fw-bold mb-1" style="font-size: 2.5rem;">Welcome :)</h1>
+                <p class="text-info small mb-0 fw-semibold" style="font-size: 0.8rem;">Convert Your Smart Idea to The Great Business</p>
             </div>
-            <div class="w-100 px-3 mt-3">
+        </div>
+        <div class="m-content-body text-center" style="justify-content: flex-start; padding-top: 1.5rem;">
+            <p class="text-white-50 small px-2 mb-4" style="font-size: 0.8rem;">Join over 50 million members from around the globe to manage your digital enterprise.</p>
+            <div class="w-100 px-2 mt-auto">
                 <button type="button" id="btnGoLogin" class="btn btn-primary w-100 mb-3 py-2.5">
                     LOGIN
                 </button>
-                <button type="button" id="btnGoRegister" class="btn w-100 py-2.5 fw-bold text-white" style="background: rgba(255,255,255,0.15); border: 1px solid rgba(255,255,255,0.4); border-radius: 50rem;">
+                <button type="button" id="btnGoRegister" class="btn w-100 py-2.5 fw-bold text-white" style="background: rgba(255,255,255,0.15); border: 1px solid rgba(255,255,255,0.3); border-radius: 50rem;">
                     SIGN UP
                 </button>
             </div>
         </div>
         <div class="mobile-footer-fixed d-lg-none text-center">
-            <span class="text-white opacity-75" style="font-size: 0.7rem;">&copy; 2026 Innoventra by Transforma &middot; Syarat & Ketentuan</span>
+            <span class="text-white opacity-75" style="font-size: 0.68rem;">&copy; 2026 Innoventra by Transforma</span>
         </div>
     </div>
 
-    <!-- SCREEN 2: LOGIN SCREEN (Form Login Mobile) -->
+    <!-- SCREEN 2: LOGIN SCREEN (Mobile) -->
     <div id="mobileLoginScreen" class="mobile-screen d-lg-none">
-        <div class="m-top-banner" style="height: 150px;">
+        <div class="m-top-banner" style="height: 160px;">
             <a href="javascript:void(0)" class="m-back-btn btnBackToWelcome"><i class="bi bi-chevron-left"></i></a>
+            <div>
+                <span class="brand-badge-pill mb-1" style="font-size: 0.75rem;"><i class="bi bi-hexagon-fill text-info"></i> COMPANY</span>
+                <h5 class="text-white fw-bold mb-0" style="font-size: 1.1rem;">Sign in to continue</h5>
+            </div>
         </div>
         <div class="m-content-body">
-            <div>
-                <h4 class="text-white fw-bold mb-1">Welcome Back</h4>
-                <p class="text-white-50 small" style="font-size: 0.78rem;">Login to your account</p>
-            </div>
-
             <form id="loginFormMobile" class="my-auto">
                 <div class="mb-3 text-start">
+                    <label class="form-label">Username</label>
                     <div class="input-group">
                         <span class="input-group-text"><i class="bi bi-person"></i></span>
                         <input type="text" id="username_mob" class="form-control" placeholder="Username" required autocomplete="username">
@@ -654,6 +647,7 @@
                 </div>
 
                 <div class="mb-3 text-start">
+                    <label class="form-label">Password</label>
                     <div class="input-group">
                         <span class="input-group-text"><i class="bi bi-lock"></i></span>
                         <input type="password" id="password_mob" class="form-control" placeholder="Password" required autocomplete="current-password">
@@ -665,91 +659,85 @@
                         <input type="checkbox" class="form-check-input" id="rememberMeMob">
                         <label for="rememberMeMob" class="form-check-label text-white small" style="font-size: 0.75rem;">Remember me</label>
                     </div>
-                    <a href="#" class="text-decoration-none text-white fw-semibold" style="font-size: 0.75rem;" data-bs-toggle="modal" data-bs-target="#modalLupaPassword">Forgot Password?</a>
+                    <a href="#" class="text-decoration-none text-white fw-semibold" style="font-size: 0.75rem;" data-bs-toggle="modal" data-bs-target="#modalLupaPassword">Forgot password?</a>
                 </div>
 
                 <button type="submit" class="btn btn-primary w-100 mb-3">
-                    LOGIN
+                    Login
                 </button>
 
                 <div class="text-center">
                     <span class="text-white-50 small" style="font-size: 0.75rem;">Don't have an account? <a href="javascript:void(0)" id="linkSwitchToRegister" class="text-white fw-bold text-decoration-underline">Sign up</a></span>
                 </div>
             </form>
-
-            <div style="height: 10px;"></div>
         </div>
         <div class="mobile-footer-fixed d-lg-none text-center">
-            <span class="text-white opacity-75" style="font-size: 0.7rem;">&copy; 2026 Innoventra by Transforma &middot; Syarat & Ketentuan</span>
+            <span class="text-white opacity-75" style="font-size: 0.68rem;">&copy; 2026 Innoventra by Transforma</span>
         </div>
     </div>
 
-    <!-- SCREEN 3: REGISTER SCREEN (Form Register Mobile) -->
+    <!-- SCREEN 3: REGISTER SCREEN (Mobile) -->
     <div id="mobileRegisterScreen" class="mobile-screen d-lg-none">
-        <div class="m-top-banner" style="height: 140px;">
+        <div class="m-top-banner" style="height: 150px;">
             <a href="javascript:void(0)" class="m-back-btn btnBackToWelcome"><i class="bi bi-chevron-left"></i></a>
+            <div>
+                <span class="brand-badge-pill mb-1" style="font-size: 0.75rem;"><i class="bi bi-hexagon-fill text-info"></i> COMPANY</span>
+                <h5 class="text-white fw-bold mb-0" style="font-size: 1.1rem;">Sign up to continue</h5>
+            </div>
         </div>
         <div class="m-content-body">
-            <div>
-                <h4 class="text-white fw-bold mb-1">Register</h4>
-                <p class="text-white-50 small" style="font-size: 0.78rem;">Create your account</p>
-            </div>
-
             <form id="registerFormMobile" class="my-auto">
                 <div class="mb-2 text-start">
+                    <label class="form-label">Email Address</label>
+                    <div class="input-group">
+                        <span class="input-group-text"><i class="bi bi-envelope"></i></span>
+                        <input type="email" id="reg_email" class="form-control" placeholder="Email Address" required>
+                    </div>
+                </div>
+
+                <div class="mb-2 text-start">
+                    <label class="form-label">Username</label>
                     <div class="input-group">
                         <span class="input-group-text"><i class="bi bi-person"></i></span>
                         <input type="text" id="reg_username" class="form-control" placeholder="Username" required>
                     </div>
                 </div>
 
-                <div class="mb-2 text-start">
-                    <div class="input-group">
-                        <span class="input-group-text"><i class="bi bi-envelope"></i></span>
-                        <input type="email" id="reg_email" class="form-control" placeholder="Email address" required>
-                    </div>
-                </div>
-
-                <div class="mb-2 text-start">
+                <div class="mb-3 text-start">
+                    <label class="form-label">Password</label>
                     <div class="input-group">
                         <span class="input-group-text"><i class="bi bi-lock"></i></span>
                         <input type="password" id="reg_password" class="form-control" placeholder="Password" required>
                     </div>
                 </div>
 
-                <div class="mb-3 text-start">
-                    <div class="input-group">
-                        <span class="input-group-text"><i class="bi bi-lock-fill"></i></span>
-                        <input type="password" id="reg_confirm" class="form-control" placeholder="Confirm password" required>
-                    </div>
+                <div class="form-check mb-3 text-start px-1">
+                    <input type="checkbox" class="form-check-input" id="agreeTerms" required>
+                    <label for="agreeTerms" class="form-check-label text-white-50" style="font-size: 0.7rem;">
+                        I agree to all statements included in <a href="#" class="text-white text-decoration-underline">Terms of Use</a>
+                    </label>
                 </div>
 
-                <p class="text-white-50 text-center mb-3" style="font-size: 0.68rem; line-height: 1.2;">
-                    By registering, you are agreeing to our <a href="#" class="text-white text-decoration-underline">Terms of use</a> and <a href="#" class="text-white text-decoration-underline">Privacy Policy</a>.
-                </p>
-
                 <button type="submit" class="btn btn-primary w-100 mb-2">
-                    REGISTER
+                    Sign Up
                 </button>
 
                 <div class="text-center">
-                    <span class="text-white-50 small" style="font-size: 0.75rem;">Already have an account? <a href="javascript:void(0)" id="linkSwitchToLogin" class="text-white fw-bold text-decoration-underline">Login</a></span>
+                    <span class="text-white-50 small" style="font-size: 0.75rem;">Already a member? <a href="javascript:void(0)" id="linkSwitchToLogin" class="text-white fw-bold text-decoration-underline">Login</a></span>
                 </div>
             </form>
-
-            <div style="height: 5px;"></div>
         </div>
         <div class="mobile-footer-fixed d-lg-none text-center">
-            <span class="text-white opacity-75" style="font-size: 0.7rem;">&copy; 2026 Innoventra by Transforma &middot; Syarat & Ketentuan</span>
+            <span class="text-white opacity-75" style="font-size: 0.68rem;">&copy; 2026 Innoventra by Transforma</span>
         </div>
     </div>
 
 
     <!-- ================= MODAL HUBUNGI ADMIN SISTEM ================= -->
-    <div class="modal fade" id="modalHubungiAdmin" tabindex="-1" aria-labelledby="modalHubungiAdminLabel" aria-hidden="true">
+    <div class="modal fade" id="modalHubungiAdmin" tabindex="-1" aria-hidden="true">
         <div class="modal-dialog modal-dialog-centered">
             <div class="modal-content border-0 shadow-lg" style="border-radius: 1.5rem; overflow: hidden;">
-                <div class="modal-header border-0 text-center flex-column pb-0 pt-4" style="background: linear-gradient(135deg, rgba(29, 78, 216, 0.08), rgba(0, 0, 0, 0.02));">
+                <div class="modal-header border-0 text-center flex-column pb-0 pt-4" style="background: linear-gradient(135deg, rgba(37, 99, 235, 0.08), rgba(0, 0, 0, 0.02));">
                     <button type="button" class="btn-close position-absolute top-0 end-0 m-3" data-bs-dismiss="modal" aria-label="Close"></button>
                     <div class="p-3 bg-white rounded-circle shadow-sm mb-2 d-inline-flex align-items-center justify-content-center" style="width: 60px; height: 60px;">
                         <i class="bi bi-headset text-primary fs-4"></i>
@@ -780,7 +768,7 @@
                                 <textarea id="contact_desc" class="form-control" rows="4" placeholder="Jelaskan kendala atau pesan Anda secara detail..." required></textarea>
                             </div>
                         </div>
-                        <button type="submit" class="btn btn-dark w-100 mt-2 rounded-3 text-white" style="background: #1d4ed8 !important; border: none;">
+                        <button type="submit" class="btn btn-dark w-100 mt-2 rounded-3 text-white" style="background: #2563eb !important; border: none;">
                             <i class="bi bi-send-fill me-2"></i>Kirim Pesan ke Admin
                         </button>
                     </form>
@@ -790,10 +778,10 @@
     </div>
 
     <!-- ================= MODAL LUPA & RESET PASSWORD ================= -->
-    <div class="modal fade" id="modalLupaPassword" tabindex="-1" aria-labelledby="modalLupaPasswordLabel" aria-hidden="true" data-bs-backdrop="static">
+    <div class="modal fade" id="modalLupaPassword" tabindex="-1" aria-hidden="true" data-bs-backdrop="static">
         <div class="modal-dialog modal-dialog-centered">
             <div class="modal-content border-0 shadow-lg" style="border-radius: 1.5rem; overflow: hidden;">
-                <div class="modal-header border-0 text-center flex-column pb-0 pt-4" style="background: linear-gradient(135deg, rgba(29, 78, 216, 0.08), rgba(0, 0, 0, 0.02));">
+                <div class="modal-header border-0 text-center flex-column pb-0 pt-4" style="background: linear-gradient(135deg, rgba(37, 99, 235, 0.08), rgba(0, 0, 0, 0.02));">
                     <button type="button" class="btn-close position-absolute top-0 end-0 m-3" data-bs-dismiss="modal" aria-label="Close"></button>
                     <div class="p-3 bg-white rounded-circle shadow-sm mb-2 d-inline-flex align-items-center justify-content-center" style="width: 60px; height: 60px;">
                         <i id="modalHeaderIcon" class="bi bi-shield-lock-fill text-primary fs-4"></i>
@@ -812,7 +800,7 @@
                                     <input type="email" id="email" class="form-control" placeholder="contoh@email.com" required>
                                 </div>
                             </div>
-                            <button type="submit" id="btnKirimOtp" class="btn btn-dark w-100 mt-2 rounded-3 text-white" style="background: #1d4ed8 !important; border: none;">
+                            <button type="submit" id="btnKirimOtp" class="btn btn-dark w-100 mt-2 rounded-3 text-white" style="background: #2563eb !important; border: none;">
                                 <i class="bi bi-send me-2"></i>Kirim Kode OTP
                             </button>
                         </form>
@@ -829,35 +817,8 @@
                                 <input type="text" class="form-control otp-input" maxlength="1" pattern="[0-9]" inputmode="numeric" required>
                                 <input type="text" class="form-control otp-input" maxlength="1" pattern="[0-9]" inputmode="numeric" required>
                             </div>
-                            <button type="submit" id="btnVerifikasiOtp" class="btn btn-dark w-100 rounded-3 text-white" style="background: #1d4ed8 !important; border: none;">
+                            <button type="submit" id="btnVerifikasiOtp" class="btn btn-dark w-100 rounded-3 text-white" style="background: #2563eb !important; border: none;">
                                 <i class="bi bi-patch-check me-2"></i>Verifikasi OTP
-                            </button>
-                        </form>
-                        <div class="mt-3">
-                            <small class="text-muted" style="font-size: 0.8rem;">Tidak menerima kode?
-                                <a href="javascript:void(0)" id="btnKirimUlangOtp" class="text-decoration-none fw-semibold text-primary">Kirim Ulang</a>
-                            </small>
-                        </div>
-                    </div>
-
-                    <div id="step-reset" style="display: none;">
-                        <form id="formResetPassword">
-                            <div class="mb-3 text-start">
-                                <label for="new_password" class="form-label text-dark">Password Baru</label>
-                                <div class="input-group mb-3">
-                                    <span class="input-group-text"><i class="bi bi-key"></i></span>
-                                    <input type="password" id="new_password" class="form-control" placeholder="Masukkan password baru" required>
-                                </div>
-                            </div>
-                            <div class="mb-3 text-start">
-                                <label for="confirm_password" class="form-label text-dark">Konfirmasi Password</label>
-                                <div class="input-group mb-3">
-                                    <span class="input-group-text"><i class="bi bi-check2-circle"></i></span>
-                                    <input type="password" id="confirm_password" class="form-control" placeholder="Ulangi password baru" required>
-                                </div>
-                            </div>
-                            <button type="submit" id="btnSimpanPassword" class="btn btn-dark w-100 mt-2 rounded-3 text-white" style="background: #1d4ed8 !important; border: none;">
-                                <i class="bi bi-box-arrow-in-down me-2"></i>Simpan Password Baru
                             </button>
                         </form>
                     </div>
@@ -976,16 +937,6 @@
         // Handler Proses Register Mobile
         document.getElementById('registerFormMobile').addEventListener('submit', function(e) {
             e.preventDefault();
-            const u = $('#reg_username').val().trim();
-            const em = $('#reg_email').val().trim();
-            const p = $('#reg_password').val().trim();
-            const cp = $('#reg_confirm').val().trim();
-
-            if (p !== cp) {
-                Swal.fire('Perhatian', 'Konfirmasi password tidak cocok!', 'warning');
-                return;
-            }
-
             const btn = this.querySelector('button[type="submit"]');
             overlaySpinner.style.display = 'block';
             overlayTitle.textContent = 'Pendaftaran Akun';
