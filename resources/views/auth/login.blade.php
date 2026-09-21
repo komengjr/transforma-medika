@@ -128,7 +128,7 @@
             max-width: 1100px;
             height: 640px;
             margin: 1.5rem;
-            background: linear-gradient(135deg, #1e3a8a 0%, #122761 60%, #0284c7 100%);
+            background: linear-gradient(135deg, #1e3a8a 0%, #1d4ed8 60%, #0284c7 100%);
             backdrop-filter: blur(25px);
             border-radius: 2.5rem;
             box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.4);
@@ -428,7 +428,7 @@
             display: none;
         }
 
-        /* === MOBILE STYLING (Fixed Full Screen, No Scroll) === */
+        /* === MOBILE STYLING (Fixed Full Screen, No Scroll, Spaced Inputs, Fixed Footer) === */
         @media (max-width: 992px) {
             body {
                 background: linear-gradient(135deg, #0d1b2a 0%, #1b263b 50%, #1d4ed8 100%) !important;
@@ -439,7 +439,6 @@
                 align-items: stretch;
                 justify-content: flex-start;
                 overflow: hidden !important;
-                /* Mencegah scroll sama sekali */
                 position: fixed;
                 inset: 0;
                 padding: 0;
@@ -468,14 +467,13 @@
             .mobile-top-banner {
                 display: block;
                 width: 100%;
-                height: 160px;
-                /* Diperkecil sedikit agar pas tanpa scroll */
+                height: 140px;
                 background-image: url('https://images.unsplash.com/photo-1522071820081-009f0129c71c?auto=format&fit=crop&w=800&q=80');
                 background-size: cover;
                 background-position: center;
                 position: relative;
-                border-bottom-left-radius: 35px;
-                border-bottom-right-radius: 35px;
+                border-bottom-left-radius: 30px;
+                border-bottom-right-radius: 30px;
                 overflow: hidden;
                 flex-shrink: 0;
             }
@@ -491,14 +489,15 @@
                 flex: 1 !important;
                 width: 100%;
                 background: transparent !important;
-                padding: 1.25rem 1.75rem 1.5rem 1.75rem !important;
+                padding: 1rem 1.5rem 3.5rem 1.5rem !important;
+                /* Padding bawah disisakan untuk footer fixed */
                 box-shadow: none !important;
                 margin-top: 0 !important;
                 border-radius: 0 !important;
                 overflow: hidden !important;
                 display: flex;
                 flex-direction: column;
-                justify-content: space-between;
+                justify-content: flex-start;
             }
 
             .login-form-side>div:first-child,
@@ -512,8 +511,8 @@
                 display: flex;
                 justify-content: space-between;
                 align-items: center;
-                margin-bottom: 1rem;
-                padding: 0 0.5rem;
+                margin-bottom: 1.2rem;
+                padding: 0 0.2rem;
                 flex-shrink: 0;
             }
 
@@ -540,6 +539,23 @@
                 height: 3px;
                 background-color: #ffffff;
                 border-radius: 2px;
+            }
+
+            /* Jarak antar elemen form mobile agar tidak berdempetan */
+            #loginForm .mb-2,
+            #loginForm .mb-3 {
+                margin-bottom: 1rem !important;
+                /* Memberi jarak lebih longgar antar input */
+            }
+
+            /* Footer Fixed Absolute di bawah khusus mobile */
+            .mobile-footer-fixed {
+                position: absolute;
+                bottom: 10px;
+                left: 0;
+                width: 100%;
+                text-align: center;
+                z-index: 10;
             }
         }
     </style>
@@ -591,7 +607,7 @@
             <!-- BAGIAN CARD FORM -->
             <div class="form-card-box my-1">
                 <form id="loginForm">
-                    <div class="mb-2 text-start">
+                    <div class="mb-3 text-start">
                         <label for="username" class="form-label d-none d-lg-block">Username</label>
                         <div class="input-group">
                             <span class="input-group-text"><i class="bi bi-envelope-fill"></i></span>
@@ -599,7 +615,7 @@
                         </div>
                     </div>
 
-                    <div class="mb-2 text-start">
+                    <div class="mb-3 text-start">
                         <label for="password" class="form-label d-none d-lg-block">Kata Sandi</label>
                         <div class="input-group">
                             <span class="input-group-text"><i class="bi bi-lock-fill"></i></span>
@@ -615,7 +631,7 @@
                         <a href="#" class="text-decoration-none text-white text-lg-white fw-semibold" style="font-size: 0.78rem;" data-bs-toggle="modal" data-bs-target="#modalLupaPassword">Forget Password?</a>
                     </div>
 
-                    <button type="submit" class="btn btn-primary w-100 mb-2">
+                    <button type="submit" class="btn btn-primary w-100 mb-3">
                         Sign In / Masuk
                     </button>
 
@@ -626,8 +642,8 @@
                 </form>
             </div>
 
-            <!-- Bagian Bawah: Footer -->
-            <div class="text-center mt-2">
+            <!-- Bagian Bawah: Footer (Desktop standard & Mobile Fixed Absolute) -->
+            <div class="text-center mt-2 d-none d-lg-block">
                 <span id="notifikasi-login" class="d-none"></span>
                 <span class="text-white opacity-75" style="font-size: 0.7rem;">&copy; 2026 Innoventra by Transforma &middot; Syarat & Ketentuan</span>
             </div>
@@ -644,6 +660,12 @@
             </div>
         </div>
 
+    </div>
+
+    <!-- Footer Fixed Absolute Khusus Tampilan Mobile di Luar Wrapper agar tidak tertutup -->
+    <div class="mobile-footer-fixed d-lg-none text-center">
+        <span id="notifikasi-login-mobile" class="d-none"></span>
+        <span class="text-white opacity-75" style="font-size: 0.7rem;">&copy; 2026 Innoventra by Transforma &middot; Syarat & Ketentuan</span>
     </div>
 
     <!-- ================= MODAL HUBUNGI ADMIN SISTEM ================= -->
