@@ -4,7 +4,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1">
-    <title>Login & Register | Innoventra by Transforma</title>
+    <title>Login | Innoventra Digital Solusi</title>
     <link rel="icon" type="image/png" sizes="32x32" href="{{ asset('img/favicon.png') }}">
     <!-- Bootstrap 5 -->
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet">
@@ -410,7 +410,7 @@
             display: none;
         }
 
-        /* === MOBILE STYLING (Posisi Button Pas Antara Tengah & Bawah Tanpa Scroll) === */
+        /* === MOBILE STYLING (Header Bergelombang & Tombol di Tengah-Bawah) === */
         @media (max-width: 992px) {
             body {
                 background: linear-gradient(135deg, #09111e 0%, #0f1c3f 50%, #1e3a8a 100%) !important;
@@ -445,20 +445,27 @@
                 display: none !important;
             }
 
+            /* Header Bergelombang (Wave Header) */
             .m-top-banner {
                 width: 100%;
-                height: 140px;
+                height: 170px;
                 background: linear-gradient(135deg, #091736 0%, #15326e 100%);
                 position: relative;
-                border-bottom-left-radius: 25px;
-                border-bottom-right-radius: 25px;
-                overflow: hidden;
                 flex-shrink: 0;
                 display: flex;
                 align-items: center;
                 justify-content: center;
                 text-align: center;
-                padding: 1rem;
+                padding: 1rem 1rem 2rem 1rem;
+            }
+
+            .m-wave-svg {
+                position: absolute;
+                bottom: -1px;
+                left: 0;
+                width: 100%;
+                height: 35px;
+                pointer-events: none;
             }
 
             .m-back-btn {
@@ -485,11 +492,11 @@
                 display: flex;
                 flex-direction: column;
                 justify-content: center;
-                /* Konten form berada di area tengah layar */
+                /* Konten di area tengah layar */
                 overflow: hidden;
             }
 
-            /* Area Tombol & Footer diatur agar berada proporsional di antara tengah dan bawah */
+            /* Area Tombol & Footer diatur agar berada tepat di antara tengah dan bawah */
             .mobile-action-area {
                 width: 100%;
                 padding: 0.5rem 1.5rem 2rem 1.5rem;
@@ -499,9 +506,7 @@
                 align-items: center;
                 flex-shrink: 0;
                 margin-top: auto;
-                /* Mendorong area aksi ke posisi bawah secara fleksibel */
                 margin-bottom: 1.5rem;
-                /* Jarak pas agar tidak terlalu mentok ke bawah layar/navigasi HP */
             }
         }
     </style>
@@ -540,8 +545,8 @@
             </div>
             <div class="banner-content-overlay">
                 <div class="welcome-big-text">Welcome :)</div>
-                <h5 class="fw-bold mb-2" style="font-size: 1.1rem; color: #38bdf8;">Convert Your Smart Idea to The Great Business</h5>
-                <p class="text-white-50 mb-0" style="font-size: 0.8rem; line-height: 1.4;">Lorem ipsum dolor sit amet, consectetuer adipiscing elit, sed diam nonummy nibh euismod tincidunt ut laoreet dolore magna aliquam erat volutpat.</p>
+                <h5 class="fw-bold mb-2" style="font-size: 1.1rem; color: #38bdf8;">PT Innoventra Solusi Digital</h5>
+                <p class="text-white-50 mb-0" style="font-size: 0.8rem; line-height: 1.4;">Penyedia layanan pengembangan perangkat lunak terkemuka, spesialis web application development, REST API design, dan integrasi sistem enterprise.</p>
             </div>
             <div>
                 <span class="text-white-50" style="font-size: 0.7rem;">&copy; 2026 Innoventra by Transforma &middot; All Rights Reserved</span>
@@ -553,7 +558,7 @@
             <div>
                 <div class="d-flex justify-content-between align-items-center mb-2">
                     <span class="brand-badge-pill d-md-none">Innoventra</span>
-                    <span class="subtitle">Join over 50 million members from around the globe</span>
+                    <span class="subtitle">Secure Enterprise Portal</span>
                 </div>
                 <div class="brand-title">Sign In to Continue</div>
             </div>
@@ -584,13 +589,9 @@
                         <a href="#" class="text-decoration-none text-white fw-semibold" style="font-size: 0.75rem;" data-bs-toggle="modal" data-bs-target="#modalLupaPassword">Forgot password?</a>
                     </div>
 
-                    <button type="submit" class="btn btn-primary w-100 mb-2">
+                    <button type="submit" id="btnSubmitDesk" class="btn btn-primary w-100 mb-2">
                         Login
                     </button>
-
-                    <div class="text-center mt-2">
-                        <span class="text-white-50" style="font-size: 0.75rem;">Don't have an account? <a href="#" class="text-white fw-bold text-decoration-underline" data-bs-toggle="modal" data-bs-target="#modalHubungiAdmin">Create Account</a></span>
-                    </div>
 
                     <a href="javascript:void(0)" class="contact-admin-link mt-2" data-bs-toggle="modal" data-bs-target="#modalHubungiAdmin">
                         <i class="bi bi-headset text-info"></i> Hubungi Admin Sistem
@@ -606,29 +607,32 @@
 
 
     <!-- ========================================================== -->
-    <!-- TAMPILAN MOBILE (Multi-Screen dengan Posisi Tombol Tengah-Bawah) -->
+    <!-- TAMPILAN MOBILE (Tanpa Sign Up, Header Gelombang, Info Innoventra) -->
     <!-- ========================================================== -->
 
     <!-- SCREEN 1: WELCOME SCREEN (Mobile) -->
     <div id="mobileWelcomeScreen" class="mobile-screen active-screen d-lg-none">
-        <div class="m-top-banner" style="height: 180px;">
+        <div class="m-top-banner">
             <div>
-                <span class="brand-badge-pill mb-2"><i class="bi bi-hexagon-fill text-info"></i> Innoventra</span>
-                <h1 class="text-white fw-bold mb-1" style="font-size: 1.8rem;">Welcome :)</h1>
-                <p class="text-info small mb-0 fw-semibold" style="font-size: 0.72rem;">Convert Your Smart Idea to The Great Business</p>
+                <span class="brand-badge-pill mb-1" style="font-size: 0.7rem;"><i class="bi bi-hexagon-fill text-info"></i> Innoventra Digital Solusi</span>
+                <h1 class="text-white fw-bold mb-0" style="font-size: 1.6rem;">Welcome :)</h1>
             </div>
+            <!-- SVG Wave Header -->
+            <svg class="m-wave-svg" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1440 120" preserveAspectRatio="none">
+                <path fill="#09111e" fill-opacity="1" d="M0,32L48,42.7C96,53,192,75,288,80C384,85,480,75,576,58.7C672,43,768,21,864,21.3C960,21,1056,43,1152,53.3C1248,64,1344,64,1392,64L1440,64L1440,120L1392,120C1344,120,1248,120,1152,120C1056,120,960,120,864,120C768,120,672,120,576,120C480,120,384,120,288,120C192,120,96,120,48,120L0,120Z"></path>
+            </svg>
         </div>
         <div class="m-content-body text-center">
-            <p class="text-white-50 small px-2 mb-0" style="font-size: 0.8rem;">Join over 50 million members from around the globe to manage your digital enterprise.</p>
+            <div class="p-3 rounded-4 mb-2" style="background: rgba(255, 255, 255, 0.05); border: 1px solid rgba(255, 255, 255, 0.1);">
+                <h6 class="text-info fw-bold mb-1" style="font-size: 0.85rem;">PT Innoventra Solusi Digital</h6>
+                <p class="text-white-50 mb-0" style="font-size: 0.75rem; line-height: 1.4;">Penyedia solusi digital terintegrasi: Web Application, REST API, Database System, dan Infrastruktur Teknologi Enterprise.</p>
+            </div>
         </div>
         <!-- Action Area (Antara Tengah & Bawah) -->
         <div class="mobile-action-area d-lg-none">
             <div class="w-100 mb-3">
-                <button type="button" id="btnGoLogin" class="btn btn-primary w-100 mb-2 py-2">
-                    LOGIN
-                </button>
-                <button type="button" id="btnGoRegister" class="btn w-100 py-2 fw-bold text-white" style="background: rgba(255,255,255,0.15); border: 1px solid rgba(255,255,255,0.3); border-radius: 50rem;">
-                    SIGN UP
+                <button type="button" id="btnGoLogin" class="btn btn-primary w-100 py-2">
+                    MASUK KE PORTAL
                 </button>
             </div>
             <span class="text-white opacity-75 text-center" style="font-size: 0.68rem;">&copy; 2026 Innoventra by Transforma</span>
@@ -637,12 +641,16 @@
 
     <!-- SCREEN 2: LOGIN SCREEN (Mobile) -->
     <div id="mobileLoginScreen" class="mobile-screen d-lg-none">
-        <div class="m-top-banner" style="height: 120px;">
+        <div class="m-top-banner">
             <a href="javascript:void(0)" class="m-back-btn btnBackToWelcome"><i class="bi bi-chevron-left"></i></a>
             <div>
-                <span class="brand-badge-pill mb-1" style="font-size: 0.7rem;"><i class="bi bi-hexagon-fill text-info"></i> Innoventra</span>
-                <h5 class="text-white fw-bold mb-0" style="font-size: 0.95rem;">Sign in to continue</h5>
+                <span class="brand-badge-pill mb-1" style="font-size: 0.7rem;"><i class="bi bi-hexagon-fill text-info"></i> Innoventra Digital Solusi</span>
+                <h5 class="text-white fw-bold mb-0" style="font-size: 0.95rem;">Sign In to Portal</h5>
             </div>
+            <!-- SVG Wave Header -->
+            <svg class="m-wave-svg" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1440 120" preserveAspectRatio="none">
+                <path fill="#09111e" fill-opacity="1" d="M0,32L48,42.7C96,53,192,75,288,80C384,85,480,75,576,58.7C672,43,768,21,864,21.3C960,21,1056,43,1152,53.3C1248,64,1344,64,1392,64L1440,64L1440,120L1392,120C1344,120,1248,120,1152,120C1056,120,960,120,864,120C768,120,672,120,576,120C480,120,384,120,288,120C192,120,96,120,48,120L0,120Z"></path>
+            </svg>
         </div>
         <div class="m-content-body">
             <form id="loginFormMobile">
@@ -673,66 +681,13 @@
         </div>
         <!-- Action Area (Antara Tengah & Bawah) -->
         <div class="mobile-action-area d-lg-none">
-            <button type="submit" form="loginFormMobile" class="btn btn-primary w-100 mb-2 py-2">
+            <button type="submit" id="btnSubmitMob" form="loginFormMobile" class="btn btn-primary w-100 mb-2 py-2">
                 Login
             </button>
             <div class="text-center mb-2">
-                <span class="text-white-50 small" style="font-size: 0.72rem;">Don't have an account? <a href="javascript:void(0)" id="linkSwitchToRegister" class="text-white fw-bold text-decoration-underline">Sign up</a></span>
-            </div>
-            <span class="text-white opacity-75 text-center" style="font-size: 0.68rem;">&copy; 2026 Innoventra by Transforma</span>
-        </div>
-    </div>
-
-    <!-- SCREEN 3: REGISTER SCREEN (Mobile) -->
-    <div id="mobileRegisterScreen" class="mobile-screen d-lg-none">
-        <div class="m-top-banner" style="height: 110px;">
-            <a href="javascript:void(0)" class="m-back-btn btnBackToWelcome"><i class="bi bi-chevron-left"></i></a>
-            <div>
-                <span class="brand-badge-pill mb-1" style="font-size: 0.7rem;"><i class="bi bi-hexagon-fill text-info"></i> Innoventra</span>
-                <h5 class="text-white fw-bold mb-0" style="font-size: 0.95rem;">Sign up to continue</h5>
-            </div>
-        </div>
-        <div class="m-content-body">
-            <form id="registerFormMobile">
-                <div class="mb-2 text-start">
-                    <label class="form-label" style="font-size: 0.72rem;">Email Address</label>
-                    <div class="input-group">
-                        <span class="input-group-text py-1"><i class="bi bi-envelope"></i></span>
-                        <input type="email" id="reg_email" class="form-control py-1" placeholder="Email Address" required>
-                    </div>
-                </div>
-
-                <div class="mb-2 text-start">
-                    <label class="form-label" style="font-size: 0.72rem;">Username</label>
-                    <div class="input-group">
-                        <span class="input-group-text py-1"><i class="bi bi-person"></i></span>
-                        <input type="text" id="reg_username" class="form-control py-1" placeholder="Username" required>
-                    </div>
-                </div>
-
-                <div class="mb-2 text-start">
-                    <label class="form-label" style="font-size: 0.72rem;">Password</label>
-                    <div class="input-group">
-                        <span class="input-group-text py-1"><i class="bi bi-lock"></i></span>
-                        <input type="password" id="reg_password" class="form-control py-1" placeholder="Password" required>
-                    </div>
-                </div>
-
-                <div class="form-check text-start px-1">
-                    <input type="checkbox" class="form-check-input" id="agreeTerms" required>
-                    <label for="agreeTerms" class="form-check-label text-white-50" style="font-size: 0.65rem;">
-                        I agree to all statements in <a href="#" class="text-white text-decoration-underline">Terms of Use</a>
-                    </label>
-                </div>
-            </form>
-        </div>
-        <!-- Action Area (Antara Tengah & Bawah) -->
-        <div class="mobile-action-area d-lg-none">
-            <button type="submit" form="registerFormMobile" class="btn btn-primary w-100 mb-2 py-2">
-                Sign Up
-            </button>
-            <div class="text-center mb-2">
-                <span class="text-white-50 small" style="font-size: 0.72rem;">Already a member? <a href="javascript:void(0)" id="linkSwitchToLogin" class="text-white fw-bold text-decoration-underline">Login</a></span>
+                <a href="javascript:void(0)" class="text-white-50 text-decoration-none small" style="font-size: 0.72rem;" data-bs-toggle="modal" data-bs-target="#modalHubungiAdmin">
+                    <i class="bi bi-headset text-info"></i> Hubungi Admin Sistem
+                </a>
             </div>
             <span class="text-white opacity-75 text-center" style="font-size: 0.68rem;">&copy; 2026 Innoventra by Transforma</span>
         </div>
@@ -849,36 +804,24 @@
             document.getElementById('mobileLoginScreen').classList.add('active-screen');
         });
 
-        document.getElementById('btnGoRegister').addEventListener('click', () => {
-            document.getElementById('mobileWelcomeScreen').classList.remove('active-screen');
-            document.getElementById('mobileRegisterScreen').classList.add('active-screen');
-        });
-
         document.querySelectorAll('.btnBackToWelcome').forEach(btn => {
             btn.addEventListener('click', () => {
                 document.getElementById('mobileLoginScreen').classList.remove('active-screen');
-                document.getElementById('mobileRegisterScreen').classList.remove('active-screen');
                 document.getElementById('mobileWelcomeScreen').classList.add('active-screen');
             });
         });
 
-        document.getElementById('linkSwitchToRegister').addEventListener('click', () => {
-            document.getElementById('mobileLoginScreen').classList.remove('active-screen');
-            document.getElementById('mobileRegisterScreen').classList.add('active-screen');
-        });
-
-        document.getElementById('linkSwitchToLogin').addEventListener('click', () => {
-            document.getElementById('mobileRegisterScreen').classList.remove('active-screen');
-            document.getElementById('mobileLoginScreen').classList.add('active-screen');
-        });
-
-        // Handler Proses Login (Desktop & Mobile)
+        // Handler Proses Login yang Aman (Anti-Null Error)
         function processLogin(username, password, btnElement) {
             overlaySpinner.style.display = 'block';
             overlayTitle.textContent = 'Autentikasi Sistem';
             statusText.className = 'encryption-text text-info';
             statusText.innerHTML = "Memulakan sambungan selamat...";
-            btnElement.disabled = true;
+
+            if (btnElement) {
+                btnElement.disabled = true;
+            }
+
             overlay.classList.add('active');
 
             setTimeout(() => {
@@ -899,7 +842,9 @@
                 dataType: 'html',
             }).done(function(data) {
                 setTimeout(() => {
-                    btnElement.disabled = false;
+                    if (btnElement) {
+                        btnElement.disabled = false;
+                    }
                     if (data.toLowerCase().includes('success') || data.toLowerCase().includes('berhasil')) {
                         statusText.className = 'encryption-text text-success';
                         statusText.innerHTML = "Login Berhasil! Mengalihkan...";
@@ -918,7 +863,9 @@
                 }, 1500);
             }).fail(function() {
                 setTimeout(() => {
-                    btnElement.disabled = false;
+                    if (btnElement) {
+                        btnElement.disabled = false;
+                    }
                     overlaySpinner.style.display = 'none';
                     overlayTitle.textContent = 'Gagal Sistem';
                     statusText.className = 'encryption-text text-danger';
@@ -932,38 +879,12 @@
 
         document.getElementById('loginFormDesktop').addEventListener('submit', function(e) {
             e.preventDefault();
-            processLogin($('#username_desk').val().trim(), $('#password_desk').val().trim(), this.querySelector('button[type="submit"]'));
+            processLogin($('#username_desk').val().trim(), $('#password_desk').val().trim(), document.getElementById('btnSubmitDesk'));
         });
 
         document.getElementById('loginFormMobile').addEventListener('submit', function(e) {
             e.preventDefault();
-            processLogin($('#username_mob').val().trim(), $('#password_mob').val().trim(), this.querySelector('button[type="submit"]'));
-        });
-
-        // Handler Proses Register Mobile
-        document.getElementById('registerFormMobile').addEventListener('submit', function(e) {
-            e.preventDefault();
-            const btn = this.querySelector('button[type="submit"]');
-            overlaySpinner.style.display = 'block';
-            overlayTitle.textContent = 'Pendaftaran Akun';
-            statusText.className = 'encryption-text text-info';
-            statusText.innerHTML = "Mendaftarkan akaun baru...";
-            btn.disabled = true;
-            overlay.classList.add('active');
-
-            setTimeout(() => {
-                overlay.classList.remove('active');
-                btn.disabled = false;
-                Swal.fire({
-                    icon: 'success',
-                    title: 'Registrasi Berhasil!',
-                    text: 'Akun Anda telah berhasil dibuat. Silakan login.',
-                    confirmButtonText: 'OK'
-                }).then(() => {
-                    document.getElementById('mobileRegisterScreen').classList.remove('active-screen');
-                    document.getElementById('mobileLoginScreen').classList.add('active-screen');
-                });
-            }, 1500);
+            processLogin($('#username_mob').val().trim(), $('#password_mob').val().trim(), document.getElementById('btnSubmitMob'));
         });
 
         $('#formHubungiAdmin').on('submit', function(e) {
@@ -1008,12 +929,12 @@
             overlayTitle.textContent = 'Pengiriman OTP';
             statusText.className = 'encryption-text text-info';
             statusText.innerHTML = "Menghantar kod pengesahan OTP...";
-            btn.disabled = true;
+            btn.prop('disabled', true);
             overlay.classList.add('active');
 
             setTimeout(() => {
                 overlay.classList.remove('active');
-                btn.disabled = false;
+                btn.prop('disabled', false);
                 $('#modalHeaderIcon').attr('class', 'bi bi-phone-vibrate-fill text-success fs-4');
                 $('#modalTitleText').text('Verifikasi Kode OTP');
                 $('#modalSubTitleText').text('Masukkan 6 digit angka yang dikirim ke email Anda.');
