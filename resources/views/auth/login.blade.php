@@ -127,7 +127,7 @@
             max-width: 1100px;
             height: 640px;
             margin: 1.5rem;
-            background: linear-gradient(135deg, #1e3a8a 0%, #1d4ed8 60%, #0284c7 100%);
+            background: linear-gradient(135deg, #1e3a8a 0%, #0c2361 60%, #0284c7 100%);
             backdrop-filter: blur(25px);
             border-radius: 2.5rem;
             box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.4);
@@ -219,7 +219,7 @@
             font-family: 'Plus Jakarta Sans', sans-serif;
             border: none;
             padding: 0.6rem 0.75rem;
-            font-size: 0.85rem;
+            font-size: 0.95rem;
             background-color: transparent !important;
             box-shadow: none !important;
             color: #222 !important;
@@ -548,7 +548,7 @@
         <div class="login-form-side">
             <div>
                 <div class="mb-3">
-                    <span class="brand-badge-pill">Innoventra</span>
+                    <span class="brand-badge-pill">Innoventra Solusi Digital</span>
                 </div>
                 <div class="brand-title">Welcome Back</div>
                 <div class="subtitle">Sila masukkan akses akaun anda untuk meneruskan</div>
