@@ -23,12 +23,12 @@
             display: flex;
             align-items: center;
             justify-content: center;
-            background: linear-gradient(135deg, #4f46e5 0%, #7c3aed 50%, #db2777 100%);
+            background: linear-gradient(135deg, #0f172a 0%, #1e1b4b 100%);
             overflow: hidden;
             position: relative;
         }
 
-        /* === ANIMASI BALON & GARIS-GARIS DI LATAR BELAKANG === */
+        /* === ANIMASI LATAR BELAKANG DESKTOP === */
         .bubble-bg {
             position: absolute;
             top: 0;
@@ -39,19 +39,19 @@
             z-index: 1;
             pointer-events: none;
             background-image:
-                repeating-linear-gradient(45deg, rgba(255, 255, 255, 0.05) 0, rgba(255, 255, 255, 0.05) 1px, transparent 0, transparent 50px),
-                repeating-linear-gradient(-45deg, rgba(255, 255, 255, 0.03) 0, rgba(255, 255, 255, 0.03) 1px, transparent 0, transparent 40px);
+                repeating-linear-gradient(45deg, rgba(255, 255, 255, 0.02) 0, rgba(255, 255, 255, 0.02) 1px, transparent 0, transparent 50px),
+                repeating-linear-gradient(-45deg, rgba(255, 255, 255, 0.01) 0, rgba(255, 255, 255, 0.01) 1px, transparent 0, transparent 40px);
         }
 
         .bubble {
             position: absolute;
             bottom: -150px;
-            background: rgba(255, 255, 255, 0.15);
+            background: rgba(255, 255, 255, 0.05);
             border-radius: 50%;
             animation: rise 12s infinite ease-in-out;
             box-shadow: 0 8px 32px 0 rgba(0, 0, 0, 0.2);
             backdrop-filter: blur(2px);
-            border: 1.5px solid rgba(255, 255, 255, 0.3);
+            border: 1.5px solid rgba(255, 255, 255, 0.1);
         }
 
         .bubble:nth-child(1) {
@@ -122,13 +122,13 @@
             max-width: 1100px;
             height: 640px;
             margin: 1.5rem;
-            background: linear-gradient(135deg, rgba(30, 27, 75, 0.9) 0%, rgba(76, 29, 149, 0.85) 100%);
+            background: linear-gradient(135deg, rgba(15, 23, 42, 0.95) 0%, rgba(30, 41, 59, 0.9) 100%);
             backdrop-filter: blur(25px);
             border-radius: 2.5rem;
-            box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.4);
+            box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.6);
             display: flex;
             overflow: hidden;
-            border: 1px solid rgba(255, 255, 255, 0.25);
+            border: 1px solid rgba(255, 255, 255, 0.1);
             animation: fadeInUp 1s cubic-bezier(0.16, 1, 0.3, 1) forwards;
         }
 
@@ -157,11 +157,11 @@
             display: inline-block;
             font-weight: 700;
             font-size: 0.95rem;
-            border: 1px solid rgba(255, 255, 255, 0.4);
+            border: 1px solid rgba(255, 255, 255, 0.2);
             padding: 0.3rem 1.25rem;
             border-radius: 50rem;
             color: #ffffff;
-            background: rgba(255, 255, 255, 0.1);
+            background: rgba(255, 255, 255, 0.05);
         }
 
         .brand-title {
@@ -173,7 +173,7 @@
         }
 
         .subtitle {
-            color: rgba(255, 255, 255, 0.85);
+            color: rgba(255, 255, 255, 0.7);
             font-size: 0.82rem;
             font-weight: 500;
         }
@@ -189,19 +189,21 @@
             border: none;
             border-radius: 0.85rem;
             overflow: hidden;
-            background-color: #ffffff;
-            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+            background-color: #1e293b;
+            border: 1px solid rgba(255, 255, 255, 0.15);
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.2);
             transition: all 0.3s ease;
         }
 
         .input-group:focus-within {
-            box-shadow: 0 0 0 4px rgba(236, 72, 153, 0.4);
+            border-color: #2dd4bf;
+            box-shadow: 0 0 0 4px rgba(45, 212, 191, 0.2);
         }
 
         .input-group-text {
             background-color: transparent;
             border: none;
-            color: #555;
+            color: #94a3b8;
             padding-left: 1rem;
             padding-right: 0.5rem;
         }
@@ -213,30 +215,30 @@
             font-size: 0.95rem;
             background-color: transparent !important;
             box-shadow: none !important;
-            color: #222 !important;
+            color: #ffffff !important;
         }
 
         .form-control::placeholder {
-            color: #999 !important;
+            color: #64748b !important;
         }
 
-        .btn-primary {
+        .btn-mint {
             font-family: 'Plus Jakarta Sans', sans-serif;
-            background: linear-gradient(135deg, #ec4899 0%, #8b5cf6 100%) !important;
+            background: #5eead4 !important;
             border: none;
             border-radius: 50rem !important;
-            padding: 0.65rem;
+            padding: 0.7rem;
             font-weight: 700;
             font-size: 0.9rem;
-            color: #ffffff !important;
+            color: #0f172a !important;
             transition: all 0.3s ease;
-            box-shadow: 0 4px 15px rgba(236, 72, 153, 0.4);
+            box-shadow: 0 4px 15px rgba(94, 234, 212, 0.3);
         }
 
-        .btn-primary:hover {
+        .btn-mint:hover {
             transform: translateY(-2px);
-            box-shadow: 0 6px 20px rgba(236, 72, 153, 0.6);
-            filter: brightness(1.1);
+            background: #2dd4bf !important;
+            box-shadow: 0 6px 20px rgba(45, 212, 191, 0.5);
         }
 
         .contact-admin-link {
@@ -250,17 +252,17 @@
             font-size: 0.78rem;
             font-weight: 600;
             color: #ffffff;
-            background: rgba(255, 255, 255, 0.15);
-            border: 1px dashed rgba(255, 255, 255, 0.5);
+            background: rgba(255, 255, 255, 0.05);
+            border: 1px dashed rgba(255, 255, 255, 0.2);
             border-radius: 0.85rem;
             text-decoration: none;
             transition: all 0.2s ease;
         }
 
         .contact-admin-link:hover {
-            background: #ffffff;
-            color: #4f46e5;
-            border-color: #ffffff;
+            background: rgba(255, 255, 255, 0.1);
+            border-color: #2dd4bf;
+            color: #5eead4;
         }
 
         .login-banner-side {
@@ -282,7 +284,7 @@
             content: '';
             position: absolute;
             inset: 0;
-            background: linear-gradient(to top, rgba(15, 23, 42, 0.7) 0%, transparent 60%);
+            background: linear-gradient(to top, rgba(15, 23, 42, 0.85) 0%, transparent 60%);
             border-radius: 2rem;
         }
 
@@ -296,7 +298,7 @@
         #login-overlay {
             position: fixed;
             inset: 0;
-            background: rgba(15, 23, 42, 0.85);
+            background: rgba(15, 23, 42, 0.9);
             backdrop-filter: blur(8px);
             z-index: 9999;
             display: flex;
@@ -315,7 +317,7 @@
 
         .encryption-box {
             background: rgba(30, 41, 59, 0.95);
-            border: 1px solid rgba(236, 72, 153, 0.5);
+            border: 1px solid rgba(94, 234, 212, 0.4);
             border-radius: 1rem;
             padding: 2rem;
             text-align: center;
@@ -327,8 +329,8 @@
         .encryption-spinner {
             width: 40px;
             height: 40px;
-            border: 3px solid rgba(236, 72, 153, 0.2);
-            border-top: 3px solid #ec4899;
+            border: 3px solid rgba(94, 234, 212, 0.2);
+            border-top: 3px solid #5eead4;
             border-radius: 50%;
             animation: spin 1s linear infinite;
             margin: 0 auto 1.2rem auto;
@@ -347,7 +349,7 @@
         .encryption-text {
             font-family: 'Fira Code', monospace;
             font-size: 0.75rem;
-            color: #f472b6;
+            color: #5eead4;
             letter-spacing: -0.5px;
             min-height: 24px;
         }
@@ -363,13 +365,12 @@
             display: none;
         }
 
-        /* === MOBILE STYLING (FULL DI ATAS TANPA SPACE KOSONG) === */
+        /* === MOBILE STYLING (3 LAYER DARK MODE SEPERTI REFERENSI GAMBAR) === */
         @media (max-width: 992px) {
             body {
-                background: linear-gradient(135deg, #3b82f6 0%, #8b5cf6 50%, #ec4899 100%) !important;
+                background: #000000 !important;
                 height: 100vh;
                 height: 100dvh;
-                /* Menyesuaikan tinggi dinamis browser mobile */
                 width: 100vw;
                 margin: 0;
                 padding: 0;
@@ -391,30 +392,29 @@
                 width: 100%;
                 height: 100vh;
                 height: 100dvh;
-                max-width: 100%;
+                max-width: 420px;
                 max-height: 100%;
                 position: absolute;
                 top: 0;
-                left: 0;
-                right: 0;
-                bottom: 0;
-                background: #ffffff;
+                left: 50%;
+                transform: translateX(-50%);
+                background: #0b0f19;
+                color: #ffffff;
                 overflow-y: auto;
-                box-shadow: none;
+                box-shadow: 0 10px 30px rgba(0, 0, 0, 0.8);
                 border-radius: 0px;
-                /* Full layar merapat */
                 animation: slideScreen 0.3s cubic-bezier(0.16, 1, 0.3, 1) forwards;
             }
 
             @keyframes slideScreen {
                 0% {
                     opacity: 0;
-                    transform: translateY(15px);
+                    transform: translate(-50%, 15px);
                 }
 
                 100% {
                     opacity: 1;
-                    transform: translateY(0);
+                    transform: translate(-50%, 0);
                 }
             }
 
@@ -422,91 +422,84 @@
                 display: none !important;
             }
 
-            /* Header Ilustrasi Mobile menempel rapat di atas */
-            .m-header-mockup {
-                background: linear-gradient(135deg, #1e1b4b 0%, #312e81 100%);
-                padding: 2.2rem 1.5rem 1.2rem 1.5rem;
-                text-align: center;
-                position: relative;
+            /* Status Bar Ponsel Atas ala iOS */
+            .m-status-bar {
+                display: flex;
+                justify-content: space-between;
+                align-items: center;
+                padding: 14px 24px 6px 24px;
+                font-size: 0.8rem;
+                font-weight: 600;
                 color: #ffffff;
-                overflow: hidden;
-                border-top-left-radius: 0;
-                border-top-right-radius: 0;
+                background: #0b0f19;
             }
 
-            /* Garis-garis dekoratif di header mobile */
-            .m-header-mockup::before {
-                content: '';
-                position: absolute;
-                inset: 0;
-                background-image: repeating-linear-gradient(120deg, rgba(236, 72, 153, 0.15) 0px, rgba(236, 72, 153, 0.15) 2px, transparent 2px, transparent 15px);
-                pointer-events: none;
+            .m-status-icons {
+                display: flex;
+                gap: 6px;
+                font-size: 0.75rem;
             }
 
-            .m-dots {
+            /* Input Group Dark Mode */
+            .mobile-screen .input-group {
+                background-color: #121826 !important;
+                border: 1px solid rgba(255, 255, 255, 0.1);
+                border-radius: 0.85rem;
+            }
+
+            .mobile-screen .input-group:focus-within {
+                border-color: #5eead4 !important;
+                box-shadow: 0 0 0 3px rgba(94, 234, 212, 0.15);
+            }
+
+            .mobile-screen .form-control {
+                color: #ffffff !important;
+                font-size: 0.85rem;
+            }
+
+            .mobile-screen .form-control::placeholder {
+                color: #475569 !important;
+            }
+
+            /* Social Login Buttons Dark */
+            .social-btn-group-dark {
                 display: flex;
                 justify-content: center;
-                gap: 6px;
-                margin-bottom: 1rem;
-                position: relative;
-                z-index: 2;
+                gap: 12px;
+                margin-top: 0.4rem;
+                margin-bottom: 0.4rem;
             }
 
-            .m-dot {
-                width: 8px;
-                height: 8px;
-                border-radius: 50%;
-                background: rgba(255, 255, 255, 0.3);
-                transition: all 0.3s ease;
-            }
-
-            .m-dot.active {
-                background: #ec4899;
-                width: 22px;
-                border-radius: 10px;
-                box-shadow: 0 0 10px #ec4899;
-            }
-
-            .m-header-mockup h4,
-            .m-header-mockup p {
-                position: relative;
-                z-index: 2;
-            }
-
-            .m-content-body {
-                flex: 1;
-                padding: 1.5rem 1.75rem 2rem 1.75rem;
+            .social-pill-btn-dark {
                 display: flex;
-                flex-direction: column;
-                justify-content: space-between;
-                background: #ffffff;
+                align-items: center;
+                justify-content: center;
+                gap: 10px;
+                width: 100%;
+                background: #121826;
+                border: 1px solid rgba(255, 255, 255, 0.08);
+                border-radius: 50rem;
+                padding: 0.65rem;
+                font-size: 0.82rem;
+                font-weight: 600;
+                color: #ffffff;
+                text-decoration: none;
+                transition: all 0.2s ease;
+                box-shadow: 0 2px 6px rgba(0, 0, 0, 0.2);
             }
 
-            .m-content-body .form-label {
-                color: #334155 !important;
-            }
-
-            .m-content-body .input-group {
-                background-color: #f8fafc !important;
-                border: 1px solid #e2e8f0 !important;
-                transition: all 0.3s ease;
-            }
-
-            .m-content-body .input-group:focus-within {
-                border-color: #8b5cf6 !important;
-                box-shadow: 0 0 0 3px rgba(139, 92, 246, 0.15) !important;
-            }
-
-            .m-content-body .form-control {
-                color: #0f172a !important;
+            .social-pill-btn-dark:hover {
+                background: #1e293b;
+                border-color: rgba(255, 255, 255, 0.2);
+                color: #5eead4;
             }
 
             .m-divider {
                 display: flex;
                 align-items: center;
                 text-align: center;
-                color: #94a3b8;
-                font-size: 0.75rem;
+                color: #475569;
+                font-size: 0.7rem;
                 margin: 0.75rem 0;
             }
 
@@ -514,7 +507,7 @@
             .m-divider::after {
                 content: '';
                 flex: 1;
-                border-bottom: 1px solid #e2e8f0;
+                border-bottom: 1px solid rgba(255, 255, 255, 0.08);
             }
 
             .m-divider::before {
@@ -523,28 +516,6 @@
 
             .m-divider::after {
                 margin-left: .75rem;
-            }
-
-            .btn-outline-custom {
-                width: 100%;
-                background: #ffffff;
-                border: 2px solid #8b5cf6;
-                border-radius: 50rem;
-                padding: 0.65rem;
-                font-weight: 700;
-                font-size: 0.9rem;
-                color: #7c3aed;
-                text-align: center;
-                text-decoration: none;
-                display: block;
-                transition: all 0.2s ease;
-            }
-
-            .btn-outline-custom:hover {
-                background: #f5f3ff;
-                border-color: #7c3aed;
-                color: #6d28d9;
-                transform: translateY(-1px);
             }
         }
     </style>
@@ -587,7 +558,7 @@
                     <div class="mb-3 text-start">
                         <label for="username_desk" class="form-label">Username</label>
                         <div class="input-group">
-                            <span class="input-group-text"><i class="bi bi-envelope-fill text-primary"></i></span>
+                            <span class="input-group-text"><i class="bi bi-envelope-fill text-info"></i></span>
                             <input type="text" id="username_desk" class="form-control" placeholder="Email Address / Username" required autocomplete="username">
                         </div>
                     </div>
@@ -595,7 +566,7 @@
                     <div class="mb-3 text-start">
                         <label for="password_desk" class="form-label">Kata Sandi</label>
                         <div class="input-group">
-                            <span class="input-group-text"><i class="bi bi-lock-fill text-primary"></i></span>
+                            <span class="input-group-text"><i class="bi bi-lock-fill text-info"></i></span>
                             <input type="password" id="password_desk" class="form-control" placeholder="Password" required autocomplete="current-password">
                         </div>
                     </div>
@@ -605,21 +576,21 @@
                             <input type="checkbox" class="form-check-input" id="rememberMeDesk">
                             <label for="rememberMeDesk" class="form-check-label text-white small fw-medium" style="font-size: 0.78rem;">Ingat saya</label>
                         </div>
-                        <a href="#" class="text-decoration-none text-pink-light fw-semibold text-warning" style="font-size: 0.78rem;" data-bs-toggle="modal" data-bs-target="#modalLupaPassword">Forget Password?</a>
+                        <a href="#" class="text-decoration-none text-info fw-semibold" style="font-size: 0.78rem;" data-bs-toggle="modal" data-bs-target="#modalLupaPassword">Forget Password?</a>
                     </div>
 
-                    <button type="submit" class="btn btn-primary w-100 mb-3">
+                    <button type="submit" class="btn btn-mint w-100 mb-3">
                         Sign In / Masuk
                     </button>
 
                     <a href="javascript:void(0)" class="contact-admin-link" data-bs-toggle="modal" data-bs-target="#modalHubungiAdmin">
-                        <i class="bi bi-headset text-warning"></i> Hubungi Admin Sistem
+                        <i class="bi bi-headset text-info"></i> Hubungi Admin Sistem
                     </a>
                 </form>
             </div>
 
             <div class="text-center mt-2">
-                <span class="text-white opacity-75" style="font-size: 0.7rem;">&copy; 2026 Innoventra by Transforma &middot; Syarat & Ketentuan</span>
+                <span class="text-white opacity-50" style="font-size: 0.7rem;">&copy; 2026 Innoventra by Transforma &middot; Syarat & Ketentuan</span>
             </div>
         </div>
 
@@ -636,226 +607,172 @@
 
 
     <!-- ========================================================== -->
-    <!-- TAMPILAN MOBILE: 3 LAYER (Login, Create, Verify) -->
+    <!-- TAMPILAN MOBILE: 3 LAYER (Sesuai Referensi Gambar Baru)   -->
     <!-- ========================================================== -->
 
-    <!-- LAYER 1: LOGIN ACCOUNT (Mobile) -->
-    <div id="mobileLoginScreen" class="mobile-screen active-screen d-lg-none">
-        <div class="m-header-mockup">
-            <div class="m-dots">
-                <div class="m-dot active"></div>
-                <div class="m-dot"></div>
-                <div class="m-dot"></div>
+    <!-- LAYER 1: WELCOME / REGISTER PROMPT (Mobile)[cite: 3] -->
+    <div id="mobileWelcomeScreen" class="mobile-screen active-screen d-lg-none">
+        <div class="m-status-bar">
+            <span>9:41</span>
+            <div class="m-status-icons">
+                <i class="bi bi-cellular"></i>
+                <i class="bi bi-wifi"></i>
+                <i class="bi bi-battery-full"></i>
             </div>
-            <div class="py-2">
-                <div class="bg-gradient text-white rounded-circle d-inline-flex align-items-center justify-content-center shadow-lg" style="width: 68px; height: 68px; background: linear-gradient(135deg, #ec4899 0%, #8b5cf6 100%);">
-                    <i class="bi bi-fingerprint fs-2"></i>
-                </div>
-            </div>
-            <h4 class="fw-bold text-white mt-2 mb-1" style="font-size: 1.35rem;">Login Account</h4>
-            <p class="text-white-50 mb-0" style="font-size: 0.74rem; padding: 0 1rem;">Selamat datang kembali, silakan masuk ke akun Anda dengan aman.</p>
         </div>
 
-        <div class="m-content-body">
-            <form id="loginFormMobile">
-                <div class="mb-3 text-start">
-                    <label class="form-label small fw-bold">Email Account</label>
-                    <div class="input-group">
-                        <span class="input-group-text bg-transparent border-0 text-primary"><i class="bi bi-envelope"></i></span>
-                        <input type="text" id="username_mob" class="form-control" placeholder="name@example.com" required autocomplete="username">
-                    </div>
+        <div class="flex-grow-1 d-flex flex-column px-4 pt-3 pb-4 justify-content-between">
+            <!-- Ilustrasi Chat UI Card -->
+            <div class="p-3 rounded-4 shadow-lg border border-secondary border-opacity-25" style="background: #121826;">
+                <div class="d-flex align-items-center mb-2 bg-dark bg-opacity-50 p-2 rounded-3 border border-secondary border-opacity-10">
+                    <div class="rounded-circle bg-primary d-flex align-items-center justify-content-center text-white me-2" style="width: 28px; height: 28px; font-size: 11px;"><i class="bi bi-person-fill"></i></div>
+                    <div style="font-size: 0.7rem; color: #cbd5e1;">How can AI optimize my business processes quickly?</div>
                 </div>
-
-                <div class="mb-2 text-start">
-                    <label class="form-label small fw-bold">Password</label>
-                    <div class="input-group">
-                        <span class="input-group-text bg-transparent border-0 text-primary"><i class="bi bi-lock"></i></span>
-                        <input type="password" id="password_mob" class="form-control" placeholder="••••••••" required autocomplete="current-password">
-                    </div>
+                <div class="d-flex align-items-center mb-2 bg-dark bg-opacity-50 p-2 rounded-3 border border-secondary border-opacity-10 ms-3">
+                    <div class="rounded-circle bg-success d-flex align-items-center justify-content-center text-white me-2" style="width: 28px; height: 28px; font-size: 11px;"><i class="bi bi-robot"></i></div>
+                    <div style="font-size: 0.7rem; color: #cbd5e1;">How long will the integration process usually take?</div>
                 </div>
-
-                <div class="d-flex justify-content-between align-items-center mb-3">
-                    <div class="form-check">
-                        <input type="checkbox" class="form-check-input" id="rememberMeMob">
-                        <label for="rememberMeMob" class="form-check-label text-muted small" style="font-size: 0.75rem;">Save Password</label>
-                    </div>
-                    <a href="#" class="text-decoration-none fw-semibold" style="font-size: 0.75rem; color: #8b5cf6;" data-bs-toggle="modal" data-bs-target="#modalLupaPassword">Forgot Password?</a>
+                <div class="d-flex align-items-center bg-dark bg-opacity-50 p-2 rounded-3 border border-secondary border-opacity-10">
+                    <div class="rounded-circle bg-info d-flex align-items-center justify-content-center text-white me-2" style="width: 28px; height: 28px; font-size: 11px;"><i class="bi bi-chat-dots-fill"></i></div>
+                    <div style="font-size: 0.7rem; color: #cbd5e1;">Can AI help streamline operations and reduce costs?</div>
                 </div>
+            </div>
 
-                <button type="submit" class="btn btn-primary w-100 mb-2 py-2.5">
-                    LOGIN
+            <!-- Teks & Tombol Utama -->
+            <div class="text-start mt-4">
+                <h2 class="fw-bold text-white mb-2" style="font-size: 1.6rem; letter-spacing: -0.5px;">Let's register account</h2>
+                <p class="text-secondary mb-4" style="font-size: 0.8rem; line-height: 1.5;">Enjoy for reading and writing blog posts. Get $ 1.00 dollars you referral your friends.</p>
+
+                <button type="button" id="btnGoRegisterFromWelcome" class="btn btn-mint w-100 py-3 mb-3 fw-bold rounded-pill shadow-sm">
+                    Get Started
                 </button>
+            </div>
 
-                <div class="m-divider">OR</div>
-
-                <button type="button" id="btnGoRegister" class="btn-outline-custom">
-                    CREATE ACCOUNT
-                </button>
-            </form>
-
-            <div class="text-center mt-3">
-                <span class="text-muted" style="font-size: 0.68rem;">&copy; 2026 Innoventra by Transforma</span>
+            <div class="text-center pb-2">
+                <span class="text-secondary" style="font-size: 0.78rem;">Already have an account? <a href="javascript:void(0)" id="linkToLoginFromWelcome" class="fw-bold text-decoration-none text-info">Login</a></span>
             </div>
         </div>
     </div>
 
-    <!-- LAYER 2: CREATE ACCOUNT (Mobile) -->
+    <!-- LAYER 2: SIGN IN / LOGIN (Mobile)[cite: 3] -->
+    <div id="mobileLoginScreen" class="mobile-screen d-lg-none">
+        <div class="m-status-bar">
+            <span>9:41</span>
+            <div class="m-status-icons">
+                <i class="bi bi-cellular"></i>
+                <i class="bi bi-wifi"></i>
+                <i class="bi bi-battery-full"></i>
+            </div>
+        </div>
+
+        <div class="flex-grow-1 d-flex flex-column px-4 py-3 justify-content-between">
+            <div>
+                <div class="text-start mb-4 mt-2">
+                    <h2 class="fw-bold text-white mb-1" style="font-size: 1.6rem; letter-spacing: -0.5px;">Let's sign in</h2>
+                    <p class="text-secondary" style="font-size: 0.78rem;">Welcome Back, You have been missed.</p>
+                </div>
+
+                <form id="loginFormMobile">
+                    <div class="mb-3 text-start">
+                        <label class="form-label text-white-50" style="font-size: 0.72rem;">Email</label>
+                        <div class="input-group">
+                            <input type="text" id="username_mob" class="form-control" placeholder="email" required autocomplete="username">
+                        </div>
+                    </div>
+
+                    <div class="mb-2 text-start">
+                        <label class="form-label text-white-50" style="font-size: 0.72rem;">Password</label>
+                        <div class="input-group">
+                            <input type="password" id="password_mob" class="form-control" placeholder="password" required autocomplete="current-password">
+                        </div>
+                    </div>
+
+                    <div class="d-flex justify-content-between align-items-center mb-4 px-1">
+                        <div class="form-check">
+                            <input type="checkbox" class="form-check-input bg-dark border-secondary" id="rememberMeMob">
+                            <label for="rememberMeMob" class="form-check-label text-secondary" style="font-size: 0.73rem;">Remember Me</label>
+                        </div>
+                        <a href="#" class="text-decoration-none fw-semibold text-info" style="font-size: 0.73rem;" data-bs-toggle="modal" data-bs-target="#modalLupaPassword">Forgot Password</a>
+                    </div>
+
+                    <button type="submit" class="btn btn-mint w-100 py-3 fw-bold rounded-pill shadow-sm mb-3">
+                        Get Started
+                    </button>
+
+                    <div class="m-divider">or continue with</div>
+
+                    <div class="d-flex flex-column gap-2 mt-2">
+                        <a href="#" class="social-pill-btn-dark">
+                            <i class="bi bi-facebook text-primary fs-5"></i> Continue with Facebook
+                        </a>
+                        <a href="#" class="social-pill-btn-dark">
+                            <i class="bi bi-google text-danger fs-5"></i> Continue with Google
+                        </a>
+                        <a href="#" class="social-pill-btn-dark">
+                            <i class="bi bi-apple text-white fs-5"></i> Continue with Apple
+                        </a>
+                    </div>
+                </form>
+            </div>
+
+            <div class="text-center py-2">
+                <span class="text-secondary" style="font-size: 0.78rem;">Don't have any account? <a href="javascript:void(0)" id="linkToGoRegister" class="fw-bold text-decoration-none text-info">Register Now</a></span>
+            </div>
+        </div>
+    </div>
+
+    <!-- LAYER 3: REGISTER ACCOUNT (Mobile)[cite: 3] -->
     <div id="mobileRegisterScreen" class="mobile-screen d-lg-none">
-        <div class="m-header-mockup" style="padding-top: 1.8rem; padding-bottom: 0.8rem;">
-            <div class="m-dots">
-                <div class="m-dot"></div>
-                <div class="m-dot active"></div>
-                <div class="m-dot"></div>
+        <div class="m-status-bar">
+            <span>9:41</span>
+            <div class="m-status-icons">
+                <i class="bi bi-cellular"></i>
+                <i class="bi bi-wifi"></i>
+                <i class="bi bi-battery-full"></i>
             </div>
-            <h4 class="fw-bold text-white mb-1" style="font-size: 1.25rem;">Create Account</h4>
-            <p class="text-white-50 mb-0" style="font-size: 0.72rem; padding: 0 1rem;">Daftarkan diri Anda untuk menikmati layanan penuh sistem kami.</p>
         </div>
 
-        <div class="m-content-body" style="padding-top: 1rem;">
-            <form id="registerFormMobile">
-                <div class="row g-2 mb-2">
-                    <div class="col-6 text-start">
-                        <label class="form-label" style="font-size: 0.72rem;">First Name</label>
+        <div class="flex-grow-1 d-flex flex-column px-4 py-2 justify-content-between">
+            <div>
+                <div class="text-start mb-3 mt-1">
+                    <h2 class="fw-bold text-white mb-1" style="font-size: 1.5rem; letter-spacing: -0.5px;">Let's register account</h2>
+                    <p class="text-secondary" style="font-size: 0.73rem;">Enjoy for reading and wiriting blog posts. Get $ 1.00 dollars you referral your friends.</p>
+                </div>
+
+                <form id="registerFormMobile">
+                    <div class="mb-2 text-start">
+                        <label class="form-label text-white-50" style="font-size: 0.7rem;">Name</label>
                         <div class="input-group">
-                            <input type="text" id="reg_firstname" class="form-control form-control-sm" placeholder="First Name" required>
+                            <input type="text" id="reg_name" class="form-control" placeholder="name" required>
                         </div>
                     </div>
-                    <div class="col-6 text-start">
-                        <label class="form-label" style="font-size: 0.72rem;">Last Name</label>
+
+                    <div class="mb-2 text-start">
+                        <label class="form-label text-white-50" style="font-size: 0.7rem;">Email</label>
                         <div class="input-group">
-                            <input type="text" id="reg_lastname" class="form-control form-control-sm" placeholder="Last Name" required>
+                            <input type="email" id="reg_email" class="form-control" placeholder="email" required>
                         </div>
                     </div>
-                </div>
 
-                <div class="mb-2 text-start">
-                    <label class="form-label" style="font-size: 0.72rem;">Email Account</label>
-                    <div class="input-group">
-                        <input type="text" id="reg_email" class="form-control form-control-sm" placeholder="Email address" required>
-                    </div>
-                </div>
-
-                <div class="mb-2 text-start">
-                    <label class="form-label" style="font-size: 0.72rem;">Username</label>
-                    <div class="input-group">
-                        <input type="text" id="reg_username" class="form-control form-control-sm" placeholder="Username" required>
-                        <span class="input-group-text text-success"><i class="bi bi-check-circle-fill"></i></span>
-                    </div>
-                </div>
-
-                <div class="mb-2 text-start">
-                    <label class="form-label" style="font-size: 0.72rem;">Birthday</label>
-                    <div class="row g-1">
-                        <div class="col-4">
-                            <select class="form-select form-select-sm" style="font-size: 0.78rem; background-color: #f8fafc;">
-                                <option selected>Day</option>
-                                <option>01</option>
-                                <option>02</option>
-                                <option>03</option>
-                                <option>04</option>
-                                <option>05</option>
-                            </select>
-                        </div>
-                        <div class="col-4">
-                            <select class="form-select form-select-sm" style="font-size: 0.78rem; background-color: #f8fafc;">
-                                <option selected>Month</option>
-                                <option>Jan</option>
-                                <option>Feb</option>
-                                <option>Mar</option>
-                                <option>Apr</option>
-                                <option>May</option>
-                            </select>
-                        </div>
-                        <div class="col-4">
-                            <select class="form-select form-select-sm" style="font-size: 0.78rem; background-color: #f8fafc;">
-                                <option selected>Year</option>
-                                <option>2000</option>
-                                <option>2001</option>
-                                <option>2002</option>
-                                <option>2003</option>
-                            </select>
+                    <div class="mb-2 text-start">
+                        <label class="form-label text-white-50" style="font-size: 0.7rem;">Password</label>
+                        <div class="input-group">
+                            <input type="password" id="reg_password" class="form-control" placeholder="password" required>
                         </div>
                     </div>
-                </div>
 
-                <div class="mb-2 text-start">
-                    <label class="form-label" style="font-size: 0.72rem;">Password</label>
-                    <div class="input-group">
-                        <input type="password" id="reg_password" class="form-control form-control-sm" placeholder="Password" required>
-                    </div>
-                </div>
+                    <p class="text-secondary text-start mb-3" style="font-size: 0.65rem; line-height: 1.4;">
+                        By clicking register button you agree to our <a href="#" class="text-info text-decoration-none">terms and conditions</a> and <a href="#" class="text-info text-decoration-none">privacy policy</a>.
+                    </p>
 
-                <div class="form-check mb-3 text-start">
-                    <input type="checkbox" class="form-check-input" id="agreeTerms" required>
-                    <label for="agreeTerms" class="form-check-label text-muted" style="font-size: 0.72rem;">Agree with <a href="#" class="fw-bold" style="color: #8b5cf6;">Terms & Conditions</a></label>
-                </div>
-
-                <button type="submit" class="btn btn-primary w-100 mb-2 py-2">
-                    CREATE ACCOUNT
-                </button>
-
-                <div class="m-divider my-1">OR</div>
-
-                <button type="button" id="btnBackToLogin" class="btn-outline-custom py-1.5" style="font-size: 0.82rem;">
-                    BACK TO LOGIN
-                </button>
-            </form>
-        </div>
-    </div>
-
-    <!-- LAYER 3: VERIFY ACCOUNT (Mobile) -->
-    <div id="mobileVerifyScreen" class="mobile-screen d-lg-none">
-        <div class="m-header-mockup">
-            <div class="m-dots">
-                <div class="m-dot"></div>
-                <div class="m-dot"></div>
-                <div class="m-dot active"></div>
+                    <button type="submit" class="btn btn-mint w-100 py-2.5 fw-bold rounded-pill shadow-sm mb-2">
+                        Register
+                    </button>
+                </form>
             </div>
-            <div class="py-1">
-                <div class="rounded-circle d-inline-flex align-items-center justify-content-center shadow-lg text-white" style="width: 68px; height: 68px; background: linear-gradient(135deg, #f59e0b 0%, #ef4444 100%);">
-                    <i class="bi bi-shield-check fs-2"></i>
-                </div>
-            </div>
-            <h4 class="fw-bold text-white mt-2 mb-1" style="font-size: 1.35rem;">Verify Account</h4>
-            <p class="text-white-50 mb-0" style="font-size: 0.74rem; padding: 0 1rem;">Verifikasi nomor telepon atau email Anda untuk aktivasi akun penuh.</p>
-        </div>
 
-        <div class="m-content-body">
-            <form id="verifyFormMobile">
-                <!-- Toggle Tab pilihan verifikasi Phone / Email -->
-                <div class="bg-light p-1 rounded-pill d-flex mb-3 border">
-                    <button type="button" class="flex-fill btn btn-sm rounded-pill btn-primary shadow-sm py-1 fw-bold" id="tabPhone" style="font-size: 0.75rem;">PHONE</button>
-                    <button type="button" class="flex-fill btn btn-sm rounded-pill text-muted py-1 fw-bold" id="tabEmail" style="font-size: 0.75rem;">Email</button>
-                </div>
-
-                <div class="mb-3 text-start" id="inputContainerVerify">
-                    <label class="form-label small fw-bold">Phone Number</label>
-                    <div class="input-group">
-                        <span class="input-group-text bg-transparent border-0 text-muted">+62</span>
-                        <input type="tel" id="verify_phone" class="form-control" placeholder="812-3456-7890" required>
-                    </div>
-                </div>
-
-                <div class="mb-3 text-start">
-                    <label class="form-label small fw-bold">Account Password</label>
-                    <div class="input-group">
-                        <input type="password" id="verify_password" class="form-control" placeholder="Enter password to confirm" required>
-                    </div>
-                </div>
-
-                <button type="submit" class="btn btn-primary w-100 mb-3 py-2.5">
-                    VERIFY PHONE
-                </button>
-
-                <div class="text-center">
-                    <a href="javascript:void(0)" id="linkBackToLoginFromVerify" class="text-muted small text-decoration-none" style="font-size: 0.78rem;">
-                        <i class="bi bi-arrow-left me-1"></i> Return to Login
-                    </a>
-                </div>
-            </form>
-
-            <div class="text-center mt-3">
-                <span class="text-muted" style="font-size: 0.68rem;">&copy; 2026 Innoventra by Transforma</span>
+            <div class="text-center py-2">
+                <span class="text-secondary" style="font-size: 0.78rem;">Already have an account? <a href="javascript:void(0)" id="linkBackToLogin" class="fw-bold text-decoration-none text-info">Login</a></span>
             </div>
         </div>
     </div>
@@ -864,39 +781,39 @@
     <!-- ================= MODAL HUBUNGI ADMIN SISTEM ================= -->
     <div class="modal fade" id="modalHubungiAdmin" tabindex="-1" aria-hidden="true">
         <div class="modal-dialog modal-dialog-centered">
-            <div class="modal-content border-0 shadow-lg" style="border-radius: 1.5rem; overflow: hidden;">
-                <div class="modal-header border-0 text-center flex-column pb-0 pt-4" style="background: linear-gradient(135deg, rgba(139, 92, 246, 0.08), rgba(0, 0, 0, 0.02));">
-                    <button type="button" class="btn-close position-absolute top-0 end-0 m-3" data-bs-dismiss="modal" aria-label="Close"></button>
-                    <div class="p-3 bg-white rounded-circle shadow-sm mb-2 d-inline-flex align-items-center justify-content-center text-primary" style="width: 60px; height: 60px;">
+            <div class="modal-content border-0 shadow-lg bg-dark text-white border border-secondary border-opacity-25" style="border-radius: 1.5rem; overflow: hidden;">
+                <div class="modal-header border-0 text-center flex-column pb-0 pt-4" style="background: rgba(255, 255, 255, 0.02);">
+                    <button type="button" class="btn-close btn-close-white position-absolute top-0 end-0 m-3" data-bs-dismiss="modal" aria-label="Close"></button>
+                    <div class="p-3 bg-secondary bg-opacity-25 rounded-circle shadow-sm mb-2 d-inline-flex align-items-center justify-content-center text-info" style="width: 60px; height: 60px;">
                         <i class="bi bi-headset fs-4"></i>
                     </div>
-                    <h5 class="modal-title fw-bold text-dark mt-1">Pusat Bantuan Admin</h5>
-                    <p class="text-muted small px-3" style="font-size: 0.82rem;">Sampaikan kendala atau pertanyaan Anda kepada tim pengelola sistem.</p>
+                    <h5 class="modal-title fw-bold text-white mt-1">Pusat Bantuan Admin</h5>
+                    <p class="text-secondary small px-3" style="font-size: 0.82rem;">Sampaikan kendala atau pertanyaan Anda kepada tim pengelola sistem.</p>
                 </div>
                 <div class="modal-body p-4">
                     <form id="formHubungiAdmin">
                         <div class="mb-3 text-start">
-                            <label class="form-label text-dark">Nama Lengkap</label>
+                            <label class="form-label text-white-50">Nama Lengkap</label>
                             <div class="input-group">
                                 <span class="input-group-text"><i class="bi bi-person"></i></span>
                                 <input type="text" id="contact_name" class="form-control" placeholder="Masukkan nama Anda" required>
                             </div>
                         </div>
                         <div class="mb-3 text-start">
-                            <label class="form-label text-dark">Alamat Email</label>
+                            <label class="form-label text-white-50">Alamat Email</label>
                             <div class="input-group">
                                 <span class="input-group-text"><i class="bi bi-envelope"></i></span>
                                 <input type="email" id="contact_email" class="form-control" placeholder="email@domain.com" required>
                             </div>
                         </div>
                         <div class="mb-3 text-start">
-                            <label class="form-label text-dark">Deskripsi / Kendala</label>
+                            <label class="form-label text-white-50">Deskripsi / Kendala</label>
                             <div class="input-group">
                                 <span class="input-group-text align-items-start pt-2"><i class="bi bi-chat-left-text"></i></span>
                                 <textarea id="contact_desc" class="form-control" rows="4" placeholder="Jelaskan kendala Anda..." required></textarea>
                             </div>
                         </div>
-                        <button type="submit" class="btn btn-dark w-100 mt-2 rounded-3 text-white" style="background: linear-gradient(135deg, #ec4899 0%, #8b5cf6 100%) !important; border: none;">
+                        <button type="submit" class="btn btn-mint w-100 mt-2 rounded-3 fw-bold text-dark">
                             <i class="bi bi-send-fill me-2"></i>Kirim Pesan ke Admin
                         </button>
                     </form>
@@ -908,25 +825,25 @@
     <!-- ================= MODAL LUPA PASSWORD ================= -->
     <div class="modal fade" id="modalLupaPassword" tabindex="-1" aria-hidden="true">
         <div class="modal-dialog modal-dialog-centered">
-            <div class="modal-content border-0 shadow-lg" style="border-radius: 1.5rem; overflow: hidden;">
-                <div class="modal-header border-0 text-center flex-column pb-0 pt-4" style="background: linear-gradient(135deg, rgba(139, 92, 246, 0.08), rgba(0, 0, 0, 0.02));">
-                    <button type="button" class="btn-close position-absolute top-0 end-0 m-3" data-bs-dismiss="modal" aria-label="Close"></button>
-                    <div class="p-3 bg-white rounded-circle shadow-sm mb-2 d-inline-flex align-items-center justify-content-center text-primary" style="width: 60px; height: 60px;">
+            <div class="modal-content border-0 shadow-lg bg-dark text-white border border-secondary border-opacity-25" style="border-radius: 1.5rem; overflow: hidden;">
+                <div class="modal-header border-0 text-center flex-column pb-0 pt-4" style="background: rgba(255, 255, 255, 0.02);">
+                    <button type="button" class="btn-close btn-close-white position-absolute top-0 end-0 m-3" data-bs-dismiss="modal" aria-label="Close"></button>
+                    <div class="p-3 bg-secondary bg-opacity-25 rounded-circle shadow-sm mb-2 d-inline-flex align-items-center justify-content-center text-info" style="width: 60px; height: 60px;">
                         <i class="bi bi-shield-lock-fill fs-4"></i>
                     </div>
-                    <h5 class="modal-title fw-bold text-dark mt-1">Reset Password</h5>
-                    <p class="text-muted small px-3" style="font-size: 0.82rem;">Masukkan email terdaftar untuk pemulihan akun.</p>
+                    <h5 class="modal-title fw-bold text-white mt-1">Reset Password</h5>
+                    <p class="text-secondary small px-3" style="font-size: 0.82rem;">Masukkan email terdaftar untuk pemulihan akun.</p>
                 </div>
                 <div class="modal-body p-4 text-center">
                     <form id="formKirimOtp">
                         <div class="mb-3 text-start">
-                            <label class="form-label text-dark">Alamat Email</label>
+                            <label class="form-label text-white-50">Alamat Email</label>
                             <div class="input-group">
                                 <span class="input-group-text"><i class="bi bi-envelope"></i></span>
                                 <input type="email" id="email_reset" class="form-control" placeholder="contoh@email.com" required>
                             </div>
                         </div>
-                        <button type="submit" class="btn w-100 text-white rounded-3 py-2" style="background: linear-gradient(135deg, #ec4899 0%, #8b5cf6 100%); border: none;">Kirim Permintaan Reset</button>
+                        <button type="submit" class="btn btn-mint w-100 text-dark rounded-3 py-2 fw-bold">Kirim Permintaan Reset</button>
                     </form>
                 </div>
             </div>
@@ -943,47 +860,25 @@
         const overlaySpinner = document.getElementById('overlaySpinner');
         const overlayTitle = document.getElementById('overlayTitle');
 
-        // Navigasi antar Layer Mobile
-        document.getElementById('btnGoRegister').addEventListener('click', () => {
+        // Navigasi Antar Layer Mobile (Welcome -> Register / Login)
+        document.getElementById('btnGoRegisterFromWelcome').addEventListener('click', () => {
+            document.getElementById('mobileWelcomeScreen').classList.remove('active-screen');
+            document.getElementById('mobileRegisterScreen').classList.add('active-screen');
+        });
+
+        document.getElementById('linkToLoginFromWelcome').addEventListener('click', () => {
+            document.getElementById('mobileWelcomeScreen').classList.remove('active-screen');
+            document.getElementById('mobileLoginScreen').classList.add('active-screen');
+        });
+
+        document.getElementById('linkToGoRegister').addEventListener('click', () => {
             document.getElementById('mobileLoginScreen').classList.remove('active-screen');
             document.getElementById('mobileRegisterScreen').classList.add('active-screen');
         });
 
-        document.getElementById('btnBackToLogin').addEventListener('click', () => {
+        document.getElementById('linkBackToLogin').addEventListener('click', () => {
             document.getElementById('mobileRegisterScreen').classList.remove('active-screen');
             document.getElementById('mobileLoginScreen').classList.add('active-screen');
-        });
-
-        document.getElementById('linkBackToLoginFromVerify').addEventListener('click', () => {
-            document.getElementById('mobileVerifyScreen').classList.remove('active-screen');
-            document.getElementById('mobileLoginScreen').classList.add('active-screen');
-        });
-
-        // Tab Switcher pada Layer 3 (Verify Account: Phone / Email)
-        $('#tabPhone').on('click', function() {
-            $(this).addClass('btn-primary shadow-sm text-white').removeClass('text-muted');
-            $('#tabEmail').removeClass('btn-primary shadow-sm text-white').addClass('text-muted');
-            $('#inputContainerVerify').html(`
-                <label class="form-label small fw-bold">Phone Number</label>
-                <div class="input-group">
-                    <span class="input-group-text bg-transparent border-0 text-muted">+62</span>
-                    <input type="tel" id="verify_phone" class="form-control" placeholder="812-3456-7890" required>
-                </div>
-            `);
-            $('#verifyFormMobile button[type="submit"]').text('VERIFY PHONE');
-        });
-
-        $('#tabEmail').on('click', function() {
-            $(this).addClass('btn-primary shadow-sm text-white').removeClass('text-muted');
-            $('#tabPhone').removeClass('btn-primary shadow-sm text-white').addClass('text-muted');
-            $('#inputContainerVerify').html(`
-                <label class="form-label small fw-bold">Email Address</label>
-                <div class="input-group">
-                    <span class="input-group-text bg-transparent border-0 text-muted"><i class="bi bi-envelope"></i></span>
-                    <input type="email" id="verify_email_input" class="form-control" placeholder="name@example.com" required>
-                </div>
-            `);
-            $('#verifyFormMobile button[type="submit"]').text('VERIFY EMAIL');
         });
 
         // Handler Proses Login
@@ -1054,7 +949,7 @@
             processLogin($('#username_mob').val().trim(), $('#password_mob').val().trim(), this.querySelector('button[type="submit"]'));
         });
 
-        // Handler Pendaftaran dari Layer 2 -> Berpindah otomatis ke Layer 3 (Verify Account)
+        // Handler Pendaftaran Akun Mobile
         document.getElementById('registerFormMobile').addEventListener('submit', function(e) {
             e.preventDefault();
             const btn = this.querySelector('button[type="submit"]');
@@ -1069,31 +964,13 @@
             setTimeout(() => {
                 overlay.classList.remove('active');
                 btn.disabled = false;
-
-                // Pindah ke Layer 3 (Verify Account)
-                document.getElementById('mobileRegisterScreen').classList.remove('active-screen');
-                document.getElementById('mobileVerifyScreen').classList.add('active-screen');
-            }, 1200);
-        });
-
-        // Handler Submit Verifikasi (Layer 3)
-        document.getElementById('verifyFormMobile').addEventListener('submit', function(e) {
-            e.preventDefault();
-            overlaySpinner.style.display = 'block';
-            overlayTitle.textContent = 'Verifikasi Akun';
-            statusText.className = 'encryption-text text-info';
-            statusText.innerHTML = "Mengesahkan kod verifikasi...";
-            overlay.classList.add('active');
-
-            setTimeout(() => {
-                overlay.classList.remove('active');
                 Swal.fire({
                     icon: 'success',
-                    title: 'Verifikasi Berhasil!',
-                    text: 'Akun Anda telah aktif dan terverifikasi sepenuhnya.',
+                    title: 'Pendaftaran Berhasil!',
+                    text: 'Akun Anda telah berhasil dibuat. Silakan login.',
                     confirmButtonText: 'MASUK SEKARANG'
                 }).then(() => {
-                    document.getElementById('mobileVerifyScreen').classList.remove('active-screen');
+                    document.getElementById('mobileRegisterScreen').classList.remove('active-screen');
                     document.getElementById('mobileLoginScreen').classList.add('active-screen');
                 });
             }, 1500);
