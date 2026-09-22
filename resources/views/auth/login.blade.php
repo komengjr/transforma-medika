@@ -613,7 +613,7 @@
     <!-- LAYER 1: WELCOME / REGISTER PROMPT (Mobile)[cite: 3] -->
     <div id="mobileWelcomeScreen" class="mobile-screen active-screen d-lg-none">
         <div class="m-status-bar">
-            <span>9:41</span>
+            <span>{{date('H:i:s')}}</span>
             <div class="m-status-icons">
                 <i class="bi bi-cellular"></i>
                 <i class="bi bi-wifi"></i>
@@ -657,7 +657,7 @@
     <!-- LAYER 2: SIGN IN / LOGIN (Mobile)[cite: 3] -->
     <div id="mobileLoginScreen" class="mobile-screen d-lg-none">
         <div class="m-status-bar">
-            <span>9:41</span>
+            <span>{{date('H:i:s')}}</span>
             <div class="m-status-icons">
                 <i class="bi bi-cellular"></i>
                 <i class="bi bi-wifi"></i>
@@ -724,7 +724,7 @@
     <!-- LAYER 3: REGISTER ACCOUNT (Mobile)[cite: 3] -->
     <div id="mobileRegisterScreen" class="mobile-screen d-lg-none">
         <div class="m-status-bar">
-            <span>9:41</span>
+            <span>{{date('H:i:s')}}</span>
             <div class="m-status-icons">
                 <i class="bi bi-cellular"></i>
                 <i class="bi bi-wifi"></i>
