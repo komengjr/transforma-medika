@@ -365,6 +365,35 @@
             display: none;
         }
 
+        /* === STYLING KHUSUS GOOGLE AUTH POPUP (SWEETALERT CUSTOM) === */
+        .swal2-google-popup {
+            background: #ffffff !important;
+            color: #202124 !important;
+            border-radius: 28px !important;
+            padding: 2rem !important;
+            box-shadow: 0 10px 40px rgba(0, 0, 0, 0.3) !important;
+            width: 400px !important;
+        }
+
+        .google-account-card {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            padding: 12px 16px;
+            border: 1px solid #dadce0;
+            border-radius: 12px;
+            text-align: left;
+            cursor: pointer;
+            transition: background 0.2s;
+            margin-top: 1rem;
+            margin-bottom: 0.5rem;
+        }
+
+        .google-account-card:hover {
+            background: #f8f9fa;
+            border-color: #1a73e8;
+        }
+
         /* === MOBILE STYLING (BIRU GELAP TERANG & ANIMATED BORDER) === */
         @media (max-width: 992px) {
             body {
@@ -398,7 +427,6 @@
                 top: 0;
                 left: 50%;
                 transform: translateX(-50%);
-                /* Diubah dari hitam (#0b0f19) menjadi Biru Gelap Terang Elegan */
                 background: linear-gradient(135deg, #0f172a 0%, #1e1b4b 100%);
                 color: #ffffff;
                 overflow-y: auto;
@@ -423,7 +451,6 @@
                 display: none !important;
             }
 
-            /* Status Bar Ponsel Atas ala iOS */
             .m-status-bar {
                 display: flex;
                 justify-content: space-between;
@@ -441,7 +468,6 @@
                 font-size: 0.75rem;
             }
 
-            /* === ANIMASI BORDER PADA INPUT MOBILE === */
             @keyframes borderGlow {
                 0% {
                     border-color: rgba(94, 234, 212, 0.4);
@@ -459,7 +485,6 @@
                 }
             }
 
-            /* Input Group Dark Mode dengan Animasi Border */
             .mobile-screen .input-group {
                 background-color: rgba(30, 41, 59, 0.7) !important;
                 border: 1.5px solid rgba(255, 255, 255, 0.15);
@@ -467,7 +492,6 @@
                 transition: all 0.4s ease;
             }
 
-            /* Memicu animasi border saat fokus atau aktif mengetik */
             .mobile-screen .input-group:focus-within {
                 animation: borderGlow 2s infinite ease-in-out;
                 background-color: rgba(30, 41, 59, 0.95) !important;
@@ -482,7 +506,6 @@
                 color: #64748b !important;
             }
 
-            /* Social Login Buttons Dark */
             .social-btn-group-dark {
                 display: flex;
                 justify-content: center;
@@ -628,10 +651,10 @@
 
 
     <!-- ========================================================== -->
-    <!-- TAMPILAN MOBILE: 3 LAYER (Biru Gelap Terang & Animated Border) -->
+    <!-- TAMPILAN MOBILE: 3 LAYER -->
     <!-- ========================================================== -->
 
-    <!-- LAYER 1: WELCOME / REGISTER PROMPT (Mobile)[cite: 3] -->
+    <!-- LAYER 1: WELCOME / REGISTER PROMPT (Mobile) -->
     <div id="mobileWelcomeScreen" class="mobile-screen active-screen d-lg-none">
         <div class="m-status-bar">
             <span>{{date('H:i:s')}}</span>
@@ -643,7 +666,6 @@
         </div>
 
         <div class="flex-grow-1 d-flex flex-column px-4 pt-3 pb-4 justify-content-between">
-            <!-- Ilustrasi Chat UI Card -->
             <div class="p-3 rounded-4 shadow-lg border border-secondary border-opacity-25" style="background: rgba(30, 41, 59, 0.6);">
                 <div class="d-flex align-items-center mb-2 bg-dark bg-opacity-50 p-2 rounded-3 border border-secondary border-opacity-10">
                     <div class="rounded-circle bg-primary d-flex align-items-center justify-content-center text-white me-2" style="width: 28px; height: 28px; font-size: 11px;"><i class="bi bi-person-fill"></i></div>
@@ -659,7 +681,6 @@
                 </div>
             </div>
 
-            <!-- Teks & Tombol Utama -->
             <div class="text-start mt-4">
                 <h2 class="fw-bold text-white mb-2" style="font-size: 1.6rem; letter-spacing: -0.5px;">Let's register account</h2>
                 <p class="text-secondary mb-4" style="font-size: 0.8rem; line-height: 1.5;">Enjoy for reading and writing blog posts. Get $ 1.00 dollars you referral your friends.</p>
@@ -675,7 +696,7 @@
         </div>
     </div>
 
-    <!-- LAYER 2: SIGN IN / LOGIN (Mobile)[cite: 3] -->
+    <!-- LAYER 2: SIGN IN / LOGIN (Mobile) -->
     <div id="mobileLoginScreen" class="mobile-screen d-lg-none">
         <div class="m-status-bar">
             <span>{{date('H:i:s')}}</span>
@@ -726,8 +747,14 @@
                         <a href="#" class="social-pill-btn-dark">
                             <i class="bi bi-facebook text-primary fs-5"></i> Continue with Facebook
                         </a>
-                        <a href="#" class="social-pill-btn-dark">
-                            <i class="bi bi-google text-danger fs-5"></i> Continue with Google
+                        <!-- Tombol Connect dengan Google -->
+                        <a href="javascript:void(0)" class="social-pill-btn-dark btn-google-connect">
+                            <svg width="18" height="18" viewBox="0 0 24 24">
+                                <path fill="#EA4335" d="M12 5c1.6 0 3 .6 4.1 1.6l3.1-3.1C17.3 1.8 14.8 1 12 1 7.5 1 3.7 3.6 1.9 7.3l3.7 2.9C6.5 7 9 5 12 5z" />
+                                <path fill="#4285F4" d="M23.5 12.3c0-.8-.1-1.6-.2-2.3H12v4.6h6.5c-.3 1.5-1.1 2.8-2.4 3.7l3.7 2.9c2.2-2 3.7-5 3.7-8.9z" />
+                                <path fill="#FBBC05" d="M5.6 14.8c-.2-.7-.4-1.5-.4-2.3s.2-1.6.4-2.3L1.9 7.3C.7 9.7 0 12.3 0 15s.7 5.3 1.9 7.7l3.7-2.9c-.3-.9-.6-2-.6-3z" />
+                                <path fill="#34A853" d="M12 23c3.2 0 6-1.1 8-3l-3.7-2.9c-1.1.7-2.5 1.2-4.3 1.2-3 0-5.5-2-6.4-4.8L1.9 16.4C3.7 20.1 7.5 23 12 23z" />
+                            </svg> Continue with Google
                         </a>
                         <a href="#" class="social-pill-btn-dark">
                             <i class="bi bi-apple text-white fs-5"></i> Continue with Apple
@@ -742,7 +769,7 @@
         </div>
     </div>
 
-    <!-- LAYER 3: REGISTER ACCOUNT (Mobile)[cite: 3] -->
+    <!-- LAYER 3: REGISTER ACCOUNT (Mobile) -->
     <div id="mobileRegisterScreen" class="mobile-screen d-lg-none">
         <div class="m-status-bar">
             <span>{{date('H:i:s')}}</span>
@@ -881,7 +908,7 @@
         const overlaySpinner = document.getElementById('overlaySpinner');
         const overlayTitle = document.getElementById('overlayTitle');
 
-        // Navigasi Antar Layer Mobile (Welcome -> Register / Login)
+        // Navigasi Antar Layer Mobile
         document.getElementById('btnGoRegisterFromWelcome').addEventListener('click', () => {
             document.getElementById('mobileWelcomeScreen').classList.remove('active-screen');
             document.getElementById('mobileRegisterScreen').classList.add('active-screen');
@@ -902,7 +929,7 @@
             document.getElementById('mobileLoginScreen').classList.add('active-screen');
         });
 
-        // Handler Proses Login
+        // Handler Proses Login Standar
         function processLogin(username, password, btnElement) {
             overlaySpinner.style.display = 'block';
             overlayTitle.textContent = 'Autentikasi Sistem';
@@ -968,6 +995,64 @@
         document.getElementById('loginFormMobile').addEventListener('submit', function(e) {
             e.preventDefault();
             processLogin($('#username_mob').val().trim(), $('#password_mob').val().trim(), this.querySelector('button[type="submit"]'));
+        });
+
+        // === FITUR CONNECT WITH GOOGLE (POP-UP KEREN & LOADING) ===
+        $(document).on('click', '.btn-google-connect', function(e) {
+            e.preventDefault();
+
+            // 1. Tampilkan Loading State Ringkas Pertama
+            overlaySpinner.style.display = 'block';
+            overlayTitle.textContent = 'Google Authentication';
+            statusText.className = 'encryption-text text-info';
+            statusText.innerHTML = "Menghubungkan ke pelayan Google OAuth...";
+            overlay.classList.add('active');
+
+            setTimeout(() => {
+                overlay.classList.remove('active');
+
+                // 2. Munculkan Pop-up Keren Google Akun Seleksi (Simulasi Pengguna Memilih Akun)
+                Swal.fire({
+                    title: '<div style="display:flex; align-items:center; justify-content:center; gap:8px;"><svg width="24" height="24" viewBox="0 0 24 24"><path fill="#EA4335" d="M12 5c1.6 0 3 .6 4.1 1.6l3.1-3.1C17.3 1.8 14.8 1 12 1 7.5 1 3.7 3.6 1.9 7.3l3.7 2.9C6.5 7 9 5 12 5z"/><path fill="#4285F4" d="M23.5 12.3c0-.8-.1-1.6-.2-2.3H12v4.6h6.5c-.3 1.5-1.1 2.8-2.4 3.7l3.7 2.9c2.2-2 3.7-5 3.7-8.9z"/><path fill="#FBBC05" d="M5.6 14.8c-.2-.7-.4-1.5-.4-2.3s.2-1.6.4-2.3L1.9 7.3C.7 9.7 0 12.3 0 15s.7 5.3 1.9 7.7l3.7-2.9c-.3-.9-.6-2-.6-3z"/><path fill="#34A853" d="M12 23c3.2 0 6-1.1 8-3l-3.7-2.9c-1.1.7-2.5 1.2-4.3 1.2-3 0-5.5-2-6.4-4.8L1.9 16.4C3.7 20.1 7.5 23 12 23z"/></svg><span style="font-size:1.1rem; font-weight:700; color:#202124;">Sign in with Google</span></div>',
+                    html: `
+                        <p style="font-size:0.82rem; color:#5f6368; margin-bottom:1rem;">Pilih akun untuk dilanjutkan ke <b>Innoventra Portal</b></p>
+                        <div class="google-account-card" id="selectGoogleAccount">
+                            <div style="width:36px; height:36px; background:#1a73e8; color:#fff; border-radius:50%; display:flex; align-items:center; justify-content:center; font-weight:bold; font-size:15px;">I</div>
+                            <div style="flex-grow:1; text-align:left;">
+                                <div style="font-size:0.85rem; font-weight:600; color:#202124;">Innoventra Dev</div>
+                                <div style="font-size:0.72rem; color:#5f6368;">dev.innoventra@gmail.com</div>
+                            </div>
+                            <i class="bi bi-chevron-right text-muted" style="font-size:0.8rem;"></i>
+                        </div>
+                    `,
+                    showConfirmButton: false,
+                    showCloseButton: true,
+                    customClass: {
+                        popup: 'swal2-google-popup'
+                    }
+                });
+
+            }, 1000);
+        });
+
+        // Ketika Akun Google Dipilih dari Pop-up
+        $(document).on('click', '#selectGoogleAccount', function() {
+            Swal.close();
+
+            // Tampilkan Loading Token Verifikasi Google Selesai
+            overlaySpinner.style.display = 'block';
+            overlayTitle.textContent = 'Verifikasi Token Google';
+            statusText.className = 'encryption-text text-info';
+            statusText.innerHTML = "Mengesahkan kredensial OAuth 2.0...";
+            overlay.classList.add('active');
+
+            setTimeout(() => {
+                statusText.className = 'encryption-text text-success';
+                statusText.innerHTML = "Autentikasi Google Berhasil! Masuk...";
+                setTimeout(() => {
+                    location.reload();
+                }, 1000);
+            }, 1500);
         });
 
         // Handler Pendaftaran Akun Mobile
