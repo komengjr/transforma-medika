@@ -365,10 +365,10 @@
             display: none;
         }
 
-        /* === MOBILE STYLING (3 LAYER DARK MODE SEPERTI REFERENSI GAMBAR) === */
+        /* === MOBILE STYLING (BIRU GELAP TERANG & ANIMATED BORDER) === */
         @media (max-width: 992px) {
             body {
-                background: #000000 !important;
+                background: #090d16 !important;
                 height: 100vh;
                 height: 100dvh;
                 width: 100vw;
@@ -398,10 +398,11 @@
                 top: 0;
                 left: 50%;
                 transform: translateX(-50%);
-                background: #0b0f19;
+                /* Diubah dari hitam (#0b0f19) menjadi Biru Gelap Terang Elegan */
+                background: linear-gradient(135deg, #0f172a 0%, #1e1b4b 100%);
                 color: #ffffff;
                 overflow-y: auto;
-                box-shadow: 0 10px 30px rgba(0, 0, 0, 0.8);
+                box-shadow: 0 10px 30px rgba(0, 0, 0, 0.6);
                 border-radius: 0px;
                 animation: slideScreen 0.3s cubic-bezier(0.16, 1, 0.3, 1) forwards;
             }
@@ -431,7 +432,7 @@
                 font-size: 0.8rem;
                 font-weight: 600;
                 color: #ffffff;
-                background: #0b0f19;
+                background: transparent;
             }
 
             .m-status-icons {
@@ -440,16 +441,36 @@
                 font-size: 0.75rem;
             }
 
-            /* Input Group Dark Mode */
-            .mobile-screen .input-group {
-                background-color: #121826 !important;
-                border: 1px solid rgba(255, 255, 255, 0.1);
-                border-radius: 0.85rem;
+            /* === ANIMASI BORDER PADA INPUT MOBILE === */
+            @keyframes borderGlow {
+                0% {
+                    border-color: rgba(94, 234, 212, 0.4);
+                    box-shadow: 0 0 5px rgba(94, 234, 212, 0.2), inset 0 0 5px rgba(94, 234, 212, 0.1);
+                }
+
+                50% {
+                    border-color: #5eead4;
+                    box-shadow: 0 0 15px rgba(94, 234, 212, 0.6), inset 0 0 8px rgba(94, 234, 212, 0.3);
+                }
+
+                100% {
+                    border-color: rgba(94, 234, 212, 0.4);
+                    box-shadow: 0 0 5px rgba(94, 234, 212, 0.2), inset 0 0 5px rgba(94, 234, 212, 0.1);
+                }
             }
 
+            /* Input Group Dark Mode dengan Animasi Border */
+            .mobile-screen .input-group {
+                background-color: rgba(30, 41, 59, 0.7) !important;
+                border: 1.5px solid rgba(255, 255, 255, 0.15);
+                border-radius: 0.85rem;
+                transition: all 0.4s ease;
+            }
+
+            /* Memicu animasi border saat fokus atau aktif mengetik */
             .mobile-screen .input-group:focus-within {
-                border-color: #5eead4 !important;
-                box-shadow: 0 0 0 3px rgba(94, 234, 212, 0.15);
+                animation: borderGlow 2s infinite ease-in-out;
+                background-color: rgba(30, 41, 59, 0.95) !important;
             }
 
             .mobile-screen .form-control {
@@ -458,7 +479,7 @@
             }
 
             .mobile-screen .form-control::placeholder {
-                color: #475569 !important;
+                color: #64748b !important;
             }
 
             /* Social Login Buttons Dark */
@@ -476,8 +497,8 @@
                 justify-content: center;
                 gap: 10px;
                 width: 100%;
-                background: #121826;
-                border: 1px solid rgba(255, 255, 255, 0.08);
+                background: rgba(30, 41, 59, 0.7);
+                border: 1px solid rgba(255, 255, 255, 0.1);
                 border-radius: 50rem;
                 padding: 0.65rem;
                 font-size: 0.82rem;
@@ -490,7 +511,7 @@
 
             .social-pill-btn-dark:hover {
                 background: #1e293b;
-                border-color: rgba(255, 255, 255, 0.2);
+                border-color: #5eead4;
                 color: #5eead4;
             }
 
@@ -498,7 +519,7 @@
                 display: flex;
                 align-items: center;
                 text-align: center;
-                color: #475569;
+                color: #94a3b8;
                 font-size: 0.7rem;
                 margin: 0.75rem 0;
             }
@@ -507,7 +528,7 @@
             .m-divider::after {
                 content: '';
                 flex: 1;
-                border-bottom: 1px solid rgba(255, 255, 255, 0.08);
+                border-bottom: 1px solid rgba(255, 255, 255, 0.1);
             }
 
             .m-divider::before {
@@ -607,7 +628,7 @@
 
 
     <!-- ========================================================== -->
-    <!-- TAMPILAN MOBILE: 3 LAYER (Sesuai Referensi Gambar Baru)   -->
+    <!-- TAMPILAN MOBILE: 3 LAYER (Biru Gelap Terang & Animated Border) -->
     <!-- ========================================================== -->
 
     <!-- LAYER 1: WELCOME / REGISTER PROMPT (Mobile)[cite: 3] -->
@@ -623,7 +644,7 @@
 
         <div class="flex-grow-1 d-flex flex-column px-4 pt-3 pb-4 justify-content-between">
             <!-- Ilustrasi Chat UI Card -->
-            <div class="p-3 rounded-4 shadow-lg border border-secondary border-opacity-25" style="background: #121826;">
+            <div class="p-3 rounded-4 shadow-lg border border-secondary border-opacity-25" style="background: rgba(30, 41, 59, 0.6);">
                 <div class="d-flex align-items-center mb-2 bg-dark bg-opacity-50 p-2 rounded-3 border border-secondary border-opacity-10">
                     <div class="rounded-circle bg-primary d-flex align-items-center justify-content-center text-white me-2" style="width: 28px; height: 28px; font-size: 11px;"><i class="bi bi-person-fill"></i></div>
                     <div style="font-size: 0.7rem; color: #cbd5e1;">How can AI optimize my business processes quickly?</div>
@@ -696,7 +717,7 @@
                     </div>
 
                     <button type="submit" class="btn btn-mint w-100 py-3 fw-bold rounded-pill shadow-sm mb-3">
-                        Get Started
+                        Log In
                     </button>
 
                     <div class="m-divider">or continue with</div>
