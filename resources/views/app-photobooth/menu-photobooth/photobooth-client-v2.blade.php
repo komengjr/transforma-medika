@@ -532,11 +532,10 @@
             </div>
         </div>
 
-        <!-- STEP 3: PEMOTRETAN (KAMERA MENYESUAIKAN TIAP KOTAK HIJAU) -->
+        <!-- STEP 3: PEMOTRETAN -->
         <div id="step-booth">
             <div class="booth-column" style="flex: 1.2;">
                 <div id="dynamic-camera-wrapper" style="width: 100%; height: 100%; display: flex; align-items: center; justify-content: center; position: relative;">
-                    <!-- Diisi via Javascript (Otomatis menyesuaikan orientasi per sesi foto) -->
                 </div>
             </div>
 
@@ -615,7 +614,6 @@
         let selectedFrameSrc = activeFrameCard?.getAttribute('data-src') || '';
         let currentFilterClass = 'filter-normal';
         let frameImageObj = new Image();
-        let transparentFrameDataUrl = '';
         let greenSlots = [];
         let framedPhotos = [];
         let audioCtx = null;
@@ -678,7 +676,8 @@
             if (v) v.className = filterClass;
         }
 
-        // Analisis Frame & Auto-Deteksi Kotak Hijau Serta Orientasinya (Potret / Lanskap)
+        // FUNGSI UTAMA: Otomatis mendeteksi lubang Transparan pada gambar Frame PNG
+        // FUNGSI UTAMA: Otomatis mendeteksi lubang tempat foto pada frame baru Anda
         function analyzeFrameImage(imgUrl, callback) {
             const img = new Image();
             img.crossOrigin = "anonymous";
@@ -701,23 +700,34 @@
                         g = data[i + 1],
                         b = data[i + 2],
                         a = data[i + 3];
-                    // Deteksi warna hijau terang (greenscreen)
-                    if (a > 128 && g > 130 && r < 90 && b < 90) {
+
+                    // Mendeteksi area transparan ATAU area putih polos sebagai lubang foto
+                    // (Karena pada gambar Anda lubangnya tampak berwarna putih bersih)
+                    let isTransparent = a < 50;
+                    let isWhiteArea = (r > 240 && g > 240 && b > 240 && a > 200);
+
+                    if (isTransparent || isWhiteArea) {
                         mask[p] = 1;
-                        data[i + 3] = 0; // Transrparankan bagian hijau pada frame asli
+                        // Jika menggunakan area putih, kita bisa membuatnya transparan di canvas utama
+                        // agar foto di belakangnya terlihat dengan sempurna
+                        if (isWhiteArea) {
+                            data[i + 3] = 0;
+                        }
                     } else {
                         mask[p] = 0;
                     }
                 }
 
+                // Perbarui data canvas jika ada area putih yang diubah jadi transparan
                 cx.putImageData(imgData, 0, 0);
                 transparentFrameDataUrl = c.toDataURL('image/png');
 
                 let visited = new Uint8Array(width * height);
                 let rawBoxes = [];
 
-                for (let y = 0; y < height; y += 2) {
-                    for (let x = 0; x < width; x += 2) {
+                // Algoritma pembacaan area lubang
+                for (let y = 0; y < height; y += 4) {
+                    for (let x = 0; x < width; x += 4) {
                         let p = y * width + x;
                         if (mask[p] === 1 && visited[p] === 0) {
                             let rx = x;
@@ -728,9 +738,10 @@
                             while (ry < height && mask[ry * width + x] === 1) ry++;
                             let rHeight = ry - y;
 
-                            if (rWidth > 50 && rHeight > 50) {
-                                for (let fy = y; fy < y + rHeight; fy += 2) {
-                                    for (let fx = x; fx < x + rWidth; fx += 2) {
+                            // Batas minimum ukuran lubang foto
+                            if (rWidth > 100 && rHeight > 100) {
+                                for (let fy = y; fy < y + rHeight; fy += 4) {
+                                    for (let fx = x; fx < x + rWidth; fx += 4) {
                                         visited[fy * width + fx] = 1;
                                     }
                                 }
@@ -745,24 +756,16 @@
                     }
                 }
 
+                // Urutkan posisi lubang dari atas ke bawah
                 rawBoxes.sort((a, b) => a.y - b.y);
-                greenSlots = rawBoxes.slice(0, 2).map(box => ({
-                    ...box,
-                    orientation: box.width > box.height ? 'landscape' : 'portrait'
-                }));
 
-                if (greenSlots.length >= 2) {
-                    greenSlots[0].orientation = 'portrait';
-                    greenSlots[1].orientation = 'landscape';
-
-                    // PENYESUAIAN KHUSUS SLOT BAWAH:
-                    // Jika kotak bawah mendeteksi area sampai menabrak kotak teks kiri,
-                    // kita sesuaikan koordinat X dan width-nya agar pas di area hijaunya saja.
-                    let slotBawah = greenSlots[1];
-                    // Cek jika slot terlalu ke kiri (menutupi area teks "SAVE UP TO")
-                    // Kita geser sedikit ke kanan dan kurangi lebarnya jika perlu:
-                    // (Anda bisa sesuaikan nilai pengali di bawah jika masih kurang pas)
-                }
+                greenSlots = rawBoxes.slice(0, 2).map(box => {
+                    let isLandscape = box.width > box.height;
+                    return {
+                        ...box,
+                        orientation: isLandscape ? 'landscape' : 'portrait'
+                    };
+                });
 
                 if (callback) callback(greenSlots);
             };
@@ -809,7 +812,6 @@
             });
         }
 
-        // Render Kamera Sesuai Orientasi Kotak Hijau Tertentu (Portrait / Landscape)
         function renderCameraForSlot(slotIndex) {
             dynamicCameraWrapper.innerHTML = '';
 
@@ -860,7 +862,6 @@
                 step2Frame.style.display = 'none';
                 stepBooth.style.display = 'flex';
 
-                // Render kamera untuk pose pertama
                 renderCameraForSlot(0);
                 resetBoothState();
             } catch (err) {
@@ -903,7 +904,6 @@
             framedPhotos = [];
 
             for (let i = 0; i < greenSlots.length; i++) {
-                // Ubah orientasi kamera otomatis sesuai kotak hijau ke-i
                 renderCameraForSlot(i);
                 await runCountdown(3);
                 captureFramedPhoto(i);
@@ -989,14 +989,13 @@
             canvas.width = fWidth;
             canvas.height = fHeight;
 
-            // Background putih dasar
             ctx.fillStyle = '#ffffff';
             ctx.fillRect(0, 0, fWidth, fHeight);
 
             let loadedImages = 0;
             const totalToLoad = Math.min(framedPhotos.length, greenSlots.length);
 
-            // Gambar semua foto di lapisan belakang
+            // 1. Gambar foto-foto terlebih dahulu di lapisan bawah
             greenSlots.forEach((slot, index) => {
                 if (index >= framedPhotos.length) return;
 
@@ -1022,12 +1021,10 @@
                         sy = (img.height - sh) / 2;
                     }
 
-                    // Gambar foto murni sesuai kotak slot hijau
                     ctx.drawImage(img, sx, sy, sw, sh, slot.x, slot.y, slot.width, slot.height);
                     ctx.restore();
 
                     loadedImages++;
-                    // Setelah foto beres, timpa frame asli di bagian paling atas
                     if (loadedImages === totalToLoad) {
                         drawFinalFrameAndSave(fWidth, fHeight);
                     }
@@ -1035,16 +1032,10 @@
             });
         }
 
+        // 2. Timpa frame PNG asli di atas foto (sehingga area transparan pada frame menampakkan foto di bawahnya)
         function drawFinalFrameAndSave(fWidth, fHeight) {
-            const transImg = new Image();
-            transImg.crossOrigin = "anonymous";
-            transImg.src = transparentFrameDataUrl;
-            transImg.onload = () => {
-                // FRAME UTUH DITIMPA DI DEPAN FOTO
-                // Karena kotak teks "SAVE UP TO" ada di frame ini, teks akan aman tampil di depan foto
-                ctx.drawImage(transImg, 0, 0, fWidth, fHeight);
-                saveToDatabase(canvas.toDataURL('image/png'));
-            };
+            ctx.drawImage(frameImageObj, 0, 0, fWidth, fHeight);
+            saveToDatabase(canvas.toDataURL('image/png'));
         }
 
         function saveToDatabase(base64Image) {
@@ -1123,7 +1114,7 @@
 
                         const tableQrContainer = document.getElementById(qrContainerId);
                         if (tableQrContainer) {
-                            tableQrContainer.innerHTML = '';
+                            tableQrContainer.innerHTML = ``;
                             new QRCode(tableQrContainer, {
                                 text: shareUrl,
                                 width: 50,

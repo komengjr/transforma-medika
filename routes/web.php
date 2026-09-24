@@ -806,11 +806,7 @@ Route::prefix('v3')->group(function (): void {
     Route::post('/api/antrian/panggil', [AntrianController::class, 'panggilAntrian'])->name('antrian.panggil');
 });
 
-// MOVIE
-Route::prefix('movie/')->group(function (): void {
-    Route::post('master-data/data-movie/add', [MoviesController::class, 'master_data_movie_add'])->name('master_data_movie_add');
-    Route::post('master-data/data-movie/save', [MoviesController::class, 'master_data_movie_save'])->name('master_data_movie_save');
-});
+
 // NEWS
 Route::prefix('news/')->group(function (): void {
     Route::post('menu_news/save', [NewsAdminController::class, 'menu_news_save'])->name('menu_news_save');
@@ -861,6 +857,7 @@ include 'hrm.php';
 include 'event.php';
 include 'medica.php';
 include 'photoboot.php';
+include 'movies.php';
 
 Route::post('/upload-sftp', [FileUploadController::class, 'uploadFile'])->name('upload.sftp');
 Route::post('/upload-ftp', [FileUploadController::class, 'uploadFileftp'])->name('upload.ftp');
@@ -889,3 +886,5 @@ Route::get('/printer', [PrinterController::class, 'index'])->name('printer.index
 
 // Route API (AJAX) untuk mengambil string ZPL
 Route::get('/printer/get-zpl', [PrinterController::class, 'getZplData'])->name('printer.get-zpl');
+
+

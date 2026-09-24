@@ -61,7 +61,8 @@
         flex-direction: column;
         align-items: center;
         justify-content: center;
-        gap: 8px;
+        gap: 6px;
+        padding: 10px;
     }
 
     .movie-card:hover .poster-overlay {
@@ -72,15 +73,17 @@
         border-radius: 20px;
         font-size: 0.75rem;
         font-weight: 600;
-        padding: 5px 14px;
+        padding: 5px 12px;
         display: flex;
         align-items: center;
         gap: 6px;
         transform: scale(0.9);
         transition: transform 0.2s ease, background-color 0.2s ease;
         border: none;
-        width: 80%;
+        width: 100%;
         justify-content: center;
+        text-decoration: none;
+        text-align: center;
     }
 
     .movie-card:hover .btn-action-overlay {
@@ -95,6 +98,28 @@
 
     .btn-play-video:hover {
         background: #be123c;
+        color: #fff;
+    }
+
+    .btn-series-episodes {
+        background: #2563eb;
+        color: #fff;
+        box-shadow: 0 0 12px rgba(37, 99, 235, 0.5);
+    }
+
+    .btn-series-episodes:hover {
+        background: #1d4ed8;
+        color: #fff;
+    }
+
+    .btn-add-episode {
+        background: #059669;
+        color: #fff;
+        box-shadow: 0 0 12px rgba(5, 150, 105, 0.5);
+    }
+
+    .btn-add-episode:hover {
+        background: #047857;
         color: #fff;
     }
 
@@ -116,12 +141,12 @@
         position: absolute;
         top: 8px;
         left: 8px;
-        background: rgba(15, 23, 42, 0.8);
+        background: rgba(15, 23, 42, 0.85);
         backdrop-filter: blur(4px);
         color: #06b6d4;
         border: 1px solid rgba(6, 182, 212, 0.3);
         font-weight: 600;
-        padding: 3px 6px;
+        padding: 3px 8px;
         border-radius: 4px;
         z-index: 2;
     }
@@ -133,7 +158,7 @@
         background: #e11d48;
         color: #fff;
         font-weight: 700;
-        padding: 2px 5px;
+        padding: 2px 6px;
         border-radius: 3px;
         z-index: 2;
     }
@@ -147,7 +172,26 @@
         overflow: hidden;
     }
 
-    /* Filter Tab Styles */
+    /* Category Main Tabs (Movie vs Series) */
+    .category-tab {
+        cursor: pointer;
+        padding: 8px 20px;
+        border-radius: 8px;
+        background: #1e293b;
+        color: #94a3b8;
+        font-weight: 600;
+        transition: all 0.2s ease;
+        border: 1px solid rgba(255, 255, 255, 0.05);
+    }
+
+    .category-tab.active,
+    .category-tab:hover {
+        background: #e11d48;
+        color: #ffffff;
+        box-shadow: 0 4px 12px rgba(225, 29, 72, 0.3);
+    }
+
+    /* Genre Quick Tabs */
     .genre-badge-tab {
         cursor: pointer;
         padding: 5px 14px;
@@ -191,17 +235,34 @@
             <div class="row align-items-center">
                 <div class="col-md-8">
                     <span class="badge bg-danger mb-2 px-2 py-1 fs--2 rounded-pill">
-                        <i class="fas fa-fire me-1"></i> MOVIE MANAGEMENT STUDIO
+                        <i class="fas fa-fire me-1"></i> STREAMING & CATALOG MANAGEMENT
                     </span>
-                    <div class="fw-bold fs-2 text-white mb-1">Layar XXI Catalog</div>
-                    <p class="text-white-50 fs-0 mb-3">Kelola koleksi film bioskop, tautan streaming, dan genre secara real-time.</p>
+                    <div class="fw-bold fs-2 text-white mb-1">Studio Master Movie & Series</div>
+                    <p class="text-white-50 fs-0 mb-3">Kelola koleksi film lepas (Movie) dan serial televisi (Series) secara terpusat.</p>
                     <button class="btn btn-primary btn-sm rounded-pill px-3 py-1 fs--1" id="button-add-movie" data-bs-toggle="modal" data-bs-target="#modal-pr-xl">
-                        <i class="fas fa-plus-circle me-1"></i>Tambah Film Baru
+                        <i class="fas fa-plus-circle me-1"></i>Tambah Data Baru
                     </button>
                 </div>
                 <div class="col-md-4 d-none d-md-block text-end">
                     <i class="fas fa-film text-white opacity-10" style="font-size: 3.5rem;"></i>
                 </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Category Main Switcher Tabs (Semua / Movie / Series) -->
+<div class="row mb-3">
+    <div class="col-12">
+        <div class="d-flex gap-2">
+            <div class="category-tab active fs--1" data-category="all">
+                <i class="fas fa-layer-group me-1"></i> Semua Kategori
+            </div>
+            <div class="category-tab fs--1" data-category="movie">
+                <i class="fas fa-video me-1"></i> Movie (Film)
+            </div>
+            <div class="category-tab fs--1" data-category="series">
+                <i class="fas fa-tv me-1"></i> Series (Serial)
             </div>
         </div>
     </div>
@@ -213,7 +274,7 @@
     <div class="col-lg-4 col-md-6">
         <div class="search-box position-relative">
             <i class="fas fa-search fs--1"></i>
-            <input type="text" id="search-movie" class="form-control form-control-sm fs--1" placeholder="Cari judul film...">
+            <input type="text" id="search-movie" class="form-control form-control-sm fs--1" placeholder="Cari judul film / series...">
         </div>
     </div>
 
@@ -243,35 +304,49 @@
 
 <!-- Grid Film (Card Layout) -->
 <div class="row g-2 g-md-3" id="movie-grid-container">
-    @foreach ($data as $datas)
+    @foreach ($data as$datas)
+    @php
+    $contentType = strtolower($datas->type ?? 'movie');
+    @endphp
     <div class="col-6 col-md-4 col-lg-3 col-xl-2 movie-item"
         data-title="{{ strtolower($datas->title) }}"
-        data-genre="{{ $datas->genre }}">
+        data-genre="{{ $datas->genre }}"
+        data-category="{{ $contentType }}">
 
         <div class="movie-card">
             <!-- Badges -->
-            <span class="badge-type fs--2"><i class="fas fa-link me-1"></i>{{ $datas->type_link ?? 'online' }}</span>
+            <span class="badge-type fs--2">
+                <i class="fas {{ $contentType == 'series' ? 'fa-tv' : 'fa-film' }} me-1"></i>
+                {{ strtoupper($contentType) }}
+            </span>
             <span class="badge-hd fs--2">{{ $datas->subtitle ?? 'SUB INDO' }}</span>
 
             <!-- Poster Container -->
             <div class="poster-wrapper">
                 <img src="{{ $datas->poster }}" alt="{{ $datas->title }}" onerror="this.src='https://via.placeholder.com/300x450?text=No+Poster'">
 
-                <!-- Hover Overlay dengan 2 Tombol (Watch & Trailer) -->
+                <!-- Hover Overlay dengan Tombol Aksi Dinamis -->
                 <div class="poster-overlay">
-                    @if(!empty($datas->video))
-                    <button class="btn-action-overlay btn-play-video btn-watch-video fs--2"
-                        data-video="{{ $datas->video }}"
-                        data-title="Tonton: {{ $datas->title }}">
-                        <i class="fas fa-play"></i> Tonton Film
+                    @if($contentType == 'series')
+                    {{-- Opsi untuk Series: Pilih Episode atau Tambah Episode baru --}}
+                    <a href="{{ url('/watch/series/' . ($datas->slug ?? $datas->id)) }}" target="_blank" class="btn-action-overlay btn-series-episodes fs--2">
+                        <i class="fas fa-list-ul"></i> Lihat Episode
+                    </a>
+                    <button type="button" class="btn-action-overlay btn-add-episode fs--2 button-add-episode-item" data-id="{{ $datas->id }}" data-title="{{ $datas->title }}" data-bs-toggle="modal" data-bs-target="#modal-pr-xl">
+                        <i class="fas fa-plus-circle"></i> Tambah Episode
                     </button>
+                    @else
+                    {{-- Opsi untuk Movie biasa: Langsung tonton --}}
+                    <a href="{{ url('/watch/stream/' . ($datas->slug ?? $datas->id)) }}" target="_blank" class="btn-action-overlay btn-play-video fs--2">
+                        <i class="fas fa-play"></i> Tonton Film
+                    </a>
                     @endif
 
                     @if(!empty($datas->triler))
-                    <button class="btn-action-overlay btn-play-trailer btn-watch-video fs--2"
+                    <button class="btn-action-overlay btn-play-trailer btn-watch-trailer fs--2"
                         data-video="{{ $datas->triler }}"
                         data-title="Trailer: {{ $datas->title }}">
-                        <i class="fas fa-film"></i> Lihat Trailer
+                        <i class="fas fa-film"></i> Trailer
                     </button>
                     @endif
                 </div>
@@ -291,32 +366,33 @@
 
                 <!-- Action Controls Footer -->
                 <div class="d-flex align-items-center justify-content-between pt-1 border-top">
-                    @if(!empty($datas->triler))
-                    <button class="btn btn-xs btn-outline-warning rounded-pill px-2 py-0 fs--2 btn-watch-video"
-                        data-video="{{ $datas->triler }}"
-                        data-title="Trailer: {{ $datas->title }}">
-                        <i class="fas fa-video me-1"></i> Trailer
-                    </button>
-                    @else
                     <span class="text-muted fs--2"><i class="fas fa-calendar-alt me-1"></i>{{ !empty($datas->release_date) ? date('Y', strtotime($datas->release_date)) : '-' }}</span>
-                    @endif
 
                     <div class="dropdown">
                         <button class="btn btn-sm btn-light rounded-circle px-2 py-0" type="button" data-bs-toggle="dropdown">
                             <i class="fas fa-ellipsis-v text-muted fs--2"></i>
                         </button>
                         <ul class="dropdown-menu dropdown-menu-end shadow border-0">
-                            @if(!empty($datas->video))
+                            @if($contentType == 'series')
                             <li>
-                                <a class="dropdown-item fs--1 btn-watch-video" href="javascript:void(0)"
-                                    data-video="{{ $datas->video }}"
-                                    data-title="Tonton: {{ $datas->title }}">
+                                <a class="dropdown-item fs--1" href="{{ url('/watch/series/' . ($datas->slug ?? $datas->id)) }}" target="_blank">
+                                    <i class="fas fa-list-ul text-primary me-2"></i> Lihat Daftar Episode
+                                </a>
+                            </li>
+                            <li>
+                                <button type="button" class="dropdown-item fs--1 button-add-episode-item" data-id="{{ $datas->id }}" data-title="{{ $datas->title }}" data-bs-toggle="modal" data-bs-target="#modal-pr-xl">
+                                    <i class="fas fa-plus-circle text-success me-2"></i> Tambah Episode Baru
+                                </button>
+                            </li>
+                            @else
+                            <li>
+                                <a class="dropdown-item fs--1" href="{{ url('/watch/stream/' . ($datas->slug ?? $datas->id)) }}" target="_blank">
                                     <i class="fas fa-play text-danger me-2"></i> Tonton Film
                                 </a>
                             </li>
                             @endif
-                            <li><a class="dropdown-item fs--1" href="#"><i class="fas fa-edit text-warning me-2"></i> Edit Data</a></li>
-                            <li><a class="dropdown-item fs--1 text-danger" href="#"><i class="fas fa-trash me-2"></i> Hapus Film</a></li>
+                            <li><a class="dropdown-item fs--1" href="#"><i class="fas fa-edit text-warning me-2"></i> Edit Master Data</a></li>
+                            <li><a class="dropdown-item fs--1 text-danger" href="#"><i class="fas fa-trash me-2"></i> Hapus Data</a></li>
                         </ul>
                     </div>
                 </div>
@@ -327,11 +403,11 @@
     @endforeach
 </div>
 
-<!-- Empty State Searching -->
-<div id="no-results" class="text-center py-4 d-none">
-    <i class="fas fa-film-slash text-muted fa-2x mb-2"></i>
-    <div class="fw-bold text-secondary fs-1">Film Tidak Ditemukan</div>
-    <p class="text-muted fs--1">Coba ubah kata kunci pencarian atau filter genre Anda.</p>
+<!-- Empty State Searching / Filtering -->
+<div id="no-results" class="text-center py-5 d-none">
+    <i class="fas fa-film-slash text-muted fa-3x mb-2"></i>
+    <div class="fw-bold text-secondary fs-1">Data Tidak Ditemukan</div>
+    <p class="text-muted fs--1">Tidak ada data yang cocok dengan kategori atau filter pencarian Anda.</p>
 </div>
 @endsection
 
@@ -341,8 +417,8 @@
     <div class="modal-dialog modal-dialog-centered modal-lg">
         <div class="modal-content border-0 shadow-lg rounded-3">
             <div class="modal-header bg-dark text-white border-0 py-2 px-3">
-                <div class="modal-title text-white fw-bold fs-1">
-                    <i class="fas fa-film text-danger me-2"></i>Form Master Movie
+                <div class="modal-title text-white fw-bold fs-1" id="modal-title-dynamic">
+                    <i class="fas fa-film text-danger me-2"></i>Form Master Movie & Series
                 </div>
                 <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal" aria-label="Close"></button>
             </div>
@@ -351,12 +427,12 @@
     </div>
 </div>
 
-<!-- Modal Watch Video / Trailer -->
+<!-- Modal Watch Trailer -->
 <div class="modal fade" id="modal-watch-video" tabindex="-1" aria-hidden="true">
     <div class="modal-dialog modal-dialog-centered modal-lg">
         <div class="modal-content bg-dark border-0 rounded-3 overflow-hidden shadow-lg">
             <div class="modal-header border-0 text-white py-2 px-3 bg-black">
-                <div class="modal-title text-white fw-bold fs-1" id="watch-movie-title">Stream Player</div>
+                <div class="modal-title text-white fw-bold fs-1" id="watch-movie-title">Trailer Player</div>
                 <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal" aria-label="Close"></button>
             </div>
             <div class="modal-body p-0">
@@ -374,27 +450,32 @@
 
 <script>
     $(document).ready(function() {
+        let selectedCategory = 'all';
         let selectedGenre = 'all';
 
-        // Helper untuk mengubah URL YouTube standar ke format Embed Iframe
+        // Helper URL YouTube Embed
         function getEmbedUrl(url) {
             if (!url) return '';
-
-            // Format YouTube Watch (youtube.com/watch?v=XXXX)
             if (url.includes('youtube.com/watch?v=')) {
                 let videoId = url.split('v=')[1].split('&')[0];
                 return 'https://www.youtube.com/embed/' + videoId + '?autoplay=1';
             }
-            // Format YouTube Short (youtu.be/XXXX)
             if (url.includes('youtu.be/')) {
                 let videoId = url.split('youtu.be/')[1].split('?')[0];
                 return 'https://www.youtube.com/embed/' + videoId + '?autoplay=1';
             }
-
             return url;
         }
 
-        // 1. Filter dengan Quick Tab Genre
+        // 1. Filter Kategori Utama
+        $('.category-tab').on('click', function() {
+            $('.category-tab').removeClass('active');
+            $(this).addClass('active');
+            selectedCategory = $(this).data('category');
+            filterMovies();
+        });
+
+        // 2. Filter Genre
         $('.genre-badge-tab').on('click', function() {
             $('.genre-badge-tab').removeClass('active');
             $(this).addClass('active');
@@ -402,7 +483,7 @@
             filterMovies();
         });
 
-        // 2. Realtime Search Input
+        // 3. Search realtime
         $('#search-movie').on('keyup', function() {
             filterMovies();
         });
@@ -414,11 +495,13 @@
             $('.movie-item').each(function() {
                 let title = $(this).data('title');
                 let genre = $(this).data('genre');
+                let category = $(this).data('category');
 
+                let matchesCategory = (selectedCategory === 'all') || (category === selectedCategory);
                 let matchesGenre = (selectedGenre === 'all') || (genre === selectedGenre);
                 let matchesSearch = title.includes(searchValue);
 
-                if (matchesGenre && matchesSearch) {
+                if (matchesCategory && matchesGenre && matchesSearch) {
                     $(this).fadeIn(200);
                     visibleCount++;
                 } else {
@@ -433,8 +516,8 @@
             }
         }
 
-        // 3. Play Video / Trailer Handler
-        $(document).on('click', '.btn-watch-video', function(e) {
+        // 4. Handler khusus Trailer
+        $(document).on('click', '.btn-watch-trailer', function(e) {
             e.preventDefault();
             let rawUrl = $(this).data('video');
             let modalTitle = $(this).data('title');
@@ -442,8 +525,8 @@
             if (!rawUrl) {
                 Swal.fire({
                     icon: 'warning',
-                    title: 'Link Tidak Tersedia',
-                    text: 'Tautan video/trailer belum diinputkan.',
+                    title: 'Trailer Tidak Tersedia',
+                    text: 'Tautan trailer belum diinputkan.',
                     timer: 2000,
                     showConfirmButton: false
                 });
@@ -451,24 +534,23 @@
             }
 
             let embedUrl = getEmbedUrl(rawUrl);
-
             $('#watch-movie-title').text(modalTitle);
             $('#video-iframe').attr('src', embedUrl);
             $('#modal-watch-video').modal('show');
         });
 
-        // Hentikan pemutaran video saat modal ditutup
         $('#modal-watch-video').on('hidden.bs.modal', function() {
             $('#video-iframe').attr('src', '');
         });
 
-        // 4. AJAX Load Form Add Movie
+        // 5. AJAX Load Form Add Master Movie/Series
         $(document).on("click", "#button-add-movie", function(e) {
             e.preventDefault();
+            $('#modal-title-dynamic').html('<i class="fas fa-film text-danger me-2"></i>Form Master Movie & Series');
             $('#menu-pr-xl').html(`
                 <div class="text-center py-4">
                     <div class="spinner-border text-danger" style="width: 2rem; height: 2rem;" role="status"></div>
-                    <p class="mt-2 text-muted fs--1 fw-bold">Memuat Form Movie...</p>
+                    <p class="mt-2 text-muted fs--1 fw-bold">Memuat Form Input...</p>
                 </div>
             `);
             $.ajax({
@@ -488,7 +570,40 @@
             });
         });
 
-        // 5. Save Data Movie AJAX
+        // 5b. AJAX Load Form Add Episode untuk Series Tertentu
+        $(document).on("click", ".button-add-episode-item", function(e) {
+            e.preventDefault();
+            let seriesId = $(this).data('id');
+            let seriesTitle = $(this).data('title');
+
+            $('#modal-title-dynamic').html(`<i class="fas fa-plus-circle text-success me-2"></i>Tambah Episode: ${seriesTitle}`);
+            $('#menu-pr-xl').html(`
+                <div class="text-center py-4">
+                    <div class="spinner-border text-success" style="width: 2rem; height: 2rem;" role="status"></div>
+                    <p class="mt-2 text-muted fs--1 fw-bold">Memuat Form Tambah Episode...</p>
+                </div>
+            `);
+
+            // Sesuaikan route add episode Anda (contoh: route('master_data_episode_add'))
+            $.ajax({
+                url: "{{ route('master_data_movie_add_episode') }}", // Ganti ke route add episode jika sudah dibuat terpisah
+                type: "POST",
+                data: {
+                    "_token": "{{ csrf_token() }}",
+                    "movie_id": seriesId,
+                    "is_episode": 1
+                },
+                dataType: 'html',
+            }).done(function(data) {
+                $('#menu-pr-xl').html(data);
+            }).fail(function() {
+                $('#menu-pr-xl').html(`
+                    <div class="alert alert-danger fs--1 text-center m-3">Gagal memuat form episode. Silahkan coba lagi.</div>
+                `);
+            });
+        });
+
+        // 6. Save Data AJAX
         $(document).on("click", "#button-simpan-data-movie", function(e) {
             e.preventDefault();
             var formData = new FormData($("#form-input-movie")[0]);
@@ -506,7 +621,7 @@
                 Swal.fire({
                     icon: 'success',
                     title: 'Berhasil!',
-                    text: 'Film baru berhasil ditambahkan!',
+                    text: 'Data baru berhasil disimpan!',
                     timer: 1500,
                     showConfirmButton: false
                 }).then(() => {
