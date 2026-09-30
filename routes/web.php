@@ -858,6 +858,7 @@ include 'event.php';
 include 'medica.php';
 include 'photoboot.php';
 include 'movies.php';
+include 'elektromedis.php';
 
 Route::post('/upload-sftp', [FileUploadController::class, 'uploadFile'])->name('upload.sftp');
 Route::post('/upload-ftp', [FileUploadController::class, 'uploadFileftp'])->name('upload.ftp');

@@ -105,98 +105,128 @@
             display: none;
             width: 100%;
             height: 100%;
-            max-width: 1200px;
-            gap: 20px;
+            max-width: 1100px;
+            background: transparent;
+            border: none;
+            padding: 10px;
+            flex-direction: column;
+            justify-content: space-between;
+            box-shadow: none;
+            animation: fadeInScale 0.4s cubic-bezier(0.16, 1, 0.3, 1) forwards;
         }
 
-        .split-left {
-            flex: 1.2;
+        @keyframes fadeInScale {
+            from {
+                opacity: 0;
+                transform: scale(0.95);
+            }
+
+            to {
+                opacity: 1;
+                transform: scale(1);
+            }
+        }
+
+        .ps3-top-bar {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            border-bottom: 1px solid rgba(255, 255, 255, 0.2);
+            padding-bottom: 15px;
+        }
+
+        .ps3-top-bar h3 {
+            color: #ffffff;
+            font-size: 1.5rem;
+            text-shadow: 0 2px 8px rgba(0, 0, 0, 0.6);
+        }
+
+        .ps3-carousel-wrapper {
+            position: relative;
+            flex: 1;
             display: flex;
             align-items: center;
             justify-content: center;
-            height: 100%;
-        }
-
-        .split-right {
-            flex: 1;
-            background: rgba(255, 255, 255, 0.95);
-            padding: 20px;
-            border-radius: 20px;
-            color: #333;
-            display: flex;
-            flex-direction: column;
-            justify-content: space-between;
-            height: 100%;
-            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.3);
             overflow: hidden;
+            margin: 20px 0;
         }
 
-        .split-right>div:first-child {
+        .frame-carousel {
             display: flex;
-            flex-direction: column;
-            flex: 1;
-            overflow: hidden;
-        }
-
-        .form-group {
-            margin-bottom: 12px;
-        }
-
-        .form-group label {
-            display: block;
-            margin-bottom: 4px;
-            font-size: 0.85rem;
-            font-weight: 600;
-            color: #444;
-        }
-
-        .form-group input,
-        .form-group select {
+            gap: 40px;
+            overflow-x: auto;
+            scroll-snap-type: x mandatory;
+            scroll-behavior: smooth;
+            padding: 30px 50px;
             width: 100%;
-            padding: 10px 12px;
-            border-radius: 8px;
-            border: 2px solid #ddd;
-            background: #f9f9f9;
-            color: #333;
-            font-size: 0.9rem;
+            align-items: center;
+            scrollbar-width: none;
         }
 
-        .frame-options {
-            display: grid;
-            grid-template-columns: repeat(2, 1fr);
-            gap: 10px;
-            flex: 1;
-            min-height: 140px;
-            max-height: 100%;
-            overflow-y: auto;
-            padding-right: 5px;
-            margin-bottom: 10px;
+        .frame-carousel::-webkit-scrollbar {
+            display: none;
         }
 
         .frame-card {
-            padding: 6px;
-            border: 2px solid #e0e0e0;
-            border-radius: 8px;
+            scroll-snap-align: center;
+            min-width: 190px;
+            max-width: 190px;
+            height: 310px;
+            background: rgba(255, 255, 255, 0.2);
+            backdrop-filter: blur(10px);
+            -webkit-backdrop-filter: blur(10px);
+            border: 2px solid rgba(255, 255, 255, 0.4);
+            border-radius: 16px;
             cursor: pointer;
-            background: #fff;
             text-align: center;
-            color: #333;
-            font-weight: 600;
-            font-size: 0.8rem;
-            position: relative;
+            flex-shrink: 0;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            padding: 12px;
+            box-shadow: 0 8px 25px rgba(0, 0, 0, 0.3);
+            transition: all 0.4s cubic-bezier(0.25, 1, 0.5, 1);
+            transform: scale(0.8);
+            opacity: 0.5;
         }
 
         .frame-card img {
             width: 100%;
-            height: 55px;
+            height: 220px;
             object-fit: contain;
-            border-radius: 4px;
-            margin-bottom: 4px;
+            border-radius: 10px;
+            filter: drop-shadow(0 5px 10px rgba(0, 0, 0, 0.3));
+            transition: all 0.4s ease;
+        }
+
+        .frame-card span {
+            display: block;
+            margin-top: 10px;
+            font-size: 0.85rem;
+            font-weight: 600;
+            color: #fff;
+            text-shadow: 0 2px 4px rgba(0, 0, 0, 0.6);
+            white-space: nowrap;
+            overflow: hidden;
+            text-overflow: ellipsis;
+            width: 100%;
         }
 
         .frame-card.active {
+            transform: scale(1.2) translateY(-5px);
+            opacity: 1;
+            z-index: 10;
+            background: rgba(255, 255, 255, 0.35);
             border-color: #ff4081;
-            background: #fff0f5;
+            box-shadow: 0 15px 35px rgba(255, 64, 129, 0.5), 0 0 20px rgba(255, 255, 255, 0.8);
+        }
+
+        .ps3-bottom-bar {
+            display: flex;
+            gap: 15px;
+            justify-content: center;
+            align-items: center;
         }
 
         #step-booth {
@@ -226,7 +256,6 @@
             display: flex;
             align-items: center;
             justify-content: center;
-            transition: all 0.3s ease;
         }
 
         .camera-container.landscape {
@@ -271,36 +300,6 @@
 
         .filter-cool {
             filter: hue-rotate(30deg) saturate(120%);
-        }
-
-        .frame-preview-box {
-            position: relative;
-            width: 100%;
-            height: 100%;
-            max-height: 80vh;
-            background: #111;
-            border-radius: 16px;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            overflow: hidden;
-            border: 4px solid #fff;
-            box-shadow: 0 10px 25px rgba(0, 0, 0, 0.4);
-        }
-
-        .frame-preview-box.landscape {
-            aspect-ratio: 4 / 3;
-        }
-
-        .frame-preview-box.portrait {
-            aspect-ratio: 3 / 4;
-            width: auto;
-        }
-
-        .frame-preview-box img {
-            width: 100%;
-            height: 100%;
-            object-fit: contain;
         }
 
         .countdown {
@@ -399,10 +398,11 @@
             width: 100%;
             margin-top: 5px;
             box-shadow: 0 4px 15px rgba(255, 64, 129, 0.4);
+            transition: transform 0.2s ease;
         }
 
         .btn:hover {
-            transform: translateY(-1px);
+            transform: translateY(-2px);
         }
 
         .btn:disabled {
@@ -412,9 +412,11 @@
         }
 
         .btn-secondary {
-            background: #666;
+            background: rgba(0, 0, 0, 0.6);
+            backdrop-filter: blur(5px);
             font-size: 0.85rem;
             padding: 8px 15px;
+            border: 1px solid rgba(255, 255, 255, 0.3);
         }
 
         .btn-merge {
@@ -433,19 +435,6 @@
             width: 180px;
             height: 180px;
             box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
-        }
-
-        .qrcode-swal-container canvas,
-        [id^="qr-table-"] canvas {
-            display: none !important;
-        }
-
-        .qrcode-swal-container img,
-        [id^="qr-table-"] img {
-            display: block !important;
-            margin: 0 auto !important;
-            max-width: 100% !important;
-            height: auto !important;
         }
     </style>
 </head>
@@ -466,69 +455,60 @@
         <!-- STEP 1: FORM DATA DIRI -->
         <div id="step-1-form" class="step-box-small">
             <h3 style="margin-bottom: 15px; color: #ff4081; text-align: center;">Langkah 1: Isi Data Diri</h3>
-            <div class="form-group">
-                <label for="user-name">Nama Lengkap:</label>
-                <input type="text" id="user-name" placeholder="Masukkan nama Anda">
+            <div class="form-group" style="margin-bottom: 12px;">
+                <label for="user-name" style="display:block; margin-bottom:4px; font-size:0.85rem; font-weight:600; color:#444;">Nama Lengkap:</label>
+                <input type="text" id="user-name" placeholder="Masukkan nama Anda" style="width:100%; padding:10px 12px; border-radius:8px; border:2px solid #ddd; background:#f9f9f9; color:#333; font-size:0.9rem;">
             </div>
-            <div class="form-group">
-                <label for="user-phone">Nomor HP / WhatsApp:</label>
-                <input type="tel" id="user-phone" placeholder="Contoh: 08123456789">
+            <div class="form-group" style="margin-bottom: 12px;">
+                <label for="user-phone" style="display:block; margin-bottom:4px; font-size:0.85rem; font-weight:600; color:#444;">Nomor HP / WhatsApp:</label>
+                <input type="tel" id="user-phone" placeholder="Contoh: 08123456789" style="width:100%; padding:10px 12px; border-radius:8px; border:2px solid #ddd; background:#f9f9f9; color:#333; font-size:0.9rem;">
             </div>
-            <div class="form-group">
-                <label for="user-email">Email:</label>
-                <input type="email" id="user-email" placeholder="Contoh: user@email.com">
+            <div class="form-group" style="margin-bottom: 15px;">
+                <label for="user-email" style="display:block; margin-bottom:4px; font-size:0.85rem; font-weight:600; color:#444;">Email:</label>
+                <input type="email" id="user-email" placeholder="Contoh: user@email.com" style="width:100%; padding:10px 12px; border-radius:8px; border:2px solid #ddd; background:#f9f9f9; color:#333; font-size:0.9rem;">
             </div>
-            <button class="btn" onclick="submitFormStep1()">Lanjut ke Pengaturan Frame</button>
+            <button class="btn" onclick="submitFormStep1()">Lanjut ke Pilih Frame</button>
         </div>
 
-        <!-- STEP 2: SPLIT SCREEN (PILIH FRAME & FILTER) -->
+        <!-- STEP 2: PS3 CAROUSEL FRAME SELECTION -->
         <div id="step-2-frame">
-            <div class="split-left">
-                <div id="frame-preview-container" class="frame-preview-box portrait">
-                    <img id="static-frame-preview" src="" alt="Preview Frame">
+            <div class="ps3-top-bar">
+                <h3>Pilih Frame Photobooth</h3>
+                <div style="width: 220px;">
+                    <select id="camera-filter" onchange="applyFilter(this.value)" style="width: 100%; padding: 8px; border-radius: 8px; border: 1px solid rgba(255,255,255,0.3); background: rgba(0,0,0,0.5); color: #fff; font-size: 0.85rem;">
+                        <option value="filter-normal">Filter: Normal</option>
+                        <option value="filter-grayscale">Filter: Hitam Putih</option>
+                        <option value="filter-sepia">Filter: Sepia</option>
+                        <option value="filter-vintage">Filter: Vintage</option>
+                        <option value="filter-bright">Filter: Bright</option>
+                        <option value="filter-cool">Filter: Cool Blue</option>
+                    </select>
                 </div>
             </div>
 
-            <div class="split-right">
-                <div>
-                    <h3 style="margin-bottom: 10px; color: #ff4081; text-align: center;">Langkah 2: Pengaturan</h3>
-
-                    <div class="form-group">
-                        <label for="camera-filter">Pilih Filter Kamera:</label>
-                        <select id="camera-filter" onchange="applyFilter(this.value)">
-                            <option value="filter-normal">Normal</option>
-                            <option value="filter-grayscale">Hitam Putih (Grayscale)</option>
-                            <option value="filter-sepia">Sepia (Klasik)</option>
-                            <option value="filter-vintage">Vintage / Retro</option>
-                            <option value="filter-bright">Bright & Contrast</option>
-                            <option value="filter-cool">Cool Blue</option>
-                        </select>
+            <div class="ps3-carousel-wrapper">
+                <div class="frame-carousel" id="frame-carousel">
+                    @forelse($photobooth->frames as $key =>$frame)
+                    @php
+                    $frameUrl = str_contains($frame->frame_path, 'photobooth/')
+                    ? asset('storage/' . $frame->frame_path)
+                    : asset('storage/photobooth/' . $frame->frame_path);
+                    @endphp
+                    <div class="frame-card {{ $key === 0 ? 'active' : '' }}"
+                        data-src="{{ $frameUrl }}"
+                        onclick="selectFrame(this)">
+                        <img src="{{ $frameUrl }}" alt="{{ $frame->frame_name }}">
+                        <span>{{ $frame->frame_name }}</span>
                     </div>
-
-                    <label style="display: block; margin-bottom: 6px; font-size: 0.85rem; font-weight: 600; color: #444;">Pilih Frame Layout:</label>
-                    <div class="frame-options">
-                        @forelse($photobooth->frames as $key => $frame)
-                        @php
-                        $frameUrl = str_contains($frame->frame_path, 'photobooth/')
-                        ? asset('storage/' . $frame->frame_path)
-                        : asset('storage/photobooth/' . $frame->frame_path);
-                        @endphp
-                        <div class="frame-card {{ $key === 0 ? 'active' : '' }}"
-                            data-src="{{ $frameUrl }}"
-                            onclick="selectFrame(this)">
-                            <img src="{{ $frameUrl }}" alt="{{ $frame->frame_name }}">
-                            <span>{{ $frame->frame_name }}</span>
-                        </div>
-                        @empty
-                        <div class="text-muted small">Belum ada frame yang diupload.</div>
-                        @endforelse
-                    </div>
+                    @empty
+                    <div class="text-muted text-center" style="width: 100%;">Belum ada frame yang diupload.</div>
+                    @endforelse
                 </div>
+            </div>
 
-                <div>
-                    <button class="btn" onclick="goToStep3Booth()">Mulai Sesi Foto</button>
-                    <button class="btn btn-secondary" onclick="backToStep1()">Kembali ke Form</button>
-                </div>
+            <div class="ps3-bottom-bar">
+                <button class="btn btn-secondary" style="max-width: 180px;" onclick="backToStep1()">Kembali</button>
+                <button class="btn" onclick="goToStep3Booth()">Mulai Sesi Foto</button>
             </div>
         </div>
 
@@ -589,8 +569,6 @@
         const step2Frame = document.getElementById('step-2-frame');
         const stepBooth = document.getElementById('step-booth');
 
-        const staticFramePreview = document.getElementById('static-frame-preview');
-        const framePreviewContainer = document.getElementById('frame-preview-container');
         const dynamicCameraWrapper = document.getElementById('dynamic-camera-wrapper');
 
         const canvas = document.getElementById('photo-strip');
@@ -636,6 +614,21 @@
             osc.stop(audioCtx.currentTime + 0.15);
         }
 
+        function playClickSound() {
+            initAudio();
+            const osc = audioCtx.createOscillator();
+            const gain = audioCtx.createGain();
+            osc.type = 'triangle';
+            osc.frequency.setValueAtTime(400, audioCtx.currentTime);
+            osc.frequency.exponentialRampToValueAtTime(200, audioCtx.currentTime + 0.08);
+            gain.gain.setValueAtTime(0.15, audioCtx.currentTime);
+            gain.gain.exponentialRampToValueAtTime(0.001, audioCtx.currentTime + 0.08);
+            osc.connect(gain);
+            gain.connect(audioCtx.destination);
+            osc.start();
+            osc.stop(audioCtx.currentTime + 0.08);
+        }
+
         function playShutterSound() {
             initAudio();
             const bufferSize = audioCtx.sampleRate * 0.08;
@@ -676,8 +669,7 @@
             if (v) v.className = filterClass;
         }
 
-        // FUNGSI UTAMA: Otomatis mendeteksi lubang Transparan pada gambar Frame PNG
-        // FUNGSI UTAMA: Otomatis mendeteksi lubang tempat foto pada frame baru Anda
+        // FUNGSI ANALISIS FRAME DENGAN DETEKSI SUDUT KEMIRINGAN & SEMUA SLOT DINAMIS
         function analyzeFrameImage(imgUrl, callback) {
             const img = new Image();
             img.crossOrigin = "anonymous";
@@ -700,34 +692,16 @@
                         g = data[i + 1],
                         b = data[i + 2],
                         a = data[i + 3];
-
-                    // Mendeteksi area transparan ATAU area putih polos sebagai lubang foto
-                    // (Karena pada gambar Anda lubangnya tampak berwarna putih bersih)
-                    let isTransparent = a < 50;
-                    let isWhiteArea = (r > 240 && g > 240 && b > 240 && a > 200);
-
-                    if (isTransparent || isWhiteArea) {
-                        mask[p] = 1;
-                        // Jika menggunakan area putih, kita bisa membuatnya transparan di canvas utama
-                        // agar foto di belakangnya terlihat dengan sempurna
-                        if (isWhiteArea) {
-                            data[i + 3] = 0;
-                        }
-                    } else {
-                        mask[p] = 0;
-                    }
+                    // Mendeteksi area transparan atau area putih bersih sebagai slot foto
+                    let isTargetArea = (a < 50) || (r > 230 && g > 230 && b > 230);
+                    mask[p] = isTargetArea ? 1 : 0;
                 }
-
-                // Perbarui data canvas jika ada area putih yang diubah jadi transparan
-                cx.putImageData(imgData, 0, 0);
-                transparentFrameDataUrl = c.toDataURL('image/png');
 
                 let visited = new Uint8Array(width * height);
                 let rawBoxes = [];
 
-                // Algoritma pembacaan area lubang
-                for (let y = 0; y < height; y += 4) {
-                    for (let x = 0; x < width; x += 4) {
+                for (let y = 0; y < height; y += 10) {
+                    for (let x = 0; x < width; x += 10) {
                         let p = y * width + x;
                         if (mask[p] === 1 && visited[p] === 0) {
                             let rx = x;
@@ -738,34 +712,70 @@
                             while (ry < height && mask[ry * width + x] === 1) ry++;
                             let rHeight = ry - y;
 
-                            // Batas minimum ukuran lubang foto
-                            if (rWidth > 100 && rHeight > 100) {
-                                for (let fy = y; fy < y + rHeight; fy += 4) {
-                                    for (let fx = x; fx < x + rWidth; fx += 4) {
+                            if (rWidth > 150 && rHeight > 150) {
+                                for (let fy = y; fy < y + rHeight; fy += 10) {
+                                    for (let fx = x; fx < x + rWidth; fx += 10) {
                                         visited[fy * width + fx] = 1;
                                     }
                                 }
+
+                                // DETEKSI SUDUT KEMIRINGAN OTOMATIS BERDASARKAN GARIS TEPI SLOT
+                                let topEdgeX1 = -1;
+                                for (let fx = x; fx < x + rWidth; fx++) {
+                                    if (mask[y * width + fx] === 1) {
+                                        topEdgeX1 = fx;
+                                        break;
+                                    }
+                                }
+
+                                let sampleY = y + Math.floor(rHeight * 0.2);
+                                let midEdgeX1 = -1;
+                                for (let fx = x; fx < x + rWidth; fx++) {
+                                    if (mask[sampleY * width + fx] === 1) {
+                                        midEdgeX1 = fx;
+                                        break;
+                                    }
+                                }
+
+                                let calculatedAngle = 0;
+                                if (topEdgeX1 !== -1 && midEdgeX1 !== -1) {
+                                    let shiftX = midEdgeX1 - topEdgeX1;
+                                    let shiftY = sampleY - y;
+                                    if (shiftY !== 0) {
+                                        calculatedAngle = Math.atan(shiftX / shiftY) * (180 / Math.PI);
+                                    }
+                                }
+
+                                if (Math.abs(calculatedAngle) > 15) calculatedAngle = 0;
+
                                 rawBoxes.push({
                                     x: x,
                                     y: y,
                                     width: rWidth,
-                                    height: rHeight
+                                    height: rHeight,
+                                    angle: calculatedAngle,
+                                    orientation: rWidth > rHeight ? 'landscape' : 'portrait'
                                 });
                             }
                         }
                     }
                 }
 
-                // Urutkan posisi lubang dari atas ke bawah
+                // Urutkan slot secara otomatis dari atas ke bawah berdasarkan koordinat Y
                 rawBoxes.sort((a, b) => a.y - b.y);
+                greenSlots = rawBoxes; // Diambil SELURUH slot yang terdeteksi secara dinamis
 
-                greenSlots = rawBoxes.slice(0, 2).map(box => {
-                    let isLandscape = box.width > box.height;
-                    return {
-                        ...box,
-                        orientation: isLandscape ? 'landscape' : 'portrait'
-                    };
-                });
+                // Fallback aman jika deteksi gagal
+                if (greenSlots.length === 0) {
+                    greenSlots = [{
+                        x: Math.floor(width * 0.1),
+                        y: Math.floor(height * 0.05),
+                        width: Math.floor(width * 0.8),
+                        height: Math.floor(height * 0.4),
+                        angle: 0,
+                        orientation: 'portrait'
+                    }];
+                }
 
                 if (callback) callback(greenSlots);
             };
@@ -801,11 +811,17 @@
         }
 
         function selectFrame(element) {
+            playClickSound();
             document.querySelectorAll('.frame-card').forEach(card => card.classList.remove('active'));
             element.classList.add('active');
 
+            element.scrollIntoView({
+                behavior: 'smooth',
+                inline: 'center',
+                block: 'nearest'
+            });
+
             selectedFrameSrc = element.getAttribute('data-src');
-            staticFramePreview.src = selectedFrameSrc;
 
             analyzeFrameImage(selectedFrameSrc, (slots) => {
                 renderPreviewSlots();
@@ -817,9 +833,6 @@
 
             const currentSlot = greenSlots[slotIndex];
             const slotOrientation = currentSlot ? currentSlot.orientation : 'portrait';
-
-            framePreviewContainer.classList.remove('landscape', 'portrait');
-            framePreviewContainer.classList.add(slotOrientation);
 
             const singleContainer = document.createElement('div');
             singleContainer.className = `camera-container ${slotOrientation}`;
@@ -853,7 +866,14 @@
             try {
                 if (!mediaStream) {
                     mediaStream = await navigator.mediaDevices.getUserMedia({
-                        video: true,
+                        video: {
+                            width: {
+                                ideal: 1920
+                            },
+                            height: {
+                                ideal: 1080
+                            }
+                        },
                         audio: false
                     });
                 }
@@ -974,14 +994,18 @@
             tempCtx.scale(-1, 1);
             tempCtx.drawImage(activeVideo, sx, sy, sWidth, sHeight, 0, 0, pWidth, pHeight);
 
-            const imgDataUrl = tempCanvas.toDataURL('image/png');
+            const imgDataUrl = tempCanvas.toDataURL('image/png', 1.0);
             framedPhotos.push(imgDataUrl);
 
             document.getElementById(`slot-${index}`).innerHTML = `<img src="${imgDataUrl}" alt="Pose ${index + 1}">`;
         }
 
-        function mergePhotos() {
-            if (framedPhotos.length < greenSlots.length) return;
+        // FUNGSI PENGGABUNGAN DENGAN AUTO-CROP KETAT SESUAI JUMLAH SLOT DINAMIS
+        async function mergePhotos() {
+            if (framedPhotos.length === 0) {
+                Swal.fire('Perhatian', 'Belum ada foto yang diambil!', 'warning');
+                return;
+            }
 
             const fWidth = frameImageObj.naturalWidth || frameImageObj.width || 1200;
             const fHeight = frameImageObj.naturalHeight || frameImageObj.height || 1800;
@@ -989,53 +1013,98 @@
             canvas.width = fWidth;
             canvas.height = fHeight;
 
+            // 1. Bersihkan canvas & beri background putih bersih
+            ctx.clearRect(0, 0, fWidth, fHeight);
             ctx.fillStyle = '#ffffff';
             ctx.fillRect(0, 0, fWidth, fHeight);
 
-            let loadedImages = 0;
-            const totalToLoad = Math.min(framedPhotos.length, greenSlots.length);
+            const targetSlots = greenSlots.length > 0 ? greenSlots : [{
+                x: 75,
+                y: 55,
+                width: 1050,
+                height: 780,
+                angle: 0
+            }];
 
-            // 1. Gambar foto-foto terlebih dahulu di lapisan bawah
-            greenSlots.forEach((slot, index) => {
-                if (index >= framedPhotos.length) return;
+            // 2. Gambar FOTO-FOTO JEPRETAN DI LAPISAN BELAKANG DENGAN AUTO-CROP KETAT
+            for (let index = 0; index < targetSlots.length; index++) {
+                if (index >= framedPhotos.length) break;
 
-                const img = new Image();
-                img.crossOrigin = "anonymous";
-                img.src = framedPhotos[index];
-                img.onload = () => {
+                const slot = targetSlots[index];
+                const photoSrc = framedPhotos[index];
+
+                await new Promise((resolve) => {
+                    const img = new Image();
+                    img.crossOrigin = "anonymous";
+                    img.onload = () => {
+                        ctx.save();
+
+                        const centerX = slot.x + slot.width / 2;
+                        const centerY = slot.y + slot.height / 2;
+
+                        ctx.translate(centerX, centerY);
+                        if (slot.angle) {
+                            ctx.rotate((slot.angle * Math.PI) / 180);
+                        }
+
+                        // AUTO-CROP KETAT:
+                        // Menggunakan ukuran murni slot tanpa overflow keluar agar terpotong pas
+                        // di dalam bidang transparan masing-masing slot.
+                        ctx.beginPath();
+                        ctx.rect(
+                            -slot.width / 2,
+                            -slot.height / 2,
+                            slot.width,
+                            slot.height
+                        );
+                        ctx.clip();
+
+                        const fitAspect = img.width / img.height;
+                        const boxAspect = slot.width / slot.height;
+
+                        let finalW, finalH, finalX, finalY;
+                        if (fitAspect > boxAspect) {
+                            finalW = slot.width;
+                            finalH = slot.width / fitAspect;
+                            finalX = -slot.width / 2;
+                            finalY = -slot.height / 2 + (slot.height - finalH) / 2;
+                        } else {
+                            finalH = slot.height;
+                            finalW = slot.height * fitAspect;
+                            finalX = -slot.width / 2 + (slot.width - finalW) / 2;
+                            finalY = -slot.height / 2;
+                        }
+
+                        ctx.imageSmoothingEnabled = true;
+                        ctx.imageSmoothingQuality = 'high';
+                        ctx.drawImage(img, 0, 0, img.width, img.height, finalX, finalY, finalW, finalH);
+
+                        ctx.restore();
+                        resolve();
+                    };
+                    img.onerror = () => resolve();
+                    img.src = photoSrc;
+                });
+            }
+
+            // 3. Timpa dengan FRAME ASLI DI LAPISAN PALING DEPAN
+            await new Promise((resolve) => {
+                const fImg = new Image();
+                fImg.crossOrigin = "anonymous";
+                fImg.onload = () => {
                     ctx.save();
-
-                    const slotAspect = slot.width / slot.height;
-                    const imgAspect = img.width / img.height;
-                    let sw, sh, sx, sy;
-
-                    if (imgAspect > slotAspect) {
-                        sh = img.height;
-                        sw = img.height * slotAspect;
-                        sx = (img.width - sw) / 2;
-                        sy = 0;
-                    } else {
-                        sw = img.width;
-                        sh = img.width / slotAspect;
-                        sx = 0;
-                        sy = (img.height - sh) / 2;
-                    }
-
-                    ctx.drawImage(img, sx, sy, sw, sh, slot.x, slot.y, slot.width, slot.height);
+                    ctx.imageSmoothingEnabled = true;
+                    ctx.imageSmoothingQuality = 'high';
+                    ctx.drawImage(fImg, 0, 0, fWidth, fHeight);
                     ctx.restore();
-
-                    loadedImages++;
-                    if (loadedImages === totalToLoad) {
-                        drawFinalFrameAndSave(fWidth, fHeight);
-                    }
+                    resolve();
                 };
+                fImg.onerror = () => resolve();
+                fImg.src = selectedFrameSrc;
             });
-        }
 
-        // 2. Timpa frame PNG asli di atas foto (sehingga area transparan pada frame menampakkan foto di bawahnya)
-        function drawFinalFrameAndSave(fWidth, fHeight) {
-            ctx.drawImage(frameImageObj, 0, 0, fWidth, fHeight);
-            saveToDatabase(canvas.toDataURL('image/png'));
+            // 4. Simpan hasil akhir ke database
+            saveToDatabase(canvas.toDataURL('image/png', 1.0));
         }
 
         function saveToDatabase(base64Image) {

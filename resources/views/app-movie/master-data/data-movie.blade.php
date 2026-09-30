@@ -219,7 +219,7 @@
 
     .search-box i {
         position: absolute;
-        left: 14px;
+        left: 54px;
         top: 50%;
         transform: translateY(-50%);
         color: #94a3b8;
