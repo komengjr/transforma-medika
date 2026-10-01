@@ -151,13 +151,48 @@
             margin: 20px 0;
         }
 
+        /* Tombol Arrow Kiri Kanan Carousel Step 2 */
+        .carousel-arrow {
+            position: absolute;
+            top: 50%;
+            transform: translateY(-50%);
+            background: rgba(0, 0, 0, 0.6);
+            color: white;
+            border: 2px solid rgba(255, 255, 255, 0.6);
+            width: 50px;
+            height: 50px;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 1.5rem;
+            cursor: pointer;
+            z-index: 20;
+            transition: all 0.2s ease;
+            box-shadow: 0 4px 10px rgba(0, 0, 0, 0.4);
+        }
+
+        .carousel-arrow:hover {
+            background: rgba(255, 64, 129, 0.8);
+            border-color: #fff;
+            transform: translateY(-50%) scale(1.1);
+        }
+
+        .carousel-arrow.left {
+            left: 10px;
+        }
+
+        .carousel-arrow.right {
+            right: 10px;
+        }
+
         .frame-carousel {
             display: flex;
             gap: 40px;
             overflow-x: auto;
             scroll-snap-type: x mandatory;
             scroll-behavior: smooth;
-            padding: 30px 50px;
+            padding: 30px 60px;
             width: 100%;
             align-items: center;
             scrollbar-width: none;
@@ -233,7 +268,7 @@
             display: none;
             width: 100%;
             height: 100%;
-            max-width: 1200px;
+            max-width: 1250px;
             gap: 20px;
         }
 
@@ -315,39 +350,44 @@
             z-index: 20;
         }
 
+        /* Preview Section Step 3 dengan Lebar Diatur 300px */
         .preview-section {
             width: 100%;
+            max-width: 300px;
+            /* Lebar panel preview dibatasi 300px sesuai permintaan */
             height: 100%;
             background: rgba(255, 255, 255, 0.95);
-            padding: 15px;
+            padding: 12px;
             border-radius: 16px;
             color: #333;
             display: flex;
             flex-direction: column;
             max-height: 80vh;
+            box-shadow: 0 10px 25px rgba(0, 0, 0, 0.3);
         }
 
         .preview-gallery {
             display: flex;
             flex-direction: column;
-            gap: 10px;
+            gap: 8px;
             flex: 1;
             overflow-y: auto;
-            padding-right: 5px;
+            padding-right: 4px;
         }
 
         .preview-item {
             background: #f0f0f0;
             border: 2px dashed #bbb;
-            border-radius: 10px;
+            border-radius: 8px;
             display: flex;
             align-items: center;
             justify-content: center;
             overflow: hidden;
             color: #888;
-            font-size: 0.9rem;
+            font-size: 0.8rem;
             font-weight: bold;
-            min-height: 100px;
+            min-height: 75px;
+            /* Dibuat lebih ringkas agar pas di lebar 300px */
             width: 100%;
             flex-shrink: 0;
         }
@@ -364,25 +404,25 @@
 
         .table-container {
             width: 100%;
-            margin-top: 10px;
+            margin-top: 8px;
             background: #fff;
-            padding: 10px;
-            border-radius: 10px;
+            padding: 8px;
+            border-radius: 8px;
             display: none;
-            max-height: 120px;
+            max-height: 100px;
             overflow-y: auto;
         }
 
         table {
             width: 100%;
             border-collapse: collapse;
-            font-size: 0.75rem;
+            font-size: 0.7rem;
             text-align: left;
         }
 
         th,
         td {
-            padding: 4px;
+            padding: 3px;
             border-bottom: 1px solid #ddd;
         }
 
@@ -390,8 +430,8 @@
             background: linear-gradient(45deg, #ff4081, #ff6e40);
             color: white;
             border: none;
-            padding: 12px 20px;
-            font-size: 1rem;
+            padding: 10px 16px;
+            font-size: 0.9rem;
             font-weight: bold;
             border-radius: 25px;
             cursor: pointer;
@@ -414,8 +454,8 @@
         .btn-secondary {
             background: rgba(0, 0, 0, 0.6);
             backdrop-filter: blur(5px);
-            font-size: 0.85rem;
-            padding: 8px 15px;
+            font-size: 0.8rem;
+            padding: 7px 12px;
             border: 1px solid rgba(255, 255, 255, 0.3);
         }
 
@@ -470,7 +510,7 @@
             <button class="btn" onclick="submitFormStep1()">Lanjut ke Pilih Frame</button>
         </div>
 
-        <!-- STEP 2: PS3 CAROUSEL FRAME SELECTION -->
+        <!-- STEP 2: PS3 CAROUSEL FRAME SELECTION DENGAN ARROW KIRI & KANAN -->
         <div id="step-2-frame">
             <div class="ps3-top-bar">
                 <h3>Pilih Frame Photobooth</h3>
@@ -487,6 +527,10 @@
             </div>
 
             <div class="ps3-carousel-wrapper">
+                <!-- Tombol Navigasi Arrow Kiri & Kanan -->
+                <div class="carousel-arrow left" onclick="scrollCarousel(-1)">&#10094;</div>
+                <div class="carousel-arrow right" onclick="scrollCarousel(1)">&#10095;</div>
+
                 <div class="frame-carousel" id="frame-carousel">
                     @forelse($photobooth->frames as $key =>$frame)
                     @php
@@ -514,17 +558,17 @@
 
         <!-- STEP 3: PEMOTRETAN -->
         <div id="step-booth">
-            <div class="booth-column" style="flex: 1.2;">
+            <div class="booth-column" style="flex: 1.5;">
                 <div id="dynamic-camera-wrapper" style="width: 100%; height: 100%; display: flex; align-items: center; justify-content: center; position: relative;">
                 </div>
             </div>
 
-            <div class="booth-column" style="flex: 1;">
+            <div class="booth-column" style="flex: 0.8; align-items: flex-start;">
                 <div class="preview-section">
-                    <h4 id="preview-title" style="margin-bottom: 8px; color: #ff4081; text-align: center;">Hasil Jepretan</h4>
+                    <h4 id="preview-title" style="margin-bottom: 6px; color: #ff4081; text-align: center; font-size: 0.9rem;">Hasil Jepretan</h4>
                     <div class="preview-gallery" id="preview-gallery"></div>
 
-                    <div style="margin-top: 10px;">
+                    <div style="margin-top: 8px;">
                         <button id="start-btn" class="btn" onclick="startPhotobooth()">Mulai Ambil Foto</button>
                         <button id="merge-btn" class="btn btn-merge" onclick="mergePhotos()">Proses & Dapatkan Barcode</button>
                         <button id="back-btn" class="btn btn-secondary" onclick="backToStep2()">Ganti Frame / Filter</button>
@@ -649,6 +693,17 @@
             noise.start();
         }
 
+        // Fungsi Navigasi Carousel Step 2 via Tombol Panah
+        function scrollCarousel(direction) {
+            playClickSound();
+            const carousel = document.getElementById('frame-carousel');
+            const scrollAmount = 220;
+            carousel.scrollBy({
+                left: direction * scrollAmount,
+                behavior: 'smooth'
+            });
+        }
+
         function renderPreviewSlots() {
             previewGallery.innerHTML = '';
             previewTitle.innerText = `Hasil Jepretan (${greenSlots.length} Pose)`;
@@ -669,7 +724,6 @@
             if (v) v.className = filterClass;
         }
 
-        // FUNGSI ANALISIS FRAME DENGAN DETEKSI SUDUT KEMIRINGAN & SEMUA SLOT DINAMIS
         function analyzeFrameImage(imgUrl, callback) {
             const img = new Image();
             img.crossOrigin = "anonymous";
@@ -692,16 +746,16 @@
                         g = data[i + 1],
                         b = data[i + 2],
                         a = data[i + 3];
-                    // Mendeteksi area transparan atau area putih bersih sebagai slot foto
-                    let isTargetArea = (a < 50) || (r > 230 && g > 230 && b > 230);
+
+                    let isTargetArea = (a < 20) || (r > 245 && g > 245 && b > 245);
                     mask[p] = isTargetArea ? 1 : 0;
                 }
 
                 let visited = new Uint8Array(width * height);
                 let rawBoxes = [];
 
-                for (let y = 0; y < height; y += 10) {
-                    for (let x = 0; x < width; x += 10) {
+                for (let y = 0; y < height; y += 8) {
+                    for (let x = 0; x < width; x += 8) {
                         let p = y * width + x;
                         if (mask[p] === 1 && visited[p] === 0) {
                             let rx = x;
@@ -712,14 +766,13 @@
                             while (ry < height && mask[ry * width + x] === 1) ry++;
                             let rHeight = ry - y;
 
-                            if (rWidth > 150 && rHeight > 150) {
-                                for (let fy = y; fy < y + rHeight; fy += 10) {
-                                    for (let fx = x; fx < x + rWidth; fx += 10) {
+                            if (rWidth > 120 && rHeight > 120) {
+                                for (let fy = y; fy < y + rHeight; fy += 8) {
+                                    for (let fx = x; fx < x + rWidth; fx += 8) {
                                         visited[fy * width + fx] = 1;
                                     }
                                 }
 
-                                // DETEKSI SUDUT KEMIRINGAN OTOMATIS BERDASARKAN GARIS TEPI SLOT
                                 let topEdgeX1 = -1;
                                 for (let fx = x; fx < x + rWidth; fx++) {
                                     if (mask[y * width + fx] === 1) {
@@ -761,11 +814,9 @@
                     }
                 }
 
-                // Urutkan slot secara otomatis dari atas ke bawah berdasarkan koordinat Y
                 rawBoxes.sort((a, b) => a.y - b.y);
-                greenSlots = rawBoxes; // Diambil SELURUH slot yang terdeteksi secara dinamis
+                greenSlots = rawBoxes;
 
-                // Fallback aman jika deteksi gagal
                 if (greenSlots.length === 0) {
                     greenSlots = [{
                         x: Math.floor(width * 0.1),
@@ -1000,7 +1051,6 @@
             document.getElementById(`slot-${index}`).innerHTML = `<img src="${imgDataUrl}" alt="Pose ${index + 1}">`;
         }
 
-        // FUNGSI PENGGABUNGAN DENGAN AUTO-CROP KETAT SESUAI JUMLAH SLOT DINAMIS
         async function mergePhotos() {
             if (framedPhotos.length === 0) {
                 Swal.fire('Perhatian', 'Belum ada foto yang diambil!', 'warning');
@@ -1013,9 +1063,7 @@
             canvas.width = fWidth;
             canvas.height = fHeight;
 
-            // 1. Bersihkan canvas & beri background putih bersih
             ctx.clearRect(0, 0, fWidth, fHeight);
-            ctx.fillStyle = '#ffffff';
             ctx.fillRect(0, 0, fWidth, fHeight);
 
             const targetSlots = greenSlots.length > 0 ? greenSlots : [{
@@ -1026,7 +1074,6 @@
                 angle: 0
             }];
 
-            // 2. Gambar FOTO-FOTO JEPRETAN DI LAPISAN BELAKANG DENGAN AUTO-CROP KETAT
             for (let index = 0; index < targetSlots.length; index++) {
                 if (index >= framedPhotos.length) break;
 
@@ -1047,9 +1094,6 @@
                             ctx.rotate((slot.angle * Math.PI) / 180);
                         }
 
-                        // AUTO-CROP KETAT:
-                        // Menggunakan ukuran murni slot tanpa overflow keluar agar terpotong pas
-                        // di dalam bidang transparan masing-masing slot.
                         ctx.beginPath();
                         ctx.rect(
                             -slot.width / 2,
@@ -1087,7 +1131,6 @@
                 });
             }
 
-            // 3. Timpa dengan FRAME ASLI DI LAPISAN PALING DEPAN
             await new Promise((resolve) => {
                 const fImg = new Image();
                 fImg.crossOrigin = "anonymous";
@@ -1103,7 +1146,6 @@
                 fImg.src = selectedFrameSrc;
             });
 
-            // 4. Simpan hasil akhir ke database
             saveToDatabase(canvas.toDataURL('image/png', 1.0));
         }
 
