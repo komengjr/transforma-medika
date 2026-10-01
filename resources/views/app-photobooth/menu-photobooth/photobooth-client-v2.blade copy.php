@@ -192,7 +192,7 @@
             overflow-x: auto;
             scroll-snap-type: x mandatory;
             scroll-behavior: smooth;
-            padding: 70px 60px;
+            padding: 30px 60px;
             width: 100%;
             align-items: center;
             scrollbar-width: none;
