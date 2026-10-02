@@ -151,7 +151,6 @@
             margin: 20px 0;
         }
 
-        /* Tombol Arrow Kiri Kanan Carousel Step 2 */
         .carousel-arrow {
             position: absolute;
             top: 50%;
@@ -350,11 +349,9 @@
             z-index: 20;
         }
 
-        /* Preview Section Step 3 dengan Lebar Diatur 300px */
         .preview-section {
             width: 100%;
             max-width: 300px;
-            /* Lebar panel preview dibatasi 300px sesuai permintaan */
             height: 100%;
             background: rgba(255, 255, 255, 0.95);
             padding: 12px;
@@ -387,7 +384,6 @@
             font-size: 0.8rem;
             font-weight: bold;
             min-height: 75px;
-            /* Dibuat lebih ringkas agar pas di lebar 300px */
             width: 100%;
             flex-shrink: 0;
         }
@@ -510,7 +506,7 @@
             <button class="btn" onclick="submitFormStep1()">Lanjut ke Pilih Frame</button>
         </div>
 
-        <!-- STEP 2: PS3 CAROUSEL FRAME SELECTION DENGAN ARROW KIRI & KANAN -->
+        <!-- STEP 2: PS3 CAROUSEL FRAME SELECTION -->
         <div id="step-2-frame">
             <div class="ps3-top-bar">
                 <h3>Pilih Frame Photobooth</h3>
@@ -527,7 +523,6 @@
             </div>
 
             <div class="ps3-carousel-wrapper">
-                <!-- Tombol Navigasi Arrow Kiri & Kanan -->
                 <div class="carousel-arrow left" onclick="scrollCarousel(-1)">&#10094;</div>
                 <div class="carousel-arrow right" onclick="scrollCarousel(1)">&#10095;</div>
 
@@ -693,7 +688,6 @@
             noise.start();
         }
 
-        // Fungsi Navigasi Carousel Step 2 via Tombol Panah
         function scrollCarousel(direction) {
             playClickSound();
             const carousel = document.getElementById('frame-carousel');
@@ -1043,7 +1037,15 @@
 
             tempCtx.translate(pWidth, 0);
             tempCtx.scale(-1, 1);
-            tempCtx.drawImage(activeVideo, sx, sy, sWidth, sHeight, 0, 0, pWidth, pHeight);
+
+            // Penambahan scaleOver (2% lebih besar) agar sudut transparan tertutup rapat tanpa sisa border
+            const scaleOver = 1.02;
+            const drawW = pWidth * scaleOver;
+            const drawH = pHeight * scaleOver;
+            const drawX = (pWidth - drawW) / 2;
+            const drawY = (pHeight - drawH) / 2;
+
+            tempCtx.drawImage(activeVideo, sx, sy, sWidth, sHeight, drawX, drawY, drawW, drawH);
 
             const imgDataUrl = tempCanvas.toDataURL('image/png', 1.0);
             framedPhotos.push(imgDataUrl);
@@ -1094,6 +1096,7 @@
                             ctx.rotate((slot.angle * Math.PI) / 180);
                         }
 
+                        // Clipping murni sesuai batas lubang frame
                         ctx.beginPath();
                         ctx.rect(
                             -slot.width / 2,
@@ -1103,25 +1106,35 @@
                         );
                         ctx.clip();
 
-                        const fitAspect = img.width / img.height;
-                        const boxAspect = slot.width / slot.height;
+                        const imgAspect = img.width / img.height;
+                        const slotAspect = slot.width / slot.height;
 
-                        let finalW, finalH, finalX, finalY;
-                        if (fitAspect > boxAspect) {
-                            finalW = slot.width;
-                            finalH = slot.width / fitAspect;
-                            finalX = -slot.width / 2;
-                            finalY = -slot.height / 2 + (slot.height - finalH) / 2;
+                        let renderW, renderH, renderX, renderY;
+
+                        if (imgAspect > slotAspect) {
+                            renderH = slot.height;
+                            renderW = renderH * imgAspect;
                         } else {
-                            finalH = slot.height;
-                            finalW = slot.height * fitAspect;
-                            finalX = -slot.width / 2 + (slot.width - finalW) / 2;
-                            finalY = -slot.height / 2;
+                            renderW = slot.width;
+                            renderH = renderW / imgAspect;
                         }
+
+                        // Perbesar sedikit (1.04 atau +4%) agar menutupi seluruh bidang dengan aman
+                        const coverScale = Math.max(slot.width / renderW, slot.height / renderH) * 1.04;
+                        renderW *= coverScale;
+                        renderH *= coverScale;
+
+                        // Posisi dasar di tengah
+                        renderX = -slot.width / 2 + (slot.width - renderW) / 2;
+                        renderY = -slot.height / 2 + (slot.height - renderH) / 2;
+
+                        // Geser sedikit ke KIRI (misal: 8 piksel) untuk menghilangkan sisa hitam di sebelah kanan
+                        const shiftLeft = 8;
+                        renderX -= shiftLeft;
 
                         ctx.imageSmoothingEnabled = true;
                         ctx.imageSmoothingQuality = 'high';
-                        ctx.drawImage(img, 0, 0, img.width, img.height, finalX, finalY, finalW, finalH);
+                        ctx.drawImage(img, 0, 0, img.width, img.height, renderX, renderY, renderW, renderH);
 
                         ctx.restore();
                         resolve();
@@ -1131,6 +1144,7 @@
                 });
             }
 
+            // Gambar file frame utamanya di lapisan paling atas
             await new Promise((resolve) => {
                 const fImg = new Image();
                 fImg.crossOrigin = "anonymous";
