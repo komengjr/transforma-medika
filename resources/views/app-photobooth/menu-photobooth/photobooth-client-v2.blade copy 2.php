@@ -309,8 +309,7 @@
             width: 100%;
             height: 100%;
             object-fit: cover;
-            /* Diubah agar tidak mirror (menghilangkan transformasi scaleX negatif) */
-            transform: scaleX(1);
+            transform: scaleX(-1);
         }
 
         .filter-normal {
@@ -616,8 +615,7 @@
         const countdownEl = document.createElement('div');
         countdownEl.id = 'countdown';
         countdownEl.className = 'countdown';
-        // Diubah default teks awal countdown menjadi 5
-        countdownEl.innerText = '5';
+        countdownEl.innerText = '3';
 
         const startBtn = document.getElementById('start-btn');
         const mergeBtn = document.getElementById('merge-btn');
@@ -972,8 +970,7 @@
 
             for (let i = 0; i < greenSlots.length; i++) {
                 renderCameraForSlot(i);
-                // Diubah durasi countdown saat pemotretan dari 3 menjadi 5 detik
-                await runCountdown(5);
+                await runCountdown(3);
                 captureFramedPhoto(i);
             }
 
@@ -1038,9 +1035,8 @@
                 sy = (videoHeight - sHeight) / 2;
             }
 
-            // Ubah arah penjepretan dari mirroring (-1) menjadi normal/tidak mirror (1)
-            tempCtx.translate(0, 0);
-            tempCtx.scale(1, 1);
+            tempCtx.translate(pWidth, 0);
+            tempCtx.scale(-1, 1);
 
             // Penambahan scaleOver (2% lebih besar) agar sudut transparan tertutup rapat tanpa sisa border
             const scaleOver = 1.02;
