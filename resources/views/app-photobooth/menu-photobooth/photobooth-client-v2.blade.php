@@ -1205,7 +1205,7 @@
                             <div class="qrcode-swal-container">
                                 <div id="swal-qrcode"></div>
                             </div>
-                            <p style="margin-top:10px;"><a href="${shareUrl}" target="_blank" style="color:#2196F3; font-weight:bold;">Buka Link Direct</a></p>
+                            <p style="margin-top:10px;">Pastika barcode nya sudah di scan lalu Klik Selesai</p>
                         `,
                             icon: 'success',
                             confirmButtonText: 'OK / Selesai',

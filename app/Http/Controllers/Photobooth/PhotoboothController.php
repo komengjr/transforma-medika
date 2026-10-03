@@ -159,7 +159,7 @@ class PhotoboothController extends Controller
             'org_code'      => 'required|string', // Hanya validasi bahwa org_code terisi
             'name'          => 'required|string|max:255',
             'phone'         => 'required|string|max:20',
-            'email'         => 'required|email|max:255',
+            // 'email'         => 'required|email|max:255',
             'image_data'    => 'required|string',
             'single_images' => 'required|array|min:1',
         ]);
