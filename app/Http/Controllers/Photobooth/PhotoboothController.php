@@ -279,7 +279,11 @@ class PhotoboothController extends Controller
                 $base64Data = $imageData;
             }
 
+            // Ambil dari file .env
+            $apiKey = env('GEMINI_API_KEY');
+            $baseUrl = env('GEMINI_API_URL', 'https://generativelanguage.googleapis.com/v1beta/models/gemini-3.5-flash-lite:generateContent');
 
+            $url = $baseUrl . "?key=" . $apiKey;
 
             // Tambahkan tanpa verifikasi SSL khusus untuk lingkungan lokal (Laragon/XAMPP)
             $response = Http::withoutVerifying()->post($url, [
