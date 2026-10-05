@@ -4,6 +4,7 @@ use App\Http\Controllers\Photobooth\PhotoboothController;
 use App\Http\Controllers\Photobooth\ViewPhotoboothController;
 use Illuminate\Support\Facades\Route;
 
+
 Route::prefix('{akses}/{id}')->group(function (): void {
     Route::get('menu-photobooth/setup-photobooth', [PhotoboothController::class, 'menu_photobooth_setup'])->name('menu_photobooth_setup');
     Route::get('menu-photobooth/data-photobooth', [PhotoboothController::class, 'menu_photobooth_data'])->name('menu_photobooth_data');
@@ -40,8 +41,4 @@ Route::get('/photobooth-file/{path}', function ($path) {
     return response()->file($fullPath);
 })->where('path', '.*')->name('photobooth.file');
 
-<<<<<<< HEAD
-// Route::post('/photobooth/ai-enhance', [PhotoboothController::class, 'enhanceImageWithAI'])->name('photobooth.ai');
-=======
 Route::post('/photobooth/ai-enhance', [PhotoboothController::class, 'enhanceImageWithAI'])->name('photobooth.ai');
->>>>>>> 684bbbb (updatatacapture1)
