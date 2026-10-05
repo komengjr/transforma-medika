@@ -1057,57 +1057,11 @@
             document.getElementById(`slot-${index}`).innerHTML = `<img src="${imgDataUrl}" alt="Pose ${index + 1}">`;
         }
 
-        // Tambahan Fungsi AI Enhancement Otomatis untuk Setiap Foto Jepretan
-        async function enhancePhotoWithAI(dataUrl) {
-            return new Promise((resolve) => {
-                const img = new Image();
-                img.crossOrigin = "anonymous";
-                img.onload = () => {
-                    const canvas = document.createElement('canvas');
-                    const ctx = canvas.getContext('2d');
-
-                    // Contoh implementasi peningkatan ketajaman/upscaling otomatis berbasis Web Canvas Matrix
-                    // (Atau dapat diganti dengan endpoint API AI Cloud seperti Replicate/Cloundinary jika menggunakan server-side AI)
-                    canvas.width = img.width;
-                    canvas.height = img.height;
-
-                    // Menerapkan filter peningkatan kontras, kejernihan, dan auto-enhancement warna khas AI
-                    ctx.filter = 'contrast(110%) brightness(105%) saturate(105%)';
-                    ctx.drawImage(img, 0, 0);
-
-                    // Mengembalikan hasil gambar yang sudah ditingkatkan kualitasnya
-                    resolve(canvas.toDataURL('image/png', 1.0));
-                };
-                img.src = dataUrl;
-            });
-        }
-
-        // Modifikasi pada fungsi mergePhotos agar memanggil AI Enhancement secara otomatis
         async function mergePhotos() {
             if (framedPhotos.length === 0) {
                 Swal.fire('Perhatian', 'Belum ada foto yang diambil!', 'warning');
                 return;
             }
-
-            // Menampilkan status loading AI Enhancement
-            Swal.fire({
-                title: 'Memproses AI Enhancement...',
-                text: 'Sedang memperjelas detail foto secara otomatis...',
-                allowOutsideClick: false,
-                didOpen: () => {
-                    Swal.showLoading();
-                }
-            });
-
-            // Melakukan peningkatan kualitas AI pada setiap foto jepretan sebelum digabung ke frame
-            let enhancedPhotos = [];
-            for (let foto of framedPhotos) {
-                let enhanced = await enhancePhotoWithAI(foto);
-                enhancedPhotos.push(enhanced);
-            }
-
-            // Simpan kembali ke array utama
-            framedPhotos = enhancedPhotos;
 
             const fWidth = frameImageObj.naturalWidth || frameImageObj.width || 1200;
             const fHeight = frameImageObj.naturalHeight || frameImageObj.height || 1800;
@@ -1146,6 +1100,7 @@
                             ctx.rotate((slot.angle * Math.PI) / 180);
                         }
 
+                        // Clipping murni sesuai batas lubang frame
                         ctx.beginPath();
                         ctx.rect(
                             -slot.width / 2,
@@ -1168,13 +1123,16 @@
                             renderH = renderW / imgAspect;
                         }
 
+                        // Perbesar sedikit (1.04 atau +4%) agar menutupi seluruh bidang dengan aman
                         const coverScale = Math.max(slot.width / renderW, slot.height / renderH) * 1.04;
                         renderW *= coverScale;
                         renderH *= coverScale;
 
+                        // Posisi dasar di tengah
                         renderX = -slot.width / 2 + (slot.width - renderW) / 2;
                         renderY = -slot.height / 2 + (slot.height - renderH) / 2;
 
+                        // Geser sedikit ke KIRI (misal: 8 piksel) untuk menghilangkan sisa hitam di sebelah kanan
                         const shiftLeft = 8;
                         renderX -= shiftLeft;
 
@@ -1190,6 +1148,7 @@
                 });
             }
 
+            // Gambar file frame utamanya di lapisan paling atas
             await new Promise((resolve) => {
                 const fImg = new Image();
                 fImg.crossOrigin = "anonymous";
