@@ -258,5 +258,76 @@ class PhotoboothController extends Controller
         ]);
     }
 
+    public function enhanceImageWithAI(Request $request)
+    {
+        $imageData = $request->input('image_data'); // Menerima base64 dari JavaScript
 
+        if (!$imageData) {
+            return response()->json([
+                'success' => false,
+                'message' => 'Data gambar tidak ditemukan.'
+            ], 400);
+        }
+
+        try {
+            // Pisahkan header data URI jika ada (misal: "data:image/jpeg;base64,...")
+            if (preg_match('/^data:image\/(\w+);base64,/', $imageData, $type)) {
+                $imageExtension = $type[1];
+                $base64Data = substr($imageData, strpos($imageData, ',') + 1);
+            } else {
+                $imageExtension = 'jpeg';
+                $base64Data = $imageData;
+            }
+
+
+
+            // Tambahkan tanpa verifikasi SSL khusus untuk lingkungan lokal (Laragon/XAMPP)
+            $response = Http::withoutVerifying()->post($url, [
+                'contents' => [
+                    [
+                        'parts' => [
+                            [
+                                'text' => 'Analisis foto ini dan berikan ulasan singkat yang seru atau tema gaya foto yang cocok berdasarkan ekspresi wajah di gambar.'
+                            ],
+                            [
+                                'inline_data' => [
+                                    'mime_type' => 'image/' . $imageExtension,
+                                    'data' => $base64Data
+                                ]
+                            ]
+                        ]
+                    ]
+                ]
+            ]);
+
+            if ($response->successful()) {
+                $result = $response->json();
+
+                // Mengambil respons teks dari Gemini AI
+                $aiResponseText = $result['candidates'][0]['content']['parts'][0]['text'] ?? 'Berhasil dianalisis oleh Gemini AI.';
+
+                return response()->json([
+                    'success' => true,
+                    'ai_message' => $aiResponseText,
+                    'enhanced_image' => $imageData // Mengembalikan gambar asli untuk digabungkan ke canvas
+                ]);
+            } else {
+                \Log::error("Gemini API Failed Response: " . $response->body());
+
+                return response()->json([
+                    'success' => false,
+                    'message' => 'API Gemini menolak permintaan: ' . $response->json('error.message', 'Unknown error'),
+                    'enhanced_image' => $imageData
+                ]);
+            }
+        } catch (\Exception $e) {
+            \Log::error("Gemini AI Exception: " . $e->getMessage());
+
+            return response()->json([
+                'success' => false,
+                'message' => 'Terjadi kesalahan sistem: ' . $e->getMessage(),
+                'enhanced_image' => $imageData
+            ]);
+        }
+    }
 }
