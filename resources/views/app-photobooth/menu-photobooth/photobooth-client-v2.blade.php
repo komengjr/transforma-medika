@@ -7,7 +7,7 @@
     <meta name="csrf-token" content="{{ csrf_token() }}">
     <title>{{ $photobooth->org_name }} Photobooth</title>
 
-    <!-- SweetAlert2 CSS & JSss -->
+    <!-- SweetAlert2 CSS & JS -->
     <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
     <!-- QRCode.js Library -->
     <script src="{{asset('asset/js/qr.js')}}"></script>
