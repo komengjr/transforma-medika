@@ -39,3 +39,9 @@ Route::get('/photobooth-file/{path}', function ($path) {
 
     return response()->file($fullPath);
 })->where('path', '.*')->name('photobooth.file');
+
+<<<<<<< HEAD
+// Route::post('/photobooth/ai-enhance', [PhotoboothController::class, 'enhanceImageWithAI'])->name('photobooth.ai');
+=======
+Route::post('/photobooth/ai-enhance', [PhotoboothController::class, 'enhanceImageWithAI'])->name('photobooth.ai');
+>>>>>>> 684bbbb (updatatacapture1)

@@ -7,7 +7,7 @@
     <meta name="csrf-token" content="{{ csrf_token() }}">
     <title>{{ $photobooth->org_name }} Photobooth</title>
 
-    <!-- SweetAlert2 CSS & JS -->
+    <!-- SweetAlert2 CSS & JSss -->
     <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
     <!-- QRCode.js Library -->
     <script src="{{asset('asset/js/qr.js')}}"></script>
@@ -309,7 +309,6 @@
             width: 100%;
             height: 100%;
             object-fit: cover;
-            /* Diubah agar tidak mirror (menghilangkan transformasi scaleX negatif) */
             transform: scaleX(1);
         }
 
@@ -616,7 +615,6 @@
         const countdownEl = document.createElement('div');
         countdownEl.id = 'countdown';
         countdownEl.className = 'countdown';
-        // Diubah default teks awal countdown menjadi 5
         countdownEl.innerText = '5';
 
         const startBtn = document.getElementById('start-btn');
@@ -972,7 +970,6 @@
 
             for (let i = 0; i < greenSlots.length; i++) {
                 renderCameraForSlot(i);
-                // Diubah durasi countdown saat pemotretan dari 3 menjadi 5 detik
                 await runCountdown(5);
                 captureFramedPhoto(i);
             }
@@ -1038,11 +1035,9 @@
                 sy = (videoHeight - sHeight) / 2;
             }
 
-            // Ubah arah penjepretan dari mirroring (-1) menjadi normal/tidak mirror (1)
             tempCtx.translate(0, 0);
             tempCtx.scale(1, 1);
 
-            // Penambahan scaleOver (2% lebih besar) agar sudut transparan tertutup rapat tanpa sisa border
             const scaleOver = 1.02;
             const drawW = pWidth * scaleOver;
             const drawH = pHeight * scaleOver;
@@ -1057,56 +1052,46 @@
             document.getElementById(`slot-${index}`).innerHTML = `<img src="${imgDataUrl}" alt="Pose ${index + 1}">`;
         }
 
-        // Tambahan Fungsi AI Enhancement Otomatis untuk Setiap Foto Jepretan
-        async function enhancePhotoWithAI(dataUrl) {
-            return new Promise((resolve) => {
-                const img = new Image();
-                img.crossOrigin = "anonymous";
-                img.onload = () => {
-                    const canvas = document.createElement('canvas');
-                    const ctx = canvas.getContext('2d');
-
-                    // Contoh implementasi peningkatan ketajaman/upscaling otomatis berbasis Web Canvas Matrix
-                    // (Atau dapat diganti dengan endpoint API AI Cloud seperti Replicate/Cloundinary jika menggunakan server-side AI)
-                    canvas.width = img.width;
-                    canvas.height = img.height;
-
-                    // Menerapkan filter peningkatan kontras, kejernihan, dan auto-enhancement warna khas AI
-                    ctx.filter = 'contrast(110%) brightness(105%) saturate(105%)';
-                    ctx.drawImage(img, 0, 0);
-
-                    // Mengembalikan hasil gambar yang sudah ditingkatkan kualitasnya
-                    resolve(canvas.toDataURL('image/png', 1.0));
-                };
-                img.src = dataUrl;
-            });
-        }
-
-        // Modifikasi pada fungsi mergePhotos agar memanggil AI Enhancement secara otomatis
         async function mergePhotos() {
             if (framedPhotos.length === 0) {
                 Swal.fire('Perhatian', 'Belum ada foto yang diambil!', 'warning');
                 return;
             }
 
-            // Menampilkan status loading AI Enhancement
             Swal.fire({
                 title: 'Memproses AI Enhancement...',
-                text: 'Sedang memperjelas detail foto secara otomatis...',
+                text: 'Sedang mempertajam detail foto secara otomatis...',
                 allowOutsideClick: false,
-                didOpen: () => {
-                    Swal.showLoading();
-                }
+                didOpen: () => Swal.showLoading()
             });
 
-            // Melakukan peningkatan kualitas AI pada setiap foto jepretan sebelum digabung ke frame
             let enhancedPhotos = [];
+            const csrfToken = document.querySelector('meta[name="csrf-token"]').getAttribute('content');
+
             for (let foto of framedPhotos) {
-                let enhanced = await enhancePhotoWithAI(foto);
-                enhancedPhotos.push(enhanced);
+                try {
+                    let res = await fetch("{{ route('photobooth.ai') }}", {
+                        method: 'POST',
+                        headers: {
+                            'Content-Type': 'application/json',
+                            'Accept': 'application/json',
+                            'X-CSRF-TOKEN': csrfToken
+                        },
+                        body: JSON.stringify({
+                            image_data: foto
+                        })
+                    });
+                    let json = await res.json();
+                    if (json.success && json.enhanced_image) {
+                        enhancedPhotos.push(json.enhanced_image);
+                    } else {
+                        enhancedPhotos.push(foto);
+                    }
+                } catch (e) {
+                    enhancedPhotos.push(foto);
+                }
             }
 
-            // Simpan kembali ke array utama
             framedPhotos = enhancedPhotos;
 
             const fWidth = frameImageObj.naturalWidth || frameImageObj.width || 1200;
@@ -1114,7 +1099,6 @@
 
             canvas.width = fWidth;
             canvas.height = fHeight;
-
             ctx.clearRect(0, 0, fWidth, fHeight);
             ctx.fillRect(0, 0, fWidth, fHeight);
 
@@ -1137,27 +1121,17 @@
                     img.crossOrigin = "anonymous";
                     img.onload = () => {
                         ctx.save();
-
                         const centerX = slot.x + slot.width / 2;
                         const centerY = slot.y + slot.height / 2;
-
                         ctx.translate(centerX, centerY);
-                        if (slot.angle) {
-                            ctx.rotate((slot.angle * Math.PI) / 180);
-                        }
+                        if (slot.angle) ctx.rotate((slot.angle * Math.PI) / 180);
 
                         ctx.beginPath();
-                        ctx.rect(
-                            -slot.width / 2,
-                            -slot.height / 2,
-                            slot.width,
-                            slot.height
-                        );
+                        ctx.rect(-slot.width / 2, -slot.height / 2, slot.width, slot.height);
                         ctx.clip();
 
                         const imgAspect = img.width / img.height;
                         const slotAspect = slot.width / slot.height;
-
                         let renderW, renderH, renderX, renderY;
 
                         if (imgAspect > slotAspect) {
@@ -1171,17 +1145,12 @@
                         const coverScale = Math.max(slot.width / renderW, slot.height / renderH) * 1.04;
                         renderW *= coverScale;
                         renderH *= coverScale;
-
                         renderX = -slot.width / 2 + (slot.width - renderW) / 2;
                         renderY = -slot.height / 2 + (slot.height - renderH) / 2;
-
-                        const shiftLeft = 8;
-                        renderX -= shiftLeft;
 
                         ctx.imageSmoothingEnabled = true;
                         ctx.imageSmoothingQuality = 'high';
                         ctx.drawImage(img, 0, 0, img.width, img.height, renderX, renderY, renderW, renderH);
-
                         ctx.restore();
                         resolve();
                     };

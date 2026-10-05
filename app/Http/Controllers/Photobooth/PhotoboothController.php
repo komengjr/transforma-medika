@@ -9,6 +9,7 @@ use Illuminate\Http\Request;
 use App\Models\PhotoboothResult;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\DB;
+use Illuminate\Support\Facades\Http;
 use Illuminate\Support\Facades\Redirect;
 use Illuminate\Support\Facades\Storage;
 use Illuminate\Support\Facades\Validator;
@@ -256,4 +257,6 @@ class PhotoboothController extends Controller
             'results'    => $results
         ]);
     }
+
+
 }
