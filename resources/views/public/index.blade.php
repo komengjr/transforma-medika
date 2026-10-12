@@ -374,7 +374,7 @@
             </div>
         </section>
 
-        <!-- ═══ WORK ═══ -->
+        <!-- ═══ WORK (PORTOFOLIO UNGGULAN) ═══ -->
         <section id="work" class="py-24 bg-gradient-to-b from-teal-50/30 via-sky-50/20 to-white dark:from-zinc-950 dark:to-zinc-950">
             <div class="max-w-6xl mx-auto px-6">
                 <div class="flex flex-col sm:flex-row sm:items-end justify-between gap-4 mb-14">
@@ -387,52 +387,91 @@
 
                 <div class="grid md:grid-cols-2 gap-6">
 
-                    <article class="card-h reveal d1 group rounded-2xl overflow-hidden bg-gradient-to-br from-sky-50/80 via-white to-teal-50/50 dark:from-zinc-900 dark:to-zinc-900 border border-sky-100 dark:border-zinc-800 hover:border-sky-400 md:row-span-2 shadow-sm">
-                        <div class="pf w-full h-64 md:h-80">
-                            <img src="https://images.unsplash.com/photo-1516549655169-df83a0774514?w=900&q=80" alt="InnoHealth Integration Gateway" loading="lazy">
+                    <!-- Fitur 1: InnoHealth Gateway -->
+                    <article @click="openModal('innohealth')" class="card-h reveal d1 group cursor-pointer rounded-2xl overflow-hidden bg-gradient-to-br from-sky-50/80 via-white to-teal-50/50 dark:from-zinc-900 dark:to-zinc-900 border border-sky-100 dark:border-zinc-800 hover:border-sky-400 md:row-span-2 shadow-sm relative">
+                        <div class="pf w-full h-64 md:h-80 relative">
+                            <img src="https://images.unsplash.com/photo-1516549655169-df83a0774514?w=900&q=80" alt="InnoHealth Integration Gateway" loading="lazy" class="group-hover:scale-105 transition-transform duration-500">
+                            <div class="absolute inset-0 bg-sky-900/20 group-hover:bg-sky-900/10 transition-colors flex items-center justify-center">
+                                <span class="bg-white/90 dark:bg-zinc-900/90 text-sky-600 dark:text-sky-400 text-xs font-semibold px-4 py-2 rounded-full shadow-lg border border-sky-200 dark:border-zinc-700 group-hover:scale-110 transition-transform flex items-center gap-2">
+                                    <svg class="w-4 h-4 animate-bounce" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z" />
+                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M2.458 12C3.732 7.943 7.523 5 12 5c4.478 0 8.268 2.943 9.542 7-1.274 4.057-5.064 7-9.542 7-4.477 0-8.268-2.943-9.542-7z" />
+                                    </svg>
+                                    Pratinjau Orthanc & OHIF Viewer
+                                </span>
+                            </div>
                         </div>
                         <div class="p-7">
                             <div class="flex flex-wrap gap-2 mb-4">
                                 <span class="text-xs bg-sky-100 dark:bg-zinc-800 text-sky-700 dark:text-sky-300 border border-sky-200 dark:border-zinc-700 px-3 py-1 rounded-full">Medis</span>
-                                <span class="text-xs bg-cyan-100 dark:bg-zinc-800 text-cyan-700 dark:text-cyan-300 px-3 py-1 rounded-full">DICOM / PACS</span>
-                                <span class="text-xs bg-teal-100 dark:bg-zinc-800 text-teal-700 dark:text-teal-300 px-3 py-1 rounded-full">HL7 / ASTM</span>
-                                <span class="text-xs bg-blue-100 dark:bg-zinc-800 text-blue-700 dark:text-blue-300 px-3 py-1 rounded-full">IoT</span>
+                                <span class="text-xs bg-cyan-100 dark:bg-zinc-800 text-cyan-700 dark:text-cyan-300 px-3 py-1 rounded-full">Orthanc PACS</span>
+                                <span class="text-xs bg-teal-100 dark:bg-zinc-800 text-teal-700 dark:text-teal-300 px-3 py-1 rounded-full">OHIF Viewer</span>
+                                <span class="text-xs bg-blue-100 dark:bg-zinc-800 text-blue-700 dark:text-blue-300 px-3 py-1 rounded-full">DICOM</span>
                             </div>
-                            <h3 class="font-display font-bold text-2xl text-zinc-900 dark:text-white mb-2">InnoHealth Integration Gateway</h3>
+                            <h3 class="font-display font-bold text-2xl text-zinc-900 dark:text-white mb-2 group-hover:text-sky-600 dark:group-hover:text-sky-400 transition-colors">InnoHealth Integration Gateway</h3>
                             <p class="text-sm text-zinc-600 dark:text-zinc-400 leading-relaxed mb-5">
                                 Central Monitoring &amp; Interoperability Hub yang menghubungkan perangkat medis terpusat:<br><br>
                                 • <strong>Radiologi (PACS/DICOM):</strong> CT-Scan, MRI, Digital X-Ray, USG 3D/4D.<br>
                                 • <strong>Laboratorium (LIS/Analyzer):</strong> Hematology, Clinical Chemistry, Urine Analyzer.<br>
                                 • <strong>Elektromedis &amp; Vital Sign:</strong> Bedside Patient Monitor, EKG 12-Lead, Spirometri &amp; Infuse Pump.
                             </p>
+                            <span class="inline-flex items-center gap-1.5 text-xs font-semibold text-sky-600 dark:text-sky-400">
+                                Buka Simulasi Web Viewer Medis &rarr;
+                            </span>
                         </div>
                     </article>
 
-                    <article class="card-h reveal d2 group rounded-2xl overflow-hidden bg-gradient-to-br from-white via-cyan-50/30 to-sky-50/50 dark:from-zinc-900 dark:to-zinc-900 border border-cyan-100 dark:border-zinc-800 hover:border-cyan-400 shadow-sm">
-                        <div class="pf w-full h-48">
-                            <img src="https://images.unsplash.com/photo-1460925895917-afdab827c52f?w=800&q=80" alt="WHOVENTRA System Management" loading="lazy">
+                    <!-- Fitur 2: WHOVENTRA Dashboard -->
+                    <article @click="openModal('whoventra')" class="card-h reveal d2 group cursor-pointer rounded-2xl overflow-hidden bg-gradient-to-br from-white via-cyan-50/30 to-sky-50/50 dark:from-zinc-900 dark:to-zinc-900 border border-cyan-100 dark:border-zinc-800 hover:border-cyan-400 shadow-sm relative">
+                        <div class="pf w-full h-48 relative">
+                            <img src="https://images.unsplash.com/photo-1460925895917-afdab827c52f?w=800&q=80" alt="WHOVENTRA System Management" loading="lazy" class="group-hover:scale-105 transition-transform duration-500">
+                            <div class="absolute inset-0 bg-cyan-900/20 group-hover:bg-cyan-900/10 transition-colors flex items-center justify-center">
+                                <span class="bg-white/90 dark:bg-zinc-900/90 text-cyan-600 dark:text-cyan-400 text-xs font-semibold px-3 py-1.5 rounded-full shadow-lg border border-cyan-200 dark:border-zinc-700 group-hover:scale-110 transition-transform flex items-center gap-1.5">
+                                    <svg class="w-3.5 h-3.5 animate-bounce" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z" />
+                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M2.458 12C3.732 7.943 7.523 5 12 5c4.478 0 8.268 2.943 9.542 7-1.274 4.057-5.064 7-9.542 7-4.477 0-8.268-2.943-9.542-7z" />
+                                    </svg>
+                                    Lihat Dashboard
+                                </span>
+                            </div>
                         </div>
                         <div class="p-6">
                             <div class="flex flex-wrap gap-2 mb-3">
                                 <span class="text-xs bg-cyan-100 dark:bg-zinc-800 text-cyan-700 dark:text-cyan-300 border border-cyan-200 dark:border-zinc-700 px-3 py-1 rounded-full">Enterprise</span>
                                 <span class="text-xs bg-sky-100 dark:bg-zinc-800 text-sky-700 dark:text-sky-300 px-3 py-1 rounded-full">SaaS Dashboard</span>
                             </div>
-                            <h3 class="font-display font-bold text-xl text-zinc-900 dark:text-white mb-1.5">WHOVENTRA Dashboard Ver.3</h3>
+                            <h3 class="font-display font-bold text-xl text-zinc-900 dark:text-white mb-1.5 group-hover:text-cyan-600 dark:group-hover:text-cyan-400 transition-colors">WHOVENTRA Dashboard Ver.3</h3>
                             <p class="text-sm text-zinc-600 dark:text-zinc-400 leading-relaxed mb-4">Sistem Manajemen Terlengkap yang mencakup modul HRM, Medika Health, Keuangan, Inventaris, Logistik, hingga Koperasi.</p>
+                            <span class="inline-flex items-center gap-1.5 text-xs font-semibold text-cyan-600 dark:text-cyan-400">
+                                Eksplorasi Fitur Enterprise &rarr;
+                            </span>
                         </div>
                     </article>
 
-                    <article class="card-h reveal d3 group rounded-2xl overflow-hidden bg-gradient-to-br from-white via-teal-50/30 to-sky-50/50 dark:from-zinc-900 dark:to-zinc-900 border border-teal-100 dark:border-zinc-800 hover:border-teal-400 shadow-sm">
-                        <div class="pf w-full h-48">
-                            <img src="https://images.unsplash.com/photo-1486406146926-c627a92ad1ab?w=800&q=80" alt="Company Profile Innoventra" loading="lazy">
+                    <!-- Fitur 3: Company Profile Corporate -->
+                    <article @click="openModal('company')" class="card-h reveal d3 group cursor-pointer rounded-2xl overflow-hidden bg-gradient-to-br from-white via-teal-50/30 to-sky-50/50 dark:from-zinc-900 dark:to-zinc-900 border border-teal-100 dark:border-zinc-800 hover:border-teal-400 shadow-sm relative">
+                        <div class="pf w-full h-48 relative">
+                            <img src="https://images.unsplash.com/photo-1486406146926-c627a92ad1ab?w=800&q=80" alt="Company Profile Innoventra" loading="lazy" class="group-hover:scale-105 transition-transform duration-500">
+                            <div class="absolute inset-0 bg-teal-900/20 group-hover:bg-teal-900/10 transition-colors flex items-center justify-center">
+                                <span class="bg-white/90 dark:bg-zinc-900/90 text-teal-600 dark:text-teal-400 text-xs font-semibold px-3 py-1.5 rounded-full shadow-lg border border-teal-200 dark:border-zinc-700 group-hover:scale-110 transition-transform flex items-center gap-1.5">
+                                    <svg class="w-3.5 h-3.5 animate-bounce" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z" />
+                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M2.458 12C3.732 7.943 7.523 5 12 5c4.478 0 8.268 2.943 9.542 7-1.274 4.057-5.064 7-9.542 7-4.477 0-8.268-2.943-9.542-7z" />
+                                    </svg>
+                                    Pratinjau Layout
+                                </span>
+                            </div>
                         </div>
                         <div class="p-6">
                             <div class="flex flex-wrap gap-2 mb-3">
                                 <span class="text-xs bg-teal-100 dark:bg-zinc-800 text-teal-700 dark:text-teal-300 border border-teal-200 dark:border-zinc-700 px-3 py-1 rounded-full">Web Profile</span>
                                 <span class="text-xs bg-sky-100 dark:bg-zinc-800 text-sky-700 dark:text-sky-300 px-3 py-1 rounded-full">Responsive</span>
                             </div>
-                            <h3 class="font-display font-bold text-xl text-zinc-900 dark:text-white mb-1.5">Company Profile Corporate</h3>
+                            <h3 class="font-display font-bold text-xl text-zinc-900 dark:text-white mb-1.5 group-hover:text-teal-600 dark:group-hover:text-teal-400 transition-colors">Company Profile Corporate</h3>
                             <p class="text-sm text-zinc-600 dark:text-zinc-400 leading-relaxed mb-4">Pengembangan website profil bisnis konstruksi, manufaktur, dan korporasi dengan tampilan profesional, clean, serta responsif.</p>
+                            <span class="inline-flex items-center gap-1.5 text-xs font-semibold text-teal-600 dark:text-teal-400">
+                                Lihat Animasi UI &rarr;
+                            </span>
                         </div>
                     </article>
 
@@ -575,9 +614,7 @@
                                             <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 11a3 3 0 11-6 0 3 3 0 016 0z" />
                                         </svg>
                                     </span>
-                                    <span class="text-sm">
-                                        <!-- Jl. Perintis Gg. Madrasah Komplek RBK 2, Kel.  -->
-                                        Pal Sembilan, Kec. Sungai Kakap, Kab. Kubu Raya, Kalimantan Barat</span>
+                                    <span class="text-sm">Pal Sembilan, Kec. Sungai Kakap, Kab. Kubu Raya, Kalimantan Barat</span>
                                 </div>
                                 <a href="tel:+6285756100160" class="group flex items-center gap-3 text-sky-100/80 hover:text-white transition-colors">
                                     <span class="w-9 h-9 flex items-center justify-center bg-sky-900/80 rounded-lg group-hover:bg-sky-700 transition-colors shrink-0">
@@ -641,6 +678,176 @@
 
     </main>
 
+    <!-- ═══ ANIMATED MODAL COMPONENT (DENGAN ORTHANC & OHIF VIEWER SIMULATOR) ═══ -->
+    <div x-show="modalOpen" x-cloak class="fixed inset-0 z-50 overflow-y-auto" aria-labelledby="modal-title" role="dialog" aria-modal="true">
+        <!-- Backdrop blur & Overlay -->
+        <div x-show="modalOpen"
+            x-transition:enter="ease-out duration-300"
+            x-transition:enter-start="opacity-0"
+            x-transition:enter-end="opacity-100"
+            x-transition:leave="ease-in duration-200"
+            x-transition:leave-start="opacity-100"
+            x-transition:leave-end="opacity-0"
+            @click="closeModal()"
+            class="fixed inset-0 bg-zinc-950/85 backdrop-blur-md transition-opacity"></div>
+
+        <div class="flex min-h-screen items-center justify-center p-2 sm:p-4 text-center">
+            <!-- Modal Content Panel -->
+            <div x-show="modalOpen"
+                x-transition:enter="ease-out duration-300"
+                x-transition:enter-start="opacity-0 translate-y-4 sm:scale-95"
+                x-transition:enter-end="opacity-100 translate-y-0 sm:scale-100"
+                x-transition:leave="ease-in duration-200"
+                x-transition:leave-start="opacity-100 translate-y-0 sm:scale-100"
+                x-transition:leave-end="opacity-0 translate-y-4 sm:scale-95"
+                class="relative transform overflow-hidden rounded-3xl bg-white dark:bg-zinc-900 border border-sky-500/30 text-left shadow-2xl transition-all sm:my-8 sm:w-full sm:max-w-4xl">
+
+                <!-- Close Button -->
+                <button @click="closeModal()" class="absolute top-4 right-4 text-zinc-400 hover:text-white z-30 w-8 h-8 flex items-center justify-center rounded-full bg-zinc-800/80 hover:bg-zinc-700 transition-colors border border-zinc-700">
+                    <svg class="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12" />
+                    </svg>
+                </button>
+
+                <template x-if="activeFeature">
+                    <div>
+                        <!-- Header & Simulasi Viewer Orthanc / OHIF -->
+                        <div class="p-5 md:p-6 bg-gradient-to-br from-slate-950 via-sky-950 to-zinc-900 text-white relative overflow-hidden">
+                            <!-- Background Grid Pattern -->
+                            <div class="absolute inset-0 opacity-10 bg-[radial-gradient(#38bdf8_1px,transparent_1px)] [background-size:16px_16px]"></div>
+
+                            <div class="flex flex-wrap items-center justify-between gap-2 mb-3">
+                                <span class="inline-block text-xs font-semibold px-3 py-1 rounded-full bg-sky-500/20 text-sky-300 border border-sky-400/30" x-text="activeFeature.badge"></span>
+                                <template x-if="activeModal === 'innohealth'">
+                                    <div class="flex items-center gap-2 bg-slate-900/90 px-3 py-1 rounded-lg border border-sky-500/30 text-[11px] font-mono text-cyan-300">
+                                        <span class="w-2 h-2 rounded-full bg-emerald-400 animate-pulse"></span>
+                                        Orthanc PACS &amp; OHIF Web Viewer Connected
+                                    </div>
+                                </template>
+                            </div>
+                            <h3 class="font-display font-bold text-2xl md:text-3xl text-white mb-1" x-text="activeFeature.title"></h3>
+                            <p class="text-xs md:text-sm text-sky-200/80 leading-relaxed mb-4" x-text="activeFeature.subtitle"></p>
+
+                            <!-- AREA UTAMA SIMULASI ORTHANC / OHIF VIEWER -->
+                            <template x-if="activeModal === 'innohealth'">
+                                <div class="bg-slate-950 rounded-2xl border border-sky-500/40 overflow-hidden shadow-2xl">
+                                    <!-- OHIF Toolbar Simulator -->
+                                    <div class="bg-slate-900 px-4 py-2 border-b border-zinc-800 flex flex-wrap items-center justify-between gap-2 text-xs text-zinc-300 font-mono">
+                                        <div class="flex items-center gap-3">
+                                            <span class="text-sky-400 font-bold flex items-center gap-1">
+                                                <svg class="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 3v2m6-2v2M9 19v2m6-2v2M5 9H3m2 6H3m18-6h-2m2 6h-2M7 19h10a2 2 0 002-2V7a2 2 0 00-2-2H7a2 2 0 00-2 2v10a2 2 0 002 2z" />
+                                                </svg>
+                                                OHIF v3.8 Web Viewer
+                                            </span>
+                                            <span class="text-zinc-500">|</span>
+                                            <span class="text-emerald-400">Series: CT Thorax Contrast (1/42)</span>
+                                        </div>
+                                        <div class="flex items-center gap-1.5">
+                                            <button @click="viewerTool = 'zoom'" :class="viewerTool === 'zoom' ? 'bg-sky-600 text-white' : 'bg-slate-800 text-zinc-300 hover:bg-slate-700'" class="px-2.5 py-1 rounded transition-colors text-[10px]">Zoom</button>
+                                            <button @click="viewerTool = 'ww/wc'" :class="viewerTool === 'ww/wc' ? 'bg-sky-600 text-white' : 'bg-slate-800 text-zinc-300 hover:bg-slate-700'" class="px-2.5 py-1 rounded transition-colors text-[10px]">WW/WC</button>
+                                            <button @click="viewerTool = 'pan'" :class="viewerTool === 'pan' ? 'bg-sky-600 text-white' : 'bg-slate-800 text-zinc-300 hover:bg-slate-700'" class="px-2.5 py-1 rounded transition-colors text-[10px]">Pan</button>
+                                            <button @click="viewerTool = 'measure'" :class="viewerTool === 'measure' ? 'bg-sky-600 text-white' : 'bg-slate-800 text-zinc-300 hover:bg-slate-700'" class="px-2.5 py-1 rounded transition-colors text-[10px]">Measure</button>
+                                        </div>
+                                    </div>
+
+                                    <!-- DICOM Viewport Screen -->
+                                    <div class="grid md:grid-cols-4 min-h-[260px] bg-black relative">
+                                        <!-- Left Patient Info Overlay -->
+                                        <div class="absolute top-3 left-3 z-10 text-[10px] font-mono text-cyan-300/90 pointer-events-none space-y-0.5 bg-black/40 p-2 rounded backdrop-blur-sm border border-cyan-500/20">
+                                            <p><strong class="text-white">ID:</strong> MED-2026-9081</p>
+                                            <p><strong class="text-white">Nama:</strong> Ny. Siti Aminah (45 Th)</p>
+                                            <p><strong class="text-white">Modality:</strong> CT (Computed Tomography)</p>
+                                            <p><strong class="text-white">Institusi:</strong> RSUD / Klinik Mitra</p>
+                                        </div>
+
+                                        <!-- Right Technical Parameters Overlay -->
+                                        <div class="absolute top-3 right-3 z-10 text-[10px] font-mono text-zinc-400 pointer-events-none text-right space-y-0.5 bg-black/40 p-2 rounded backdrop-blur-sm border border-zinc-700/40">
+                                            <p>KV: 120 | mA: 240</p>
+                                            <p>Slice Thickness: 1.25 mm</p>
+                                            <p>WW: 400 | WC: 40 (Lung Window)</p>
+                                            <p class="text-emerald-400 font-bold">Orthanc Storage: OK</p>
+                                        </div>
+
+                                        <!-- Center Simulated DICOM Image Viewport -->
+                                        <div class="col-span-3 flex items-center justify-center p-6 relative overflow-hidden">
+                                            <!-- Simulated Medical Scan Graphics -->
+                                            <div class="w-48 h-48 sm:w-56 sm:h-56 rounded-full border-4 border-dashed border-sky-500/30 flex items-center justify-center relative animate-pulse-wave">
+                                                <div class="absolute inset-4 rounded-full border-2 border-cyan-400/50 flex items-center justify-center bg-gradient-to-tr from-slate-900 via-sky-950 to-black">
+                                                    <!-- Lung / Organ Outline Graphic Simulator -->
+                                                    <div class="w-28 h-28 rounded-2xl bg-zinc-900 border border-sky-400/40 flex items-center justify-center shadow-inner relative overflow-hidden">
+                                                        <div class="absolute inset-0 bg-[radial-gradient(#0ea5e9_1px,transparent_1px)] [background-size:8px_8px] opacity-30"></div>
+                                                        <div class="text-center">
+                                                            <svg class="w-10 h-10 text-sky-400 mx-auto mb-1 animate-pulse" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M4.318 6.318a4.5 4.5 0 000 6.364L12 20.364l7.682-7.682a4.5 4.5 0 00-6.364-6.364L12 7.636l-1.318-1.318a4.5 4.5 0 00-6.364 0z" />
+                                                            </svg>
+                                                            <span class="text-[9px] font-mono text-cyan-300 font-bold">DICOM SLICE #24</span>
+                                                        </div>
+                                                    </div>
+                                                </div>
+                                            </div>
+                                        </div>
+
+                                        <!-- Orthanc Series Selector Sidebar -->
+                                        <div class="bg-slate-900/90 border-t md:border-t-0 md:border-l border-zinc-800 p-3 flex flex-col justify-between text-xs font-mono">
+                                            <div>
+                                                <p class="text-[10px] uppercase text-zinc-400 font-bold mb-2">Orthanc Series List</p>
+                                                <div class="space-y-1.5">
+                                                    <div class="bg-sky-950/80 border border-sky-500/50 rounded p-1.5 text-sky-300 text-[10px] cursor-pointer">
+                                                        <p class="font-bold">1. Axial Lung (42 img)</p>
+                                                        <p class="text-[9px] text-zinc-400">DICOM Transfer: 100%</p>
+                                                    </div>
+                                                    <div class="bg-slate-800/60 hover:bg-slate-800 border border-zinc-700/60 rounded p-1.5 text-zinc-300 text-[10px] cursor-pointer">
+                                                        <p class="font-bold">2. Coronal Bone (30 img)</p>
+                                                        <p class="text-[9px] text-zinc-500">DICOM Transfer: 100%</p>
+                                                    </div>
+                                                </div>
+                                            </div>
+                                            <div class="mt-4 pt-2 border-t border-zinc-800 text-[10px] text-emerald-400 flex items-center gap-1">
+                                                <span class="w-1.5 h-1.5 rounded-full bg-emerald-400">From Modality: Direct DICOM Store</span>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </template>
+
+                            <!-- Fallback/Default untuk modul lain -->
+                            <template x-if="activeModal !== 'innohealth'">
+                                <div class="mt-4 p-6 bg-slate-950/80 rounded-2xl border border-sky-500/30 text-center">
+                                    <p class="text-sm text-sky-200" x-text="activeFeature.subtitle"></p>
+                                </div>
+                            </template>
+                        </div>
+
+                        <!-- Body & Penjelasan Detail Fitur -->
+                        <div class="p-6 md:p-8 space-y-4 text-zinc-700 dark:text-zinc-300 text-sm leading-relaxed">
+                            <h4 class="font-display font-bold text-base text-zinc-900 dark:text-white uppercase tracking-wider text-xs">Penjelasan Detail Modul:</h4>
+                            <p x-text="activeFeature.description"></p>
+
+                            <div class="bg-sky-50 dark:bg-zinc-800/60 p-4 rounded-xl border border-sky-100 dark:border-zinc-700">
+                                <h5 class="font-bold text-xs uppercase text-sky-700 dark:text-sky-300 mb-2">Keunggulan Utama:</h5>
+                                <ul class="list-disc list-inside space-y-1 text-xs text-zinc-600 dark:text-zinc-400">
+                                    <template x-for="item in activeFeature.highlights" :key="item">
+                                        <li x-text="item"></li>
+                                    </template>
+                                </ul>
+                            </div>
+                        </div>
+
+                        <!-- Footer Modal -->
+                        <div class="px-6 py-4 bg-zinc-50 dark:bg-zinc-950 border-t border-zinc-100 dark:border-zinc-800 flex justify-between items-center">
+                            <span class="text-xs text-zinc-500 dark:text-zinc-400">PT Innoventra Solusi Digital</span>
+                            <button @click="closeModal()" class="px-5 py-2 bg-sky-600 hover:bg-sky-700 text-white text-xs font-medium rounded-full transition-colors shadow-sm">
+                                Tutup Pratinjau
+                            </button>
+                        </div>
+                    </div>
+                </template>
+
+            </div>
+        </div>
+    </div>
+
     <footer class="bg-slate-950 text-white border-t border-sky-950">
         <div class="max-w-6xl mx-auto px-6 py-8 flex flex-col sm:flex-row items-center justify-between gap-4">
             <p class="text-sm text-sky-200/70">© <span id="yr"></span> PT INNOVENTRA SOLUSI DIGITAL. All rights reserved.</p>
@@ -655,6 +862,52 @@
                 mm: false,
                 sc: false,
                 s: 'hero',
+
+                // State Modal
+                modalOpen: false,
+                activeModal: null,
+                activeFeature: null,
+                viewerTool: 'zoom',
+
+                // Data Fitur Portofolio
+                featuresData: {
+                    innohealth: {
+                        badge: 'Solusi Medis & Interoperabilitas',
+                        title: 'InnoHealth Integration Gateway',
+                        subtitle: 'Pusat bridging dan otomatisasi data rekam medis pasien dari alat kesehatan langsung ke SIMRS/EMR.',
+                        description: 'Modul ini dilengkapi dengan integrasi server Orthanc PACS berkecepatan tinggi dan OHIF Web Viewer berbasis web, memungkinkan dokter spesialis radiologi dan tenaga medis membuka, memanipulasi (Zoom, Pan, Window/Level), serta menganalisis citra DICOM (CT-Scan, MRI, X-Ray) secara real-time langsung melalui browser tanpa memerlukan instalasi aplikasi tambahan.',
+                        highlights: [
+                            'Integrasi langsung server Orthanc PACS dengan protokol DICOM standard',
+                            'OHIF Web Viewer responsif untuk manipulasi citra (Zoom, Window/Level, Measurement)',
+                            'Dukungan otomatisasi alat Laboratorium (HL7 / ASTM Serial & TCP/IP)',
+                            'Kompatibel penuh dengan Rekam Medis Elektronik (RME) Rumah Sakit / Klinik'
+                        ]
+                    },
+                    whoventra: {
+                        badge: 'SaaS Enterprise Suite',
+                        title: 'WHOVENTRA Dashboard Ver.3',
+                        subtitle: 'Platfrom manajemen bisnis serbaguna dengan arsitektur modern.',
+                        description: 'Sistem ERP/CRM terpadu yang memadukan pengelolaan SDM (HRM), pelaporan keuangan real-time, manajemen inventaris logistik, hingga pengelolaan unit usaha kesehatan dan koperasi dalam satu dashboard terpusat.',
+                        highlights: [
+                            'Manajemen Absensi & KPI Karyawan berbasis AI/Geofencing',
+                            'Jurnal Keuangan Otomatis & Laporan Arus Kas Multi-Cabang',
+                            'Sistem Kasir (POS) & Pelacakan Inventaris Otomatis',
+                            'Aksesibilitas Multi-Platform dengan tingkat keamanan granular'
+                        ]
+                    },
+                    company: {
+                        badge: 'Web Enterprise & Branding',
+                        title: 'Company Profile Corporate',
+                        subtitle: 'Website bisnis berkinerja tinggi dengan optimasi SEO & UX modern.',
+                        description: 'Layanan pembuatan platform web profil usaha profesional yang didesain interaktif untuk membangun reputasi merek, menarik calon mitra bisnis, dan dioptimalkan agar selalu berada di peringkat atas mesin pencari.',
+                        highlights: [
+                            'Kecepatan muat halaman super cepat (< 2 detik)',
+                            'Desain UX/UI responsif sempurna di perangkat mobile & desktop',
+                            'Struktur SEO-friendly teroptimasi untuk Google',
+                            'Dukungan multi-bahasa & integrasi formulir kontak cepat'
+                        ]
+                    }
+                },
 
                 init() {
                     this.dark = localStorage.getItem('theme') === 'dark' ||
@@ -682,6 +935,16 @@
                     document.querySelectorAll('.reveal').forEach(el => io.observe(el));
 
                     document.getElementById('yr').textContent = new Date().getFullYear();
+                },
+
+                openModal(key) {
+                    this.activeModal = key;
+                    this.activeFeature = this.featuresData[key];
+                    this.modalOpen = true;
+                },
+
+                closeModal() {
+                    this.modalOpen = false;
                 },
 
                 updateSection() {
