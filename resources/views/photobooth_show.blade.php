@@ -12,6 +12,8 @@
             color: #fff;
             text-align: center;
             padding: 20px;
+            /* Padding bawah ditambah agar konten tidak tertutup floating bar */
+            padding-bottom: 100px;
         }
 
         .container {
@@ -71,11 +73,86 @@
             font-size: 0.85rem;
             font-weight: bold;
             margin-top: 8px;
+            transition: background 0.2s;
+        }
+
+        .btn:hover {
+            background: #e0356d;
         }
 
         .btn-main {
             padding: 12px 24px;
             font-size: 1rem;
+        }
+
+        /* Styling untuk Floating Bar Donasi / Saweria di Bawah */
+        .donation-floating-bar {
+            position: fixed;
+            bottom: 0;
+            left: 0;
+            width: 100%;
+            background: rgba(30, 30, 30, 0.95);
+            backdrop-filter: blur(10px);
+            border-top: 1px solid rgba(255, 255, 255, 0.1);
+            padding: 12px 20px;
+            box-shadow: 0 -5px 20px rgba(0, 0, 0, 0.4);
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            gap: 15px;
+            z-index: 999;
+            box-sizing: border-box;
+        }
+
+        .donation-text {
+            font-size: 0.9rem;
+            color: #ddd;
+            margin: 0;
+            text-align: left;
+        }
+
+        .donation-text span {
+            color: #ffc107;
+            font-weight: bold;
+        }
+
+        .btn-saweria {
+            background: #ffc107;
+            color: #121212;
+            padding: 10px 20px;
+            border-radius: 30px;
+            font-weight: bold;
+            text-decoration: none;
+            font-size: 0.9rem;
+            display: inline-flex;
+            align-items: center;
+            gap: 6px;
+            box-shadow: 0 4px 15px rgba(255, 193, 7, 0.3);
+            transition: transform 0.2s, background 0.2s;
+        }
+
+        .btn-saweria:hover {
+            background: #ffb300;
+            transform: translateY(-2px);
+        }
+
+        /* Responsif untuk layar HP kecil */
+        @media (max-width: 480px) {
+            .donation-floating-bar {
+                flex-direction: column;
+                gap: 8px;
+                padding: 10px;
+                text-align: center;
+            }
+
+            .donation-text {
+                font-size: 0.8rem;
+                text-align: center;
+            }
+
+            body {
+                padding-bottom: 120px;
+            }
         }
     </style>
 </head>
@@ -85,12 +162,12 @@
         <h2>Hasil Foto Photobooth</h2>
         <p style="color: #aaa;">Nama: <strong>{{ $result->name }}</strong> | Kode: <strong>{{ $result->code }}</strong></p>
 
-        <!-- FOTO GABUNGAN (PHOTO STRIP) -->
+        <!-- FOTO GABUNGAN / GIF (PHOTO STRIP / ANIMATED) -->
         <div class="merged-box">
-            <h3 style="margin-bottom: 10px; font-size: 1.1rem;">Foto Strip Gabungan</h3>
-            <img src="{{ route('photobooth.image', ['code' => $result->code, 'type' => 'merged']) }}" alt="Foto Strip">
+            <h3 style="margin-bottom: 10px; font-size: 1.1rem;">Hasil Foto Anda</h3>
+            <img src="{{ route('photobooth.image', ['code' => $result->code, 'type' => 'merged']) }}" alt="Foto Photobooth">
             <br><br>
-            <a href="{{ route('photobooth.image', ['code' => $result->code, 'type' => 'merged']) }}" download="Photobooth_Strip_{{ $result->code }}.png" class="btn btn-main">Unduh Foto Strip</a>
+            <a href="{{ route('photobooth.image', ['code' => $result->code, 'type' => 'merged']) }}" download="Photobooth_{{ $result->code }}" class="btn btn-main">Unduh Hasil Foto</a>
         </div>
 
         <!-- FOTO SATUAN (POSE 1 - 4) -->
@@ -105,6 +182,15 @@
             @endforeach
             @endif
         </div>
+    </div>
+
+    <!-- FLOATING BAR DONASI / SAWERIA DI BAGIAN BAWAH -->
+    <div class="donation-floating-bar">
+        <p class="donation-text">Suka dengan hasilnya? <span>Dukung kami</span> agar terus berkarya! ✨</p>
+        <!-- Ganti link '#' di bawah dengan link Saweria atau Sociabuzz Anda -->
+        <a href="https://saweria.co/agusraharjo" target="_blank" class="btn-saweria">
+            ☕ Traktir / Sawer
+        </a>
     </div>
 </body>
 

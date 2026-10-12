@@ -151,7 +151,7 @@ $bgUrl = $pb->bg_path
             <span class="badge bg-dark text-white me-2 px-2 py-2 font-monospace">{{ $pb->org_code }}</span>
             <h5 class="fw-bold text-dark mb-0">{{ $pb->org_name }}</h5>
         </div>
-        <a href="{{ route('photobooth.client', $pb->org_code) }}" target="_blank" class="btn btn-outline-primary btn-sm rounded-pill px-3 shadow-sm">
+        <a href="{{ route('photobooth.client_v2', $pb->org_code) }}" target="_blank" class="btn btn-outline-primary btn-sm rounded-pill px-3 shadow-sm">
             <i class="bi bi-box-arrow-up-right me-1"></i> Buka Canvas Photobooth
         </a>
     </div>

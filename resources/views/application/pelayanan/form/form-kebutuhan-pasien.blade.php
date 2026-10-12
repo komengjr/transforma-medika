@@ -25,7 +25,7 @@
                 <select name="layanan" id="layanan" class="form-control form-control-lg single-select">
                     <option value="">Pilih Layanan</option>
                     @foreach ($layanan as $lay)
-                        <option data-id="{{ $lay->t_layanan_cat_code }}" value="{{ $lay->t_layanan_cat_code }}">{{ $lay->t_layanan_cat_name }}</option>
+                    <option data-id="{{ $lay->t_layanan_cat_code }}" value="{{ $lay->t_layanan_cat_code }}">{{ $lay->t_layanan_cat_name }}</option>
                     @endforeach
                 </select>
             </div>

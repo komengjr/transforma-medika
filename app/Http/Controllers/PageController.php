@@ -10,14 +10,14 @@ class PageController extends Controller
 {
     public function fisrt()
     {
-        // $data = NewsData::latest()->limit(9)->get();
-        // return view('index',compact('data'));
+        $data = NewsData::latest()->limit(9)->get();
+        return view('public.index',compact('data'));
 
-        if (Auth::check()) {
-            return Redirect('dashboard/home');
-        } else {
-            return view('auth.login');
-        }
+        // if (Auth::check()) {
+        //     return Redirect('dashboard/home');
+        // } else {
+        //     return view('auth.login');
+        // }
     }
     public function app_hrm()
     {

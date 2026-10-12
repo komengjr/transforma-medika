@@ -587,7 +587,7 @@
         </div>
 
     </div>
-
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/gifshot/0.3.2/gifshot.min.js"></script>
     <script>
         let isFullscreenTriggered = false;
 
@@ -1059,13 +1059,15 @@
             }
 
             Swal.fire({
-                title: 'Memproses AI Enhancement...',
-                text: 'Sedang mempertajam detail foto secara otomatis...',
+                title: 'Memproses Gemini AI...',
+                text: 'Menganalisis ekspresi dan menyiapakan dekorasi...',
                 allowOutsideClick: false,
                 didOpen: () => Swal.showLoading()
             });
 
             let enhancedPhotos = [];
+            let aiMessages = []; // Menampung ulasan teks dari Gemini AI untuk setiap foto
+            let gifOverlayUrl = null; // Menyimpan path URL animasi GIF dari backend
             const csrfToken = document.querySelector('meta[name="csrf-token"]').getAttribute('content');
 
             for (let foto of framedPhotos) {
@@ -1082,12 +1084,28 @@
                         })
                     });
                     let json = await res.json();
-                    if (json.success && json.enhanced_image) {
-                        enhancedPhotos.push(json.enhanced_image);
+
+                    if (json.success) {
+                        if (json.enhanced_image) {
+                            enhancedPhotos.push(json.enhanced_image);
+                        } else {
+                            enhancedPhotos.push(foto);
+                        }
+
+                        // Ambil pesan ulasan teks jika ada
+                        if (json.ai_message) {
+                            aiMessages.push(json.ai_message);
+                        }
+
+                        // Ambil URL animasi GIF jika dikirimkan oleh backend
+                        if (json.gif_overlay) {
+                            gifOverlayUrl = json.gif_overlay;
+                        }
                     } else {
                         enhancedPhotos.push(foto);
                     }
                 } catch (e) {
+                    console.error("AI Error:", e);
                     enhancedPhotos.push(foto);
                 }
             }
@@ -1159,6 +1177,7 @@
                 });
             }
 
+            // Gambar Bingkai / Frame Utama
             await new Promise((resolve) => {
                 const fImg = new Image();
                 fImg.crossOrigin = "anonymous";
@@ -1174,10 +1193,35 @@
                 fImg.src = selectedFrameSrc;
             });
 
-            saveToDatabase(canvas.toDataURL('image/png', 1.0));
+            // Atau tampilkan elemen GIF overlay di atas elemen preview canvas HTML Anda.
+            if (gifOverlayUrl) {
+                await new Promise((resolve) => {
+                    const gifImg = new Image();
+                    gifImg.crossOrigin = "anonymous";
+                    gifImg.onload = () => {
+                        ctx.save();
+                        // Contoh penempatan GIF di pojok kanan bawah atau area tertentu frame (sesuaikan koordinatnya)
+                        ctx.drawImage(gifImg, fWidth - 250, fHeight - 250, 200, 200);
+                        ctx.restore();
+                        resolve();
+                    };
+                    gifImg.onerror = () => resolve();
+                    gifImg.src = gifOverlayUrl;
+                });
+            }
+
+            // Tutup loading Swal dan tampilkan hasil atau notifikasi sukses ulasan AI
+            Swal.close();
+
+            // Jika Anda ingin menampilkan pesan dari AI ke elemen HTML tertentu:
+            if (aiMessages.length > 0 && document.getElementById('ai-caption')) {
+                document.getElementById('ai-caption').innerText = aiMessages.join(' | ');
+            }
+
+            saveToDatabase(canvas.toDataURL('image/png', 1.0), gifOverlayUrl);
         }
 
-        function saveToDatabase(base64Image) {
+        function saveToDatabase(base64Image, gifUrl = null) {
             const name = document.getElementById('user-name').value;
             const phone = document.getElementById('user-phone').value;
             const email = document.getElementById('user-email').value;
@@ -1204,7 +1248,8 @@
                         phone: phone,
                         email: email,
                         image_data: base64Image,
-                        single_images: framedPhotos
+                        single_images: framedPhotos,
+                        gif_url: gifUrl // Kirim path/URL GIF ke backend
                     })
                 })
                 .then(response => response.json())
@@ -1215,12 +1260,12 @@
                         Swal.fire({
                             title: 'Berhasil Disimpan!',
                             html: `
-                            <p style="font-size:0.85rem; color:#555;">Scan QR Code untuk ambil foto:</p>
-                            <div class="qrcode-swal-container">
-                                <div id="swal-qrcode"></div>
-                            </div>
-                            <p style="margin-top:10px;">Pastika barcode nya sudah di scan lalu Klik Selesai</p>
-                        `,
+                    <p style="font-size:0.85rem; color:#555;">Scan QR Code untuk ambil foto:</p>
+                    <div class="qrcode-swal-container">
+                        <div id="swal-qrcode"></div>
+                    </div>
+                    <p style="margin-top:10px;">Pastika barcode nya sudah di scan lalu Klik Selesai</p>
+                `,
                             icon: 'success',
                             confirmButtonText: 'OK / Selesai',
                             didOpen: () => {
@@ -1244,9 +1289,9 @@
                         const tr = document.createElement('tr');
                         const qrContainerId = `qr-table-${Date.now()}`;
                         tr.innerHTML = `
-                        <td>${escapeHtml(data.data.name)}</td>
-                        <td><div id="${qrContainerId}"></div></td>
-                    `;
+                <td>${escapeHtml(data.data.name)}</td>
+                <td><div id="${qrContainerId}"></div></td>
+            `;
 
                         userTableBody.appendChild(tr);
                         tableContainer.style.display = 'block';

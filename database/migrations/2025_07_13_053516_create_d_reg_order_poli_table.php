@@ -19,16 +19,37 @@ class CreateDRegOrderPoliTable extends Migration
             $table->string('d_reg_order_code');
             $table->string('m_doctor_poli_code');
             $table->date('d_reg_order_poli_date');
-            $table->string('d_reg_order_poli_status');
+            $table->enum('d_reg_order_poli_status', ['MENUNGGU', 'DILAYANI', 'SELESAI', 'BATAL'])->default('MENUNGGU'); // Duplikat dihapus, gunakan enum ini
             $table->string('d_reg_order_poli_user');
             $table->string('d_reg_order_poli_queue');
-            // $table->unsignedBigInteger('patient_id'); // Merujuk ke id_master_patient
             $table->string('m_poli_code');
             $table->unsignedBigInteger('schedule_id');
             $table->date('d_reg_order_poli_visit');
-            $table->string('payment_method'); // UMUM, BPJS, ASURANSI
+            $table->string('payment_method');
             $table->string('insurance_no')->nullable();
-            $table->enum('d_reg_order_poli_status', ['MENUNGGU', 'DILAYANI', 'SELESAI', 'BATAL'])->default('MENUNGGU');
+            $table->timestamps();
+
+            $table->foreign('d_reg_order_code')->references('d_reg_order_code')->on('d_reg_order')->onDelete('cascade');
+        });
+        Schema::create('d_reg_order_poli_list', function (Blueprint $table) {
+            $table->id('id_d_reg_order_poli_list');
+            $table->string('order_poli_list_code')->unique();
+            $table->string('d_reg_order_poli_code'); // Relasi ke Poli, bukan order utama
+            $table->string('p_sales_data_code');
+            $table->integer('order_poli_log_price'); // Ubah dari string ke integer
+            $table->integer('order_poli_log_discount'); // Ubah dari string ke integer
+            $table->string('status_pembayaran');
+            $table->timestamps();
+
+            $table->foreign('d_reg_order_poli_code')->references('d_reg_order_poli_code')->on('d_reg_order_poli')->onDelete('cascade');
+        });
+        Schema::create('d_reg_order_poli_log', function (Blueprint $table) {
+            $table->id('id_order_poli_log');
+            $table->string('order_poli_log_code')->unique();
+            $table->string('d_reg_order_poli_code');
+            $table->string('p_sales_data_code');
+            $table->integer('order_poli_log_price');
+            $table->integer('order_poli_log_discount');
             $table->timestamps();
         });
     }
@@ -41,5 +62,7 @@ class CreateDRegOrderPoliTable extends Migration
     public function down()
     {
         Schema::dropIfExists('d_reg_order_poli');
+        Schema::dropIfExists('d_reg_order_poli_list');
+        Schema::dropIfExists('d_reg_order_poli_log');
     }
 }

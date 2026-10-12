@@ -260,7 +260,7 @@ class PhotoboothController extends Controller
 
     public function enhanceImageWithAI(Request $request)
     {
-        $imageData = $request->input('image_data'); // Menerima base64 dari JavaScript
+        $imageData = $request->input('image_data');
 
         if (!$imageData) {
             return response()->json([
@@ -270,7 +270,6 @@ class PhotoboothController extends Controller
         }
 
         try {
-            // Pisahkan header data URI jika ada (misal: "data:image/jpeg;base64,...")
             if (preg_match('/^data:image\/(\w+);base64,/', $imageData, $type)) {
                 $imageExtension = $type[1];
                 $base64Data = substr($imageData, strpos($imageData, ',') + 1);
@@ -279,13 +278,10 @@ class PhotoboothController extends Controller
                 $base64Data = $imageData;
             }
 
-            // Ambil dari file .env
             $apiKey = env('GEMINI_API_KEY');
             $baseUrl = env('GEMINI_API_URL', 'https://generativelanguage.googleapis.com/v1beta/models/gemini-3.5-flash-lite:generateContent');
-
             $url = $baseUrl . "?key=" . $apiKey;
 
-            // Tambahkan tanpa verifikasi SSL khusus untuk lingkungan lokal (Laragon/XAMPP)
             $response = Http::withoutVerifying()->post($url, [
                 'contents' => [
                     [
@@ -306,14 +302,14 @@ class PhotoboothController extends Controller
 
             if ($response->successful()) {
                 $result = $response->json();
-
-                // Mengambil respons teks dari Gemini AI
                 $aiResponseText = $result['candidates'][0]['content']['parts'][0]['text'] ?? 'Berhasil dianalisis oleh Gemini AI.';
 
                 return response()->json([
                     'success' => true,
                     'ai_message' => $aiResponseText,
-                    'enhanced_image' => $imageData // Mengembalikan gambar asli untuk digabungkan ke canvas
+                    'enhanced_image' => $imageData,
+                    // Tambahkan path URL asset GIF di sini agar bisa diakses oleh JavaScript frontend
+                    'gif_overlay' => asset('images/sparkle.gif')
                 ]);
             } else {
                 \Log::error("Gemini API Failed Response: " . $response->body());
