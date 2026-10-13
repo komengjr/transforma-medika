@@ -5,6 +5,7 @@ use App\Http\Controllers\AntrianController;
 use App\Http\Controllers\ApplicationController;
 use App\Http\Controllers\Auth\AuthController;
 use App\Http\Controllers\Brodcast\BrodcastController;
+use App\Http\Controllers\ConsultationController;
 use App\Http\Controllers\dashboardController;
 use App\Http\Controllers\Event\EventController;
 use App\Http\Controllers\Farmasi\FarmasiController;
@@ -62,6 +63,18 @@ Route::controller(AuthController::class)->group(function () {
 });
 Route::controller(PageController::class)->group(function () {
     Route::get('/', 'fisrt')->name('/');
+    Route::post('/consultation', [ConsultationController::class, 'store'])->name('consultation.store');
+    Route::get('/innohealth-detail', function () {
+        return view('details.innohealth');
+    });
+
+    Route::get('/whoventra-detail', function () {
+        return view('details.whoventra');
+    });
+
+    Route::get('/company-profile-detail', function () {
+        return view('details.company-profile');
+    });
     Route::get('/app-hrm', 'app_hrm')->name('public-hrm');
     Route::get('/app-medical', 'app_medical')->name('public-medical');
     Route::get('/app-accounting', 'app_accounting')->name('public-accounting');
@@ -760,5 +773,3 @@ Route::get('/printer', [PrinterController::class, 'index'])->name('printer.index
 
 // Route API (AJAX) untuk mengambil string ZPL
 Route::get('/printer/get-zpl', [PrinterController::class, 'getZplData'])->name('printer.get-zpl');
-
-

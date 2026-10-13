@@ -636,8 +636,17 @@
                         </div>
 
                         <div class="reveal d2">
-                            <form action="#" method="POST" novalidate>
+                            <form action="{{ route('consultation.store') }}" method="POST">
+                                @csrf
                                 <div class="flex flex-col gap-4">
+
+                                    <!-- Notifikasi Sukses (Opsional) -->
+                                    @if(session('success'))
+                                    <div class="bg-emerald-500/20 border border-emerald-500 text-emerald-300 text-xs p-3 rounded-xl">
+                                        {{ session('success') }}
+                                    </div>
+                                    @endif
+
                                     <div class="grid sm:grid-cols-2 gap-4">
                                         <div>
                                             <label for="fname" class="block text-xs font-medium text-sky-200 mb-1.5">Nama Lengkap <span aria-hidden="true">*</span></label>
@@ -835,11 +844,20 @@
                         </div>
 
                         <!-- Footer Modal -->
-                        <div class="px-6 py-4 bg-zinc-50 dark:bg-zinc-950 border-t border-zinc-100 dark:border-zinc-800 flex justify-between items-center">
+                        <div class="px-6 py-4 bg-zinc-50 dark:bg-zinc-950 border-t border-zinc-100 dark:border-zinc-800 flex flex-wrap justify-between items-center gap-3">
                             <span class="text-xs text-zinc-500 dark:text-zinc-400">PT Innoventra Solusi Digital</span>
-                            <button @click="closeModal()" class="px-5 py-2 bg-sky-600 hover:bg-sky-700 text-white text-xs font-medium rounded-full transition-colors shadow-sm">
-                                Tutup Pratinjau
-                            </button>
+                            <div class="flex items-center gap-3">
+                                <!-- Link Baru untuk melihat penjelasan lengkap di tab baru -->
+                                <a :href="activeFeature.detailUrl || '#'" target="_blank" rel="noopener noreferrer" class="inline-flex items-center gap-1.5 px-4 py-2 border border-sky-500 text-sky-600 dark:text-sky-400 hover:bg-sky-500/10 text-xs font-medium rounded-full transition-colors">
+                                    <span>Lihat Penjelasan Lengkap</span>
+                                    <svg class="w-3.5 h-3.5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10 6H6a2 2 0 00-2 2v10a2 2 0 002 2h10a2 2 0 002-2v-4M14 4h6m0 0v6m0-6L10 14" />
+                                    </svg>
+                                </a>
+                                <button @click="closeModal()" class="px-5 py-2 bg-sky-600 hover:bg-sky-700 text-white text-xs font-medium rounded-full transition-colors shadow-sm">
+                                    Tutup Pratinjau
+                                </button>
+                            </div>
                         </div>
                     </div>
                 </template>
@@ -876,6 +894,7 @@
                         title: 'InnoHealth Integration Gateway',
                         subtitle: 'Pusat bridging dan otomatisasi data rekam medis pasien dari alat kesehatan langsung ke SIMRS/EMR.',
                         description: 'Modul ini dilengkapi dengan integrasi server Orthanc PACS berkecepatan tinggi dan OHIF Web Viewer berbasis web, memungkinkan dokter spesialis radiologi dan tenaga medis membuka, memanipulasi (Zoom, Pan, Window/Level), serta menganalisis citra DICOM (CT-Scan, MRI, X-Ray) secara real-time langsung melalui browser tanpa memerlukan instalasi aplikasi tambahan.',
+                        detailUrl: "{{ url('innohealth-detail') }}",
                         highlights: [
                             'Integrasi langsung server Orthanc PACS dengan protokol DICOM standard',
                             'OHIF Web Viewer responsif untuk manipulasi citra (Zoom, Window/Level, Measurement)',
@@ -888,6 +907,7 @@
                         title: 'WHOVENTRA Dashboard Ver.3',
                         subtitle: 'Platfrom manajemen bisnis serbaguna dengan arsitektur modern.',
                         description: 'Sistem ERP/CRM terpadu yang memadukan pengelolaan SDM (HRM), pelaporan keuangan real-time, manajemen inventaris logistik, hingga pengelolaan unit usaha kesehatan dan koperasi dalam satu dashboard terpusat.',
+                        detailUrl: "{{ url('whoventra-detail') }}",
                         highlights: [
                             'Manajemen Absensi & KPI Karyawan berbasis AI/Geofencing',
                             'Jurnal Keuangan Otomatis & Laporan Arus Kas Multi-Cabang',
@@ -900,6 +920,7 @@
                         title: 'Company Profile Corporate',
                         subtitle: 'Website bisnis berkinerja tinggi dengan optimasi SEO & UX modern.',
                         description: 'Layanan pembuatan platform web profil usaha profesional yang didesain interaktif untuk membangun reputasi merek, menarik calon mitra bisnis, dan dioptimalkan agar selalu berada di peringkat atas mesin pencari.',
+                        detailUrl: "{{ url('company-profile-detail') }}",
                         highlights: [
                             'Kecepatan muat halaman super cepat (< 2 detik)',
                             'Desain UX/UI responsif sempurna di perangkat mobile & desktop',
