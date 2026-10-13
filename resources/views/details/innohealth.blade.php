@@ -74,6 +74,73 @@
                 </p>
             </section>
 
+            <!-- FLOW DIAGRAM ALUR PELAYANAN PASIEN -->
+            <section class="bg-gradient-to-br from-sky-950/30 via-zinc-900 to-zinc-900 border border-sky-900/40 p-8 rounded-3xl">
+                <h2 class="font-display font-bold text-2xl text-white mb-2">Flow Diagram Alur Layanan & Integrasi Alat Medis</h2>
+                <p class="text-xs text-zinc-400 mb-8">Berikut adalah tahapan alur operasional pasien dari pendaftaran hingga pengiriman hasil pemeriksaan otomatis.</p>
+
+                <div class="relative border-l border-sky-500/30 ml-4 space-y-8 pl-6">
+
+                    <!-- Step 1 -->
+                    <div class="relative">
+                        <span class="absolute -left-[37px] top-0 w-8 h-8 rounded-full bg-sky-600 text-white flex items-center justify-center font-bold text-xs shadow-md">01</span>
+                        <div class="bg-zinc-900/80 border border-zinc-800 p-5 rounded-2xl">
+                            <h3 class="font-display font-bold text-white text-base mb-1">Pendaftaran Bagian Depan (Front Office)</h3>
+                            <p class="text-xs text-zinc-400">Pasien baru atau lama mendaftarkan diri di bagian pendaftaran depan untuk memasukkan data demografi dan memilih jenis layanan/poli.</p>
+                        </div>
+                    </div>
+
+                    <!-- Step 2 -->
+                    <div class="relative">
+                        <span class="absolute -left-[37px] top-0 w-8 h-8 rounded-full bg-sky-600 text-white flex items-center justify-center font-bold text-xs shadow-md">02</span>
+                        <div class="bg-zinc-900/80 border border-zinc-800 p-5 rounded-2xl">
+                            <h3 class="font-display font-bold text-white text-base mb-1">Pelunasan di Bagian Kasir</h3>
+                            <p class="text-xs text-zinc-400">Pasien melakukan pembayaran atau pelunasan administrasi biaya pemeriksaan di bagian kasir sebelum diarahkan ke stage pemeriksaan medis.</p>
+                        </div>
+                    </div>
+
+                    <!-- Step 3: Percabangan Stage Pemeriksaan -->
+                    <div class="relative">
+                        <span class="absolute -left-[37px] top-0 w-8 h-8 rounded-full bg-cyan-600 text-white flex items-center justify-center font-bold text-xs shadow-md">03</span>
+                        <div class="bg-zinc-900/80 border border-zinc-800 p-5 rounded-2xl space-y-4">
+                            <h3 class="font-display font-bold text-white text-base">Stage Sesuai Jenis Pemeriksaan (Percabangan Alur)</h3>
+
+                            <div class="grid md:grid-cols-2 gap-4">
+                                <!-- Cabang Radiologi -->
+                                <div class="bg-zinc-950/60 border border-sky-900/50 p-4 rounded-xl">
+                                    <span class="text-[10px] uppercase font-semibold text-sky-400 tracking-wider">Jalur Radiologi (Contoh: Thorax)</span>
+                                    <p class="text-xs text-zinc-300 mt-1 font-medium">Alat Radiologi ➔ Mengirim data DICOM ke Server Orthanc ➔ Ditampilkan ke SIMRS.</p>
+                                </div>
+                                <!-- Cabang Laboratorium -->
+                                <div class="bg-zinc-950/60 border border-teal-900/50 p-4 rounded-xl">
+                                    <span class="text-[10px] uppercase font-semibold text-teal-400 tracking-wider">Jalur Laboratorium (Contoh: Hema, dll)</span>
+                                    <p class="text-xs text-zinc-300 mt-1 font-medium">Alat Analyzer Lab ➔ Bantuan Gateway (Kabel RS-232 ke LAN) ➔ Mengirim data langsung ke SIMRS ➔ Mendapatkan nilai hasil pemeriksaan.</p>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Step 4 -->
+                    <div class="relative">
+                        <span class="absolute -left-[37px] top-0 w-8 h-8 rounded-full bg-sky-600 text-white flex items-center justify-center font-bold text-xs shadow-md">04</span>
+                        <div class="bg-zinc-900/80 border border-zinc-800 p-5 rounded-2xl">
+                            <h3 class="font-display font-bold text-white text-base mb-1">Verifikasi Hasil Pemeriksaan</h3>
+                            <p class="text-xs text-zinc-400">Setelah seluruh rangkaian pemeriksaan (Radiologi & Laboratorium) selesai, hasil diverifikasi oleh penanggung jawab / dokter spesialis di bagiannya masing-masing.</p>
+                        </div>
+                    </div>
+
+                    <!-- Step 5 -->
+                    <div class="relative">
+                        <span class="absolute -left-[37px] top-0 w-8 h-8 rounded-full bg-emerald-600 text-white flex items-center justify-center font-bold text-xs shadow-md">05</span>
+                        <div class="bg-zinc-900/80 border border-zinc-800 p-5 rounded-2xl">
+                            <h3 class="font-display font-bold text-white text-base mb-1">Pengiriman Hasil ke Pasien</h3>
+                            <p class="text-xs text-zinc-400">Hasil pemeriksaan yang telah diverifikasi secara otomatis dikirimkan langsung ke pasien melalui <strong class="text-white">Email</strong> dan <strong class="text-white">WhatsApp</strong>.</p>
+                        </div>
+                    </div>
+
+                </div>
+            </section>
+
             <section class="grid md:grid-cols-2 gap-6">
                 <div class="bg-zinc-900/40 border border-zinc-800 p-6 rounded-2xl">
                     <h3 class="font-display font-bold text-lg text-white mb-3 text-accent">Modul Radiologi (PACS / DICOM)</h3>
