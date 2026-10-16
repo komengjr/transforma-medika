@@ -1,12 +1,23 @@
 <!DOCTYPE html>
 <html lang="id" x-data="app()" :class="{'dark':dark}" class="scroll-smooth">
 
+<!DOCTYPE html>
+<html lang="id" x-data="app()" :class="{'dark':dark}" class="scroll-smooth">
+
 <head>
     <meta name="google-adsense-account" content="ca-pub-4154628728879232">
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
     <title>{{ $blog->title }} - PT Innoventra Solusi Digital</title>
     <meta name="description" content="{{ Str::limit(strip_tags($blog->content), 150) }}">
+
+    <!-- Favicon Dinamis Menyesuaikan Thumbnail -->
+    @if($blog->thumbnail)
+    <link rel="icon" href="{{ route('blog.image', basename($blog->thumbnail)) }}">
+    @else
+    <link rel="icon" href="https://images.unsplash.com/photo-1551288049-bebda4e38f71?w=1200&q=80">
+    @endif
 
     <script src="https://cdn.tailwindcss.com"></script>
     <script defer src="https://cdn.jsdelivr.net/npm/alpinejs@3.x.x/dist/cdn.min.js"></script>
