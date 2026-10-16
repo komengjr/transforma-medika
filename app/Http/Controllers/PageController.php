@@ -2,22 +2,21 @@
 
 namespace App\Http\Controllers;
 
+use App\Models\Blog;
 use App\Models\NewsData;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Auth;
+
 class PageController extends Controller
 {
     public function fisrt()
     {
-        $data = NewsData::latest()->limit(9)->get();
-        return view('public.index',compact('data'));
+        // Mengambil 3 artikel/blog terbaru berdasarkan tanggal dibuat
+        $latest_blogs = Blog::orderBy('created_at', 'desc')->take(3)->get();
 
-        // if (Auth::check()) {
-        //     return Redirect('dashboard/home');
-        // } else {
-        //     return view('auth.login');
-        // }
+        // Mengirimkan variabel $latest_blogs ke file view 'public.index'
+        return view('public.index', compact('latest_blogs'));
     }
     public function app_hrm()
     {

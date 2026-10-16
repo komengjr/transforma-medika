@@ -4,6 +4,7 @@ use App\Http\Controllers\Accounting\AccountingController;
 use App\Http\Controllers\AntrianController;
 use App\Http\Controllers\ApplicationController;
 use App\Http\Controllers\Auth\AuthController;
+use App\Http\Controllers\BlogController;
 use App\Http\Controllers\Brodcast\BrodcastController;
 use App\Http\Controllers\ConsultationController;
 use App\Http\Controllers\dashboardController;
@@ -60,6 +61,21 @@ Route::controller(AuthController::class)->group(function () {
     Route::post('verifikasi-reset-pass', 'verifikasi_reset_pass')->name('verifikasi_reset_pass');
     Route::post('verifikasi-otp-check', 'verifikasi_otp_check')->name('verifikasi_otp_check');
     // Route::get('dashboard', [AuthController::class, 'dashboard']);
+});
+Route::get('/blog', [BlogController::class, 'index'])->name('blog.index');
+// Menampilkan halaman detail artikel (otomatis menambah view)
+Route::get('/blog/{slug}', [BlogController::class, 'show'])->name('blog.show');
+// Menyimpan komentar pengunjung pada blog tertentu
+Route::post('/blog/{slug}/comment', [BlogController::class, 'storeComment'])->name('blog.comment');
+// Route untuk menampilkan file gambar dari storage
+Route::get('/storage/blogs/{filename}', [BlogController::class, 'showImage'])->name('blog.image');
+// --- ROUTES ADMIN (UNTUK MENGISI DATA) ---
+// (Pastikan dibungkus dengan middleware auth agar hanya admin yang bisa akses)
+Route::prefix('admin')->middleware(['auth'])->group(function () {
+    // Menampilkan form pengisian blog
+    Route::get('/blog/create', [BlogController::class, 'create'])->name('admin.blog.create');
+    // Proses simpan data blog ke database
+    Route::post('/blog/store', [BlogController::class, 'store'])->name('admin.blog.store');
 });
 Route::controller(PageController::class)->group(function () {
     Route::get('/', 'fisrt')->name('/');

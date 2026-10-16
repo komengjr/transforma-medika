@@ -49,7 +49,7 @@
 
     <style>
         /* ========================================================= */
-        /* BACKGROUND SMART CITY TEKNOLOGI DENGAN EFEK BLUR           */
+        /* GLOBAL (DEFAULT UNTUK MOBILE) - TEMA GELAP CITY           */
         /* ========================================================= */
         body {
             font-family: 'Plus Jakarta Sans', sans-serif !important;
@@ -61,7 +61,7 @@
             min-height: 100vh;
         }
 
-        /* Container Layer Gambar Background + Filter Blur */
+        /* Latar Belakang Image Khusus Mobile */
         body::before {
             content: "";
             position: fixed;
@@ -78,7 +78,6 @@
             z-index: -2;
         }
 
-        /* Overlay Gradien Halus */
         body::after {
             content: "";
             position: fixed;
@@ -90,7 +89,6 @@
             z-index: -1;
         }
 
-        /* Memastikan seluruh elemen teks dan komponen ikut menggunakan Plus Jakarta Sans */
         input,
         button,
         select,
@@ -111,7 +109,7 @@
         }
 
         /* ========================================================= */
-        /* MODE DESKTOP OPTIMIZED: NO SCROLL & AUTO FIT-TO-SCREEN     */
+        /* MODE DESKTOP OPTIMIZED: LEBIH RINGAN & GRADASI WARNA      */
         /* ========================================================= */
         @media (min-width: 992px) {
 
@@ -120,6 +118,14 @@
                 height: 100vh !important;
                 max-height: 100vh !important;
                 overflow: hidden !important;
+                /* Background Pure CSS Gradient agar sangat ringan */
+                background: linear-gradient(135deg, #f1f5f9 0%, #e0f2fe 100%) !important;
+            }
+
+            /* Mematikan background gambar berat di mode desktop */
+            body::before,
+            body::after {
+                display: none !important;
             }
 
             .main-desktop-wrapper {
@@ -127,7 +133,7 @@
                 display: flex;
                 flex-direction: column;
                 justify-content: space-between;
-                padding: 1rem 2rem;
+                padding: 1.5rem 3rem;
                 box-sizing: border-box;
             }
 
@@ -143,19 +149,27 @@
 
             /* Header Desktop Card */
             .glass-header-card {
-                background: rgba(255, 255, 255, 0.88);
-                backdrop-filter: blur(24px);
+                background: rgba(255, 255, 255, 0.95);
+                backdrop-filter: blur(15px);
                 border-radius: 16px;
-                border: 1px solid rgba(255, 255, 255, 0.9);
-                box-shadow: 0 10px 25px rgba(2, 132, 199, 0.12);
+                border: 1px solid rgba(255, 255, 255, 1);
+                box-shadow: 0 4px 15px rgba(2, 132, 199, 0.05);
                 padding: 0.6rem 1.2rem;
-                margin-bottom: 0.8rem;
+                margin-bottom: 1rem;
                 position: relative;
                 z-index: 1050 !important;
                 flex-shrink: 0;
             }
 
-            /* Dropdown z-index Fix */
+            .desktop-search-wrapper {
+                max-width: 450px;
+            }
+
+            .desktop-search-wrapper input:focus {
+                outline: none;
+                background: #fff;
+            }
+
             .dropdown-menu-custom {
                 z-index: 999999 !important;
                 position: absolute !important;
@@ -163,139 +177,139 @@
                 padding: 0.5rem !important;
                 background-color: #ffffff !important;
                 border: 1px solid #e2e8f0 !important;
-                box-shadow: 0 20px 40px rgba(15, 23, 42, 0.25) !important;
+                box-shadow: 0 20px 40px rgba(15, 23, 42, 0.15) !important;
             }
 
             .marquee-box {
-                background: linear-gradient(90deg, #0369a1, #0284c7);
+                background: #ffffff;
                 border-radius: 10px;
                 padding: 5px 14px;
-                color: #fff;
-                margin-bottom: 0.8rem;
-                box-shadow: 0 4px 10px rgba(2, 132, 199, 0.2);
+                color: #0284c7;
+                margin-bottom: 1rem;
+                box-shadow: 0 2px 6px rgba(0, 0, 0, 0.03);
+                border: 1px solid #e2e8f0;
                 flex-shrink: 0;
             }
 
-            /* Container Grid Dynamic Height */
+            /* Container Grid App Desktop dengan Support Scroll & Ukuran Fixed */
             .menu-grid-desktop {
                 flex: 1;
                 display: grid;
                 grid-template-columns: repeat(5, 1fr);
-                gap: 0.8rem;
+                grid-auto-rows: min-content;
+                /* Memastikan baris tidak memanjang memenuhi kontainer kosong */
+                gap: 1rem;
                 align-items: stretch;
+                align-content: start;
+                /* Mencegah card tertarik vertikal jika hanya 1 aplikasi */
                 min-height: 0;
+                overflow-y: auto;
+                /* Aktifkan scroll ke bawah jika card melebihi tinggi layar */
+                padding-bottom: 1rem;
+                padding-right: 0.5rem;
             }
 
-            /* Styling Card Desktop dengan Border Gradien Modern */
+            /* Scrollbar styling agar rapi */
+            .menu-grid-desktop::-webkit-scrollbar {
+                width: 6px;
+            }
+
+            .menu-grid-desktop::-webkit-scrollbar-track {
+                background: transparent;
+            }
+
+            .menu-grid-desktop::-webkit-scrollbar-thumb {
+                background-color: rgba(2, 132, 199, 0.2);
+                border-radius: 10px;
+            }
+
+            /* ----------------------------------------------------- */
+            /* STYLING CARD OPTIMIZED & RINGAN (TanPA Gambar Besar)  */
+            /* ----------------------------------------------------- */
             .menu-card-desktop {
-                border: none;
+                background: #ffffff;
                 border-radius: 16px;
-                overflow: hidden;
                 position: relative;
-                height: 100%;
-                min-height: 120px;
+                min-height: 140px;
                 cursor: pointer;
                 transition: all 0.3s cubic-bezier(0.175, 0.885, 0.32, 1.275);
-                box-shadow: 0 8px 20px rgba(0, 0, 0, 0.25);
-                z-index: 1;
-                background: #0f172a;
-                padding: 2px;
-            }
-
-            /* Lapisan Border Gradien (Pseudo Element) */
-            .menu-card-desktop::before {
-                content: "";
-                position: absolute;
-                inset: 0;
-                border-radius: 16px;
-                padding: 2px;
-                background: linear-gradient(135deg, rgba(56, 189, 248, 0.8), rgba(99, 102, 241, 0.2), rgba(236, 72, 153, 0.8));
-                -webkit-mask: linear-gradient(#fff 0 0) content-box, linear-gradient(#fff 0 0);
-                -webkit-mask-composite: xor;
-                mask-composite: exclude;
-                pointer-events: none;
-                z-index: 10;
-                transition: all 0.4s ease;
-                opacity: 0.7;
-            }
-
-            /* Efek Hover: Border Gradien Menyala & Membesar */
-            .menu-card-desktop:hover {
-                transform: translateY(-5px);
-                box-shadow: 0 14px 28px rgba(2, 132, 199, 0.4), 0 0 15px rgba(56, 189, 248, 0.25);
-            }
-
-            .menu-card-desktop:hover::before {
-                opacity: 1;
-                background: linear-gradient(135deg, #00f2fe, #4facfe, #00c6ff);
-            }
-
-            .menu-card-desktop .card-bg-img {
-                position: absolute;
-                top: 0;
-                left: 0;
-                width: 100%;
-                height: 100%;
-                object-fit: cover;
-                transition: transform 0.4s ease;
-                z-index: 1;
-                border-radius: 14px;
-            }
-
-            .menu-card-desktop .card-overlay {
-                position: absolute;
-                top: 0;
-                left: 0;
-                width: 100%;
-                height: 100%;
-                background: linear-gradient(180deg, rgba(15, 23, 42, 0.15) 0%, rgba(15, 23, 42, 0.9) 100%);
-                z-index: 2;
-                border-radius: 14px;
-            }
-
-            .menu-card-desktop .card-content {
-                position: relative;
-                z-index: 3;
-                height: 100%;
+                box-shadow: 0 4px 12px rgba(0, 0, 0, 0.03);
+                overflow: hidden;
                 display: flex;
                 flex-direction: column;
-                justify-content: flex-end;
-                padding: 1rem;
-                color: #ffffff;
+                justify-content: center;
+                padding: 1.2rem;
+                z-index: 1;
             }
 
-            .menu-card-desktop .menu-icon-badge {
+            /* Background Gradasi Transparan di dalam Card */
+            .card-gradient-bg {
                 position: absolute;
-                top: 12px;
-                right: 12px;
-                width: 36px;
-                height: 36px;
-                background: rgba(255, 255, 255, 0.2);
-                backdrop-filter: blur(8px);
-                border-radius: 10px;
+                top: 0;
+                left: 0;
+                width: 100%;
+                height: 100%;
+                opacity: 0.05;
+                transition: opacity 0.3s ease;
+                z-index: -1;
+            }
+
+            .menu-card-desktop:hover {
+                transform: translateY(-6px);
+                box-shadow: 0 12px 24px rgba(0, 0, 0, 0.08);
+            }
+
+            .menu-card-desktop:hover .card-gradient-bg {
+                opacity: 0.15;
+            }
+
+            /* Container Isi Card */
+            .card-content-wrapper {
+                display: flex;
+                flex-direction: column;
+                height: 100%;
+            }
+
+            /* Icon Card Besar dengan Warna Gradien */
+            .menu-icon-wrapper {
+                width: 48px;
+                height: 48px;
+                border-radius: 12px;
                 display: flex;
                 align-items: center;
                 justify-content: center;
-                font-size: 1rem;
-                color: #fff;
-                border: 1px solid rgba(255, 255, 255, 0.4);
-                z-index: 3;
+                font-size: 1.4rem;
+                color: #ffffff;
+                margin-bottom: 0.8rem;
+                box-shadow: 0 4px 10px rgba(0, 0, 0, 0.1);
+                transition: transform 0.3s ease;
             }
 
-            .menu-card-desktop:hover .card-bg-img {
-                transform: scale(1.08);
+            .menu-card-desktop:hover .menu-icon-wrapper {
+                transform: scale(1.1);
+            }
+
+            .card-text h6 {
+                color: #0f172a;
+                font-size: 0.9rem;
+            }
+
+            .card-text p {
+                color: #64748b;
+                line-height: 1.3;
             }
 
             .desktop-footer {
-                padding: 0.4rem 0 0 0;
+                padding: 0.8rem 0 0 0;
                 text-align: center;
-                color: #f8fafc !important;
+                color: #475569 !important;
                 flex-shrink: 0;
+                font-weight: 600;
             }
         }
 
         /* ========================================================= */
-        /* MODE MOBILE: HOME SCREEN ANDROID NATIVE LAUNCHER          */
+        /* MODE MOBILE: HOME SCREEN ANDROID NATIVE LAUNCHER (TETAP)  */
         /* ========================================================= */
         @media (max-width: 991.98px) {
             body {
@@ -370,7 +384,6 @@
                 overflow: hidden;
             }
 
-            /* Custom Floating Dock Bottom Nav */
             .android-bottom-nav {
                 position: fixed;
                 bottom: 16px;
@@ -459,7 +472,7 @@
             }
         }
 
-        /* Custom Stylish Dropdown */
+        /* Custom Stylish Dropdown & Modals */
         .glass-dropdown-menu {
             background: rgba(255, 255, 255, 0.95) !important;
             backdrop-filter: blur(20px) saturate(180%);
@@ -743,6 +756,7 @@
             <div class="glass-header-card">
                 <div class="d-flex align-items-center justify-content-between">
 
+                    <!-- Kiri: Logo -->
                     <div class="d-flex align-items-center gap-3">
                         <div class="p-2 bg-white rounded-3 border shadow-sm">
                             <img src="{{asset('img/logo-pt.png')}}" alt="Logo" width="85" height="36">
@@ -755,6 +769,17 @@
                         </div>
                     </div>
 
+                    <!-- Tengah: Search Filter Aplikasi -->
+                    <div class="flex-grow-1 px-4 mx-3 desktop-search-wrapper">
+                        <div class="input-group shadow-sm bg-white rounded-pill overflow-hidden border">
+                            <span class="input-group-text bg-transparent border-0 text-muted ps-3">
+                                <i class="fas fa-search"></i>
+                            </span>
+                            <input type="text" id="desktopSearchApp" class="form-control border-0 ps-2" placeholder="Cari modul atau aplikasi..." style="box-shadow: none;">
+                        </div>
+                    </div>
+
+                    <!-- Kanan: Profil & Setting -->
                     <div class="d-flex align-items-center gap-3">
                         <div class="text-end">
                             <h6 class="mb-0 fw-bold text-dark fs--1">{{Auth::user()->fullname}}</h6>
@@ -765,15 +790,13 @@
                             <img class="rounded-circle border border-2 border-primary" src="{{asset('img/pp.png')}}" width="38" height="38" alt="Profile" />
                         </div>
 
-                        <!-- Dropdown Action Button Modern -->
+                        <!-- Dropdown Action Button -->
                         <div class="dropdown" style="z-index: 999999 !important; position: relative;">
                             <button class="btn btn-dropdown-trigger shadow-sm" type="button" id="dropdownDesktop" data-bs-toggle="dropdown" aria-expanded="false">
                                 <i class="fas fa-ellipsis-v"></i>
                             </button>
 
                             <ul class="dropdown-menu dropdown-menu-end glass-dropdown-menu border-0 shadow-lg" aria-labelledby="dropdownDesktop">
-
-                                <!-- Header Ringkas Profil -->
                                 <li class="dropdown-profile-header">
                                     <div class="d-flex align-items-center justify-content-between">
                                         <div>
@@ -788,7 +811,6 @@
                                     </div>
                                 </li>
 
-                                <!-- Menu Navigation -->
                                 <li>
                                     <button class="dropdown-item glass-dropdown-item" id="button-menu-utama">
                                         <div class="d-flex align-items-center">
@@ -858,7 +880,7 @@
             </div>
 
             <!-- Grid Card Features Desktop -->
-            <div class="menu-grid-desktop">
+            <div class="menu-grid-desktop" id="desktopAppGrid">
                 @if (Auth::user()->access_code == 'master')
                 @php $menu = DB::table('z_menu_super')->get(); @endphp
                 @else
@@ -873,31 +895,43 @@
                 @foreach ($menu as $menus)
                 @php
                 $code = strtolower($menus->menu_super_code);
-                $imgUrl = 'https://images.unsplash.com/photo-1460925895917-afdab827c52f?auto=format&fit=crop&w=600&q=80';
-                $iconClass = 'fa-th-large';
+
+                $iconClass = 'fa-cubes';
+                $iconBg = 'linear-gradient(135deg, #38bdf8, #0284c7)';
+                $cardBorder = 'rgba(2, 132, 199, 0.3)';
 
                 if(str_contains($code, 'account') || str_contains($code, 'keuangan')) {
-                $imgUrl = 'https://images.unsplash.com/photo-1554224155-8d04cb21cd6c?auto=format&fit=crop&w=600&q=80';
-                $iconClass = 'fa-calculator';
+                $iconClass = 'fa-chart-pie';
+                $iconBg = 'linear-gradient(135deg, #34d399, #059669)';
+                $cardBorder = 'rgba(5, 150, 105, 0.3)';
                 } elseif(str_contains($code, 'inventar') || str_contains($code, 'stok')) {
-                $imgUrl = 'https://images.unsplash.com/photo-1586528116311-ad8dd3c8310d?auto=format&fit=crop&w=600&q=80';
-                $iconClass = 'fa-boxes';
+                $iconClass = 'fa-box-open';
+                $iconBg = 'linear-gradient(135deg, #fbbf24, #d97706)';
+                $cardBorder = 'rgba(217, 119, 6, 0.3)';
                 } elseif(str_contains($code, 'medic') || str_contains($code, 'health')) {
-                $imgUrl = 'https://images.unsplash.com/photo-1576091160399-112ba8d25d1d?auto=format&fit=crop&w=600&q=80';
-                $iconClass = 'fa-user-md';
+                $iconClass = 'fa-notes-medical';
+                $iconBg = 'linear-gradient(135deg, #f87171, #dc2626)';
+                $cardBorder = 'rgba(220, 38, 38, 0.3)';
                 } elseif(str_contains($code, 'logis') || str_contains($code, 'kurir')) {
-                $imgUrl = 'https://images.unsplash.com/photo-1580674684081-7617fbf3d745?auto=format&fit=crop&w=600&q=80';
-                $iconClass = 'fa-truck';
+                $iconClass = 'fa-truck-fast';
+                $iconBg = 'linear-gradient(135deg, #a78bfa, #6d28d9)';
+                $cardBorder = 'rgba(109, 40, 217, 0.3)';
                 }
                 @endphp
 
-                <div class="menu-card-desktop" id="menu" data-code="{{$menus->menu_super_code}}">
-                    <img src="{{ asset($menus->menu_super_img ?? $imgUrl) }}" alt="{{$menus->menu_super_name}}" class="card-bg-img">
-                    <div class="card-overlay"></div>
-                    <div class="menu-icon-badge"><i class="fas {{$iconClass}}"></i></div>
-                    <div class="card-content">
-                        <h6 class="fw-bold text-uppercase mb-1 text-white fs--1">{{$menus->menu_super_name}}</h6>
-                        <p class="fs--2 opacity-75 mb-0 text-truncate">{{$menus->menu_super_desc}}</p>
+                <div class="menu-card-desktop item-card-filter" id="menu" data-code="{{$menus->menu_super_code}}" style="border: 1px solid {{$cardBorder}};">
+
+                    <div class="card-gradient-bg" style="background: {{$iconBg}};"></div>
+
+                    <div class="card-content-wrapper">
+                        <div class="menu-icon-wrapper" style="background: {{$iconBg}};">
+                            <i class="fas {{$iconClass}}"></i>
+                        </div>
+
+                        <div class="card-text">
+                            <h6 class="fw-bold text-uppercase mb-1 filter-title">{{$menus->menu_super_name}}</h6>
+                            <p class="fs--2 mb-0 text-truncate filter-desc">{{$menus->menu_super_desc}}</p>
+                        </div>
                     </div>
                 </div>
                 @endforeach
@@ -906,7 +940,7 @@
         </div>
 
         <footer class="desktop-footer text-center fs--2">
-            <p class="mb-0 fw-medium">Innoventra System &copy; 2026 | v3.4.0</p>
+            <p class="mb-0">Innoventra System &copy; 2026 | v3.4.0</p>
         </footer>
     </div>
 
@@ -927,57 +961,43 @@
                 <button class="btn btn-mobile-trigger shadow-sm" type="button" id="dropdownMobile" data-bs-toggle="dropdown" aria-expanded="false">
                     <i class="fas fa-ellipsis-v"></i>
                 </button>
-
                 <ul class="dropdown-menu dropdown-menu-end glass-dropdown-mobile border-0" aria-labelledby="dropdownMobile">
-
                     <li>
                         <button class="dropdown-item mobile-dropdown-item" id="button-menu-utama">
                             <div class="d-flex align-items-center">
-                                <span class="mobile-icon-box bg-primary-subtle text-primary">
-                                    <i class="fab fa-dashcube"></i>
-                                </span>
+                                <span class="mobile-icon-box bg-primary-subtle text-primary"><i class="fab fa-dashcube"></i></span>
                                 <span>Menu Utama</span>
                             </div>
                             <i class="fas fa-chevron-right fs--2 opacity-50"></i>
                         </button>
                     </li>
-
                     <li>
                         <button class="dropdown-item mobile-dropdown-item" data-bs-toggle="modal" data-bs-target="#modal-keuangan" id="button-proses-transaksi">
                             <div class="d-flex align-items-center">
-                                <span class="mobile-icon-box bg-warning-subtle text-warning">
-                                    <i class="fas fa-key"></i>
-                                </span>
+                                <span class="mobile-icon-box bg-warning-subtle text-warning"><i class="fas fa-key"></i></span>
                                 <span>Ubah Password</span>
                             </div>
                             <i class="fas fa-chevron-right fs--2 opacity-50"></i>
                         </button>
                     </li>
-
                     @if (Auth::user()->access_code == 'master')
                     <li>
                         <button class="dropdown-item mobile-dropdown-item" id="button-master-dashboard">
                             <div class="d-flex align-items-center">
-                                <span class="mobile-icon-box bg-info-subtle text-info">
-                                    <i class="fas fa-cog"></i>
-                                </span>
+                                <span class="mobile-icon-box bg-info-subtle text-info"><i class="fas fa-cog"></i></span>
                                 <span>Master Page</span>
                             </div>
                             <i class="fas fa-chevron-right fs--2 opacity-50"></i>
                         </button>
                     </li>
                     @endif
-
                     <li>
                         <hr class="dropdown-divider my-1 opacity-25">
                     </li>
-
                     <li>
                         <button class="dropdown-item mobile-dropdown-item text-danger" id="button-logout">
                             <div class="d-flex align-items-center">
-                                <span class="mobile-icon-box bg-danger-subtle text-danger">
-                                    <i class="fas fa-sign-out-alt"></i>
-                                </span>
+                                <span class="mobile-icon-box bg-danger-subtle text-danger"><i class="fas fa-sign-out-alt"></i></span>
                                 <span>Log Out</span>
                             </div>
                             <i class="fas fa-chevron-right fs--2 opacity-50"></i>
@@ -1027,39 +1047,27 @@
             @endforeach
         </div>
 
-        <!-- Floating Glass Bottom Navigation -->
         <div class="android-bottom-nav">
             <a class="android-nav-btn" href="#">
-                <div class="nav-icon-wrapper nav-icon-home">
-                    <i class="fas fa-home"></i>
-                </div>
+                <div class="nav-icon-wrapper nav-icon-home"><i class="fas fa-home"></i></div>
                 <span>Home</span>
             </a>
-
             <a class="android-nav-btn" href="#" data-bs-toggle="modal" data-bs-target="#modal-keuangan">
-                <div class="nav-icon-wrapper nav-icon-reset">
-                    <i class="fas fa-key"></i>
-                </div>
+                <div class="nav-icon-wrapper nav-icon-reset"><i class="fas fa-key"></i></div>
                 <span>Reset</span>
             </a>
-
             <a class="android-nav-btn" href="#" data-bs-toggle="modal" data-bs-target="#staticBackdrop">
-                <div class="nav-icon-wrapper nav-icon-info">
-                    <i class="fas fa-comment-alt"></i>
-                </div>
+                <div class="nav-icon-wrapper nav-icon-info"><i class="fas fa-comment-alt"></i></div>
                 <span>Info</span>
             </a>
-
             <a class="android-nav-btn" id="button-logout" href="#">
-                <div class="nav-icon-wrapper nav-icon-logout">
-                    <i class="fas fa-power-off"></i>
-                </div>
+                <div class="nav-icon-wrapper nav-icon-logout"><i class="fas fa-power-off"></i></div>
                 <span class="text-danger">Keluar</span>
             </a>
         </div>
     </div>
 
-    <!-- Modal Information -->
+    <!-- Modals -->
     <div class="modal fade" id="staticBackdrop" data-bs-keyboard="false" tabindex="-1" aria-hidden="true">
         <div class="modal-dialog modal-dialog-centered" role="document">
             <div class="modal-content border-0 shadow-lg rounded-4 overflow-hidden">
@@ -1068,39 +1076,27 @@
                     <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
                 </div>
                 <div class="modal-body p-4">
-                    <p class="text-muted fs--1 mb-0">
-                        Layanan integrasi dashboard manajemen terlengkap untuk membantu pengelolaan data perusahaan Anda.
-                    </p>
+                    <p class="text-muted fs--1 mb-0">Layanan integrasi dashboard manajemen terlengkap untuk membantu pengelolaan data perusahaan Anda.</p>
                 </div>
             </div>
         </div>
     </div>
 
-    <!-- Modal Reset Password Multi-step -->
     <div class="modal fade" id="modal-keuangan" tabindex="-1" aria-hidden="true" data-bs-backdrop="static">
         <div class="modal-dialog modal-dialog-centered modal-sm-custom">
             <div class="modal-content glass-reset-modal border-0 shadow-lg">
-
-                <!-- Close Button -->
                 <button type="button" class="btn-close btn-close-custom" data-bs-dismiss="modal" aria-label="Close"></button>
-
-                <!-- STEP 1: Input Email -->
                 <div id="reset-step-1" class="reset-step-container">
                     <div class="text-center mb-4">
-                        <div class="reset-icon-badge bg-warning-subtle text-warning mx-auto mb-3">
-                            <i class="fas fa-envelope fs-3"></i>
-                        </div>
+                        <div class="reset-icon-badge bg-warning-subtle text-warning mx-auto mb-3"><i class="fas fa-envelope fs-3"></i></div>
                         <h5 class="fw-bold text-dark mb-1">Reset Password</h5>
                         <p class="text-muted fs--2 mb-0">Masukkan email terdaftar untuk menerima kode verifikasi OTP.</p>
                     </div>
-
                     <form id="form-request-otp">
                         <div class="mb-3">
                             <label class="form-label text-secondary fw-semibold fs--2">EMAIL TERDAFTAR</label>
                             <div class="input-group">
-                                <span class="input-group-text border-end-0 bg-transparent text-muted">
-                                    <i class="fas fa-at"></i>
-                                </span>
+                                <span class="input-group-text border-end-0 bg-transparent text-muted"><i class="fas fa-at"></i></span>
                                 <input type="email" class="form-control custom-input border-start-0" id="reset-email" placeholder="nama@email.com" required>
                             </div>
                         </div>
@@ -1110,16 +1106,12 @@
                     </form>
                 </div>
 
-                <!-- STEP 2: Input 6 Digit OTP -->
                 <div id="reset-step-2" class="reset-step-container d-none">
                     <div class="text-center mb-3">
-                        <div class="reset-icon-badge bg-info-subtle text-info mx-auto mb-2">
-                            <i class="fas fa-shield-alt fs-4"></i>
-                        </div>
+                        <div class="reset-icon-badge bg-info-subtle text-info mx-auto mb-2"><i class="fas fa-shield-alt fs-4"></i></div>
                         <h5 class="fw-bold text-dark mb-1">Verifikasi OTP</h5>
                         <p class="text-muted fs--2 mb-0">Masukkan 6 digit kode OTP yang dikirim ke email Anda.</p>
                     </div>
-
                     <form id="form-verify-otp">
                         <div class="mb-3">
                             <label class="form-label text-secondary fw-semibold fs--2 text-center d-block">KODE VERIFIKASI (OTP)</label>
@@ -1131,29 +1123,19 @@
                                 <input type="text" maxlength="1" class="form-control otp-input text-center px-1" required>
                                 <input type="text" maxlength="1" class="form-control otp-input text-center px-1" required>
                             </div>
-                            <div class="text-center">
-                                <small class="text-muted fs--2">Belum terima kode? <a href="#" id="btn-resend-otp" class="text-primary fw-bold text-decoration-none">Kirim Ulang</a></small>
-                            </div>
+                            <div class="text-center"><small class="text-muted fs--2">Belum terima kode? <a href="#" id="btn-resend-otp" class="text-primary fw-bold text-decoration-none">Kirim Ulang</a></small></div>
                         </div>
-
-                        <button type="submit" class="btn btn-primary-gradient w-100 rounded-pill py-2 fw-semibold text-white mt-2" id="btn-check-otp">
-                            <i class="fas fa-check-circle me-1"></i> Verifikasi Kode OTP
-                        </button>
+                        <button type="submit" class="btn btn-primary-gradient w-100 rounded-pill py-2 fw-semibold text-white mt-2" id="btn-check-otp"><i class="fas fa-check-circle me-1"></i> Verifikasi Kode OTP</button>
                     </form>
                 </div>
 
-                <!-- STEP 3: Input Password Baru -->
                 <div id="reset-step-3" class="reset-step-container d-none">
                     <div class="text-center mb-3">
-                        <div class="reset-icon-badge bg-success-subtle text-success mx-auto mb-2">
-                            <i class="fas fa-lock fs-4"></i>
-                        </div>
+                        <div class="reset-icon-badge bg-success-subtle text-success mx-auto mb-2"><i class="fas fa-lock fs-4"></i></div>
                         <h5 class="fw-bold text-dark mb-1">Password Baru</h5>
                         <p class="text-muted fs--2 mb-0">Buat kata sandi baru untuk akun Anda.</p>
                     </div>
-
                     <form id="form-reset-password">
-                        <!-- New Password Input -->
                         <div class="mb-3">
                             <label class="form-label text-secondary fw-semibold fs--2">KATA SANDI BARU</label>
                             <div class="input-group">
@@ -1162,8 +1144,6 @@
                                 <button class="btn border border-start-0 text-muted btn-toggle-pass" type="button"><i class="fas fa-eye"></i></button>
                             </div>
                         </div>
-
-                        <!-- Confirm Password Input -->
                         <div class="mb-3">
                             <label class="form-label text-secondary fw-semibold fs--2">KONFIRMASI KATA SANDI</label>
                             <div class="input-group">
@@ -1171,13 +1151,9 @@
                                 <input type="password" class="form-control custom-input border-start-0" id="confirm-password" placeholder="••••••••" minlength="6" required>
                             </div>
                         </div>
-
-                        <button type="submit" class="btn btn-success-gradient w-100 rounded-pill py-2 fw-semibold text-white mt-2" id="btn-save-password">
-                            <i class="fas fa-save me-1"></i> Simpan Password Baru
-                        </button>
+                        <button type="submit" class="btn btn-success-gradient w-100 rounded-pill py-2 fw-semibold text-white mt-2" id="btn-save-password"><i class="fas fa-save me-1"></i> Simpan Password Baru</button>
                     </form>
                 </div>
-
             </div>
         </div>
     </div>
@@ -1191,16 +1167,30 @@
 
     <script>
         document.addEventListener("DOMContentLoaded", function() {
+            const searchInput = document.getElementById('desktopSearchApp');
+            if (searchInput) {
+                searchInput.addEventListener('input', function() {
+                    const filter = this.value.toLowerCase();
+                    const cards = document.querySelectorAll('.item-card-filter');
+                    cards.forEach(card => {
+                        const title = card.querySelector('.filter-title').innerText.toLowerCase();
+                        const desc = card.querySelector('.filter-desc').innerText.toLowerCase();
+                        if (title.includes(filter) || desc.includes(filter)) {
+                            card.style.display = '';
+                        } else {
+                            card.style.display = 'none';
+                        }
+                    });
+                });
+            }
+
             const step1 = document.getElementById("reset-step-1");
             const step2 = document.getElementById("reset-step-2");
             const step3 = document.getElementById("reset-step-3");
-
             const formReq = document.getElementById("form-request-otp");
             const formVerifyOtp = document.getElementById("form-verify-otp");
             const formResetPass = document.getElementById("form-reset-password");
-
             const otpInputs = document.querySelectorAll(".otp-input");
-
             let userEmail = "";
             let verifiedOtp = "";
 
@@ -1210,7 +1200,6 @@
                         otpInputs[index + 1].focus();
                     }
                 });
-
                 input.addEventListener("keydown", (e) => {
                     if (e.key === "Backspace" && !e.target.value && index > 0) {
                         otpInputs[index - 1].focus();
@@ -1233,13 +1222,10 @@
             formReq.addEventListener("submit", function(e) {
                 e.preventDefault();
                 e.stopImmediatePropagation();
-
                 const emailInput = document.getElementById("reset-email");
                 userEmail = emailInput.value;
                 const btn = $("#btn-send-otp");
-
                 btn.prop("disabled", true).html('<i class="fas fa-spinner fa-spin"></i> Memeriksa Email...');
-
                 $.ajax({
                     url: "{{ route('verifikasi_send_email') }}",
                     type: "POST",
@@ -1250,7 +1236,6 @@
                     dataType: "json"
                 }).done(function(res) {
                     btn.prop("disabled", false).html('<span>Kirim Kode Verifikasi</span> <i class="fas fa-arrow-right ms-2 fs--2"></i>');
-
                     if (res.status === 'success') {
                         Swal.fire({
                             icon: 'success',
@@ -1259,7 +1244,6 @@
                             timer: 1500,
                             showConfirmButton: false
                         });
-
                         step1.classList.add("d-none");
                         step2.classList.remove("d-none");
                         step3.classList.add("d-none");
@@ -1268,7 +1252,6 @@
                         step1.classList.remove("d-none");
                         step2.classList.add("d-none");
                         step3.classList.add("d-none");
-
                         Swal.fire({
                             icon: 'error',
                             title: 'Email Tidak Ditemukan!',
@@ -1280,14 +1263,11 @@
                     }
                 }).fail(function(xhr) {
                     btn.prop("disabled", false).html('<span>Kirim Kode Verifikasi</span> <i class="fas fa-arrow-right ms-2 fs--2"></i>');
-
                     step1.classList.remove("d-none");
                     step2.classList.add("d-none");
                     step3.classList.add("d-none");
-
                     const res = xhr.responseJSON;
                     const errorMsg = (res && res.message) ? res.message : "Email tidak terdaftar atau terjadi kesalahan server.";
-
                     Swal.fire({
                         icon: 'error',
                         title: 'Gagal Memeriksa Email',
@@ -1306,18 +1286,14 @@
 
             formVerifyOtp.addEventListener("submit", function(e) {
                 e.preventDefault();
-
                 let otpCode = "";
                 otpInputs.forEach(input => otpCode += input.value);
                 const btn = $("#btn-check-otp");
-
                 if (otpCode.length < 6) {
                     Swal.fire("Peringatan", "Harap masukkan 6 digit kode OTP secara lengkap!", "warning");
                     return;
                 }
-
                 btn.prop("disabled", true).html('<i class="fas fa-spinner fa-spin"></i> Memverifikasi...');
-
                 $.ajax({
                     url: "{{ route('verifikasi_otp_check') }}",
                     type: "POST",
@@ -1353,18 +1329,14 @@
 
             formResetPass.addEventListener("submit", function(e) {
                 e.preventDefault();
-
                 const password = document.getElementById("new-password").value;
                 const confirmPassword = document.getElementById("confirm-password").value;
                 const btn = $("#btn-save-password");
-
                 if (password !== confirmPassword) {
                     Swal.fire("Perhatian", "Konfirmasi kata sandi tidak cocok!", "warning");
                     return;
                 }
-
                 btn.prop("disabled", true).html('<i class="fas fa-spinner fa-spin"></i> Menyimpan...');
-
                 $.ajax({
                     url: "{{ route('verifikasi_reset_pass') }}",
                     type: "POST",
@@ -1450,7 +1422,6 @@
             e.preventDefault();
             window.location.href = "{{route('master_dashboard')}}";
         });
-
         $(document).on("click", "#button-menu-utama", function(e) {
             e.preventDefault();
             window.location.href = "{{route('/')}}";
