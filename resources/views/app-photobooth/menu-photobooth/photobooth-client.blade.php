@@ -35,7 +35,7 @@
             height: 100vh;
             overflow: hidden;
             font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
-            background: linear-gradient(135deg, rgba(106, 17, 203, 0.85), rgba(37, 117, 252, 0.85), rgba(255, 64, 129, 0.85)),
+            background: linear-gradient(135deg, rgba(106, 17, 203, 0.75), rgba(37, 117, 252, 0.75), rgba(255, 64, 129, 0.75)),
             url('{{ $bgUrl }}') center/cover no-repeat fixed;
             color: #fff;
             display: flex;
@@ -50,18 +50,18 @@
             flex-direction: column;
             align-items: center;
             justify-content: center;
-            gap: 8px;
+            gap: 6px;
         }
 
         .header-logo {
-            height: 50px;
+            height: 45px;
             width: auto;
             object-fit: contain;
             filter: drop-shadow(0 2px 4px rgba(0, 0, 0, 0.3));
         }
 
         h1 {
-            font-size: 1.8rem;
+            font-size: 1.6rem;
             font-weight: bold;
             text-shadow: 0 4px 10px rgba(0, 0, 0, 0.5);
             color: #ffffff;
@@ -88,7 +88,7 @@
             align-items: center;
             justify-content: center;
             padding: 10px 20px 20px 20px;
-            height: calc(100vh - 100px);
+            height: calc(100vh - 90px);
         }
 
         .step-box-small {
@@ -99,45 +99,6 @@
             border-radius: 20px;
             color: #333;
             box-shadow: 0 10px 30px rgba(0, 0, 0, 0.3);
-        }
-
-        #step-2-frame {
-            display: none;
-            width: 100%;
-            height: 100%;
-            max-width: 1200px;
-            gap: 20px;
-        }
-
-        .split-left {
-            flex: 1.2;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            height: 100%;
-        }
-
-        .split-right {
-            flex: 1;
-            background: rgba(255, 255, 255, 0.95);
-            padding: 20px;
-            border-radius: 20px;
-            color: #333;
-            display: flex;
-            flex-direction: column;
-            justify-content: space-between;
-            height: 100%;
-            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.3);
-            overflow: hidden;
-            /* Ubah dari auto ke hidden agar scroll fokus di frame-options */
-        }
-
-        .split-right>div:first-child {
-            display: flex;
-            flex-direction: column;
-            flex: 1;
-            /* Mengisi sisa tinggi di dalam split-right */
-            overflow: hidden;
         }
 
         .form-group {
@@ -163,97 +124,212 @@
             font-size: 0.9rem;
         }
 
-        .layout-options {
-            display: grid;
-            grid-template-columns: repeat(3, 1fr);
-            gap: 10px;
-            margin-top: 4px;
-        }
-
-        .layout-card {
-            padding: 8px 4px;
-            border: 2px solid #e0e0e0;
-            border-radius: 8px;
-            cursor: pointer;
-            background: #fff;
-            text-align: center;
-            color: #333;
-            font-weight: 600;
-            font-size: 0.75rem;
-            display: flex;
+        /* --- STEP 2: CAROUSEL PILIH FRAME --- */
+        #step-2-frame {
+            display: none;
+            width: 100%;
+            height: 100%;
+            max-width: 1200px;
             flex-direction: column;
+            justify-content: space-between;
+            position: relative;
+        }
+
+        .step2-header {
+            display: flex;
+            justify-content: space-between;
             align-items: center;
-            justify-content: center;
-            gap: 6px;
-            transition: all 0.2s ease;
+            width: 100%;
+            padding: 10px 20px;
         }
 
-        .layout-card:hover {
-            border-color: #ff4081;
+        .step2-title {
+            font-size: 1.8rem;
+            font-weight: 700;
+            text-shadow: 0 2px 8px rgba(0, 0, 0, 0.5);
         }
 
-        .layout-card.active {
-            border-color: #ff4081;
-            background: #fff0f5;
+        .filter-select-wrapper {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            background: rgba(0, 0, 0, 0.4);
+            padding: 6px 14px;
+            border-radius: 20px;
+            border: 1px solid rgba(255, 255, 255, 0.2);
         }
 
-        .layout-card.disabled {
-            opacity: 0.4;
-            cursor: not-allowed;
-            border-color: #ddd !important;
-            background: #f5f5f5 !important;
+        .filter-select-wrapper select {
+            background: transparent;
+            border: none;
+            color: #fff;
+            font-size: 0.9rem;
+            outline: none;
+            cursor: pointer;
         }
 
-        .layout-icon {
-            width: 42px;
-            height: 42px;
+        .filter-select-wrapper select option {
+            background: #333;
+            color: #fff;
+        }
+
+        .carousel-wrapper {
             display: flex;
             align-items: center;
             justify-content: center;
+            width: 100%;
+            flex: 1;
+            position: relative;
+            gap: 15px;
+            padding: 20px 0;
         }
 
-        .frame-options {
-            display: grid;
-            grid-template-columns: repeat(2, 1fr);
-            gap: 10px;
-            flex: 1;
-            /* Mengambil seluruh sisa ruang kosong di bawah */
-            min-height: 120px;
-            /* Batas tinggi minimal */
-            max-height: 100%;
-            /* Mencegah meluap melebihi container */
-            overflow-y: auto;
-            /* Scrollbar baru muncul jika item melebihi ruang yang tersedia */
-            padding-right: 5px;
-            margin-bottom: 10px;
+        .nav-arrow {
+            width: 50px;
+            height: 50px;
+            border-radius: 50%;
+            background: rgba(0, 0, 0, 0.6);
+            border: 2px solid rgba(255, 255, 255, 0.8);
+            color: white;
+            font-size: 1.5rem;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            cursor: pointer;
+            z-index: 10;
+            transition: all 0.3s ease;
+            box-shadow: 0 4px 15px rgba(0, 0, 0, 0.3);
+            user-select: none;
+        }
+
+        .nav-arrow:hover {
+            background: #ff4081;
+            border-color: #ff4081;
+            transform: scale(1.15);
+        }
+
+        .frame-carousel {
+            display: flex;
+            align-items: center;
+            gap: 25px;
+            overflow-x: auto;
+            scroll-behavior: smooth;
+            padding: 40px 20px;
+            width: 100%;
+            scrollbar-width: none;
+        }
+
+        .frame-carousel::-webkit-scrollbar {
+            display: none;
         }
 
         .frame-card {
-            padding: 6px;
-            border: 2px solid #e0e0e0;
-            border-radius: 8px;
+            flex: 0 0 230px;
+            height: 310px;
+            background: rgba(255, 255, 255, 0.15);
+            backdrop-filter: blur(8px);
+            border: 2px solid rgba(255, 255, 255, 0.2);
+            border-radius: 20px;
+            padding: 15px;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: space-between;
             cursor: pointer;
-            background: #fff;
-            text-align: center;
-            color: #333;
-            font-weight: 600;
-            font-size: 0.8rem;
-            position: relative;
+            opacity: 0.55;
+            transform: scale(0.88);
+            transition: all 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+            box-shadow: 0 8px 20px rgba(0, 0, 0, 0.2);
+        }
+
+        .frame-card:hover {
+            opacity: 0.85;
+            transform: scale(0.95) translateY(-5px);
+        }
+
+        .frame-card.active {
+            opacity: 1;
+            transform: scale(1.1) translateY(-10px);
+            border: 3px solid #ff4081;
+            background: rgba(255, 255, 255, 0.3);
+            box-shadow: 0 0 30px rgba(255, 64, 129, 0.8), inset 0 0 15px rgba(255, 64, 129, 0.4);
+            animation: pulseGlow 2s infinite alternate;
+        }
+
+        @keyframes pulseGlow {
+            0% {
+                box-shadow: 0 0 20px rgba(255, 64, 129, 0.7);
+            }
+
+            100% {
+                box-shadow: 0 0 35px rgba(255, 64, 129, 1);
+            }
         }
 
         .frame-card img {
             width: 100%;
-            height: 50px;
+            height: 210px;
             object-fit: contain;
-            border-radius: 4px;
-            margin-bottom: 4px;
+            border-radius: 10px;
+            transition: transform 0.3s ease;
         }
 
-        .frame-card.active {
-            border-color: #ff4081;
-            background: #fff0f5;
+        .frame-card.active img {
+            transform: scale(1.05);
         }
 
+        .frame-card span {
+            font-size: 1.05rem;
+            font-weight: bold;
+            color: #fff;
+            text-shadow: 0 2px 4px rgba(0, 0, 0, 0.6);
+            margin-top: 8px;
+        }
+
+        .step2-bottom-bar {
+            display: flex;
+            align-items: center;
+            gap: 15px;
+            width: 100%;
+            padding: 10px 0;
+        }
+
+        .btn-bottom-back {
+            flex: 0 0 160px;
+            background: rgba(20, 20, 30, 0.8);
+            color: #fff;
+            border: 1px solid rgba(255, 255, 255, 0.3);
+            border-radius: 25px;
+            padding: 14px;
+            font-weight: bold;
+            cursor: pointer;
+            transition: all 0.2s;
+        }
+
+        .btn-bottom-back:hover {
+            background: rgba(40, 40, 50, 0.9);
+        }
+
+        .btn-bottom-start {
+            flex: 1;
+            background: linear-gradient(90deg, #ff4081, #ff6e40);
+            color: white;
+            border: none;
+            padding: 14px 20px;
+            font-size: 1.1rem;
+            font-weight: bold;
+            border-radius: 25px;
+            cursor: pointer;
+            box-shadow: 0 4px 20px rgba(255, 64, 129, 0.5);
+            transition: all 0.2s ease;
+        }
+
+        .btn-bottom-start:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 6px 25px rgba(255, 64, 129, 0.7);
+        }
+
+        /* --- STEP 3: BOOTH --- */
         #step-booth {
             display: none;
             width: 100%;
@@ -344,7 +420,7 @@
             top: 50%;
             left: 50%;
             transform: translate(-50%, -50%);
-            font-size: 6rem;
+            font-size: 8rem;
             font-weight: bold;
             color: #ffeb3b;
             text-shadow: 0 0 20px rgba(0, 0, 0, 0.9);
@@ -458,7 +534,6 @@
             display: none;
         }
 
-        /* --- STYLES UNTUK QR CODE DI MOBILE & CEGAH DOUBLE --- */
         .qrcode-swal-container {
             display: flex;
             justify-content: center;
@@ -515,118 +590,64 @@
                 <label for="user-email">Email:</label>
                 <input type="email" id="user-email" placeholder="Contoh: user@email.com">
             </div>
-            <button class="btn" onclick="submitFormStep1()">Lanjut ke Pengaturan</button>
+            <button class="btn" onclick="submitFormStep1()">Lanjut ke Pilih Frame</button>
         </div>
 
-        <!-- STEP 2: SPLIT SCREEN -->
+        <!-- STEP 2: CAROUSEL PILIH FRAME (KAMERA BELUM AKTIF) -->
         <div id="step-2-frame">
-            <div class="split-left">
-                <div id="cam-container-preview" class="camera-container landscape">
-                    <video id="webcam-preview" class="filter-normal" autoplay playsinline></video>
-                    <img id="frame-preview-overlay" class="frame-overlay" src="" alt="Frame Overlay">
+            <div class="step2-header">
+                <div class="step2-title">Pilih Frame Photobooth</div>
+                <div class="filter-select-wrapper">
+                    <span>Filter:</span>
+                    <select id="camera-filter" onchange="applyFilter(this.value)">
+                        <option value="filter-normal">Normal</option>
+                        <option value="filter-grayscale">Grayscale</option>
+                        <option value="filter-sepia">Sepia</option>
+                        <option value="filter-vintage">Vintage</option>
+                        <option value="filter-bright">Bright & Contrast</option>
+                        <option value="filter-cool">Cool Blue</option>
+                    </select>
                 </div>
             </div>
 
-            <div class="split-right">
-                <div>
-                    <h3 style="margin-bottom: 10px; color: #ff4081; text-align: center;">Langkah 2: Pengaturan</h3>
+            <div class="carousel-wrapper">
+                <button class="nav-arrow" onclick="scrollCarousel(-1)">&lt;</button>
 
-                    <div class="form-group">
-                        <label for="photo-count">Jumlah Pose / Jepretan:</label>
-                        <select id="photo-count" onchange="updateTotalPhotos(this.value)">
-                            <option value="1">1 Jepretan (Single Photo)</option>
-                            <option value="2">2 Jepretan</option>
-                            <option value="3">3 Jepretan</option>
-                            <option value="4" selected>4 Jepretan (Photo Strip)</option>
-                        </select>
+                <div class="frame-carousel" id="frameCarousel">
+                    @forelse($photobooth->frames as $key => $frame)
+                    @php
+                    $frameUrl = str_contains($frame->frame_path, 'photobooth/')
+                    ? asset('storage/' . $frame->frame_path)
+                    : asset('storage/photobooth/' . $frame->frame_path);
+                    @endphp
+                    <div class="frame-card {{ $key === 0 ? 'active' : '' }}"
+                        data-src="{{ $frameUrl }}"
+                        data-orientation="{{ $frame->orientation ?? 'portrait' }}"
+                        onclick="selectFrame(this)">
+                        <img src="{{ $frameUrl }}" alt="{{ $frame->frame_name }}">
+                        <span>{{ $frame->frame_name }}</span>
                     </div>
-
-                    <div class="form-group" id="layout-group">
-                        <label>Tata Letak Hasil Gabungan:</label>
-                        <div class="layout-options">
-                            <div class="layout-card active" data-layout="vertical" onclick="selectLayout(this)">
-                                <div class="layout-icon">
-                                    <svg width="30" height="38" viewBox="0 0 30 38" fill="none">
-                                        <rect x="2" y="2" width="26" height="10" rx="2" fill="#ff4081" stroke="#333" stroke-width="1.5" />
-                                        <rect x="2" y="14" width="26" height="10" rx="2" fill="#ff4081" stroke="#333" stroke-width="1.5" />
-                                        <rect x="2" y="26" width="26" height="10" rx="2" fill="#ff4081" stroke="#333" stroke-width="1.5" />
-                                    </svg>
-                                </div>
-                                <span>Atas - Bawah</span>
-                            </div>
-
-                            <div class="layout-card" data-layout="horizontal" onclick="selectLayout(this)">
-                                <div class="layout-icon">
-                                    <svg width="40" height="28" viewBox="0 0 40 28" fill="none">
-                                        <rect x="2" y="2" width="10" height="24" rx="2" fill="#2196F3" stroke="#333" stroke-width="1.5" />
-                                        <rect x="15" y="2" width="10" height="24" rx="2" fill="#2196F3" stroke="#333" stroke-width="1.5" />
-                                        <rect x="28" y="2" width="10" height="24" rx="2" fill="#2196F3" stroke="#333" stroke-width="1.5" />
-                                    </svg>
-                                </div>
-                                <span>Kiri - Kanan</span>
-                            </div>
-
-                            <div class="layout-card" data-layout="grid" id="layout-grid-card" onclick="selectLayout(this)">
-                                <div class="layout-icon">
-                                    <svg width="34" height="34" viewBox="0 0 34 34" fill="none">
-                                        <rect x="2" y="2" width="13" height="13" rx="2" fill="#4CAF50" stroke="#333" stroke-width="1.5" />
-                                        <rect x="19" y="2" width="13" height="13" rx="2" fill="#4CAF50" stroke="#333" stroke-width="1.5" />
-                                        <rect x="2" y="19" width="13" height="13" rx="2" fill="#4CAF50" stroke="#333" stroke-width="1.5" />
-                                        <rect x="19" y="19" width="13" height="13" rx="2" fill="#4CAF50" stroke="#333" stroke-width="1.5" />
-                                    </svg>
-                                </div>
-                                <span>Grid (2x2)</span>
-                            </div>
-                        </div>
-                    </div>
-
-                    <div class="form-group">
-                        <label for="camera-filter">Pilih Filter Kamera:</label>
-                        <select id="camera-filter" onchange="applyFilter(this.value)">
-                            <option value="filter-normal">Normal</option>
-                            <option value="filter-grayscale">Hitam Putih (Grayscale)</option>
-                            <option value="filter-sepia">Sepia (Klasik)</option>
-                            <option value="filter-vintage">Vintage / Retro</option>
-                            <option value="filter-bright">Bright & Contrast</option>
-                            <option value="filter-cool">Cool Blue</option>
-                        </select>
-                    </div>
-
-                    <label style="display: block; margin-bottom: 6px; font-size: 0.85rem; font-weight: 600; color: #444;">Pilih Frame Layout:</label>
-                    <div class="frame-options">
-                        @forelse($photobooth->frames as $key => $frame)
-                        @php
-                        $frameUrl = str_contains($frame->frame_path, 'photobooth/')
-                        ? asset('storage/' . $frame->frame_path)
-                        : asset('storage/photobooth/' . $frame->frame_path);
-                        @endphp
-                        <div class="frame-card {{ $key === 0 ? 'active' : '' }}"
-                            data-src="{{ $frameUrl }}"
-                            data-orientation="{{ $frame->orientation ?? 'portrait' }}"
-                            onclick="selectFrame(this)">
-                            <img src="{{ $frameUrl }}" alt="{{ $frame->frame_name }}">
-                            <span>{{ $frame->frame_name }}</span>
-                        </div>
-                        @empty
-                        <div class="text-muted small">Belum ada frame yang diupload.</div>
-                        @endforelse
-                    </div>
+                    @empty
+                    <div style="color: #fff; text-align: center;">Belum ada frame yang diupload.</div>
+                    @endforelse
                 </div>
 
-                <div>
-                    <button class="btn" onclick="goToStep3Booth()">Mulai Sesi Foto</button>
-                    <button class="btn btn-secondary" onclick="backToStep1()">Kembali ke Form</button>
-                </div>
+                <button class="nav-arrow" onclick="scrollCarousel(1)">&gt;</button>
+            </div>
+
+            <div class="step2-bottom-bar">
+                <button class="btn-bottom-back" onclick="backToStep1()">Kembali</button>
+                <button class="btn-bottom-start" onclick="goToStep3Booth()">Mulai Sesi Foto</button>
             </div>
         </div>
 
-        <!-- STEP 3: PEMOTRETAN -->
+        <!-- STEP 3: PEMOTRETAN (KAMERA AKTIF DI SINI & PERLUKAN KLIK UNTUK JEPRET) -->
         <div id="step-booth">
             <div class="booth-column" style="flex: 1.2;">
                 <div id="cam-container-main" class="camera-container landscape">
                     <video id="webcam" class="filter-normal" autoplay playsinline></video>
                     <img id="live-frame-overlay" class="frame-overlay" src="" alt="Frame Overlay">
-                    <div id="countdown" class="countdown">3</div>
+                    <div id="countdown" class="countdown">5</div>
                 </div>
             </div>
 
@@ -636,7 +657,7 @@
                     <div class="preview-gallery" id="preview-gallery"></div>
 
                     <div style="margin-top: 10px;">
-                        <button id="start-btn" class="btn" onclick="startPhotobooth()">Mulai Ambil Foto</button>
+                        <button id="start-btn" class="btn" onclick="startPhotobooth()">Ambil Foto / Jepret</button>
                         <button id="merge-btn" class="btn btn-merge" onclick="mergePhotos()">Proses & Dapatkan Barcode</button>
                         <button id="back-btn" class="btn btn-secondary" onclick="backToStep2()">Ganti Frame / Filter</button>
                     </div>
@@ -680,13 +701,8 @@
         const step2Frame = document.getElementById('step-2-frame');
         const stepBooth = document.getElementById('step-booth');
 
-        const videoPreview = document.getElementById('webcam-preview');
         const videoMain = document.getElementById('webcam');
-
-        const camContainerPreview = document.getElementById('cam-container-preview');
         const camContainerMain = document.getElementById('cam-container-main');
-
-        const framePreviewOverlay = document.getElementById('frame-preview-overlay');
         const liveOverlay = document.getElementById('live-frame-overlay');
 
         const canvas = document.getElementById('photo-strip');
@@ -703,10 +719,11 @@
         const userTableBody = document.getElementById('user-table-body');
 
         let currentOrientation = 'landscape';
-        let totalPhotos = 4;
-        let selectedLayout = 'vertical';
-        let photoWidth = 600,
-            photoHeight = 450;
+        let totalPhotos = 1;
+
+        let photoWidth = 1200,
+            photoHeight = 900;
+
         const PADDING = 20,
             BORDER_COLOR = '#ffffff',
             BORDER_WIDTH = 6;
@@ -759,52 +776,22 @@
 
         function updateOrientation(mode) {
             currentOrientation = mode;
-
-            camContainerPreview.classList.remove('landscape', 'portrait');
             camContainerMain.classList.remove('landscape', 'portrait');
-
-            camContainerPreview.classList.add(mode);
             camContainerMain.classList.add(mode);
 
             if (mode === 'portrait') {
-                photoWidth = 450;
-                photoHeight = 600;
+                photoWidth = 900;
+                photoHeight = 1200;
             } else {
-                photoWidth = 600;
-                photoHeight = 450;
-            }
-        }
-
-        function selectLayout(element) {
-            if (element.classList.contains('disabled')) return;
-
-            document.querySelectorAll('.layout-card').forEach(card => card.classList.remove('active'));
-            element.classList.add('active');
-            selectedLayout = element.getAttribute('data-layout');
-        }
-
-        function updateTotalPhotos(val) {
-            totalPhotos = parseInt(val);
-            renderPreviewSlots();
-
-            const gridCard = document.getElementById('layout-grid-card');
-            const verticalCard = document.querySelector('.layout-card[data-layout="vertical"]');
-
-            if (totalPhotos < 4) {
-                gridCard.classList.add('disabled');
-                if (selectedLayout === 'grid') {
-                    selectLayout(verticalCard);
-                }
-            } else {
-                gridCard.classList.remove('disabled');
+                photoWidth = 1200;
+                photoHeight = 900;
             }
         }
 
         function renderPreviewSlots() {
             previewGallery.innerHTML = '';
-
-            previewTitle.innerText = `Hasil Jepretan (${totalPhotos} Pose)`;
-            startBtn.innerText = `Mulai Foto (${totalPhotos} Pose)`;
+            previewTitle.innerText = `Hasil Jepretan`;
+            startBtn.innerText = `Ambil Foto / Jepret`;
 
             for (let i = 0; i < totalPhotos; i++) {
                 const slot = document.createElement('div');
@@ -817,11 +804,10 @@
 
         function applyFilter(filterClass) {
             currentFilterClass = filterClass;
-            videoPreview.className = filterClass;
             videoMain.className = filterClass;
         }
 
-        async function submitFormStep1() {
+        function submitFormStep1() {
             const name = document.getElementById('user-name').value.trim();
             const phone = document.getElementById('user-phone').value.trim();
             const email = document.getElementById('user-email').value.trim();
@@ -835,41 +821,19 @@
                 return;
             }
 
-            Swal.fire({
-                title: 'Memuat Kamera...',
-                allowOutsideClick: false,
-                didOpen: () => {
-                    Swal.showLoading();
-                }
-            });
+            // Pindah ke Step 2 tanpa mengaktifkan kamera
+            step1Form.style.display = 'none';
+            step2Frame.style.display = 'flex';
 
-            try {
-                await startCamera();
-                Swal.close();
-
-                step1Form.style.display = 'none';
-                step2Frame.style.display = 'flex';
-
-                videoPreview.srcObject = mediaStream;
-
-                // Set orientasi awal sesuai frame yang aktif
-                const activeCard = document.querySelector('.frame-card.active');
-                if (activeCard) {
-                    selectFrame(activeCard);
-                } else {
-                    updateOrientation(currentOrientation);
-                    updateFrameOverlay();
-                }
-
-                renderPreviewSlots();
-
-            } catch (err) {
-                Swal.fire({
-                    icon: 'error',
-                    title: 'Kamera Gagal',
-                    text: err.message
-                });
+            const activeCard = document.querySelector('.frame-card.active');
+            if (activeCard) {
+                selectFrame(activeCard);
+            } else {
+                updateOrientation(currentOrientation);
+                updateFrameOverlay();
             }
+
+            renderPreviewSlots();
         }
 
         function backToStep1() {
@@ -885,43 +849,82 @@
             selectedFrameSrc = element.getAttribute('data-src');
             const frameOrientation = element.getAttribute('data-orientation') || 'portrait';
 
-            // Otomatis ubah mode orientasi kamera berdasarkan data frame
+            element.scrollIntoView({
+                behavior: 'smooth',
+                block: 'nearest',
+                inline: 'center'
+            });
+
             updateOrientation(frameOrientation);
             updateFrameOverlay();
+        }
+
+        function scrollCarousel(direction) {
+            const carousel = document.getElementById('frameCarousel');
+            carousel.scrollBy({
+                left: direction * 260,
+                behavior: 'smooth'
+            });
         }
 
         function updateFrameOverlay() {
             if (selectedFrameSrc) {
                 frameImageObj.src = selectedFrameSrc;
-                framePreviewOverlay.src = selectedFrameSrc;
                 liveOverlay.src = selectedFrameSrc;
             }
         }
 
-        function goToStep3Booth() {
+        async function goToStep3Booth() {
             if (!selectedFrameSrc) {
                 Swal.fire('Perhatian', 'Silakan pilih frame terlebih dahulu!', 'warning');
                 return;
             }
 
-            step2Frame.style.display = 'none';
-            stepBooth.style.display = 'flex';
+            Swal.fire({
+                title: 'Memuat Kamera...',
+                allowOutsideClick: false,
+                didOpen: () => {
+                    Swal.showLoading();
+                }
+            });
 
-            videoMain.srcObject = mediaStream;
-            resetBoothState();
+            try {
+                // Aktifkan Kamera baru di Step 3
+                await startCamera();
+                videoMain.srcObject = mediaStream;
+                Swal.close();
+
+                step2Frame.style.display = 'none';
+                stepBooth.style.display = 'flex';
+
+                resetBoothState();
+            } catch (err) {
+                Swal.fire({
+                    icon: 'error',
+                    title: 'Kamera Gagal',
+                    text: err.message
+                });
+            }
         }
 
         function backToStep2() {
             resetBoothState();
             stepBooth.style.display = 'none';
             step2Frame.style.display = 'flex';
-            videoPreview.srcObject = mediaStream;
+            stopCamera(); // Matikan kamera saat kembali ke Step 2
         }
 
         async function startCamera() {
             if (!mediaStream) {
                 mediaStream = await navigator.mediaDevices.getUserMedia({
-                    video: true,
+                    video: {
+                        width: {
+                            ideal: 1920
+                        },
+                        height: {
+                            ideal: 1080
+                        }
+                    },
                     audio: false
                 });
             }
@@ -951,7 +954,8 @@
             framedPhotos = [];
 
             for (let i = 0; i < totalPhotos; i++) {
-                await runCountdown(3);
+                // Hitung mundur 5 detik
+                await runCountdown(5);
                 captureFramedPhoto(i);
             }
 
@@ -989,11 +993,9 @@
             tempCanvas.height = photoHeight;
             const tempCtx = tempCanvas.getContext('2d');
 
-            // 1. Ambil filter dari video webcam
             const filterStyles = getComputedStyle(videoMain).filter;
             tempCtx.filter = filterStyles !== 'none' ? filterStyles : 'none';
 
-            // 2. Hitung Crop (Object-Fit: Cover) agar foto tidak gepeng di mode Portrait
             const videoWidth = videoMain.videoWidth || photoWidth;
             const videoHeight = videoMain.videoHeight || photoHeight;
 
@@ -1003,31 +1005,26 @@
             let sx, sy, sWidth, sHeight;
 
             if (videoAspect > canvasAspect) {
-                // Video terlalu lebar (potong sisi kiri & kanan)
                 sHeight = videoHeight;
                 sWidth = videoHeight * canvasAspect;
                 sx = (videoWidth - sWidth) / 2;
                 sy = 0;
             } else {
-                // Video terlalu tinggi (potong sisi atas & bawah)
                 sWidth = videoWidth;
                 sHeight = videoWidth / canvasAspect;
                 sx = 0;
                 sy = (videoHeight - sHeight) / 2;
             }
 
-            // 3. Mirroring Horizontal (agar hasil foto sesuai tampilan cermin kamera)
             tempCtx.translate(photoWidth, 0);
             tempCtx.scale(-1, 1);
 
-            // 4. Gambar potongan video (Crop Center) ke Canvas
             tempCtx.drawImage(
                 videoMain,
-                sx, sy, sWidth, sHeight, // Sumber video yang dipotong
-                0, 0, photoWidth, photoHeight // Ukuran tujuan di canvas
+                sx, sy, sWidth, sHeight,
+                0, 0, photoWidth, photoHeight
             );
 
-            // 5. Reset Transformasi & Filter untuk menempelkan Frame PNG bawaan
             tempCtx.setTransform(1, 0, 0, 1, 0, 0);
             tempCtx.filter = 'none';
 
@@ -1044,49 +1041,22 @@
         function mergePhotos() {
             if (framedPhotos.length < totalPhotos) return;
 
-            let cols = 1;
-            let rows = totalPhotos;
-
-            if (selectedLayout === 'horizontal') {
-                cols = totalPhotos;
-                rows = 1;
-            } else if (selectedLayout === 'grid' && totalPhotos >= 4) {
-                cols = 2;
-                rows = Math.ceil(totalPhotos / 2);
-            } else {
-                cols = 1;
-                rows = totalPhotos;
-            }
-
-            canvas.width = (photoWidth * cols) + (PADDING * (cols + 1));
-            canvas.height = (photoHeight * rows) + (PADDING * (rows + 1));
+            canvas.width = photoWidth + (PADDING * 2);
+            canvas.height = photoHeight + (PADDING * 2);
 
             ctx.fillStyle = '#ffffff';
             ctx.fillRect(0, 0, canvas.width, canvas.height);
 
-            let loadedCount = 0;
+            const img = new Image();
+            img.src = framedPhotos[0];
+            img.onload = () => {
+                ctx.drawImage(img, PADDING, PADDING, photoWidth, photoHeight);
+                ctx.strokeStyle = BORDER_COLOR;
+                ctx.lineWidth = BORDER_WIDTH;
+                ctx.strokeRect(PADDING, PADDING, photoWidth, photoHeight);
 
-            framedPhotos.forEach((src, index) => {
-                const img = new Image();
-                img.src = src;
-                img.onload = () => {
-                    const colIndex = index % cols;
-                    const rowIndex = Math.floor(index / cols);
-
-                    const xOffset = PADDING + colIndex * (photoWidth + PADDING);
-                    const yOffset = PADDING + rowIndex * (photoHeight + PADDING);
-
-                    ctx.drawImage(img, xOffset, yOffset, photoWidth, photoHeight);
-                    ctx.strokeStyle = BORDER_COLOR;
-                    ctx.lineWidth = BORDER_WIDTH;
-                    ctx.strokeRect(xOffset, yOffset, photoWidth, photoHeight);
-
-                    loadedCount++;
-                    if (loadedCount === totalPhotos) {
-                        saveToDatabase(canvas.toDataURL('image/png'));
-                    }
-                };
-            });
+                saveToDatabase(canvas.toDataURL('image/png'));
+            };
         }
 
         function saveToDatabase(base64Image) {
@@ -1131,7 +1101,6 @@
                                 <div class="qrcode-swal-container">
                                     <div id="swal-qrcode"></div>
                                 </div>
-                                <p style="margin-top:10px;"><a href="${shareUrl}" target="_blank" style="color:#2196F3; font-weight:bold;">Buka Link Direct</a></p>
                             `,
                             icon: 'success',
                             confirmButtonText: 'OK / Selesai',
