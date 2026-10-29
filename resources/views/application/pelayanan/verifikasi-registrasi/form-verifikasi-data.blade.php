@@ -103,27 +103,27 @@
             <h6 class="mb-0 text-white fw-bold">Verifikasi Data Registrasi</h6>
         </div>
         <span class="badge bg-white text-primary rounded-pill px-3 py-1 fs--2 fw-bold shadow-sm">
-            <i class="fas fa-hashtag me-1"></i>{{ $pasien->d_reg_order_code }}
+            <i class="fas fa-hashtag me-1"></i>{{ $pasien->no_registrasi }}
         </span>
     </div>
 
     <!-- Content Area Compact Grid -->
     <div class="row g-3 p-3" id="menu-registrasi-pasien">
 
-        <!-- KOLOM KIRI: Ringkasan Identitas Pasien (Colorful & Compact) -->
+        <!-- KOLOM KIRI: Ringkasan Identitas Pasien -->
         <div class="col-lg-5">
             <div class="profile-card-mini p-3 h-100 border-top border-3 border-primary">
                 <form id="form-create-pasien-baru" method="POST">
                     @csrf
-                    <input type="hidden" name="no_reg" id="no_reg" value="{{ $pasien->d_reg_order_code }}">
+                    <input type="hidden" name="no_reg" id="no_reg" value="{{ $pasien->registrasi_id }}">
 
                     <!-- Mini Profile Header Colorful -->
                     <div class="d-flex align-items-center gap-3 pb-2 mb-2 border-bottom">
                         <div class="position-relative flex-shrink-0">
-                            @if ($pasien->master_patient_profile == "")
+                            @if (empty($pasien->master_patient_profile))
                             <img src="{{ asset('img/pasien.png') }}" class="rounded-circle p-1 bg-soft-primary border border-primary border-2" width="45" height="45" alt="Avatar" id="videoPreview">
                             @else
-                            <img src="{{ Storage::url($pasien->master_patient_profile) }}" class="rounded-circle p-1 bg-soft-primary border border-primary border-2 object-fit-cover" width="45" height="45" alt="Avatar" id="videoPreview">
+                            <img src="{{ $pasien->master_patient_profile }}" class="rounded-circle p-1 bg-soft-primary border border-primary border-2 object-fit-cover" width="45" height="45" alt="Avatar" id="videoPreview">
                             @endif
                         </div>
                         <div class="overflow-hidden">
@@ -147,58 +147,49 @@
                             <label class="label-mini-color text-danger">
                                 <i class="fas fa-venus-mars text-danger"></i> Jenis Kelamin
                             </label>
-                            <input type="text" name="jk" class="form-control form-control-compact" value="{{ $pasien->master_patient_jk }}" readonly>
+                            <input type="text" name="jk" class="form-control form-control-compact" value="{{ $pasien->master_patient_jk == 'L' ? 'Laki-Laki' : 'Perempuan' }}" readonly>
                         </div>
 
                         <div class="col-6">
                             <label class="label-mini-color text-warning">
                                 <i class="fas fa-calendar-alt text-warning"></i> Tgl Lahir
                             </label>
-                            <input type="text" name="tgl_lahir" class="form-control form-control-compact" value="{{ $pasien->master_patient_tgl_lahir }}" readonly>
+                            <input type="text" name="tgl_lahir" class="form-control form-control-compact" value="{{ $pasien->master_patient_tgl_lahir ? date('d-m-Y', strtotime($pasien->master_patient_tgl_lahir)) : '-' }}" readonly>
                         </div>
 
                         <div class="col-6">
                             <label class="label-mini-color text-success">
                                 <i class="fas fa-map-marker-alt text-success"></i> Tempat Lahir
                             </label>
-                            <input type="text" name="tempat_lahir" class="form-control form-control-compact" value="{{ $pasien->master_patient_tempat_lahir }}" readonly>
+                            <input type="text" name="tempat_lahir" class="form-control form-control-compact" value="{{ $pasien->master_patient_tempat_lahir ?? '-' }}" readonly>
                         </div>
 
                         <div class="col-6">
                             <label class="label-mini-color text-info">
                                 <i class="fas fa-phone-alt text-info"></i> No. HP
                             </label>
-                            <input type="text" name="no_hp" class="form-control form-control-compact" value="{{ $pasien->master_patient_no_hp }}" readonly>
+                            <input type="text" name="no_hp" class="form-control form-control-compact" value="{{ $pasien->master_patient_no_hp ?? '-' }}" readonly>
                         </div>
 
                         <div class="col-6">
                             <label class="label-mini-color text-purple">
                                 <i class="fas fa-pray text-purple"></i> Agama
                             </label>
-                            <input type="text" name="agama" class="form-control form-control-compact" value="{{ $pasien->master_patient_agama }}" readonly>
+                            <input type="text" name="agama" class="form-control form-control-compact" value="{{ $pasien->master_patient_agama ?? '-' }}" readonly>
                         </div>
 
                         <div class="col-6">
-                            <label class="label-mini-color text-primary">
-                                <i class="fas fa-city text-primary"></i> Provinsi
-                            </label>
-                            <select name="provinsi" id="data_provinsi" class="form-select form-control-compact py-0">
-                                <option value="">Pilih...</option>
-                            </select>
-                        </div>
-
-                        <div class="col-12">
                             <label class="label-mini-color text-secondary">
                                 <i class="fas fa-envelope text-secondary"></i> Email
                             </label>
-                            <input type="text" name="email" class="form-control form-control-compact" value="{{ $pasien->master_patient_email }}" readonly>
+                            <input type="text" name="email" class="form-control form-control-compact" value="{{ $pasien->master_patient_email ?? '-' }}" readonly>
                         </div>
 
                         <div class="col-12">
                             <label class="label-mini-color text-dark">
                                 <i class="fas fa-home text-dark"></i> Alamat Lengkap
                             </label>
-                            <textarea class="form-control form-control-compact" name="alamat" id="inputAddress3" rows="2" style="height: auto;" placeholder="Alamat">{{ $pasien->master_patient_alamat }}</textarea>
+                            <textarea class="form-control form-control-compact" name="alamat" id="inputAddress3" rows="2" style="height: auto;" placeholder="Alamat" readonly>{{ $pasien->master_patient_alamat ?? '-' }}</textarea>
                         </div>
                     </div>
                 </form>
@@ -222,8 +213,8 @@
                     @foreach ($data as $datas)
                     <li class="nav-item" role="presentation">
                         <button class="nav-link" id="button-data-verifikasi"
-                            data-code="{{ $datas->d_reg_order_list_code }}" data-bs-toggle="tab" href="#pill-tab-home"
-                            role="tab" aria-controls="pill-tab-home{{ $datas->id_d_reg_order_list }}" aria-selected="true">
+                            data-code="{{ $datas->detail_id }}" data-bs-toggle="tab" href="#pill-tab-home"
+                            role="tab" aria-controls="pill-tab-home{{ $datas->detail_id }}" aria-selected="true">
                             <i class="fas fa-check-circle me-1 text-success"></i>{{ $datas->t_layanan_cat_name }}
                         </button>
                     </li>

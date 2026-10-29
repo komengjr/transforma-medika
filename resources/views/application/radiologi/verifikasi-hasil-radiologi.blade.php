@@ -39,6 +39,68 @@
         pointer-events: none;
     }
 
+    /* Filter Bar Atas */
+    .filter-wrapper {
+        background: #ffffff;
+        border: 1px solid #d1d5db;
+        padding: 10px;
+        display: flex;
+        gap: 10px;
+        align-items: center;
+        margin-bottom: 20px;
+        border-radius: 12px;
+        box-shadow: 0 4px 16px rgba(0, 0, 0, 0.04);
+    }
+
+    .custom-input-box {
+        border: 1px solid #9ca3af;
+        border-radius: 6px;
+        padding: 18px 10px 4px 10px;
+        position: relative;
+        background: #fff;
+        flex: 1;
+    }
+
+    .custom-input-box label {
+        position: absolute;
+        top: 4px;
+        left: 8px;
+        font-size: 10px;
+        color: #6b7280;
+        pointer-events: none;
+        font-weight: 600;
+    }
+
+    .custom-input-box input,
+    .custom-input-box select {
+        border: none;
+        outline: none;
+        width: 100%;
+        background: transparent;
+        font-size: 13px;
+        color: #374151;
+        padding: 0;
+        font-weight: 500;
+    }
+
+    .btn-search-blue {
+        background-color: #0284c7;
+        color: white;
+        border: none;
+        border-radius: 6px;
+        padding: 0 20px;
+        height: 42px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        cursor: pointer;
+        transition: 0.2s;
+    }
+
+    .btn-search-blue:hover {
+        background-color: #0369a1;
+    }
+
     /* Card Table Frame */
     .rad-card {
         background: #ffffff;
@@ -107,18 +169,6 @@
         border: 1px solid rgba(56, 189, 248, 0.3);
         box-shadow: 0 20px 50px rgba(15, 23, 42, 0.5);
     }
-
-    /* Flatpickr Input Custom */
-    .rad-date-input {
-        border-radius: 20px !important;
-        border: 1px solid rgba(255, 255, 255, 0.3);
-        background: rgba(255, 255, 255, 0.15) !important;
-        color: #fff !important;
-    }
-
-    .rad-date-input::placeholder {
-        color: #cbd5e1 !important;
-    }
 </style>
 @endsection
 
@@ -135,12 +185,12 @@
                     </div>
                     <div>
                         <div class="d-flex align-items-center gap-2 mb-1">
-                            <span class="badge bg-info bg-opacity-20 text-cyan px-2 py-1 rounded-pill fw-semibold" style="font-size: 0.7rem; color: #38bdf8;">
-                                <i class="fas fa-radiation me-1"></i> TRANS MANAGEMENT SYSTEM
+                            <span class="badge bg-info bg-opacity-20 text-cyan px-2 py-1 rounded-pill fw-semibold" style="font-size: 0.7rem;">
+                                <i class="fas fa-radiation me-1"></i> MEDICAL SUITE v2.4
                             </span>
                         </div>
                         <h4 class="fw-bold mb-0 text-white" style="font-size: 1.3rem;">
-                            Welcome to <span style="color: #38bdf8;">Management System</span>
+                            Dokter: <span style="color: #38bdf8;">Pengisian & Verifikasi Ekspertise</span>
                         </h4>
                         <p class="text-white-50 mb-0 small" style="font-size: 0.75rem;">Modul Verifikasi & Processing Hasil Pemeriksaan Radiologi</p>
                     </div>
@@ -149,7 +199,7 @@
                 <div class="d-flex align-items-center">
                     <div class="bg-white bg-opacity-10 border border-info border-opacity-30 px-3 py-2 rounded-pill backdrop-blur">
                         <span class="text-info fw-bold mb-0" style="font-size: 0.9rem; color: #38bdf8 !important;">
-                            <i class="fas fa-notes-medical me-2"></i>Radiologi : Data Registrasi
+                            <i class="fas fa-notes-medical me-2"></i>Radiologi : Ekspertise
                         </span>
                     </div>
                 </div>
@@ -158,13 +208,62 @@
     </div>
 </div>
 
+<!-- FILTER BAR ATAS (AJAX Form) -->
+<form id="form-filter-verifikasi" class="filter-wrapper">
+    <!-- Tanggal Awal -->
+    <div class="custom-input-box" style="flex: 0.8;">
+        <label>Tanggal Awal</label>
+        <input type="text" class="datetimepicker" name="tgl_awal" value="{{ date('Y-m-d') }}" data-options='{"dateFormat":"Y-m-d","disableMobile":true}'>
+    </div>
+
+    <!-- Tanggal Akhir -->
+    <div class="custom-input-box" style="flex: 0.8;">
+        <label>Tanggal Akhir</label>
+        <input type="text" class="datetimepicker" name="tgl_akhir" value="{{ date('Y-m-d') }}" data-options='{"dateFormat":"Y-m-d","disableMobile":true}'>
+    </div>
+
+    <!-- Cari -->
+    <div class="custom-input-box" style="flex: 1.2;">
+        <label>Cari...</label>
+        <input type="text" name="cari" placeholder="No Reg / Nama / RM">
+    </div>
+
+    <!-- Kel. Pelanggan -->
+    <div class="custom-input-box" style="flex: 1;">
+        <label>Kel. Pelanggan</label>
+        <select name="penjamin">
+            <option value="Semua">Semua</option>
+            <option value="UMUM">UMUM</option>
+            <option value="PASIEN KLINIS">PASIEN KLINIS</option>
+            <option value="ASURANSI">ASURANSI</option>
+        </select>
+    </div>
+
+    <!-- Pemeriksaan (X-Ray, USG, dll) -->
+    <div class="custom-input-box" style="flex: 1;">
+        <label>Pemeriksaan</label>
+        <select name="pemeriksaan">
+            <option value="Semua">Semua Pemeriksaan</option>
+            <option value="X-RAY">X-RAY / Rontgen</option>
+            <option value="USG">USG</option>
+            <option value="CT-SCAN">CT-SCAN</option>
+            <option value="MRI">MRI</option>
+        </select>
+    </div>
+
+    <!-- Tombol Submit Form -->
+    <button type="submit" class="btn-search-blue">
+        <i class="fas fa-search"></i>
+    </button>
+</form>
+
 <!-- MAIN TABLE CARD -->
 <div class="rad-card mb-4">
     <div class="rad-card-header">
         <div class="d-flex justify-content-between align-items-center flex-wrap gap-2">
             <div class="d-flex align-items-center gap-2">
                 <button class="btn btn-sm btn-outline-light rounded-circle p-2 d-flex align-items-center justify-content-center"
-                    onclick="location.reload();"
+                    onclick="loadDataVerifikasi();"
                     data-bs-toggle="tooltip"
                     title="Refresh Data"
                     style="width: 32px; height: 32px;">
@@ -175,130 +274,32 @@
                     <i class="fas fa-list-alt me-1 text-info"></i> Data Antrean & Verifikasi Hasil Radiologi
                 </span>
             </div>
-
-            <div class="d-flex align-items-center">
-                <div class="input-group input-group-sm">
-                    <span class="input-group-text bg-dark border-secondary text-info"><i class="fas fa-calendar-alt"></i></span>
-                    <input class="form-control datetimepicker ps-2 rad-date-input" id="timepicker3" type="text" placeholder="Filter Tanggal..." data-options='{"mode":"range","dateFormat":"d/m/Y","disableMobile":true,"locale":"en"}' />
-                </div>
-            </div>
         </div>
     </div>
 
     <div class="card-body p-0">
         <div class="table-responsive">
-            <table id="example" class="table table-hover align-middle table-radiologi w-100 mb-0">
+            <!-- Menghapus instansiasi bawaan DataTables untuk mencegah konflik saat inject HTML via AJAX -->
+            <table class="table table-hover align-middle table-radiologi w-100 mb-0">
                 <thead>
                     <tr>
                         <th class="text-center" style="width: 40px;">No</th>
-                        <th>No Registrasi</th>
-                        <th>Nama Pasien</th>
-                        <th>Kategori Pasien</th>
+                        <th>Identitas Pasien</th>
+                        <th>Kategori</th>
                         <th>Tanggal Reg</th>
-                        <th>Dokter Rujukan</th>
+                        <th>Dokter / Petugas</th>
                         <th class="text-center">Status Pembayaran</th>
-                        <th class="text-center">Status Reg</th>
+                        <th class="text-center">Status Pem.</th>
                         <th class="text-center" style="width: 100px;">Aksi</th>
                     </tr>
                 </thead>
-                <tbody class="fs--1">
-                    @php $no = 1; @endphp
-                    @foreach ($data as $datas)
-                    @php
-                    $user = DB::table('user_mains')
-                    ->select('fullname')
-                    ->where('userid', $datas->d_reg_order_rad_user)
-                    ->first();
-
-                    $pasien = DB::table('t_pasien_cat')
-                    ->where('t_pasien_cat_code', $datas->t_pasien_cat_code)
-                    ->first();
-
-                    $dokter = DB::table('master_doctor')
-                    ->where('master_doctor_code', $datas->d_reg_order_rad_dr_rujukan)
-                    ->first();
-
-                    $payment = DB::table('d_reg_order_payment')
-                    ->where('d_reg_order_list_code', $datas->d_reg_order_rad_code)
-                    ->first();
-                    @endphp
-                    <tr class="row-clickable"
-                        id="button-verifikasi-hasil"
-                        data-code="{{ $datas->d_reg_order_code }}"
-                        data-reg="{{ $datas->d_reg_order_rad_code }}"
-                        data-bs-toggle="modal"
-                        data-bs-target="#modal-radiologi-full">
-
-                        <td class="text-center fw-bold text-secondary">{{ $no++ }}</td>
-                        <td>
-                            <div class="mb-1">
-                                <span class="code-chip text-dark fs--2">{{ $datas->d_reg_order_code }}</span>
-                            </div>
-                            <div class="mb-1">
-                                <span class="code-chip code-chip-cyan fs--2">{{ $datas->d_reg_order_rad_code }}</span>
-                            </div>
-                            <div>
-                                @if ($user)
-                                <span class="badge bg-soft-primary text-primary fs--2"><i class="fas fa-user me-1"></i>{{ $user->fullname }}</span>
-                                @else
-                                <span class="badge bg-soft-secondary text-secondary fs--2">Unknown</span>
-                                @endif
-                            </div>
-                        </td>
-                        <td>
-                            <div class="fw-bold text-dark patient-name transition-base">{{ $datas->master_patient_name }}</div>
-                        </td>
-                        <td>
-                            @if ($pasien)
-                            <span class="badge bg-soft-info text-info fw-bold">{{ $pasien->t_pasien_cat_name }}</span>
-                            @else
-                            <span class="text-muted">-</span>
-                            @endif
-                        </td>
-                        <td>
-                            <span class="text-secondary"><i class="far fa-clock me-1 text-info"></i>{{ \Carbon\Carbon::parse($datas->d_reg_order_rad_date)->format('d/m/Y H:i') }}</span>
-                        </td>
-                        <td>
-                            @if ($dokter)
-                            <div class="fw-semibold text-dark">
-                                {{ $dokter->master_doctor_title_f }} {{ $dokter->master_doctor_name }} {{ $dokter->master_doctor_title_e }}
-                            </div>
-                            @else
-                            <span class="text-muted">-</span>
-                            @endif
-                        </td>
-                        <td class="text-center" onclick="event.stopPropagation();">
-                            @if ($payment)
-                            <span class="badge rounded-pill bg-soft-success text-success px-2 py-1"><i class="fas fa-check-circle me-1"></i>Lunas</span>
-                            @else
-                            <span class="badge rounded-pill bg-soft-danger text-danger px-2 py-1"><i class="fas fa-times-circle me-1"></i>Belum Lunas</span>
-                            @endif
-                        </td>
-                        <td class="text-center" onclick="event.stopPropagation();">
-                            @if ($datas->d_reg_order_rad_status == 0)
-                            <span class="badge rounded-pill bg-soft-warning text-warning px-2 py-1"><i class="fas fa-hourglass-half me-1"></i>Belum Diproses</span>
-                            @else
-                            <span class="badge rounded-pill bg-soft-success text-success px-2 py-1"><i class="fas fa-check me-1"></i>Selesai</span>
-                            @endif
-                        </td>
-                        <td class="text-center" onclick="event.stopPropagation();">
-                            <div class="dropdown font-sans-serif position-static">
-                                <button class="btn btn-sm btn-outline-info rounded-pill dropdown-toggle px-3" type="button" id="dropdownMenuButton{{ $no }}" data-bs-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
-                                    <i class="fas fa-cog me-1"></i>Menu
-                                </button>
-                                <div class="dropdown-menu dropdown-menu-end border shadow-sm py-2" aria-labelledby="dropdownMenuButton{{ $no }}">
-                                    <a class="dropdown-item text-primary fw-semibold" href="javascript:void(0)"
-                                        data-bs-toggle="modal"
-                                        data-bs-target="#modal-radiologi"
-                                        id="button-proses-handling"
-                                        data-code="{{ $datas->d_reg_order_rad_code }}">
-                                        <i class="fas fa-dna me-2 text-info"></i>Proses Verifikasi Pasien
-                                    </a>
-                                </div>
-                            </div>
+                <!-- ID tbody untuk render AJAX -->
+                <tbody id="tbody-verifikasi" class="fs--1">
+                    <tr>
+                        <td colspan="8" class="text-center py-4 text-muted">
+                            <i class="fas fa-spinner fa-spin me-2"></i> Memuat data verifikasi...
                         </td>
                     </tr>
-                    @endforeach
                 </tbody>
             </table>
         </div>
@@ -319,64 +320,139 @@
     </div>
 </div>
 
-<div class="modal fade" id="modal-radiologi" data-bs-keyboard="false" data-bs-backdrop="static" tabindex="-1" aria-labelledby="modalRadiologiLabel" aria-hidden="true">
-    <div class="modal-dialog modal-dialog-centered modal-xl" role="document">
-        <div class="modal-content rad-modal border-0 shadow-lg">
-            <div class="position-absolute top-0 end-0 mt-3 me-3 z-index-1">
-                <button class="btn-close btn btn-sm btn-circle d-flex flex-center transition-base bg-light" data-bs-dismiss="modal" aria-label="Close"></button>
-            </div>
-            <div id="menu-radiologi" class="p-3"></div>
-        </div>
-    </div>
-</div>
-
 <!-- Scripts -->
-<script src="https://cdn.datatables.net/2.2.2/js/dataTables.js"></script>
-<script src="https://cdn.datatables.net/2.2.2/js/dataTables.bootstrap5.js"></script>
-<script src="https://cdn.datatables.net/responsive/3.0.4/js/dataTables.responsive.js"></script>
-<script src="https://cdn.datatables.net/responsive/3.0.4/js/responsive.bootstrap5.js"></script>
 <script src="{{ asset('vendors/choices/choices.min.js') }}"></script>
 <script src="{{ asset('asset/js/flatpickr.js') }}"></script>
 <script src="{{ asset('asset/js/swetalert.js') }}"></script>
 
 <script>
-    $(document).ready(function() {
-        $('#example').DataTable({
-            responsive: true,
-            language: {
-                search: "_INPUT_",
-                searchPlaceholder: "Cari No Reg / Nama Pasien...",
-                lengthMenu: "Tampilkan _MENU_ data",
-                zeroRecords: "Tidak ada data registrasi radiologi",
-                info: "Menampilkan _START_ - _END_ dari _TOTAL_ data",
-                infoEmpty: "Data kosong",
-                infoFiltered: "(difilter dari total _MAX_ data)"
+    // Fungsi Global Load Data Table
+    function loadDataVerifikasi() {
+        var formData = $('#form-filter-verifikasi').serialize();
+
+        $('#tbody-verifikasi').html(`
+            <tr>
+                <td colspan="8" class="text-center py-5 text-muted">
+                    <div class="spinner-border text-primary mb-2" role="status"></div>
+                    <br>Mencari data...
+                </td>
+            </tr>
+        `);
+
+        $.ajax({
+            url: "{{ route('radiologi.get_data_verifikasi') }}",
+            type: "GET",
+            data: formData,
+            success: function(response) {
+                var html = '';
+                if (response.data && response.data.length > 0) {
+                    $.each(response.data, function(index, val) {
+
+                        // Badge Status Pembayaran
+                        var paymentBadge = '';
+                        if (val.status_pembayaran === 'LUNAS' || val.status_pembayaran === 'SEBAGIAN' || val.status_pembayaran === 'ASURANSI') {
+                            paymentBadge = '<span class="badge rounded-pill bg-soft-success text-success px-2 py-1"><i class="fas fa-check-circle me-1"></i>Lunas</span>';
+                        } else {
+                            paymentBadge = '<span class="badge rounded-pill bg-soft-danger text-danger px-2 py-1"><i class="fas fa-times-circle me-1"></i>Belum Lunas</span>';
+                        }
+
+                        // Badge Status Pemeriksaan
+                        var statusBadge = '';
+                        if (val.status_pemeriksaan === 'SELESAI') {
+                            statusBadge = '<span class="badge rounded-pill bg-soft-success text-success px-2 py-1"><i class="fas fa-check-double me-1"></i>Selesai / Menunggu Verif</span>';
+                        } else if (val.status_pemeriksaan === 'PROSES') {
+                            statusBadge = '<span class="badge rounded-pill bg-soft-warning text-warning px-2 py-1"><i class="fas fa-spinner fa-spin me-1"></i>Diproses Petugas</span>';
+                        } else {
+                            statusBadge = '<span class="badge rounded-pill bg-soft-danger text-danger px-2 py-1"><i class="fas fa-hourglass-half me-1"></i>Antrean</span>';
+                        }
+
+                        html += `
+                            <tr class="row-clickable" id="button-verifikasi-hasil" data-code="${val.registrasi_id}" data-reg="${val.order_rad_code}" data-bs-toggle="modal" data-bs-target="#modal-radiologi-full">
+                                <td class="text-center fw-bold text-secondary">${index + 1}</td>
+                                <td>
+                                    <div class="fw-bold text-dark patient-name transition-base">${val.master_patient_name}</div>
+                                    <div class="mt-1 d-flex gap-1">
+                                        <span class="code-chip text-dark fs--2" title="No Registrasi">${val.no_registrasi}</span>
+                                        <span class="code-chip code-chip-cyan fs--2" title="Order Code">${val.order_rad_code}</span>
+                                    </div>
+                                </td>
+                                <td>
+                                    <span class="badge bg-soft-info text-info fw-bold">${val.nama_penjamin}</span>
+                                </td>
+                                <td>
+                                    <span class="text-secondary"><i class="far fa-clock me-1 text-info"></i>${val.tanggal_registrasi_formatted}</span>
+                                </td>
+                                <td>
+                                    <span class="badge bg-soft-primary text-primary fs--2">
+                                        <i class="fas fa-user-md me-1"></i>${val.nama_dokter_petugas}
+                                    </span>
+                                </td>
+                                <td class="text-center" onclick="event.stopPropagation();">
+                                    ${paymentBadge}
+                                </td>
+                                <td class="text-center" onclick="event.stopPropagation();">
+                                    ${statusBadge}
+                                </td>
+                                <td class="text-center" onclick="event.stopPropagation();">
+                                    <button class="btn btn-sm btn-info rounded-pill px-3 fw-bold shadow-sm" type="button"
+                                            data-bs-toggle="modal"
+                                            data-bs-target="#modal-radiologi-full"
+                                            id="button-verifikasi-hasil"
+                                            data-code="${val.registrasi_id}"
+                                            data-reg="${val.order_rad_code}">
+                                        <i class="fas fa-pen-alt me-1"></i>Isi Ekspertise
+                                    </button>
+                                </td>
+                            </tr>
+                        `;
+                    });
+                } else {
+                    html = `
+                        <tr>
+                            <td colspan="8" class="text-center py-4 text-muted">
+                                <i class="fas fa-box-open fa-2x mb-2 opacity-50"></i><br>
+                                Tidak ada data verifikasi hasil radiologi.
+                            </td>
+                        </tr>
+                    `;
+                }
+                $('#tbody-verifikasi').html(html);
             },
-            pageLength: 10,
-            dom: "<'row p-3 align-items-center'<'col-sm-12 col-md-6'l><'col-sm-12 col-md-6'f>>" +
-                "<'row'<'col-sm-12'tr>>" +
-                "<'row p-3 align-items-center'<'col-sm-12 col-md-5'i><'col-sm-12 col-md-7'p>>"
+            error: function() {
+                $('#tbody-verifikasi').html('<tr><td colspan="8" class="text-center text-danger py-4">Gagal mengambil data dari server. Periksa koneksi atau route.</td></tr>');
+            }
+        });
+    }
+
+    $(document).ready(function() {
+        // Load data otomatis saat pertama kali dibuka
+        loadDataVerifikasi();
+
+        // Trigger load data saat form di-submit
+        $('#form-filter-verifikasi').on('submit', function(e) {
+            e.preventDefault();
+            loadDataVerifikasi();
         });
     });
 
-    // Event Handler: Verifikasi Hasil Detail (Click Row)
+    // Event Handler: Klik Row atau Tombol Isi Ekspertise
     $(document).on("click", "#button-verifikasi-hasil", function(e) {
         e.preventDefault();
-        var code = $(this).data("code");
-        var reg = $(this).data("reg");
+        var code = $(this).data("code"); // registrasi_id
+        var reg = $(this).data("reg"); // order_rad_code
 
         $('#menu-radiologi-full').html(`
             <div class="text-center my-5 py-4">
                 <div class="spinner-border text-info" role="status" style="width: 3.5rem; height: 3.5rem;">
                     <span class="visually-hidden">Loading...</span>
                 </div>
-                <h6 class="mt-3 fw-bold text-dark">Memuat Detail Verifikasi Hasil Radiologi...</h6>
+                <h6 class="mt-3 fw-bold text-dark">Memuat Detail Verifikasi Ekspertise Radiologi...</h6>
                 <p class="text-muted small mb-0">Mohon tunggu sebentar, data pemeriksaan sedang disiapkan.</p>
             </div>
         `);
 
         $.ajax({
-            url: "{{ route('hasil_radiologi_verifikasi_detail') }}",
+            url: "{{ route('menu_radiologi_verifikasi_handling_pasien') }}",
             type: "POST",
             cache: false,
             data: {
@@ -391,106 +467,10 @@
             $('#menu-radiologi-full').html(`
                 <div class="alert alert-danger border-0 rounded-3 text-center my-4 p-4" role="alert">
                     <i class="fas fa-exclamation-triangle fa-2x mb-2"></i>
-                    <h6>Gagal Memuat Detail Verifikasi</h6>
+                    <h6>Gagal Memuat Form Ekspertise</h6>
                     <p class="mb-0 small">Terjadi kesalahan sistem. Silakan coba beberapa saat lagi.</p>
                 </div>
             `);
-        });
-    });
-
-    // Event Handler: Preview Report
-    $(document).on("click", "#button-verifikasi-preview-report", function(e) {
-        e.preventDefault();
-        var code = $(this).data("code");
-        var reg = $(this).data("reg");
-
-        $('#view-map').html(`
-            <div class="text-center my-4 py-3">
-                <div class="spinner-border text-info" role="status">
-                    <span class="visually-hidden">Loading...</span>
-                </div>
-                <p class="text-muted small mt-2 mb-0">Menyiapkan Preview Laporan Hasil...</p>
-            </div>
-        `);
-
-        $.ajax({
-            url: "{{ route('verifikasi_radiologi_preview_report') }}",
-            type: "POST",
-            cache: false,
-            data: {
-                "_token": "{{ csrf_token() }}",
-                "code": code,
-                "reg": reg,
-            },
-            dataType: 'html',
-        }).done(function(data) {
-            $('#button-verifikasi-hasil-rad').show();
-            $('#view-map').html(`
-                <iframe src="data:application/pdf;base64, ${data}" style="width:100%; height:533px;" frameborder="0" class="rounded-3 shadow-sm"></iframe>
-            `);
-        }).fail(function() {
-            $('#view-map').html(`
-                <div class="alert alert-danger border-0 rounded-3 text-center my-3 p-3">
-                    <i class="fas fa-exclamation-circle me-2"></i>Gagal memuat pratinjau dokumen PDF.
-                </div>
-            `);
-        });
-    });
-
-    // Event Handler: Action Verifikasi Final (SweetAlert)
-    $(document).on("click", "#button-verifikasi-hasil-rad", function(e) {
-        e.preventDefault();
-        var code = $(this).data("code");
-        var reg = $(this).data("reg");
-
-        Swal.fire({
-            title: "Konfirmasi Verifikasi?",
-            text: "Apakah Anda yakin ingin memverifikasi hasil pemeriksaan radiologi ini?",
-            icon: "warning",
-            allowOutsideClick: false,
-            allowEscapeKey: false,
-            showCancelButton: true,
-            confirmButtonColor: "#0284c7",
-            cancelButtonColor: "#dc2626",
-            confirmButtonText: "<i class='fas fa-check me-1'></i> Ya, Verifikasi!",
-            cancelButtonText: "Batal"
-        }).then((result) => {
-            if (result.isConfirmed) {
-                Swal.fire({
-                    title: "Berhasil!",
-                    text: "Dokumen laporan telah diverifikasi.",
-                    icon: "success",
-                    timer: 1500,
-                    showConfirmButton: false
-                });
-
-                $('#menu-verifikasi-hasil').html(`
-                    <div class="text-center my-3 py-2">
-                        <div class="spinner-border text-info" role="status">
-                            <span class="visually-hidden">Loading...</span>
-                        </div>
-                    </div>
-                `);
-
-                $.ajax({
-                    url: "{{ route('hasil_radiologi_verifikasi_data') }}",
-                    type: "POST",
-                    cache: false,
-                    data: {
-                        "_token": "{{ csrf_token() }}",
-                        "code": code,
-                        "reg": reg,
-                    },
-                    dataType: 'html',
-                }).done(function(data) {
-                    $('#menu-verifikasi-hasil').html(data);
-                    location.reload();
-                }).fail(function() {
-                    $('#menu-verifikasi-hasil').html(`
-                        <div class="alert alert-danger text-center my-2">Gagal menyimpan verifikasi data.</div>
-                    `);
-                });
-            }
         });
     });
 </script>

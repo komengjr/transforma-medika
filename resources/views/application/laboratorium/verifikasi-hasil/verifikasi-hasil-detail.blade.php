@@ -39,18 +39,14 @@
                         <!-- Profil Pasien Avatar & Nama -->
                         <div class="text-center position-relative mb-3 pt-2">
                             <div class="avatar avatar-5xl shadow-lg rounded-circle mx-auto mb-3 position-relative p-1 bg-white border border-2 border-primary">
-                                @if (empty($data->master_patient_profile))
-                                <img src="{{ asset('img/pasien.png') }}" class="rounded-circle img-fluid w-100 h-100 object-fit-cover" alt="Foto Pasien" id="videoPreview">
-                                @else
-                                <img src="{{ Storage::url($data->master_patient_profile) }}" class="rounded-circle img-fluid w-100 h-100 object-fit-cover" alt="Foto Pasien" id="videoPreview">
-                                @endif
+                                <img src="{{ asset('img/pasien.png') }}" class="rounded-circle img-fluid w-100 h-100 object-fit-cover" alt="Foto Pasien">
                                 <span class="position-absolute bottom-0 end-0 p-2 bg-success border border-2 border-white rounded-circle" title="Pasien Aktif"></span>
                             </div>
 
-                            <h5 class="mb-1 fw-bold text-900 fs-0">{{ $data->master_patient_name }}</h5>
+                            <h5 class="mb-1 fw-bold text-900 fs-0">{{ $data->master_patient_name ?? '-' }}</h5>
                             <div class="d-flex align-items-center justify-content-center gap-1">
                                 <span class="badge bg-soft-secondary text-secondary fw-bold fs--2">
-                                    <i class="fas fa-id-badge me-1"></i>RM: {{ $data->master_patient_code }}
+                                    <i class="fas fa-id-badge me-1"></i>RM: {{ $data->master_patient_code ?? '-' }}
                                 </span>
                             </div>
                         </div>
@@ -64,19 +60,6 @@
 
                         <!-- Info Grid Cards -->
                         <div class="row g-2 fs--1">
-                            <!-- NIK -->
-                            <div class="col-12">
-                                <div class="p-2 rounded-2 bg-soft-info border border-info-subtle d-flex align-items-center">
-                                    <div class="icon-item icon-item-sm bg-info text-white rounded-2 me-2 flex-shrink-0">
-                                        <i class="fas fa-id-card"></i>
-                                    </div>
-                                    <div class="overflow-hidden">
-                                        <div class="fs--2 text-600 text-uppercase fw-semi-bold">Nomor Induk Kependudukan (NIK)</div>
-                                        <div class="fw-bold text-800 text-truncate">{{ $data->master_patient_nik ?? '-' }}</div>
-                                    </div>
-                                </div>
-                            </div>
-
                             <!-- Tanggal Lahir -->
                             <div class="col-6">
                                 <div class="p-2 rounded-2 bg-soft-warning border border-warning-subtle d-flex align-items-center h-100">
@@ -85,7 +68,7 @@
                                     </div>
                                     <div class="overflow-hidden">
                                         <div class="fs--2 text-600 text-uppercase fw-semi-bold">Tgl Lahir</div>
-                                        <div class="fw-bold text-800 fs--1">{{ $data->master_patient_tgl_lahir ?? '-' }}</div>
+                                        <div class="fw-bold text-800 fs--1">{{ !empty($data->master_patient_tgl_lahir) ? date('d/m/Y', strtotime($data->master_patient_tgl_lahir)) : '-' }}</div>
                                     </div>
                                 </div>
                             </div>
@@ -98,7 +81,15 @@
                                     </div>
                                     <div class="overflow-hidden">
                                         <div class="fs--2 text-600 text-uppercase fw-semi-bold">Gender</div>
-                                        <div class="fw-bold text-800 fs--1">{{ $data->master_patient_jk ?? '-' }}</div>
+                                        <div class="fw-bold text-800 fs--1">
+                                            @if(strtolower($data->master_patient_jk ?? '') == 'l' || strtolower($data->master_patient_jk ?? '') == 'laki-laki')
+                                            Laki-laki
+                                            @elseif(strtolower($data->master_patient_jk ?? '') == 'p' || strtolower($data->master_patient_jk ?? '') == 'perempuan')
+                                            Perempuan
+                                            @else
+                                            {{ $data->master_patient_jk ?? '-' }}
+                                            @endif
+                                        </div>
                                     </div>
                                 </div>
                             </div>
@@ -144,7 +135,7 @@
                         <div class="d-flex align-items-center gap-2">
                             <span id="text-status-verifikasi" class="fs--2 fw-semi-bold text-danger me-2"></span>
 
-                            <button class="btn btn-danger btn-sm px-4 shadow-sm" id="button-verifikasi-hasil-lab"
+                            <button class="btn btn-success btn-sm px-4 shadow-sm" id="button-verifikasi-hasil-lab"
                                 data-code="{{ $code }}" data-reg="{{ $reg }}" disabled>
                                 <i class="fas fa-exclamation-circle me-1" id="icon-button-verifikasi"></i>
                                 <span id="label-button-verifikasi">Hasil Belum Lengkap</span>
@@ -168,7 +159,7 @@
                                 </thead>
                                 <tbody>
                                     @foreach ($pemeriksaan as $pem)
-                                    <!-- Header Kelompok Utama -->
+                                    <!-- Header Layanan Utama -->
                                     <tr class="bg-soft-primary border-top border-primary border-2">
                                         <td colspan="6" class="fw-bold text-primary ps-3 py-2">
                                             <i class="fas fa-vial text-primary me-2"></i>{{ strtoupper($pem->t_pemeriksaan_list_name) }}
@@ -176,94 +167,91 @@
                                     </tr>
 
                                     @php
-                                    $sub = DB::table('t_pemeriksaan_list_val')
-                                    ->where('t_pemeriksaan_list_code', $pem->t_pemeriksaan_list_code)
+                                    // Ambil Parameter Utama (Tanpa Induk/Parent)
+                                    $parameters = DB::table('medical_master_parameter')
+                                    ->where('master_pemeriksaan_id', $pem->t_pemeriksaan_list_code)
+                                    ->whereNull('parent_id')
+                                    ->orderBy('urutan', 'ASC')
                                     ->get();
                                     @endphp
 
-                                    @foreach ($sub as $subs)
-                                    @php
-                                    // PENCARIAN DIREVISI MENGGUNAKAN COLUMN: order_lab_list_code
-                                    $nilai = DB::table('h_reg_lab')
-                                    ->where('order_lab_list_code', $pem->order_lab_list_code)
-                                    ->where('t_pem_list_val_code', $subs->t_pem_list_val_code)
-                                    ->first();
-
-                                    $is_child = !empty($subs->t_pem_list_val_opt_code);
-                                    @endphp
-
-                                    {{-- CASE 1: JIKA INI KEPALA TURUNAN (t_pem_list_val_opt == 'Y') --}}
-                                    @if ($subs->t_pem_list_val_opt == 'Y')
+                                    @foreach ($parameters as $param)
+                                    @if($param->is_group == 1)
+                                    <!-- JIKA INI GRUP (Cth: Hitung Jenis) -->
                                     <tr class="bg-soft-warning border-start border-3 border-warning">
                                         <td colspan="6" class="fw-bold text-800 ps-3 py-2">
-                                            <i class="fas fa-folder text-warning me-2 fs-0"></i>{{ $subs->t_pem_list_val_name }}
+                                            <i class="fas fa-folder text-warning me-2 fs-0"></i>{{ $param->nama_parameter }}
                                         </td>
                                     </tr>
 
-                                    {{-- CASE 2: PARAMETER INPUT (Bisa Anakan ATAU Parameter Mandiri) --}}
-                                    @else
-                                    <tr class="hover-actions-trigger">
-                                        <!-- Parameter Name -->
-                                        <td class="{{ $is_child ? 'ps-4' : 'ps-3' }}">
-                                            @if($is_child)
-                                            <!-- Jika Anak -->
-                                            <span class="text-400 me-2 fw-bold">↳</span>
-                                            <span class="text-700 fw-medium">{{ $subs->t_pem_list_val_name }}</span>
-                                            @else
-                                            <!-- Jika Parameter Mandiri -->
-                                            <span class="fw-bold text-800">{{ $subs->t_pem_list_val_name }}</span>
-                                            @endif
-                                        </td>
+                                    @php
+                                    $subParams = DB::table('medical_master_parameter')
+                                    ->where('parent_id', $param->id)
+                                    ->orderBy('urutan', 'ASC')
+                                    ->get();
+                                    @endphp
 
-                                        <!-- Input Hasil & Satuan -->
+                                    @foreach($subParams as $sub)
+                                    @php
+                                    $nilai = DB::table('medical_transaksi_hasil')
+                                    ->where('detail_id', $pem->detail_id)
+                                    ->where('parameter_id', $sub->id)
+                                    ->first();
+                                    @endphp
+                                    <!-- Anakan Parameter (Indentasi) -->
+                                    <tr class="hover-actions-trigger">
+                                        <td class="ps-4">
+                                            <span class="text-400 me-2 fw-bold">↳</span>
+                                            <span class="text-700 fw-medium">{{ $sub->nama_parameter }}</span>
+                                        </td>
                                         <td>
                                             <div class="input-group input-group-sm">
+                                                <!-- Disabled saat verifikasi, hanya re-check jika perlu -->
                                                 <input type="text" class="form-control text-end bg-white fw-bold text-primary"
-                                                    name="hasil[{{ $subs->t_pem_list_val_code }}]"
-                                                    value="{{ $nilai ? $nilai->h_reg_lab_value : '' }}">
-                                                @if(!empty($subs->t_pem_list_val_satuan))
-                                                <span class="input-group-text bg-100 text-600 px-2 fs--2 fw-semi-bold" style="min-width: 45px; justify-content: center;">
-                                                    {{ $subs->t_pem_list_val_satuan }}
+                                                    name="hasil[{{ $pem->detail_id }}][{{ $sub->id }}]"
+                                                    value="{{ $nilai ? $nilai->hasil : '' }}" readonly>
+                                                @if(!empty($sub->satuan))
+                                                <span class="input-group-text bg-100 text-600 px-2 fs--2 fw-semi-bold">
+                                                    {{ $sub->satuan }}
                                                 </span>
                                                 @endif
                                             </div>
                                         </td>
+                                        <td class="text-center fw-bold text-danger">{{ $nilai ? $nilai->flag : '-' }}</td>
+                                        <td class="text-center text-700 fs--2 fw-medium">{{ $sub->nilai_normal ?? '-' }}</td>
+                                        <!-- PERBAIKAN DI SINI -->
+                                        <td class="fs--2 text-center text-uppercase">{{ $sub->metode ?? '-' }}</td>
+                                        <td><input type="text" class="form-control form-control-sm fs--2 bg-white" value="{{ $nilai ? $nilai->catatan : '' }}" readonly></td>
+                                    </tr>
+                                    @endforeach
 
-                                        <!-- Dropdown Flag -->
-                                        <td class="text-center">
-                                            <select class="form-select form-select-sm text-center px-1 fw-bold text-danger" name="flag[{{ $subs->t_pem_list_val_code }}]">
-                                                <option value="">-</option>
-                                                <option value="N" {{ ($nilai && $nilai->h_reg_lab_flag == 'N') ? 'selected' : '' }}>N</option>
-                                                <option value="H" class="text-danger fw-bold" {{ ($nilai && $nilai->h_reg_lab_flag == 'H') ? 'selected' : '' }}>H</option>
-                                                <option value="L" class="text-warning fw-bold" {{ ($nilai && $nilai->h_reg_lab_flag == 'L') ? 'selected' : '' }}>L</option>
-                                                <option value="*" class="text-danger fw-bold" {{ ($nilai && $nilai->h_reg_lab_flag == '*') ? 'selected' : '' }}>*</option>
-                                            </select>
-                                        </td>
-
-                                        <!-- Nilai Rujukan -->
-                                        <td class="text-center text-700 fs--2 fw-medium">
-                                            {{ $subs->t_pem_list_val_rujukan ?? '-' }}
-                                        </td>
-
-                                        <!-- Dropdown Metode -->
+                                    @else
+                                    <!-- JIKA INI PARAMETER TUNGGAL (Cth: Hemoglobin) -->
+                                    @php
+                                    $nilai = DB::table('medical_transaksi_hasil')
+                                    ->where('detail_id', $pem->detail_id)
+                                    ->where('parameter_id', $param->id)
+                                    ->first();
+                                    @endphp
+                                    <tr class="hover-actions-trigger">
+                                        <td class="ps-3 fw-bold text-800">{{ $param->nama_parameter }}</td>
                                         <td>
-                                            <select class="form-select form-select-sm fs--2 text-uppercase" name="metode[{{ $subs->t_pem_list_val_code }}]">
-                                                <option value="">-- Pilih --</option>
-                                                <option value="LASER OPTICAL FLOWCY" {{ ($nilai && $nilai->h_reg_lab_metode == 'LASER OPTICAL FLOWCY') ? 'selected' : '' }}>LASER OPTICAL FLOWCY</option>
-                                                <option value="IMPEDANCE WITH HDFC" {{ ($nilai && $nilai->h_reg_lab_metode == 'IMPEDANCE WITH HDFC') ? 'selected' : '' }}>IMPEDANCE WITH HDFC</option>
-                                                <option value="SLS HEMOGLOBIN" {{ ($nilai && $nilai->h_reg_lab_metode == 'SLS HEMOGLOBIN') ? 'selected' : '' }}>SLS HEMOGLOBIN</option>
-                                                <option value="RBC PULSE HEIGHT DETE" {{ ($nilai && $nilai->h_reg_lab_metode == 'RBC PULSE HEIGHT DETE') ? 'selected' : '' }}>RBC PULSE HEIGHT DETE</option>
-                                                <option value="CALCULATION" {{ ($nilai && $nilai->h_reg_lab_metode == 'CALCULATION') ? 'selected' : '' }}>CALCULATION</option>
-                                                @if($nilai && !empty($nilai->h_reg_lab_metode))
-                                                <option value="{{ $nilai->h_reg_lab_metode }}" selected>{{ $nilai->h_reg_lab_metode }}</option>
+                                            <div class="input-group input-group-sm">
+                                                <input type="text" class="form-control text-end bg-white fw-bold text-primary"
+                                                    name="hasil[{{ $pem->detail_id }}][{{ $param->id }}]"
+                                                    value="{{ $nilai ? $nilai->hasil : '' }}" readonly>
+                                                @if(!empty($param->satuan))
+                                                <span class="input-group-text bg-100 text-600 px-2 fs--2 fw-semi-bold">
+                                                    {{ $param->satuan }}
+                                                </span>
                                                 @endif
-                                            </select>
+                                            </div>
                                         </td>
-
-                                        <!-- Input Catatan -->
-                                        <td>
-                                            <input type="text" class="form-control form-control-sm fs--2" name="catatan[{{ $subs->t_pem_list_val_code }}]" placeholder="...">
-                                        </td>
+                                        <td class="text-center fw-bold text-danger">{{ $nilai ? $nilai->flag : '-' }}</td>
+                                        <td class="text-center text-700 fs--2 fw-medium">{{ $param->nilai_normal ?? '-' }}</td>
+                                        <!-- PERBAIKAN DI SINI -->
+                                        <td class="fs--2 text-center text-uppercase">{{ $param->metode ?? '-' }}</td>
+                                        <td><input type="text" class="form-control form-control-sm fs--2 bg-white" value="{{ $nilai ? $nilai->catatan : '' }}" readonly></td>
                                     </tr>
                                     @endif
                                     @endforeach
@@ -276,7 +264,7 @@
                     <!-- Footer Modal -->
                     <div class="card-footer bg-light py-3 border-top d-flex justify-content-between align-items-center">
                         <button class="btn btn-falcon-default btn-sm" data-bs-dismiss="modal">
-                            <i class="fas fa-times me-1"></i> Batal
+                            <i class="fas fa-times me-1"></i> Tutup Form
                         </button>
                     </div>
                 </div>
@@ -289,12 +277,11 @@
 <script>
     $(document.body).ready(function() {
 
-        // Fungsi mengecek apakah semua input hasil terisi
         function checkFormCompleteness() {
             let totalInput = 0;
             let emptyCount = 0;
 
-            $('input[name^="hasil"]').each(function() {
+            $('input[name^="hasil["]').each(function() {
                 totalInput++;
                 if ($(this).val().trim() === '') {
                     emptyCount++;
@@ -307,30 +294,100 @@
             const $statusText = $('#text-status-verifikasi');
 
             if (emptyCount > 0) {
-                $btn.removeClass('btn-success')
-                    .addClass('btn-danger')
-                    .prop('disabled', true);
-
+                $btn.removeClass('btn-success').addClass('btn-danger').prop('disabled', true);
                 $icon.attr('class', 'fas fa-exclamation-circle me-1');
                 $label.text(`Belum Lengkap (${emptyCount} Kosong)`);
                 $statusText.html(`<i class="fas fa-info-circle me-1"></i> Ada ${emptyCount} parameter belum diisi`);
             } else {
-                $btn.removeClass('btn-danger')
-                    .addClass('btn-success')
-                    .prop('disabled', false);
-
+                $btn.removeClass('btn-danger').addClass('btn-success').prop('disabled', false);
                 $icon.attr('class', 'fas fa-check-circle me-1');
-                $label.text('Verifikasi Hasil');
+                $label.text('Verifikasi Hasil Sekarang');
                 $statusText.html('<span class="text-success"><i class="fas fa-check me-1"></i> Semua hasil siap diverifikasi</span>');
             }
         }
 
-        // Run otomatis saat load
         checkFormCompleteness();
 
-        // Real-time listener
-        $(document).on('input change', 'input[name^="hasil"]', function() {
-            checkFormCompleteness();
+        // ====================================================================
+        // TAMBAHKAN KODE INI UNTUK AKSI KLIK TOMBOL VERIFIKASI HASIL
+        // ====================================================================
+        $('#button-verifikasi-hasil-lab').off('click').on('click', function(e) {
+            e.preventDefault();
+            var code = $(this).data("code"); // registrasi_id
+            var reg = $(this).data("reg"); // no_registrasi
+            var $btn = $(this);
+
+            Swal.fire({
+                title: "Konfirmasi Verifikasi?",
+                text: "Anda yakin akan memverifikasi hasil ini? Dokumen PDF terenkripsi (Password Tgl Lahir) akan dibuat otomatis.",
+                icon: "warning",
+                showCancelButton: true,
+                confirmButtonColor: "#22c55e",
+                cancelButtonColor: "#ef4444",
+                confirmButtonText: "Ya, Verifikasi!",
+                cancelButtonText: "Batal",
+                reverseButtons: true
+            }).then((result) => {
+                if (result.isConfirmed) {
+                    // Tampilkan status loading pada tombol
+                    $btn.prop('disabled', true).html('<span class="spinner-border spinner-border-sm me-1"></span> Memproses PDF...');
+
+                    $.ajax({
+                        url: "{{ route('verifikasi_laboratorium_verifikasi_data') }}", // Pastikan nama route ini sudah benar di file web.php Anda
+                        type: "POST",
+                        cache: false,
+                        data: {
+                            "_token": "{{ csrf_token() }}",
+                            "code": code,
+                            "reg": reg,
+                        },
+                        success: function(response) {
+                            Swal.fire({
+                                title: "Terverifikasi!",
+                                text: "Hasil laboratorium berhasil diverifikasi dan dokumen PDF telah tersimpan.",
+                                icon: "success",
+                                timer: 2000,
+                                showConfirmButton: false
+                            }).then(() => {
+                                $('#modal-lab-full').modal('hide'); // Tutup Modal
+                                location.reload(); // Reload halaman untuk mereset DataTable
+                            });
+                        },
+                        error: function(xhr) {
+                            Swal.fire("Gagal!", "Terjadi kesalahan saat memverifikasi atau membuat PDF.", "error");
+                            $btn.prop('disabled', false).html('<i class="fas fa-check-circle me-1"></i> Verifikasi Hasil Sekarang');
+                        }
+                    });
+                }
+            });
+        });
+
+        // ====================================================================
+        // TAMBAHKAN KODE INI UNTUK PREVIEW DOKUMEN (Opsional jika Anda pakai fitur ini)
+        // ====================================================================
+        $('#button-verifikasi-preview-report').off('click').on('click', function(e) {
+            e.preventDefault();
+            var code = $(this).data("code");
+            var reg = $(this).data("reg");
+
+            $('#view-map').html('<div class="text-center py-4"><div class="spinner-border text-primary" role="status"></div><p class="text-muted fs--1 mt-2">Menyiapkan pratinjau dokumen...</p></div>');
+
+            $.ajax({
+                url: "{{ route('verifikasi_laboratorium_preview_report') }}", // Sesuaikan nama route preview Anda
+                type: "POST",
+                cache: false,
+                data: {
+                    "_token": "{{ csrf_token() }}",
+                    "code": code,
+                    "reg": reg,
+                },
+                success: function(data) {
+                    $('#view-map').html('<iframe src="data:application/pdf;base64, ' + data + '" style="width:100%; height:450px;" frameborder="0" class="rounded-3 shadow-sm border"></iframe>');
+                },
+                error: function() {
+                    $('#view-map').html('<div class="alert alert-danger m-0 fs--1">Gagal memuat pratinjau laporan.</div>');
+                }
+            });
         });
 
     });

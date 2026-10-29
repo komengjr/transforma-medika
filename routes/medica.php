@@ -4,7 +4,9 @@ use App\Http\Controllers\ApplicationController;
 use App\Http\Controllers\KeuanganController;
 use App\Http\Controllers\LaboratoriumController;
 use App\Http\Controllers\MasterDataController;
+use App\Http\Controllers\Medic\LayananMedisController;
 use App\Http\Controllers\Medic\MasterMedController;
+use App\Http\Controllers\Medic\PasienController;
 use App\Http\Controllers\PelayananController;
 use App\Http\Controllers\PoliklinikController;
 use App\Http\Controllers\RadiologiController;
@@ -134,7 +136,7 @@ Route::prefix('application')->group(function () {
     Route::post('data-registrasi/refresh-data', [PelayananController::class, 'data_registrasi_refresh_data'])->name('data_registrasi_refresh_data');
     // SUPERVISIOR PELAYANAN
     Route::post('menu-pelayanan/menu-supervisior/find', [PelayananController::class, 'menu_pelayanan_supervisior_find'])->name('menu_pelayanan_supervisior_find');
-    Route::post('menu-pelayanan/menu-supervisior/detail-pasien', [PelayananController::class, 'menu_pelayanan_supervisior_detail_pasien'])->name('menu_pelayanan_supervisior_detail_pasien');
+    // Route::post('menu-pelayanan/menu-supervisior/detail-pasien', [PelayananController::class, 'menu_pelayanan_supervisior_detail_pasien'])->name('menu_pelayanan_supervisior_detail_pasien');
     // VERIFIKASI PENDAFTARAN
     Route::post('menu-pelayanan/verifikasi-data-registrasi/verifikasi', [PelayananController::class, 'menu_pelayanan_verifikasi_registrasi_data'])->name('menu_pelayanan_verifikasi_registrasi_data');
     Route::post('menu-pelayanan/verifikasi-data-registrasi/verifikasi-detail', [PelayananController::class, 'menu_pelayanan_verifikasi_registrasi_data_detail'])->name('menu_pelayanan_verifikasi_registrasi_data_detail');
@@ -147,3 +149,72 @@ Route::prefix('tat')->name('master_tat.')->group(function () {
     Route::post('/update-lab', [TatController::class, 'updateLab'])->name('update_lab');
     Route::post('/update-nonlab', [TatController::class, 'updateNonLab'])->name('update_nonlab');
 });
+
+Route::prefix('pasien')->group(function () {
+    Route::get('/search', [PasienController::class, 'search'])->name('pasien.search');
+    Route::post('/store', [PasienController::class, 'store'])->name('pasien.store');
+    Route::post('/update/{id}', [PasienController::class, 'update'])->name('pasien.update');
+});
+
+Route::get('/pemeriksaan/by-sub-penjamin/{id}', [LayananMedisController::class, 'getPemeriksaanBySubPenjamin']);
+// Route Proses Pembayaran dan Cetak Nota
+Route::post('/pembayaran/proses-cetak', [LayananMedisController::class, 'prosesDanCetak']);
+Route::get('/pembayaran/nota/{id}', [LayananMedisController::class, 'tampilkanNota'])->name('pembayaran.nota');
+
+Route::prefix('application')->group(function () {
+    Route::post('menu-laboratorium/data-registrasi-lab/handling', [LaboratoriumController::class, 'data_registrasi_lab_handling'])->name('data_registrasi_lab_handling');
+    Route::post('menu-laboratorium/data-registrasi-lab/handling-proses', [LaboratoriumController::class, 'data_registrasi_lab_handling_proses'])->name('data_registrasi_lab_handling_proses');
+    Route::post('menu-laboratorium/specimen-collection/detail', [LaboratoriumController::class, 'data_specimen_collection_lab_detail'])->name('data_specimen_collection_lab_detail');
+    Route::post('menu-laboratorium/specimen-collection/cari-data', [LaboratoriumController::class, 'data_specimen_collection_lab_cari_data'])->name('data_specimen_collection_lab_cari_data');
+    Route::get('menu-laboratorium/specimen-collection/print-barcode', [LaboratoriumController::class, 'data_specimen_collection_lab_print_barcode'])->name('data_specimen_collection_lab_print_barcode');
+    Route::post('menu-laboratorium/specimen-collection/print-barcode-proses', [LaboratoriumController::class, 'data_specimen_collection_lab_print_barcode_proses'])->name('data_specimen_collection_lab_print_barcode_proses');
+    Route::post('menu-laboratorium/specimen-collection/proses', [LaboratoriumController::class, 'data_specimen_collection_lab_proses'])->name('data_specimen_collection_lab_proses');
+    Route::post('menu-laboratorium/specimen-collection/proses-simpan', [LaboratoriumController::class, 'data_specimen_collection_lab_proses_simpan'])->name('data_specimen_collection_lab_proses_simpan');
+    Route::post('menu-laboratorium/specimen-collection/proses-fix-simpan', [LaboratoriumController::class, 'data_specimen_collection_lab_proses_simpan_fix'])->name('data_specimen_collection_lab_proses_simpan_fix');
+    Route::post('menu-laboratorium/proses-result/detail', [LaboratoriumController::class, 'menu_lab_proses_result_detail'])->name('menu_lab_proses_result_detail');
+    Route::post('menu-laboratorium/proses-result/detail/proses-sinkronisasi', [LaboratoriumController::class, 'menu_lab_proses_result_detail_sinkronisasi'])->name('menu_lab_proses_result_detail_sinkronisasi');
+    Route::post('menu-laboratorium/proses-result/detail/simpan-sinkronisasi', [LaboratoriumController::class, 'menu_lab_proses_result_simpan_sinkronisasi'])->name('menu_lab_proses_result_simpan_sinkronisasi');
+    Route::post('menu-laboratorium/proses-result/detail/proses-save', [LaboratoriumController::class, 'menu_lab_proses_result_detail_proses_save'])->name('menu_lab_proses_result_detail_proses_save');
+    Route::post('verifikasi-lab/verifikasi-hasil/detail', [LaboratoriumController::class, 'verifikasi_laboratorium_detail'])->name('verifikasi_laboratorium_detail');
+    Route::post('verifikasi-lab/verifikasi-hasil/verifikasi-data', [LaboratoriumController::class, 'verifikasi_laboratorium_verifikasi_data'])->name('verifikasi_laboratorium_verifikasi_data');
+    Route::post('verifikasi-lab/verifikasi-hasil/preview-report', [LaboratoriumController::class, 'verifikasi_laboratorium_preview_report'])->name('verifikasi_laboratorium_preview_report');
+    Route::post('verifikasi-lab/dokumentasi-hasil/detail', [LaboratoriumController::class, 'dokumentasi_hasil_laboratorium_detail'])->name('dokumentasi_hasil_laboratorium_detail');
+    Route::post('verifikasi-lab/dokumentasi-hasil/kirim-hasil', [LaboratoriumController::class, 'dokumentasi_hasil_laboratorium_detail_kirim_hasil'])->name('dokumentasi_hasil_laboratorium_detail_kirim_hasil');
+    Route::post('verifikasi-lab/dokumentasi-hasil/batal-kirim-hasil', [LaboratoriumController::class, 'dokumentasi_hasil_laboratorium_detail_batal_kirim_hasil'])->name('dokumentasi_hasil_laboratorium_detail_batal_kirim_hasil');
+    Route::post('verifikasi-lab/pengiriman-hasil/add', [LaboratoriumController::class, 'pengiriman_hasil_laboratorium_add'])->name('pengiriman_hasil_laboratorium_add');
+    Route::post('verifikasi-lab/pengiriman-hasil/save', [LaboratoriumController::class, 'pengiriman_hasil_laboratorium_save'])->name('pengiriman_hasil_laboratorium_save');
+    Route::get('verifikasi-lab/pengiriman-hasil/template', [LaboratoriumController::class, 'pengiriman_hasil_laboratorium_template'])->name('pengiriman_hasil_laboratorium_template');
+
+    Route::get('interface-lab/data-result/data', [LaboratoriumController::class, 'interfave_lab_data_result_get_data'])->name('interfave_lab_data_result_get_data');
+    Route::get('interface-lab/data-result/{id}/detail', [LaboratoriumController::class, 'interfave_lab_data_result_show_data_detail'])->name('interfave_lab_data_result_show_data_detail');
+    Route::get('interface-lab/data-result/{id}/raw', [LaboratoriumController::class, 'interfave_lab_data_result_show_data_raw'])->name('interfave_lab_data_result_show_data_raw');
+});
+
+Route::get('/pelayanan/get-specimen-barcode/{registrasi_id}', [PelayananController::class, 'getSpecimenBarcodeList'])->name('get_specimen_barcode_list');
+Route::get('/pelayanan/get-filter-options', [PelayananController::class, 'getFilterOptions'])->name('get_filter_options');
+Route::post('/pelayanan/verifikasi/datatable', [PelayananController::class, 'data_verifikasi_registrasi_table'])->name('data_verifikasi_registrasi_table');
+// Rute untuk Supervisi / Detail Pasien
+Route::post('/pelayanan/supervisior/detail-pasien', [PelayananController::class, 'menu_pelayanan_supervisior_detail_pasien'])->name('menu_pelayanan_supervisior_detail_pasien');
+
+// Rute untuk Update Identitas Pasien
+Route::post('/pelayanan/supervisior/update-pasien', [PelayananController::class, 'menu_pelayanan_supervisior_update_pasien'])->name('menu_pelayanan_supervisior_update_pasien');
+
+// Rute untuk Tambah Pemeriksaan
+Route::post('/pelayanan/supervisior/tambah-pemeriksaan', [PelayananController::class, 'menu_pelayanan_supervisior_tambah_pemeriksaan'])->name('menu_pelayanan_supervisior_tambah_pemeriksaan');
+
+// Rute untuk Hapus Pemeriksaan
+Route::post('/pelayanan/supervisior/hapus-pemeriksaan', [PelayananController::class, 'menu_pelayanan_supervisior_hapus_pemeriksaan'])->name('menu_pelayanan_supervisior_hapus_pemeriksaan');
+
+// Rute untuk Void / Batalkan Registrasi Total
+Route::post('/pelayanan/supervisior/void-registrasi', [PelayananController::class, 'menu_pelayanan_supervisior_void_registrasi'])->name('menu_pelayanan_supervisior_void_registrasi');
+
+// LABORATTORIUM
+Route::post('/laboratorium/registrasi/datatable', [LaboratoriumController::class, 'data_registrasi_lab_table'])->name('data_registrasi_lab_table');
+
+Route::post('menu-radiologi/registrasi/datatable', [RadiologiController::class, 'data_registrasi_radiologi_table'])->name('data_registrasi_radiologi_table');
+// Tambahkan route ini di routes/web.php
+Route::post('/menu-radiolog/mulai-handling', [RadiologiController::class, 'mulaiHandling'])->name('radiologi.mulai_handling');
+Route::post('/menu-radiolog/selesai-handling', [RadiologiController::class, 'selesaiHandling'])->name('radiologi.selesai_handling');
+Route::get('/menu-radiologi/handling/get-data', [App\Http\Controllers\RadiologiController::class, 'getDataRadiologiHandling'])->name('radiologi.get_data_handling');
+Route::get('/menu-radiologi/verifikasi/get-data', [App\Http\Controllers\RadiologiController::class, 'getDataVerifikasiRadiologi'])->name('radiologi.get_data_verifikasi');
+Route::post('/menu-radiologi/verifikasi/handling-data', [App\Http\Controllers\RadiologiController::class, 'menu_radiologi_verifikasi_handling_pasien'])->name('menu_radiologi_verifikasi_handling_pasien');

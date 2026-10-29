@@ -14,7 +14,7 @@ class CreateUserMainsTable extends Migration
     public function up()
     {
         Schema::create('user_mains', function (Blueprint $table) {
-            $table->id('id_user_mains');
+            $table->id('id');
             $table->string('fullname');
             $table->string('username')->unique();
             $table->string('userid')->index();

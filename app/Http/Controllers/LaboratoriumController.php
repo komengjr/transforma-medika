@@ -52,7 +52,238 @@ class LaboratoriumController extends Controller
         }
     }
     // DATA REGISTRASI LAB
+    // 1. Render Halaman Utama Lab
     public function data_registrasi_lab($akses, $id)
+    {
+        if ($this->url_akses_sub($akses, $id) == true) {
+            return view('application.laboratorium.data-registrasi-lab', [
+                'akses' => $akses,
+                'code' => $id
+            ]);
+        } else {
+            return Redirect::to('dashboard/home');
+        }
+    }
+
+    // 2. Fungsi JSON Server-Side DataTable untuk Lab
+    public function data_registrasi_lab_table(Request $request)
+    {
+        // Base Query mengambil detail transaksi yang masuk kategori Laboratorium
+        $query = DB::table('medical_transaksi_detail as td')
+            ->join('medical_master_pemeriksaan as mp', 'td.master_pemeriksaan_id', '=', 'mp.id')
+            ->join('medical_transaksi as t', 'td.transaksi_id', '=', 't.id')
+            ->join('medical_registrasi as reg', 't.registrasi_id', '=', 'reg.id')
+            ->join('medical_patient as p', 'reg.pasien_id', '=', 'p.id')
+            ->leftJoin('medical_tipe_layanan as tl', 'mp.tipe_layanan_id', '=', 'tl.id')
+            ->where(function ($q) {
+                $q->where('tl.prefix', 'LIKE', '%LAB%')
+                    ->orWhere('td.no_pemeriksaan', 'LIKE', 'LAB%')
+                    ->orWhere(function ($subQ) {
+                        $subQ->where('mp.is_paket', 1)
+                            ->whereExists(function ($query) {
+                                $query->select(DB::raw(1))
+                                    ->from('medical_paket_detail as pd')
+                                    ->join('medical_master_pemeriksaan as sub_mp', 'pd.pemeriksaan_id', '=', 'sub_mp.id')
+                                    ->join('medical_tipe_layanan as sub_tl', 'sub_mp.tipe_layanan_id', '=', 'sub_tl.id')
+                                    ->whereColumn('pd.paket_id', 'mp.id')
+                                    ->where('sub_tl.prefix', 'LIKE', '%LAB%');
+                            });
+                    });
+            });
+
+        // Filter Rentang Tanggal (jika dikirim dari frontend)
+        $tglAwal = $request->input('tgl1');
+        $tglAkhir = $request->input('tgl2');
+        if ($tglAwal && $tglAkhir) {
+            $query->whereBetween('reg.tanggal_registrasi', [
+                $tglAwal . ' 00:00:00',
+                $tglAkhir . ' 23:59:59'
+            ]);
+        }
+
+        $totalData = DB::table('medical_transaksi_detail as td')
+            ->join('medical_transaksi as t', 'td.transaksi_id', '=', 't.id')
+            ->join('medical_registrasi as reg', 't.registrasi_id', '=', 'reg.id')
+            ->count();
+
+        // Global Search DataTables
+        $searchValue = $request->input('search.value');
+        if ($searchValue) {
+            $query->where(function ($q) use ($searchValue) {
+                $q->where('reg.no_registrasi', 'like', "%{$searchValue}%")
+                    ->orWhere('p.nama', 'like', "%{$searchValue}%")
+                    ->orWhere('p.pid', 'like', "%{$searchValue}%")
+                    ->orWhere('td.no_pemeriksaan', 'like', "%{$searchValue}%")
+                    ->orWhere('mp.nama_layanan', 'like', "%{$searchValue}%");
+            });
+        }
+
+        $totalFiltered = $query->count();
+
+        // Pagination & Ordering
+        $start  = $request->input('start', 0);
+        $length = $request->input('length', 10);
+
+        $rawQuery = $query->select([
+            'reg.id as registrasi_id',
+            'reg.no_registrasi',
+            'reg.tanggal_registrasi',
+            'reg.dokter as d_reg_order_lab_rujukan',
+            'p.pid as d_reg_order_rm',
+            'p.title',
+            'p.nama as nama_pasien',
+            'td.id as detail_id',
+            'td.no_pemeriksaan as d_reg_order_lab_code',
+            'mp.id as master_pemeriksaan_id',
+            'mp.nama_layanan',
+            'mp.is_paket',
+            'td.status_pemeriksaan'
+        ])
+            ->orderBy('reg.tanggal_registrasi', 'DESC')
+            ->offset($start)
+            ->limit($length)
+            ->get();
+
+        // Grouping data berdasarkan no_registrasi di tingkat koleksi
+        $groupedData = $rawQuery->groupBy('no_registrasi')->map(function ($rows) {
+            $first = $rows->first();
+
+            $itemsPemeriksaan = [];
+            foreach ($rows as $row) {
+                $subPaketItems = [];
+                if ($row->is_paket == 1 || $row->is_paket == true) {
+                    $subPaketItems = DB::table('medical_paket_detail as pd')
+                        ->join('medical_master_pemeriksaan as sub_mp', 'pd.pemeriksaan_id', '=', 'sub_mp.id')
+                        ->leftJoin('medical_tipe_layanan as sub_tl', 'sub_mp.tipe_layanan_id', '=', 'sub_tl.id')
+                        ->where('pd.paket_id', $row->master_pemeriksaan_id)
+                        ->where('sub_tl.prefix', 'LIKE', '%LAB%')
+                        ->select('sub_mp.nama_layanan', 'sub_mp.kode_layanan')
+                        ->get();
+                }
+
+                $itemsPemeriksaan[] = [
+                    'detail_id' => $row->detail_id,
+                    'no_pemeriksaan' => $row->d_reg_order_lab_code,
+                    'nama_layanan' => $row->nama_layanan,
+                    'is_paket' => $row->is_paket,
+                    'status_pemeriksaan' => $row->status_pemeriksaan,
+                    'sub_paket' => $subPaketItems
+                ];
+            }
+
+            return (object)[
+                'registrasi_id' => $first->registrasi_id,
+                'no_registrasi' => $first->no_registrasi,
+                'tanggal_registrasi' => $first->tanggal_registrasi,
+                'd_reg_order_lab_rujukan' => $first->d_reg_order_lab_rujukan,
+                'd_reg_order_rm' => $first->d_reg_order_rm,
+                'title' => $first->title,
+                'nama_pasien' => $first->nama_pasien,
+                'items' => $itemsPemeriksaan
+            ];
+        })->values();
+
+        // Format Output untuk DataTables JSON
+        $formattedData = [];
+        $no = $start + 1;
+
+        foreach ($groupedData as $datas) {
+            // HTML Kolom No Registrasi
+            $noRegHtml = '<div class="d-flex flex-column">
+                            <span class="code-block text-primary">' . e($datas->no_registrasi) . '</span>
+                            <span class="text-muted fs--2 mt-1">Reg. Kunjungan</span>
+                          </div>';
+
+            // HTML Kolom Nama Pasien
+            $pasienHtml = '<div class="fw-bold text-dark">' . e($datas->title) . ' ' . e($datas->nama_pasien) . '</div>
+                           <span class="text-muted fs--2">PID: ' . e($datas->d_reg_order_rm) . '</span>';
+
+            // HTML Kolom Tanggal
+            $tglHtml = '<div class="text-nowrap text-secondary">
+                            <i class="far fa-clock me-1 opacity-50"></i>' . date('d/m/Y H:i', strtotime($datas->tanggal_registrasi)) . '
+                        </div>';
+
+            // HTML Kolom Rujukan
+            $rujukanHtml = '<span class="text-dark fw-medium">' . e($datas->d_reg_order_lab_rujukan ?? '-') . '</span>';
+
+            // HTML Kolom Pemeriksaan & Paket
+            $pemeriksaanHtml = '<div class="d-flex flex-column gap-3">';
+            foreach ($datas->items as $item) {
+                $paketBadge = ($item['is_paket'] == 1 || $item['is_paket'] == true)
+                    ? '<span class="badge bg-warning text-dark ms-1" style="font-size: 0.65rem;">PAKET</span>'
+                    : '';
+
+                $subPaketHtml = '';
+                if (($item['is_paket'] == 1 || $item['is_paket'] == true) && !empty($item['sub_paket']) && count($item['sub_paket']) > 0) {
+                    $subPaketHtml .= '<div class="ms-3 border-start ps-2 my-1">
+                                        <span class="text-xs fw-bold text-muted d-block mb-1" style="font-size: 0.7rem;">Isi Paket Pemeriksaan:</span>';
+                    foreach ($item['sub_paket'] as $sub) {
+                        $subPaketHtml .= '<span class="text-dark fs--2 d-block mb-1">
+                                            <i class="fas fa-angle-right text-primary me-1"></i> ' . e($sub->nama_layanan) . ' <span class="text-muted">(' . e($sub->kode_layanan) . ')</span>
+                                          </span>';
+                    }
+                    $subPaketHtml .= '</div>';
+                }
+
+                $pemeriksaanHtml .= '<div class="border-bottom pb-2 mb-1">
+                                        <div>
+                                            <span class="list-pemeriksaan-tag">
+                                                <i class="fas fa-flask me-1 text-primary fs--2"></i>' . e($item['nama_layanan']) . $paketBadge . '
+                                            </span>
+                                            <div class="code-block text-danger fs--2 mt-1">
+                                                <i class="fas fa-barcode me-1"></i>' . e($item['no_pemeriksaan']) . '
+                                            </div>
+                                        </div>
+                                        ' . $subPaketHtml . '
+                                     </div>';
+            }
+            $pemeriksaanHtml .= '</div>';
+
+            // HTML Status Badge
+            $status = $datas->items[0]['status_pemeriksaan'] ?? 'MENUNGGU';
+            if ($status == 'MENUNGGU') {
+                $statusHtml = '<span class="badge badge-soft-danger px-2 py-1 rounded-pill"><i class="fas fa-exclamation-circle me-1"></i>Belum</span>';
+            } elseif ($status == 'PROSES') {
+                $statusHtml = '<span class="badge badge-soft-warning px-2 py-1 rounded-pill"><i class="fas fa-spinner fa-spin me-1"></i>Proses</span>';
+            } elseif ($status == 'SELESAI') {
+                $statusHtml = '<span class="badge badge-soft-primary px-2 py-1 rounded-pill"><i class="fas fa-award me-1"></i>Selesai</span>';
+            } else {
+                $statusHtml = '<span class="badge badge-soft-info px-2 py-1 rounded-pill">' . e($status) . '</span>';
+            }
+
+            // HTML Kolom Aksi
+            $firstNoPemeriksaan = $datas->items[0]['no_pemeriksaan'] ?? '';
+            $actionHtml = '<div class="dropdown font-sans-serif position-static">
+                            <button class="btn btn-link text-600 btn-sm dropdown-toggle btn-reveal" type="button" data-bs-toggle="dropdown" data-boundary="viewport" aria-haspopup="true" aria-expanded="false">
+                                <span class="fas fa-ellipsis-h fs--1"></span>
+                            </button>
+                            <div class="dropdown-menu dropdown-menu-end border py-2">
+                                <a class="dropdown-item text-warning fw-medium button-proses-handling-lab" href="#" data-bs-toggle="modal" data-bs-target="#modal-lab" data-code="' . e($firstNoPemeriksaan) . '">
+                                    <i class="fas fa-dna me-2"></i>Proses Handling Pasien
+                                </a>
+                            </div>
+                           </div>';
+
+            $formattedData[] = [
+                'no'           => $no++,
+                'no_registrasi' => $noRegHtml,
+                'nama_pasien'  => $pasienHtml,
+                'tanggal_reg'  => $tglHtml,
+                'rujukan'      => $rujukanHtml,
+                'pemeriksaan'  => $pemeriksaanHtml,
+                'status'       => '<div class="text-center">' . $statusHtml . '</div>',
+                'action'       => '<div class="text-center">' . $actionHtml . '</div>'
+            ];
+        }
+
+        return response()->json([
+            "draw"            => intval($request->input('draw')),
+            "recordsTotal"    => intval($totalData),
+            "recordsFiltered" => intval($totalFiltered),
+            "data"            => $formattedData
+        ]);
+    }
+    public function data_registrasi_lab_old($akses, $id)
     {
         if ($this->url_akses_sub($akses, $id) == true) {
             $data = DB::table('d_reg_order_lab')
@@ -87,6 +318,213 @@ class LaboratoriumController extends Controller
     public function data_specimen_collection_lab($akses, $id)
     {
         if ($this->url_akses_sub($akses, $id) == true) {
+            // Mengambil data registrasi laboratorium yang status pemeriksaannya masih MENUNGGU atau ber-prefix LAB
+            $data = DB::table('medical_transaksi_detail as td')
+                ->join('medical_master_pemeriksaan as mp', 'td.master_pemeriksaan_id', '=', 'mp.id')
+                ->join('medical_transaksi as t', 'td.transaksi_id', '=', 't.id')
+                ->join('medical_registrasi as reg', 't.registrasi_id', '=', 'reg.id')
+                ->join('medical_patient as p', 'reg.pasien_id', '=', 'p.id')
+                ->leftJoin('medical_tipe_layanan as tl', 'mp.tipe_layanan_id', '=', 'tl.id')
+                ->where(function ($q) {
+                    $q->where('tl.prefix', 'LIKE', '%LAB%')
+                        ->orWhere('td.no_pemeriksaan', 'LIKE', 'LAB%');
+                })
+                ->where('td.status_pemeriksaan', 'MENUNGGU') // Filter status spesimen yang belum diambil/diproses
+                ->select([
+                    'td.id as id_d_reg_order_lab',
+                    'td.no_pemeriksaan as d_reg_order_lab_code',
+                    'reg.no_registrasi as d_reg_order_code',
+                    'reg.tanggal_registrasi as d_reg_order_date',
+                    'p.pid as d_reg_order_rm',
+                    'p.title',
+                    'p.nama as master_patient_name',
+                    'td.status_pemeriksaan as d_reg_order_lab_status'
+                ])
+                ->orderBy('td.id', 'DESC')
+                ->get();
+
+            return view('application.laboratorium.data-specimen-collection', [
+                'data' => $data,
+                'akses' => $akses,
+                'code' => $id
+            ]);
+        } else {
+            return Redirect::to('dashboard/home');
+        }
+    }
+    public function data_specimen_collection_lab_cari_data(Request $request)
+    {
+        $keyword = trim($request->code); // Nomor Registrasi yang di-scan (misal: REG-20261026-0001)
+
+        // 1. Cari data registrasi dan pasien berdasarkan nomor registrasi
+        $data = DB::table('medical_registrasi as reg')
+            ->join('medical_patient as p', 'reg.pasien_id', '=', 'p.id')
+            ->where('reg.no_registrasi', $keyword)
+            ->select([
+                'reg.id as registrasi_id',
+                'reg.no_registrasi',
+                'reg.tanggal_registrasi',
+                'p.id as master_patient_id',
+                'p.pid as master_patient_code',
+                'p.title',
+                'p.nama as master_patient_name',
+                'p.no_id as master_patient_nik',
+                'p.jk as master_patient_jk',
+                'p.tgl_lahir as master_patient_tgl_lahir',
+                'p.tempat_lahir as master_patient_tempat_lahir',
+                'p.foto as master_patient_profile',
+                'reg.status_kunjungan'
+            ])
+            ->first();
+
+        if (!$data) {
+            return 'false'; // Data registrasi tidak ditemukan
+        }
+
+        // 2. Ambil seluruh item pemeriksaan laboratorium berdasarkan registrasi (mendukung paket & item satuan)
+        $pemeriksaanRaw = DB::table('medical_transaksi_detail as td')
+            ->join('medical_transaksi as t', 'td.transaksi_id', '=', 't.id')
+            ->join('medical_registrasi as reg', 't.registrasi_id', '=', 'reg.id')
+            ->join('medical_master_pemeriksaan as mp', 'td.master_pemeriksaan_id', '=', 'mp.id')
+            ->leftJoin('medical_tipe_layanan as tl', 'mp.tipe_layanan_id', '=', 'tl.id')
+            ->where('reg.no_registrasi', $data->no_registrasi)
+            ->where(function ($q) {
+                $q->where('tl.prefix', 'LIKE', '%LAB%')
+                    ->orWhere('td.no_pemeriksaan', 'LIKE', 'LAB%')
+                    ->orWhere('mp.is_paket', 1);
+            })
+            ->select([
+                'mp.id as id_t_pemeriksaan_list',
+                'mp.kode_layanan as t_pemeriksaan_list_code',
+                'mp.nama_layanan as t_pemeriksaan_list_name',
+                'mp.is_paket',
+                'td.no_pemeriksaan as order_lab_list_code'
+            ])
+            ->get();
+
+        $finalPemeriksaan = collect();
+
+        // 3. Looping untuk membongkar isi paket jika item berupa paket (`is_paket = 1`)
+        foreach ($pemeriksaanRaw as $pem) {
+            if ($pem->is_paket == 1 || $pem->is_paket == true) {
+                $subItems = DB::table('medical_paket_detail as pd')
+                    ->join('medical_master_pemeriksaan as sub_mp', 'pd.pemeriksaan_id', '=', 'sub_mp.id')
+                    ->leftJoin('medical_tipe_layanan as sub_tl', 'sub_mp.tipe_layanan_id', '=', 'sub_tl.id')
+                    ->where('pd.paket_id', $pem->id_t_pemeriksaan_list)
+                    ->where('sub_tl.prefix', 'LIKE', '%LAB%') // Hanya ambil sub-item yang ber-prefix LAB
+                    ->select([
+                        'sub_mp.id as id_t_pemeriksaan_list',
+                        'sub_mp.kode_layanan as t_pemeriksaan_list_code',
+                        'sub_mp.nama_layanan as t_pemeriksaan_list_name',
+                        DB::raw("'" . $pem->order_lab_list_code . "' as order_lab_list_code")
+                    ])
+                    ->get();
+
+                foreach ($subItems as $sub) {
+                    $finalPemeriksaan->push($sub);
+                }
+            } else {
+                $finalPemeriksaan->push($pem);
+            }
+        }
+
+        // Return ke view detail spesimen
+        return view('application.laboratorium.speciment-collection.detail-speciment', [
+            'data' => $data,
+            'pemeriksaan' => $finalPemeriksaan,
+            'code' => $keyword
+        ]);
+    }
+    public function data_specimen_collection_lab_proses(Request $request)
+    {
+        try {
+            DB::beginTransaction();
+
+            // Menyesuaikan penangkapan parameter dari request JS
+            $pemeriksaanId = $request->code ?? $request->pemeriksaan_id;
+            $specimenId    = $request->specimen ?? $request->specimen_id;
+            $orderLab      = $request->reg ?? $request->order_lab;
+
+            // 1. Cari transaksi_detail_id berdasarkan no_pemeriksaan (order_lab)
+            $transaksiDetail = DB::table('medical_transaksi_detail')
+                ->where('no_pemeriksaan', $orderLab)
+                ->first();
+
+            $transaksiDetailId = $transaksiDetail ? $transaksiDetail->id : 0;
+
+            // 2. Generate Nomor Barcode Spesimen Unik
+            $noBarcode = 'SPL-' . $orderLab . '-' . $specimenId;
+
+            // 3. Pastikan spesimen belum pernah diproses (mencegah error Duplicate Insert)
+            $cekCollection = DB::table('medical_specimen_collection')
+                ->where('transaksi_detail_id', $transaksiDetailId)
+                ->where('specimen_data_id', $specimenId)
+                ->first();
+
+            if (!$cekCollection) {
+                // Insert ke tabel medical_specimen_collection
+                $collectionId = DB::table('medical_specimen_collection')->insertGetId([
+                    'transaksi_detail_id' => $transaksiDetailId,
+                    'specimen_data_id'    => $specimenId,
+                    'no_barcodespesimen'  => $noBarcode,
+                    'status_koleksi'      => 'DIPROSES',
+                    'waktu_koleksi'       => now(),
+                    'petugas_koleksi_id'  => auth()->user()->id ?? 'System',
+                    'kondisi_sampel'      => 'Baik',
+                    'created_at'          => now(),
+                    'updated_at'          => now(),
+                ]);
+
+                // Insert ke tabel log (medical_specimen_log)
+                DB::table('medical_specimen_log')->insert([
+                    'specimen_collection_id' => $collectionId,
+                    'status_log'             => 'DIKOLEKSI',
+                    'keterangan'             => 'Waktu pengambilan sampel dimulai',
+                    'user_pencatat'          => auth()->user()->name ?? 'System',
+                    'waktu_log'              => now(),
+                    'created_at'             => now(),
+                    'updated_at'             => now(),
+                ]);
+
+                // Update status transaksi utama menjadi PROSES jika masih MENUNGGU
+                if ($transaksiDetail && $transaksiDetail->status_pemeriksaan == 'MENUNGGU') {
+                    DB::table('medical_transaksi_detail')
+                        ->where('id', $transaksiDetail->id)
+                        ->update([
+                            'status_pemeriksaan' => 'PROSES',
+                            'updated_at'         => now()
+                        ]);
+                }
+            }
+
+            DB::commit();
+
+            // 4. Ambil data nama spesimen dan tabung untuk ditampilkan di UI
+            $specimenData = DB::table('medical_specimen_data')->where('id', $specimenId)->first();
+            $specimenName = $specimenData->s_specimen_data_name ?? 'Spesimen';
+            $wadahTabung  = $specimenData->wadah_tabung ?? 'Tabung';
+
+            // 5. Kembalikan HTML langsung (Instan Swap UI ke Tombol Print Barcode)
+            return '
+            <div class="d-inline-flex flex-column align-items-center">
+                <button class="btn btn-success btn-sm shadow-sm px-3 py-1 d-flex align-items-center justify-content-center gap-1 btn-print-barcode-satuan"
+                    data-barcode="' . $noBarcode . '"
+                    title="Klik untuk Cetak Barcode Sampel ke Printer Zebra">
+                    <i class="fas fa-barcode"></i> Print (' . $noBarcode . ')
+                </button>
+                <small class="text-muted fw-semibold mt-1 fs--2">
+                    ' . $specimenName . ' (' . $wadahTabung . ')
+                </small>
+            </div>';
+        } catch (\Exception $e) {
+            DB::rollBack();
+            // Kembalikan pesan error dalam bentuk HTML agar JS tidak hang
+            return '<div class="text-danger fs--2 fw-bold"><i class="fas fa-exclamation-triangle"></i> Gagal: ' . $e->getMessage() . '</div>';
+        }
+    }
+    public function data_specimen_collection_lab_old($akses, $id)
+    {
+        if ($this->url_akses_sub($akses, $id) == true) {
             $data = DB::table('d_reg_order_lab')
                 ->join('d_reg_order', 'd_reg_order.d_reg_order_code', '=', 'd_reg_order_lab.d_reg_order_code')
                 ->join('master_patient', 'master_patient.master_patient_code', '=', 'd_reg_order.d_reg_order_rm')
@@ -97,7 +535,7 @@ class LaboratoriumController extends Controller
             return Redirect::to('dashboard/home');
         }
     }
-    public function data_specimen_collection_lab_cari_data(Request $request)
+    public function data_specimen_collection_lab_cari_data_old(Request $request)
     {
         $data = DB::table('d_reg_order_lab')
             ->join('d_reg_order', 'd_reg_order.d_reg_order_code', '=', 'd_reg_order_lab.d_reg_order_code')
@@ -125,55 +563,90 @@ class LaboratoriumController extends Controller
     }
     public function data_specimen_collection_lab_print_barcode(Request $request)
     {
-        $codeId     = $request->query('code');     // id_t_pemeriksaan_list
-        $specimenId = $request->query('specimen'); // t_pem_specimen_code
-        $regId      = $request->query('reg');      // order_lab_list_code
+        // Parameter query dari frontend
+        $detailId   = $request->query('code');     // transaksi_detail_id / no_pemeriksaan
+        $registrasiId = $request->query('reg');    // registrasi_id / no_registrasi
+        $specimenId = $request->query('specimen'); // ID atau jenis spesimen
 
-        // 1. Ambil data spesimen saja (tanpa join ke order_lab_list yang tidak ada)
-        $specimenData = DB::table('t_pem_specimen as tps')
-            ->join('s_specimen_data as ssd', 'ssd.s_specimen_data_code', '=', 'tps.s_specimen_data_code')
-            ->where('tps.t_pem_specimen_code', '=', $specimenId) // Di-binding aman oleh Query Builder
+        // 1. Ambil data Registrasi, Pasien, & Detail Pemeriksaan dari Database Baru
+        $data = DB::table('medical_registrasi as reg')
+            ->join('medical_patient as p', 'p.id', '=', 'reg.pasien_id')
+            ->leftJoin('medical_transaksi as t', 't.registrasi_id', '=', 'reg.id')
+            ->leftJoin('medical_transaksi_detail as td', 'td.transaksi_id', '=', 't.id')
+            ->leftJoin('medical_master_pemeriksaan as mp', 'td.master_pemeriksaan_id', '=', 'mp.id')
+            ->where(function ($q) use ($registrasiId, $detailId) {
+                if ($registrasiId) {
+                    $q->where('reg.id', $registrasiId)
+                        ->orWhere('reg.no_registrasi', $registrasiId);
+                }
+                if ($detailId) {
+                    $q->orWhere('td.id', $detailId)
+                        ->orWhere('td.no_pemeriksaan', $detailId);
+                }
+            })
             ->select(
-                'tps.t_pem_specimen_code',
-                'ssd.s_specimen_data_name'
+                'reg.no_registrasi',
+                'reg.tanggal_registrasi',
+                'p.pid',
+                'p.nama as nama_pasien',
+                'p.title',
+                'p.jk',
+                'p.tgl_lahir',
+                'p.umur',
+                'td.no_pemeriksaan',
+                'mp.nama_layanan'
             )
             ->first();
 
-        // Jika Anda punya tabel registrasi/pasien lain, ganti 'NAMA_TABEL_ANDA' di bawah:
-        /*
-    $patientData = DB::table('NAMA_TABEL_ANDA')
-        ->where('order_lab_list_code', $regId)
-        ->first();
-    */
-
-        if (!$specimenData) {
+        // Fallback jika data tidak ditemukan
+        if (!$data) {
             return response('
-            <div class="alert alert-danger text-center m-0 p-2">
-                <i class="fas fa-exclamation-triangle me-1"></i> Data spesimen tidak ditemukan.
-            </div>
-        ', 404);
+                <div class="alert alert-danger text-center m-0 p-2" style="font-size: 12px;">
+                    <i class="fas fa-exclamation-triangle me-1"></i> Data registrasi / spesimen tidak ditemukan.
+                </div>
+            ', 404);
         }
 
-        // 2. Generate Barcode (C128)
-        $dns1d = new \Milon\Barcode\DNS1D();
-        $barcodeHtml = $dns1d->getBarcodeHTML($regId, 'C128', 1.5, 45);
+        // 2. Tentukan Kode yang dijadikan Barcode (Prioritas: No. Pemeriksaan / No. Registrasi)
+        $barcodeCode = $data->no_pemeriksaan;
 
-        // 3. Susun HTML Preview
+        // 3. Generate Barcode 1D (C128)
+        $dns1d = new \Milon\Barcode\DNS1D();
+        // Parameter barcode: (code, type, width, height)
+        $barcodeHtml = $dns1d->getBarcodeHTML($barcodeCode, 'C128', 1.2, 33);
+
+        // Format Tampilan Data Pasien
+        $namaLengkap = strtoupper(($data->title ? $data->title . ' ' : '') . $data->nama_pasien);
+        $jenisKelamin = $data->jk == 'L' ? 'L' : ($data->jk == 'P' ? 'P' : '-');
+        $tglLahir = $data->tgl_lahir ? date('d/m/Y', strtotime($data->tgl_lahir)) : '-';
+        $umur = $data->umur ? $data->umur . ' Thn' : '';
+
+        // 4. Susun HTML Preview Stiker Barcode Laboratorium
         $html = '
-        <div style="font-family: Arial, sans-serif; text-align: center; color: #333; padding: 5px;">
-            <div style="font-size: 11px; font-weight: bold; margin-bottom: 4px;">
-                Sample : ' . e($specimenData->s_specimen_data_name) . '
+        <div style="width: 100%; max-width: 250px; margin: 0 auto; font-family: Arial, Helvetica, sans-serif; color: #000; padding: 4px; box-sizing: border-box; text-align: left;">
+            <!-- Header Nama & PID -->
+            <div style="font-size: 11px; font-weight: bold; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; line-height: 1.2;">
+                ' . e($namaLengkap) . '
             </div>
 
-            <div style="display: flex; justify-content: center; align-items: center; margin: 8px 0; background: #fff; padding: 4px;">
+            <div style="font-size: 9.5px; margin-top: 2px; display: flex; justify-content: space-between;">
+                <span>PID: <b>' . e($data->pid) . '</b> (' . $jenisKelamin . ')</span>
+                <span>' . e($tglLahir) . '</span>
+            </div>
+
+            <!-- Area Gambar Barcode -->
+            <div style="display: flex; justify-content: center; align-items: center; margin: 4px 0; padding: 2px 0;">
                 ' . $barcodeHtml . '
             </div>
 
-            <div style="font-size: 10px; font-weight: bold; letter-spacing: 0.5px;">
-                ' . e($regId) . '
+            <!-- Text Kode Barcode & Nama Pemeriksaan -->
+            <div style="font-size: 10px; font-weight: bold; text-align: center; letter-spacing: 0.5px; line-height: 1.1;">
+                ' . e($barcodeCode) . '
             </div>
 
-
+            <div style="font-size: 8.5px; text-align: center; color: #333; margin-top: 2px; white-space: nowrap; overflow: hidden; text-overflow: ellipsis;">
+                ' . e($data->nama_layanan ?? 'Spesimen Lab') . '
+            </div>
         </div>
         ';
 
@@ -252,7 +725,7 @@ class LaboratoriumController extends Controller
             ], 500);
         }
     }
-    public function data_specimen_collection_lab_proses(Request $request)
+    public function data_specimen_collection_lab_proses_old(Request $request)
     {
         DB::table('s_specimen_log')->insert([
             's_specimen_log_code' => $request->reg . '' . Str::upper(Str::random(2)),
@@ -350,6 +823,141 @@ class LaboratoriumController extends Controller
     public function menu_lab_proses_result($akses, $id)
     {
         if ($this->url_akses_sub($akses, $id) == true) {
+            // Ambil data detail transaksi lab yang masih proses/menunggu
+            $rawQuery = DB::table('medical_transaksi_detail as td')
+                ->join('medical_transaksi as t', 'td.transaksi_id', '=', 't.id')
+                ->join('medical_registrasi as reg', 't.registrasi_id', '=', 'reg.id')
+                ->join('medical_patient as p', 'reg.pasien_id', '=', 'p.id')
+                ->join('medical_master_pemeriksaan as mp', 'td.master_pemeriksaan_id', '=', 'mp.id')
+                ->whereIn('td.status_pemeriksaan', ['MENUNGGU', 'PROSES'])
+                ->select([
+                    'reg.id as registrasi_id',
+                    'reg.no_registrasi',
+                    'reg.tanggal_registrasi as d_reg_order_lab_date',
+                    'p.nama as master_patient_name',
+                    'p.pid as master_patient_rm',
+                    'td.id as detail_id',
+                    'td.no_pemeriksaan as d_reg_order_lab_code',
+                    'mp.nama_layanan'
+                ])
+                ->orderBy('reg.tanggal_registrasi', 'ASC')
+                ->get();
+
+            // Grouping berdasarkan no_registrasi
+            $groupedData = $rawQuery->groupBy('no_registrasi')->map(function ($rows) {
+                $first = $rows->first();
+                return (object)[
+                    'registrasi_id'          => $first->registrasi_id,
+                    'no_registrasi'          => $first->no_registrasi,
+                    'd_reg_order_lab_date'   => $first->d_reg_order_lab_date,
+                    'master_patient_name'    => $first->master_patient_name,
+                    'master_patient_rm'      => $first->master_patient_rm,
+                    'total_pemeriksaan'      => $rows->count(),
+                    'items'                  => $rows // Semua pemeriksaan dalam registrasi ini
+                ];
+            })->values();
+
+            return view('application.laboratorium.proses-result', [
+                'data'  => $groupedData,
+                'akses' => $akses,
+                'code'  => $id
+            ]);
+        } else {
+            return Redirect::to('dashboard/home');
+        }
+    }
+    public function menu_lab_proses_result_detail(Request $request)
+    {
+        $registrasiId = $request->code;
+
+        // 1. Ambil data registrasi & pasien (sesuaikan kolom yang ada di tabel medical_patient)
+        $data = DB::table('medical_registrasi as reg')
+            ->join('medical_patient as p', 'reg.pasien_id', '=', 'p.id')
+            ->where('reg.id', $registrasiId)
+            ->select(
+                'reg.*',
+                'p.nama as master_patient_name',
+                'p.pid as master_patient_code',
+                'p.jk as master_patient_jk',
+                'p.tgl_lahir as master_patient_tgl_lahir',
+                'p.tempat_lahir as master_patient_tempat_lahir'
+                // Hapus 'p.nik' dan 'p.foto' jika kolom tersebut belum ada di database
+            )
+            ->first();
+
+        // 2. Ambil daftar pemeriksaan
+        $pemeriksaan = [];
+        if ($data) {
+            $pemeriksaan = DB::table('medical_transaksi_detail as td')
+                ->join('medical_transaksi as t', 'td.transaksi_id', '=', 't.id')
+                ->join('medical_master_pemeriksaan as mp', 'td.master_pemeriksaan_id', '=', 'mp.id')
+                ->where('t.registrasi_id', $data->id)
+                ->select(
+                    'td.id as detail_id',
+                    'td.no_pemeriksaan as order_lab_list_code',
+                    'mp.id as t_pemeriksaan_list_code',
+                    'mp.nama_layanan as t_pemeriksaan_list_name'
+                )
+                ->get();
+        }
+
+        return view('application.laboratorium.proses-result.proses-result-detail', [
+            'data'        => $data,
+            'pemeriksaan' => $pemeriksaan,
+            'code'        => $data->no_registrasi ?? $registrasiId
+        ]);
+    }
+    public function menu_lab_proses_result_detail_proses_save(Request $request)
+    {
+        $arrayHasil   = $request->hasil;   // Format: hasil[detail_id][parameter_id] = nilai
+        $arrayFlag    = $request->flag;    // Format: flag[detail_id][parameter_id] = nilai
+        $arrayCatatan = $request->catatan; // Format: catatan[detail_id][parameter_id] = nilai
+
+        $savedCodes = []; // Array untuk menampung ID parameter yang berhasil disimpan
+
+        if (!empty($arrayHasil)) {
+            foreach ($arrayHasil as $detailId => $parameters) {
+                foreach ($parameters as $paramId => $nilai) {
+                    $flag = $arrayFlag[$detailId][$paramId] ?? null;
+                    $catatan = $arrayCatatan[$detailId][$paramId] ?? null;
+
+                    // Simpan atau update ke tabel medical_transaksi_hasil
+                    DB::table('medical_transaksi_hasil')->updateOrInsert(
+                        [
+                            'detail_id'    => $detailId,
+                            'parameter_id' => $paramId
+                        ],
+                        [
+                            'hasil'      => $nilai,
+                            'flag'       => $flag,
+                            'catatan'    => $catatan,
+                            'updated_at' => now(),
+                            'created_at' => now()
+                        ]
+                    );
+
+                    // Masukkan kode parameter ke dalam array untuk memberi penanda warna hijau di frontend
+                    $savedCodes[] = $paramId;
+                }
+
+                // Update status pemeriksaan pada detail transaksi menjadi SELESAI
+                DB::table('medical_transaksi_detail')->where('id', $detailId)->update([
+                    'status_pemeriksaan' => 'SELESAI',
+                    'updated_at'         => now()
+                ]);
+            }
+        }
+
+        // Kembalikan response JSON yang persis diharapkan oleh script AJAX (status, message, dan saved_codes)
+        return response()->json([
+            'status'      => 'success',
+            'message'     => 'Data hasil laboratorium berhasil disimpan.',
+            'saved_codes' => $savedCodes
+        ]);
+    }
+    public function menu_lab_proses_result_old($akses, $id)
+    {
+        if ($this->url_akses_sub($akses, $id) == true) {
             $data = DB::table('d_reg_order_lab')
                 ->join('d_reg_order', 'd_reg_order.d_reg_order_code', '=', 'd_reg_order_lab.d_reg_order_code')
                 ->join('master_patient', 'master_patient.master_patient_code', '=', 'd_reg_order.d_reg_order_rm')
@@ -360,7 +968,7 @@ class LaboratoriumController extends Controller
             return Redirect::to('dashboard/home');
         }
     }
-    public function menu_lab_proses_result_detail(Request $request)
+    public function menu_lab_proses_result_detail_old(Request $request)
     {
         $data = DB::table('d_reg_order_lab')
             ->join('d_reg_order', 'd_reg_order.d_reg_order_code', '=', 'd_reg_order_lab.d_reg_order_code')
@@ -652,7 +1260,7 @@ class LaboratoriumController extends Controller
             ], 500);
         }
     }
-    public function menu_lab_proses_result_detail_proses_save(Request $request)
+    public function menu_lab_proses_result_detail_proses_save_old(Request $request)
     {
         $data = DB::table('d_reg_order_lab_list')
             ->join('p_sales_data', 'p_sales_data.p_sales_data_code', '=', 'd_reg_order_lab_list.p_sales_data_code')
@@ -694,6 +1302,94 @@ class LaboratoriumController extends Controller
     public function verifikasi_laboratorium($akses, $id)
     {
         if ($this->url_akses_sub($akses, $id) == true) {
+            // Mengambil registrasi yang memiliki pemeriksaan lab dengan status 'SELESAI' (Menunggu Verifikasi)
+            $rawQuery = DB::table('medical_transaksi_detail as td')
+                ->join('medical_transaksi as t', 'td.transaksi_id', '=', 't.id')
+                ->join('medical_registrasi as reg', 't.registrasi_id', '=', 'reg.id')
+                ->join('medical_patient as p', 'reg.pasien_id', '=', 'p.id')
+                ->join('medical_master_pemeriksaan as mp', 'td.master_pemeriksaan_id', '=', 'mp.id')
+                ->where('td.status_pemeriksaan', 'SELESAI') // Syarat: Hasil sudah diisi di menu Proses Result
+                ->select([
+                    'reg.id as registrasi_id',
+                    'reg.no_registrasi',
+                    'reg.tanggal_registrasi as d_reg_order_date',
+                    'reg.dokter as master_doctor_name',
+                    'p.nama as master_patient_name',
+                    'p.pid as master_patient_rm',
+                    'td.id as detail_id',
+                    'td.no_pemeriksaan as d_reg_order_lab_code',
+                    'td.status_pemeriksaan',
+                    'mp.nama_layanan'
+                ])
+                ->orderBy('reg.tanggal_registrasi', 'DESC')
+                ->get();
+
+            // Grouping berdasarkan no_registrasi agar tidak duplikat baris pasien
+            $groupedData = $rawQuery->groupBy('no_registrasi')->map(function ($rows) {
+                $first = $rows->first();
+                return (object)[
+                    'registrasi_id'       => $first->registrasi_id,
+                    'no_registrasi'       => $first->no_registrasi,
+                    'd_reg_order_date'    => $first->d_reg_order_date,
+                    'master_doctor_name'  => $first->master_doctor_name,
+                    'master_patient_name' => $first->master_patient_name,
+                    'master_patient_rm'   => $first->master_patient_rm,
+                    'items'               => $rows, // Daftar layanan/pemeriksaan
+                    'status'              => $first->status_pemeriksaan
+                ];
+            })->values();
+
+            return view('application.laboratorium.verifikasi-hasil-lab', [
+                'data'  => $groupedData,
+                'akses' => $akses,
+                'code'  => $id
+            ]);
+        } else {
+            return Redirect::to('dashboard/home');
+        }
+    }
+    public function verifikasi_laboratorium_detail(Request $request)
+    {
+        $registrasiId = $request->code; // ID dari medical_registrasi
+        $noReg = $request->reg;         // Nomor Registrasi
+
+        // 1. Ambil data registrasi & pasien (Hanya kolom yang ada di database)
+        $data = DB::table('medical_registrasi as reg')
+            ->join('medical_patient as p', 'reg.pasien_id', '=', 'p.id')
+            ->where('reg.id', $registrasiId)
+            ->select(
+                'reg.no_registrasi',
+                'p.nama as master_patient_name',
+                'p.pid as master_patient_code',
+                'p.jk as master_patient_jk',
+                'p.tgl_lahir as master_patient_tgl_lahir',
+                'p.tempat_lahir as master_patient_tempat_lahir'
+            )
+            ->first();
+
+        // 2. Ambil list pemeriksaan lab untuk registrasi tersebut
+        $pemeriksaan = DB::table('medical_transaksi_detail as td')
+            ->join('medical_transaksi as t', 'td.transaksi_id', '=', 't.id')
+            ->join('medical_master_pemeriksaan as mp', 'td.master_pemeriksaan_id', '=', 'mp.id')
+            ->where('t.registrasi_id', $registrasiId)
+            ->select(
+                'td.id as detail_id',
+                'td.no_pemeriksaan as order_lab_list_code',
+                'mp.id as t_pemeriksaan_list_code',
+                'mp.nama_layanan as t_pemeriksaan_list_name'
+            )
+            ->get();
+
+        return view('application.laboratorium.verifikasi-hasil.verifikasi-hasil-detail', [
+            'code'        => $registrasiId,
+            'reg'         => $noReg,
+            'pemeriksaan' => $pemeriksaan,
+            'data'        => $data,
+        ]);
+    }
+    public function verifikasi_laboratorium_old($akses, $id)
+    {
+        if ($this->url_akses_sub($akses, $id) == true) {
             $data = DB::table('d_reg_order_lab')
                 ->join('d_reg_order', 'd_reg_order.d_reg_order_code', '=', 'd_reg_order_lab.d_reg_order_code')
                 ->join('master_patient', 'master_patient.master_patient_code', '=', 'd_reg_order.d_reg_order_rm')
@@ -705,7 +1401,7 @@ class LaboratoriumController extends Controller
             return Redirect::to('dashboard/home');
         }
     }
-    public function verifikasi_laboratorium_detail(Request $request)
+    public function verifikasi_laboratorium_detail_old(Request $request)
     {
         $data = DB::table('d_reg_order_lab')
             ->join('d_reg_order', 'd_reg_order.d_reg_order_code', '=', 'd_reg_order_lab.d_reg_order_code')
@@ -723,6 +1419,91 @@ class LaboratoriumController extends Controller
         ]);
     }
     public function verifikasi_laboratorium_verifikasi_data(Request $request)
+    {
+        $registrasiId = $request->code; // ID registrasi (medical_registrasi)
+        $noReg        = $request->reg;  // Nomor Registrasi string
+
+        // 1. Ambil Data Registrasi & Pasien
+        $data = DB::table('medical_registrasi as reg')
+            ->join('medical_patient as p', 'reg.pasien_id', '=', 'p.id')
+            ->where('reg.id', $registrasiId)
+            ->select(
+                'reg.no_registrasi',
+                'reg.tanggal_registrasi',
+                'reg.dokter',
+                'p.nama as nama_pasien',
+                'p.pid as rm_pasien',
+                'p.jk as jk_pasien',
+                'p.alamat as alamat_pasien',
+                'p.tgl_lahir as tgl_lahir_pasien'
+            )
+            ->first();
+
+        // 2. Ambil Data Layanan Pemeriksaan
+        $pemeriksaan = DB::table('medical_transaksi_detail as td')
+            ->join('medical_transaksi as t', 'td.transaksi_id', '=', 't.id')
+            ->join('medical_master_pemeriksaan as mp', 'td.master_pemeriksaan_id', '=', 'mp.id')
+            ->where('t.registrasi_id', $registrasiId)
+            ->select(
+                'td.id as detail_id',
+                'td.no_pemeriksaan',
+                'mp.id as master_pemeriksaan_id',
+                'mp.nama_layanan'
+            )
+            ->get();
+
+        $image = base64_encode(file_get_contents(public_path('img/logo.png')));
+
+        // 3. Generate PDF View
+        $pdf = \Barryvdh\DomPDF\Facade\Pdf::loadview('application.laboratorium.verifikasi-hasil.report.report-hasil-lab', [
+            'code'        => $registrasiId,
+            'reg'         => $noReg,
+            'data'        => $data,
+            'pemeriksaan' => $pemeriksaan,
+        ], compact('image'))->setPaper('A4', 'portrait')->setOptions(['defaultFont' => 'Helvetica']);
+
+        $pdf->output();
+
+        // Atur background/cover
+        $canvas = $pdf->getDomPDF()->getCanvas();
+        $canvas->page_script('
+            // $pdf->set_opacity(.9);
+            $pdf->image("img/cover.png", 12, 12, 575, 823);
+        ');
+
+        // 4. Enkripsi PDF (Password: Tanggal Lahir Pasien format dmy/dmY)
+        $passwordPdf = date('dmY', strtotime($data->tgl_lahir_pasien));
+        $pdf->get_canvas()->get_cpdf()->setEncryption("admin", $passwordPdf);
+
+        // 5. Simpan PDF ke Storage
+        $file = base64_encode($pdf->stream());
+        $base64Pdf = 'data:application/pdf;base64,' . $file;
+        list($type, $pdfData) = explode(';', $base64Pdf);
+        list(, $pdfData) = explode(',', $pdfData);
+        $pdfBinaryData = base64_decode($pdfData);
+
+        // Pastikan direktori tersedia
+        $folderPath = storage_path('app/public/hasil/lab/');
+        if (!file_exists($folderPath)) {
+            mkdir($folderPath, 0755, true);
+        }
+
+        $tempPdfPath = $folderPath . $noReg . '.pdf';
+        file_put_contents($tempPdfPath, $pdfBinaryData);
+
+        // 6. Update Status Pemeriksaan menjadi TERVERIFIKASI
+        DB::table('medical_transaksi_detail')
+            ->join('medical_transaksi as t', 'medical_transaksi_detail.transaksi_id', '=', 't.id')
+            ->where('t.registrasi_id', $registrasiId)
+            ->update([
+                // Tambahkan prefix nama tabel agar spesifik dan tidak ambigu
+                'medical_transaksi_detail.status_pemeriksaan' => 'TERVERIFIKASI',
+                'medical_transaksi_detail.updated_at'         => now(),
+            ]);
+
+        return 'berhasil';
+    }
+    public function verifikasi_laboratorium_verifikasi_data_old(Request $request)
     {
         $pemeriksaan = DB::table('d_reg_order_lab_list')
             ->join('p_sales_data', 'p_sales_data.p_sales_data_code', '=', 'd_reg_order_lab_list.p_sales_data_code')
@@ -791,6 +1572,76 @@ class LaboratoriumController extends Controller
     public function dokumentasi_hasil_laboratorium($akses, $id)
     {
         if ($this->url_akses_sub($akses, $id) == true) {
+            // Mengambil registrasi lab yang statusnya 'TERVERIFIKASI' atau setara (> 2)
+            $rawQuery = DB::table('medical_transaksi_detail as td')
+                ->join('medical_transaksi as t', 'td.transaksi_id', '=', 't.id')
+                ->join('medical_registrasi as reg', 't.registrasi_id', '=', 'reg.id')
+                ->join('medical_patient as p', 'reg.pasien_id', '=', 'p.id')
+                ->whereIn('td.status_pemeriksaan', ['TERVERIFIKASI', 'SELESAI']) // Disesuaikan dengan status tahap lanjut
+                ->select([
+                    'reg.id as registrasi_id',
+                    'reg.no_registrasi',
+                    'reg.tanggal_registrasi as d_reg_order_lab_date',
+                    'p.nama as master_patient_name',
+                    'p.pid as master_patient_rm',
+                    'td.id as detail_id',
+                    'td.no_pemeriksaan as d_reg_order_lab_code',
+                    'td.status_pemeriksaan'
+                ])
+                ->orderBy('reg.tanggal_registrasi', 'DESC')
+                ->get();
+
+            // Grouping berdasarkan no_registrasi
+            $groupedData = $rawQuery->groupBy('no_registrasi')->map(function ($rows) {
+                $first = $rows->first();
+                return (object)[
+                    'registrasi_id'         => $first->registrasi_id,
+                    'no_registrasi'         => $first->no_registrasi,
+                    'd_reg_order_lab_date'  => $first->d_reg_order_lab_date,
+                    'master_patient_name'   => $first->master_patient_name,
+                    'master_patient_rm'     => $first->master_patient_rm,
+                    'd_reg_order_lab_code'  => $first->d_reg_order_lab_code, // Kode unik untuk target AJAX detail
+                    'total_pemeriksaan'     => $rows->count(),
+                    'items'                 => $rows
+                ];
+            })->values();
+
+            return view('application.laboratorium.dokumentasi-hasil-lab', [
+                'data'  => $groupedData,
+                'akses' => $akses,
+                'code'  => $id
+            ]);
+        } else {
+            return Redirect::to('dashboard/home');
+        }
+    }
+    public function dokumentasi_hasil_laboratorium_detail(Request $request)
+    {
+        $registrasiId = $request->code; // Ini adalah registrasi_id
+
+        // Ambil data registrasi, pasien, dan detail transaksi lab
+        $data = DB::table('medical_registrasi as reg')
+            ->join('medical_patient as p', 'reg.pasien_id', '=', 'p.id')
+            ->join('medical_transaksi as t', 't.registrasi_id', '=', 'reg.id')
+            ->join('medical_transaksi_detail as td', 'td.transaksi_id', '=', 't.id')
+            ->where('reg.id', $registrasiId)
+            ->select(
+                'reg.id as registrasi_id',
+                'reg.no_registrasi',
+                'p.nama as master_patient_name',
+                'p.pid as master_patient_code',
+                'td.status_pemeriksaan'
+            )
+            ->first();
+
+        return view('application.laboratorium.dokumentasi-hasil.form-dokumentasi-hasil', [
+            'data' => $data,
+            'code' => $data->no_registrasi ?? $registrasiId
+        ]);
+    }
+    public function dokumentasi_hasil_laboratorium_old($akses, $id)
+    {
+        if ($this->url_akses_sub($akses, $id) == true) {
             $data = DB::table('d_reg_order_lab')
                 ->join('d_reg_order', 'd_reg_order.d_reg_order_code', '=', 'd_reg_order_lab.d_reg_order_code')
                 ->join('master_patient', 'master_patient.master_patient_code', '=', 'd_reg_order.d_reg_order_rm')
@@ -801,7 +1652,7 @@ class LaboratoriumController extends Controller
             return Redirect::to('dashboard/home');
         }
     }
-    public function dokumentasi_hasil_laboratorium_detail(Request $request)
+    public function dokumentasi_hasil_laboratorium_detail_old(Request $request)
     {
         $data = DB::table('d_reg_order_lab')->where('d_reg_order_lab_code', $request->code)->first();
         return view('application.laboratorium.dokumentasi-hasil.form-dokumentasi-hasil', ['data' => $data, 'code' => $request->code]);

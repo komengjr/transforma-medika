@@ -360,34 +360,7 @@ Route::prefix('application')->group(function () {
 Route::get('/orthanc-proxy/{path?}', [RadiologiController::class, 'proxy'])->where('path', '.*');
 Route::post('/orthanc-proxy/{path?}', [RadiologiController::class, 'proxy'])->where('path', '.*');
 // MENU LABORATORIUM
-Route::prefix('application')->group(function () {
-    Route::post('menu-laboratorium/data-registrasi-lab/handling', [LaboratoriumController::class, 'data_registrasi_lab_handling'])->name('data_registrasi_lab_handling');
-    Route::post('menu-laboratorium/data-registrasi-lab/handling-proses', [LaboratoriumController::class, 'data_registrasi_lab_handling_proses'])->name('data_registrasi_lab_handling_proses');
-    Route::post('menu-laboratorium/specimen-collection/detail', [LaboratoriumController::class, 'data_specimen_collection_lab_detail'])->name('data_specimen_collection_lab_detail');
-    Route::post('menu-laboratorium/specimen-collection/cari-data', [LaboratoriumController::class, 'data_specimen_collection_lab_cari_data'])->name('data_specimen_collection_lab_cari_data');
-    Route::get('menu-laboratorium/specimen-collection/print-barcode', [LaboratoriumController::class, 'data_specimen_collection_lab_print_barcode'])->name('data_specimen_collection_lab_print_barcode');
-    Route::post('menu-laboratorium/specimen-collection/print-barcode-proses', [LaboratoriumController::class, 'data_specimen_collection_lab_print_barcode_proses'])->name('data_specimen_collection_lab_print_barcode_proses');
-    Route::post('menu-laboratorium/specimen-collection/proses', [LaboratoriumController::class, 'data_specimen_collection_lab_proses'])->name('data_specimen_collection_lab_proses');
-    Route::post('menu-laboratorium/specimen-collection/proses-simpan', [LaboratoriumController::class, 'data_specimen_collection_lab_proses_simpan'])->name('data_specimen_collection_lab_proses_simpan');
-    Route::post('menu-laboratorium/specimen-collection/proses-fix-simpan', [LaboratoriumController::class, 'data_specimen_collection_lab_proses_simpan_fix'])->name('data_specimen_collection_lab_proses_simpan_fix');
-    Route::post('menu-laboratorium/proses-result/detail', [LaboratoriumController::class, 'menu_lab_proses_result_detail'])->name('menu_lab_proses_result_detail');
-    Route::post('menu-laboratorium/proses-result/detail/proses-sinkronisasi', [LaboratoriumController::class, 'menu_lab_proses_result_detail_sinkronisasi'])->name('menu_lab_proses_result_detail_sinkronisasi');
-    Route::post('menu-laboratorium/proses-result/detail/simpan-sinkronisasi', [LaboratoriumController::class, 'menu_lab_proses_result_simpan_sinkronisasi'])->name('menu_lab_proses_result_simpan_sinkronisasi');
-    Route::post('menu-laboratorium/proses-result/detail/proses-save', [LaboratoriumController::class, 'menu_lab_proses_result_detail_proses_save'])->name('menu_lab_proses_result_detail_proses_save');
-    Route::post('verifikasi-lab/verifikasi-hasil/detail', [LaboratoriumController::class, 'verifikasi_laboratorium_detail'])->name('verifikasi_laboratorium_detail');
-    Route::post('verifikasi-lab/verifikasi-hasil/verifikasi-data', [LaboratoriumController::class, 'verifikasi_laboratorium_verifikasi_data'])->name('verifikasi_laboratorium_verifikasi_data');
-    Route::post('verifikasi-lab/verifikasi-hasil/preview-report', [LaboratoriumController::class, 'verifikasi_laboratorium_preview_report'])->name('verifikasi_laboratorium_preview_report');
-    Route::post('verifikasi-lab/dokumentasi-hasil/detail', [LaboratoriumController::class, 'dokumentasi_hasil_laboratorium_detail'])->name('dokumentasi_hasil_laboratorium_detail');
-    Route::post('verifikasi-lab/dokumentasi-hasil/kirim-hasil', [LaboratoriumController::class, 'dokumentasi_hasil_laboratorium_detail_kirim_hasil'])->name('dokumentasi_hasil_laboratorium_detail_kirim_hasil');
-    Route::post('verifikasi-lab/dokumentasi-hasil/batal-kirim-hasil', [LaboratoriumController::class, 'dokumentasi_hasil_laboratorium_detail_batal_kirim_hasil'])->name('dokumentasi_hasil_laboratorium_detail_batal_kirim_hasil');
-    Route::post('verifikasi-lab/pengiriman-hasil/add', [LaboratoriumController::class, 'pengiriman_hasil_laboratorium_add'])->name('pengiriman_hasil_laboratorium_add');
-    Route::post('verifikasi-lab/pengiriman-hasil/save', [LaboratoriumController::class, 'pengiriman_hasil_laboratorium_save'])->name('pengiriman_hasil_laboratorium_save');
-    Route::get('verifikasi-lab/pengiriman-hasil/template', [LaboratoriumController::class, 'pengiriman_hasil_laboratorium_template'])->name('pengiriman_hasil_laboratorium_template');
 
-    Route::get('interface-lab/data-result/data', [LaboratoriumController::class, 'interfave_lab_data_result_get_data'])->name('interfave_lab_data_result_get_data');
-    Route::get('interface-lab/data-result/{id}/detail', [LaboratoriumController::class, 'interfave_lab_data_result_show_data_detail'])->name('interfave_lab_data_result_show_data_detail');
-    Route::get('interface-lab/data-result/{id}/raw', [LaboratoriumController::class, 'interfave_lab_data_result_show_data_raw'])->name('interfave_lab_data_result_show_data_raw');
-});
 Route::prefix('pelayanan/laboratorium')->name('lab.')->group(function () {
     Route::get('/', [LabRegistrationController::class, 'index'])->name('index');
     Route::post('/get-sub-sales', [LabRegistrationController::class, 'getSubSales'])->name('get_sub_sales');

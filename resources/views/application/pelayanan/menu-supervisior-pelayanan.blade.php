@@ -3,15 +3,11 @@
 @section('base.css')
 <link rel="stylesheet" href="https://cdn.datatables.net/2.2.2/css/dataTables.bootstrap5.css">
 <link rel="stylesheet" href="https://cdn.datatables.net/responsive/3.0.4/css/responsive.bootstrap5.css">
-<link href="{{ asset('vendors/choices/choices.min.css') }}" rel="stylesheet" />
 <link href="{{ asset('vendors/flatpickr/flatpickr.min.css') }}" rel="stylesheet" />
+<link href="https://cdn.jsdelivr.net/npm/select2@4.1.0-rc.0/dist/css/select2.min.css" rel="stylesheet" />
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/select2-bootstrap-5-theme@1.3.0/dist/select2-bootstrap-5-theme.min.css" />
 
 <style>
-    .js-choice {
-        width: 100%;
-        border-radius: 8px;
-    }
-
     /* Banner Header Gradient */
     .welcome-banner {
         background: linear-gradient(135deg, #0ea5e9 0%, #2563eb 50%, #4f46e5 100%);
@@ -24,32 +20,68 @@
         border: none;
         border-radius: 16px;
         box-shadow: 0 4px 20px rgba(0, 0, 0, 0.03);
-        background: #ffffff;
+        /* background: #ffffff; */
     }
 
-    .filter-control {
-        background-color: #f8fafc !important;
-        border: 1px solid #e2e8f0 !important;
-        border-radius: 10px !important;
-        font-size: 0.85rem !important;
+    /* Floating Field Filter Style */
+    .form-floating-custom {
+        position: relative;
+    }
+
+    .form-floating-custom label {
+        position: absolute;
+        top: 3px;
+        left: 10px;
+        font-size: 0.68rem;
+        color: #6c757d;
+        pointer-events: none;
+        z-index: 5 !important;
+        background: transparent !important;
+    }
+
+    .form-floating-custom .form-control,
+    .form-floating-custom .form-select {
+        padding-top: 16px;
+        padding-bottom: 4px;
+        padding-left: 10px;
+        font-size: 0.8rem;
+        font-weight: 600;
+        height: 42px;
+        border-color: #ced4da;
+        border-radius: 6px;
+    }
+
+    /* Penyesuaian Khusus Select2 Floating Label */
+    .form-floating-custom .select2-container--bootstrap-5 .select2-selection {
+        height: 42px !important;
+        padding-top: 14px !important;
+        padding-bottom: 2px !important;
+        padding-left: 6px !important;
+        border-radius: 6px !important;
+        background-color: #fff !important;
+        border: 1px solid #ced4da !important;
+    }
+
+    .form-floating-custom .select2-container--bootstrap-5 .select2-selection--single .select2-selection__rendered {
+        font-size: 0.8rem !important;
         font-weight: 600 !important;
-        color: #1e293b !important;
-        transition: all 0.2s ease;
+        color: #212529 !important;
+        padding-left: 4px !important;
+        line-height: 1.5 !important;
     }
 
-    .filter-control:focus {
-        border-color: #3b82f6 !important;
-        background-color: #ffffff !important;
-        box-shadow: 0 0 0 3px rgba(59, 130, 246, 0.15) !important;
+    .form-floating-custom .select2-container--bootstrap-5 .select2-selection--single .select2-selection__arrow {
+        top: 6px !important;
     }
 
+    /* Button Search */
     .btn-search-modern {
         background: linear-gradient(135deg, #0ea5e9 0%, #2563eb 100%);
         border: none;
-        border-radius: 10px;
+        border-radius: 6px;
         color: #fff;
         font-weight: 700;
-        padding: 0 20px;
+        height: 42px;
         transition: all 0.2s ease;
         box-shadow: 0 4px 12px rgba(37, 99, 235, 0.2);
     }
@@ -58,17 +90,6 @@
         transform: translateY(-1px);
         box-shadow: 0 6px 16px rgba(37, 99, 235, 0.3);
         color: #fff;
-    }
-
-    .label-filter-mini {
-        font-size: 0.68rem;
-        font-weight: 700;
-        text-transform: uppercase;
-        letter-spacing: 0.5px;
-        margin-bottom: 4px;
-        display: flex;
-        align-items: center;
-        gap: 4px;
     }
 </style>
 @endsection
@@ -84,8 +105,8 @@
                         <img src="{{ asset('img/super.png') }}" alt="Icon" width="48" height="48" class="object-fit-contain" />
                     </div>
                     <div>
-                        <span class="badge bg-white bg-opacity-20 text-white rounded-pill px-3 py-1 fs--2 fw-semibold mb-1">
-                            Welcome Back
+                        <span class="badge bg-white bg-opacity-20 text-dark rounded-pill px-3 py-1 fs--2 fw-semibold mb-1">
+                            Akses Khusus
                         </span>
                         <h4 class="text-white fw-bold mb-0">
                             {{ Env('APP_LABEL') }} <span class="fw-normal text-white-50">Management System</span>
@@ -95,7 +116,7 @@
                 <div class="col-md-5 text-md-end border-start border-white border-opacity-25 ps-md-4">
                     <span class="text-white-50 fs--2 fw-bold text-uppercase d-block">Modul Layanan</span>
                     <h5 class="text-white fw-bold mb-0">
-                        Supervisor <span class="badge bg-warning text-dark rounded-pill ms-1 fs--2">Pelayanan</span>
+                        Supervisor <span class="badge bg-warning text-dark rounded-pill ms-1 fs--2">Verifikasi & Koreksi</span>
                     </h5>
                 </div>
             </div>
@@ -103,61 +124,60 @@
     </div>
 </div>
 
-<!-- Filter & Content Area -->
+<!-- Filter Area -->
 <div class="card filter-card mb-4">
     <div class="card-body p-3 p-lg-4">
         <!-- Form Pencarian Filter -->
-        <div class="row g-3 align-items-end mb-3">
-            <div class="col-md-4">
-                <label class="label-filter-mini text-primary">
-                    <i class="fas fa-layer-group text-primary"></i> Kategori Pasien
-                </label>
-                <select class="form-select filter-control" id="kategori_pasien" name="organizerSingle">
-                    <option value="">Pilih Kategori</option>
-                    @foreach ($kategori as $cat)
-                    <option value="{{ $cat->t_pasien_cat_code }}">{{ $cat->t_pasien_cat_name }}</option>
-                    @endforeach
-                </select>
+        <div class="row g-2 align-items-end mb-3">
+
+            <div class="col-12 col-md-3">
+                <div class="form-floating-custom">
+                    <label>Kelompok Pasien (Penjamin)</label>
+                    <select class="form-select" id="kategori_pasien">
+                        <option value="">Semua Kelompok</option>
+                        @foreach ($kategori as $cat)
+                        <option value="{{ $cat->id }}">{{ $cat->nama_sub_penjamin }}</option>
+                        @endforeach
+                    </select>
+                </div>
             </div>
 
-            <div class="col-md-4">
-                <label class="label-filter-mini text-info">
-                    <i class="fas fa-notes-medical text-info"></i> Jenis Layanan
-                </label>
-                <select class="form-select filter-control" id="layanan_pasien" name="organizerSingle">
-                    <option value="">Pilih Layanan</option>
-                    <option value="all">Semua Layanan (All)</option>
-                    @foreach ($layanan as $lay)
-                    <option value="{{ $lay->t_layanan_cat_code }}">{{ $lay->t_layanan_cat_name }}</option>
-                    @endforeach
-                </select>
+            <div class="col-12 col-md-3">
+                <div class="form-floating-custom">
+                    <label>Jenis Pemeriksaan</label>
+                    <select class="form-select" id="layanan_pasien">
+                        <option value="all">Semua Layanan (All)</option>
+                        @foreach ($layanan as $lay)
+                        <option value="{{ $lay->id }}">{{ $lay->nama_layanan }}</option>
+                        @endforeach
+                    </select>
+                </div>
             </div>
 
-            <div class="col-md-3">
-                <label class="label-filter-mini text-warning">
-                    <i class="fas fa-calendar-alt text-warning"></i> Rentang Tanggal
-                </label>
-                <input class="form-control filter-control datetimepicker" id="timepicker3" type="text"
-                    placeholder="d-m-y s/d d-m-y"
-                    data-options='{"mode":"range","dateFormat":"d-m-y","disableMobile":true,"locale":"in"}' />
+            <div class="col-12 col-md-4">
+                <div class="form-floating-custom">
+                    <label>Rentang Tanggal Registrasi</label>
+                    <input class="form-control datetimepicker" id="rentang_tanggal" type="text"
+                        placeholder="Filter Tanggal (YYYY-MM-DD)"
+                        data-options='{"mode":"range","dateFormat":"Y-m-d","disableMobile":true,"locale":"id"}' />
+                </div>
             </div>
 
-            <div class="col-md-1 d-grid">
-                <button class="btn btn-search-modern py-2 d-flex align-items-center justify-content-center" id="button-pencarian-data-pasien" title="Cari Data">
-                    <i class="fas fa-search me-md-0 me-1"></i>
-                    <span class="d-md-none fw-bold">Cari Data</span>
+            <div class="col-12 col-md-2 d-grid">
+                <button class="btn btn-search-modern d-flex align-items-center justify-content-center gap-2" id="button-pencarian-data-pasien">
+                    <i class="fas fa-search"></i> Tampilkan
                 </button>
             </div>
         </div>
 
         <!-- Area Hasil Pencarian (Dynamic Ajax Content) -->
-        <div class="border-top pt-3" id="menu-pencarian-data-pasien">
+        <div class="border-top pt-4 mt-2" id="menu-pencarian-data-pasien">
             <div class="text-center py-5 text-muted">
                 <div class="p-3 bg-light rounded-circle d-inline-block mb-3">
-                    <i class="fas fa-search fs-2 text-primary opacity-50"></i>
+                    <i class="fas fa-clipboard-list fs-2 text-primary opacity-50"></i>
                 </div>
-                <h6 class="fw-bold text-dark mb-1">Siap Melakukan Pencarian</h6>
-                <p class="fs--1 mb-0">Gunakan filter di atas untuk menampilkan data registrasi pasien.</p>
+                <h6 class="fw-bold text-dark mb-1">Pusat Koreksi Data Registrasi</h6>
+                <p class="fs--1 mb-0" style="max-width: 400px; margin: 0 auto;">Gunakan filter di atas untuk menampilkan, mengoreksi, menghapus (VOID), atau menambahkan pemeriksaan pasien.</p>
             </div>
         </div>
     </div>
@@ -165,19 +185,13 @@
 @endsection
 
 @section('base.js')
-<!-- Modal Company Full -->
-<div class="modal fade" id="modal-company-full" data-bs-keyboard="false" data-bs-backdrop="static" tabindex="-1" aria-hidden="true">
-    <div class="modal-dialog modal-dialog-centered" role="document" style="max-width: 95%;">
-        <div class="modal-content border-0 shadow-lg rounded-4 overflow-hidden">
-            <div id="menu-company-full"></div>
-        </div>
-    </div>
-</div>
-
-<!-- Modal Supervisior Verifikasi Pasien -->
+<!-- Modal Modal Ajax untuk Koreksi/Edit Supervisor -->
 <div class="modal fade" id="modal-supervisior" data-bs-keyboard="false" data-bs-backdrop="static" tabindex="-1" aria-hidden="true">
     <div class="modal-dialog modal-dialog-centered modal-xl" role="document">
         <div class="modal-content border-0 shadow-lg rounded-4 overflow-hidden">
+            <div class="position-absolute top-0 end-0 mt-3 me-3 z-index-1">
+                <button class="btn-close btn btn-sm btn-circle bg-light d-flex flex-center transition-base" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
             <div id="menu-supervisior"></div>
         </div>
     </div>
@@ -187,22 +201,100 @@
 <script src="https://cdn.datatables.net/2.2.2/js/dataTables.bootstrap5.js"></script>
 <script src="https://cdn.datatables.net/responsive/3.0.4/js/dataTables.responsive.js"></script>
 <script src="https://cdn.datatables.net/responsive/3.0.4/js/responsive.bootstrap5.js"></script>
-<script src="{{ asset('vendors/choices/choices.min.js') }}"></script>
 <script src="{{ asset('asset/js/flatpickr.js') }}"></script>
 <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+<script src="https://cdn.jsdelivr.net/npm/select2@4.1.0-rc.0/dist/js/select2.min.js"></script>
 
 <script>
-    new DataTable('#example', {
-        responsive: true
+    $(document).ready(function() {
+        // Inisialisasi Select2
+        $('#kategori_pasien, #layanan_pasien').select2({
+            theme: 'bootstrap-5',
+            width: '100%',
+            allowClear: true
+        });
     });
 
-    // Event handler detail pasien
-    $(document).on("click", "#button-data-detail-Pasien", function(e) {
+    // Event handler load data Ajax
+    $(document).on("click", "#button-pencarian-data-pasien", function(e) {
+        e.preventDefault();
+        var kategori = $('#kategori_pasien').val();
+        var layanan = $('#layanan_pasien').val();
+        var tanggal = $('#rentang_tanggal').val();
+
+        // Validasi opsional: pastikan setidaknya tanggal diisi
+        if (!tanggal || tanggal.length < 20) {
+            Swal.fire({
+                title: "Tanggal Belum Dipilih",
+                text: "Silakan pilih rentang tanggal pencarian terlebih dahulu.",
+                icon: "warning",
+                confirmButtonColor: "#2563eb"
+            });
+            return;
+        }
+
+        $('#menu-pencarian-data-pasien').html(
+            '<div class="text-center py-5"><div class="spinner-border text-primary" role="status"></div><p class="mt-2 text-muted fs--1 fw-semibold">Memuat Data Registrasi...</p></div>'
+        );
+
+        $.ajax({
+            url: "{{ route('menu_pelayanan_supervisior_find') }}",
+            type: "POST",
+            cache: false,
+            data: {
+                "_token": "{{ csrf_token() }}",
+                "kategori": kategori,
+                "layanan": layanan,
+                "tanggal": tanggal
+            },
+            dataType: 'html',
+        }).done(function(data) {
+            $('#menu-pencarian-data-pasien').html(data);
+
+            // Inisialisasi ulang Datatable jika table hasil dikembalikan sebagai HTML murni
+            if ($.fn.DataTable.isDataTable('#table_hasil_supervisor')) {
+                $('#table_hasil_supervisor').DataTable().destroy();
+            }
+            $('#table_hasil_supervisor').DataTable({
+                responsive: true
+            });
+
+            Swal.mixin({
+                toast: true,
+                position: "bottom-end",
+                showConfirmButton: false,
+                timer: 2000
+            }).fire({
+                icon: "success",
+                title: "Data Ditemukan"
+            });
+        }).fail(function() {
+            Swal.fire({
+                title: "Gagal",
+                text: "Gagal mengambil data dari server, silakan coba lagi.",
+                icon: "error",
+                confirmButtonColor: "#2563eb"
+            });
+            $('#menu-pencarian-data-pasien').html('<div class="p-4 text-center text-danger"><i class="fas fa-exclamation-triangle"></i> Terjadi kesalahan memuat data.</div>');
+        });
+    });
+
+    // Event handler klik detail pasien (Edit / Void / Koreksi)
+    // Menggunakan class selector (.) bukan ID (#) untuk elemen dinamis DataTables
+    $(document).on("click", ".button-data-detail-pasien", function(e) {
         e.preventDefault();
         var code = $(this).data("code");
+
+        // Kosongkan modal dan tampilkan loading spinner
         $('#menu-supervisior').html(
-            '<div class="text-center py-5"><div class="spinner-border text-primary" role="status"><span class="visually-hidden">Loading...</span></div><p class="mt-2 text-muted fs--1 fw-semibold">Memuat Detail Pasien...</p></div>'
+            '<div class="text-center py-5"><div class="spinner-border text-primary" role="status"></div><p class="mt-2 text-muted fs--1 fw-semibold">Membuka Panel Supervisi...</p></div>'
         );
+
+        // Pastikan modal terbuka
+        var modalEl = document.getElementById('modal-supervisior');
+        var modalSup = bootstrap.Modal.getOrCreateInstance(modalEl);
+        modalSup.show();
+
         $.ajax({
             url: "{{ route('menu_pelayanan_supervisior_detail_pasien') }}",
             type: "POST",
@@ -215,70 +307,8 @@
         }).done(function(data) {
             $('#menu-supervisior').html(data);
         }).fail(function() {
-            $('#menu-supervisior').html('<div class="p-4 text-center text-danger"><i class="fas fa-exclamation-circle me-1"></i> Gagal memuat data verifikasi.</div>');
+            $('#menu-supervisior').html('<div class="p-4 text-center text-danger"><i class="fas fa-exclamation-circle fs-3 mb-2"></i><br>Gagal memuat panel pengeditan registrasi.</div>');
         });
-    });
-
-    // Event handler pencarian data pasien
-    $(document).on("click", "#button-pencarian-data-pasien", function(e) {
-        e.preventDefault();
-        var kategori = document.getElementById("kategori_pasien").value;
-        var layanan = document.getElementById("layanan_pasien").value;
-
-        if (kategori == "") {
-            Swal.fire({
-                title: "Kategori Belum Dipilih",
-                text: "Silakan pilih Kategori Pasien terlebih dahulu.",
-                icon: "warning",
-                confirmButtonColor: "#2563eb"
-            });
-        } else if (layanan == "") {
-            Swal.fire({
-                title: "Layanan Belum Dipilih",
-                text: "Silakan pilih Layanan Pasien terlebih dahulu.",
-                icon: "warning",
-                confirmButtonColor: "#2563eb"
-            });
-        } else {
-            $('#menu-pencarian-data-pasien').html(
-                '<div class="text-center py-5"><div class="spinner-border text-primary" role="status"><span class="visually-hidden">Loading...</span></div><p class="mt-2 text-muted fs--1 fw-semibold">Mencari Data Pasien...</p></div>'
-            );
-            $.ajax({
-                url: "{{ route('menu_pelayanan_supervisior_find') }}",
-                type: "POST",
-                cache: false,
-                data: {
-                    "_token": "{{ csrf_token() }}",
-                    "kategori": kategori,
-                    "layanan": layanan,
-                },
-                dataType: 'html',
-            }).done(function(data) {
-                $('#menu-pencarian-data-pasien').html(data);
-                const Toast = Swal.mixin({
-                    toast: true,
-                    position: "bottom-end",
-                    showConfirmButton: false,
-                    timer: 3000,
-                    timerProgressBar: true,
-                    didOpen: (toast) => {
-                        toast.onmouseenter = Swal.stopTimer;
-                        toast.onmouseleave = Swal.resumeTimer;
-                    }
-                });
-                Toast.fire({
-                    icon: "success",
-                    title: "Data Pasien Berhasil Dimuat"
-                });
-            }).fail(function() {
-                Swal.fire({
-                    title: "Koneksi Lambat?",
-                    text: "Gagal mengambil data dari server, silakan coba lagi.",
-                    icon: "error",
-                    confirmButtonColor: "#2563eb"
-                });
-            });
-        }
     });
 </script>
 @endsection

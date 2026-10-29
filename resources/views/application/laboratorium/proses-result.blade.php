@@ -135,27 +135,27 @@
 
                     <hr class="my-2 text-200">
 
-                    <!-- LIST PASIEN -->
+                    <!-- LIST PASIEN / REGISTRASI -->
                     <div class="patient-list-container">
                         @forelse ($data as $datas)
-                        <div class="card border mb-2 patient-card remove-class shadow-none" id="button-proses-result-lab" data-code="{{ $datas->d_reg_order_lab_code }}">
-                            <div class="card-body p-2">
+                        <div class="card border mb-2 patient-card remove-class shadow-none button-pilih-registrasi" data-code="{{ $datas->registrasi_id }}">
+                            <div class="card-body p-2.5">
                                 <div class="d-flex justify-content-between align-items-start mb-1">
                                     <h6 class="mb-0 fw-bold text-dark fs--1">{{ $datas->master_patient_name }}</h6>
-                                    <span class="badge bg-soft-warning text-warning fs--2 rounded-pill fw-bold">
-                                        {{ $datas->d_reg_order_lab_code }}
+                                    <span class="badge bg-soft-primary text-primary fs--2 rounded-pill fw-bold">
+                                        {{ $datas->no_registrasi }}
                                     </span>
                                 </div>
                                 <div class="d-flex justify-content-between align-items-center fs--2 text-600">
                                     <span><i class="fas fa-clock me-1 text-400"></i>{{ $datas->d_reg_order_lab_date }}</span>
-                                    <span class="text-primary fw-semibold fs--2">Proses <i class="fas fa-chevron-right ms-1"></i></span>
+                                    <span class="text-primary fw-semibold">{{ $datas->total_pemeriksaan }} Pemeriksaan <i class="fas fa-chevron-right ms-1"></i></span>
                                 </div>
                             </div>
                         </div>
                         @empty
                         <div class="text-center py-4 text-muted">
                             <i class="fas fa-inbox fa-2x mb-2 text-300"></i>
-                            <p class="fs--1 mb-0">Tidak ada antrean pasien</p>
+                            <p class="fs--1 mb-0">Tidak ada antrean registrasi lab</p>
                         </div>
                         @endforelse
                     </div>
@@ -179,7 +179,6 @@
     </div>
 </div>
 @endsection
-
 @section('base.js')
 <!-- MODALS -->
 <div class="modal fade" id="modal-poliklinik-full" data-bs-keyboard="false" data-bs-backdrop="static" tabindex="-1" aria-hidden="true">
@@ -214,20 +213,21 @@
 <script src="{{ asset('asset/js/swetalert.js') }}"></script>
 
 <script>
-    $(document).on("click", "#button-proses-result-lab", function(e) {
+    // Event listener untuk klik antrean registrasi pasien lab di sebelah kiri
+    $(document).on("click", ".button-pilih-registrasi", function(e) {
         e.preventDefault();
 
-        // Visual indicator active state
+        // Mengatur status aktif pada kartu pasien
         $('.patient-card').removeClass('active-patient');
         $(this).addClass('active-patient');
 
-        var code = $(this).data("code");
+        var registrasiId = $(this).data("code");
 
         $('#menu-detail-result').html(
             '<div class="card shadow-sm border-0 py-5 text-center">' +
             '<div class="card-body">' +
             '<div class="spinner-border text-primary my-3" role="status"><span class="visually-hidden">Loading...</span></div>' +
-            '<p class="text-muted fs--1 mb-0">Memuat data hasil pemeriksaan lab...</p>' +
+            '<p class="text-muted fs--1 mb-0">Memuat daftar pemeriksaan & parameter lab...</p>' +
             '</div>' +
             '</div>'
         );
@@ -238,7 +238,7 @@
             cache: false,
             data: {
                 "_token": "{{ csrf_token() }}",
-                "code": code,
+                "code": registrasiId, // Mengirim ID Registrasi
             },
             dataType: 'html',
         }).done(function(data) {
@@ -246,12 +246,13 @@
         }).fail(function() {
             $('#menu-detail-result').html(
                 '<div class="alert alert-danger shadow-sm border-0" role="alert">' +
-                '<i class="fas fa-exclamation-triangle me-2"></i> Gagal memuat data. Silakan coba lagi.' +
+                '<i class="fas fa-exclamation-triangle me-2"></i> Gagal memuat data pemeriksaan. Silakan coba lagi.' +
                 '</div>'
             );
         });
     });
 
+    // Event listener untuk menyimpan hasil pemeriksaan lab
     $(document).on("click", "#button-simpan-proses-result", function(e) {
         e.preventDefault();
         var data = $("#form-result-pasien").serialize();

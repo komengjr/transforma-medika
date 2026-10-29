@@ -24,7 +24,12 @@
                     @if (empty($data->master_patient_profile))
                     <img src="{{ asset('img/pasien.png') }}" class="w-100 h-100 object-fit-cover" alt="Foto Pasien" id="videoPreview">
                     @else
-                    <img src="{{ Storage::url($data->master_patient_profile) }}" class="w-100 h-100 object-fit-cover" alt="Foto Pasien" id="videoPreview">
+                    {{-- Render Base64 Image Profile --}}
+                    @php
+                    $foto = $data->master_patient_profile;
+                    $src = str_starts_with($foto, 'data:image') ? $foto : 'data:image/jpeg;base64,' . $foto;
+                    @endphp
+                    <img src="{{ $src }}" class="w-100 h-100 object-fit-cover" alt="Foto Pasien" id="videoPreview">
                     @endif
                 </div>
                 <br>
@@ -113,54 +118,46 @@
                         <tr>
                             <td class="py-3 px-3">
                                 <div class="fw-bold text-dark mb-0">{{ $pem->t_pemeriksaan_list_name }}</div>
-                                <span class="fs--2 text-muted">Kode List: {{ $pem->t_pemeriksaan_list_code }}</span>
+                                <span class="fs--2 text-muted">Kode Layanan: {{ $pem->t_pemeriksaan_list_code }} | No. Lab: {{ $pem->order_lab_list_code }}</span>
                                 @php
-                                $specimen = DB::table('t_pem_specimen')
-                                ->join('s_specimen_data', 's_specimen_data.s_specimen_data_code', '=', 't_pem_specimen.s_specimen_data_code')
-                                ->where('t_pemeriksaan_list_code', $pem->t_pemeriksaan_list_code)
+                                // MENGAMBIL SPESIMEN BERDASARKAN TABEL BARU BER-AWALAN MEDICAL_
+                                $specimen = DB::table('medical_pem_specimen')
+                                ->join('medical_specimen_data', 'medical_specimen_data.id', '=', 'medical_pem_specimen.specimen_data_id')
+                                ->where('medical_pem_specimen.master_pemeriksaan_id', $pem->id_t_pemeriksaan_list)
                                 ->get();
                                 @endphp
                             </td>
                             <td class="py-3 px-3 text-end">
-                                @foreach ($specimen as $spec)
+                                @forelse ($specimen as $spec)
                                 @php
-                                $log = DB::table('s_specimen_log')
-                                ->where('t_pem_specimen_code', $spec->t_pem_specimen_code)
-                                ->where('order_lab_list_code', $pem->order_lab_list_code)
+                                // Mengecek status pengambilan spesimen di tabel medical_specimen_collection
+                                $collection = DB::table('medical_specimen_collection')
+                                ->where('specimen_data_id', $spec->id)
+                                ->where('no_barcodespesimen', 'LIKE', '%' . $pem->order_lab_list_code . '%')
                                 ->first();
                                 @endphp
 
-                                <div id="menudata{{ $pem->id_t_pemeriksaan_list }}{{ $spec->id_s_specimen_data }}" class="d-inline-flex align-items-center gap-1 m-1">
+                                <div id="menudata{{ $pem->id_t_pemeriksaan_list }}{{ $spec->id }}" class="d-inline-flex align-items-center gap-1 m-1">
 
                                     <!-- TOMBOL AKSI SPESIMEN -->
-                                    @if ($log)
-                                    @if ($log->s_specimen_log_status == 0)
-                                    <!-- STATUS BELUM SELESAI / DALAM PROSES -->
-                                    <!-- STATUS DALAM PROSES (1 BUTTON UTAMA + NAMA SPESIMEN DI BAWAH) -->
+                                    @if ($collection)
+                                    @if ($collection->status_koleksi == 'DITERIMA' || $collection->status_koleksi == 'DIPROSES')
                                     <div class="d-inline-flex flex-column align-items-center">
-                                        <button class="btn btn-warning btn-sm shadow-sm px-3 py-1 d-flex align-items-center justify-content-center gap-1"
-                                            id="button-simpan-specimen{{ $pem->id_t_pemeriksaan_list }}{{ $spec->t_pem_specimen_code }}"
-                                            data-code="{{ $pem->id_t_pemeriksaan_list }}"
-                                            data-specimen="{{ $spec->t_pem_specimen_code }}"
-                                            data-reg="{{ $pem->order_lab_list_code }}"
-                                            title="Klik untuk Menyelesaikan Proses Spesimen">
-                                            <i class="fas fa-clock me-1"></i> Proses ({{ $log->s_specimen_log_time }})
+                                        <!-- Tombol Print Satuan Zebra -->
+                                        <button class="btn btn-success btn-sm shadow-sm px-3 py-1 d-flex align-items-center justify-content-center gap-1 btn-print-barcode-satuan"
+                                            data-barcode="{{ $collection->no_barcodespesimen }}"
+                                            title="Klik untuk Cetak Barcode Sampel ke Printer Zebra">
+                                            <i class="fas fa-barcode"></i> Print ({{ $collection->no_barcodespesimen }})
                                         </button>
                                         <small class="text-muted fw-semibold mt-1 fs--2">
-                                            {{ $spec->s_specimen_data_name }}
+                                            {{ $spec->s_specimen_data_name }} ({{ $spec->wadah_tabung }})
                                         </small>
                                     </div>
                                     @else
-                                    <!-- STATUS SELESAI -->
-                                    <!-- STATUS SELESAI & PRINT BARCODE (1 BUTTON TUNGGAL) -->
                                     <div class="d-inline-flex flex-column align-items-center">
-                                        <button class="btn btn-success btn-sm shadow-sm px-3 py-1 d-flex align-items-center justify-content-center gap-1"
-                                            id="button-print-barcode{{ $pem->id_t_pemeriksaan_list }}{{ $spec->id_s_specimen_data }}"
-                                            data-code="{{ $pem->id_t_pemeriksaan_list }}"
-                                            data-specimen="{{ $spec->t_pem_specimen_code }}"
-                                            data-reg="{{ $pem->order_lab_list_code }}"
-                                            title="Klik untuk Cetak Barcode Sampel">
-                                            <i class="fas fa-barcode"></i> Print Barcode
+                                        <button class="btn btn-warning btn-sm shadow-sm px-3 py-1 d-flex align-items-center justify-content-center gap-1"
+                                            title="Proses Spesimen">
+                                            <i class="fas fa-clock me-1"></i> Proses
                                         </button>
                                         <small class="text-muted fw-semibold mt-1 fs--2">
                                             {{ $spec->s_specimen_data_name }}
@@ -168,208 +165,25 @@
                                     </div>
                                     @endif
                                     @else
-                                    <!-- BELUM DIPROSES -->
-                                    <!-- STATUS BELUM DIPROSES (1 BUTTON UTAMA + NAMA SPESIMEN DI BAWAH) -->
+                                    <!-- JIKA BELUM DIPROSES / BELUM ADA DI COLLECTION -->
                                     <div class="d-inline-flex flex-column align-items-center">
-                                        <button class="btn btn-outline-danger btn-sm shadow-sm px-3 py-1 d-flex align-items-center justify-content-center gap-1"
-                                            id="button-collection-specimen{{ $pem->id_t_pemeriksaan_list }}{{ $spec->id_s_specimen_data }}"
-                                            data-code="{{ $pem->id_t_pemeriksaan_list }}"
-                                            data-specimen="{{ $spec->t_pem_specimen_code }}"
-                                            data-reg="{{ $pem->order_lab_list_code }}"
+                                        <button class="btn btn-outline-danger btn-sm shadow-sm px-3 py-1 d-flex align-items-center justify-content-center gap-1 btn-mulai-proses"
+                                            id="button-collection-specimen{{ $pem->id_t_pemeriksaan_list }}{{ $spec->id }}"
+                                            data-pemeriksaan-id="{{ $pem->id_t_pemeriksaan_list }}"
+                                            data-specimen-id="{{ $spec->id }}"
+                                            data-order-lab="{{ $pem->order_lab_list_code }}"
                                             title="Klik untuk Mulai Ambil/Proses Spesimen">
                                             <i class="fas fa-vial me-1"></i> Mulai Proses
                                         </button>
                                         <small class="text-muted fw-semibold mt-1 fs--2">
-                                            {{ $spec->s_specimen_data_name }}
+                                            {{ $spec->s_specimen_data_name }} — <span class="text-primary">{{ $spec->wadah_tabung ?? 'Tabung Standar' }}</span>
                                         </small>
                                     </div>
                                     @endif
                                 </div>
-
-                                <script>
-                                    // PRINT BARCODE SAMPLE HANDLER
-                                    $(document).off("click", "#button-print-barcode{{ $pem->id_t_pemeriksaan_list }}{{ $spec->id_s_specimen_data }}").on("click", "#button-print-barcode{{ $pem->id_t_pemeriksaan_list }}{{ $spec->id_s_specimen_data }}", function(e) {
-                                        e.preventDefault();
-                                        var code = $(this).data("code");
-                                        var specimen = $(this).data("specimen");
-                                        var reg = $(this).data("reg");
-
-                                        // 1. Tampilkan Swal Loading saat mengambil preview
-                                        Swal.fire({
-                                            title: 'Memuat Preview Barcode...',
-                                            text: 'Mohon tunggu sebentar',
-                                            allowOutsideClick: false,
-                                            didOpen: () => {
-                                                Swal.showLoading();
-                                            }
-                                        });
-
-                                        // Ambil data preview barcode dari backend
-                                        $.ajax({
-                                            url: "{{ route('data_specimen_collection_lab_print_barcode') }}",
-                                            type: 'GET',
-                                            data: {
-                                                code: code,
-                                                specimen: specimen,
-                                                reg: reg
-                                            },
-                                            dataType: 'html',
-                                            success: function(response) {
-                                                // 2. Tampilkan Modal Swal dengan Preview & Tombol Cetak
-                                                Swal.fire({
-                                                    title: '<strong>Preview Barcode Sampel</strong>',
-                                                    html: '<div class="p-2 border rounded bg-light overflow-auto" style="max-height: 400px;">' + response + '</div>',
-                                                    showCancelButton: true,
-                                                    confirmButtonColor: '#0d6efd',
-                                                    cancelButtonColor: '#6c757d',
-                                                    confirmButtonText: '<i class="fas fa-print me-1"></i> Cetak Now',
-                                                    cancelButtonText: 'Tutup',
-                                                    focusConfirm: false,
-                                                    showLoaderOnConfirm: true, // Mengaktifkan loading bawaan Swal pada tombol confirm
-                                                    preConfirm: () => {
-                                                        // 3. Kirim Perintah Cetak ke Backend saat "Cetak Now" diklik
-                                                        return $.ajax({
-                                                            url: "{{ route('data_specimen_collection_lab_print_barcode_proses') }}",
-                                                            type: 'POST',
-                                                            data: {
-                                                                _token: "{{ csrf_token() }}",
-                                                                code: code,
-                                                                specimen: specimen,
-                                                                reg: reg
-                                                            },
-                                                            dataType: 'json'
-                                                        }).then(function(res) {
-                                                            if (!res.success) {
-                                                                throw new Error(res.message || 'Gagal mencetak barcode.');
-                                                            }
-                                                            return res;
-                                                        }).catch(function(error) {
-                                                            Swal.showValidationMessage(`Proses Cetak Gagal: ${error.message}`);
-                                                        });
-                                                    },
-                                                    allowOutsideClick: () => !Swal.isLoading()
-                                                }).then((result) => {
-                                                    // 4. Tampilkan Respon Sukses dari Backend
-                                                    if (result.isConfirmed && result.value) {
-                                                        Swal.fire({
-                                                            icon: 'success',
-                                                            title: 'Berhasil!',
-                                                            text: result.value.message || 'Perintah cetak telah dikirim ke printer.',
-                                                            timer: 2000,
-                                                            showConfirmButton: false
-                                                        });
-                                                    }
-                                                });
-                                            },
-                                            error: function() {
-                                                Swal.fire({
-                                                    icon: 'error',
-                                                    title: 'Gagal Memuat Barcode',
-                                                    text: 'Terjadi kesalahan saat mengambil data preview.',
-                                                    confirmButtonColor: '#ef4444'
-                                                });
-                                            }
-                                        });
-                                    });
-
-                                    // PROSES COLLECTION HANDLER
-                                    $(document).on("click", "#button-collection-specimen{{ $pem->id_t_pemeriksaan_list }}{{ $spec->id_s_specimen_data }}", function(e) {
-                                        e.preventDefault();
-                                        var code = $(this).data("code");
-                                        var specimen = $(this).data("specimen");
-                                        var reg = $(this).data("reg");
-
-                                        Swal.fire({
-                                            title: "Proses Spesimen?",
-                                            text: "Apakah Anda yakin ingin memproses pengambilan spesimen ini?",
-                                            icon: "question",
-                                            showCancelButton: true,
-                                            confirmButtonColor: "#22c55e",
-                                            cancelButtonColor: "#ef4444",
-                                            confirmButtonText: "Ya, Proses!",
-                                            cancelButtonText: "Batal",
-                                            reverseButtons: true
-                                        }).then((result) => {
-                                            if (result.isConfirmed) {
-                                                $.ajax({
-                                                    url: "{{ route('data_specimen_collection_lab_proses') }}",
-                                                    type: "POST",
-                                                    cache: false,
-                                                    data: {
-                                                        "_token": "{{ csrf_token() }}",
-                                                        "code": code,
-                                                        "specimen": specimen,
-                                                        "reg": reg,
-                                                    },
-                                                    dataType: 'html',
-                                                }).done(function(data) {
-                                                    $('#menudata{{ $pem->id_t_pemeriksaan_list }}{{ $spec->id_s_specimen_data }}').html(data);
-                                                    Toast.fire({
-                                                        icon: "success",
-                                                        title: "Spesimen Berhasil Diproses"
-                                                    });
-                                                }).fail(function() {
-                                                    Swal.fire({
-                                                        title: "Gagal!",
-                                                        text: "Proses spesimen gagal dilakukan.",
-                                                        icon: "error"
-                                                    });
-                                                });
-                                            }
-                                        });
-                                    });
-
-                                    // SIMPAN SPECIMEN HANDLER
-                                    $(document).on("click", "#button-simpan-specimen{{ $pem->id_t_pemeriksaan_list }}{{ $spec->t_pem_specimen_code }}", function(e) {
-                                        e.preventDefault();
-                                        var code = $(this).data("code");
-                                        var specimen = $(this).data("specimen");
-                                        var reg = $(this).data("reg");
-
-                                        Swal.fire({
-                                            title: "Konfirmasi Simpan",
-                                            text: "Apakah Anda yakin ingin menyimpan status spesimen ini?",
-                                            icon: "warning",
-                                            showCancelButton: true,
-                                            confirmButtonColor: "#22c55e",
-                                            cancelButtonColor: "#ef4444",
-                                            confirmButtonText: "Ya, Simpan!",
-                                            cancelButtonText: "Batal",
-                                            reverseButtons: true
-                                        }).then((result) => {
-                                            if (result.isConfirmed) {
-                                                $.ajax({
-                                                    url: "{{ route('data_specimen_collection_lab_proses_simpan') }}",
-                                                    type: "POST",
-                                                    cache: false,
-                                                    data: {
-                                                        "_token": "{{ csrf_token() }}",
-                                                        "code": code,
-                                                        "specimen": specimen,
-                                                        "reg": reg,
-                                                    },
-                                                    dataType: 'html',
-                                                }).done(function(data) {
-                                                    Swal.fire({
-                                                        title: "Berhasil!",
-                                                        text: "Data spesimen telah disimpan.",
-                                                        icon: "success",
-                                                        timer: 1500,
-                                                        showConfirmButton: false
-                                                    });
-                                                    $('#menudata{{ $pem->id_t_pemeriksaan_list }}{{ $spec->id_s_specimen_data }}').html(data);
-                                                }).fail(function() {
-                                                    Swal.fire({
-                                                        title: "Gagal!",
-                                                        text: "Terjadi kesalahan saat menyimpan data.",
-                                                        icon: "error"
-                                                    });
-                                                });
-                                            }
-                                        });
-                                    });
-                                </script>
-                                @endforeach
+                                @empty
+                                <span class="text-muted fs--2 fst-italic">Tidak memerlukan spesimen khusus</span>
+                                @endforelse
                             </td>
                         </tr>
                         @endforeach
@@ -379,10 +193,117 @@
         </div>
 
         <!-- ACTION FOOTER -->
-        <div class="d-flex justify-content-end pt-3">
-            <button class="btn btn-primary rounded-pill px-4 shadow-sm" id="button-simpan-proses-specimen-collection" data-code="{{ $code }}">
-                <i class="fas fa-save me-1"></i> Simpan Keseluruhan Spesimen
+        <div class="d-flex justify-content-end pt-4 gap-2 border-top mt-3">
+            <button class="btn btn-info rounded-pill px-4 shadow-sm text-white fw-medium" id="button-print-all-barcode" data-reg="{{ $code }}">
+                <i class="fas fa-print me-1"></i> Cetak Semua Barcode
+            </button>
+            <button class="btn btn-primary rounded-pill px-4 shadow-sm fw-medium" id="button-simpan-proses-specimen-collection" data-code="{{ $code }}">
+                <i class="fas fa-save me-1"></i> Simpan Keseluruhan
             </button>
         </div>
     </div>
 </div>
+
+<!-- SCRIPT HANDLER UNTUK TOMBOL CETAK ZEBRA -->
+<script>
+    // --- HANDLER CETAK BARCODE ZEBRA (SATUAN) ---
+    $(document).off("click", ".btn-print-barcode-satuan").on("click", ".btn-print-barcode-satuan", function(e) {
+        e.preventDefault();
+        var barcode = $(this).data("barcode");
+
+        // Membuka popup cetak khusus ukuran Zebra
+        var printUrl = "{{ route('data_specimen_collection_lab_print_barcode') }}?type=single&barcode=" + barcode;
+        var printWindow = window.open(printUrl, '_blank', 'width=600,height=400,toolbar=no,menubar=no,scrollbars=yes');
+
+        if (printWindow) {
+            printWindow.focus();
+        } else {
+            Toast.fire({
+                icon: "warning",
+                title: "Mohon izinkan pop-up blocker untuk mencetak"
+            });
+        }
+    });
+
+    // --- HANDLER CETAK BARCODE ZEBRA (SEMUA) ---
+    $(document).off("click", "#button-print-all-barcode").on("click", "#button-print-all-barcode", function(e) {
+        e.preventDefault();
+        var reg = $(this).data("reg"); // Nomor Registrasi (REG-...)
+
+        var printUrl = "{{ route('data_specimen_collection_lab_print_barcode') }}?type=all&reg=" + reg;
+        var printWindow = window.open(printUrl, '_blank', 'width=600,height=400,toolbar=no,menubar=no,scrollbars=yes');
+
+        if (printWindow) {
+            printWindow.focus();
+        } else {
+            Toast.fire({
+                icon: "warning",
+                title: "Mohon izinkan pop-up blocker untuk mencetak"
+            });
+        }
+    });
+
+    // --- HANDLER MULAI PROSES SPESIMEN ---
+    $(document).off("click", ".btn-mulai-proses").on("click", ".btn-mulai-proses", function(e) {
+        e.preventDefault();
+
+        var btn = $(this);
+        var pemeriksaan_id = btn.data("pemeriksaan-id");
+        var specimen_id = btn.data("specimen-id");
+        var order_lab = btn.data("order-lab");
+
+        // Target div container pembungkus tombol berdasarkan ID unik
+        var targetContainer = $('#menudata' + pemeriksaan_id + specimen_id);
+
+        Swal.fire({
+            title: "Mulai Ambil Spesimen?",
+            text: "Sistem akan mencatat waktu mulai (koleksi) spesimen ini.",
+            icon: "question",
+            showCancelButton: true,
+            confirmButtonColor: "#22c55e",
+            cancelButtonColor: "#ef4444",
+            confirmButtonText: "Ya, Mulai!",
+            cancelButtonText: "Batal",
+            reverseButtons: true
+        }).then((result) => {
+            if (result.isConfirmed) {
+                // Ubah status tombol menjadi loading agar tidak diklik berkali-kali
+                btn.html('<i class="fas fa-spinner fa-spin me-1"></i> Memproses...');
+                btn.prop('disabled', true);
+
+                $.ajax({
+                    url: "{{ route('data_specimen_collection_lab_proses') }}",
+                    type: "POST",
+                    data: {
+                        "_token": "{{ csrf_token() }}",
+                        "pemeriksaan_id": pemeriksaan_id,
+                        "specimen_id": specimen_id,
+                        "order_lab": order_lab
+                    },
+                    dataType: 'html', // UBAH KE HTML KARENA CONTROLLER MENGEMBALIKAN TAG HTML
+                    success: function(response) {
+                        // Cek apakah response mengandung pesan error dari catch Controller (text-danger)
+                        if (response.includes('text-danger')) {
+                            Swal.fire("Gagal!", "Gagal memproses spesimen.", "error");
+                            btn.html('<i class="fas fa-vial me-1"></i> Mulai Proses');
+                            btn.prop('disabled', false);
+                        } else {
+                            // Instan Swap UI: Ganti isi target div dengan tombol Print Barcode dari response
+                            targetContainer.html(response);
+
+                            Toast.fire({
+                                icon: "success",
+                                title: "Spesimen berhasil diproses"
+                            });
+                        }
+                    },
+                    error: function(xhr, status, error) {
+                        Swal.fire("Error!", "Terjadi kesalahan pada server.", "error");
+                        btn.html('<i class="fas fa-vial me-1"></i> Mulai Proses');
+                        btn.prop('disabled', false);
+                    }
+                });
+            }
+        });
+    });
+</script>

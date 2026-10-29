@@ -7,13 +7,13 @@
             </div>
             <div>
                 <h6 class="mb-0 text-white fw-bold">Report Dokumentasi Hasil</h6>
-                <span class="fs--2 text-300">Preview Laporan Hasil Laboratorium</span>
+                <span class="fs--2 text-300">Preview Laporan Hasil Laboratorium: {{ $data->master_patient_name ?? '-' }}</span>
             </div>
         </div>
 
         <div class="d-flex align-items-center gap-2">
             <!-- Badge Status & Dynamic Action Button -->
-            @if ($data->d_reg_order_lab_status == 3)
+            @if (isset($data->status_pemeriksaan) && $data->status_pemeriksaan == 'TERVERIFIKASI')
             <span class="badge bg-warning bg-opacity-20 text-white border border-warning border-opacity-25 rounded-pill px-2.5 py-1 fs--2 d-none d-sm-inline-block">
                 <i class="fas fa-clock me-1"></i>Menunggu Pengiriman
             </span>

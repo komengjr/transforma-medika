@@ -3,7 +3,7 @@
 
 <head>
     <meta charset="UTF-8">
-    <title>Hasil Pemeriksaan Laboratorium - {{ $code }}</title>
+    <title>Hasil Pemeriksaan Laboratorium - {{ $reg }}</title>
     <style>
         @page {
             margin: 20px 25px 20px 25px;
@@ -18,7 +18,6 @@
             padding: 0;
         }
 
-        /* HELPER STYLES */
         .text-center {
             text-align: center;
         }
@@ -47,7 +46,7 @@
             color: #1a5bb8;
         }
 
-        /* HEADER / KOP SURAT */
+        /* KOP SURAT */
         .header-table {
             width: 100%;
             border-bottom: 2px solid #1a5bb8;
@@ -91,7 +90,7 @@
             vertical-align: middle;
         }
 
-        /* TITLE DOKUMEN */
+        /* BAR TITLE */
         .doc-title {
             background-color: #f0f4f9;
             border-left: 4px solid #1a5bb8;
@@ -154,12 +153,10 @@
             font-size: 10px;
         }
 
-        /* Tr Mencegah Pemotongan Baris oleh Dompdf */
         .lab-table tr {
             page-break-inside: avoid;
         }
 
-        /* Header Kelompok Utama */
         .lab-table tr.main-category-row td {
             background-color: #f0f4f9;
             color: #1a5bb8;
@@ -169,7 +166,6 @@
             border-bottom: 1px solid #c8d9f1;
         }
 
-        /* Sub-Header / Kepala (t_pem_list_val_opt = Y) */
         .lab-table tr.parent-header-row td {
             background-color: #f8fafc;
             font-weight: bold;
@@ -178,7 +174,6 @@
             border-bottom: 1px solid #e0e0e0;
         }
 
-        /* Anak (Child Row) */
         .lab-table tr.child-row td {
             background-color: #ffffff;
         }
@@ -189,7 +184,7 @@
             margin-right: 4px;
         }
 
-        /* FOOTER & TANDA TANGAN */
+        /* FOOTER */
         .footer-container {
             width: 100%;
             margin-top: 20px;
@@ -226,7 +221,6 @@
 </head>
 
 <body>
-
     <!-- KOP SURAT / HEADER -->
     <table class="header-table">
         <tr>
@@ -239,7 +233,7 @@
                 <p>Jl. Simulasi Kecamatan Singsingamaraja No. 98Z | Telp: (021) 12345678</p>
             </td>
             <td class="header-qr">
-                <img src="data:image/png;base64, {!! base64_encode(QrCode::style('round')->eye('circle')->format('svg')->size(75)->errorCorrection('H')->generate($code)) !!}" width="75" alt="QR Code">
+                <img src="data:image/png;base64, {!! base64_encode(QrCode::style('round')->eye('circle')->format('svg')->size(75)->errorCorrection('H')->generate($reg)) !!}" width="75" alt="QR Code">
             </td>
         </tr>
     </table>
@@ -259,43 +253,43 @@
         <tr>
             <td class="label">No. Registrasi</td>
             <td class="separator">:</td>
-            <td class="value text-primary">{{ $code }}</td>
+            <td class="value text-primary">{{ $reg }}</td>
 
             <td class="label">Tgl. Registrasi</td>
             <td class="separator">:</td>
             <td class="value">
-                {{ !empty($reg->d_reg_order_lab_date) ? date('d-m-Y', strtotime($reg->d_reg_order_lab_date)) : date('d-m-Y') }}
+                {{ !empty($data->tanggal_registrasi) ? date('d-m-Y', strtotime($data->tanggal_registrasi)) : date('d-m-Y') }}
             </td>
         </tr>
         <tr>
             <td class="label">Nama Pasien</td>
             <td class="separator">:</td>
-            <td class="value">{{ $data->master_patient_name }}</td>
+            <td class="value">{{ $data->nama_pasien }}</td>
 
             <td class="label">ID Pasien / RM</td>
             <td class="separator">:</td>
-            <td class="value">{{ $data->master_patient_code }}</td>
+            <td class="value">{{ $data->rm_pasien }}</td>
         </tr>
         <tr>
             <td class="label">Dokter Pengirim</td>
             <td class="separator">:</td>
-            <td class="value">{{ $reg->d_reg_order_lab_rujukan ?? '-' }}</td>
+            <td class="value">{{ $data->dokter ?? '-' }}</td>
 
             <td class="label">Jenis Kelamin</td>
             <td class="separator">:</td>
             <td class="value">
-                {{ ($data->master_patient_jk == 'L' || $data->master_patient_jk == 'Laki-laki') ? 'Laki-Laki' : 'Perempuan' }}
+                {{ (strtolower($data->jk_pasien) == 'l' || strtolower($data->jk_pasien) == 'laki-laki') ? 'Laki-Laki' : 'Perempuan' }}
             </td>
         </tr>
         <tr>
             <td class="label">Alamat Pasien</td>
             <td class="separator">:</td>
-            <td class="value">{{ $data->master_patient_alamat ?? '-' }}</td>
+            <td class="value">{{ $data->alamat_pasien ?? '-' }}</td>
 
             <td class="label">Tanggal Lahir</td>
             <td class="separator">:</td>
             <td class="value">
-                {{ !empty($data->master_patient_tgl_lahir) ? date('d-m-Y', strtotime($data->master_patient_tgl_lahir)) : '-' }}
+                {{ !empty($data->tgl_lahir_pasien) ? date('d-m-Y', strtotime($data->tgl_lahir_pasien)) : '-' }}
             </td>
         </tr>
     </table>
@@ -316,76 +310,134 @@
             <!-- Header Utama Kelompok Pemeriksaan -->
             <tr class="main-category-row">
                 <td colspan="5">
-                    <span style="text-transform: uppercase;">{{ $pem->t_pemeriksaan_list_name }}</span>
+                    <span style="text-transform: uppercase;">{{ $pem->nama_layanan }}</span>
                 </td>
             </tr>
 
             @php
-            $sub = DB::table('t_pemeriksaan_list_val')
-            ->where('t_pemeriksaan_list_code', $pem->t_pemeriksaan_list_code)
+            $parameters = DB::table('medical_master_parameter')
+            ->where('master_pemeriksaan_id', $pem->master_pemeriksaan_id)
+            ->whereNull('parent_id')
+            ->orderBy('urutan', 'ASC')
             ->get();
             @endphp
 
-            @foreach ($sub as $subs)
-            @php
-            $is_child = !empty($subs->t_pem_list_val_opt_code);
-            @endphp
-
-            {{-- CASE 1: JIKA INI KEPALA / PARENT (t_pem_list_val_opt == 'Y') --}}
-            @if ($subs->t_pem_list_val_opt == 'Y')
+            @foreach ($parameters as $param)
+            @if ($param->is_group == 1)
+            {{-- CASE 1: JIKA INI KEPALA (Misal: Hitung Jenis) --}}
             <tr class="parent-header-row">
                 <td colspan="5">
-                    <strong>{{ $subs->t_pem_list_val_name }}</strong>
+                    <strong>{{ $param->nama_parameter }}</strong>
                 </td>
             </tr>
 
-            {{-- CASE 2: ITEM BARIS HASIL (Anak atau Parameter Mandiri) --}}
-            @else
             @php
-            $nilai = DB::table('h_reg_lab')
-            ->where('order_lab_list_code', $pem->order_lab_list_code)
-            ->where('t_pem_list_val_code', $subs->t_pem_list_val_code)
-            ->first();
+            $subParams = DB::table('medical_master_parameter')
+            ->where('parent_id', $param->id)
+            ->orderBy('urutan', 'ASC')
+            ->get();
             @endphp
 
-            <tr class="{{ $is_child ? 'child-row' : '' }}">
-                <!-- Kolom Nama Jenis Pemeriksaan -->
-                <td style="{{ $is_child ? 'padding-left: 22px;' : '' }}">
-                    @if ($is_child)
-                    <span class="child-prefix">-</span>
+            @foreach ($subParams as $sub)
+            @php
+            $nilai = DB::table('medical_transaksi_hasil')
+            ->where('detail_id', $pem->detail_id)
+            ->where('parameter_id', $sub->id)
+            ->first();
+
+            // Logika Auto-Detect Abnormal (Merah)
+            $isAbnormal = false;
+            if ($nilai && !empty($nilai->hasil)) {
+            // 1. Cek dari Flag manual yang diisi petugas
+            if (in_array($nilai->flag, ['H', 'L', 'A'])) {
+            $isAbnormal = true;
+            }
+            // 2. Jika tidak ada flag, cek otomatis dari rentang angka (Misal: 3,80 - 5,20)
+            elseif (!empty($sub->nilai_normal)) {
+            $rujukan = str_replace(',', '.', $sub->nilai_normal);
+            $hasilAngka = (float) str_replace(',', '.', $nilai->hasil);
+
+            if (strpos($rujukan, '-') !== false) {
+            $parts = explode('-', $rujukan);
+            if (count($parts) == 2) {
+            $min = (float) trim($parts[0]);
+            $max = (float) trim($parts[1]);
+            if ($hasilAngka < $min || $hasilAngka> $max) {
+                $isAbnormal = true;
+                }
+                }
+                }
+                }
+                }
+                @endphp
+                <tr class="child-row">
+                    <td style="padding-left: 22px;">
+                        <span class="child-prefix">-</span>
+                        <span>{{ $sub->nama_parameter }}</span>
+                    </td>
+                    <td class="text-center fw-bold">
+                        @if($nilai && !empty($nilai->hasil))
+                        <!-- Jika abnormal berikan class text-danger (merah) -->
+                        <span class="{{ $isAbnormal ? 'text-danger' : '' }}">{{ $nilai->hasil }}</span>
+                        @else
+                        <span class="text-danger" style="font-style: italic;">Belum</span>
+                        @endif
+                    </td>
+                    <td class="text-center">{{ $sub->nilai_normal ?? '-' }}</td>
+                    <td class="text-center">{{ $sub->satuan ?? '-' }}</td>
+                    <td class="text-left">{{ $sub->metode ?? '-' }}</td>
+                </tr>
+                @endforeach
+
+                @else
+                {{-- CASE 2: PARAMETER TUNGGAL (Misal: Hemoglobin) --}}
+                @php
+                $nilai = DB::table('medical_transaksi_hasil')
+                ->where('detail_id', $pem->detail_id)
+                ->where('parameter_id', $param->id)
+                ->first();
+
+                // Logika Auto-Detect Abnormal (Merah)
+                $isAbnormal = false;
+                if ($nilai && !empty($nilai->hasil)) {
+                if (in_array($nilai->flag, ['H', 'L', 'A'])) {
+                $isAbnormal = true;
+                } elseif (!empty($param->nilai_normal)) {
+                $rujukan = str_replace(',', '.', $param->nilai_normal);
+                $hasilAngka = (float) str_replace(',', '.', $nilai->hasil);
+
+                if (strpos($rujukan, '-') !== false) {
+                $parts = explode('-', $rujukan);
+                if (count($parts) == 2) {
+                $min = (float) trim($parts[0]);
+                $max = (float) trim($parts[1]);
+                if ($hasilAngka < $min || $hasilAngka> $max) {
+                    $isAbnormal = true;
+                    }
+                    }
+                    }
+                    }
+                    }
+                    @endphp
+                    <tr>
+                        <td>
+                            <span class="fw-bold">{{ $param->nama_parameter }}</span>
+                        </td>
+                        <td class="text-center fw-bold">
+                            @if($nilai && !empty($nilai->hasil))
+                            <!-- Jika abnormal berikan class text-danger (merah) -->
+                            <span class="{{ $isAbnormal ? 'text-danger' : '' }}">{{ $nilai->hasil }}</span>
+                            @else
+                            <span class="text-danger" style="font-style: italic;">Belum</span>
+                            @endif
+                        </td>
+                        <td class="text-center">{{ $param->nilai_normal ?? '-' }}</td>
+                        <td class="text-center">{{ $param->satuan ?? '-' }}</td>
+                        <td class="text-left">{{ $param->metode ?? '-' }}</td>
+                    </tr>
                     @endif
-                    <span class="{{ !$is_child ? 'fw-bold' : '' }}">
-                        {{ $subs->t_pem_list_val_name }}
-                    </span>
-                </td>
-
-                <!-- Kolom Hasil -->
-                <td class="text-center fw-bold">
-                    @if ($nilai && !empty($nilai->h_reg_lab_value))
-                    {{ $nilai->h_reg_lab_value }}
-                    @else
-                    <span class="text-danger" style="font-style: italic;">Belum</span>
-                    @endif
-                </td>
-
-                <!-- Nilai Rujukan -->
-                <td class="text-center">{{ $subs->t_pem_list_val_rujukan ?? '-' }}</td>
-
-                <!-- Satuan -->
-                <td class="text-center">{{ $subs->t_pem_list_val_satuan ?? '-' }}</td>
-
-                <!-- Metode -->
-                <td class="text-left">
-                    @if ($nilai && !empty($nilai->h_reg_lab_metode))
-                    {{ $nilai->h_reg_lab_metode }}
-                    @else
-                    <span class="text-muted" style="font-style: italic;">-</span>
-                    @endif
-                </td>
-            </tr>
-            @endif
-            @endforeach
-            @endforeach
+                    @endforeach
+                    @endforeach
         </tbody>
     </table>
 
@@ -398,10 +450,10 @@
                         <strong class="text-primary">Informasi Layanan:</strong>
                         <p style="margin: 3px 0 6px 0; line-height: 1.4;">
                             Hasil laboratorium ini dapat diakses secara online melalui Web Resmi kami atau Email terdaftar.<br>
-                            Jika ada pertanyaan, silakan hubungi Customer Service RS.
+                            Dokumen terenkripsi dengan password menggunakan format: <strong>DDMMYYYY</strong> (Tgl. Lahir Pasien).
                         </p>
                         <span class="text-muted" style="font-size: 8.5px;">
-                            Dicetak oleh: <strong>agus</strong> pada {{ date('d-m-Y H:i:s') }} WIB
+                            Dicetak pada {{ date('d-m-Y H:i:s') }} WIB
                         </span>
                     </div>
                 </td>
@@ -409,7 +461,7 @@
                 <td style="width: 40%;" class="signature-box">
                     <p class="fw-bold">Petugas Validasi,</p>
                     <div style="margin: 6px 0;">
-                        <img src="data:image/png;base64, {!! base64_encode(QrCode::style('round')->eye('circle')->format('svg')->size(55)->errorCorrection('H')->generate($code)) !!}" width="55" alt="Validation Stamp">
+                        <img src="data:image/png;base64, {!! base64_encode(QrCode::style('round')->eye('circle')->format('svg')->size(55)->errorCorrection('H')->generate($reg)) !!}" width="55" alt="Validation Stamp">
                     </div>
                     <p class="fw-bold text-primary" style="text-decoration: underline;">Penanggung Jawab Lab</p>
                     <p class="text-muted" style="font-size: 8px;">SIP: 446/LAB/{{ date('Y') }}</p>
@@ -417,7 +469,6 @@
             </tr>
         </table>
     </div>
-
 </body>
 
 </html>
