@@ -7,96 +7,187 @@
 <link href="{{ asset('vendors/flatpickr/flatpickr.min.css') }}" rel="stylesheet" />
 <link href="https://cdn.jsdelivr.net/npm/select2@4.1.0-rc.0/dist/css/select2.min.css" rel="stylesheet" />
 <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/select2-bootstrap-5-theme@1.3.0/dist/select2-bootstrap-5-theme.min.css" />
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
+
 <style>
-    .table-custom thead th {
-        font-weight: 600;
+    /* =========================================
+       RETRO / NEUBRUTALISM THEME STYLES
+       ========================================= */
+    :root {
+        --retro-dark: #1e1e24;
+        --retro-yellow: #ffde59;
+        --retro-pink: #ffa6c9;
+        --retro-cyan: #8bf0fa;
+        --retro-orange: #ff914d;
+        --retro-green: #c1ff72;
+        --retro-purple: #c8b6ff;
+        --retro-bg: #f4f0ea;
+        --retro-border: 3px solid var(--retro-dark);
+        --retro-shadow: 5px 5px 0px var(--retro-dark);
+        --retro-shadow-sm: 3px 3px 0px var(--retro-dark);
+    }
+
+    body {
+        /* background-color: var(--retro-bg); */
+    }
+
+    /* Retro Cards & Banners */
+    .retro-card {
+        border: var(--retro-border);
+        border-radius: 12px;
+        box-shadow: var(--retro-shadow);
+        /* background-color: #ffffff; */
+        overflow: hidden;
+    }
+
+    .retro-header-banner {
+        background: linear-gradient(135deg, var(--retro-yellow) 0%, var(--retro-orange) 100%);
+        border: var(--retro-border);
+        border-radius: 12px;
+        box-shadow: var(--retro-shadow);
+        color: var(--retro-dark);
+    }
+
+    /* Retro Buttons */
+    .retro-btn {
+        font-weight: 800 !important;
+        border: 2px solid var(--retro-dark);
+        box-shadow: var(--retro-shadow-sm);
+        border-radius: 6px;
+        transition: all 0.1s ease-in-out;
         text-transform: uppercase;
-        font-size: 0.75rem;
         letter-spacing: 0.5px;
-        background-color: #0f5aa4 !important;
-        color: #ffffff !important;
-        border-bottom: 2px solid #dee2e6;
+        cursor: pointer;
     }
 
-    .badge-soft-danger {
-        background-color: #fde8e8;
-        color: #e02424;
+    .retro-btn:active {
+        transform: translate(3px, 3px);
+        box-shadow: 0px 0px 0px var(--retro-dark);
     }
 
-    .badge-soft-warning {
-        background-color: #fef3c7;
-        color: #d97706;
+    .retro-btn-primary {
+        background-color: var(--retro-cyan);
+        color: var(--retro-dark);
     }
 
-    .badge-soft-info {
-        background-color: #e0f2fe;
-        color: #0284c7;
+    .retro-btn-primary:hover {
+        background-color: #6ce0ed;
+        color: var(--retro-dark);
     }
 
-    .badge-soft-success {
-        background-color: #def7ec;
-        color: #03543f;
+    .retro-btn-warning {
+        background-color: var(--retro-yellow);
+        color: var(--retro-dark);
     }
 
-    .badge-soft-primary {
-        background-color: #e1effe;
-        color: #1e429f;
+    .retro-btn-warning:hover {
+        background-color: #e6c84c;
+        color: var(--retro-dark);
     }
 
-    .list-pemeriksaan-tag {
-        display: inline-block;
-        background-color: #f1f5f9;
-        color: #334155;
-        padding: 2px 8px;
-        border-radius: 4px;
-        font-size: 0.75rem;
-        margin: 1px;
-        font-weight: 500;
+    .retro-btn-success {
+        background-color: var(--retro-green);
+        color: var(--retro-dark);
     }
 
-    .code-block {
-        font-family: SFMono-Regular, Menlo, Monaco, Consolas, "Liberation Mono", "Courier New", monospace;
-        font-size: 0.8rem;
-        font-weight: 600;
+    .retro-btn-success:hover {
+        background-color: #b0f55b;
+        color: var(--retro-dark);
     }
 
-    .custom-loader {
-        display: flex;
-        flex-direction: column;
-        align-items: center;
-        justify-content: center;
-        padding: 25px 0;
+    .retro-btn-danger {
+        background-color: var(--retro-pink);
+        color: var(--retro-dark);
     }
 
-    /* Floating Field Filter Style Persis List Pasien */
+    /* Inputs, Selects & Floating Filters */
+    .filter-bar-container {
+        background-color: #ffffff;
+        border: var(--retro-border);
+        border-radius: 12px;
+        padding: 15px 20px;
+        margin-bottom: 20px;
+        box-shadow: var(--retro-shadow-sm);
+    }
+
     .form-floating-custom {
         position: relative;
     }
 
     .form-floating-custom label {
         position: absolute;
-        top: 3px;
-        left: 10px;
-        font-size: 0.68rem;
-        color: #6c757d;
+        top: 2px;
+        left: 8px;
+        font-size: 0.65rem;
+        font-weight: 800;
+        color: var(--retro-dark);
         pointer-events: none;
-        z-index: 5 !important;
-        background: transparent !important;
+        z-index: 5;
+        background: transparent;
     }
 
-    .form-floating-custom .form-control,
-    .form-floating-custom .form-select {
-        padding-top: 16px;
-        padding-bottom: 4px;
-        padding-left: 10px;
-        font-size: 0.8rem;
-        font-weight: 600;
-        height: 42px;
-        border-color: #ced4da;
+    .retro-input,
+    .form-control,
+    .form-select {
+        border: 2px solid var(--retro-dark) !important;
+        border-radius: 6px !important;
+        box-shadow: 2px 2px 0px var(--retro-dark) !important;
+        font-weight: 700 !important;
+        color: var(--retro-dark) !important;
+        background-color: #ffffff !important;
+        padding-top: 16px !important;
+        padding-bottom: 4px !important;
+        font-size: 0.8rem !important;
+    }
+
+    .retro-input:focus,
+    .form-control:focus,
+    .form-select:focus {
+        border-color: var(--retro-dark) !important;
+        box-shadow: 4px 4px 0px var(--retro-dark) !important;
+        outline: none;
+    }
+
+    /* Tabel Custom Retro */
+    .table-custom thead th {
+        background-color: var(--retro-dark) !important;
+        color: var(--retro-green) !important;
+        font-size: 0.75rem;
+        font-weight: 800;
+        text-transform: uppercase;
+        border-bottom: 3px solid var(--retro-dark);
+        padding: 12px 10px;
+        letter-spacing: 0.5px;
+    }
+
+    .table-custom tbody tr {
+        transition: background 0.2s;
+    }
+
+    .table-custom tbody tr:hover {
+        background-color: var(--retro-yellow) !important;
+    }
+
+    .table-custom td {
+        border: 2px solid var(--retro-dark) !important;
+        font-weight: 700;
+        color: var(--retro-dark);
+        padding: 10px;
+        vertical-align: middle;
+    }
+
+    .retro-badge {
+        border: 2px solid var(--retro-dark);
         border-radius: 6px;
+        padding: 4px 8px;
+        font-weight: 800;
+        box-shadow: 2px 2px 0px var(--retro-dark);
+        text-transform: uppercase;
+        display: inline-block;
+        font-size: 0.7rem;
     }
 
-    /* Penyesuaian Select2 Floating Label */
+    /* Select2 Retro Styling */
     .form-floating-custom .select2-container--bootstrap-5 .select2-selection {
         height: 42px !important;
         padding-top: 14px !important;
@@ -104,58 +195,60 @@
         padding-left: 6px !important;
         border-radius: 6px !important;
         background-color: #fff !important;
-        border: 1px solid #ced4da !important;
+        border: 2px solid var(--retro-dark) !important;
+        box-shadow: 2px 2px 0px var(--retro-dark) !important;
     }
 
     .form-floating-custom .select2-container--bootstrap-5 .select2-selection--single .select2-selection__rendered {
         font-size: 0.8rem !important;
-        font-weight: 600 !important;
-        color: #212529 !important;
+        font-weight: 700 !important;
+        color: var(--retro-dark) !important;
         padding-left: 4px !important;
         line-height: 1.5 !important;
     }
 
     .form-floating-custom .select2-container--bootstrap-5 .select2-selection--single .select2-selection__arrow {
-        top: 6px !important;
+        top: 8px !important;
+    }
+
+    /* Modal Styling */
+    .retro-modal-content {
+        border: var(--retro-border);
+        border-radius: 12px;
+        box-shadow: 8px 8px 0px var(--retro-dark);
+        background-color: #ffffff;
     }
 </style>
 @endsection
 
 @section('content')
-<!-- BREADCRUMB & HERO HEADER -->
-<div class="row mb-3">
+<!-- HEADER HERO BANNER RETRO -->
+<div class="row mb-4">
     <div class="col-12">
-        <div class="card border-0 shadow-lg rounded-4 overflow-hidden position-relative"
-            style="background: linear-gradient(135deg, #1f6f92 0%, #203a43 50%, #2c5364 100%);">
-
-            <div class="position-absolute rounded-circle bg-primary opacity-25 blur-3xl"
-                style="width: 250px; height: 250px; top: -80px; right: 10%; filter: blur(60px);"></div>
-            <div class="position-absolute rounded-circle bg-info opacity-25 blur-3xl"
-                style="width: 200px; height: 200px; bottom: -80px; left: -50px; filter: blur(50px);"></div>
-
-            <div class="card-body p-4 text-white position-relative z-1">
+        <div class="card retro-header-banner p-1">
+            <div class="card-body p-4 text-dark position-relative z-1">
                 <div class="row align-items-center gy-3">
                     <div class="col-lg-7 d-flex align-items-center">
-                        <div class="p-2 bg-opacity-10 rounded-4 shadow-sm me-3 border-opacity-10 d-flex align-items-center justify-content-center backdrop-blur"
-                            style="width: 65px; height: 65px; backdrop-filter: blur(10px);">
-                            <img src="{{ asset('img/lab.png') }}" alt="Logo" class="img-fluid drop-shadow" width="42" />
+                        <div class="p-2 rounded-4 shadow-sm me-3 d-flex align-items-center justify-content-center"
+                            style="width: 65px; height: 65px; background: white; border: 2px solid var(--retro-dark); box-shadow: 3px 3px 0px var(--retro-dark);">
+                            <img src="{{ asset('img/lab.png') }}" alt="Logo" class="img-fluid" width="42" />
                         </div>
                         <div>
                             <div class="d-flex align-items-center gap-2 mb-1">
-                                <span class="badge bg-primary text-dark fw-bold px-2 py-1 rounded-pill" style="font-size: 0.68rem; letter-spacing: 0.5px;">
-                                    <i class="fas fa-shield-alt me-1 text-info"></i> <span class="text-white" style="font-size: 0.75rem;">v2.4 Medical Suite</span>
+                                <span class="retro-badge" style="background-color: var(--retro-cyan); color: var(--retro-dark);">
+                                    <i class="fas fa-shield-alt me-1"></i> v2.4 Medical Suite
                                 </span>
                             </div>
-                            <h3 class="text-white fw-extrabold mb-0 tracking-tight" style="font-size: 1.4rem;">
-                                Welcome to {{ Env('APP_LABEL')}} <span class="text-info fw-light">Management System</span>
+                            <h3 class="fw-bolder mb-0 text-dark" style="font-size: 1.4rem; text-shadow: 1px 1px 0px white;">
+                                Welcome to {{ Env('APP_LABEL')}} <span class="fw-normal">Management System</span>
                             </h3>
                         </div>
                     </div>
 
-                    <div class="col-lg-5 text-lg-end border-start-lg border-white border-opacity-10 ps-lg-4">
-                        <div class="d-inline-flex align-items-center bg-white bg-opacity-10 border border-white border-opacity-20 px-3 py-2 rounded-pill backdrop-blur">
-                            <h6 class="text-primary fw-bold mb-0" style="font-size: 0.95rem;">
-                                <i class="fas fa-file-alt me-1"></i> Data Registrasi Laboratorium
+                    <div class="col-lg-5 text-lg-end">
+                        <div class="d-inline-flex align-items-center bg-white px-3 py-2 rounded-pill" style="border: 2px solid var(--retro-dark); box-shadow: 3px 3px 0px var(--retro-dark);">
+                            <h6 class="fw-bolder mb-0 text-dark" style="font-size: 0.95rem;">
+                                <i class="fas fa-file-alt me-1 text-primary"></i> Data Registrasi Laboratorium
                             </h6>
                         </div>
                     </div>
@@ -166,23 +259,23 @@
 </div>
 
 <!-- MAIN DATA TABLE CARD -->
-<div class="card shadow-sm border-0 mb-4">
+<div class="retro-card mb-4">
     <!-- CARD HEADER TOOLBAR & FILTER -->
-    <div class="card-header bg-white border-bottom border-light py-3 px-3 rounded-top-4">
+    <div class="card-header bg-white border-bottom border-dark py-3 px-3">
         <div class="row align-items-center g-2">
 
             <!-- TOMBOL UTAMA (Refresh & Mobile Toggle) -->
             <div class="col-12 col-md-auto d-flex align-items-center justify-content-between gap-2">
-                <button class="btn btn-sm btn-primary rounded-3 px-3 py-2 d-flex align-items-center gap-1" style="height: 42px;"
+                <button class="btn btn-sm retro-btn retro-btn-primary px-3 py-2 d-flex align-items-center gap-1" style="height: 42px;"
                     type="button" id="btn-refresh-lab" data-bs-toggle="tooltip" title="Refresh Data Hari Ini">
                     <i class="fas fa-sync-alt"></i>
-                    <span class="d-sm-inline fw-semibold ms-1">Refresh Data</span>
+                    <span class="d-sm-inline fw-bold ms-1">Refresh Data</span>
                 </button>
 
-                <button class="btn btn-sm btn-outline-secondary rounded-3 px-3 py-2 d-md-none d-flex align-items-center gap-1" style="height: 42px;"
+                <button class="btn btn-sm retro-btn retro-btn-warning px-3 py-2 d-md-none d-flex align-items-center gap-1" style="height: 42px;"
                     type="button" data-bs-toggle="collapse" data-bs-target="#collapseFilterMobile" aria-expanded="false" aria-controls="collapseFilterMobile">
-                    <i class="fas fa-filter text-primary"></i>
-                    <span class="fw-semibold">Filter</span>
+                    <i class="fas fa-filter"></i>
+                    <span class="fw-bold">Filter</span>
                     <i class="fas fa-chevron-down ms-1"></i>
                 </button>
             </div>
@@ -195,7 +288,7 @@
                     <div class="col-12 col-sm-6 col-md">
                         <div class="form-floating-custom">
                             <label>Tanggal Awal</label>
-                            <input type="text" class="form-control datetimepicker" id="filter_tgl_awal" value="{{ date('Y-m-d') }}" placeholder="YYYY-MM-DD" data-options='{"dateFormat":"Y-m-d","disableMobile":true}'>
+                            <input type="text" class="form-control datetimepicker retro-input" id="filter_tgl_awal" value="{{ date('Y-m-d') }}" placeholder="YYYY-MM-DD" data-options='{"dateFormat":"Y-m-d","disableMobile":true}'>
                         </div>
                     </div>
 
@@ -203,7 +296,7 @@
                     <div class="col-12 col-sm-6 col-md">
                         <div class="form-floating-custom">
                             <label>Tanggal Akhir</label>
-                            <input type="text" class="form-control datetimepicker" id="filter_tgl_akhir" value="{{ date('Y-m-d') }}" placeholder="YYYY-MM-DD" data-options='{"dateFormat":"Y-m-d","disableMobile":true}'>
+                            <input type="text" class="form-control datetimepicker retro-input" id="filter_tgl_akhir" value="{{ date('Y-m-d') }}" placeholder="YYYY-MM-DD" data-options='{"dateFormat":"Y-m-d","disableMobile":true}'>
                         </div>
                     </div>
 
@@ -211,7 +304,7 @@
                     <div class="col-12 col-sm-6 col-md">
                         <div class="form-floating-custom">
                             <label>No Reg / Nama</label>
-                            <input type="text" class="form-control" id="filter_search" placeholder="Cari Reg/Nama...">
+                            <input type="text" class="form-control retro-input" id="filter_search" placeholder="Cari Reg/Nama...">
                         </div>
                     </div>
 
@@ -219,7 +312,7 @@
                     <div class="col-12 col-sm-6 col-md">
                         <div class="form-floating-custom">
                             <label>Dokter</label>
-                            <select class="form-select" id="filter_dokter">
+                            <select class="form-select retro-input" id="filter_dokter">
                                 <option value="">Semua Dokter</option>
                             </select>
                         </div>
@@ -229,7 +322,7 @@
                     <div class="col-12 col-sm-6 col-md">
                         <div class="form-floating-custom">
                             <label>Kel. Pelanggan</label>
-                            <select class="form-select" id="filter_penjamin">
+                            <select class="form-select retro-input" id="filter_penjamin">
                                 <option value="">Semua Kelompok</option>
                                 <option value="PASIEN KLINIS">PASIEN KLINIS</option>
                                 <option value="UMUM">UMUM / PRIBADI</option>
@@ -242,7 +335,7 @@
                     <div class="col-12 col-sm-6 col-md">
                         <div class="form-floating-custom">
                             <label>Pemeriksaan</label>
-                            <select class="form-select" id="filter_pemeriksaan">
+                            <select class="form-select retro-input" id="filter_pemeriksaan">
                                 <option value="">Semua Pemeriksaan</option>
                             </select>
                         </div>
@@ -257,9 +350,9 @@
     <!-- CARD BODY / TABLE -->
     <div class="card-body p-3">
         <div class="table-responsive">
-            <table id="example" class="table table-hover table-custom align-middle mb-0" style="width:100%">
+            <table id="example" class="table table-custom align-middle mb-0" style="width:100%; border: 2px solid var(--retro-dark);">
                 <thead>
-                    <tr class="bg-400">
+                    <tr>
                         <th class="text-center" style="width: 5%;">No</th>
                         <th style="width: 18%;">No Registrasi</th>
                         <th style="width: 20%;">Nama Pasien</th>
@@ -270,7 +363,7 @@
                         <th class="text-center" style="width: 8%;">Aksi</th>
                     </tr>
                 </thead>
-                <tbody class="fs--1"></tbody>
+                <tbody></tbody>
             </table>
         </div>
     </div>
@@ -281,9 +374,9 @@
 <!-- MODALS -->
 <div class="modal fade" id="modal-lab" data-bs-keyboard="false" data-bs-backdrop="static" tabindex="-1" aria-hidden="true">
     <div class="modal-dialog modal-dialog-centered modal-xl">
-        <div class="modal-content border-0 shadow-lg">
+        <div class="modal-content retro-modal-content">
             <div class="position-absolute top-0 end-0 mt-3 me-3 z-index-1">
-                <button class="btn-close btn btn-sm btn-circle d-flex flex-center transition-base" data-bs-dismiss="modal" aria-label="Close"></button>
+                <button class="btn-close btn btn-sm btn-circle bg-light d-flex flex-center transition-base" data-bs-dismiss="modal" aria-label="Close" style="border: 2px solid var(--retro-dark);"></button>
             </div>
             <div id="menu-lab" class="p-3"></div>
         </div>
@@ -303,7 +396,7 @@
     let labTable;
 
     $(document).ready(function() {
-        // Inisialisasi Select2 untuk Filter
+        // Inisialisasi Select2 untuk Filter dengan Tema Bootstrap 5
         $('#filter_dokter, #filter_penjamin, #filter_pemeriksaan').select2({
             theme: 'bootstrap-5',
             width: '100%',
@@ -333,40 +426,44 @@
             },
             columns: [{
                     data: 'no',
-                    className: 'text-center fw-bold text-secondary',
+                    className: 'text-center align-middle',
                     orderable: false,
                     searchable: false
                 },
                 {
                     data: 'no_registrasi',
+                    className: 'align-middle',
                     orderable: false
                 },
                 {
                     data: 'nama_pasien',
+                    className: 'align-middle',
                     orderable: false
                 },
                 {
                     data: 'tanggal_reg',
-                    orderable: false,
-                    className: 'text-nowrap'
+                    className: 'align-middle text-nowrap',
+                    orderable: false
                 },
                 {
                     data: 'rujukan',
+                    className: 'align-middle',
                     orderable: false
                 },
                 {
                     data: 'pemeriksaan',
+                    className: 'align-middle',
                     orderable: false
                 },
                 {
                     data: 'status',
-                    className: 'text-center',
+                    className: 'text-center align-middle',
                     orderable: false,
                     searchable: false
                 },
                 {
                     data: 'action',
-                    className: 'text-center',
+                    className: 'text-center align-middle',
                     orderable: false,
                     searchable: false
                 }
@@ -383,9 +480,9 @@
                     previous: "<i class='fas fa-chevron-left'></i>"
                 },
                 processing: `
-                    <div class="custom-loader">
-                        <div class="spinner-border text-primary mb-2" style="width: 2.2rem; height: 2.2rem;" role="status"></div>
-                        <span class="fw-bold text-primary small">Memuat data laboratorium...</span>
+                    <div class="custom-loader py-3 text-center">
+                        <div class="spinner-border text-dark mb-2" style="width: 2.2rem; height: 2.2rem;" role="status"></div>
+                        <span class="fw-bold text-dark small d-block">Memuat data laboratorium...</span>
                     </div>
                 `
             },
@@ -448,24 +545,20 @@
                     data.pemeriksaan.forEach(item => $pemeriksaan.append(new Option(item.nama_layanan, item.id, false, item.id == selectedPemeriksaan)));
                     $pemeriksaan.trigger('change.select2');
                 }
-            }).catch(err => console.error(err));
+            }).catch(err => console.error("Gagal memuat opsi filter:", err));
     }
-
-    // LOADING SPINNER HTML HELPER
-    const loadingSpinner = `
-        <div class="text-center py-5">
-            <div class="spinner-border text-primary" role="status" style="width: 3rem; height: 3rem;">
-                <span class="visually-hidden">Loading...</span>
-            </div>
-            <p class="text-muted mt-3 mb-0 fw-medium">Memuat data pemeriksaan...</p>
-        </div>
-    `;
 
     // Event Delegasi Handler untuk tombol aksi handling lab
     $(document).on("click", ".button-proses-handling-lab", function(e) {
         e.preventDefault();
         var code = $(this).data("code");
-        $('#menu-lab').html(loadingSpinner);
+
+        $('#menu-lab').html(`
+            <div class="custom-loader py-5 text-center">
+                <div class="spinner-border text-dark mb-2" role="status" style="width: 3rem; height: 3rem; border-width: 4px;"></div>
+                <p class="text-dark mt-3 mb-0 fw-bolder">Memuat data pemeriksaan...</p>
+            </div>
+        `);
 
         $.ajax({
             url: "{{ route('data_registrasi_lab_handling') }}",
@@ -479,7 +572,7 @@
         }).done(function(data) {
             $('#menu-lab').html(data);
         }).fail(function() {
-            $('#menu-lab').html('<div class="alert alert-danger m-4" role="alert"><i class="fas fa-exclamation-triangle me-2"></i>Gagal memuat data. Silakan coba lagi.</div>');
+            $('#menu-lab').html('<div class="alert alert-danger m-4 fw-bold border-dark shadow-sm" role="alert"><i class="fas fa-exclamation-triangle me-2"></i>Gagal memuat data. Silakan coba lagi.</div>');
         });
     });
 </script>

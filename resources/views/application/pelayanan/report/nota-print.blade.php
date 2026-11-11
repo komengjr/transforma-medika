@@ -8,10 +8,11 @@
     <style>
         @page {
             size: A4 portrait;
-            margin: 15mm 20mm 20mm 20mm; /* Memberikan ruang margin bawah untuk footer */
+            margin: 5mm 5mm 5mm 5mm;
         }
 
-        html, body {
+        html,
+        body {
             height: 100%;
             margin: 0;
             padding: 0;
@@ -21,7 +22,6 @@
             background: #fff;
         }
 
-        /* Container Utama dengan Ketinggian Penuh */
         .receipt-container {
             width: 100%;
             max-width: 800px;
@@ -29,14 +29,28 @@
             margin: 0 auto;
             position: relative;
             box-sizing: border-box;
-            padding-bottom: 90px; /* Jarak aman agar konten tidak tertimpa footer */
+            padding-bottom: 90px;
         }
 
-        .text-center { text-align: center; }
-        .text-end { text-align: right; }
-        .text-start { text-align: left; }
-        .fw-bold { font-weight: bold; }
-        .fst-italic { font-style: italic; }
+        .text-center {
+            text-align: center;
+        }
+
+        .text-end {
+            text-align: right;
+        }
+
+        .text-start {
+            text-align: left;
+        }
+
+        .fw-bold {
+            font-weight: bold;
+        }
+
+        .fst-italic {
+            font-style: italic;
+        }
 
         .line-solid {
             border-top: 2px solid #000;
@@ -68,20 +82,34 @@
             margin-bottom: 10px;
             font-size: 11px;
         }
+
         .info-table td {
             padding: 3px 0;
             vertical-align: top;
         }
-        .info-table .col-label { width: 14%; }
-        .info-table .col-colon { width: 2%; text-align: center; }
-        .info-table .col-value { width: 34%; padding-right: 15px; }
+
+        .info-table .col-label {
+            width: 16%;
+        }
+
+        .info-table .col-colon {
+            width: 2%;
+            text-align: center;
+        }
+
+        .info-table .col-value {
+            width: 32%;
+            padding-right: 10px;
+        }
 
         .item-table {
             width: 100%;
             border-collapse: collapse;
             margin-top: 5px;
         }
-        .item-table th, .item-table td {
+
+        .item-table th,
+        .item-table td {
             padding: 4px 0;
             vertical-align: top;
         }
@@ -103,7 +131,6 @@
             width: 250px;
         }
 
-        /* WRAPPER KELOMPOK FOOTER DIPOSISIKAN KE PALING BAWAH HALAMAN */
         .footer-wrapper {
             position: absolute;
             bottom: 0;
@@ -141,10 +168,14 @@
         }
 
         @media print {
-            .btn-print { display: none; }
-            .receipt-container {
-                min-height: 98vh; /* Memastikan memenuhi tinggi kertas saat cetak */
+            .btn-print {
+                display: none;
             }
+
+            .receipt-container {
+                min-height: 98vh;
+            }
+
             .footer-wrapper {
                 position: fixed;
                 bottom: 0;
@@ -157,10 +188,10 @@
 
     <div class="receipt-container">
 
-        <div class="form-code">YAN.33-FRM-CR-01.1/05</div>
+        <div class="form-code">XXX.XX-XXX-XX-01.1/xx</div>
 
         <div class="text-center" style="margin-bottom: 20px;">
-            <h2 class="nota-title">NOTA PEMBAYARAN</h2>
+            <h2 class="nota-title">NOTA PEMBAYARAN KUNJUNGAN</h2>
             <div>No. Nota : {{ $transaksi->no_registrasi }}</div>
         </div>
 
@@ -188,18 +219,32 @@
                 <td class="col-colon">:</td>
                 <td class="col-value">{{ $transaksi->alamat ?? '-' }}</td>
 
-                <td class="col-label">Pengirim</td>
+                <td class="col-label">Jenis Layanan</td>
                 <td class="col-colon">:</td>
-                <td class="col-value">{{ $transaksi->dokter ?? '-' }}</td>
+                <td class="col-value fw-bold text-uppercase">
+                    {{ str_replace('_', ' ', $transaksi->jenis_layanan ?? 'RAWAT JALAN') }}
+                    @if(!empty($transaksi->nama_poli))
+                    ({{ $transaksi->nama_poli }})
+                    @endif
+                </td>
             </tr>
             <tr>
                 <td class="col-label">Penjamin</td>
                 <td class="col-colon">:</td>
                 <td class="col-value">{{ $transaksi->agreement ?? 'UMUM / PRIBADI' }}</td>
 
+                <td class="col-label">Dokter Pengirim</td>
+                <td class="col-colon">:</td>
+                <td class="col-value">{{ $transaksi->nama_dokter_pengirim ?? '-' }}</td>
+            </tr>
+            <tr>
                 <td class="col-label">Tanggal</td>
                 <td class="col-colon">:</td>
                 <td class="col-value">{{ date('d-m-Y H:i:s', strtotime($transaksi->tanggal_registrasi)) }}</td>
+
+                <td class="col-label">Dokter Pemeriksa</td>
+                <td class="col-colon">:</td>
+                <td class="col-value">{{ $transaksi->nama_dokter_poli ?? '-' }}</td>
             </tr>
         </table>
 
@@ -208,7 +253,7 @@
         <table class="item-table">
             <thead>
                 <tr>
-                    <th class="text-start fst-italic fw-bold" style="width: 50%;">PEMERIKSAAN</th>
+                    <th class="text-start fst-italic fw-bold" style="width: 50%;">URAIAN LAYANAN & PEMERIKSAAN</th>
                     <th class="text-end fst-italic fw-bold" style="width: 20%;">BRUTO</th>
                     <th class="text-end fst-italic fw-bold" style="width: 15%;">DISKON</th>
                     <th class="text-end fst-italic fw-bold" style="width: 15%;">HARGA</th>
@@ -218,14 +263,29 @@
                 @php $subtotal = 0; @endphp
                 @foreach($details as $item)
                 @php
-                    $hargaDasar = $item->harga_dasar + $item->biaya_cito;
-                    $subtotal += $item->harga_akhir;
+                $hargaDasar = ($item->harga_dasar ?? 0) + ($item->biaya_cito ?? 0);
+                $subtotal += ($item->harga_akhir ?? 0);
+                $isChild = ($item->harga_akhir == 0 && $item->kategori_biaya != 'ADMINISTRASI' && $item->kategori_biaya != 'JASA_DOKTER' && empty($item->is_paket));
                 @endphp
                 <tr>
-                    <td>{{ $item->nama_layanan }}</td>
+                    <td @if($isChild) style="padding-left: 20px; font-size: 10px; color: #333;" @endif>
+                        @if($isChild)
+                        &bull; {{ $item->nama_layanan }}
+                        @elseif(isset($item->is_paket) && $item->is_paket == 1)
+                        <span class="fw-bold">📦 [PAKET] {{ $item->nama_layanan }}</span>
+                        @else
+                        {{ $item->nama_layanan }}
+                        @endif
+
+                        @if(isset($item->kategori_biaya) && $item->kategori_biaya == 'ADMINISTRASI')
+                        <small class="fw-normal text-muted">(Admin)</small>
+                        @elseif(isset($item->kategori_biaya) && $item->kategori_biaya == 'JASA_DOKTER')
+                        <small class="fw-normal text-muted">(Jasa Medis)</small>
+                        @endif
+                    </td>
                     <td class="text-end">{{ number_format($hargaDasar, 0, ',', '.') }}</td>
-                    <td class="text-end">{{ number_format($item->diskon, 0, ',', '.') }}</td>
-                    <td class="text-end">{{ number_format($item->harga_akhir, 0, ',', '.') }}</td>
+                    <td class="text-end">{{ number_format($item->diskon ?? 0, 0, ',', '.') }}</td>
+                    <td class="text-end">{{ number_format($item->harga_akhir ?? 0, 0, ',', '.') }}</td>
                 </tr>
                 @endforeach
             </tbody>
@@ -277,7 +337,7 @@
             <tr>
                 <td class="fw-bold fst-italic">Kembalian</td>
                 @php
-                    $kembalian = $transaksi->total_bayar > $transaksi->total_tagihan ? ($transaksi->total_bayar - $transaksi->total_tagihan) : 0;
+                $kembalian = $transaksi->total_bayar > $transaksi->total_tagihan ? ($transaksi->total_bayar - $transaksi->total_tagihan) : 0;
                 @endphp
                 <td class="text-end">{{ number_format($kembalian, 0, ',', '.') }}</td>
             </tr>
@@ -286,12 +346,10 @@
         <!-- Info Metode Pengiriman -->
         <div style="margin-top: 10px;">
             <div class="fw-bold fst-italic">Metode Pengiriman :</div>
-
             @php
-                $metode = is_string($transaksi->metode_pengiriman) ? json_decode($transaksi->metode_pengiriman, true) : ($transaksi->metode_pengiriman ?? []);
-                $metode = is_array($metode) ? $metode : [];
+            $metode = is_string($transaksi->metode_pengiriman) ? json_decode($transaksi->metode_pengiriman, true) : ($transaksi->metode_pengiriman ?? []);
+            $metode = is_array($metode) ? $metode : [];
             @endphp
-
             <table style="width: 400px; margin-top: 3px;">
                 <tr>
                     <td style="width: 25%;">Cetak Fisik</td>
@@ -310,21 +368,20 @@
 
         <div style="margin-top: 10px;">
             <div class="fw-bold fst-italic">Hasil Selesai :</div>
-            <div>{{ $transaksi->janji_hasil ? date('d-m-Y H:i:s', strtotime($transaksi->janji_hasil)) : 'Menunggu Info Lab' }}</div>
+            <div>{{ $transaksi->janji_hasil ? date('d-m-Y H:i:s', strtotime($transaksi->janji_hasil)) : 'Menunggu Info Lab / Pemeriksaan' }}</div>
         </div>
 
         <!-- Notes & Cap Lunas -->
         <div style="display: flex; justify-content: space-between; align-items: flex-start; margin-top: 10px;">
             <div style="font-style: italic; max-width: 65%;">
                 NB:<br>
-                - Nota harap dibawa saat ambil hasil<br>
-                - Hasil harap diambil paling lambat 1(satu) minggu setelah tanggal janji hasil<br>
+                - Nota harap dibawa Jika Terjadi Kesalahan Penginputan<br>
                 - Pembatalan tidak bisa dilakukan bila pemeriksaan sudah dilakukan, pembatalan pemeriksaan yang belum dilakukan sebelum lewat bulan dikenakan biaya pembatalan sebesar 10% dan 25% setelah lewat bulan<br>
                 - Pembatalan tidak bisa dilakukan untuk semua program PROMO
             </div>
 
             @if(strtoupper($transaksi->status_pembayaran ?? '') == 'LUNAS')
-                <div class="box-lunas">LUNAS</div>
+            <div class="box-lunas">LUNAS</div>
             @endif
         </div>
 
@@ -333,20 +390,18 @@
             <div>Pontianak, {{ date('d-m-Y H:i:s') }}</div>
             <br><br><br>
             <div style="text-decoration: underline; font-weight: bold;">
-                {{ optional(auth()->user())->name ?? $transaksi->user_id }}
+                {{ optional(auth()->user())->fullname ?? $transaksi->user_id }}
             </div>
         </div>
 
-        <!-- ========================================== -->
-        <!-- WRAPPER FOOTER (TERKUNCI DI PALING BAWAH) -->
-        <!-- ========================================== -->
+        <!-- FOOTER -->
         <div class="footer-wrapper">
             <div class="footer-text">
-                Terima kasih Anda telah melakukan pemeriksaan di Lab. Klinik "{{ config('app.name', 'Innoventra') }}". Sampaikan kesan dan saran Anda terhadap kualitas hasil & layanan kami melalui WhatsApp ke no. 0852-5172-0189
+                Terima kasih Anda telah melakukan pemeriksaan di Layanan Kesehatan Kami. Sampaikan kesan dan saran Anda terhadap kualitas hasil & layanan melalui WhatsApp ke no. 0852-XXXX-XXXX
             </div>
 
             <div class="bottom-meta">
-                <div>Dicetak Oleh : {{ optional(auth()->user())->name ?? $transaksi->user_id }}</div>
+                <div>Dicetak Oleh : {{ optional(auth()->user())->fullname ?? $transaksi->user_id }}</div>
                 <div>1 &nbsp;/&nbsp; 1</div>
                 <div>{{ date('d M Y H.i') }}</div>
             </div>
@@ -354,8 +409,8 @@
 
     </div>
 
-    <!-- Tombol Cetak Manual -->
     <button class="btn-print" onclick="window.print()">Cetak Nota Pembayaran</button>
 
 </body>
+
 </html>

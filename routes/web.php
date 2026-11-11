@@ -192,21 +192,6 @@ Route::prefix('{akses}/{id}')->group(function (): void {
     Route::get('master-brodcast/configure-whatsapp', [BrodcastController::class, 'master_brodcast_configure_whatsapp'])->name('master_brodcast_configure_whatsapp');
     Route::get('menu-brodcast/brodcast-email', [BrodcastController::class, 'menu_brodcast_email'])->name('menu_brodcast_email');
 
-    // FARMASI
-    Route::get('penjualan/penjualan-non-resep', [FarmasiController::class, 'penjualan_non_resep'])->name('penjualan_non_resep');
-    Route::get('penjualan/penjualan-dengan-resep', [FarmasiController::class, 'penjualan_farmasi_resep'])->name('penjualan_farmasi_resep');
-    Route::get('penjualan/verifikasi-resep-dan-dosis', [FarmasiController::class, 'penjualan_verifikasi_dosis_resep'])->name('penjualan_verifikasi_dosis_resep');
-    Route::get('penjualan/cetak-nota-pembelian', [FarmasiController::class, 'penjualan_cetak_nota_farmmasi'])->name('penjualan_cetak_nota_farmmasi');
-    Route::get('penjualan/history-penjualan', [FarmasiController::class, 'penjualan_history_penjualan'])->name('penjualan_history_penjualan');
-    Route::get('manajemen-farmasi/pembelian-obat', [FarmasiController::class, 'manajemen_farmasi_pembelian_obat'])->name('manajemen_farmasi_pembelian_obat');
-    Route::get('manajemen-farmasi/penerimaan-barang', [FarmasiController::class, 'manajemen_farmasi_penerimaan_barang'])->name('manajemen_farmasi_penerimaan_barang');
-    Route::get('manajemen-farmasi/pembuatan-faktur', [FarmasiController::class, 'manajemen_farmasi_pembuatan_faktur'])->name('manajemen_farmasi_pembuatan_faktur');
-    Route::get('manajemen-farmasi/riwayat-transaksi-pembelian', [FarmasiController::class, 'manajemen_farmasi_riwayat_transaksi'])->name('manajemen_farmasi_riwayat_transaksi');
-    Route::get('manajemen-farmasi/data-obat', [FarmasiController::class, 'manajemen_farmasi_data_obat'])->name('manajemen_farmasi_data_obat');
-    Route::get('manajemen-farmasi/obat-masuk-dan-keluar', [FarmasiController::class, 'manajemen_farmasi_obat_in_out'])->name('manajemen_farmasi_obat_in_out');
-    Route::get('manajemen-farmasi/stok-min-and-max', [FarmasiController::class, 'manajemen_farmasi_stock_min_max'])->name('manajemen_farmasi_stock_min_max');
-    Route::get('manajemen-farmasi/data-supplier', [FarmasiController::class, 'manajemen_farmasi_data_supplier'])->name('manajemen_farmasi_data_supplier');
-    Route::get('manajemen-farmasi/data-pelanggan', [FarmasiController::class, 'manajemen_farmasi_data_pelanggan'])->name('manajemen_farmasi_data_pelanggan');
 
     // MOVIE
     Route::get('master-data/data-movie', [MoviesController::class, 'master_data_movie'])->name('master_data_movie');
@@ -312,51 +297,8 @@ Route::prefix('master-data')->group(function () {
     Route::post('menu/gateway-whatsapp/send-message', [MasterController::class, 'master_gateway_whatsapp_send_message'])->name('master_gateway_whatsapp_send_message');
     Route::post('menu/gateway-whatsapp/send-message-prosess', [MasterController::class, 'master_gateway_whatsapp_send_message_prosess'])->name('master_gateway_whatsapp_send_message_prosess');
 });
-// MENU POLIKLINIK
-Route::prefix('application')->group(function () {
-    Route::get('poliklinik/registrasi-poliklinik/searchPatient', [PoliklinikController::class, 'poliklinik_register_poli_searchPatient'])->name('poliklinik_register_poli_searchPatient');
-    Route::get('poliklinik/registrasi-poliklinik/getAvailableDoctors', [PoliklinikController::class, 'poliklinik_register_poli_getAvailableDoctors'])->name('poliklinik_register_poli_getAvailableDoctors');
-    Route::get('poliklinik/registrasi-poliklinik/store', [PoliklinikController::class, 'poliklinik_register_poli_store'])->name('poliklinik_register_poli_store');
 
-    Route::post('menu-poliklinik/data-registrasi/handling', [PoliklinikController::class, 'data_registrasi_poli_handling'])->name('data_registrasi_poli_handling');
-    Route::post('menu-poliklinik/data-registrasi/handling-pasien', [PoliklinikController::class, 'data_registrasi_poli_handling_pasien'])->name('data_registrasi_poli_handling_pasien');
-    Route::post('menu-poliklinik/poliklinik-handling/detail', [PoliklinikController::class, 'data_registrasi_poliklinik_handling_detail'])->name('data_registrasi_poliklinik_handling_detail');
-    Route::post('menu-poliklinik/poliklinik-handling/order-layanan', [PoliklinikController::class, 'data_registrasi_poliklinik_handling_order_layanan'])->name('data_registrasi_poliklinik_handling_order_layanan');
-    Route::post('menu-poliklinik/poliklinik-handling/order-layanan/save', [PoliklinikController::class, 'data_registrasi_poliklinik_handling_order_layanan_save'])->name('data_registrasi_poliklinik_handling_order_layanan_save');
-    Route::post('menu-poliklinik/poliklinik-handling/order-layanan/rad', [PoliklinikController::class, 'data_registrasi_poliklinik_handling_order_layanan_rad'])->name('data_registrasi_poliklinik_handling_order_layanan_rad');
-    Route::post('menu-poliklinik/poliklinik-handling/poli-gigi/save-odontogram', [PoliklinikController::class, 'data_registrasi_poliklinik_save_odontogram'])->name('data_registrasi_poliklinik_save_odontogram');
-    Route::post('menu-poliklinik/poliklinik-handling/poli-gigi/reset-odontogram', [PoliklinikController::class, 'data_registrasi_poliklinik_reset_odontogram'])->name('data_registrasi_poliklinik_reset_odontogram');
-    Route::post('menu-poliklinik/poliklinik-handling/poli-gigi/save-diagnosa', [PoliklinikController::class, 'data_registrasi_poliklinik_save_diagnosa'])->name('data_registrasi_poliklinik_save_diagnosa');
-    Route::post('menu-poliklinik/poliklinik-handling/poli-gigi/save-diagnosa-pasien-poli', [PoliklinikController::class, 'data_registrasi_poliklinik_save_diagnosa_pasien_poli'])->name('data_registrasi_poliklinik_save_diagnosa_pasien_poli');
-    Route::post('menu-poliklinik/poliklinik-handling/poli-gigi/data-penunjang', [PoliklinikController::class, 'data_registrasi_poliklinik_data_penunjang'])->name('data_registrasi_poliklinik_data_penunjang');
 
-    Route::post('verifikasi-poliklinik/verifikasi-dokter/verify', [PoliklinikController::class, 'verifikasi_poliklinik_dokter_verify'])->name('verifikasi_poliklinik_dokter_verify');
-    Route::post('verifikasi-poliklinik/verifikasi-dokter/pilih-penjualan', [PoliklinikController::class, 'verifikasi_poliklinik_dokter_pilih_penjualan'])->name('verifikasi_poliklinik_dokter_pilih_penjualan');
-    Route::post('verifikasi-poliklinik/verifikasi-dokter/pilih-sub-penjualan', [PoliklinikController::class, 'verifikasi_poliklinik_dokter_pilih_sub_penjualan'])->name('verifikasi_poliklinik_dokter_pilih_sub_penjualan');
-    Route::post('verifikasi-poliklinik/verifikasi-dokter/pilih-pemeriksaan', [PoliklinikController::class, 'verifikasi_poliklinik_dokter_pilih_pemeriksaan'])->name('verifikasi_poliklinik_dokter_pilih_pemeriksaan');
-    Route::post('verifikasi-poliklinik/verifikasi-dokter/remove-pemeriksaan', [PoliklinikController::class, 'verifikasi_poliklinik_dokter_remove_pemeriksaan'])->name('verifikasi_poliklinik_dokter_remove_pemeriksaan');
-    Route::post('verifikasi-poliklinik/verifikasi-dokter/save-verify', [PoliklinikController::class, 'verifikasi_poliklinik_dokter_save_verify'])->name('verifikasi_poliklinik_dokter_save_verify');
-
-    Route::post('verifikasi-poliklinik/dokumentasi-hasil/preview', [PoliklinikController::class, 'verifikasi_poliklinik_dokumentasi_hasil_preview'])->name('verifikasi_poliklinik_dokumentasi_hasil_preview');
-    Route::post('verifikasi-poliklinik/dokumentasi-hasil/preview-report', [PoliklinikController::class, 'verifikasi_poliklinik_dokumentasi_hasil_preview_report'])->name('verifikasi_poliklinik_dokumentasi_hasil_preview_report');
-    Route::post('verifikasi-poliklinik/dokumentasi-hasil/send-report', [PoliklinikController::class, 'verifikasi_poliklinik_dokumentasi_hasil_send_report'])->name('verifikasi_poliklinik_dokumentasi_hasil_send_report');
-});
-// MENU RADIOLOGI
-Route::prefix('application')->group(function () {
-    Route::post('menu-radiologi/data-registrasi-radiologi/handling', [RadiologiController::class, 'data_registrasi_radiologi_handling'])->name('data_registrasi_radiologi_handling');
-    Route::post('menu-radiologi/data-registrasi-radiologi/handling-pasien', [RadiologiController::class, 'menu_radiologi_handling_pasien'])->name('menu_radiologi_handling_pasien');
-    Route::get('menu-radiologi/data-registrasi-radiologi/handling-pasien/print-barcode/{code}', [RadiologiController::class, 'menu_radiologi_handling_pasien_print_barcode'])->name('menu_radiologi_handling_pasien_print_barcode');
-    Route::get('menu-radiologi/data-registrasi-radiologi/handling-pasien/images/{code}', [RadiologiController::class, 'menu_radiologi_handling_pasien_image'])->name('menu_radiologi_handling_pasien_image');
-    Route::get('menu-radiologi/data-registrasi-radiologi/handling-pasien/render/{instanceId}', [RadiologiController::class, 'menu_radiologi_handling_pasien_rander_image'])->name('menu_radiologi_handling_pasien_rander_image');
-    Route::post('menu-radiologi/data-registrasi-radiologi/handling-pasien/proses-simpan-hasil', [RadiologiController::class, 'menu_radiologi_handling_pasien_simpan_hasil'])->name('menu_radiologi_handling_pasien_simpan_hasil');
-
-    Route::post('hasil-radiologi/verifikasi-hasil/detail', [RadiologiController::class, 'hasil_radiologi_verifikasi_detail'])->name('hasil_radiologi_verifikasi_detail');
-    Route::post('hasil-radiologi/verifikasi-hasil/verifikasi-data', [RadiologiController::class, 'hasil_radiologi_verifikasi_data'])->name('hasil_radiologi_verifikasi_data');
-    Route::post('hasil-radiologi/verifikasi-hasil/preview-report', [RadiologiController::class, 'verifikasi_radiologi_preview_report'])->name('verifikasi_radiologi_preview_report');
-    Route::post('hasil-radiologi/dokumentasi-hasil/detail', [RadiologiController::class, 'dokumentasi_hasil_radiologi_detail'])->name('dokumentasi_hasil_radiologi_detail');
-    Route::post('hasil-radiologi/dokumentasi-hasil/kirim-hasil', [RadiologiController::class, 'dokumentasi_hasil_radiologi_detail_kirim_hasil'])->name('dokumentasi_hasil_radiologi_detail_kirim_hasil');
-    Route::get('pacs-server/studies-get/{studyId}', [RadiologiController::class, 'pacs_server_studies_show'])->name('pacs_server_studies_show');
-});
 Route::get('/orthanc-proxy/{path?}', [RadiologiController::class, 'proxy'])->where('path', '.*');
 Route::post('/orthanc-proxy/{path?}', [RadiologiController::class, 'proxy'])->where('path', '.*');
 // MENU LABORATORIUM
@@ -382,68 +324,8 @@ Route::prefix('pemeriksaan-setting')->name('pemeriksaan.setting.')->group(functi
     Route::post('/store', [PemeriksaanSettingController::class, 'storeParameters'])->name('store');
 });
 
-// MENU KEUANGAN
-Route::prefix('application')->group(function () {
-    Route::post('keuangan/menu-kasir/find-data', [KeuanganController::class, 'keuangan_menu_cashier_find_data'])->name('keuangan_menu_cashier_find_data');
-    Route::get('keuangan/menu-kasir/list-all-patient', [KeuanganController::class, 'keuangan_menu_cashier_list_all_patient'])->name('keuangan_menu_cashier_list_all_patient');
-    Route::get('keuangan/menu-kasir/find-data-v2', [KeuanganController::class, 'keuangan_menu_cashier_find_data_v2'])->name('keuangan_menu_cashier_find_data_v2');
-    Route::post('keuangan/menu-kasir/proses-payment', [KeuanganController::class, 'keuangan_menu_cashier_proses_payment'])->name('keuangan_menu_cashier_proses_payment');
-    Route::post('keuangan/menu-kasir/find', [KeuanganController::class, 'keuangan_menu_cashier_find'])->name('keuangan_menu_cashier_find');
-    Route::post('keuangan/menu-kasir/fix-payment', [KeuanganController::class, 'keuangan_menu_cashier_find_fix_payment'])->name('keuangan_menu_cashier_find_fix_payment');
-    Route::post('transaksi-keuangan/penerimaan-transaksi/proses-transaksi', [KeuanganController::class, 'keuangan_penerimaan_proses_transaksi'])->name('keuangan_penerimaan_proses_transaksi');
-    Route::get('/cashier/download-receipt-pdf/{orderCode}', [KeuanganController::class, 'downloadReceiptPdf'])->name('keuangan_menu_cashier_download_pdf');
-});
-// MASTER DATA MEDICAL
-Route::prefix('application')->group(function () {
-    Route::post('master-doctor/data-doctor/import', [MasterDataController::class, 'master_doctor_data_doctor_import'])->name('master_doctor_data_doctor_import');
-    Route::get('master-doctor/data-doctor/download-template', [MasterDataController::class, 'master_doctor_download_template'])->name('master_doctor_download_template');
-    Route::post('master-doctor/data-doctor/add', [MasterDataController::class, 'master_doctor_data_doctor_add'])->name('master_doctor_data_doctor_add');
-    Route::post('master-doctor/data-doctor/save', [MasterDataController::class, 'master_doctor_data_doctor_save'])->name('master_doctor_data_doctor_save');
 
-    Route::get('master-doctor/doctor-poliklinik/list', [MasterDataController::class, 'master_doctor_poliklinik_list'])->name('master_doctor_poliklinik_list');
-    Route::get('master-doctor/doctor-poliklinik/get-doctor', [MasterDataController::class, 'master_doctor_poliklinik_get_doctor'])->name('master_doctor_poliklinik_get_doctor');
 
-    Route::post('master-doctor/doctor-poliklinik/add', [MasterDataController::class, 'master_doctor_poliklinik_add'])->name('master_doctor_poliklinik_add');
-    Route::post('master-doctor/doctor-poliklinik/save', [MasterDataController::class, 'master_doctor_poliklinik_save'])->name('master_doctor_poliklinik_save');
-    Route::post('master-doctor/doctor-poliklinik/remove', [MasterDataController::class, 'master_doctor_poliklinik_remove'])->name('master_doctor_poliklinik_remove');
-    Route::post('master-doctor/doctor-poliklinik/pilih-dokter', [MasterDataController::class, 'master_doctor_poliklinik_pilih_dokter'])->name('master_doctor_poliklinik_pilih_dokter');
-    Route::post('master-doctor/doctor-poliklinik/pilih-dokter-save', [MasterDataController::class, 'master_doctor_poliklinik_pilih_dokter_save'])->name('master_doctor_poliklinik_pilih_dokter_save');
-    // JADWAL DOKTER POLI
-    Route::get('master-doctor/jadwal-dokter-poli/getSchedules', [MasterDataController::class, 'master_jadwal_doctor_poliklinik_getSchedules'])->name('master_jadwal_doctor_poliklinik_getSchedules');
-    Route::get('master-doctor/jadwal-dokter-poli/getDoctorsByPoli', [MasterDataController::class, 'master_jadwal_doctor_poliklinik_getDoctorsByPoli'])->name('master_jadwal_doctor_poliklinik_getDoctorsByPoli');
-    Route::post('master-doctor/jadwal-dokter-poli/saveSchedule', [MasterDataController::class, 'master_jadwal_doctor_poliklinik_saveSchedule'])->name('master_jadwal_doctor_poliklinik_saveSchedule');
-    Route::delete('master-doctor/jadwal-dokter-poli/remove', [MasterDataController::class, 'master_jadwal_doctor_poliklinik_remove'])->name('master_jadwal_doctor_poliklinik_remove');
-
-    // PEMERIKSAAN
-    Route::post('master-pemeriksaan/category-pemeriksaan/add', [MasterDataController::class, 'master_pemeriksaan_category_add'])->name('master_pemeriksaan_category_add');
-    Route::post('master-pemeriksaan/category-pemeriksaan/save', [MasterDataController::class, 'master_pemeriksaan_category_save'])->name('master_pemeriksaan_category_save');
-    Route::post('master-pemeriksaan/data-pemeriksaan/add', [MasterDataController::class, 'master_pemeriksaan_data_add'])->name('master_pemeriksaan_data_add');
-    Route::post('master-pemeriksaan/data-pemeriksaan/save', [MasterDataController::class, 'master_pemeriksaan_data_save'])->name('master_pemeriksaan_data_save');
-    Route::post('master-pemeriksaan/harga-pemeriksaan/master', [MasterDataController::class, 'master_pemeriksaan_harga_master'])->name('master_pemeriksaan_harga_master');
-    Route::post('master-pemeriksaan/harga-pemeriksaan/group', [MasterDataController::class, 'master_pemeriksaan_harga_group'])->name('master_pemeriksaan_harga_group');
-    Route::post('master-pemeriksaan/specimen-pemeriksaan/detail', [MasterDataController::class, 'master_pemeriksaan_specimen_detail'])->name('master_pemeriksaan_specimen_detail');
-    Route::post('master-pemeriksaan/specimen-pemeriksaan/save', [MasterDataController::class, 'master_pemeriksaan_specimen_save'])->name('master_pemeriksaan_specimen_save');
-    // LAYANAN
-    Route::post('master-layanan/category-layanan/add', [MasterDataController::class, 'master_layanan_category_add'])->name('master_layanan_category_add');
-    Route::post('master-layanan/category-layanan/save', [MasterDataController::class, 'master_layanan_category_save'])->name('master_layanan_category_save');
-    Route::post('master-layanan/data-layanan/add', [MasterDataController::class, 'master_layanan_data_add'])->name('master_layanan_data_add');
-    Route::post('master-layanan/data-layanan/save', [MasterDataController::class, 'master_layanan_data_save'])->name('master_layanan_data_save');
-    Route::post('master-layanan/formulir-layanan/add', [MasterDataController::class, 'master_layanan_formulir_add'])->name('master_layanan_formulir_add');
-    Route::post('master-layanan/formulir-layanan/save', [MasterDataController::class, 'master_layanan_formulir_save'])->name('master_layanan_formulir_save');
-    Route::post('master-layanan/formulir-layanan/add-field', [MasterDataController::class, 'master_layanan_formulir_add_field'])->name('master_layanan_formulir_add_field');
-    Route::post('master-layanan/formulir-layanan/save-field', [MasterDataController::class, 'master_layanan_formulir_save_field'])->name('master_layanan_formulir_save_field');
-
-    // PENJUALAN DATA
-    Route::post('master-penjualan/data-penjualan/master', [MasterDataController::class, 'master_penjualan_data_master'])->name('master_penjualan_data_master');
-    Route::post('master-penjualan/data-penjualan/group', [MasterDataController::class, 'master_penjualan_data_group'])->name('master_penjualan_data_group');
-    Route::post('master-penjualan/data-penjualan/add-data', [MasterDataController::class, 'master_penjualan_data_add'])->name('master_penjualan_data_add');
-    Route::post('master-penjualan/data-penjualan/save-data', [MasterDataController::class, 'master_penjualan_data_save'])->name('master_penjualan_data_save');
-    Route::post('master-penjualan/data-penjualan/import-data', [MasterDataController::class, 'master_penjualan_data_import'])->name('master_penjualan_data_import');
-    Route::post('master-penjualan/data-penjualan/save-import-data', [MasterDataController::class, 'master_penjualan_data_import_save'])->name('master_penjualan_data_import_save');
-    // KATEGORI PENJUALAN
-    Route::post('master-penjualan/kategori-penjualan/add-kategori', [MasterDataController::class, 'master_penjualan_kategori_add_kategori'])->name('master_penjualan_kategori_add_kategori');
-    Route::post('master-penjualan/kategori-penjualan/save-kategori', [MasterDataController::class, 'master_penjualan_kategori_save_kategori'])->name('master_penjualan_kategori_save_kategori');
-});
 // MASTER DATA MEDICAL
 Route::prefix('application')->group(function () {
     // MASTER COMPANY
@@ -592,16 +474,11 @@ Route::prefix('pembelian/')->group(function (): void {
     Route::post('purchasing/cash-purchase/preview-report', [PurchaseController::class, 'purchase_cash_purchase_preview'])->name('purchase_cash_purchase_preview');
     Route::post('purchasing/cash-purchase/print-report', [PurchaseController::class, 'purchase_cash_purchase_print'])->name('purchase_cash_purchase_print');
 });
-
-
 // SUPLLIER
 Route::prefix('supplier/')->group(function (): void {
     Route::post('master-supplier/data-supplier/add', [SupplierController::class, 'master_data_supplier_add'])->name('master_data_supplier_add');
     Route::post('master-supplier/data-supplier/save', [SupplierController::class, 'master_data_supplier_save'])->name('master_data_supplier_save');
 });
-
-
-
 // LOGISTIK
 Route::prefix('logistik/')->group(function (): void {
     Route::post('transaction-product/product-in/add-schedule', [LogistikController::class, 'transaction_product_in_add_schedule'])->name('transaction_product_in_add_schedule');
@@ -629,8 +506,6 @@ Route::prefix('logistik/')->group(function (): void {
     Route::post('master-logistik/master-product/add-deskripsi-product', [LogistikController::class, 'master_logistik_add_desc_product'])->name('master_logistik_add_desc_product');
     Route::post('master-logistik/master-product/save-deskripsi-product', [LogistikController::class, 'master_logistik_save_desc_product'])->name('master_logistik_save_desc_product');
 });
-
-
 
 Route::prefix('shop')->name('shop.')->group(function () {
     Route::get('/', [ShopController::class, 'index'])->name('index');
@@ -680,7 +555,6 @@ Route::prefix('v3')->group(function (): void {
     Route::post('/api/antrian/panggil', [AntrianController::class, 'panggilAntrian'])->name('antrian.panggil');
 });
 
-
 // NEWS
 Route::prefix('news/')->group(function (): void {
     Route::post('menu_news/save', [NewsAdminController::class, 'menu_news_save'])->name('menu_news_save');
@@ -692,7 +566,6 @@ Route::prefix('news/')->group(function (): void {
 use App\Http\Controllers\MovieController;
 use App\Http\Controllers\News\NewsController;
 use App\Http\Controllers\OrthancController;
-
 use App\Http\Controllers\PrivateDocumentController;
 use Illuminate\Support\Facades\Storage;
 

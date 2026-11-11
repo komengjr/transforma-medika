@@ -120,21 +120,38 @@
         .exam-title {
             background-color: #fafafa;
             font-weight: bold;
-            font-size: 11px;
+            font-size: 12px;
             color: #004085;
             border-bottom: 1px solid #cccccc !important;
+            padding-top: 8px !important;
+            padding-bottom: 8px !important;
         }
 
         .result-value {
             white-space: pre-line;
             line-height: 1.4;
-            font-family: 'Courier', monospace, sans-serif;
+            text-align: justify;
+        }
+
+        .section-title {
+            font-weight: bold;
+            font-size: 10px;
+            color: #333333;
+            margin-bottom: 2px;
+            margin-top: 6px;
+        }
+
+        .impression-box {
+            margin-top: 10px;
+            padding: 10px;
+            background-color: #f8f9fa;
+            border: 1px solid #e0e0e0;
         }
 
         /* FOOTER / TANDA TANGAN */
         .footer-section {
             position: fixed;
-            bottom: 0;
+            bottom: 10px;
             left: 0;
             right: 0;
             width: 100%;
@@ -195,7 +212,7 @@
         <tr>
             <td style="width: 12%;">No. Reg</td>
             <td style="width: 2%;">:</td>
-            <td style="width: 36%; font-weight: bold;">{{ $code }}</td>
+            <td style="width: 36%; font-weight: bold;">{{ $data->no_registrasi ?? $code }}</td>
 
             <td style="width: 14%;">Tgl Registrasi</td>
             <td style="width: 2%;">:</td>
@@ -213,23 +230,14 @@
         <tr>
             <td>Dokter Pengirim</td>
             <td>:</td>
-            <td>
-                @php
-                $dokter = DB::table('master_doctor')->where('master_doctor_code', $reg->d_reg_order_rad_dr_rujukan ?? null)->first();
-                @endphp
-                {{ $dokter->master_doctor_name ?? 'Dokter Rujukan / Luar' }}
-            </td>
+            <td>{{ $data->dokter_rujukan ?? 'Dokter Rujukan / Luar' }}</td>
 
             <td>Jenis Kelamin</td>
             <td>:</td>
             <td>
-                @if (($data->master_patient_jk ?? '') == 'L')
-                Laki - Laki
-                @elseif (($data->master_patient_jk ?? '') == 'P')
-                Perempuan
-                @else
-                -
-                @endif
+                @if (($data->master_patient_jk ?? '') == 'L') Laki - Laki
+                @elseif (($data->master_patient_jk ?? '') == 'P') Perempuan
+                @else - @endif
             </td>
         </tr>
         <tr>
@@ -242,9 +250,7 @@
             <td>
                 @if(!empty($data->master_patient_tgl_lahir))
                 {{ date('d-m-Y', strtotime($data->master_patient_tgl_lahir)) }}
-                @else
-                -
-                @endif
+                @else - @endif
             </td>
         </tr>
     </table>
@@ -254,61 +260,72 @@
         <table class="table-result">
             <thead>
                 <tr>
-                    <th style="width: 35%;">JENIS PEMERIKSAAN / PARAMETER</th>
-                    <th style="width: 65%;">HASIL EKSPERTISE / DESKRIPSI</th>
+                    <th style="width: 100%; text-align: center;">LAPORAN EKSPERTISE RADIOLOGI</th>
                 </tr>
             </thead>
             <tbody>
-                @foreach ($pemeriksaan as $pem)
-                <!-- BARIS NAMA PEMERIKSAAN / EXAMINATION NAME -->
+                @foreach ($pemeriksaanList as $pem)
+
+                <!-- NAMA PEMERIKSAAN -->
                 <tr>
-                    <td colspan="2" class="exam-title">
-                        {{ $pem->t_pemeriksaan_list_name ?? $pem->p_sales_data_name ?? 'Pemeriksaan Radiologi' }}
+                    <td class="exam-title" style="text-align: center; text-transform: uppercase;">
+                        {{ $pem->nama_layanan }}
                     </td>
                 </tr>
 
-                @php
-                // Ambil sub-parameter jika ada
-                $sub = DB::table('t_pemeriksaan_list_val')
-                ->where('t_pemeriksaan_list_code', $pem->t_pemeriksaan_list_code ?? '')
-                ->get();
-
-                // Query data hasil dari h_reg_rad
-                $hRegRad = DB::table('h_reg_rad')
-                ->where('order_rad_list_code', $pem->order_rad_list_code ?? $code)
-                ->get();
-                @endphp
-
-                @if($sub->count() > 0)
-                @foreach ($sub as $subs)
-                @php
-                $valResult = $hRegRad->firstWhere('t_pem_list_val_code', $subs->t_pem_list_val_code);
-                $textHasil = $valResult->h_reg_rad_value ?? '- Belum Ada Hasil -';
-                @endphp
+                <!-- KONTEN HASIL -->
                 <tr>
-                    <td style="vertical-align: top; font-weight: bold; padding-left: 12px;">
-                        {{ $subs->t_pem_list_val_name }}
-                    </td>
-                    <td class="result-value">
-                        {!! nl2br(e($textHasil)) !!}
+                    <td style="padding: 12px;">
+
+                        <!-- KLINIS & TEKNIK -->
+                        <table style="width: 100%; margin-bottom: 8px;">
+                            <tr>
+                                <td style="width: 15%; vertical-align: top; font-weight: bold;">Klinis</td>
+                                <td style="width: 2%; vertical-align: top;">:</td>
+                                <td style="width: 83%; vertical-align: top;">{{ !empty($pem->klinis_indikasi) ? $pem->klinis_indikasi : '-' }}</td>
+                            </tr>
+                            <tr>
+                                <td style="vertical-align: top; font-weight: bold;">Teknik Foto</td>
+                                <td style="vertical-align: top;">:</td>
+                                <td style="vertical-align: top;">{{ !empty($pem->teknik_pemeriksaan) ? $pem->teknik_pemeriksaan : '-' }}</td>
+                            </tr>
+                        </table>
+
+                        <div style="border-top: 0.5px dashed #cccccc; margin: 8px 0;"></div>
+
+                        <!-- DETAIL PARAMETER (Jika Ada) -->
+                        @if(count($pem->details) > 0)
+                        <table style="width: 100%; margin-bottom: 10px;">
+                            @foreach ($pem->details as $det)
+                            <tr>
+                                <td style="width: 25%; vertical-align: top; font-weight: bold; padding-bottom: 4px;">{{ $det->nama_parameter }}</td>
+                                <td style="width: 2%; vertical-align: top; padding-bottom: 4px;">:</td>
+                                <td class="result-value" style="width: 73%; vertical-align: top; padding-bottom: 4px;">
+                                    {!! nl2br(e($det->nilai_hasil ?? '-')) !!}
+                                </td>
+                            </tr>
+                            @endforeach
+                        </table>
+                        @endif
+
+                        <!-- KESAN / KESIMPULAN (SELALU DITAMPILKAN PALING BAWAH & TER-HIGHLIGHT) -->
+                        <div class="impression-box">
+                            <div class="section-title" style="font-size: 11px; text-decoration: underline; margin-bottom: 4px;">KESAN / KESIMPULAN:</div>
+                            <div class="result-value" style="font-weight: bold;">
+                                {!! !empty($pem->kesan_kesimpulan) ? nl2br(e($pem->kesan_kesimpulan)) : '-' !!}
+                            </div>
+                        </div>
+
+                        <!-- SARAN -->
+                        @if(!empty($pem->saran))
+                        <div style="margin-top: 8px;">
+                            <span style="font-weight: bold;">Saran:</span>
+                            <span class="result-value">{!! nl2br(e($pem->saran)) !!}</span>
+                        </div>
+                        @endif
+
                     </td>
                 </tr>
-                @endforeach
-                @else
-                <!-- JIKA TIDAK ADA SUB-PARAMETER, TAMPILKAN HASIL UTAMA -->
-                @php
-                $valResult = $hRegRad->first();
-                $textHasil = $valResult->h_reg_rad_value ?? '- Belum Ada Hasil -';
-                @endphp
-                <tr>
-                    <td style="vertical-align: top; font-weight: bold; padding-left: 12px;">
-                        Deskripsi Hasil
-                    </td>
-                    <td class="result-value">
-                        {!! nl2br(e($textHasil)) !!}
-                    </td>
-                </tr>
-                @endif
                 @endforeach
             </tbody>
         </table>
@@ -316,27 +333,35 @@
 
     <!-- FOOTER / TANDA TANGAN & VALIDASI -->
     <div class="footer-section">
+        @php
+        // Ambil data verifikasi dari item pertama
+        $firstExam = $pemeriksaanList->first();
+        $verifDate = !empty($firstExam->tanggal_verifikasi) ? date('d-m-Y H:i', strtotime($firstExam->tanggal_verifikasi)) : date('d-m-Y H:i');
+        $radiologName = $firstExam->dokter_radiolog ?? (auth()->user()->name ?? 'Dr. Radiologi, Sp.Rad');
+        @endphp
+
         <table class="table-footer" style="width: 100%;">
             <tr>
                 <td style="width: 60%; text-align: left; vertical-align: bottom;">
                     <div class="note-text">
-                        * Hasil pemeriksaan ini dibuat dan divalidasi secara elektronik.<br>
-                        * Informasi lebih lanjut dapat menghubungi Customer Service kami.<br><br>
-                        <strong>Printed by:</strong> {{ auth()->user()->name ?? 'Operator' }} / {{ date('d-m-Y H:i:s') }} / {{ $code }}
+                        * Laporan ekspertise ini telah divalidasi secara elektronik dan sah tanpa tanda tangan basah.<br>
+                        * Kesalahan interpretasi karena pencetakan kualitas rendah di luar tanggung jawab RS.<br><br>
+                        <strong>Printed by:</strong> {{ auth()->user()->name ?? 'Operator' }} / {{ date('d-m-Y H:i') }}
                     </div>
                 </td>
 
                 <td style="width: 40%; text-align: center; vertical-align: bottom;">
-                    <p style="margin: 0 0 4px 0; font-weight: bold;">Dokter Penanggung Jawab / Radiolog</p>
+                    <p style="margin: 0 0 4px 0; font-weight: bold;">Dokter Spesialis Radiologi</p>
 
                     <!-- QR VALIDASI -->
                     <img src="data:image/png;base64, {!! base64_encode(
-                        QrCode::style('round')->eye('circle')->format('svg')->size(55)->errorCorrection('H')->generate($code . ' | Validated By Radiologist')
-                    ) !!}" width="55" height="55">
+                        QrCode::style('round')->eye('circle')->format('svg')->size(60)->errorCorrection('H')->generate($reg . ' | Validated By: ' . $radiologName . ' | Date: ' . $verifDate)
+                    ) !!}" width="60" height="60">
 
                     <p style="margin: 4px 0 0 0; font-weight: bold; font-size: 10px;">
-                        <u>{{ auth()->user()->name ?? 'Dr. Radiologi, Sp.Rad' }}</u>
+                        <u>{{ $radiologName }}</u>
                     </p>
+                    <p style="margin: 0; font-size: 8px;">Telah Diverifikasi Tgl: {{ $verifDate }}</p>
                 </td>
             </tr>
         </table>

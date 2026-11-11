@@ -1,316 +1,539 @@
 <style>
-    /* Styling Ringkas & Hemat Ruang untuk Detail Pasien */
-    .patient-compact-card {
+    /* Variabel Retro Lokal */
+    .retro-modal-wrap {
+        --retro-dark: #1e1e24;
+        --retro-yellow: #ffde59;
+        --retro-cyan: #8bf0fa;
+        --retro-green: #c1ff72;
+        --retro-purple: #c8b6ff;
+        --retro-orange: #ff914d;
+        --retro-pink: #ff66c4;
+        --retro-bg: #f4f0ea;
+        --retro-red: #ff4d4d;
+        --retro-blue: #4d94ff;
+        --retro-gray: #a6a6a6;
+    }
+
+    .retro-modal-wrap .card-retro {
+        border: 3px solid var(--retro-dark);
+        border-radius: 12px;
+        box-shadow: 4px 4px 0px var(--retro-dark);
+        background: #ffffff;
+        margin-bottom: 1rem;
+    }
+
+    .retro-modal-wrap .input-group-text {
+        background-color: var(--retro-bg);
+        border: 2px solid var(--retro-dark);
+        border-right: none;
+        color: var(--retro-dark);
+        font-weight: 800;
+    }
+
+    .retro-modal-wrap .form-control,
+    .retro-modal-wrap .form-select {
+        border: 2px solid var(--retro-dark) !important;
         background-color: #ffffff;
-        border-left: 4px solid #2c7be5 !important;
-    }
-
-    .patient-avatar-compact {
-        width: 48px;
-        height: 48px;
-        object-fit: cover;
-        border: 2px solid #e3e8f0;
-    }
-
-    .info-label {
-        font-size: 0.72rem;
-        text-transform: uppercase;
-        letter-spacing: 0.5px;
-        color: #6e84a3;
         font-weight: 700;
-        margin-bottom: 1px;
+        color: var(--retro-dark);
     }
 
-    .info-value {
-        font-size: 0.875rem;
-        font-weight: 600;
-        color: #2c3e50;
-        white-space: nowrap;
-        overflow: hidden;
-        text-overflow: ellipsis;
+    .retro-modal-wrap .form-control:focus,
+    .retro-modal-wrap .form-select:focus,
+    .retro-modal-wrap textarea:focus {
+        box-shadow: 3px 3px 0px var(--retro-dark);
+        border-color: var(--retro-dark) !important;
     }
 
-    /* ========================================== */
-    /* ODONTOGRAM ANATOMIS MINIMALIS & PRESISI    */
-    /* ========================================== */
-    .odontogram-wrapper {
-        background: #f8fafc;
-        border-radius: 8px;
-        padding: 12px;
-        border: 1px solid #e2e8f0;
+    .retro-modal-wrap .btn-retro {
+        font-weight: 800;
+        text-transform: uppercase;
+        border: 2px solid var(--retro-dark);
+        box-shadow: 3px 3px 0px var(--retro-dark);
+        border-radius: 6px;
+        transition: all 0.1s;
     }
 
-    .jaw-container {
+    .retro-modal-wrap .btn-retro:hover {
+        transform: translate(2px, 2px);
+        box-shadow: 0px 0px 0px var(--retro-dark);
+    }
+
+    .retro-modal-wrap .form-header-retro {
+        background-color: var(--retro-dark);
+        color: #fff;
+        padding: 10px 15px;
+        font-weight: 800;
+        text-transform: uppercase;
+        border-bottom: 3px solid var(--retro-dark);
+    }
+
+    .retro-modal-wrap .table-retro th {
+        background-color: var(--retro-dark);
+        color: #fff;
+        border: 2px solid var(--retro-dark);
+        text-transform: uppercase;
+        font-size: 0.85rem;
+    }
+
+    .retro-modal-wrap .table-retro td {
+        border: 2px solid var(--retro-dark);
+        font-weight: 700;
+        vertical-align: middle;
+    }
+
+    /* ODONTOGRAM STYLES */
+    .odontogram-container {
         display: flex;
-        justify-content: center;
-        gap: 4px;
-        flex-wrap: nowrap;
-        overflow-x: auto;
-        padding-bottom: 4px;
+        flex-direction: column;
+        gap: 15px;
+        align-items: center;
+        background-color: var(--retro-bg);
+        padding: 20px;
+        border: 3px solid var(--retro-dark);
+        border-radius: 12px;
+    }
+
+    .odontogram-row {
+        display: flex;
+        gap: 20px;
+    }
+
+    .odontogram-quadrant {
+        display: flex;
+        gap: 5px;
     }
 
     .tooth-box {
+        width: 35px;
+        height: 45px;
+        border: 2px solid var(--retro-dark);
+        background-color: #ffffff;
         display: flex;
-        flex-direction: column;
         align-items: center;
-        width: 38px;
+        justify-content: center;
+        font-weight: 900;
+        font-size: 0.85rem;
+        color: var(--retro-dark);
         cursor: pointer;
-        user-select: none;
-        transition: transform 0.15s ease;
+        box-shadow: 2px 2px 0px var(--retro-dark);
+        transition: all 0.1s;
+        position: relative;
     }
 
     .tooth-box:hover {
-        transform: translateY(-2px);
+        transform: translate(-2px, -2px);
+        box-shadow: 4px 4px 0px var(--retro-dark);
     }
 
-    .tooth-number {
-        font-size: 11px;
-        font-weight: 700;
-        color: #475569;
-        margin-bottom: 2px;
+    .tooth-normal {
+        background-color: #ffffff;
+        color: var(--retro-dark);
+        text-shadow: none;
+        background-image: none !important;
     }
 
-    /* Tampilan Anatomi Gigi 5 Sektor (Cross/Crown Shape) */
-    .tooth-crown-svg {
-        width: 32px;
-        height: 32px;
+    /* Custom Checkbox dalam SweetAlert */
+    .swal2-html-container .form-check-input {
+        border: 2px solid var(--retro-dark);
+        cursor: pointer;
     }
 
-    .tooth-sector {
-        fill: #ffffff;
-        stroke: #64748b;
-        stroke-width: 1.5;
-        transition: fill 0.2s ease;
-    }
-
-    .tooth-box:hover .tooth-sector {
-        stroke: #2563eb;
-    }
-
-    .tooth-status-label {
-        font-size: 9px;
-        font-weight: 600;
-        color: #64748b;
-        text-align: center;
-        margin-top: 2px;
-        white-space: nowrap;
-        max-width: 38px;
-        overflow: hidden;
-        text-overflow: ellipsis;
-    }
-
-    /* Warna Status Odontogram */
-    .tooth-box[data-status="karies"] .tooth-sector {
-        fill: #ef4444;
-        stroke: #dc2626;
-    }
-
-    .tooth-box[data-status="tambalan"] .tooth-sector {
-        fill: #a855f7;
-        stroke: #9333ea;
-    }
-
-    .tooth-box[data-status="hilang"] .tooth-sector {
-        fill: #94a3b8;
-        stroke: #64748b;
-    }
-
-    .tooth-box[data-status="lainnya"] .tooth-sector {
-        fill: #eab308;
-        stroke: #ca8a04;
-    }
-
-    /* Separator Rahang Kiri & Kanan */
-    .jaw-divider {
-        width: 2px;
-        background-color: #cbd5e1;
-        margin: 0 4px;
-        height: 32px;
-        align-self: flex-end;
+    .swal2-html-container .form-check-input:checked {
+        background-color: var(--retro-green);
+        border-color: var(--retro-dark);
     }
 </style>
 
-<!-- CARD DETIL PASIEN (MINIMALIS & COMPACT) -->
-<div class="card mb-3 border-0 shadow-sm patient-compact-card">
-    <div class="card-body p-2 p-md-3">
-        <div class="row align-items-center g-2">
-            <!-- Foto & Info Ringkas Utama -->
-            <div class="col-auto d-flex align-items-center me-md-2">
-                @if (empty($data->master_patient_profile))
-                <img src="{{ asset('img/pasien.png') }}" class="rounded-circle patient-avatar-compact me-2" alt="Profile Pasien" id="videoPreview">
-                @else
-                <img src="{{ Storage::url($data->master_patient_profile) }}" class="rounded-circle patient-avatar-compact me-2" alt="Profile Pasien" id="videoPreview">
-                @endif
-                <div>
-                    <div class="d-flex align-items-center gap-2">
-                        <h6 class="mb-0 fw-bold text-dark">{{ $data->master_patient_name }}</h6>
-                        <span class="badge bg-soft-primary text-primary fs--2 border border-primary-subtle">
-                            {{ $data->master_patient_code ?? 'RM-000' }}
-                        </span>
-                    </div>
-                    <div class="text-muted fs--2 mt-1">
-                        <i class="fas fa-venus-mars me-1 text-400"></i>{{ $data->master_patient_jk ?? '-' }}
-                        <span class="mx-1">•</span>
-                        <i class="fas fa-birthday-cake me-1 text-400"></i>{{ $data->master_patient_tgl_lahir ?? '-' }}
-                    </div>
-                </div>
+<div class="modal-body p-0 retro-modal-wrap" style="background-color: var(--retro-bg);">
+    <div class="card-retro">
+        <div class="py-3 px-4 d-flex justify-content-between align-items-center" style="background-color: var(--retro-cyan); border-bottom: 3px solid var(--retro-dark);">
+            <div>
+                <h4 class="mb-0 text-dark fw-bolder d-flex align-items-center">
+                    <i class="fas fa-notes-medical me-2"></i> Handling: {{ $data->m_poli_name ?? 'Poliklinik' }}
+                </h4>
+                <span class="badge bg-white text-dark mt-1 border border-dark fw-bold">Template Aktif: {{ $template_type }}</span>
             </div>
-
-            <div class="col-12 col-md d-none d-lg-block border-start px-3">
-                <div class="row g-2">
-                    <div class="col-4">
-                        <div class="info-label"><i class="fas fa-id-card me-1"></i>NIK</div>
-                        <div class="info-value">{{ $data->master_patient_nik ?? '-' }}</div>
-                    </div>
-                    <div class="col-4">
-                        <div class="info-label"><i class="fas fa-phone me-1"></i>No. HP / WA</div>
-                        <div class="info-value">{{ $data->master_patient_no_hp ?? '-' }}</div>
-                    </div>
-                    <div class="col-4">
-                        <div class="info-label"><i class="fas fa-envelope me-1"></i>Email</div>
-                        <div class="info-value">{{ $data->master_patient_email ?? '-' }}</div>
-                    </div>
-                </div>
-            </div>
-
-            <!-- Tombol Aksi Kanan -->
-            <div class="col-auto ms-auto" id="menu-pasien-poliklinik">
-                <button class="btn btn-outline-primary btn-sm fw-bold px-3" id="button-save-data-diagnosa-pasien-poli">
-                    <i class="fas fa-save me-1"></i> Simpan
-                </button>
+            <div class="text-end">
+                <span class="badge bg-warning text-dark px-3 py-2 fw-bolder" style="border: 2px solid var(--retro-dark); box-shadow: 2px 2px 0px var(--retro-dark);">
+                    <i class="fas fa-hashtag me-1"></i> {{ $data->no_registrasi }}
+                </span>
             </div>
         </div>
-    </div>
-</div>
 
-<!-- CARD DIAGNOSA PASIEN (MINIMALIS & COMPACT) -->
-<div class="card mb-3 shadow-sm border-0">
-    <div class="card-header bg-300 py-2">
-        <div class="row gx-0 flex-between-center">
-            <div class="col-auto d-flex align-items-center">
-                <h6 class="mb-0 fw-bold fs--1 text-800"><i class="fas fa-notes-medical me-2 text-primary"></i>Diagnosa Pasien</h6>
-            </div>
-            <div class="col-auto">
-                <button class="btn btn-primary btn-sm py-0 px-2 fs--2" data-bs-toggle="modal" data-bs-target="#modal-poliklinik" id="button-penunjang-poliklinik">
-                    <i class="fas fa-folder-open me-1"></i> Data Penunjang
-                </button>
-            </div>
-        </div>
-    </div>
-    <div class="card-body p-2 bg-light">
-        <!-- Form Input Horizontal 1 Baris (Inline Input) -->
-        <div class="bg-white p-2 rounded border mb-2">
-            <div class="row g-2 align-items-center">
-                <div class="col-md-4">
-                    <input class="form-control form-control-sm" id="data-name" type="text" placeholder="Nama Diagnosa / Anamnesa (mis: ICD-10)" />
+        <div class="p-4">
+            <div class="row g-4">
+                <!-- IDENTITAS PASIEN -->
+                <div class="col-12">
+                    <div class="card-retro p-0">
+                        <div class="row g-0">
+                           <div class="col-md-2 d-flex align-items-center justify-content-center p-3 border-end border-dark border-3" style="background-color: var(--retro-yellow);">
+                                @if (empty($data->master_patient_profile))
+                                    <img src="{{ asset('img/pasien.png') }}" class="rounded-circle" alt="Foto Pasien" style="width: 80px; height: 80px; object-fit: cover; border: 3px solid var(--retro-dark);">
+                                @else
+                                    <!-- Render string Base64 langsung ke dalam atribut src -->
+                                    <img src="{{ $data->master_patient_profile }}" class="rounded-circle" alt="Foto Pasien" style="width: 80px; height: 80px; object-fit: cover; border: 3px solid var(--retro-dark);">
+                                @endif
+                            </div>
+                            <div class="col-md-10 p-3">
+                                <div class="row g-3">
+                                    <div class="col-md-4">
+                                        <label class="form-label fs--1 fw-bold text-dark mb-1">Nama Pasien</label>
+                                        <div class="fw-bolder fs-5 text-dark">{{ $data->master_patient_name }}</div>
+                                        <div class="fs--1 fw-bold opacity-75">RM: {{ $data->master_patient_code }}</div>
+                                    </div>
+                                    <div class="col-md-3">
+                                        <label class="form-label fs--1 fw-bold text-dark mb-1">Gender & Tgl Lahir</label>
+                                        <div class="fw-bold text-dark">{{ $data->master_patient_jk == 'L' ? 'Laki-Laki' : 'Perempuan' }}</div>
+                                        <div class="fw-bold text-dark">{{ $data->master_patient_tgl_lahir }}</div>
+                                    </div>
+                                    <div class="col-md-5">
+                                        <label class="form-label fs--1 fw-bold text-dark mb-1">Dokter & Penjamin</label>
+                                        <div class="fw-bolder text-dark"><i class="fas fa-user-md me-1"></i> {{ $data->master_doctor_name ?? 'Belum Ditentukan' }}</div>
+                                        <div class="mt-1">
+                                            <span class="badge text-dark border border-dark fw-bold" style="background-color: var(--retro-green);">
+                                                <i class="fas fa-shield-alt me-1"></i> {{ $data->nama_penjamin ?? 'UMUM' }}
+                                                {{ !empty($data->nama_sub_penjamin) ? ' - ' . $data->nama_sub_penjamin : '' }}
+                                            </span>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
                 </div>
-                <div class="col-md-6">
-                    <input class="form-control form-control-sm" id="data-desc" type="text" placeholder="Deskripsi & Catatan Dokter..." />
+
+                <!-- FORM TEMPLATE -->
+                <div class="col-12">
+                    <form id="form-handling-medis">
+                        @csrf
+                        <input type="hidden" name="no_registrasi" value="{{ $code }}">
+                        <input type="hidden" name="jenis_template" value="{{ $template_type }}">
+
+                        @if(!empty($data->instruksi_poli))
+                        <div class="alert alert-warning border-dark border-3 fw-bold text-dark" style="box-shadow: 3px 3px 0px var(--retro-dark);">
+                            <i class="fas fa-info-circle me-2"></i> Instruksi: {{ $data->instruksi_poli }}
+                        </div>
+                        @endif
+
+                        <!-- 1. ODONTOGRAM (MUNCUL JIKA DICENTANG DI TEMPLATE & TIPE GIGI) -->
+                        @if($template_type === 'GIGI' && in_array('odontogram', $menu_aktif))
+                        <div class="card-retro mb-4">
+                            <div class="form-header-retro" style="background-color: var(--retro-orange); color: var(--retro-dark);">
+                                <i class="fas fa-tooth me-2"></i> Odontogram Interaktif & Asesmen Gigi
+                            </div>
+                            <div class="card-body p-4">
+                                <div class="row g-4">
+                                    <div class="col-12">
+                                        <div class="odontogram-container">
+                                            <h6 class="fw-bolder text-dark mb-2 border-bottom border-dark pb-1 text-uppercase">RAHANG ATAS</h6>
+                                            <div class="odontogram-row">
+                                                <div class="odontogram-quadrant" id="quadrant-1">
+                                                    @foreach(range(18, 11) as $tooth)
+                                                    <div class="tooth-box tooth-normal" data-tooth="{{ $tooth }}"><span class="tooth-num">{{ $tooth }}</span></div>
+                                                    <input type="hidden" name="gigi[{{ $tooth }}]" id="input-gigi-{{ $tooth }}" value="NORMAL">
+                                                    @endforeach
+                                                </div>
+                                                <div style="width: 4px; background-color: var(--retro-dark);"></div>
+                                                <div class="odontogram-quadrant" id="quadrant-2">
+                                                    @foreach(range(21, 28) as $tooth)
+                                                    <div class="tooth-box tooth-normal" data-tooth="{{ $tooth }}"><span class="tooth-num">{{ $tooth }}</span></div>
+                                                    <input type="hidden" name="gigi[{{ $tooth }}]" id="input-gigi-{{ $tooth }}" value="NORMAL">
+                                                    @endforeach
+                                                </div>
+                                            </div>
+                                            <div style="height: 4px; width: 100%; background-color: var(--retro-dark); margin: 5px 0;"></div>
+                                            <div class="odontogram-row">
+                                                <div class="odontogram-quadrant" id="quadrant-4">
+                                                    @foreach(range(48, 41) as $tooth)
+                                                    <div class="tooth-box tooth-normal" data-tooth="{{ $tooth }}"><span class="tooth-num">{{ $tooth }}</span></div>
+                                                    <input type="hidden" name="gigi[{{ $tooth }}]" id="input-gigi-{{ $tooth }}" value="NORMAL">
+                                                    @endforeach
+                                                </div>
+                                                <div style="width: 4px; background-color: var(--retro-dark);"></div>
+                                                <div class="odontogram-quadrant" id="quadrant-3">
+                                                    @foreach(range(31, 38) as $tooth)
+                                                    <div class="tooth-box tooth-normal" data-tooth="{{ $tooth }}"><span class="tooth-num">{{ $tooth }}</span></div>
+                                                    <input type="hidden" name="gigi[{{ $tooth }}]" id="input-gigi-{{ $tooth }}" value="NORMAL">
+                                                    @endforeach
+                                                </div>
+                                            </div>
+                                            <h6 class="fw-bolder text-dark mt-2 border-top border-dark pt-1 text-uppercase">RAHANG BAWAH</h6>
+                                        </div>
+                                        <div class="d-flex justify-content-center gap-3 mt-3 flex-wrap">
+                                            <div class="d-flex align-items-center gap-1"><span style="display:inline-block; width:15px; height:15px; border:2px solid var(--retro-dark); background:#fff;"></span> <span class="fw-bold fs--1">Normal</span></div>
+                                            <div class="d-flex align-items-center gap-1"><span style="display:inline-block; width:15px; height:15px; border:2px solid var(--retro-dark); background:var(--retro-red);"></span> <span class="fw-bold fs--1">Karies/Lubang</span></div>
+                                            <div class="d-flex align-items-center gap-1"><span style="display:inline-block; width:15px; height:15px; border:2px solid var(--retro-dark); background:var(--retro-blue);"></span> <span class="fw-bold fs--1">Tumpatan/Tambal</span></div>
+                                            <div class="d-flex align-items-center gap-1"><span style="display:inline-block; width:15px; height:15px; border:2px solid var(--retro-dark); background:var(--retro-dark);"></span> <span class="fw-bold fs--1">Hilang/Cabut</span></div>
+                                            <div class="d-flex align-items-center gap-1"><span style="display:inline-block; width:15px; height:15px; border:2px solid var(--retro-dark); background:var(--retro-gray);"></span> <span class="fw-bold fs--1">Sisa Akar</span></div>
+                                        </div>
+                                    </div>
+
+                                    <div class="col-md-6">
+                                        <label class="fw-bold text-dark mb-1">Kalkulus / Karang Gigi</label>
+                                        <select class="form-select form-select-retro" name="gigi_kalkulus">
+                                            <option value="TIDAK_ADA">Tidak Ada</option>
+                                            <option value="RINGAN">Ringan</option>
+                                            <option value="SEDANG">Sedang</option>
+                                            <option value="BERAT">Berat</option>
+                                        </select>
+                                    </div>
+                                    <div class="col-md-6">
+                                        <label class="fw-bold text-dark mb-1">Catatan Khusus Gigi Utama</label>
+                                        <textarea class="form-control form-control-retro" rows="2" name="keluhan_gigi"></textarea>
+                                    </div>
+                                    <div class="col-12 mt-2">
+                                        <label class="fw-bold text-dark mb-1">Rincian Tindakan per Gigi</label>
+                                        <table class="table table-retro w-100 mb-0" id="tabel-log-gigi">
+                                            <thead>
+                                                <tr>
+                                                    <th width="15%" class="text-center">No Gigi</th>
+                                                    <th width="35%">Kondisi / Diagnosa (Multiple)</th>
+                                                    <th width="50%">Catatan / Rencana Tindakan</th>
+                                                </tr>
+                                            </thead>
+                                            <tbody></tbody>
+                                        </table>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                        @endif
+
+                        <!-- 2. ANAMNESA (MUNCUL JIKA DICENTANG DI MENU_AKTIF) -->
+                        @if(in_array('anamnesa', $menu_aktif))
+                        <div class="card-retro mb-4">
+                            <div class="form-header-retro" style="background-color: var(--retro-cyan); color: var(--retro-dark);">
+                                <i class="fas fa-comment-medical me-2"></i> Anamnesa & Riwayat Medis Pasien
+                            </div>
+                            <div class="card-body p-4">
+                                <div class="row g-3">
+                                    <div class="col-12">
+                                        <label class="form-label fw-bold text-dark mb-1">Keluhan Utama <span class="text-danger">*</span></label>
+                                        <textarea name="keluhan_utama" class="form-control form-control-retro" rows="2" placeholder="Tuliskan keluhan utama secara rinci...">{{ $existing_anamnesa->keluhan_utama ?? '' }}</textarea>
+                                    </div>
+                                    <div class="col-md-6">
+                                        <label class="form-label fw-bold text-dark mb-1">Riwayat Penyakit Sekarang</label>
+                                        <textarea name="riwayat_penyakit_sekarang" class="form-control form-control-retro" rows="2" placeholder="Perjalanan penyakit saat ini...">{{ $existing_anamnesa->riwayat_penyakit_sekarang ?? '' }}</textarea>
+                                    </div>
+                                    <div class="col-md-6">
+                                        <label class="form-label fw-bold text-dark mb-1">Riwayat Penyakit Dahulu</label>
+                                        <textarea name="riwayat_penyakit_dahulu" class="form-control form-control-retro" rows="2" placeholder="Contoh: Hipertensi, Diabetes, Asma...">{{ $existing_anamnesa->riwayat_penyakit_dahulu ?? '' }}</textarea>
+                                    </div>
+                                    <div class="col-md-4">
+                                        <label class="form-label fw-bold text-dark mb-1">Riwayat Penyakit Keluarga</label>
+                                        <input type="text" name="riwayat_penyakit_keluarga" class="form-control form-control-retro" value="{{ $existing_anamnesa->riwayat_penyakit_keluarga ?? '' }}" placeholder="Penyakit turunan/menular dalam keluarga">
+                                    </div>
+                                    <div class="col-md-4">
+                                        <label class="form-label fw-bold text-dark mb-1">Riwayat Alergi</label>
+                                        <input type="text" name="riwayat_alergi" class="form-control form-control-retro" value="{{ $existing_anamnesa->riwayat_alergi ?? '' }}" placeholder="Alergi obat, makanan, dll">
+                                    </div>
+                                    <div class="col-md-4">
+                                        <label class="form-label fw-bold text-dark mb-1">Riwayat Penggunaan Obat</label>
+                                        <input type="text" name="riwayat_penggunaan_obat" class="form-control form-control-retro" value="{{ $existing_anamnesa->riwayat_penggunaan_obat ?? '' }}" placeholder="Obat yang sedang rutin dikonsumsi">
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                        @endif
+
+                        <!-- 3. VITAL SIGN (MUNCUL JIKA DICENTANG DI MENU_AKTIF) -->
+                        @if(in_array('vital_sign', $menu_aktif))
+                        <div class="card-retro mb-4">
+                            <div class="form-header-retro" style="background-color: var(--retro-green); color: var(--retro-dark);">
+                                <i class="fas fa-heartbeat me-2"></i> Fisik Umum & Tanda Vital (Vital Signs)
+                            </div>
+                            <div class="card-body p-4">
+                                <div class="row g-3">
+                                    <div class="col-md-3">
+                                        <label class="form-label fw-bold text-dark mb-1">Kesadaran</label>
+                                        <select name="kesadaran" class="form-select form-select-retro">
+                                            @php $kesadaranVal = $existing_vs->kesadaran ?? 'Compos Mentis'; @endphp
+                                            <option value="Compos Mentis" {{ $kesadaranVal == 'Compos Mentis' ? 'selected' : '' }}>Compos Mentis (Sadar)</option>
+                                            <option value="Apatis" {{ $kesadaranVal == 'Apatis' ? 'selected' : '' }}>Apatis</option>
+                                            <option value="Delirium" {{ $kesadaranVal == 'Delirium' ? 'selected' : '' }}>Delirium</option>
+                                            <option value="Somnolen" {{ $kesadaranVal == 'Somnolen' ? 'selected' : '' }}>Somnolen</option>
+                                            <option value="Sopor" {{ $kesadaranVal == 'Sopor' ? 'selected' : '' }}>Sopor</option>
+                                            <option value="Coma" {{ $kesadaranVal == 'Coma' ? 'selected' : '' }}>Coma</option>
+                                        </select>
+                                    </div>
+                                    <div class="col-md-3">
+                                        <label class="form-label fw-bold text-dark mb-1">Tekanan Darah (TD)</label>
+                                        <div class="input-group">
+                                            <input type="text" name="tekanan_darah" class="form-control form-control-retro" value="{{ $existing_vs->tekanan_darah ?? '' }}" placeholder="120/80">
+                                            <span class="input-group-text" style="background-color: var(--retro-yellow);">mmHg</span>
+                                        </div>
+                                    </div>
+                                    <div class="col-md-3">
+                                        <label class="form-label fw-bold text-dark mb-1">Nadi</label>
+                                        <div class="input-group">
+                                            <input type="number" name="nadi" class="form-control form-control-retro" value="{{ $existing_vs->nadi ?? '' }}" placeholder="80">
+                                            <span class="input-group-text" style="background-color: var(--retro-yellow);">x/min</span>
+                                        </div>
+                                    </div>
+                                    <div class="col-md-3">
+                                        <label class="form-label fw-bold text-dark mb-1">Suhu Tubuh</label>
+                                        <div class="input-group">
+                                            <input type="number" step="0.1" name="suhu" class="form-control form-control-retro" value="{{ $existing_vs->suhu ?? '' }}" placeholder="36.5">
+                                            <span class="input-group-text" style="background-color: var(--retro-yellow);">&deg;C</span>
+                                        </div>
+                                    </div>
+                                    <div class="col-md-3">
+                                        <label class="form-label fw-bold text-dark mb-1">Pernapasan (RR)</label>
+                                        <div class="input-group">
+                                            <input type="number" name="pernapasan" class="form-control form-control-retro" value="{{ $existing_vs->pernapasan ?? '' }}" placeholder="20">
+                                            <span class="input-group-text" style="background-color: var(--retro-yellow);">x/min</span>
+                                        </div>
+                                    </div>
+                                    <div class="col-md-3">
+                                        <label class="form-label fw-bold text-dark mb-1">Saturasi Oksigen (SpO2)</label>
+                                        <div class="input-group">
+                                            <input type="number" name="saturasi_o2" class="form-control form-control-retro" value="{{ $existing_vs->saturasi_o2 ?? '' }}" placeholder="98">
+                                            <span class="input-group-text" style="background-color: var(--retro-yellow);">%</span>
+                                        </div>
+                                    </div>
+                                    <div class="col-md-3">
+                                        <label class="form-label fw-bold text-dark mb-1">Berat Badan (BB)</label>
+                                        <div class="input-group">
+                                            <input type="number" step="0.1" name="berat_badan" class="form-control form-control-retro" value="{{ $existing_vs->berat_badan ?? '' }}" placeholder="60">
+                                            <span class="input-group-text" style="background-color: var(--retro-yellow);">Kg</span>
+                                        </div>
+                                    </div>
+                                    <div class="col-md-3">
+                                        <label class="form-label fw-bold text-dark mb-1">Tinggi Badan (TB)</label>
+                                        <div class="input-group">
+                                            <input type="number" step="0.1" name="tinggi_badan" class="form-control form-control-retro" value="{{ $existing_vs->tinggi_badan ?? '' }}" placeholder="170">
+                                            <span class="input-group-text" style="background-color: var(--retro-yellow);">cm</span>
+                                        </div>
+                                    </div>
+                                    <div class="col-12 mt-2">
+                                        <label class="form-label fw-bold text-dark mb-1">Pemeriksaan Fisik Lain / Status Generalis</label>
+                                        <textarea name="pemeriksaan_fisik_lain" class="form-control form-control-retro" rows="2" placeholder="Catatan tambahan pemeriksaan fisik...">{{ $existing_vs->pemeriksaan_fisik_lain ?? '' }}</textarea>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                        @endif
+
+                        <!-- 4. ORDER TINDAKAN (MUNCUL JIKA DICENTANG DI MENU_AKTIF) -->
+                        @if(in_array('tindakan', $menu_aktif))
+                        <div class="card-retro mb-4">
+                            <div class="form-header-retro d-flex justify-content-between align-items-center" style="background-color: var(--retro-purple); color: var(--retro-dark);">
+                                <span><i class="fas fa-vial me-2"></i> Order Pemeriksaan Lab / Rad / Tindakan Poli</span>
+                                <span class="badge bg-white text-dark border-dark border px-2 py-1 fs--2">Tarif: {{ $data->nama_sub_penjamin ?? ($data->nama_penjamin ?? 'UMUM') }}</span>
+                            </div>
+                            <div class="card-body p-4 bg-white">
+                                <div class="row g-2 mb-3">
+                                    <div class="col-md-9">
+                                        <label class="fw-bold text-dark mb-1">Cari Layanan / Tindakan</label>
+                                        <div class="input-group">
+                                            <span class="input-group-text"><i class="fas fa-search"></i></span>
+                                            <select id="input_pemeriksaan" class="form-select form-select-retro">
+                                                <option value="" disabled selected>Pilih Layanan / Tindakan...</option>
+                                                @foreach($daftar_tindakan ?? [] as $tindakan)
+                                                <option value="{{ $tindakan->id }}"
+                                                    data-nama="{{ $tindakan->nama_layanan }}"
+                                                    data-kategori="{{ $tindakan->kategori_tindakan }}"
+                                                    data-harga="{{ $tindakan->harga_akhir }}">
+                                                    [{{ $tindakan->kategori_tindakan }}] {{ $tindakan->nama_layanan }} - Rp {{ number_format($tindakan->harga_akhir, 0, ',', '.') }}
+                                                </option>
+                                                @endforeach
+                                            </select>
+                                        </div>
+                                    </div>
+                                    <div class="col-md-3 d-flex align-items-end">
+                                        <button type="button" class="btn btn-primary btn-retro w-100 text-dark" id="btn-tambah-pemeriksaan" style="background-color: var(--retro-cyan);">
+                                            <i class="fas fa-plus"></i> Tambah Order
+                                        </button>
+                                    </div>
+                                </div>
+                                <table class="table table-retro w-100 mb-0" id="tabel-order-pemeriksaan">
+                                    <thead>
+                                        <tr>
+                                            <th width="50%">Nama Tindakan / Pemeriksaan</th>
+                                            <th width="20%">Kategori</th>
+                                            <th width="20%">Tarif Akhir</th>
+                                            <th width="10%" class="text-center">Aksi</th>
+                                        </tr>
+                                    </thead>
+                                    <tbody></tbody>
+                                </table>
+                            </div>
+                        </div>
+                        @endif
+
+                        <!-- 5. E-RESEP OBAT (MUNCUL JIKA DICENTANG DI MENU_AKTIF) -->
+                        @if(in_array('resep', $menu_aktif))
+                        <div class="card-retro mb-4">
+                            <div class="form-header-retro d-flex justify-content-between align-items-center" style="background-color: var(--retro-yellow); color: var(--retro-dark);">
+                                <span><i class="fas fa-pills me-2"></i> E-Resep Dokter (Order Obat)</span>
+                                <span class="badge bg-white text-dark border-dark border px-2 py-1 fs--2">Harga: {{ $data->nama_sub_penjamin ?? ($data->nama_penjamin ?? 'UMUM') }}</span>
+                            </div>
+                            <div class="card-body p-4 bg-white">
+                                <div class="row g-2 mb-3">
+                                    <div class="col-md-4">
+                                        <label class="fw-bold text-dark mb-1">Nama Obat</label>
+                                        <select id="input_obat" class="form-select form-select-retro">
+                                            <option value="" disabled selected>Pilih Obat...</option>
+                                            @foreach($daftar_obat ?? [] as $obat)
+                                            <option value="{{ $obat->farm_data_obat_code }}"
+                                                data-nama="{{ $obat->farm_data_obat_name }}"
+                                                data-satuan="{{ $obat->farm_data_obat_satuan }}"
+                                                data-harga="{{ $obat->harga_jual }}"
+                                                data-stok="{{ $obat->farm_data_obat_stok }}">
+                                                {{ $obat->farm_data_obat_name }} (Stok: {{ $obat->farm_data_obat_stok }}) - Rp {{ number_format($obat->harga_jual, 0, ',', '.') }}
+                                            </option>
+                                            @endforeach
+                                        </select>
+                                    </div>
+                                    <div class="col-md-2">
+                                        <label class="fw-bold text-dark mb-1">Jumlah</label>
+                                        <input type="number" id="input_jumlah_obat" class="form-control form-control-retro" min="1" value="1">
+                                    </div>
+                                    <div class="col-md-4">
+                                        <label class="fw-bold text-dark mb-1">Signa / Aturan Pakai</label>
+                                        <input type="text" id="input_signa_obat" class="form-control form-control-retro" placeholder="3 x 1 sesudah makan">
+                                    </div>
+                                    <div class="col-md-2 d-flex align-items-end">
+                                        <button type="button" class="btn btn-warning btn-retro w-100 text-dark" id="btn-tambah-resep" style="background-color: var(--retro-orange);">
+                                            <i class="fas fa-plus"></i> Resep
+                                        </button>
+                                    </div>
+                                </div>
+                                <table class="table table-retro w-100 mb-0" id="tabel-resep-obat">
+                                    <thead>
+                                        <tr>
+                                            <th width="35%">Nama Obat</th>
+                                            <th width="15%" class="text-center">Jumlah</th>
+                                            <th width="15%">Satuan / Harga</th>
+                                            <th width="25%">Aturan Pakai</th>
+                                            <th width="10%" class="text-center">Aksi</th>
+                                        </tr>
+                                    </thead>
+                                    <tbody></tbody>
+                                </table>
+                            </div>
+                        </div>
+                        @endif
+
+                        <!-- 6. DIAGNOSA AKHIR (MUNCUL JIKA DICENTANG DI MENU_AKTIF) -->
+                        @if(in_array('diagnosa', $menu_aktif))
+                        <div class="card-retro mb-4">
+                            <div class="card-body p-4" style="background-color: #f1f1f1;">
+                                <label class="fw-bolder text-dark mb-2 text-uppercase"><i class="fas fa-stethoscope me-1"></i> Diagnosa Utama Dokter</label>
+                                <textarea name="diagnosa_akhir" class="form-control form-control-retro" rows="2" placeholder="Masukkan diagnosa medis akhir..." required></textarea>
+                            </div>
+                        </div>
+                        @endif
+                    </form>
                 </div>
-                <div class="col-md-2">
-                    <button class="btn btn-primary btn-sm w-100 fs--1" type="button" id="button-simpan-data-diagnosa-umum">
-                        <span class="fas fa-plus me-1"></span>Tambah
+
+                <!-- Footer Action Button -->
+                <div class="col-12 mt-2 border-top border-dark pt-4 text-end">
+                    <button type="button" class="btn btn-light btn-retro px-4 me-2 text-dark" data-bs-dismiss="modal">Batal</button>
+                    <button type="button" class="btn btn-success btn-lg btn-retro px-5 text-dark" id="button-save-data-diagnosa-pasien-poli" style="background-color: var(--retro-green);">
+                        <i class="fas fa-save me-2"></i> Simpan Hasil Pemeriksaan
                     </button>
-                </div>
-            </div>
-        </div>
-
-        <!-- Tabel Hasil Diagnosa Compact -->
-        <div id="menu-diagnosa-umum">
-            @php
-            $umum = DB::table('diag_poli_gigi_umum')->where('d_reg_order_poli_code', $data->d_reg_order_poli_code)->get();
-            @endphp
-            <div class="table-responsive scrollbar">
-                <table class="table table-sm table-bordered table-striped bg-white fs--1 mb-0">
-                    <thead class="bg-200">
-                        <tr>
-                            <th scope="col" style="width: 35%;">Title</th>
-                            <th scope="col">Deskripsi</th>
-                            <th class="text-end" scope="col" style="width: 10%;">Aksi</th>
-                        </tr>
-                    </thead>
-                    <tbody>
-                        @forelse ($umum as $umums)
-                        <tr>
-                            <td class="fw-semi-bold align-middle">{{ $umums->diag_poli_gigi_umum_name }}</td>
-                            <td class="align-middle">{{ $umums->diag_poli_gigi_umum_desc }}</td>
-                            <td class="text-end align-middle">
-                                <button class="btn p-0 text-500 hover-text-info" type="button" data-bs-toggle="tooltip" title="Edit"><span class="fas fa-edit"></span></button>
-                                <button class="btn p-0 ms-2 text-500 hover-text-danger" type="button" data-bs-toggle="tooltip" title="Delete"><span class="fas fa-trash-alt"></span></button>
-                            </td>
-                        </tr>
-                        @empty
-                        <tr>
-                            <td colspan="3" class="text-center text-muted py-2 fs--2">Belum ada data diagnosa tersimpan.</td>
-                        </tr>
-                        @endforelse
-                    </tbody>
-                </table>
-            </div>
-        </div>
-    </div>
-</div>
-
-<!-- TEMPLATE SPESIFIK KEBUTUHAN TIAP POLIKLINIK (M_POLI_NAME) -->
-@php
-$ran = mt_rand(100, 999);
-$namaPoli = strtoupper($poli->m_poli_name ?? '');
-@endphp
-
-@if (str_contains($namaPoli, 'GIGI'))
-<!-- TEMPLATE POLI GIGI (ODONTOGRAM ANATOMIS MINIMALIS) -->
-<div class="card mb-3 shadow-sm border-0">
-    <div class="card-header bg-300 py-2 d-flex justify-content-between align-items-center">
-        <h6 class="mb-0 fw-bold fs--1"><i class="fas fa-tooth me-2 text-primary"></i>Odontogram Interaktif - {{ $poli->m_poli_name }}</h6>
-        <div class="d-flex align-items-center gap-3 fs--2">
-            <span class="d-flex align-items-center"><span class="badge bg-danger rounded-circle me-1" style="width:8px;height:8px;"></span> Karies</span>
-            <span class="d-flex align-items-center"><span class="badge bg-purple rounded-circle me-1" style="width:8px;height:8px;background-color:#a855f7;"></span> Tambalan</span>
-            <span class="d-flex align-items-center"><span class="badge bg-secondary rounded-circle me-1" style="width:8px;height:8px;"></span> Hilang</span>
-            <span class="d-flex align-items-center"><span class="badge bg-warning rounded-circle me-1" style="width:8px;height:8px;"></span> Lainnya</span>
-        </div>
-    </div>
-    <div class="card-body p-3 bg-light">
-        <input type="hidden" name="code_gigi" value="{{ $data->d_reg_order_poli_code }}" id="code_gigi">
-
-        <div class="odontogram-wrapper shadow-xs">
-            <!-- Rahang Atas (Maxilla) -->
-            <div class="d-flex justify-content-between align-items-center mb-1">
-                <span class="fs--2 fw-bold text-primary"><i class="fas fa-chevron-up me-1"></i> Rahang Atas (Maxilla)</span>
-                <span class="fs--2 text-muted">Klik elemen gigi untuk ubah kondisi</span>
-            </div>
-            <div class="jaw-container bg-white p-2 rounded border mb-3" id="upperJaw"></div>
-
-            <!-- Rahang Bawah (Mandibula) -->
-            <div class="d-flex justify-content-between align-items-center mb-1">
-                <span class="fs--2 fw-bold text-primary"><i class="fas fa-chevron-down me-1"></i> Rahang Bawah (Mandibula)</span>
-            </div>
-            <div class="jaw-container bg-white p-2 rounded border" id="lowerJaw"></div>
-        </div>
-
-        <!-- Tombol Aksi Minimalis -->
-        <div class="mt-2 d-flex justify-content-end gap-2">
-            <button class="btn btn-outline-danger btn-sm py-1 fs--2" id="resetBtn"><i class="fas fa-undo me-1"></i> Reset</button>
-            <button class="btn btn-success btn-sm py-1 fs--2" id="exportBtn"><i class="fas fa-save me-1"></i> Simpan Odontogram</button>
-        </div>
-        <textarea id="exportArea" class="d-none"></textarea>
-
-        <!-- Modal Diagnosa Gigi -->
-        <div class="modal fade" id="diagnosisModal" tabindex="-1" aria-hidden="true">
-            <div class="modal-dialog modal-dialog-centered modal-md">
-                <div class="modal-content border-0 shadow">
-                    <div class="modal-header bg-primary text-white py-2">
-                        <h6 class="modal-title text-white fw-bold fs-0"><i class="fas fa-tooth me-2"></i>Kondisi Gigi No: <span id="toothNumber" class="badge bg-light text-primary"></span></h6>
-                        <button class="btn-close btn-close-white" data-bs-dismiss="modal" aria-label="Close"></button>
-                    </div>
-                    <div class="modal-body p-3">
-                        <div id="diagnosisList" class="row g-2"></div>
-                        <label for="note" class="form-label mt-3 fw-bold fs--1 text-700">Catatan Khusus Tindakan:</label>
-                        <textarea id="note" class="form-control form-control-sm" rows="2" placeholder="Catatan kondisi/tindakan medis gigi..."></textarea>
-                    </div>
-                    <div class="modal-footer py-2">
-                        <button type="button" class="btn btn-light btn-sm fs--1" data-bs-dismiss="modal">Batal</button>
-                        <button type="button" class="btn btn-primary btn-sm fs--1" id="saveBtn"><i class="fas fa-check me-1"></i> Terapkan</button>
-                    </div>
                 </div>
             </div>
         </div>
@@ -318,448 +541,379 @@ $namaPoli = strtoupper($poli->m_poli_name ?? '');
 </div>
 
 <script>
-    var upperNums = [18, 17, 16, 15, 14, 13, 12, 11, 21, 22, 23, 24, 25, 26, 27, 28];
-    var lowerNums = [48, 47, 46, 45, 44, 43, 42, 41, 31, 32, 33, 34, 35, 36, 37, 38];
-    var diagnoses = [
-        "Karies superfisialis", "Karies media", "Karies profunda", "Pulpitis",
-        "Abses periapikal", "Tambalan baik", "Tambalan bocor", "Kalkulus",
-        "Gingivitis", "Periodontitis", "Gigi hilang", "Gigi goyah",
-        "Gigi impaksi", "Gigi fraktur", "Gigi erupsi parsial",
-        "Crown / bridge", "Protesa", "Lainnya"
-    ];
-    var data = {};
+    // --- ODONTOGRAM LOGIC ---
+    $('.tooth-box').click(async function() {
+        const toothNo = $(this).data('tooth');
+        const box = $(this);
+        const inputHidden = $('#input-gigi-' + toothNo);
+        const currentVals = inputHidden.val().split(',');
 
-    // SVG Anatomi Gigi 5 Sektor Standar Kedokteran Gigi
-    function getToothSVG() {
-        return `
-            <svg class="tooth-crown-svg" viewBox="0 0 40 40">
-                <polygon points="0,0 40,0 30,10 10,10" class="tooth-sector sector-top" />
-                <polygon points="40,0 40,40 30,30 30,10" class="tooth-sector sector-right" />
-                <polygon points="0,40 40,40 30,30 10,30" class="tooth-sector sector-bottom" />
-                <polygon points="0,0 0,40 10,30 10,10" class="tooth-sector sector-left" />
-                <rect x="10" y="10" width="20" height="20" class="tooth-sector sector-center" />
-            </svg>
-        `;
-    }
-
-    function makeTooth(num) {
-        var t = document.createElement("div");
-        t.className = "tooth-box";
-        t.dataset.num = num;
-        t.dataset.status = "sehat";
-        t.innerHTML = `
-            <div class="tooth-number">${num}</div>
-            ${getToothSVG()}
-            <div class="tooth-status-label">Normal</div>
-        `;
-        t.onclick = () => openModal(num);
-        return t;
-    }
-
-    function buildOdontogram() {
-        var uj = document.getElementById("upperJaw");
-        var lj = document.getElementById("lowerJaw");
-        if (uj && lj) {
-            uj.innerHTML = "";
-            lj.innerHTML = "";
-
-            upperNums.forEach((n, idx) => {
-                uj.appendChild(makeTooth(n));
-                if (idx === 7) {
-                    var div = document.createElement("div");
-                    div.className = "jaw-divider";
-                    uj.appendChild(div);
-                }
-            });
-
-            lowerNums.forEach((n, idx) => {
-                lj.appendChild(makeTooth(n));
-                if (idx === 7) {
-                    var div = document.createElement("div");
-                    div.className = "jaw-divider";
-                    lj.appendChild(div);
-                }
-            });
-        }
-    }
-    buildOdontogram();
-
-    var modal = new bootstrap.Modal(document.getElementById('diagnosisModal'));
-    var diagList = document.getElementById("diagnosisList");
-    var toothNumLabel = document.getElementById("toothNumber");
-    var noteField = document.getElementById("note");
-    let currentTooth<?php echo $ran ?> = null;
-
-    function openModal(num) {
-        currentTooth<?php echo $ran ?> = num;
-        toothNumLabel.textContent = num;
-        diagList.innerHTML = diagnoses.map((d, i) => `
-            <div class="col-6">
-              <div class="form-check mb-1">
-                <input class="form-check-input" type="checkbox" value="${d}" id="d${i}">
-                <label class="form-check-label fs--2 text-700" for="d${i}">${d}</label>
-              </div>
-            </div>
-          `).join("");
-        var existing = data[num] || {
-            diagnosis: [],
-            note: ""
+        const conditionOpts = {
+            'KARIES': 'Karies (Berlubang)',
+            'TAMBALAN': 'Tumpatan (Tambalan)',
+            'HILANG': 'Hilang / Dicabut',
+            'SISA_AKAR': 'Sisa Akar'
         };
-        [...diagList.querySelectorAll("input")].forEach(i => {
-            if (existing.diagnosis.includes(i.value)) i.checked = true;
+
+        let htmlCheckboxes = '<div class="text-start px-3 mt-2"><div class="form-check mb-2"><input class="form-check-input swal-tooth-check" type="checkbox" value="NORMAL" id="check-NORMAL" ' + (currentVals.includes('NORMAL') ? 'checked' : '') + '><label class="form-check-label fw-bold" for="check-NORMAL">Normal / Sehat (Reset)</label></div><hr class="border-dark my-2">';
+        for (const [val, label] of Object.entries(conditionOpts)) {
+            let isChecked = currentVals.includes(val) ? 'checked' : '';
+            htmlCheckboxes += `<div class="form-check mb-2"><input class="form-check-input swal-tooth-check" type="checkbox" value="${val}" id="check-${val}" ${isChecked}><label class="form-check-label fw-bold" for="check-${val}">${label}</label></div>`;
+        }
+        htmlCheckboxes += '</div>';
+
+        const {
+            value: selectedStatuses
+        } = await Swal.fire({
+            title: 'Diagnosa Gigi ' + toothNo,
+            html: htmlCheckboxes,
+            showCancelButton: true,
+            confirmButtonText: 'Lanjut',
+            cancelButtonText: 'Batal',
+            customClass: {
+                confirmButton: 'btn btn-retro btn-primary mx-1',
+                cancelButton: 'btn btn-retro btn-light mx-1'
+            },
+            buttonsStyling: false,
+            didOpen: () => {
+                $('.swal-tooth-check').change(function() {
+                    if ($(this).val() === 'NORMAL' && $(this).is(':checked')) $('.swal-tooth-check').not(this).prop('checked', false);
+                    else if ($(this).val() !== 'NORMAL' && $(this).is(':checked')) $('#check-NORMAL').prop('checked', false);
+                });
+            },
+            preConfirm: () => {
+                let vals = [];
+                $('.swal-tooth-check:checked').each(function() {
+                    vals.push($(this).val());
+                });
+                if (vals.length === 0) {
+                    Swal.showValidationMessage('Pilih minimal satu kondisi!');
+                    return false;
+                }
+                return vals;
+            }
         });
-        noteField.value = existing.note;
-        modal.show();
-    }
 
-    document.getElementById("saveBtn").onclick = () => {
-        var selected = [...diagList.querySelectorAll("input:checked")].map(i => i.value);
-        var note = noteField.value.trim();
-        data[currentTooth<?php echo $ran ?>] = {
-            diagnosis: selected,
-            note
-        };
-        updateToothDisplay(currentTooth<?php echo $ran ?>);
-        modal.hide();
-    };
+        if (selectedStatuses) {
+            let catatan = '';
+            if (!selectedStatuses.includes('NORMAL')) {
+                let currentCatatan = $(`#catatan-gigi-${toothNo}`).val() || '';
+                let labels = selectedStatuses.map(s => conditionOpts[s]).join(' + ');
+                const {
+                    value: textCatatan
+                } = await Swal.fire({
+                    title: 'Catatan Gigi ' + toothNo,
+                    text: 'Kondisi: ' + labels,
+                    input: 'text',
+                    inputValue: currentCatatan,
+                    inputPlaceholder: 'Rencana / Detail (Opsional)',
+                    showCancelButton: true,
+                    confirmButtonText: 'Simpan',
+                    cancelButtonText: 'Lewati',
+                    customClass: {
+                        confirmButton: 'btn btn-retro btn-success mx-1',
+                        cancelButton: 'btn btn-retro btn-light mx-1'
+                    },
+                    buttonsStyling: false
+                });
+                catatan = textCatatan || '';
+            }
 
-    function updateToothDisplay(num) {
-        var el = document.querySelector(`.tooth-box[data-num='${num}']`);
-        if (!el) return;
-        var info = data[num];
-        if (!info || info.diagnosis.length === 0) {
-            el.dataset.status = "sehat";
-            el.querySelector(".tooth-status-label").textContent = "Normal";
-            return;
-        }
-        let status = "lainnya";
-        if (info.diagnosis.some(d => d.toLowerCase().includes("karies"))) status = "karies";
-        else if (info.diagnosis.some(d => d.toLowerCase().includes("tambalan"))) status = "tambalan";
-        else if (info.diagnosis.some(d => d.toLowerCase().includes("hilang"))) status = "hilang";
-        el.dataset.status = status;
-        el.querySelector(".tooth-status-label").textContent = info.diagnosis[0];
-    }
-
-    var reset = document.getElementById("resetBtn");
-    reset.onclick = () => {
-        if (confirm("Yakin ingin reset semua data odontogram?")) {
-            var id = document.getElementById('code_gigi').value;
-            for (var k in data) delete data[k];
-            document.querySelectorAll(".tooth-box").forEach(el => {
-                el.dataset.status = "sehat";
-                el.querySelector(".tooth-status-label").textContent = "Normal";
+            inputHidden.val(selectedStatuses.join(','));
+            box.removeClass('tooth-normal').css({
+                'background-image': 'none',
+                'color': 'var(--retro-dark)',
+                'text-shadow': 'none'
             });
 
-            $.ajax({
-                url: "{{ route('data_registrasi_poliklinik_reset_odontogram') }}",
-                type: "POST",
-                data: {
-                    "_token": "{{ csrf_token() }}",
-                    "id": id
-                },
-                dataType: 'html',
+            if (selectedStatuses.includes('NORMAL')) {
+                box.addClass('tooth-normal').css('background-color', '#ffffff');
+            } else {
+                const colorMap = {
+                    'KARIES': 'var(--retro-red)',
+                    'TAMBALAN': 'var(--retro-blue)',
+                    'HILANG': 'var(--retro-dark)',
+                    'SISA_AKAR': 'var(--retro-gray)'
+                };
+                let activeColors = selectedStatuses.map(s => colorMap[s]);
+                box.css({
+                    'color': '#ffffff',
+                    'text-shadow': '1px 1px 0px #000'
+                });
+                if (activeColors.length === 1) box.css('background-color', activeColors[0]);
+                else {
+                    let gradient = 'linear-gradient(135deg, ',
+                        step = 100 / activeColors.length,
+                        stops = [];
+                    for (let i = 0; i < activeColors.length; i++) {
+                        stops.push(`${activeColors[i]} ${i*step}%`);
+                        stops.push(`${activeColors[i]} ${(i+1)*step}%`);
+                    }
+                    box.css('background-image', gradient + stops.join(', ') + ')');
+                }
+            }
+
+            $('#log-gigi-' + toothNo).remove();
+            if (!selectedStatuses.includes('NORMAL')) {
+                let displayStatus = selectedStatuses.map(s => `<span class="badge bg-dark border border-light mx-1">${conditionOpts[s]}</span>`).join('');
+                let row = `<tr id="log-gigi-${toothNo}"><td class="text-center fw-bolder fs-5 text-dark align-middle">${toothNo}</td><td class="align-middle">${displayStatus}</td><td class="align-middle"><input type="text" name="catatan_gigi[${toothNo}]" id="catatan-gigi-${toothNo}" class="form-control form-control-retro form-control-sm" value="${catatan}"></td></tr>`;
+                $('#tabel-log-gigi tbody').append(row);
+            }
+        }
+    });
+
+    // --- ORDER PEMERIKSAAN DENGAN TARIF PENJAMIN ---
+    $('#btn-tambah-pemeriksaan').click(function() {
+        let select = $('#input_pemeriksaan option:selected');
+        let id = select.val();
+        let nama = select.data('nama');
+        let kategori = select.data('kategori');
+        let harga = select.data('harga'); // Mengambil harga dari data-harga option
+
+        if (!id) return Swal.fire({
+            icon: 'warning',
+            title: 'Perhatian',
+            text: 'Pilih pemeriksaan!'
+        });
+
+        let row = `
+            <tr>
+                <td>
+                    ${nama}
+                    <input type="hidden" name="order_pemeriksaan_id[]" value="${id}">
+                    <input type="hidden" name="order_tarif[]" value="${harga}"> <!-- Menyimpan nilai tarif -->
+                </td>
+                <td><span class="badge bg-light text-dark border border-dark">${kategori}</span></td>
+                <td>Rp ${parseInt(harga).toLocaleString('id-ID')}</td>
+                <td class="text-center"><button type="button" class="btn btn-sm btn-danger btn-retro text-dark btn-hapus-row"><i class="fas fa-trash"></i></button></td>
+            </tr>`;
+        $('#tabel-order-pemeriksaan tbody').append(row);
+        $('#input_pemeriksaan').val('');
+    });
+
+    // --- TAMBAH E-RESEP ---
+    $('#btn-tambah-resep').click(function() {
+        let select = $('#input_obat option:selected');
+        let kodeObat = select.val();
+        let nama = select.data('nama');
+        let satuan = select.data('satuan');
+        let harga = select.data('harga');
+        let stok = parseInt(select.data('stok') || 0);
+        let jumlah = parseInt($('#input_jumlah_obat').val());
+        let signa = $('#input_signa_obat').val();
+
+        if (!kodeObat || !jumlah || !signa) {
+            return Swal.fire({
+                icon: 'warning',
+                title: 'Perhatian',
+                text: 'Pilih obat, isi jumlah dan aturan pakai!'
             });
         }
-    };
 
-    $(document).on("click", "#exportBtn", function(e) {
+        if (jumlah > stok) {
+            return Swal.fire({
+                icon: 'error',
+                title: 'Stok Tidak Cukup',
+                text: `Stok obat saat ini tersisa ${stok} ${satuan}.`
+            });
+        }
+
+        let row = `
+            <tr>
+                <td>
+                    ${nama}
+                    <input type="hidden" name="resep_obat_code[]" value="${kodeObat}">
+                    <input type="hidden" name="resep_harga[]" value="${harga}">
+                </td>
+                <td class="text-center">
+                    ${jumlah} ${satuan}
+                    <input type="hidden" name="resep_jumlah[]" value="${jumlah}">
+                </td>
+                <td>Rp ${parseInt(harga * jumlah).toLocaleString('id-ID')}</td>
+                <td>
+                    ${signa}
+                    <input type="hidden" name="resep_signa[]" value="${signa}">
+                </td>
+                <td class="text-center">
+                    <button type="button" class="btn btn-sm btn-danger btn-retro text-dark btn-hapus-row"><i class="fas fa-trash"></i></button>
+                </td>
+            </tr>`;
+
+        $('#tabel-resep-obat tbody').append(row);
+        $('#input_obat').val('');
+        $('#input_jumlah_obat').val('1');
+        $('#input_signa_obat').val('');
+    });
+
+    $(document).on('click', '.btn-hapus-row', function() {
+        $(this).closest('tr').remove();
+    });
+
+    // --- SIMPAN FINAL ---
+    $('#button-save-data-diagnosa-pasien-poli').click(function(e) {
         e.preventDefault();
-        var id = document.getElementById('code_gigi').value;
         Swal.fire({
-            title: "Simpan Odontogram?",
-            text: "Data pemeriksaan gigi pasien akan diperbarui.",
-            icon: "question",
+            title: "Simpan Pemeriksaan?",
+            text: "Data anamnesa, order tindakan, resep, dan diagnosa akan disimpan secara final.",
+            icon: "warning",
             showCancelButton: true,
             confirmButtonText: "Ya, Simpan!",
-            cancelButtonText: "Batal"
+            cancelButtonText: "Batal",
+            customClass: {
+                confirmButton: 'btn btn-success btn-retro mx-2',
+                cancelButton: 'btn btn-light btn-retro mx-2'
+            },
+            buttonsStyling: false
         }).then((result) => {
             if (result.isConfirmed) {
+                let formData = $('#form-handling-medis').serialize();
+
                 $.ajax({
-                    url: "{{ route('data_registrasi_poliklinik_save_odontogram') }}",
+                    url: "{{ route('store_handling_medis') }}",
                     type: "POST",
-                    data: {
-                        "_token": "{{ csrf_token() }}",
-                        "id": id,
-                        "data": JSON.stringify(data, null, 2),
+                    data: formData,
+                    dataType: "json",
+                    beforeSend: function() {
+                        Swal.fire({
+                            title: 'Menyimpan...',
+                            text: 'Mohon tunggu sebentar.',
+                            allowOutsideClick: false,
+                            didOpen: () => {
+                                Swal.showLoading();
+                            }
+                        });
                     },
-                    dataType: 'html',
-                }).done(function(res) {
-                    Swal.fire("Berhasil!", "Data odontogram berhasil disimpan.", "success");
-                }).fail(function() {
-                    Swal.fire("Gagal", "Gagal menyimpan data.", "error");
+                    success: function(response) {
+                        if (response.success) {
+                            Swal.fire({
+                                icon: 'success',
+                                title: 'Berhasil!',
+                                text: response.message,
+                                confirmButtonText: 'OK',
+                                customClass: {
+                                    confirmButton: 'btn btn-success btn-retro'
+                                },
+                                buttonsStyling: false
+                            }).then(() => {
+                                $('.modal').modal('hide');
+                                location.reload();
+                            });
+                        } else {
+                            Swal.fire({
+                                icon: 'error',
+                                title: 'Gagal',
+                                text: response.message
+                            });
+                        }
+                    },
+                    error: function(xhr) {
+                        Swal.fire({
+                            icon: 'error',
+                            title: 'Server Error',
+                            text: 'Terjadi kesalahan pada server.'
+                        });
+                    }
                 });
             }
         });
     });
 </script>
-
-@elseif (str_contains($namaPoli, 'DALAM'))
-<!-- TEMPLATE POLI PENYAKIT DALAM -->
-<div class="card mb-3">
-    <div class="card-header bg-300 py-2">
-        <h6 class="mb-0 fw-bold"><i class="fas fa-stethoscope me-2"></i>Pemeriksaan Spesifik - {{ $poli->m_poli_name }}</h6>
-    </div>
-    <div class="card-body bg-light p-3">
-        <div class="row g-2">
-            <div class="col-md-3">
-                <label class="form-label fw-semi-bold fs--1">Tekanan Darah (mmHg)</label>
-                <input type="text" class="form-control form-control-sm" placeholder="Contoh: 120/80">
-            </div>
-            <div class="col-md-3">
-                <label class="form-label fw-semi-bold fs--1">Gula Darah Sewaktu (mg/dL)</label>
-                <input type="number" class="form-control form-control-sm" placeholder="Contoh: 110">
-            </div>
-            <div class="col-md-3">
-                <label class="form-label fw-semi-bold fs--1">Asam Urat (mg/dL)</label>
-                <input type="number" step="0.1" class="form-control form-control-sm" placeholder="Contoh: 6.0">
-            </div>
-            <div class="col-md-3">
-                <label class="form-label fw-semi-bold fs--1">Kolesterol Total (mg/dL)</label>
-                <input type="number" class="form-control form-control-sm" placeholder="Contoh: 190">
-            </div>
-            <div class="col-md-12">
-                <label class="form-label fw-semi-bold fs--1">Pemeriksaan Abdomen / Organ Dalam</label>
-                <textarea class="form-control form-control-sm" rows="2" placeholder="Hasil palpasi, auskultasi, dll..."></textarea>
-            </div>
-        </div>
-    </div>
-</div>
-
-@elseif (str_contains($namaPoli, 'JANTUNG'))
-<!-- TEMPLATE POLI JANTUNG -->
-<div class="card mb-3">
-    <div class="card-header bg-300 py-2">
-        <h6 class="mb-0 fw-bold"><i class="fas fa-heartbeat me-2"></i>Pemeriksaan Kardiovaskular - {{ $poli->m_poli_name }}</h6>
-    </div>
-    <div class="card-body bg-light p-3">
-        <div class="row g-2">
-            <div class="col-md-4">
-                <label class="form-label fw-semi-bold fs--1">Detak Jantung (BPM)</label>
-                <input type="number" class="form-control form-control-sm" placeholder="Contoh: 80 bpm">
-            </div>
-            <div class="col-md-4">
-                <label class="form-label fw-semi-bold fs--1">Irama Jantung</label>
-                <select class="form-select form-select-sm">
-                    <option value="Reguler">Reguler (Sinus Rhythm)</option>
-                    <option value="Ireguler">Ireguler (Aritmia)</option>
-                </select>
-            </div>
-            <div class="col-md-4">
-                <label class="form-label fw-semi-bold fs--1">Hasil EKG Ringkas</label>
-                <input type="text" class="form-control form-control-sm" placeholder="Contoh: Normal Sinus Rhythm">
-            </div>
-            <div class="col-md-12">
-                <label class="form-label fw-semi-bold fs--1">Catatan Echocardiography / EKG Detail</label>
-                <textarea class="form-control form-control-sm" rows="2" placeholder="Masukkan hasil evaluasi gelombang EKG..."></textarea>
-            </div>
-        </div>
-    </div>
-</div>
-
-@elseif (str_contains($namaPoli, 'ANAK'))
-<!-- TEMPLATE POLI ANAK -->
-<div class="card mb-3">
-    <div class="card-header bg-300 py-2">
-        <h6 class="mb-0 fw-bold"><i class="fas fa-baby me-2"></i>Pemeriksaan Tumbuh Tembang - {{ $poli->m_poli_name }}</h6>
-    </div>
-    <div class="card-body bg-light p-3">
-        <div class="row g-2">
-            <div class="col-md-3">
-                <label class="form-label fw-semi-bold fs--1">Berat Badan (Kg)</label>
-                <input type="number" step="0.1" class="form-control form-control-sm" placeholder="Contoh: 12.5">
-            </div>
-            <div class="col-md-3">
-                <label class="form-label fw-semi-bold fs--1">Tinggi / Panjang Badan (cm)</label>
-                <input type="number" step="0.1" class="form-control form-control-sm" placeholder="Contoh: 85">
-            </div>
-            <div class="col-md-3">
-                <label class="form-label fw-semi-bold fs--1">Lingkar Kepala (cm)</label>
-                <input type="number" step="0.1" class="form-control form-control-sm" placeholder="Contoh: 46">
-            </div>
-            <div class="col-md-3">
-                <label class="form-label fw-semi-bold fs--1">Suhu Tubuh (°C)</label>
-                <input type="number" step="0.1" class="form-control form-control-sm" placeholder="Contoh: 36.6">
-            </div>
-            <div class="col-md-12">
-                <label class="form-label fw-semi-bold fs--1">Riwayat Imunisasi & Tumbuh Tumbuh</label>
-                <textarea class="form-control form-control-sm" rows="2" placeholder="Catatan vaksinasi dan perkembangan anak..."></textarea>
-            </div>
-        </div>
-    </div>
-</div>
-
-@else
-<!-- TEMPLATE DEFAULT POLI UMUM / LAINNYA -->
-<div class="card mb-3">
-    <div class="card-header bg-300 py-2">
-        <h6 class="mb-0 fw-bold"><i class="fas fa-clinic-medical me-2"></i>Pemeriksaan Umum - {{ $poli->m_poli_name ?? 'Poliklinik' }}</h6>
-    </div>
-    <div class="card-body bg-light p-3">
-        <div class="row g-2">
-            <div class="col-md-4">
-                <label class="form-label fw-semi-bold fs--1">Tekanan Darah</label>
-                <input type="text" class="form-control form-control-sm" placeholder="120/80 mmHg">
-            </div>
-            <div class="col-md-4">
-                <label class="form-label fw-semi-bold fs--1">Suhu (°C)</label>
-                <input type="number" step="0.1" class="form-control form-control-sm" placeholder="36.5">
-            </div>
-            <div class="col-md-4">
-                <label class="form-label fw-semi-bold fs--1">Nadi (x/menit)</label>
-                <input type="number" class="form-control form-control-sm" placeholder="80">
-            </div>
-        </div>
-    </div>
-</div>
-@endif
-
-<!-- CARD FASILITAS ORDER / PENUNJANG -->
-<!-- CARD FASILITAS ORDER / PENUNJANG (2 KOLOM - SPLIT VIEW) -->
-<div class="card mb-3 shadow-sm border-0">
-    <div class="card-header bg-300 py-2 d-flex justify-content-between align-items-center">
-        <h6 class="mb-0 fw-bold fs--1 text-800">
-            <i class="fas fa-boxes me-2 text-primary"></i>Fasilitas Order (Laboratorium, Radiologi, dll)
-        </h6>
-        <span class="badge bg-soft-info text-info fs--2">Pemeriksaan Penunjang</span>
-    </div>
-    <div class="card-body bg-light p-2 p-md-3">
-        <div class="row g-2">
-            <!-- KOLOM KIRI: DAFTAR LAYANAN (LIST VERTIKAL) -->
-            <div class="col-12 col-md-4 col-lg-3 border-end-md">
-                <div class="text-xs fw-bold text-uppercase text-muted mb-2 px-1">
-                    <i class="fas fa-list me-1"></i>Pilih Jenis Order
-                </div>
-                <div class="nav flex-column nav-pills gap-1" id="order-layanan-tab" role="tablist">
-                    @foreach ($layanan as $lay)
-                    <button class="nav-link text-start btn-order-category fs--2 fw-semi-bold py-2 px-3 d-flex align-items-center justify-content-between border"
-                        type="button"
-                        data-code="{{ $lay->t_layanan_cat_code }}"
-                        data-reg="{{ $code }}"
-                        style="border-radius: 6px; background-color: #ffffff;">
-                        <span>
-                            <i class="fas fa-microscope me-2 text-primary"></i> {{ $lay->t_layanan_cat_name }}
-                        </span>
-                        <i class="fas fa-chevron-right fs--3 opacity-50 icon-arrow"></i>
-                    </button>
-                    @endforeach
-                </div>
-            </div>
-
-            <!-- KOLOM KANAN: MENU & FORM ORDER VIA AJAX -->
-            <div class="col-12 col-md-8 col-lg-9 ps-md-3">
-                <div id="menu-order-layanan-dokter" class="h-100">
-                    <!-- Default State Tampilan Awal Sebelum Kategori Dipilih -->
-                    <div class="d-flex flex-column align-items-center justify-content-center h-100 py-4 text-center bg-white rounded border border-dashed p-3" style="min-height: 180px;">
-                        <i class="fas fa-hand-pointer text-400 fa-2x mb-2"></i>
-                        <h6 class="fs--1 text-600 mb-1 fw-bold">Belum Ada Kategori Dipilih</h6>
-                        <p class="fs--2 text-500 mb-0">Silakan pilih jenis layanan/order di panel sebelah kiri untuk melihat opsi pemeriksaan.</p>
-                    </div>
-                </div>
-            </div>
-        </div>
-    </div>
-</div>
-
-<style>
-    /* Styling Komponen List Kiri agar Lebih Interaktif */
-    .btn-order-category {
-        color: #475569;
-        transition: all 0.2s ease;
-    }
-
-    .btn-order-category:hover {
-        background-color: #edf2f7 !important;
-        color: #2b6cb0;
-    }
-
-    .btn-order-category.active-order-btn {
-        background-color: #2c7be5 !important;
-        color: #ffffff !important;
-        border-color: #2c7be5 !important;
-    }
-
-    .btn-order-category.active-order-btn i {
-        color: #ffffff !important;
-    }
-</style>
-
 <script>
-    (function() {
-        // Variabel terisolasi di dalam scope IIFE (Aman dari error redeclaration)
-        let activeCategoryCode = null;
-        var isAllSelected = false;
-        $(document).ready(function() {
+    // --- AUTOLOAD DATA LAMA JIKA SUDAH PERNAH DIISI ---
+    $(document).ready(function() {
+        @if(isset($existing_soap) && $existing_soap)
+            // 1. Munculkan Diagnosa Akhir yang lama
+            $('textarea[name="diagnosa_akhir"]').val("{{ $existing_soap->asesmen }}");
 
-            // 1. Matikan event handler lama sebelum mendaftarkan yang baru (.off)
-            $(document).off('click', '.btn-order-category').on('click', '.btn-order-category', function(e) {
-                e.preventDefault();
+            // 2. Jika Poli Gigi, Load Odontogram lama dari JSON
+            @if($template_type === 'GIGI' && !empty($existing_soap->data_spesifik_poli))
+                let savedData = {!! $existing_soap->data_spesifik_poli !!};
 
-                var $btn = $(this);
-                var catCode = $btn.data('code');
-                var regCode = $btn.data('reg');
-                var $container = $('#menu-order-layanan-dokter');
-
-                // Toggle off jika tombol kategori yang sama diklik ulang
-                if (activeCategoryCode === catCode) {
-                    resetOrderMenu();
-                    return;
+                if (savedData.kalkulus) {
+                    $('select[name="gigi_kalkulus"]').val(savedData.kalkulus);
                 }
 
-                // Highlight item terpilih di kolom kiri
-                $('.btn-order-category').removeClass('active-order-btn');
-                $btn.addClass('active-order-btn');
-                activeCategoryCode = catCode;
+                if (savedData.gigi_status) {
+                    for (const [toothNo, statusStr] of Object.entries(savedData.gigi_status)) {
+                        if (statusStr !== 'NORMAL') {
+                            let inputHidden = $('#input-gigi-' + toothNo);
+                            inputHidden.val(statusStr);
+                            let statuses = statusStr.split(',');
+                            let box = $(`[data-tooth="${toothNo}"]`);
 
-                // Tampilkan Loading State di kolom kanan
-                $container.html(`
-                <div class="d-flex flex-column align-items-center justify-content-center h-100 py-4 text-center bg-white rounded border" style="min-height: 180px;">
-                    <div class="spinner-border spinner-border-sm text-primary mb-2" role="status"></div>
-                    <span class="fs--1 text-muted">Memuat item order penunjang...</span>
-                </div>
-            `);
+                            // Warnai kotak gigi
+                            box.removeClass('tooth-normal');
+                            const colorMap = {'KARIES': 'var(--retro-red)', 'TAMBALAN': 'var(--retro-blue)', 'HILANG': 'var(--retro-dark)', 'SISA_AKAR': 'var(--retro-gray)'};
+                            let activeColors = statuses.map(s => colorMap[s]);
+                            box.css({'color': '#ffffff', 'text-shadow': '1px 1px 0px #000'});
 
-                // Exec AJAX Request untuk ambil Form Order di kanan
-                $.ajax({
-                    url: "{{ route('data_registrasi_poliklinik_handling_order_layanan') }}",
-                    type: "POST",
-                    data: {
-                        "_token": "{{ csrf_token() }}",
-                        "cat_code": catCode,
-                        "reg_code": regCode
-                    },
-                    dataType: "html",
-                    success: function(response) {
-                        $container.hide().html(response).fadeIn(150);
-                    },
-                    error: function(xhr, status, error) {
-                        console.error("Error AJAX Order:", error);
-                        $container.html(`
-                        <div class="alert alert-danger fs--1 mb-0 py-2" role="alert">
-                            <i class="fas fa-exclamation-triangle me-1"></i> Gagal memuat formulir order. Silakan coba lagi.
-                        </div>
-                    `);
+                            if(activeColors.length === 1) {
+                                box.css('background-color', activeColors[0]);
+                            } else {
+                                let gradient = 'linear-gradient(135deg, ', step = 100 / activeColors.length, stops = [];
+                                for(let i=0; i < activeColors.length; i++) {
+                                    stops.push(`${activeColors[i]} ${i*step}%`);
+                                    stops.push(`${activeColors[i]} ${(i+1)*step}%`);
+                                }
+                                box.css('background-image', gradient + stops.join(', ') + ')');
+                            }
+
+                            // Masukkan ke tabel rincian gigi
+                            let conditionOpts = {'KARIES': 'Karies (Berlubang)', 'TAMBALAN': 'Tumpatan (Tambalan)', 'HILANG': 'Hilang / Dicabut', 'SISA_AKAR': 'Sisa Akar'};
+                            let displayStatus = statuses.map(s => `<span class="badge bg-dark border border-light mx-1">${conditionOpts[s]}</span>`).join('');
+                            let catatanVal = savedData.gigi_catatan[toothNo] || '';
+
+                            let row = `<tr id="log-gigi-${toothNo}">
+                                <td class="text-center fw-bolder fs-5 text-dark align-middle">${toothNo}</td>
+                                <td class="align-middle">${displayStatus}</td>
+                                <td class="align-middle"><input type="text" name="catatan_gigi[${toothNo}]" id="catatan-gigi-${toothNo}" class="form-control form-control-retro form-control-sm" value="${catatanVal}"></td>
+                            </tr>`;
+                            $('#tabel-log-gigi tbody').append(row);
+                        }
                     }
-                });
-            });
+                }
+            @endif
+        @endif
 
-            // 2. Fungsi Helper untuk Mereset Tampilan Menu & State
-            function resetOrderMenu() {
-                activeCategoryCode = null;
-                $('.btn-order-category').removeClass('active-order-btn');
-                $('#menu-order-layanan-dokter').html(`
-                <div class="d-flex flex-column align-items-center justify-content-center h-100 py-4 text-center bg-white rounded border border-dashed p-3" style="min-height: 180px;">
-                    <i class="fas fa-hand-pointer text-400 fa-2x mb-2"></i>
-                    <h6 class="fs--1 text-600 mb-1 fw-bold">Belum Ada Kategori Dipilih</h6>
-                    <p class="fs--2 text-500 mb-0">Silakan pilih jenis layanan/order di panel sebelah kiri untuk melihat opsi pemeriksaan.</p>
-                </div>
-            `);
-            }
+        // 3. Load Tabel Order Tindakan Lama
+        @if(isset($existing_tindakan))
+            @foreach($existing_tindakan as $tind)
+                let rowTindakan = `
+                    <tr>
+                        <td>{{ $tind->nama_layanan }}<input type="hidden" name="order_pemeriksaan_id[]" value="{{ $tind->id }}"></td>
+                        <td><span class="badge bg-light text-dark border border-dark">{{ $tind->kategori_tindakan }}</span></td>
+                        <td>Rp {{ number_format($tind->tarif, 0, ',', '.') }}</td>
+                        <td class="text-center"><button type="button" class="btn btn-sm btn-danger btn-retro text-dark btn-hapus-row"><i class="fas fa-trash"></i></button></td>
+                    </tr>`;
+                $('#tabel-order-pemeriksaan tbody').append(rowTindakan);
+            @endforeach
+        @endif
 
-            // 3. Listener Custom Event saat Pasien Berganti
-            $(document).off('patientChanged').on('patientChanged', function() {
-                resetOrderMenu();
-            });
-
-        });
-    })();
+        // 4. Load Tabel Resep Obat Lama
+        @if(isset($existing_resep))
+            @foreach($existing_resep as $rsp)
+                let rowResep = `
+                    <tr>
+                        <td>
+                            {{ $rsp->farm_data_obat_name }}
+                            <input type="hidden" name="resep_obat_code[]" value="{{ $rsp->farm_data_obat_code }}">
+                            <input type="hidden" name="resep_harga[]" value="{{ $rsp->harga }}">
+                        </td>
+                        <td class="text-center">
+                            {{ $rsp->qty }} {{ $rsp->farm_data_obat_satuan }}
+                            <input type="hidden" name="resep_jumlah[]" value="{{ $rsp->qty }}">
+                        </td>
+                        <td>Rp {{ number_format($rsp->harga * $rsp->qty, 0, ',', '.') }}</td>
+                        <td>
+                            {{ $rsp->signa }}
+                            <input type="hidden" name="resep_signa[]" value="{{ $rsp->signa }}">
+                        </td>
+                        <td class="text-center">
+                            <button type="button" class="btn btn-sm btn-danger btn-retro text-dark btn-hapus-row"><i class="fas fa-trash"></i></button>
+                        </td>
+                    </tr>`;
+                $('#tabel-resep-obat tbody').append(rowResep);
+            @endforeach
+        @endif
+    });
 </script>

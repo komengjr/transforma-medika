@@ -48,6 +48,118 @@ class FarmasiController extends Controller
         }
     }
     // PENJUALAN NON RESEP
+    public function menu_farmasi_order_internal($akses, $id)
+    {
+        if ($this->url_akses_sub($akses, $id) == true) {
+            return view('app-farmasi.menu-farmasi.order-list-pasien-internal', ['akses' => $akses, 'code' => $id]);
+        } else {
+            return Redirect::to('dashboard/home');
+        }
+    }
+    public function getOrderInternalData(Request $request)
+    {
+        $startDate = $request->input('start_date');
+        $endDate   = $request->input('end_date');
+        $kategori  = $request->input('kategori_layanan');
+        $keyword   = $request->input('keyword');
+
+        // 1. Query ke tabel medical_registrasi dengan relasinya
+        $query = DB::table('medical_registrasi as r')
+            ->join('medical_patient as p', 'r.pasien_id', '=', 'p.id')
+            ->leftJoin('medical_master_doctor as d', 'r.doctor_poli_id', '=', 'd.id')
+            ->leftJoin('medical_master_ruangan as ru', 'r.ruangan_id', '=', 'ru.id')
+            ->leftJoin('medical_master_poli as po', 'r.poli_id', '=', 'po.id')
+            // =========================================================================
+            // FILTER UTAMA: HANYA TAMPILKAN JIKA PASIEN MEMILIKI ORDER RESEP OBAT
+            // =========================================================================
+            ->whereExists(function ($query) {
+                $query->select(DB::raw(1))
+                    ->from('medical_ranap_resep as rr')
+                    ->whereColumn('rr.registrasi_id', 'r.id');
+            })
+            ->select(
+                'r.id as registrasi_id',
+                'r.no_registrasi',
+                'r.tanggal_registrasi as tgl_order',
+                'p.nama as nama_pasien',
+                'p.pid',
+                'r.jenis_layanan as kategori',
+                DB::raw('COALESCE(ru.nama_ruangan, po.nama_poli, "IGD / Non-Ruangan") as nama_ruangan'),
+                DB::raw('COALESCE(d.nama_lengkap, "-") as nama_dokter'),
+                'r.status_kunjungan as status_order'
+            );
+
+        // 2. Filter Rentang Tanggal
+        if (!empty($startDate) && !empty($endDate)) {
+            $query->whereDate('r.tanggal_registrasi', '>=', $startDate)
+                ->whereDate('r.tanggal_registrasi', '<=', $endDate);
+        }
+
+        // 3. Filter Kategori (Konversi nilai frontend ke ENUM tabel)
+        if (!empty($kategori) && $kategori !== 'ALL') {
+            $enumLayanan = $kategori;
+            if ($kategori === 'RANAP') {
+                $enumLayanan = 'RAWAT_INAP';
+            } elseif ($kategori === 'POLIKLINIK') {
+                $enumLayanan = 'RAWAT_JALAN';
+            }
+            $query->where('r.jenis_layanan', $enumLayanan);
+        }
+
+        // 4. Filter Pencarian Keyword (No Reg, Nama Pasien, RM)
+        if (!empty($keyword)) {
+            $query->where(function ($q) use ($keyword) {
+                $q->where('r.no_registrasi', 'LIKE', "%{$keyword}%")
+                    ->orWhere('p.nama', 'LIKE', "%{$keyword}%")
+                    ->orWhere('p.pid', 'LIKE', "%{$keyword}%");
+            });
+        }
+
+        // Ambil data terbaru di atas
+        $data = $query->orderBy('r.tanggal_registrasi', 'DESC')->get();
+
+        // 5. Format kembalian DataTables
+        return response()->json([
+            'draw'            => intval($request->input('draw')),
+            'recordsTotal'    => $data->count(),
+            'recordsFiltered' => $data->count(),
+            'data'            => $data
+        ]);
+    }
+
+    public function getDetailOrderInternal(Request $request)
+    {
+        $registrasiId = $request->input('registrasi_id');
+        $kategori     = $request->input('kategori'); // RAWAT_INAP, RAWAT_JALAN, atau IGD
+
+        try {
+            // Catatan: Jika resep IGD/Poli memiliki tabel yang berbeda (misal: medical_rajal_resep),
+            // Anda dapat menggunakan kondisi IF($kategori == 'RAWAT_JALAN') di sini.
+            // Untuk saat ini disesuaikan dengan tabel resep rawat inap yang kita bangun sebelumnya.
+            $dataObat = DB::table('medical_ranap_resep as rr')
+                ->join('farm_data_obat as fo', 'rr.farm_data_obat_code', '=', 'fo.farm_data_obat_code')
+                ->select(
+                    'fo.farm_data_obat_code', // <--- TAMBAHKAN INI
+                    'fo.farm_data_obat_name as nama_obat',
+                    'rr.qty',
+                    'rr.signa',
+                    'rr.harga'
+                )
+                ->where('rr.registrasi_id', $registrasiId)
+                ->get();
+
+            return response()->json([
+                'success' => true,
+                'data'    => $dataObat
+            ]);
+        } catch (\Exception $e) {
+            return response()->json([
+                'success' => false,
+                'message' => 'Gagal mengambil detail order obat: ' . $e->getMessage()
+            ]);
+        }
+    }
+    // PENJUALAN NON RESEP
     public function penjualan_non_resep($akses, $id)
     {
         if ($this->url_akses($akses, $id) == true) {
@@ -271,7 +383,6 @@ class FarmasiController extends Controller
                 ]);
             }
         } else {
-
         }
         $list = DB::table('farm_list_log')->join('farm_data_obat', 'farm_data_obat.farm_data_obat_code', '=', 'farm_list_log.farm_data_obat_code')
             ->where('farm_list_log_reg', $request->no_reg)->get();
@@ -313,11 +424,31 @@ class FarmasiController extends Controller
         }
     }
     // HISTORY PENJUALAN
-    public function penjualan_history_penjualan($akses, $id)
+    public function penjualan_history_penjualan(Request $request, $akses, $id)
     {
         if ($this->url_akses($akses, $id) == true) {
-            $data = DB::table('farm_order_data')->get();
-            return view('app-farmasi.penjualan.history-penjualan', ['data' => $data, 'akses' => $akses, 'code' => $id]);
+            $startDate = $request->input('start_date', date('Y-m-01'));
+            $endDate   = $request->input('end_date', date('Y-m-d'));
+            $keyword   = $request->input('keyword');
+
+            $query = DB::table('farm_order_data')
+                ->whereDate('farm_order_data_date', '>=', $startDate)
+                ->whereDate('farm_order_data_date', '<=', $endDate);
+
+            if (!empty($keyword)) {
+                $query->where('farm_order_data_code', 'LIKE', '\%' . $keyword . '%');
+            }
+
+            $data = $query->orderBy('farm_order_data_date', 'DESC')->get();
+
+            return view('app-farmasi.penjualan.history-penjualan', [
+                'data'      => $data,
+                'akses'     => $akses,
+                'code'      => $id,
+                'startDate' => $startDate,
+                'endDate'   => $endDate,
+                'keyword'   => $keyword
+            ]);
         } else {
             return Redirect::to('dashboard/home');
         }
@@ -371,10 +502,25 @@ class FarmasiController extends Controller
     {
         if ($this->url_akses_sub($akses, $id) == true) {
             $data = DB::table('farm_data_obat')
-                ->join('farm_data_satuan', 'farm_data_satuan.farm_data_satuan_code', '=', 'farm_data_obat.farm_data_obat_satuan')
-                ->join('farm_data_jenis', 'farm_data_jenis.farm_data_jenis_code', '=', 'farm_data_obat.farm_data_obat_jenis')
+                ->leftJoin('farm_data_satuan', 'farm_data_satuan.farm_data_satuan_code', '=', 'farm_data_obat.farm_data_obat_satuan')
+                ->leftJoin('farm_data_jenis', 'farm_data_jenis.farm_data_jenis_code', '=', 'farm_data_obat.farm_data_obat_jenis')
+                ->select([
+                    'farm_data_obat.*',
+                    'farm_data_satuan.farm_data_satuan_name',
+                    'farm_data_jenis.farm_data_jenis_name'
+                ])
                 ->get();
-            return view('app-farmasi.manajemen.data-obat', ['data' => $data, 'akses' => $akses, 'code' => $id]);
+
+            // Cek jika request dari AJAX (untuk refresh partial table)
+            if (request()->ajax()) {
+                return view('app-farmasi.manajemen.partials.table-data-obat', ['data' => $data])->render();
+            }
+
+            return view('app-farmasi.manajemen.data-obat', [
+                'data'  => $data,
+                'akses' => $akses,
+                'code'  => $id
+            ]);
         } else {
             return Redirect::to('dashboard/home');
         }
@@ -430,7 +576,7 @@ class FarmasiController extends Controller
         $grn = DB::table('pem_grn_token')->get();
         return view('app-farmasi.manajemen.master-obat.form-add-batch', [
             'code' => $request->code,
-            'grn' => $grn
+            'grns' => $grn
         ]);
     }
     public function manajemen_farmasi_data_obat_save_batch(Request $request)
@@ -512,8 +658,23 @@ class FarmasiController extends Controller
     public function manajemen_farmasi_stock_min_max($akses, $id)
     {
         if ($this->url_akses_sub($akses, $id) == true) {
-            $data = DB::table('farm_data_obat')->get();
-            return view('app-farmasi.manajemen.stox-min-max', ['data' => $data, 'akses' => $akses, 'code' => $id]);
+            $data = DB::table('farm_data_obat as fo')
+                ->leftJoin('farm_data_satuan as fs', 'fs.farm_data_satuan_code', '=', 'fo.farm_data_obat_satuan')
+                ->leftJoin('farm_data_jenis as fj', 'fj.farm_data_jenis_code', '=', 'fo.farm_data_obat_jenis')
+                ->select([
+                    'fo.*',
+                    'fs.farm_data_satuan_name',
+                    'fj.farm_data_jenis_name',
+                    // Menghitung total stok aktif dari tabel batch/expired
+                    DB::raw('(SELECT COALESCE(SUM(data_obat_stok), 0) FROM farm_data_obat_exp WHERE farm_data_obat_exp.farm_data_obat_code = fo.farm_data_obat_code) as total_stok')
+                ])
+                ->get();
+
+            return view('app-farmasi.manajemen.stox-min-max', [
+                'data'  => $data,
+                'akses' => $akses,
+                'code'  => $id
+            ]);
         } else {
             return Redirect::to('dashboard/home');
         }
@@ -538,5 +699,81 @@ class FarmasiController extends Controller
             return Redirect::to('dashboard/home');
         }
     }
+    // DATA SUPPLIER
+    public function master_data_farmasi_harga_obat($akses, $id)
+    {
+        if ($this->url_akses_sub($akses, $id) == true) {
+            $penjamins = DB::table('medical_penjamin')->get();
 
+            $obats = DB::table('farm_data_obat as fo')
+                ->leftJoin('farm_data_satuan as fs', 'fs.farm_data_satuan_code', '=', 'fo.farm_data_obat_satuan')
+                ->select('fo.*', 'fs.farm_data_satuan_name')
+                ->get();
+
+            return view('app-farmasi.master-data.master-harga-obat', [
+                'akses'     => $akses,
+                'code'      => $id,
+                'penjamins' => $penjamins,
+                'obats'     => $obats
+            ]);
+        } else {
+            return Redirect::to('dashboard/home');
+        }
+    }
+
+    public function master_data_farmasi_harga_obat_save(Request $request)
+    {
+        $subPenjaminId = $request->input('sub_penjamin_id');
+        $penjaminId    = $request->input('penjamin_id');
+        $items         = $request->input('item', []); // Format: [ obat_code => [ 'harga' => 1000, 'status' => 1 ] ]
+
+        if (!$subPenjaminId) {
+            return response()->json(['success' => false, 'message' => 'Sub penjamin belum dipilih!']);
+        }
+
+        foreach ($items as $obatCode => $data) {
+            $isActive = isset($data['status']) ? 1 : 0;
+            $harga    = str_replace('.', '', $data['harga'] ?? 0); // Bersihkan format rupiah jika ada
+
+            if ($isActive) {
+                // Jika diaktifkan, simpan atau update harganya
+                DB::table('farm_penjamin_obat')->updateOrInsert(
+                    [
+                        'farm_data_obat_code' => $obatCode,
+                        'sub_penjamin_id'     => $subPenjaminId,
+                    ],
+                    [
+                        'penjamin_id'         => $penjaminId,
+                        'harga_jual'          => $harga,
+                        'status'              => 1,
+                        'updated_at'          => now(),
+                        'created_at'          => now()
+                    ]
+                );
+            } else {
+                // Jika dinonaktifkan, Anda bisa menghapusnya dari database atau mengubah statusnya jadi 0
+                DB::table('farm_penjamin_obat')
+                    ->where('farm_data_obat_code', $obatCode)
+                    ->where('sub_penjamin_id', $subPenjaminId)
+                    ->update(['status' => 0, 'updated_at' => now()]);
+            }
+        }
+
+        return response()->json(['success' => true, 'message' => 'Pengaturan master harga obat berhasil disimpan!']);
+    }
+    public function master_data_farmasi_harga_obat_get(Request $request)
+    {
+        $subPenjaminId = $request->input('sub_penjamin_id');
+
+        // Mengambil data harga dan status aktif per kode obat
+        $pricesData = DB::table('farm_penjamin_obat')
+            ->where('sub_penjamin_id', $subPenjaminId)
+            ->select('farm_data_obat_code', 'harga_jual', 'status')
+            ->get()
+            ->keyBy('farm_data_obat_code');
+
+        return response()->json([
+            'prices' => $pricesData
+        ]);
+    }
 }

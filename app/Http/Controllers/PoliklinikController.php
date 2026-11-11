@@ -250,74 +250,138 @@ class PoliklinikController extends Controller
     public function data_registrasi_poli(Request $request, $akses, $id)
     {
         if ($this->url_akses_sub($akses, $id) == true) {
-            // Default rentang tanggal: Hari ini
-            $startDate = Carbon::today()->toDateString();
-            $endDate   = Carbon::today()->toDateString();
+            $startDate = $request->input('start_date', Carbon::today()->toDateString());
+            $endDate   = $request->input('end_date', Carbon::today()->toDateString());
 
-            // Parse jika input range tanggal dikirim (format: "YYYY-MM-DD to YYYY-MM-DD")
-            if ($request->filled('date_range')) {
-                $dates = explode(' to ', $request->date_range);
-                $startDate = $dates[0];
-                $endDate   = isset($dates[1]) ? $dates[1] : $dates[0];
-            }
-
-            // Ambil daftar dokter untuk pilihan dropdown filter
-            $doctors = DB::table('master_doctor')->select('master_doctor_code', 'master_doctor_name')->get();
-
-            // Query Pendaftaran Pasien
-            $query = DB::table('d_reg_order_poli')
-                ->join('d_reg_order', 'd_reg_order.d_reg_order_code', '=', 'd_reg_order_poli.d_reg_order_code')
-                ->join('master_patient', 'master_patient.master_patient_code', '=', 'd_reg_order.d_reg_order_rm')
-                ->join('master_doctor', 'master_doctor.master_doctor_code', '=', 'd_reg_order_poli.master_doctor_code')
-                ->join('m_poli', 'm_poli.m_poli_code', '=', 'd_reg_order_poli.m_poli_code')
-                ->where('d_reg_order.d_reg_order_cabang', Auth::user()->access_cabang)
-
-                // Filter Rentang Tanggal (between)
-                ->whereBetween(DB::raw('DATE(d_reg_order.d_reg_order_date)'), [$startDate, $endDate]);
-
-            // Filter Dokter spesifik (opsional)
-            if ($request->filled('doctor_code')) {
-                $query->where('master_doctor.master_doctor_code', $request->doctor_code);
-            }
-
-            $data = $query->select(
-                'd_reg_order_poli.*',
-                'd_reg_order.d_reg_order_rm',
-                'd_reg_order.d_reg_order_date',
-                'master_patient.master_patient_name',
-                'master_patient.master_patient_code',
-                'm_poli.m_poli_name as t_layanan_data_name',
-                'master_doctor.master_doctor_name',
-                'master_doctor.master_doctor_code'
-            )
-                ->orderBy('d_reg_order_poli.id_d_reg_order_poli', 'DESC')
+            // Mengambil data dropdown dokter dari tabel `medical_master_doctor`
+            $doctors = DB::table('medical_master_doctor')
+                ->where('is_active', 1)
+                ->select('id', 'nama_lengkap as master_doctor_name')
                 ->get();
 
+            $subPenjamins = DB::table('medical_sub_penjamin')->select('id', 'nama_sub_penjamin')->get();
+            $polis = DB::table('medical_master_poli')->where('is_active', 1)->select('id', 'nama_poli')->get();
+
             return view('application.poliklinik.data-registrasi-poliklinik', [
-                'data'      => $data,
-                'doctors'   => $doctors,
-                'startDate' => $startDate,
-                'endDate'   => $endDate,
-                'akses'     => $akses ?? null,
-                'code'      => $id
+                'doctors'       => $doctors,
+                'subPenjamins'  => $subPenjamins,
+                'polis'         => $polis,
+                'startDate'     => $startDate,
+                'endDate'       => $endDate,
+                'akses'         => $akses ?? null,
+                'code'          => $id
             ]);
         } else {
             return Redirect::to('dashboard/home');
         }
     }
+
+    // Route khusus untuk memuat data tabel secara asinkron (AJAX)
+    public function getDataPasienPoliJson(Request $request)
+    {
+        $startDate = $request->input('start_date', date('Y-m-d'));
+        $endDate   = $request->input('end_date', date('Y-m-d'));
+        $keyword   = $request->input('keyword');
+        $poliId    = $request->input('poli_id');
+        $dokter    = $request->input('dokter');
+        $subPenjId = $request->input('sub_penjamin_id');
+
+        $query = DB::table('medical_registrasi as reg')
+            ->join('medical_patient as p', 'p.id', '=', 'reg.pasien_id')
+            ->leftJoin('medical_transaksi as t', 't.registrasi_id', '=', 'reg.id')
+            ->leftJoin('medical_sub_penjamin as sp', 'sp.id', '=', 'reg.sub_penjamin_id')
+            ->leftJoin('user_mains as u', 'u.userid', '=', 'reg.user_id')
+            ->leftJoin('medical_master_poli as mmp', 'mmp.id', '=', 'reg.poli_id')
+            ->leftJoin('medical_master_doctor as doc_poli', 'doc_poli.id', '=', 'reg.doctor_poli_id')
+            ->leftJoin('medical_master_doctor as doc_pengirim', 'doc_pengirim.id', '=', 'reg.doctor_id')
+            ->whereBetween('reg.tanggal_registrasi', [$startDate . ' 00:00:00', $endDate . ' 23:59:59'])
+            ->select([
+                'reg.id',
+                'reg.no_registrasi',
+                'reg.tanggal_registrasi',
+                'reg.jenis_layanan',
+                'reg.janji_hasil',
+                'reg.metode_pengiriman',
+                'reg.status_kunjungan',
+                'mmp.nama_poli as poli_nama',
+                'doc_poli.nama_lengkap as dokter_poli_nama',
+                'doc_pengirim.nama_lengkap as dokter_pengirim_nama',
+                'p.nama as pasien_nama',
+                'p.pid as pasien_pid',
+                'sp.nama_sub_penjamin as agreement', // <--- Disamakan menjadi 'agreement' agar sesuai dengan script Blade
+                'u.username as petugas_nama',
+                't.total_tagihan',
+                't.status_pembayaran'
+            ]);
+
+        // Filter berdasarkan Keyword (No Reg / Nama Pasien / PID)
+        if (!empty($keyword)) {
+            $query->where(function ($q) use ($keyword) {
+                $q->where('reg.no_registrasi', 'like', "%{$keyword}%")
+                    ->orWhere('p.nama', 'like', "%{$keyword}%")
+                    ->orWhere('p.pid', 'like', "%{$keyword}%");
+            });
+        }
+
+        // Filter berdasarkan Poli
+        if (!empty($poliId)) {
+            $query->where('reg.poli_id', $poliId);
+        }
+
+        // Filter berdasarkan Dokter
+        if (!empty($dokter)) {
+            $query->where(function ($q) use ($dokter) {
+                $q->where('doc_poli.nama_lengkap', 'like', "%{$dokter}%")
+                    ->orWhere('doc_pengirim.nama_lengkap', 'like', "%{$dokter}%");
+            });
+        }
+
+        // Filter berdasarkan Sub Penjamin
+        if (!empty($subPenjId)) {
+            $query->where('reg.sub_penjamin_id', $subPenjId);
+        }
+
+        $data = $query->orderBy('reg.id', 'DESC')->get();
+
+        return response()->json([
+            'success' => true,
+            'data' => $data
+        ]);
+    }
     public function data_registrasi_poli_handling(Request $request)
     {
-        $data = DB::table('d_reg_order_poli')
-            ->join('d_reg_order', 'd_reg_order.d_reg_order_code', '=', 'd_reg_order_poli.d_reg_order_code')
-            ->join('master_patient', 'master_patient.master_patient_code', '=', 'd_reg_order.d_reg_order_rm')
-            ->where('d_reg_order_poli.d_reg_order_poli_code', $request->code)
+        // 1. Ambil data dari tabel medical_registrasi (pendaftaran baru)
+        $data = DB::table('medical_registrasi as reg')
+            ->join('medical_patient as p', 'reg.pasien_id', '=', 'p.id')
+            // Join opsional ke poli jika ingin menampilkan nama poli
+            ->leftJoin('medical_master_poli as poli', 'reg.poli_id', '=', 'poli.id')
+            ->select(
+                'reg.id as registrasi_id',
+                'reg.no_registrasi',
+                'reg.tanggal_registrasi',
+                'p.pid as master_patient_code',
+                'p.nama as master_patient_name',
+                'p.no_id as master_patient_nik',
+                'p.jk as master_patient_jk',
+                'p.tgl_lahir as master_patient_tgl_lahir',
+                'p.foto as master_patient_profile',
+                'poli.nama_poli'
+            )
+            ->where('reg.no_registrasi', $request->code)
             ->first();
+
+        if (!$data) {
+            return response()->json(['message' => 'Data Registrasi Tidak Ditemukan'], 404);
+        }
+
+        // 2. Ambil referensi form fisik & anamnesa (Tabel ini masih menggunakan tabel lama Anda)
         $fisik = DB::table('diag_poli_fisik_umum')->where('diag_poli_fisik_type', 'text')->get();
         $fisik1 = DB::table('diag_poli_fisik_umum')->where('diag_poli_fisik_type', 'textarea')->get();
+
         return view('application.poliklinik.data-registrasi.form-handling', [
-            'data' => $data,
-            'code' => $request->code,
-            'fisik' => $fisik,
+            'data'   => $data,
+            'code'   => $request->code,
+            'fisik'  => $fisik,
             'fisik1' => $fisik1
         ]);
     }
@@ -356,33 +420,69 @@ class PoliklinikController extends Controller
         return '<span class="badge bg-primary">Done</span>';
     }
     // POLIKLINIK HANDLING
-    public function data_registrasi_poliklinik_handling($akses, $id)
+    public function data_registrasi_poliklinik_handling(Request $request, $akses, $id = null)
     {
+        // Validasi hak akses
         if ($this->url_akses_sub($akses, $id) == true) {
-            $data = DB::table('d_reg_order_poli')
-                ->select(
-                    'd_reg_order_poli.*',
-                    'd_reg_order.*',
-                    'master_patient.*',
-                    'master_doctor.*',
-                    'm_poli.*'
-                )
-                ->join('d_reg_order', 'd_reg_order.d_reg_order_code', '=', 'd_reg_order_poli.d_reg_order_code')
-                ->join('master_patient', 'master_patient.master_patient_code', '=', 'd_reg_order.d_reg_order_rm')
-                // Join langsung ke master_doctor menggunakan master_doctor_code
-                ->join('master_doctor', 'master_doctor.master_doctor_code', '=', 'd_reg_order_poli.master_doctor_code')
-                // Join ke m_doctor_poli berdasarkan master_doctor_code (jika masih membutuhkan data poli/layanan dokter)
-                ->join('m_poli_doctor', 'm_poli_doctor.master_doctor_code', '=', 'master_doctor.master_doctor_code')
-                ->join('m_poli', 'm_poli.m_poli_code', '=', 'm_poli_doctor.m_poli_code')
-                ->where('d_reg_order.d_reg_order_cabang', Auth::user()->access_cabang)
-                ->where('d_reg_order_poli.d_reg_order_poli_status', '=', '1')
 
-                ->get();
-            // dd($data);
+            // Inisialisasi Query dengan relasi ke tabel dokter terbaru
+            $query = DB::table('medical_registrasi as reg')
+                ->select(
+                    'reg.id as registrasi_id',
+                    'reg.no_registrasi',
+                    'reg.tanggal_registrasi',
+                    'reg.status_kunjungan',
+                    'p.pid as master_patient_code',
+                    'p.nama as master_patient_name',
+                    'poli.nama_poli as m_poli_name',
+                    'doc.nama_lengkap as master_doctor_name' // Disesuaikan dengan tabel medical_master_doctor
+                )
+                ->join('medical_patient as p', 'p.id', '=', 'reg.pasien_id')
+                ->leftJoin('medical_master_poli as poli', 'poli.id', '=', 'reg.poli_id')
+                ->leftJoin('medical_master_doctor as doc', 'doc.id', '=', 'reg.doctor_poli_id') // Relasi dokter pemeriksa
+                ->where('reg.jenis_layanan', 'RAWAT_JALAN')
+                ->whereIn('reg.status_kunjungan', ['MENUNGGU', 'PROSES']);
+
+            // ==========================================
+            // FILTER HANDLING
+            // ==========================================
+            // 1. Filter Range Tanggal
+            if ($request->filled('start_date') && $request->filled('end_date')) {
+                $query->whereBetween(DB::raw('DATE(reg.tanggal_registrasi)'), [$request->start_date, $request->end_date]);
+            } elseif ($request->filled('start_date')) {
+                $query->whereDate('reg.tanggal_registrasi', '>=', $request->start_date);
+            } elseif ($request->filled('end_date')) {
+                $query->whereDate('reg.tanggal_registrasi', '<=', $request->end_date);
+            } else {
+                // Default tampilkan hari ini
+                $query->whereDate('reg.tanggal_registrasi', date('Y-m-d'));
+            }
+
+            // 2. Filter Poliklinik
+            if ($request->filled('poli_id')) {
+                $query->where('reg.poli_id', $request->poli_id);
+            }
+
+            // 3. Filter No Registrasi / Nama / RM
+            if ($request->filled('search_query')) {
+                $query->where(function ($q) use ($request) {
+                    $q->where('reg.no_registrasi', 'like', '%' . $request->search_query . '%')
+                        ->orWhere('p.nama', 'like', '%' . $request->search_query . '%')
+                        ->orWhere('p.pid', 'like', '%' . $request->search_query . '%');
+                });
+            }
+
+            $data = $query->orderBy('reg.tanggal_registrasi', 'asc')->get();
+
+            // Ambil daftar poliklinik untuk dropdown filter
+            $polis = DB::table('medical_master_poli')->get();
+
             return view('application.poliklinik.poliklinik-handling', [
                 'data' => $data,
+                'polis' => $polis,
                 'akses' => $akses,
-                'code' => $id
+                'code' => $id,
+                'request' => $request
             ]);
         } else {
             return Redirect::to('dashboard/home');
@@ -390,70 +490,275 @@ class PoliklinikController extends Controller
     }
     public function data_registrasi_poliklinik_handling_detail(Request $request)
     {
-        // 1. Validasi input request
-        $request->validate([
-            'code' => 'required|string'
-        ]);
+        $request->validate(['code' => 'required|string']);
 
-        // 2. Query Utama: Mengambil data Registrasi, Pasien, Poli, dan Dokter
-        $data = DB::table('d_reg_order_poli')
-            ->join('d_reg_order', 'd_reg_order.d_reg_order_code', '=', 'd_reg_order_poli.d_reg_order_code')
-            ->join('master_patient', 'master_patient.master_patient_code', '=', 'd_reg_order.d_reg_order_rm')
-            ->leftJoin('m_poli', 'm_poli.m_poli_code', '=', 'd_reg_order_poli.m_poli_code')
-            ->leftJoin('m_poli_doctor', 'm_poli_doctor.m_poli_code', '=', 'd_reg_order_poli.m_poli_code')
-            ->leftJoin('master_doctor', 'master_doctor.master_doctor_code', '=', 'm_poli_doctor.master_doctor_code')
-            ->where('d_reg_order.d_reg_order_code', $request->code)
+        // 1. Query Utama Pasien & Registrasi (Termasuk template & menu_aktif)
+        $data = DB::table('medical_registrasi as reg')
+            ->join('medical_patient as p', 'p.id', '=', 'reg.pasien_id')
+            ->leftJoin('medical_master_poli as poli', 'poli.id', '=', 'reg.poli_id')
+            ->leftJoin('medical_master_doctor as doc', 'doc.id', '=', 'reg.doctor_poli_id')
+            ->leftJoin('medical_poli_template_setting as tpl', 'tpl.poli_id', '=', 'poli.id')
+            ->leftJoin('medical_sub_penjamin as sp', 'sp.id', '=', 'reg.sub_penjamin_id')
+            ->leftJoin('medical_penjamin as pj', 'pj.id', '=', 'sp.penjamin_id')
+            ->where('reg.no_registrasi', $request->code)
             ->select(
-                // Pilih kolom secara spesifik agar tidak saling tumpang tindih
-                'd_reg_order_poli.d_reg_order_poli_code',
-                'd_reg_order_poli.d_reg_order_poli_date',
-                'd_reg_order_poli.d_reg_order_poli_status',
-                'd_reg_order_poli.d_reg_order_poli_queue',
-                'd_reg_order_poli.payment_method',
-                'd_reg_order_poli.insurance_no',
-                'd_reg_order.d_reg_order_code',
-                'master_patient.master_patient_code',
-                'master_patient.master_patient_name',
-                'master_patient.master_patient_nik',
-                'master_patient.master_patient_tgl_lahir',
-                'master_patient.master_patient_jk',
-                'master_patient.master_patient_tempat_lahir',
-                'master_patient.master_patient_agama',
-                'master_patient.master_patient_no_hp',
-                'master_patient.master_patient_email',
-                'master_patient.master_patient_profile',
-                'm_poli.m_poli_code',
-                'm_poli.m_poli_name',
-                'master_doctor.master_doctor_name',
-                'master_doctor.master_doctor_title_f',
-                'master_doctor.master_doctor_title_e'
+                'reg.id as registrasi_id',
+                'reg.no_registrasi',
+                'reg.sub_penjamin_id',
+                'pj.nama_penjamin',
+                'sp.nama_sub_penjamin',
+                'p.pid as master_patient_code',
+                'p.nama as master_patient_name',
+                'p.tgl_lahir as master_patient_tgl_lahir',
+                'p.jk as master_patient_jk',
+                'p.foto as master_patient_profile',
+                'poli.nama_poli as m_poli_name',
+                'doc.nama_lengkap as master_doctor_name',
+                'tpl.jenis_template',
+                'tpl.menu_aktif',
+                'tpl.keterangan as instruksi_poli'
             )
             ->first();
 
-        // 3. Jika data tidak ditemukan
         if (!$data) {
-            return response()->json([
-                'status'  => 'error',
-                'message' => 'Data registrasi pasien tidak ditemukan.'
-            ], 404);
+            return '<div class="card-retro bg-danger p-4 text-center"><h4 class="text-white fw-bolder">Data Registrasi Tidak Ditemukan!</h4></div>';
         }
 
-        // 4. Query Poli (diambil langsung dari $data atau query terpisah ke m_poli)
-        $poli = DB::table('d_reg_order_poli')
-            ->join('m_poli', 'm_poli.m_poli_code', '=', 'd_reg_order_poli.m_poli_code')
-            ->where('d_reg_order_poli.d_reg_order_code', $request->code)
-            ->select('m_poli.*')
+        // CEK APAKAH TEMPLATE POLI SUDAH DISETTING ATAU BELUM
+        if (empty($data->jenis_template)) {
+            return '
+            <div class="modal-body p-4 text-center" style="background-color: #f4f0ea;">
+                <div class="card p-4 border-3 border-dark" style="border-radius: 12px; box-shadow: 4px 4px 0px #1e1e24; background-color: #fff;">
+                    <div class="text-warning mb-3"><i class="fas fa-exclamation-triangle fa-3x"></i></div>
+                    <h4 class="fw-bolder text-dark">Template Poliklinik Belum Dikonfigurasi!</h4>
+                    <p class="text-muted fw-bold mt-2">Poliklinik <strong>' . ($data->m_poli_name ?? 'Poli Ini') . '</strong> belum memiliki setting jenis template dan menu form. Silakan lakukan pengaturan terlebih dahulu pada menu <em>Master Setting Template Poliklinik</em>.</p>
+                    <button type="button" class="btn btn-secondary btn-sm fw-bold px-4 mt-3 border-dark" data-bs-dismiss="modal">Tutup</button>
+                </div>
+            </div>';
+        }
+
+        $template_type = $data->jenis_template;
+
+        // Decode menu_aktif JSON menjadi Array
+        $menu_aktif = [];
+        if (!empty($data->menu_aktif)) {
+            $menu_aktif = json_decode($data->menu_aktif, true) ?? [];
+        } else {
+            // Fallback jika template ada tapi menu aktif belum dicentang
+            $menu_aktif = ['anamnesa', 'vital_sign', 'odontogram', 'tindakan', 'resep', 'diagnosa'];
+        }
+
+        // 2. Ambil Riwayat Pemeriksaan SOAP / Odontogram
+        $existing_soap = DB::table('medical_poli_soap')
+            ->where('registrasi_id', $data->registrasi_id)
             ->first();
 
-        // 5. Master kategori layanan
-        $layanan = DB::table('t_layanan_cat')->get();
+        // 3. Ambil Riwayat Anamnesa Terpisah
+        $existing_anamnesa = DB::table('medical_poli_anamnesa')
+            ->where('registrasi_id', $data->registrasi_id)
+            ->first();
+
+        // 4. Ambil Riwayat Vital Sign Terpisah
+        $existing_vs = DB::table('medical_poli_vital_sign')
+            ->where('registrasi_id', $data->registrasi_id)
+            ->first();
+
+        // 5. Ambil Daftar Order Tindakan
+        $existing_tindakan = DB::table('medical_poli_tindakan as pt')
+            ->join('medical_master_pemeriksaan as mp', 'mp.id', '=', 'pt.master_pemeriksaan_id')
+            ->join('medical_tipe_layanan as tl', 'tl.id', '=', 'mp.tipe_layanan_id')
+            ->where('pt.registrasi_id', $data->registrasi_id)
+            ->select('mp.id', 'mp.nama_layanan', 'tl.nama_tipe as kategori_tindakan', 'pt.tarif')
+            ->get();
+
+        // 6. Ambil Daftar Resep Obat
+        $existing_resep = DB::table('medical_poli_resep as pr')
+            ->join('farm_data_obat as obat', 'obat.farm_data_obat_code', '=', 'pr.farm_data_obat_code')
+            ->where('pr.registrasi_id', $data->registrasi_id)
+            ->select('obat.farm_data_obat_code', 'obat.farm_data_obat_name', 'obat.farm_data_obat_satuan', 'pr.qty', 'pr.signa', 'pr.harga')
+            ->get();
+
+        // 7. Query Master Pemeriksaan untuk Dropdown Order Baru
+        $daftar_tindakan = DB::table('medical_master_pemeriksaan as mp')
+            ->join('medical_tipe_layanan as tl', 'tl.id', '=', 'mp.tipe_layanan_id')
+            ->leftJoin('medical_penjamin_pemeriksaan as mpp', function ($join) use ($data) {
+                $join->on('mpp.master_pemeriksaan_id', '=', 'mp.id')
+                    ->where('mpp.sub_penjamin_id', '=', $data->sub_penjamin_id);
+            })
+            ->where('mp.is_active', true)
+            ->select(
+                'mp.id',
+                'mp.nama_layanan',
+                'tl.nama_tipe as kategori_tindakan',
+                DB::raw('(mp.harga - COALESCE(mpp.diskon, 0)) as harga_akhir')
+            )
+            ->get();
+
+        // 8. Query Master Obat untuk Dropdown Resep Baru
+        $daftar_obat = DB::table('farm_data_obat as obat')
+            ->join('farm_penjamin_obat as fpo', 'fpo.farm_data_obat_code', '=', 'obat.farm_data_obat_code')
+            ->where('fpo.sub_penjamin_id', $data->sub_penjamin_id)
+            ->where('fpo.status', 1)
+            ->select(
+                'obat.farm_data_obat_code',
+                'obat.farm_data_obat_name',
+                'obat.farm_data_obat_satuan',
+                'obat.farm_data_obat_stok',
+                'fpo.harga_jual'
+            )
+            ->get();
+
+        $fisik = DB::table('diag_poli_fisik_umum')->where('diag_poli_fisik_type', 'text')->get();
+        $fisik1 = DB::table('diag_poli_fisik_umum')->where('diag_poli_fisik_type', 'textarea')->get();
 
         return view('application.poliklinik.poliklinik-handling.form-handling', [
-            'data'    => $data,
-            'poli'    => $poli,
-            'layanan' => $layanan,
-            'code'    => $request->code
+            'data'              => $data,
+            'code'              => $request->code,
+            'template_type'     => $template_type,
+            'menu_aktif'        => $menu_aktif,
+            'fisik'             => $fisik,
+            'fisik1'            => $fisik1,
+            'daftar_tindakan'   => $daftar_tindakan,
+            'daftar_obat'       => $daftar_obat,
+            'existing_soap'     => $existing_soap,
+            'existing_anamnesa' => $existing_anamnesa,
+            'existing_vs'       => $existing_vs,
+            'existing_tindakan' => $existing_tindakan,
+            'existing_resep'    => $existing_resep
         ]);
+    }
+    public function store_handling_medis(Request $request)
+    {
+        $request->validate([
+            'no_registrasi'  => 'required|string',
+            'jenis_template' => 'required|string',
+            'diagnosa_akhir' => 'required|string',
+        ]);
+
+        DB::beginTransaction();
+        try {
+            $registrasi = DB::table('medical_registrasi')
+                ->where('no_registrasi', $request->no_registrasi)
+                ->first();
+
+            if (!$registrasi) {
+                return response()->json(['success' => false, 'message' => 'Registrasi tidak ditemukan.'], 404);
+            }
+
+            // 1. Data Spesifik Poli (Odontogram dll)
+            $dataSpesifik = null;
+            if ($request->jenis_template === 'GIGI') {
+                $dataSpesifik = [
+                    'gigi_status'  => $request->gigi ?? [],
+                    'gigi_catatan' => $request->catatan_gigi ?? [],
+                    'kalkulus'     => $request->gigi_kalkulus ?? 'TIDAK_ADA'
+                ];
+            }
+
+            // 2. Simpan SOAP (Update jika sudah ada, Insert jika belum)
+            DB::table('medical_poli_soap')->updateOrInsert(
+                ['registrasi_id' => $registrasi->id],
+                [
+                    'subjektif'          => $request->keluhan_utama ?? $request->subjektif ?? null,
+                    'objektif'           => $request->pemeriksaan_fisik ?? $request->objektif ?? null,
+                    'asesmen'            => $request->diagnosa_akhir,
+                    'planning'           => 'Pemberian resep & tindakan medis',
+                    'data_spesifik_poli' => $dataSpesifik ? json_encode($dataSpesifik) : null,
+                    'input_by'           => auth()->user()->name ?? 'Dokter Poli',
+                    'status_verifikasi'  => 'Pending',
+                    'updated_at'         => now(),
+                    'created_at'         => now()
+                ]
+            );
+            // 1. Simpan / Update Anamnesa Lengkap
+            DB::table('medical_poli_anamnesa')->updateOrInsert(
+                ['registrasi_id' => $registrasi->id],
+                [
+                    'keluhan_utama'             => $request->keluhan_utama,
+                    'riwayat_penyakit_sekarang' => $request->riwayat_penyakit_sekarang,
+                    'riwayat_penyakit_dahulu'   => $request->riwayat_penyakit_dahulu,
+                    'riwayat_penyakit_keluarga' => $request->riwayat_penyakit_keluarga,
+                    'riwayat_alergi'            => $request->riwayat_alergi,
+                    'riwayat_penggunaan_obat'   => $request->riwayat_penggunaan_obat,
+                    'input_by'                  => auth()->user()->name ?? 'Dokter Poli',
+                    'updated_at'                => now(),
+                    'created_at'                => now()
+                ]
+            );
+
+            // 2. Simpan / Update Vital Sign & Fisik Umum
+            DB::table('medical_poli_vital_sign')->updateOrInsert(
+                ['registrasi_id' => $registrasi->id],
+                [
+                    'kesadaran'               => $request->kesadaran,
+                    'tekanan_darah'           => $request->tekanan_darah,
+                    'nadi'                    => $request->nadi,
+                    'suhu'                    => $request->suhu,
+                    'pernapasan'              => $request->pernapasan,
+                    'saturasi_o2'             => $request->saturasi_o2,
+                    'berat_badan'             => $request->berat_badan,
+                    'tinggi_badan'            => $request->tinggi_badan,
+                    'pemeriksaan_fisik_lain'  => $request->pemeriksaan_fisik_lain,
+                    'input_by'                => auth()->user()->name ?? 'Dokter Poli',
+                    'updated_at'              => now(),
+                    'created_at'              => now()
+                ]
+            );
+
+            // 3. Update Order Tindakan (Hapus yang lama, masukkan yang baru dari form)
+            DB::table('medical_poli_tindakan')->where('registrasi_id', $registrasi->id)->delete();
+            if ($request->has('order_pemeriksaan_id')) {
+                for ($i = 0; $i < count($request->order_pemeriksaan_id); $i++) {
+                    DB::table('medical_poli_tindakan')->insert([
+                        'registrasi_id'         => $registrasi->id,
+                        'master_pemeriksaan_id' => $request->order_pemeriksaan_id[$i],
+                        'tarif'                 => $request->order_tarif[$i] ?? 0,
+                        'jumlah'                => 1,
+                        'input_by'              => auth()->user()->name ?? 'Dokter Poli',
+                        'status_verifikasi'     => 'Pending',
+                        'created_at'            => now(),
+                        'updated_at'            => now()
+                    ]);
+                }
+            }
+
+            // 4. Update E-Resep (Hapus yang lama, masukkan yang baru dari form)
+            DB::table('medical_poli_resep')->where('registrasi_id', $registrasi->id)->delete();
+            if ($request->has('resep_obat_code')) {
+                $noResep = 'RSP-' . date('Ymd') . '-' . rand(1000, 9999);
+
+                for ($i = 0; $i < count($request->resep_obat_code); $i++) {
+                    DB::table('medical_poli_resep')->insert([
+                        'registrasi_id'         => $registrasi->id,
+                        'transaksi_id'          => null,
+                        'no_resep'              => $noResep,
+                        'farm_data_obat_code'   => $request->resep_obat_code[$i],
+                        'qty'                   => $request->resep_jumlah[$i],
+                        'harga'                 => $request->resep_harga[$i],
+                        'signa'                 => $request->resep_signa[$i],
+                        'input_by'              => auth()->user()->name ?? 'Dokter Poli',
+                        'status_verifikasi'     => 'Pending',
+                        'status_pembayaran'     => 'BELUM LUNAS',
+                        'created_at'            => now(),
+                        'updated_at'            => now()
+                    ]);
+                }
+            }
+
+            DB::commit();
+            DB::table('medical_registrasi')
+                ->where('no_registrasi', $request->no_registrasi)->update(['status_kunjungan' => 'PROSES']);
+            return response()->json([
+                'success' => true,
+                'message' => 'Hasil pemeriksaan berhasil diperbarui dan disimpan!'
+            ]);
+        } catch (\Exception $e) {
+            DB::rollBack();
+            return response()->json([
+                'success' => false,
+                'message' => 'Terjadi kesalahan sistem: ' . $e->getMessage()
+            ], 500);
+        }
     }
     public function data_registrasi_poliklinik_handling_order_layanan(Request $request)
     {
@@ -652,24 +957,385 @@ class PoliklinikController extends Controller
     }
 
     // POLIKLINIK VERIFIKASI DOKTER
-    public function verifikasi_poliklinik_dokter($akses, $id)
+    public function verifikasi_poliklinik_dokter(Request $request, $akses, $id = null)
     {
         if ($this->url_akses_sub($akses, $id) == true) {
-            $data = DB::table('d_reg_order_poli')
-                ->join('d_reg_order', 'd_reg_order.d_reg_order_code', '=', 'd_reg_order_poli.d_reg_order_code')
-                ->join('master_patient', 'master_patient.master_patient_code', '=', 'd_reg_order.d_reg_order_rm')
-                ->join('m_doctor_poli', 'm_doctor_poli.m_doctor_poli_code', '=', 'd_reg_order_poli.m_doctor_poli_code')
-                ->join('t_layanan_data', 't_layanan_data.t_layanan_data_code', '=', 'm_doctor_poli.t_layanan_data_code')
-                ->join('master_doctor', 'master_doctor.master_doctor_code', '=', 'm_doctor_poli.master_doctor_code')
-                ->where('d_reg_order.d_reg_order_cabang', Auth::user()->access_cabang)
-                ->where('d_reg_order_poli.d_reg_order_poli_status', 2)->get();
+
+            $query = DB::table('medical_registrasi as reg')
+                ->select(
+                    'reg.id as registrasi_id',
+                    'reg.no_registrasi',
+                    'reg.tanggal_registrasi',
+                    'reg.status_kunjungan',
+                    'p.pid as master_patient_code',
+                    'p.nama as master_patient_name',
+                    'poli.nama_poli as m_poli_name',
+                    'doc.nama_lengkap as master_doctor_name',
+                    'soap.status_verifikasi as status_verifikasi_dokter' // Mengambil status dari tabel SOAP poli
+                )
+                ->join('medical_patient as p', 'p.id', '=', 'reg.pasien_id')
+                ->leftJoin('medical_master_poli as poli', 'poli.id', '=', 'reg.poli_id')
+                ->leftJoin('medical_master_doctor as doc', 'doc.id', '=', 'reg.doctor_poli_id')
+                ->leftJoin('medical_poli_soap as soap', 'soap.registrasi_id', '=', 'reg.id') // Join ke tabel SOAP poli
+                ->where('reg.jenis_layanan', 'RAWAT_JALAN')
+                ->where('reg.status_kunjungan', 'PROSES');
+
+            // Filter Tanggal (Default Hari Ini)
+            if ($request->filled('start_date') && $request->filled('end_date')) {
+                $query->whereBetween(DB::raw('DATE(reg.tanggal_registrasi)'), [$request->start_date, $request->end_date]);
+            } else {
+                $query->whereDate('reg.tanggal_registrasi', date('Y-m-d'));
+            }
+
+            $data = $query->orderBy('reg.tanggal_registrasi', 'asc')->get();
+
             return view('application.poliklinik.verifikasi-dokter-poliklinik', [
                 'akses' => $akses,
                 'code' => $id,
-                'data' => $data
+                'data' => $data,
+                'request' => $request
             ]);
         } else {
             return Redirect::to('dashboard/home');
+        }
+    }
+    public function verifikasi_poliklinik_dokter_detail(Request $request)
+    {
+        $request->validate(['code' => 'required|string']);
+
+        // 1. Query Utama Pasien & Registrasi
+        $data = DB::table('medical_registrasi as reg')
+            ->join('medical_patient as p', 'p.id', '=', 'reg.pasien_id')
+            ->leftJoin('medical_master_poli as poli', 'poli.id', '=', 'reg.poli_id')
+            ->leftJoin('medical_master_doctor as doc', 'doc.id', '=', 'reg.doctor_poli_id')
+            ->leftJoin('medical_poli_template_setting as tpl', 'tpl.poli_id', '=', 'poli.id')
+            ->leftJoin('medical_sub_penjamin as sp', 'sp.id', '=', 'reg.sub_penjamin_id')
+            ->leftJoin('medical_penjamin as pj', 'pj.id', '=', 'sp.penjamin_id')
+            ->where('reg.no_registrasi', $request->code)
+            ->select(
+                'reg.id as registrasi_id',
+                'reg.no_registrasi',
+                'reg.sub_penjamin_id',
+                'pj.nama_penjamin',
+                'sp.nama_sub_penjamin',
+                'p.pid as master_patient_code',
+                'p.nama as master_patient_name',
+                'p.tgl_lahir as master_patient_tgl_lahir',
+                'p.jk as master_patient_jk',
+                'p.foto as master_patient_profile',
+                'poli.nama_poli as m_poli_name',
+                'doc.nama_lengkap as master_doctor_name',
+                'tpl.jenis_template',
+                'tpl.menu_aktif',
+                'tpl.keterangan as instruksi_poli'
+            )
+            ->first();
+
+        if (!$data) {
+            return '<div class="card-retro bg-danger p-4 text-center"><h4 class="text-white fw-bolder">Data Registrasi Tidak Ditemukan!</h4></div>';
+        }
+
+        $template_type = $data->jenis_template ?? 'UMUM';
+
+        $menu_aktif = [];
+        if (!empty($data->menu_aktif)) {
+            $menu_aktif = json_decode($data->menu_aktif, true) ?? [];
+        } else {
+            $menu_aktif = ['anamnesa', 'vital_sign', 'odontogram', 'tindakan', 'resep', 'diagnosa'];
+        }
+
+        // 2. Ambil Riwayat SOAP / Diagnosa
+        $existing_soap = DB::table('medical_poli_soap')
+            ->where('registrasi_id', $data->registrasi_id)
+            ->first();
+
+        // 3. Ambil Riwayat Anamnesa
+        $existing_anamnesa = DB::table('medical_poli_anamnesa')
+            ->where('registrasi_id', $data->registrasi_id)
+            ->first();
+
+        // 4. Ambil Riwayat Vital Sign
+        $existing_vs = DB::table('medical_poli_vital_sign')
+            ->where('registrasi_id', $data->registrasi_id)
+            ->first();
+
+        // 5. Ambil Daftar Tindakan Tersimpan
+        $existing_tindakan = DB::table('medical_poli_tindakan as pt')
+            ->join('medical_master_pemeriksaan as mp', 'mp.id', '=', 'pt.master_pemeriksaan_id')
+            ->join('medical_tipe_layanan as tl', 'tl.id', '=', 'mp.tipe_layanan_id')
+            ->where('pt.registrasi_id', $data->registrasi_id)
+            ->select('mp.id', 'mp.nama_layanan', 'tl.nama_tipe as kategori_tindakan', 'pt.tarif')
+            ->get();
+
+        // 6. Ambil Daftar Resep Obat Tersimpan
+        $existing_resep = DB::table('medical_poli_resep as pr')
+            ->join('farm_data_obat as obat', 'obat.farm_data_obat_code', '=', 'pr.farm_data_obat_code')
+            ->where('pr.registrasi_id', $data->registrasi_id)
+            ->select('obat.farm_data_obat_code', 'obat.farm_data_obat_name', 'obat.farm_data_obat_satuan', 'pr.qty', 'pr.signa', 'pr.harga')
+            ->get();
+
+        // 7. Master Tindakan & Obat (untuk opsi dropdown jika diperlukan edit saat verifikasi)
+        $daftar_tindakan = DB::table('medical_master_pemeriksaan as mp')
+            ->join('medical_tipe_layanan as tl', 'tl.id', '=', 'mp.tipe_layanan_id')
+            ->leftJoin('medical_penjamin_pemeriksaan as mpp', function ($join) use ($data) {
+                $join->on('mpp.master_pemeriksaan_id', '=', 'mp.id')
+                    ->where('mpp.sub_penjamin_id', '=', $data->sub_penjamin_id);
+            })
+            ->where('mp.is_active', true)
+            ->select('mp.id', 'mp.nama_layanan', 'tl.nama_tipe as kategori_tindakan', DB::raw('(mp.harga - COALESCE(mpp.diskon, 0)) as harga_akhir'))
+            ->get();
+
+        $daftar_obat = DB::table('farm_data_obat as obat')
+            ->join('farm_penjamin_obat as fpo', 'fpo.farm_data_obat_code', '=', 'obat.farm_data_obat_code')
+            ->where('fpo.sub_penjamin_id', $data->sub_penjamin_id)
+            ->where('fpo.status', 1)
+            ->select('obat.farm_data_obat_code', 'obat.farm_data_obat_name', 'obat.farm_data_obat_satuan', 'obat.farm_data_obat_stok', 'fpo.harga_jual')
+            ->get();
+
+        return view('application.poliklinik.verifikasi-poli.form-verifikasi-preview', [
+            'data'              => $data,
+            'code'              => $request->code,
+            'template_type'     => $template_type,
+            'menu_aktif'        => $menu_aktif,
+            'daftar_tindakan'   => $daftar_tindakan,
+            'daftar_obat'       => $daftar_obat,
+            'existing_soap'     => $existing_soap,
+            'existing_anamnesa' => $existing_anamnesa,
+            'existing_vs'       => $existing_vs,
+            'existing_tindakan' => $existing_tindakan,
+            'existing_resep'    => $existing_resep
+        ]);
+    }
+    public function verifikasi_poliklinik_dokter_save_verify(Request $request)
+    {
+        $request->validate(['code' => 'required|string']);
+
+        try {
+            DB::beginTransaction();
+
+            // 1. Ambil Data Registrasi
+            $registrasi = DB::table('medical_registrasi')
+                ->where('no_registrasi', $request->code)
+                ->first();
+
+            if (!$registrasi) {
+                return response()->json(['success' => false, 'message' => 'Data registrasi tidak ditemukan.']);
+            }
+
+            // 2. Update status verifikasi langsung pada tabel medical_poli_soap
+            DB::table('medical_poli_soap')
+                ->where('registrasi_id', $registrasi->id)
+                ->update([
+                    'status_verifikasi' => 'Verified',
+                    'updated_at'        => now()
+                ]);
+
+            // 3. Ambil ID Transaksi Utama (Kasir)
+            $transaksi = DB::table('medical_transaksi')->where('registrasi_id', $registrasi->id)->first();
+
+            if (!$transaksi) {
+                $transaksiId = DB::table('medical_transaksi')->insertGetId([
+                    'registrasi_id'     => $registrasi->id,
+                    'total_tagihan'     => 0,
+                    'total_bayar'       => 0,
+                    'sisa_tagihan'      => 0,
+                    'metode_bayar'      => 'CASH',
+                    'status_pembayaran' => 'BELUM LUNAS',
+                    'created_at'        => now(),
+                    'updated_at'        => now(),
+                ]);
+            } else {
+                $transaksiId = $transaksi->id;
+            }
+
+            $akumulasiSelisihTagihan = 0; // Untuk melacak naik/turunnya tagihan kasir
+            $tanggalFormat = date('dmy');
+
+            // =================================================================================
+            // TAHAP 1: CLEAN UP (Hapus tagihan di kasir jika dokter membatalkan/menghapus item)
+            // =================================================================================
+
+            // Bersihkan Tindakan Poli yang sudah tidak ada
+            $orphanedTindakan = DB::table('medical_transaksi_detail')
+                ->where('transaksi_id', $transaksiId)
+                ->where('sumber_tagihan', 'POLI_TINDAKAN')
+                ->where('status_pembayaran', 'BELUM LUNAS') // Hanya hapus jika belum dibayar
+                ->whereNotIn('sumber_id', function ($q) use ($registrasi) {
+                    $q->select('id')->from('medical_poli_tindakan')->where('registrasi_id', $registrasi->id);
+                })->get();
+
+            foreach ($orphanedTindakan as $ot) {
+                $akumulasiSelisihTagihan -= $ot->harga_akhir; // Kurangi tagihan
+                DB::table('medical_transaksi_detail')->where('id', $ot->id)->delete();
+            }
+
+            // Bersihkan Resep Obat yang sudah tidak ada
+            $orphanedResep = DB::table('medical_transaksi_detail')
+                ->where('transaksi_id', $transaksiId)
+                ->where('sumber_tagihan', 'POLI_RESEP')
+                ->where('status_pembayaran', 'BELUM LUNAS')
+                ->whereNotIn('sumber_id', function ($q) use ($registrasi) {
+                    $q->select('id')->from('medical_poli_resep')->where('registrasi_id', $registrasi->id);
+                })->get();
+
+            foreach ($orphanedResep as $or) {
+                $akumulasiSelisihTagihan -= $or->harga_akhir; // Kurangi tagihan
+                DB::table('medical_transaksi_detail')->where('id', $or->id)->delete();
+            }
+
+            // =================================================================================
+            // TAHAP 2: SINKRONISASI TINDAKAN POLI
+            // =================================================================================
+
+            $tindakanPoli = DB::table('medical_poli_tindakan')
+                ->where('registrasi_id', $registrasi->id)
+                ->get(); // Ambil semua untuk dicek ulang
+
+            foreach ($tindakanPoli as $tind) {
+                $detailKasir = DB::table('medical_transaksi_detail')
+                    ->where('transaksi_id', $transaksiId)
+                    ->where('sumber_tagihan', 'POLI_TINDAKAN')
+                    ->where('sumber_id', $tind->id)
+                    ->first();
+
+                if (!$detailKasir) {
+                    // JIKA BELUM ADA: INSERT BARU
+                    $master = DB::table('medical_master_pemeriksaan as mp')
+                        ->leftJoin('medical_tipe_layanan as tl', 'mp.tipe_layanan_id', '=', 'tl.id')
+                        ->select('mp.nama_layanan', 'tl.prefix')
+                        ->where('mp.id', $tind->master_pemeriksaan_id)
+                        ->first();
+
+                    $prefix = strtoupper($master->prefix ?? 'ORD');
+                    $lastOrder = DB::table('medical_transaksi_detail')
+                        ->where('no_pemeriksaan', 'like', "{$prefix}{$tanggalFormat}%")
+                        ->orderBy('id', 'desc')->first();
+
+                    $noUrutOrder = $lastOrder ? (int) substr($lastOrder->no_pemeriksaan, -4) + 1 : 1;
+                    $noPemeriksaanBaru = $prefix . $tanggalFormat . str_pad($noUrutOrder, 4, '0', STR_PAD_LEFT);
+
+                    DB::table('medical_transaksi_detail')->insert([
+                        'transaksi_id'          => $transaksiId,
+                        'jenis_item'            => 'TINDAKAN',
+                        'nama_item'             => $master->nama_layanan ?? 'Tindakan Poli',
+                        'master_pemeriksaan_id' => $tind->master_pemeriksaan_id,
+                        'farm_data_obat_code'   => null,
+                        'sumber_tagihan'        => 'POLI_TINDAKAN',
+                        'sumber_id'             => $tind->id,
+                        'no_pemeriksaan'        => $noPemeriksaanBaru,
+                        'qty'                   => 1,
+                        'harga_dasar'           => $tind->tarif,
+                        'harga_akhir'           => $tind->tarif,
+                        'status_pemeriksaan'    => 'MENUNGGU',
+                        'status_pembayaran'     => 'BELUM LUNAS',
+                        'created_at'            => now(),
+                        'updated_at'            => now(),
+                    ]);
+
+                    $akumulasiSelisihTagihan += $tind->tarif;
+                } else {
+                    // JIKA SUDAH ADA & BELUM LUNAS: UPDATE JIKA ADA PERUBAHAN HARGA
+                    if ($detailKasir->status_pembayaran == 'BELUM LUNAS' && $detailKasir->harga_akhir != $tind->tarif) {
+                        $selisih = $tind->tarif - $detailKasir->harga_akhir;
+                        $akumulasiSelisihTagihan += $selisih;
+
+                        DB::table('medical_transaksi_detail')->where('id', $detailKasir->id)->update([
+                            'harga_dasar' => $tind->tarif,
+                            'harga_akhir' => $tind->tarif,
+                            'updated_at'  => now()
+                        ]);
+                    }
+                }
+
+                // Tandai tindakan poli sudah diverifikasi
+                DB::table('medical_poli_tindakan')->where('id', $tind->id)->update(['status_verifikasi' => 'Verified']);
+            }
+
+            // =================================================================================
+            // TAHAP 3: SINKRONISASI RESEP OBAT
+            // =================================================================================
+
+            $resepPoli = DB::table('medical_poli_resep')
+                ->where('registrasi_id', $registrasi->id)
+                ->get();
+
+            foreach ($resepPoli as $rsp) {
+                $subtotalObat = $rsp->qty * $rsp->harga;
+
+                $detailKasir = DB::table('medical_transaksi_detail')
+                    ->where('transaksi_id', $transaksiId)
+                    ->where('sumber_tagihan', 'POLI_RESEP')
+                    ->where('sumber_id', $rsp->id)
+                    ->first();
+
+                if (!$detailKasir) {
+                    // JIKA BELUM ADA: INSERT BARU
+                    $masterObat = DB::table('farm_data_obat')->where('farm_data_obat_code', $rsp->farm_data_obat_code)->first();
+
+                    DB::table('medical_transaksi_detail')->insert([
+                        'transaksi_id'          => $transaksiId,
+                        'jenis_item'            => 'OBAT',
+                        'nama_item'             => $masterObat->farm_data_obat_name ?? 'Obat Farmasi',
+                        'farm_data_obat_code'   => $rsp->farm_data_obat_code,
+                        'sumber_tagihan'        => 'POLI_RESEP',
+                        'sumber_id'             => $rsp->id,
+                        'qty'                   => $rsp->qty,
+                        'harga_dasar'           => $rsp->harga,
+                        'harga_akhir'           => $subtotalObat,
+                        'status_pemeriksaan'    => 'MENUNGGU',
+                        'status_pembayaran'     => 'BELUM LUNAS',
+                        'created_at'            => now(),
+                        'updated_at'            => now(),
+                    ]);
+
+                    $akumulasiSelisihTagihan += $subtotalObat;
+                } else {
+                    // JIKA SUDAH ADA & BELUM LUNAS: UPDATE JIKA DOKTER MENGUBAH QTY/HARGA
+                    if ($detailKasir->status_pembayaran == 'BELUM LUNAS' && $detailKasir->harga_akhir != $subtotalObat) {
+                        $selisih = $subtotalObat - $detailKasir->harga_akhir;
+                        $akumulasiSelisihTagihan += $selisih;
+
+                        DB::table('medical_transaksi_detail')->where('id', $detailKasir->id)->update([
+                            'qty'         => $rsp->qty,
+                            'harga_dasar' => $rsp->harga,
+                            'harga_akhir' => $subtotalObat,
+                            'updated_at'  => now()
+                        ]);
+                    }
+                }
+
+                // Tandai resep sudah diverifikasi
+                DB::table('medical_poli_resep')->where('id', $rsp->id)->update([
+                    'status_verifikasi' => 'Verified',
+                    'transaksi_id'      => $transaksiId
+                ]);
+            }
+
+            // =================================================================================
+            // TAHAP 4: KALKULASI ULANG TOTAL TAGIHAN
+            // =================================================================================
+
+            if ($akumulasiSelisihTagihan != 0) {
+                DB::table('medical_transaksi')
+                    ->where('id', $transaksiId)
+                    ->update([
+                        'total_tagihan' => DB::raw("total_tagihan + ($akumulasiSelisihTagihan)"),
+                        'sisa_tagihan'  => DB::raw("sisa_tagihan + ($akumulasiSelisihTagihan)"),
+                    ]);
+            }
+
+            DB::commit();
+
+            return response()->json([
+                'success' => true,
+                'message' => 'Pemeriksaan poliklinik berhasil disinkronisasi & tagihan diteruskan ke kasir!'
+            ]);
+        } catch (\Exception $e) {
+            DB::rollback();
+            return response()->json([
+                'success' => false,
+                'message' => 'Terjadi kesalahan: ' . $e->getMessage()
+            ], 500);
         }
     }
     public function verifikasi_poliklinik_dokter_verify(Request $request)
@@ -741,24 +1407,7 @@ class PoliklinikController extends Controller
             ->where('d_reg_order_code', $request->code)->get();
         return view('application.poliklinik.verifikasi-poli.table.list-harga-pemeriksaan', ['list' => $list, 'code' => $request->code]);
     }
-    public function verifikasi_poliklinik_dokter_save_verify(Request $request)
-    {
-        $data = DB::table('d_reg_order_poli_log')->where('d_reg_order_code', $request->code)->get();
-        $code = 'R' . $request->no_reg . '0001';
-        foreach ($data as $value) {
-            DB::table('d_reg_order_poli_list')->insert([
-                'order_poli_list_code' => str::uuid(),
-                'd_reg_order_poli_code' => $request->code,
-                'p_sales_data_code' => $value->p_sales_data_code,
-                'order_poli_log_price' => $value->order_poli_log_price,
-                'order_poli_log_discount' => $value->order_poli_log_discount,
-                'created_at' => now()
-            ]);
-        }
-        DB::table('d_reg_order_poli')->where('d_reg_order_poli_code', $request->code)->update([
-            'd_reg_order_poli_status' => 3
-        ]);
-    }
+
     // POLIKLINIK DOKUMENTASI HASIL
     public function verifikasi_poliklinik_dokumentasi_hasil($akses, $id)
     {
@@ -948,5 +1597,101 @@ class PoliklinikController extends Controller
             'updated_at' => now(),
         ]);
         return 123;
+    }
+
+    // POLIKLINIK DOKUMENTASI HASIL
+    public function master_poliklinik_template($akses, $id)
+    {
+        if ($this->url_akses_sub($akses, $id) == true) {
+
+            // Ambil data poliklinik beserta setting template dan menu_aktif-nya
+            $data = DB::table('medical_master_poli as poli')
+                ->leftJoin('medical_poli_template_setting as setting', 'poli.id', '=', 'setting.poli_id')
+                ->select(
+                    'poli.id as poli_id',
+                    'poli.kode_poli',
+                    'poli.nama_poli',
+                    'setting.id as setting_id',
+                    'setting.jenis_template',
+                    'setting.menu_aktif', // <-- Tambahkan ini agar data JSON menu terbawa
+                    'setting.keterangan',
+                    'setting.is_active'
+                )
+                ->orderBy('poli.nama_poli', 'asc')
+                ->get();
+
+            // Pilihan template yang tersedia di sistem
+            $template_options = [
+                'UMUM' => 'Formulir Standar (Umum)',
+                'GIGI' => 'Formulir Gigi & Odontogram',
+                'KANDUNGAN' => 'Formulir Kandungan & USG',
+                'MATA' => 'Formulir Pemeriksaan Mata (Visus)',
+                'THT' => 'Formulir Pemeriksaan THT',
+                'KULIT_KELAMIN' => 'Formulir Kulit & Kelamin',
+                'CUSTOM' => 'Formulir Custom / Lainnya'
+            ];
+
+            return view('application.poliklinik.master-poliklinik-template', [
+                'data' => $data,
+                'template_options' => $template_options,
+                'akses' => $akses,
+                'code' => $id
+            ]);
+        } else {
+            return Redirect::to('dashboard/home');
+        }
+    }
+    public function save_poliklinik_template(Request $request)
+    {
+        // 1. Validasi input yang masuk
+        $request->validate([
+            'poli_id' => 'required|integer',
+            'jenis_template' => 'required|string',
+        ]);
+
+        try {
+            // 2. Ubah array menu_form dari checkbox menjadi string JSON (jika ada)
+            $menuAktif = $request->has('menu_form') ? json_encode($request->menu_form) : null;
+
+            // 3. Cek apakah setting untuk poli_id ini sudah ada di database
+            $exists = DB::table('medical_poli_template_setting')
+                ->where('poli_id', $request->poli_id)
+                ->first();
+
+            if ($exists) {
+                // Jika sudah ada -> Lakukan Update
+                DB::table('medical_poli_template_setting')
+                    ->where('poli_id', $request->poli_id)
+                    ->update([
+                        'jenis_template' => $request->jenis_template,
+                        'menu_aktif'     => $menuAktif, // Simpan konfigurasi menu aktif
+                        'keterangan'     => $request->keterangan,
+                        'updated_at'     => now()
+                    ]);
+            } else {
+                // Jika belum ada -> Lakukan Insert Baru
+                DB::table('medical_poli_template_setting')->insert([
+                    'poli_id'        => $request->poli_id,
+                    'jenis_template' => $request->jenis_template,
+                    'menu_aktif'     => $menuAktif, // Simpan konfigurasi menu aktif
+                    'keterangan'     => $request->keterangan,
+                    'is_active'      => 1,
+                    'created_at'     => now(),
+                    'updated_at'     => now()
+                ]);
+            }
+
+            // 4. Kembalikan response JSON karena request menggunakan AJAX
+            return response()->json([
+                'success' => true,
+                'message' => 'Konfigurasi template dan menu poliklinik berhasil disimpan!'
+            ]);
+        } catch (\Exception $e) {
+            // Tangkap error jika terjadi masalah pada database
+            return response()->json([
+                'success' => false,
+                'message' => 'Terjadi kesalahan sistem: ' . $e->getMessage()
+            ], 500);
+        }
     }
 }

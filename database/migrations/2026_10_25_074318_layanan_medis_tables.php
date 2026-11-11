@@ -19,7 +19,6 @@ class LayananMedisTables extends Migration
             $table->string('nama_penjamin');
             $table->timestamps();
         });
-
         // 2. Table Sub Penjamin
         Schema::create('medical_sub_penjamin', function (Blueprint $table) {
             $table->id();
@@ -27,7 +26,6 @@ class LayananMedisTables extends Migration
             $table->string('nama_sub_penjamin');
             $table->timestamps();
         });
-
         // 3. Table Master Tipe Layanan
         Schema::create('medical_tipe_layanan', function (Blueprint $table) {
             $table->id();
@@ -36,17 +34,30 @@ class LayananMedisTables extends Migration
             $table->boolean('is_active')->default(true)->comment('Status aktif/nonaktif');
             $table->timestamps();
         });
-
         // 4. Table Master Pemeriksaan (PERUBAHAN DARI medical_pemeriksaan)
         Schema::create('medical_master_pemeriksaan', function (Blueprint $table) {
             $table->id();
             // Relasi ke tipe layanan (sub_penjamin_id dihilangkan dari master)
             $table->foreignId('tipe_layanan_id')->constrained('medical_tipe_layanan')->onDelete('cascade');
 
-            $table->string('kode_layanan');
+            // Mencegah duplikasi kode layanan
+            $table->string('kode_layanan')->unique();
             $table->string('nama_layanan');
             $table->text('deskripsi')->nullable()->comment('Opsional: Penjelasan persiapan pasien, misal: Puasa 10 Jam');
+
+            // --- [REKOMENDASI TAMBAHAN] ---
+            // 1. Integrasi & Operasional Radiologi/Lab
+            $table->string('modality_code', 10)->nullable()->comment('Kode DICOM Modality (CR, DX, CT, US, MR, dll)');
+            $table->string('jenis_sampel')->nullable()->comment('Khusus Lab: Darah EDTA, Urine, Serum, dll');
+
+            // 2. Manajemen Antrean & Medikolegal
+            $table->integer('estimasi_waktu_menit')->default(15)->comment('Estimasi lama tindakan/pemeriksaan');
+            $table->boolean('is_consent_required')->default(false)->comment('Butuh TTD Informed Consent? (Misal: CT Kontras)');
+            // ------------------------------
+
+            // Pricing
             $table->decimal('harga', 15, 2); // Harga dasar (Master Price)
+
             $table->boolean('is_paket')->default(false);
             $table->boolean('is_active')->default(true);
             $table->timestamps();

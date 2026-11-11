@@ -86,7 +86,9 @@ class PelayananController extends Controller
     }
     public function registrasi_pasien_v2($akses, $id)
     {
-        return view('application.pelayanan.registrasi-v2');
+        $polis = DB::table('medical_master_poli')->where('is_active', 1)->get();
+        $ruangans = DB::table('medical_master_ruangan')->get();
+        return view('application.pelayanan.registrasi-v2', compact('polis', 'ruangans'));
     }
     public function registrasi_pasien_add(Request $request)
     {
@@ -1309,20 +1311,31 @@ class PelayananController extends Controller
     }
     public function data_registrasi_data_table(Request $request)
     {
-        // 1. Base Query
+        // 1. Base Query dengan join tambahan ke master ruangan dan master bed
         $query = DB::table('medical_registrasi as reg')
             ->join('medical_patient as p', 'p.id', '=', 'reg.pasien_id')
             ->leftJoin('medical_transaksi as t', 't.registrasi_id', '=', 'reg.id')
             ->leftJoin('medical_sub_penjamin as sp', 'sp.id', '=', 'reg.sub_penjamin_id')
             ->leftJoin('user_mains as u', 'u.userid', '=', 'reg.user_id')
+            ->leftJoin('medical_master_poli as mmp', 'mmp.id', '=', 'reg.poli_id')
+            ->leftJoin('medical_master_ruangan as mmr', 'mmr.id', '=', 'reg.ruangan_id')
+            ->leftJoin('medical_master_bed as mmb', 'mmb.id', '=', 'reg.bed_id')
+            ->leftJoin('medical_master_doctor as doc_pengirim', 'doc_pengirim.id', '=', 'reg.doctor_id')
+            ->leftJoin('medical_master_doctor as doc_poli', 'doc_poli.id', '=', 'reg.doctor_poli_id')
             ->select([
                 'reg.id as registrasi_id',
                 'reg.no_registrasi',
                 'reg.tanggal_registrasi',
-                'reg.dokter',
                 'reg.janji_hasil',
                 'reg.metode_pengiriman',
                 'reg.is_cito',
+                'reg.jenis_layanan',
+                'mmp.nama_poli',
+                'mmr.nama_ruangan',
+                'mmr.kelas as kelas_ruangan',
+                'mmb.nomor_bed',
+                'doc_pengirim.nama_lengkap as nama_dokter_pengirim',
+                'doc_poli.nama_lengkap as nama_dokter_poli',
                 'p.title',
                 'p.nama as nama_pasien',
                 'p.pid',
@@ -1346,7 +1359,10 @@ class PelayananController extends Controller
 
         // Filter 2: Dokter
         if ($dokter = $request->input('dokter')) {
-            $query->where('reg.dokter', $dokter);
+            $query->where(function ($q) use ($dokter) {
+                $q->where('doc_pengirim.nama_lengkap', 'like', "%{$dokter}%")
+                    ->orWhere('doc_poli.nama_lengkap', 'like', "%{$dokter}%");
+            });
         }
 
         // Filter 3: Kelompok Pelanggan / Penjamin
@@ -1365,17 +1381,313 @@ class PelayananController extends Controller
             });
         }
 
+        // Filter 5: Jenis Layanan (Rajal, Ranap, IGD)
+        if ($jenisLayanan = $request->input('jenis_layanan')) {
+            $query->where('reg.jenis_layanan', $jenisLayanan);
+        }
+
         // Total data awal
         $totalData = $query->count();
 
-        // 2. Global Search & Input No Reg / Nama
+        // 2. Global Search
         $searchValue = $request->input('search_custom') ?? $request->input('search.value');
         if ($searchValue) {
             $query->where(function ($q) use ($searchValue) {
                 $q->where('reg.no_registrasi', 'like', "%{$searchValue}%")
                     ->orWhere('p.nama', 'like', "%{$searchValue}%")
                     ->orWhere('p.pid', 'like', "%{$searchValue}%")
-                    ->orWhere('reg.dokter', 'like', "%{$searchValue}%");
+                    ->orWhere('mmr.nama_ruangan', 'like', "%{$searchValue}%")
+                    ->orWhere('doc_pengirim.nama_lengkap', 'like', "%{$searchValue}%")
+                    ->orWhere('doc_poli.nama_lengkap', 'like', "%{$searchValue}%");
+            });
+        }
+
+        $totalFiltered = $query->count();
+
+        // 3. Pagination & Ordering
+        $start  = $request->input('start', 0);
+        $length = $request->input('length', 10);
+
+        $data = $query->offset($start)
+            ->limit($length)
+            ->orderBy('reg.tanggal_registrasi', 'desc')
+            ->get();
+
+        // Fetch List Pemeriksaan
+        $transaksiIds = $data->pluck('transaksi_id')->filter()->unique();
+
+        $rawDetails = DB::table('medical_transaksi_detail as td')
+            ->join('medical_master_pemeriksaan as mp', 'td.master_pemeriksaan_id', '=', 'mp.id')
+            ->whereIn('td.transaksi_id', $transaksiIds)
+            ->select('td.transaksi_id', 'mp.id as master_id', 'mp.nama_layanan', 'mp.is_paket', 'td.harga_akhir')
+            ->get()
+            ->groupBy('transaksi_id');
+
+        // Susun item pemeriksaan agar mendeteksi paket dan menampilkan rincian isinya di bawah
+        $pemeriksaanData = [];
+        foreach ($rawDetails as $transId => $items) {
+            $htmlOutput = '';
+
+            $packetItems = $items->where('is_paket', 1);
+            $singleItems = $items->where('is_paket', '!=', 1)->where('harga_akhir', '>', 0);
+
+            // 1. Jika ada Paket
+            foreach ($packetItems as $pkt) {
+                $htmlOutput .= '<div class="p-2 mb-2 rounded" style="background-color: #fff3cd; border-left: 4px solid #ffc107;">';
+                $htmlOutput .= '<div class="fw-bold text-dark"><i class="fas fa-flask text-primary me-1"></i> ' . e($pkt->nama_layanan) . ' <span class="badge bg-warning text-dark" style="font-size: 0.6rem;">PAKET</span></div>';
+
+                // Ambil isi komponen paket dari medical_paket_detail
+                $komponenPaket = DB::table('medical_paket_detail as pd')
+                    ->join('medical_master_pemeriksaan as sub_mp', 'pd.pemeriksaan_id', '=', 'sub_mp.id')
+                    ->where('pd.paket_id', $pkt->master_id)
+                    ->select('sub_mp.nama_layanan', 'sub_mp.kode_layanan')
+                    ->get();
+
+                if ($komponenPaket->count() > 0) {
+                    $htmlOutput .= '<div class="small text-muted mt-1 ms-2" style="border-left: 2px solid #dee2e6; padding-left: 8px;">';
+                    $htmlOutput .= '<div class="fw-semibold text-secondary" style="font-size: 0.75rem;">Isi Paket Pemeriksaan:</div>';
+                    foreach ($komponenPaket as $komp) {
+                        $htmlOutput .= '<div style="font-size: 0.75rem;"><i class="fas fa-angle-right text-primary me-1"></i> ' . e($komp->nama_layanan) . ' <span class="text-danger">(' . e($komp->kode_layanan) . ')</span></div>';
+                    }
+                    $htmlOutput .= '</div>';
+                }
+                $htmlOutput .= '</div>';
+            }
+
+            // 2. Jika ada Pemeriksaan Satuan / Di luar Paket (misal: Tes HIV tambahan)
+            foreach ($singleItems as $sng) {
+                $isAnakPaket = DB::table('medical_paket_detail')->where('pemeriksaan_id', $sng->master_id)->exists();
+                if (!$isAnakPaket) {
+                    $htmlOutput .= '<div class="mb-1"><i class="fas fa-check-circle text-success me-1"></i> ' . e($sng->nama_layanan) . '</div>';
+                }
+            }
+
+            if (empty($htmlOutput)) {
+                $htmlOutput = '-';
+            }
+
+            $pemeriksaanData[$transId] = $htmlOutput;
+        }
+
+        // 4. Formatting Output JSON
+        $formattedData = [];
+        $no = $start + 1;
+
+        foreach ($data as $item) {
+            $actionBtn = '<div class="dropdown text-center">
+                <button class="btn btn-sm text-white" type="button" data-bs-toggle="dropdown" style="background-color: #ff9800; height: 100%; min-height: 40px;">
+                    <i class="fas fa-ellipsis-v"></i>
+                </button>
+                <ul class="dropdown-menu shadow-sm">
+                    <li><a class="dropdown-item button-data-history-pasien" href="#" data-code="' . e($item->registrasi_id) . '">Riwayat Pasien</a></li>
+                    <li><a class="dropdown-item" href="/pembayaran/nota/' . e($item->transaksi_id) . '" target="_blank">Cetak Struk</a></li>
+                    <li><a class="dropdown-item btn-modal-barcode" href="#" data-regid="' . e($item->registrasi_id) . '" data-transid="' . e($item->transaksi_id) . '"><i class="fas fa-barcode me-1"></i> Cetak Barcode</a></li>
+                </ul>
+              </div>';
+
+            $petugasBadge = $item->petugas
+                ? '<span class="badge bg-secondary text-white px-2 py-1" style="font-size: 0.7rem; border-radius: 4px;">' . e($item->petugas) . '</span>'
+                : '<span class="badge bg-secondary text-white px-2 py-1" style="font-size: 0.7rem; border-radius: 4px;">Sistem</span>';
+
+            $namaHtml = '<div class="text-start">
+                <div class="fw-bold text-dark" style="font-size: 0.85rem;">' . e($item->title) . ' ' . e($item->nama_pasien) . '</div>
+                <div class="mt-1">' . $petugasBadge . '</div>
+                <div class="mt-1 bg-secondary text-white d-inline-block px-2 py-1" style="font-size: 0.7rem; border-radius: 4px;">
+                    ' . date('d-m-Y H:i', strtotime($item->tanggal_registrasi)) . '
+                </div>
+               </div>';
+
+            $layananText = str_replace('_', ' ', ($item->jenis_layanan ?? 'RAWAT JALAN'));
+            if ($item->jenis_layanan == 'RAWAT_JALAN' && !empty($item->nama_poli)) {
+                $layananText .= ' - ' . $item->nama_poli;
+            } elseif ($item->jenis_layanan == 'RAWAT_INAP' && !empty($item->nama_ruangan)) {
+                $layananText .= ' (' . $item->nama_ruangan;
+                if (!empty($item->kelas_ruangan)) {
+                    $layananText .= ' - ' . $item->kelas_ruangan;
+                }
+                if (!empty($item->nomor_bed)) {
+                    $layananText .= ' | Bed: ' . $item->nomor_bed;
+                }
+                $layananText .= ')';
+            }
+
+            $layananColor = 'bg-primary';
+            if ($item->jenis_layanan == 'IGD') {
+                $layananColor = 'bg-danger';
+            } elseif ($item->jenis_layanan == 'RAWAT_INAP') {
+                $layananColor = 'bg-success';
+            }
+
+            $layananBadge = '<div class="mt-1"><span class="badge ' . $layananColor . ' text-white shadow-sm" style="font-size: 0.65rem;"><i class="fas fa-hospital-user me-1"></i>' . e($layananText) . '</span></div>';
+
+            $citoBadge = $item->is_cito == 1
+                ? '<div class="mb-1"><span class="badge bg-danger text-white shadow-sm" style="font-size: 0.65rem;"><i class="fas fa-exclamation-triangle me-1"></i>CITO</span></div>'
+                : '';
+
+            $noRegHtml = '<div class="text-start">' . $citoBadge . '
+                <div class="fw-bold text-dark" style="font-size: 0.85rem;">' . e($item->no_registrasi) . '</div>
+                <div class="fw-bold" style="font-size: 0.85rem; color: #800000;">' . e($item->pid) . '</div>
+                ' . $layananBadge . '
+              </div>';
+
+            $pemeriksaanHtml = '<div class="text-dark" style="font-size: 0.85rem;">';
+            $pemeriksaanHtml .= $pemeriksaanData[$item->transaksi_id] ?? '-';
+            $pemeriksaanHtml .= '</div>';
+
+            $pengirimanHtml = '<div class="d-flex flex-column gap-1 align-items-start">';
+            if (!empty($item->metode_pengiriman)) {
+                $metodeArray = json_decode($item->metode_pengiriman, true);
+                if (is_array($metodeArray)) {
+                    foreach ($metodeArray as $metode) {
+                        if ($metode == 'whatsapp') {
+                            $pengirimanHtml .= '<button class="btn btn-sm text-white fw-bold py-1 px-2 w-100 text-start" style="font-size: 0.7rem; background-color: #25D366; border:none;"><i class="fab fa-whatsapp me-1"></i> WHATSAPP</button>';
+                        } elseif ($metode == 'email') {
+                            $pengirimanHtml .= '<button class="btn btn-sm text-white fw-bold py-1 px-2 w-100 text-start" style="font-size: 0.7rem; background-color: #EA4335; border:none;"><i class="fas fa-envelope me-1"></i> EMAIL</button>';
+                        } elseif ($metode == 'satusehat') {
+                            $pengirimanHtml .= '<button class="btn btn-sm text-white fw-bold py-1 px-2 w-100 text-start" style="font-size: 0.7rem; background-color: #00BFA6; border:none;"><i class="fas fa-heartbeat me-1"></i> SATU SEHAT</button>';
+                        } elseif ($metode == 'cetak_fisik') {
+                            $pengirimanHtml .= '<button class="btn btn-sm text-white fw-bold py-1 px-2 w-100 text-start" style="font-size: 0.7rem; background-color: #6c757d; border:none;"><i class="fas fa-print me-1"></i> CETAK FISIK</button>';
+                        }
+                    }
+                }
+            } else {
+                $pengirimanHtml .= '<button class="btn btn-info btn-sm text-white fw-bold py-1 px-2" style="font-size: 0.7rem; background-color: #00a8ff; border:none;">AMBIL SENDIRI</button>';
+            }
+            $pengirimanHtml .= '</div>';
+
+            $statusBayar = strtoupper($item->status_pembayaran ?? 'LUNAS');
+            $pembayaranBadge = $statusBayar === 'LUNAS'
+                ? '<div class="mt-1"><span class="badge bg-success text-white shadow-sm" style="font-size: 0.65rem;"><i class="fas fa-check-circle me-1"></i>LUNAS</span></div>'
+                : '<div class="mt-1"><span class="badge bg-warning text-dark shadow-sm" style="font-size: 0.65rem;"><i class="fas fa-clock me-1"></i>BELUM LUNAS</span></div>';
+
+            $totalTagihanHtml = '<div class="text-end">
+                            <div class="fw-bold text-dark" style="font-size: 0.85rem;">' . number_format($item->total_tagihan, 0, ',', '.') . '</div>
+                            ' . $pembayaranBadge . '
+                           </div>';
+
+            $infoDokterHtml = '<div style="font-size: 0.80rem;">';
+            if (!empty($item->nama_dokter_poli)) {
+                $infoDokterHtml .= '<div class="fw-bold text-dark"><i class="fas fa-user-md text-primary me-1"></i> ' . e($item->nama_dokter_poli) . '</div>';
+            }
+            if (!empty($item->nama_dokter_pengirim)) {
+                $infoDokterHtml .= '<div class="text-muted small mt-1">Pengirim: ' . e($item->nama_dokter_pengirim) . '</div>';
+            }
+            if (empty($item->nama_dokter_poli) && empty($item->nama_dokter_pengirim)) {
+                $infoDokterHtml .= '-';
+            }
+            $infoDokterHtml .= '</div>';
+
+            $formattedData[] = [
+                'action'       => $actionBtn,
+                'no'           => $no++,
+                'no_reg'       => $noRegHtml,
+                'nama'         => $namaHtml,
+                'agreement'    => '<div class="text-primary fw-bold" style="font-size: 0.85rem;">' . e($item->agreement ?? 'UMUM / PRIBADI') . '</div>',
+                'dokter'       => $infoDokterHtml,
+                'janji_hasil'  => '<div class="text-dark" style="font-size: 0.85rem;">' . ($item->janji_hasil ? date('d-m-Y H:i', strtotime($item->janji_hasil)) : '-') . '</div>',
+                'pemeriksaan'  => $pemeriksaanHtml,
+                'pengiriman'   => $pengirimanHtml,
+                'total'        => $totalTagihanHtml
+            ];
+        }
+
+        return response()->json([
+            "draw"            => intval($request->input('draw')),
+            "recordsTotal"    => intval($totalData),
+            "recordsFiltered" => intval($totalFiltered),
+            "data"            => $formattedData
+        ]);
+    }
+    public function data_registrasi_data_table_old2(Request $request)
+    {
+        // 1. Base Query dengan join tambahan ke master ruangan dan master bed
+        $query = DB::table('medical_registrasi as reg')
+            ->join('medical_patient as p', 'p.id', '=', 'reg.pasien_id')
+            ->leftJoin('medical_transaksi as t', 't.registrasi_id', '=', 'reg.id')
+            ->leftJoin('medical_sub_penjamin as sp', 'sp.id', '=', 'reg.sub_penjamin_id')
+            ->leftJoin('user_mains as u', 'u.userid', '=', 'reg.user_id')
+            ->leftJoin('medical_master_poli as mmp', 'mmp.id', '=', 'reg.poli_id')
+            ->leftJoin('medical_master_ruangan as mmr', 'mmr.id', '=', 'reg.ruangan_id') // <--- Join Master Ruangan
+            ->leftJoin('medical_master_bed as mmb', 'mmb.id', '=', 'reg.bed_id')             // <--- Join Master Bed
+            ->leftJoin('medical_master_doctor as doc_pengirim', 'doc_pengirim.id', '=', 'reg.doctor_id') // Dokter Pengirim
+            ->leftJoin('medical_master_doctor as doc_poli', 'doc_poli.id', '=', 'reg.doctor_poli_id')     // Dokter Pemeriksa/Poli
+            ->select([
+                'reg.id as registrasi_id',
+                'reg.no_registrasi',
+                'reg.tanggal_registrasi',
+                'reg.janji_hasil',
+                'reg.metode_pengiriman',
+                'reg.is_cito',
+                'reg.jenis_layanan',
+                'mmp.nama_poli',
+                'mmr.nama_ruangan',          // <--- Ambil Nama Ruangan
+                'mmr.kelas as kelas_ruangan', // <--- Ambil Kelas Ruangan
+                'mmb.nomor_bed',             // <--- Ambil Nomor Bed
+                'doc_pengirim.nama_lengkap as nama_dokter_pengirim',
+                'doc_poli.nama_lengkap as nama_dokter_poli',
+                'p.title',
+                'p.nama as nama_pasien',
+                'p.pid',
+                'sp.nama_sub_penjamin as agreement',
+                'u.username as petugas',
+                't.id as transaksi_id',
+                't.total_tagihan',
+                't.status_pembayaran'
+            ]);
+
+        // Filter 1: Tanggal Awal & Tanggal Akhir
+        $tglAwal = $request->input('tgl1');
+        $tglAkhir = $request->input('tgl2');
+
+        if ($tglAwal && $tglAkhir) {
+            $query->whereBetween('reg.tanggal_registrasi', [
+                $tglAwal . ' 00:00:00',
+                $tglAkhir . ' 23:59:59'
+            ]);
+        }
+
+        // Filter 2: Dokter
+        if ($dokter = $request->input('dokter')) {
+            $query->where(function ($q) use ($dokter) {
+                $q->where('doc_pengirim.nama_lengkap', 'like', "%{$dokter}%")
+                    ->orWhere('doc_poli.nama_lengkap', 'like', "%{$dokter}%");
+            });
+        }
+
+        // Filter 3: Kelompok Pelanggan / Penjamin
+        if ($penjamin = $request->input('penjamin')) {
+            $query->where('sp.nama_sub_penjamin', 'like', "%{$penjamin}%");
+        }
+
+        // Filter 4: Filter Spesifik Pemeriksaan
+        if ($pemeriksaan = $request->input('pemeriksaan')) {
+            $query->whereExists(function ($sub) use ($pemeriksaan) {
+                $sub->select(DB::raw(1))
+                    ->from('medical_transaksi_detail as td_sub')
+                    ->join('medical_master_pemeriksaan as mp_sub', 'td_sub.master_pemeriksaan_id', '=', 'mp_sub.id')
+                    ->whereColumn('td_sub.transaksi_id', 't.id')
+                    ->where('mp_sub.id', $pemeriksaan);
+            });
+        }
+
+        // Filter 5: Jenis Layanan (Rajal, Ranap, IGD)
+        if ($jenisLayanan = $request->input('jenis_layanan')) {
+            $query->where('reg.jenis_layanan', $jenisLayanan);
+        }
+
+        // Total data awal
+        $totalData = $query->count();
+
+        // 2. Global Search
+        $searchValue = $request->input('search_custom') ?? $request->input('search.value');
+        if ($searchValue) {
+            $query->where(function ($q) use ($searchValue) {
+                $q->where('reg.no_registrasi', 'like', "%{$searchValue}%")
+                    ->orWhere('p.nama', 'like', "%{$searchValue}%")
+                    ->orWhere('p.pid', 'like', "%{$searchValue}%")
+                    ->orWhere('mmr.nama_ruangan', 'like', "%{$searchValue}%") // <--- Bisa search nama ruangan juga
+                    ->orWhere('doc_pengirim.nama_lengkap', 'like', "%{$searchValue}%")
+                    ->orWhere('doc_poli.nama_lengkap', 'like', "%{$searchValue}%");
             });
         }
 
@@ -1405,53 +1717,73 @@ class PelayananController extends Controller
         $no = $start + 1;
 
         foreach ($data as $item) {
-            // -- Kolom Aksi --
             $actionBtn = '<div class="dropdown text-center">
-                            <button class="btn btn-sm text-white" type="button" data-bs-toggle="dropdown" style="background-color: #ff9800; height: 100%; min-height: 40px;">
-                                <i class="fas fa-ellipsis-v"></i>
-                            </button>
-                            <ul class="dropdown-menu shadow-sm">
-                                <li><a class="dropdown-item button-data-history-pasien" href="#" data-code="' . e($item->registrasi_id) . '">Riwayat Pasien</a></li>
-                                <li><a class="dropdown-item" href="/pembayaran/nota/' . e($item->transaksi_id) . '" target="_blank">Cetak Struk</a></li>
-                                <li><a class="dropdown-item btn-modal-barcode" href="#" data-regid="' . e($item->registrasi_id) . '" data-transid="' . e($item->transaksi_id) . '"><i class="fas fa-barcode me-1"></i> Cetak Barcode</a></li>
-                            </ul>
-                          </div>';
+                <button class="btn btn-sm text-white" type="button" data-bs-toggle="dropdown" style="background-color: #ff9800; height: 100%; min-height: 40px;">
+                    <i class="fas fa-ellipsis-v"></i>
+                </button>
+                <ul class="dropdown-menu shadow-sm">
+                    <li><a class="dropdown-item button-data-history-pasien" href="#" data-code="' . e($item->registrasi_id) . '">Riwayat Pasien</a></li>
+                    <li><a class="dropdown-item" href="/pembayaran/nota/' . e($item->transaksi_id) . '" target="_blank">Cetak Struk</a></li>
+                    <li><a class="dropdown-item btn-modal-barcode" href="#" data-regid="' . e($item->registrasi_id) . '" data-transid="' . e($item->transaksi_id) . '"><i class="fas fa-barcode me-1"></i> Cetak Barcode</a></li>
+                </ul>
+              </div>';
 
-            // -- Badge Petugas --
             $petugasBadge = $item->petugas
                 ? '<span class="badge bg-secondary text-white px-2 py-1" style="font-size: 0.7rem; border-radius: 4px;">' . e($item->petugas) . '</span>'
                 : '<span class="badge bg-secondary text-white px-2 py-1" style="font-size: 0.7rem; border-radius: 4px;">Sistem</span>';
 
             $namaHtml = '<div class="text-start">
-                            <div class="fw-bold text-dark" style="font-size: 0.85rem;">' . e($item->title) . ' ' . e($item->nama_pasien) . '</div>
-                            <div class="mt-1">' . $petugasBadge . '</div>
-                            <div class="mt-1 bg-secondary text-white d-inline-block px-2 py-1" style="font-size: 0.7rem; border-radius: 4px;">
-                                ' . date('d-m-Y H:i', strtotime($item->tanggal_registrasi)) . '
-                            </div>
-                         </div>';
+                <div class="fw-bold text-dark" style="font-size: 0.85rem;">' . e($item->title) . ' ' . e($item->nama_pasien) . '</div>
+                <div class="mt-1">' . $petugasBadge . '</div>
+                <div class="mt-1 bg-secondary text-white d-inline-block px-2 py-1" style="font-size: 0.7rem; border-radius: 4px;">
+                    ' . date('d-m-Y H:i', strtotime($item->tanggal_registrasi)) . '
+                </div>
+               </div>';
 
-            // -- Badge CITO --
+            // Logika Teks Layanan (Rajal + Poli / Ranap + Ruangan & Bed / IGD)
+            $layananText = str_replace('_', ' ', ($item->jenis_layanan ?? 'RAWAT JALAN'));
+            if ($item->jenis_layanan == 'RAWAT_JALAN' && !empty($item->nama_poli)) {
+                $layananText .= ' - ' . $item->nama_poli;
+            } elseif ($item->jenis_layanan == 'RAWAT_INAP' && !empty($item->nama_ruangan)) {
+                $layananText .= ' (' . $item->nama_ruangan;
+                if (!empty($item->kelas_ruangan)) {
+                    $layananText .= ' - ' . $item->kelas_ruangan;
+                }
+                if (!empty($item->nomor_bed)) {
+                    $layananText .= ' | Bed: ' . $item->nomor_bed;
+                }
+                $layananText .= ')';
+            }
+
+            $layananColor = 'bg-primary';
+            if ($item->jenis_layanan == 'IGD') {
+                $layananColor = 'bg-danger';
+            } elseif ($item->jenis_layanan == 'RAWAT_INAP') {
+                $layananColor = 'bg-success';
+            }
+
+            $layananBadge = '<div class="mt-1"><span class="badge ' . $layananColor . ' text-white shadow-sm" style="font-size: 0.65rem;"><i class="fas fa-hospital-user me-1"></i>' . e($layananText) . '</span></div>';
+
             $citoBadge = $item->is_cito == 1
                 ? '<div class="mb-1"><span class="badge bg-danger text-white shadow-sm" style="font-size: 0.65rem;"><i class="fas fa-exclamation-triangle me-1"></i>CITO</span></div>'
-                : '<div class="mb-1"><span class="badge bg-info text-white shadow-sm" style="font-size: 0.65rem;">NORMAL</span></div>';
+                : '';
 
             $noRegHtml = '<div class="text-start">' . $citoBadge . '
-                            <div class="fw-bold text-dark" style="font-size: 0.85rem;">' . e($item->no_registrasi) . '</div>
-                            <div class="fw-bold" style="font-size: 0.85rem; color: #800000;">' . e($item->pid) . '</div>
-                          </div>';
+                <div class="fw-bold text-dark" style="font-size: 0.85rem;">' . e($item->no_registrasi) . '</div>
+                <div class="fw-bold" style="font-size: 0.85rem; color: #800000;">' . e($item->pid) . '</div>
+                ' . $layananBadge . '
+              </div>';
 
-            // -- Kolom Daftar Pemeriksaan --
             $pemeriksaanHtml = '<div class="text-dark" style="font-size: 0.85rem;">';
             if (isset($pemeriksaanData[$item->transaksi_id])) {
                 foreach ($pemeriksaanData[$item->transaksi_id] as $l) {
-                    $pemeriksaanHtml .= '<div class="mb-1">' . e($l->nama_layanan) . '</div>';
+                    $pemeriksaanHtml .= '<div class="mb-1"><i class="fas fa-check-circle text-success me-1 fs--2"></i>' . e($l->nama_layanan) . '</div>';
                 }
             } else {
                 $pemeriksaanHtml .= '-';
             }
             $pemeriksaanHtml .= '</div>';
 
-            // -- Kolom Pengiriman Hasil --
             $pengirimanHtml = '<div class="d-flex flex-column gap-1 align-items-start">';
             if (!empty($item->metode_pengiriman)) {
                 $metodeArray = json_decode($item->metode_pengiriman, true);
@@ -1473,25 +1805,36 @@ class PelayananController extends Controller
             }
             $pengirimanHtml .= '</div>';
 
-            // -- Badge Pembayaran --
             $statusBayar = strtoupper($item->status_pembayaran ?? 'LUNAS');
             $pembayaranBadge = $statusBayar === 'LUNAS'
                 ? '<div class="mt-1"><span class="badge bg-success text-white shadow-sm" style="font-size: 0.65rem;"><i class="fas fa-check-circle me-1"></i>LUNAS</span></div>'
                 : '<div class="mt-1"><span class="badge bg-warning text-dark shadow-sm" style="font-size: 0.65rem;"><i class="fas fa-clock me-1"></i>BELUM LUNAS</span></div>';
 
             $totalTagihanHtml = '<div class="text-end">
-                                    <div class="fw-bold text-dark" style="font-size: 0.85rem;">' . number_format($item->total_tagihan, 0, ',', '.') . '</div>
-                                    ' . $pembayaranBadge . '
-                                 </div>';
+                            <div class="fw-bold text-dark" style="font-size: 0.85rem;">' . number_format($item->total_tagihan, 0, ',', '.') . '</div>
+                            ' . $pembayaranBadge . '
+                           </div>';
+
+            $infoDokterHtml = '<div style="font-size: 0.8rem;">';
+            if (!empty($item->nama_dokter_poli)) {
+                $infoDokterHtml .= '<div class="fw-bold text-dark"><i class="fas fa-user-md text-primary me-1"></i> ' . e($item->nama_dokter_poli) . '</div>';
+            }
+            if (!empty($item->nama_dokter_pengirim)) {
+                $infoDokterHtml .= '<div class="text-muted small mt-1">Pengirim: ' . e($item->nama_dokter_pengirim) . '</div>';
+            }
+            if (empty($item->nama_dokter_poli) && empty($item->nama_dokter_pengirim)) {
+                $infoDokterHtml .= '-';
+            }
+            $infoDokterHtml .= '</div>';
 
             $formattedData[] = [
                 'action'       => $actionBtn,
                 'no'           => $no++,
                 'no_reg'       => $noRegHtml,
                 'nama'         => $namaHtml,
-                'agreement'    => '<div class="text-primary">' . e($item->agreement ?? 'UMUM') . '</div>',
-                'dokter'       => '<div class="text-dark">' . e($item->dokter ?? '-') . '</div>',
-                'janji_hasil'  => '<div class="text-dark">' . ($item->janji_hasil ? date('d-m-Y H:i', strtotime($item->janji_hasil)) : '-') . '</div>',
+                'agreement'    => '<div class="text-primary fw-bold" style="font-size: 0.85rem;">' . e($item->agreement ?? 'UMUM / PRIBADI') . '</div>',
+                'dokter'       => $infoDokterHtml,
+                'janji_hasil'  => '<div class="text-dark" style="font-size: 0.85rem;">' . ($item->janji_hasil ? date('d-m-Y H:i', strtotime($item->janji_hasil)) : '-') . '</div>',
                 'pemeriksaan'  => $pemeriksaanHtml,
                 'pengiriman'   => $pengirimanHtml,
                 'total'        => $totalTagihanHtml
@@ -1507,21 +1850,25 @@ class PelayananController extends Controller
     }
     public function data_verifikasi_registrasi_table(Request $request)
     {
-        // 1. Base Query
         $query = DB::table('medical_registrasi as reg')
             ->join('medical_patient as p', 'p.id', '=', 'reg.pasien_id')
             ->leftJoin('medical_transaksi as t', 't.registrasi_id', '=', 'reg.id')
             ->leftJoin('medical_sub_penjamin as sp', 'sp.id', '=', 'reg.sub_penjamin_id')
             ->leftJoin('user_mains as u', 'u.userid', '=', 'reg.user_id')
+            ->leftJoin('medical_master_poli as mmp', 'mmp.id', '=', 'reg.poli_id')
+            ->leftJoin('medical_master_doctor as doc_pengirim', 'doc_pengirim.id', '=', 'reg.doctor_id')
+            ->leftJoin('medical_master_doctor as doc_poli', 'doc_poli.id', '=', 'reg.doctor_poli_id')
             ->select([
                 'reg.id as registrasi_id',
                 'reg.no_registrasi',
                 'reg.tanggal_registrasi',
-                'reg.dokter',
                 'reg.janji_hasil',
                 'reg.metode_pengiriman',
                 'reg.is_cito',
-                'reg.status_kunjungan', // Status Batal/Selesai
+                'reg.jenis_layanan',
+                'mmp.nama_poli',
+                'doc_pengirim.nama_lengkap as nama_dokter_pengirim',
+                'doc_poli.nama_lengkap as nama_dokter_poli',
                 'p.title',
                 'p.nama as nama_pasien',
                 'p.pid',
@@ -1529,10 +1876,10 @@ class PelayananController extends Controller
                 'u.username as petugas',
                 't.id as transaksi_id',
                 't.total_tagihan',
-                't.status_pembayaran' // Status Lunas/Refund/Batal
+                't.status_pembayaran'
             ]);
 
-        // Filter 1: Tanggal Awal & Tanggal Akhir
+        // Filter Tanggal
         $tglAwal = $request->input('tgl1');
         $tglAkhir = $request->input('tgl2');
 
@@ -1543,17 +1890,20 @@ class PelayananController extends Controller
             ]);
         }
 
-        // Filter 2: Dokter
+        // Filter Dokter
         if ($dokter = $request->input('dokter')) {
-            $query->where('reg.dokter', $dokter);
+            $query->where(function ($q) use ($dokter) {
+                $q->where('doc_pengirim.nama_lengkap', 'like', "%{$dokter}%")
+                    ->orWhere('doc_poli.nama_lengkap', 'like', "%{$dokter}%");
+            });
         }
 
-        // Filter 3: Kelompok Pelanggan / Penjamin
+        // Filter Penjamin
         if ($penjamin = $request->input('penjamin')) {
             $query->where('sp.nama_sub_penjamin', 'like', "%{$penjamin}%");
         }
 
-        // Filter 4: Pemeriksaan
+        // Filter Pemeriksaan
         if ($pemeriksaan = $request->input('pemeriksaan')) {
             $query->whereExists(function ($sub) use ($pemeriksaan) {
                 $sub->select(DB::raw(1))
@@ -1566,20 +1916,20 @@ class PelayananController extends Controller
 
         $totalData = $query->count();
 
-        // 2. Global Search
+        // Global Search
         $searchValue = $request->input('search_custom') ?? $request->input('search.value');
         if ($searchValue) {
             $query->where(function ($q) use ($searchValue) {
                 $q->where('reg.no_registrasi', 'like', "%{$searchValue}%")
                     ->orWhere('p.nama', 'like', "%{$searchValue}%")
                     ->orWhere('p.pid', 'like', "%{$searchValue}%")
-                    ->orWhere('reg.dokter', 'like', "%{$searchValue}%");
+                    ->orWhere('doc_pengirim.nama_lengkap', 'like', "%{$searchValue}%")
+                    ->orWhere('doc_poli.nama_lengkap', 'like', "%{$searchValue}%");
             });
         }
 
         $totalFiltered = $query->count();
 
-        // 3. Pagination & Ordering (VARIABEL YANG SEMPAT HILANG)
         $start  = $request->input('start', 0);
         $length = $request->input('length', 10);
 
@@ -1588,8 +1938,8 @@ class PelayananController extends Controller
             ->orderBy('reg.tanggal_registrasi', 'desc')
             ->get();
 
-        // Fetch List Pemeriksaan
         $transaksiIds = $data->pluck('transaksi_id')->filter()->unique();
+
         $pemeriksaanData = DB::table('medical_transaksi_detail as td')
             ->join('medical_master_pemeriksaan as mp', 'td.master_pemeriksaan_id', '=', 'mp.id')
             ->whereIn('td.transaksi_id', $transaksiIds)
@@ -1597,72 +1947,61 @@ class PelayananController extends Controller
             ->get()
             ->groupBy('transaksi_id');
 
-        // 4. Formatting Output JSON
         $formattedData = [];
         $no = $start + 1;
 
         foreach ($data as $item) {
-            // Cek apakah data ini BATAL
-            $isBatal = ($item->status_kunjungan === 'BATAL');
-
-            // -- KOLOM AKSI --
-            if ($isBatal) {
-                // Jika sudah batal, hilangkan tombol dropdown aksi, ganti dengan label
-                $actionBtn = '<span class="badge bg-danger px-3 py-2"><i class="fas fa-ban me-1"></i>VOID</span>';
-            } else {
-                $actionBtn = '<div class="dropdown text-center">
-                                <button class="btn btn-sm btn-light border text-secondary" type="button" data-bs-toggle="dropdown" style="height: 100%; min-height: 40px; border-radius: 6px;">
-                                    <i class="fas fa-ellipsis-v"></i>
-                                </button>
-                                <ul class="dropdown-menu dropdown-menu-end border-0 shadow rounded-3 py-2 fs--1">
-                                    <li>
-                                        <button class="dropdown-item text-primary py-2 button-verifikasi-data" data-bs-toggle="modal" data-bs-target="#modal-registrasi" data-code="' . e($item->registrasi_id) . '">
-                                            <i class="fas fa-user-shield me-2"></i> Verifikasi Data
-                                        </button>
-                                    </li>
-                                    <li>
-                                        <hr class="dropdown-divider my-1">
-                                    </li>
-                                    <li>
-                                        <button class="dropdown-item text-danger py-2 button-batal-registrasi" data-code="' . e($item->registrasi_id) . '">
-                                            <i class="fas fa-ban me-2"></i> Pembatalan Registrasi
-                                        </button>
-                                    </li>
-                                </ul>
-                              </div>';
-            }
+            // Tombol Aksi Verifikasi & Batal
+            $actionBtn = '<div class="dropdown text-center">
+                    <button class="btn btn-sm text-white" type="button" data-bs-toggle="dropdown" style="background-color: #ff9800; height: 100%; min-height: 40px;">
+                        <i class="fas fa-ellipsis-v"></i>
+                    </button>
+                    <ul class="dropdown-menu shadow-sm">
+                        <li><a class="dropdown-item button-verifikasi-data" href="#" data-code="' . e($item->registrasi_id) . '"><i class="fas fa-user-check me-1 text-success"></i> Verifikasi Data</a></li>
+                        <li><a class="dropdown-item button-batal-registrasi text-danger" href="#" data-code="' . e($item->registrasi_id) . '"><i class="fas fa-ban me-1"></i> Batalkan Registrasi</a></li>
+                    </ul>
+                  </div>';
 
             $petugasBadge = $item->petugas
                 ? '<span class="badge bg-secondary text-white px-2 py-1" style="font-size: 0.7rem; border-radius: 4px;">' . e($item->petugas) . '</span>'
                 : '<span class="badge bg-secondary text-white px-2 py-1" style="font-size: 0.7rem; border-radius: 4px;">Sistem</span>';
 
             $namaHtml = '<div class="text-start">
-                            <div class="fw-bold text-dark" style="font-size: 0.85rem;">' . e($item->title) . ' ' . e($item->nama_pasien) . '</div>
-                            <div class="mt-1">' . $petugasBadge . '</div>
-                            <div class="mt-1 bg-secondary text-white d-inline-block px-2 py-1" style="font-size: 0.7rem; border-radius: 4px;">
-                                ' . date('d-m-Y H:i', strtotime($item->tanggal_registrasi)) . '
-                            </div>
-                         </div>';
+                    <div class="fw-bold text-dark" style="font-size: 0.85rem;">' . e($item->title) . ' ' . e($item->nama_pasien) . '</div>
+                    <div class="mt-1">' . $petugasBadge . '</div>
+                    <div class="mt-1 bg-secondary text-white d-inline-block px-2 py-1" style="font-size: 0.7rem; border-radius: 4px;">
+                        ' . date('d-m-Y H:i', strtotime($item->tanggal_registrasi)) . '
+                    </div>
+                   </div>';
 
-            // -- BADGE CITO & BATAL (Muncul di atas No Registrasi) --
+            $layananText = str_replace('_', ' ', ($item->jenis_layanan ?? 'RAWAT JALAN'));
+            if (!empty($item->nama_poli)) {
+                $layananText .= ' - ' . $item->nama_poli;
+            }
+
+            $layananColor = 'bg-primary';
+            if ($item->jenis_layanan == 'IGD') {
+                $layananColor = 'bg-danger';
+            } elseif ($item->jenis_layanan == 'RAWAT_INAP') {
+                $layananColor = 'bg-success';
+            }
+
+            $layananBadge = '<div class="mt-1"><span class="badge ' . $layananColor . ' text-white shadow-sm" style="font-size: 0.65rem;"><i class="fas fa-hospital-user me-1"></i>' . e($layananText) . '</span></div>';
+
             $citoBadge = $item->is_cito == 1
-                ? '<span class="badge bg-danger text-white shadow-sm me-1" style="font-size: 0.65rem;"><i class="fas fa-exclamation-triangle me-1"></i>CITO</span>'
+                ? '<div class="mb-1"><span class="badge bg-danger text-white shadow-sm" style="font-size: 0.65rem;"><i class="fas fa-exclamation-triangle me-1"></i>CITO</span></div>'
                 : '';
 
-            $batalBadge = $isBatal
-                ? '<span class="badge bg-dark text-white shadow-sm" style="font-size: 0.65rem;"><i class="fas fa-times me-1"></i>DIBATALKAN</span>'
-                : '';
+            $noRegHtml = '<div class="text-start">' . $citoBadge . '
+                    <div class="fw-bold text-dark" style="font-size: 0.85rem;">' . e($item->no_registrasi) . '</div>
+                    <div class="fw-bold" style="font-size: 0.85rem; color: #800000;">' . e($item->pid) . '</div>
+                    ' . $layananBadge . '
+                  </div>';
 
-            $noRegHtml = '<div class="text-start mb-1">' . $citoBadge . $batalBadge . '</div>
-                          <div class="text-start">
-                            <div class="fw-bold ' . ($isBatal ? 'text-decoration-line-through text-muted' : 'text-dark') . '" style="font-size: 0.85rem;">' . e($item->no_registrasi) . '</div>
-                            <div class="fw-bold" style="font-size: 0.85rem; color: #800000;">' . e($item->pid) . '</div>
-                          </div>';
-
-            $pemeriksaanHtml = '<div class="text-start ' . ($isBatal ? 'text-decoration-line-through text-muted' : '') . '" style="font-size: 0.85rem; color: #444;">';
+            $pemeriksaanHtml = '<div class="text-dark" style="font-size: 0.85rem;">';
             if (isset($pemeriksaanData[$item->transaksi_id])) {
                 foreach ($pemeriksaanData[$item->transaksi_id] as $l) {
-                    $pemeriksaanHtml .= '<div class="mb-1">' . e($l->nama_layanan) . '</div>';
+                    $pemeriksaanHtml .= '<div class="mb-1"><i class="fas fa-check-circle text-success me-1 fs--2"></i>' . e($l->nama_layanan) . '</div>';
                 }
             } else {
                 $pemeriksaanHtml .= '-';
@@ -1674,10 +2013,15 @@ class PelayananController extends Controller
                 $metodeArray = json_decode($item->metode_pengiriman, true);
                 if (is_array($metodeArray)) {
                     foreach ($metodeArray as $metode) {
-                        if ($metode == 'whatsapp') $pengirimanHtml .= '<button class="btn btn-sm text-white fw-bold py-1 px-2 w-100 text-start" style="font-size: 0.7rem; background-color: #25D366; border:none;"><i class="fab fa-whatsapp me-1"></i> WHATSAPP</button>';
-                        elseif ($metode == 'email') $pengirimanHtml .= '<button class="btn btn-sm text-white fw-bold py-1 px-2 w-100 text-start" style="font-size: 0.7rem; background-color: #EA4335; border:none;"><i class="fas fa-envelope me-1"></i> EMAIL</button>';
-                        elseif ($metode == 'satusehat') $pengirimanHtml .= '<button class="btn btn-sm text-white fw-bold py-1 px-2 w-100 text-start" style="font-size: 0.7rem; background-color: #00BFA6; border:none;"><i class="fas fa-heartbeat me-1"></i> SATU SEHAT</button>';
-                        elseif ($metode == 'cetak_fisik') $pengirimanHtml .= '<button class="btn btn-sm text-white fw-bold py-1 px-2 w-100 text-start" style="font-size: 0.7rem; background-color: #6c757d; border:none;"><i class="fas fa-print me-1"></i> CETAK FISIK</button>';
+                        if ($metode == 'whatsapp') {
+                            $pengirimanHtml .= '<button class="btn btn-sm text-white fw-bold py-1 px-2 w-100 text-start" style="font-size: 0.7rem; background-color: #25D366; border:none;"><i class="fab fa-whatsapp me-1"></i> WHATSAPP</button>';
+                        } elseif ($metode == 'email') {
+                            $pengirimanHtml .= '<button class="btn btn-sm text-white fw-bold py-1 px-2 w-100 text-start" style="font-size: 0.7rem; background-color: #EA4335; border:none;"><i class="fas fa-envelope me-1"></i> EMAIL</button>';
+                        } elseif ($metode == 'satusehat') {
+                            $pengirimanHtml .= '<button class="btn btn-sm text-white fw-bold py-1 px-2 w-100 text-start" style="font-size: 0.7rem; background-color: #00BFA6; border:none;"><i class="fas fa-heartbeat me-1"></i> SATU SEHAT</button>';
+                        } elseif ($metode == 'cetak_fisik') {
+                            $pengirimanHtml .= '<button class="btn btn-sm text-white fw-bold py-1 px-2 w-100 text-start" style="font-size: 0.7rem; background-color: #6c757d; border:none;"><i class="fas fa-print me-1"></i> CETAK FISIK</button>';
+                        }
                     }
                 }
             } else {
@@ -1685,35 +2029,40 @@ class PelayananController extends Controller
             }
             $pengirimanHtml .= '</div>';
 
-            // -- BADGE STATUS PEMBAYARAN & REFUND --
-            $statusBayar = strtoupper($item->status_pembayaran ?? 'BELUM LUNAS');
-
-            if ($statusBayar === 'BATAL') {
-                $pembayaranBadge = '<div class="mt-1"><span class="badge bg-danger text-white shadow-sm" style="font-size: 0.65rem;"><i class="fas fa-times-circle me-1"></i>BATAL (VOID)</span></div>';
-            } elseif ($statusBayar === 'REFUND') {
-                $pembayaranBadge = '<div class="mt-1"><span class="badge bg-secondary text-white shadow-sm" style="font-size: 0.65rem;"><i class="fas fa-undo me-1"></i>RETUR DANA</span></div>';
-            } elseif ($statusBayar === 'LUNAS') {
-                $pembayaranBadge = '<div class="mt-1"><span class="badge bg-success text-white shadow-sm" style="font-size: 0.65rem;"><i class="fas fa-check-circle me-1"></i>LUNAS</span></div>';
-            } else {
-                $pembayaranBadge = '<div class="mt-1"><span class="badge bg-warning text-dark shadow-sm" style="font-size: 0.65rem;"><i class="fas fa-clock me-1"></i>BELUM LUNAS</span></div>';
-            }
+            $statusBayar = strtoupper($item->status_pembayaran ?? 'LUNAS');
+            $pembayaranBadge = $statusBayar === 'LUNAS'
+                ? '<div class="mt-1"><span class="badge bg-success text-white shadow-sm" style="font-size: 0.65rem;"><i class="fas fa-check-circle me-1"></i>LUNAS</span></div>'
+                : '<div class="mt-1"><span class="badge bg-warning text-dark shadow-sm" style="font-size: 0.65rem;"><i class="fas fa-clock me-1"></i>BELUM LUNAS</span></div>';
 
             $totalTagihanHtml = '<div class="text-end">
-                                    <div class="fw-bold ' . ($isBatal ? 'text-decoration-line-through text-muted' : 'text-dark') . '" style="font-size: 0.85rem;">' . number_format($item->total_tagihan, 0, ',', '.') . '</div>
-                                    ' . $pembayaranBadge . '
-                                 </div>';
+                                <div class="fw-bold text-dark" style="font-size: 0.85rem;">' . number_format($item->total_tagihan, 0, ',', '.') . '</div>
+                                ' . $pembayaranBadge . '
+                               </div>';
+
+            // Tampilan Kolom Dokter (Dokter Poli & Pengirim)
+            $infoDokterHtml = '<div style="font-size: 0.8rem;">';
+            if (!empty($item->nama_dokter_poli)) {
+                $infoDokterHtml .= '<div class="fw-bold text-dark"><i class="fas fa-user-md text-primary me-1"></i> ' . e($item->nama_dokter_poli) . '</div>';
+            }
+            if (!empty($item->nama_dokter_pengirim)) {
+                $infoDokterHtml .= '<div class="text-muted small mt-1">Pengirim: ' . e($item->nama_dokter_pengirim) . '</div>';
+            }
+            if (empty($item->nama_dokter_poli) && empty($item->nama_dokter_pengirim)) {
+                $infoDokterHtml .= '-';
+            }
+            $infoDokterHtml .= '</div>';
 
             $formattedData[] = [
-                'action'       => $actionBtn,
-                'no'           => $no++,
-                'no_reg'       => $noRegHtml,
-                'nama'         => $namaHtml,
-                'agreement'    => '<div style="font-size: 0.85rem; color: #555;">' . e($item->agreement ?? 'UMUM') . '</div>',
-                'dokter'       => '<div style="font-size: 0.85rem; color: #555;">' . e($item->dokter ?? '-') . '</div>',
-                'janji_hasil'  => '<div style="font-size: 0.85rem; color: #555;">' . ($item->janji_hasil ? date('d-m-Y H:i', strtotime($item->janji_hasil)) : '-') . '</div>',
-                'pemeriksaan'  => $pemeriksaanHtml,
-                'pengiriman'   => $pengirimanHtml,
-                'total'        => $totalTagihanHtml
+                'action'      => $actionBtn,
+                'no'          => $no++,
+                'no_reg'      => $noRegHtml,
+                'nama'        => $namaHtml,
+                'agreement'   => '<div class="text-primary fw-bold" style="font-size: 0.85rem;">' . e($item->agreement ?? 'UMUM / PRIBADI') . '</div>',
+                'dokter'      => $infoDokterHtml,
+                'janji_hasil' => '<div class="text-dark" style="font-size: 0.85rem;">' . ($item->janji_hasil ? date('d-m-Y H:i', strtotime($item->janji_hasil)) : '-') . '</div>',
+                'pemeriksaan' => $pemeriksaanHtml,
+                'pengiriman'  => $pengirimanHtml,
+                'total'       => $totalTagihanHtml
             ];
         }
 
@@ -1922,34 +2271,7 @@ class PelayananController extends Controller
     public function menu_pelayanan_verifikasi_registrasi($akses, $id)
     {
         if ($this->url_akses_sub($akses, $id) == true) {
-            // Mengambil data registrasi & pasien dari tabel medis baru
-            $data = DB::table('medical_registrasi as reg')
-                ->join('medical_patient as p', 'p.id', '=', 'reg.pasien_id')
-                ->leftJoin('medical_sub_penjamin as sp', 'sp.id', '=', 'reg.sub_penjamin_id')
-                ->leftJoin('user_mains as u', 'u.userid', '=', 'reg.user_id')
-                ->leftJoin('medical_transaksi as t', 't.registrasi_id', '=', 'reg.id')
-                ->select([
-                    'reg.id as registrasi_id',
-                    'reg.no_registrasi',
-                    'reg.tanggal_registrasi',
-                    'reg.dokter',
-                    'reg.is_cito',
-                    'p.id as pasien_id',
-                    'p.pid',
-                    'p.title',
-                    'p.nama as nama_pasien',
-                    'p.jk',
-                    'p.tempat_lahir', // <-- Diperbaiki sesuai schema
-                    'p.tgl_lahir',
-                    'sp.nama_sub_penjamin as agreement',
-                    'u.username as petugas',
-                    't.id as transaksi_id'
-                ])
-                ->orderBy('reg.id', 'DESC')
-                ->get();
-
             return view('application.pelayanan.menu-verifikasi-data-registrasi', [
-                'data' => $data,
                 'akses' => $akses,
                 'code' => $id
             ]);
@@ -1957,6 +2279,9 @@ class PelayananController extends Controller
             return Redirect::to('dashboard/home');
         }
     }
+
+    // Controller untuk DataTables Verifikasi Registrasi
+
     public function menu_pelayanan_verifikasi_registrasi_old($akses, $id)
     {
         if ($this->url_akses_sub($akses, $id) == true) {

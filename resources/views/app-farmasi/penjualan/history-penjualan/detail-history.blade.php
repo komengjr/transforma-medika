@@ -1,170 +1,164 @@
 <div class="modal-body p-0">
-    <div class="bg-primary rounded-top-lg py-3 ps-4 pe-6">
-        <h4 class="mb-1" style="color: white;" id="staticBackdropLabel">Data Riwayat Penjualan</h4>
-        <p class="fs--2 mb-0" style="color: white;">Support by <a class="link-600 fw-semi-bold"
-                href="#!">{{ Env('APP_LABEL')}}</a>
-        </p>
+    <!-- Header Modal Tema Retro -->
+    <div class="py-3 ps-4 pe-6" style="background-color: var(--retro-dark); border-bottom: 3px solid var(--retro-dark);">
+        <h4 class="mb-1 fw-bolder" style="color: var(--retro-green);" id="staticBackdropLabel">
+            <i class="fas fa-file-invoice me-2"></i> Detail Invoice / Nota Penjualan
+        </h4>
+        <p class="fs--2 mb-0 text-white">Support by <span class="fw-bold" style="color: var(--retro-yellow);">{{ Env('APP_LABEL') }}</span></p>
     </div>
-    <div class="p-3 pb-3">
-        <div class="card mb-3 border border-warning">
-            <div class="card-body">
+
+    <div class="p-4 bg-white">
+        <!-- Top Bar Action & Nomor Nota -->
+        <div class="card mb-3 retro-card shadow-sm">
+            <div class="card-body p-3">
                 <div class="row justify-content-between align-items-center">
                     <div class="col-md">
-                        <h5 class="mb-2 mb-md-0">Order #AD20294</h5>
+                        <h5 class="mb-0 fw-bold text-dark">No. Nota / Order: <span class="text-success">{{ $order->farm_order_data_code ?? $code }}</span></h5>
                     </div>
                     <div class="col-auto">
-
-                        <button class="btn btn-falcon-default btn-sm me-1 mb-2 mb-sm-0" type="button"><svg
-                                class="svg-inline--fa fa-print fa-w-16 me-1" aria-hidden="true" focusable="false"
-                                data-prefix="fas" data-icon="print" role="img" xmlns="http://www.w3.org/2000/svg"
-                                viewBox="0 0 512 512" data-fa-i2svg="">
-                                <path fill="currentColor"
-                                    d="M448 192V77.25c0-8.49-3.37-16.62-9.37-22.63L393.37 9.37c-6-6-14.14-9.37-22.63-9.37H96C78.33 0 64 14.33 64 32v160c-35.35 0-64 28.65-64 64v112c0 8.84 7.16 16 16 16h48v96c0 17.67 14.33 32 32 32h320c17.67 0 32-14.33 32-32v-96h48c8.84 0 16-7.16 16-16V256c0-35.35-28.65-64-64-64zm-64 256H128v-96h256v96zm0-224H128V64h192v48c0 8.84 7.16 16 16 16h48v96zm48 72c-13.25 0-24-10.75-24-24 0-13.26 10.75-24 24-24s24 10.74 24 24c0 13.25-10.75 24-24 24z">
-                                </path>
-                            </svg>Print</button>
-
+                        <button class="btn retro-btn retro-btn-primary btn-sm me-1 mb-2 mb-sm-0" type="button" onclick="window.print()">
+                            <i class="fas fa-print me-1"></i> Print Nota
+                        </button>
                     </div>
                 </div>
             </div>
         </div>
-        <div class="card border border-primary">
-            <div class="card-body">
+
+        <!-- Invoice Body Card -->
+        <div class="card retro-card border-0">
+            <div class="card-body p-4">
+                <!-- Header Nota / Instansi -->
                 <div class="row align-items-center text-center mb-3">
-                    <div class="col-sm-6 text-sm-start"><img src="{{asset('img/favicon.png')}}" alt="invoice"
-                            width="150"></div>
+                    <div class="col-sm-6 text-sm-start">
+                        <img src="{{ asset('img/favicon.png') }}" alt="logo" width="100" class="mb-2">
+                        <h5 class="fw-bold mb-0 text-dark">{{ Env('APP_LABEL', 'Sistem Farmasi') }}</h5>
+                        <p class="fs--1 text-muted mb-0">Layanan Kesehatan & Farmasi Terpadu</p>
+                    </div>
                     <div class="col text-sm-end mt-3 mt-sm-0">
-                        <h2 class="mb-3">Invoice / Nota</h2>
-                        <h5>Falcon Design Studio</h5>
-                        <p class="fs--1 mb-0">156 University Ave, Toronto<br>On, Canada, M5H 2H7</p>
+                        <h3 class="mb-1 text-uppercase fw-bolder text-dark">INVOICE</h3>
+                        <p class="fs--1 mb-0 fw-bold text-success">STATUS: LUNAS / SELESAI</p>
                     </div>
                     <div class="col-12">
-                        <hr>
+                        <hr class="border-dark my-3">
                     </div>
                 </div>
-                <div class="row align-items-center">
-                    <div class="col">
-                        <h6 class="text-500">Invoice to</h6>
-                        <h5>Antonio Banderas</h5>
-                        <p class="fs--1">1954 Bloor Street West<br>Torronto ON, M6P 3K9<br>Canada</p>
-                        <p class="fs--1">
-                            <a href="mailto:example@gmail.com">example@gmail.com</a><br>
-                            <a href="tel:444466667777">+4444-6666-7777</a>
-                        </p>
+
+                <!-- Informasi Pembeli / Pasien & Detail Nota -->
+                <div class="row align-items-center mb-4">
+                    <div class="col-md-6">
+                        <h6 class="text-muted fw-bold fs--1 text-uppercase">Informasi Pembeli / Pasien:</h6>
+                        @php
+                        $pasien = DB::table('farm_order_data_pasien')->where('farm_order_data_code', $code)->first();
+                        @endphp
+                        @if ($pasien)
+                        <h5 class="fw-bolder text-dark mb-1">{{ $pasien->farm_order_data_pasien_name }}</h5>
+                        <p class="fs--1 text-muted mb-0">Tipe Order: <span class="badge bg-primary">RESEP DOKTER</span></p>
+                        @else
+                        <h5 class="fw-bolder text-dark mb-1">Umum / Non-Resep</h5>
+                        <p class="fs--1 text-muted mb-0">Tipe Order: <span class="badge bg-warning text-dark">NON RESEP (BEBAS)</span></p>
+                        @endif
                     </div>
-                    <div class="col-sm-auto ms-auto">
+                    <div class="col-md-6 ms-auto mt-3 mt-md-0">
                         <div class="table-responsive">
-                            <table class="table table-sm table-borderless fs--1">
+                            <table class="table table-sm table-borderless fs--1 mb-0">
                                 <tbody>
                                     <tr>
-                                        <th>Invoice No</th>
-                                        <td>:</td>
-                                        <td>14</td>
+                                        <th class="text-end text-muted">No. Order / Nota:</th>
+                                        <td class="fw-bold text-dark">: {{ $code }}</td>
+                                    </tr>
+                                    @php
+                                    $orderHeader = DB::table('farm_order_data')->where('farm_order_data_code', $code)->first();
+                                    @endphp
+                                    <tr>
+                                        <th class="text-end text-muted">Tanggal Transaksi:</th>
+                                        <td class="fw-bold text-dark">: {{ $orderHeader->farm_order_data_date ?? date('Y-m-d H:i:s') }}</td>
                                     </tr>
                                     <tr>
-                                        <th>Order Number:</th>
-                                        <td>:</td>
-                                        <td>{{$code}}</td>
+                                        <th class="text-end text-muted">Metode Pembayaran:</th>
+                                        <td class="fw-bold text-dark">: Tunai / Kasir</td>
                                     </tr>
-                                    <tr>
-                                        <th>Invoice Date:</th>
-                                        <td>:</td>
-                                        <td>2018-09-25</td>
-                                    </tr>
-                                    <tr>
-                                        <th>Payment Due:</th>
-                                        <td>:</td>
-                                        <td>Upon receipt</td>
-                                    </tr>
-                                    <!-- <tr class="alert-success fw-bold">
-                                        <th class="text-sm-end">Amount Due:</th>
-                                        <td>$19688.40</td>
-                                    </tr> -->
                                 </tbody>
                             </table>
                         </div>
                     </div>
                 </div>
-                <div class="table-responsive scrollbar mt-4 fs--1">
-                    <table class="table table-striped border-bottom">
-                        <thead class="light">
-                            <tr class="bg-primary text-white dark__bg-1000">
-                                <th class="border-0">Products</th>
-                                <th class="border-0 text-center">Quantity</th>
-                                <th class="border-0 text-end">Rate</th>
-                                <th class="border-0 text-end">Amount</th>
+
+                <!-- Tabel Item Obat -->
+                <div class="table-responsive scrollbar mb-4 fs--1">
+                    <table class="table table-bordered table-custom align-middle">
+                        <thead class="table-dark" style="background-color: var(--retro-dark); color: var(--retro-green);">
+                            <tr>
+                                <th class="py-2 px-3 text-start">Nama Produk / Obat</th>
+                                <th class="py-2 px-3 text-center" style="width: 80px;">Qty</th>
+                                <th class="py-2 px-3 text-end" style="width: 130px;">Harga Satuan</th>
+                                <th class="py-2 px-3 text-end" style="width: 140px;">Subtotal</th>
                             </tr>
                         </thead>
-                        <tbody>
+                        <tbody class="bg-white">
+                            @php
+                            $subtotalTotal = 0;
+                            $listObat = DB::table('farm_order_data_list')
+                            ->join('farm_data_obat', 'farm_data_obat.farm_data_obat_code', '=', 'farm_order_data_list.farm_data_obat_code')
+                            ->where('farm_order_data_code', $code)
+                            ->get();
+                            @endphp
+
+                            @if($listObat->count() > 0)
+                            @foreach ($listObat as $item)
+                            @php
+                            $sub = $item->farm_order_data_list_price * $item->farm_order_data_list_qty;
+                            $subtotalTotal += $sub;
+                            @endphp
                             <tr>
-                                <td class="align-middle">
-                                    <h6 class="mb-0 text-nowrap">Platinum web hosting package</h6>
-                                    <p class="mb-0">Down 35mb, Up 100mb</p>
+                                <td class="align-middle py-2 px-3">
+                                    <h6 class="mb-0 fw-bold text-dark">{{ $item->farm_data_obat_name }}</h6>
+                                    <small class="text-muted">Kode: {{ $item->farm_data_obat_code }}</small>
                                 </td>
-                                <td class="align-middle text-center">2</td>
-                                <td class="align-middle text-end">$65.00</td>
-                                <td class="align-middle text-end">$130.00</td>
+                                <td class="align-middle text-center py-2 px-3 fw-bold">{{ $item->farm_order_data_list_qty }}</td>
+                                <td class="align-middle text-end py-2 px-3">@currency($item->farm_order_data_list_price)</td>
+                                <td class="align-middle text-end py-2 px-3 fw-bold text-success">@currency($sub)</td>
                             </tr>
+                            @endforeach
+                            @else
                             <tr>
-                                <td class="align-middle">
-                                    <h6 class="mb-0 text-nowrap">2 Page website design</h6>
-                                    <p class="mb-0">Includes basic wireframes and responsive templates</p>
-                                </td>
-                                <td class="align-middle text-center">1</td>
-                                <td class="align-middle text-end">$2,100.00</td>
-                                <td class="align-middle text-end">$2,100.00</td>
+                                <td colspan="4" class="text-center py-3 text-muted fw-bold">Tidak ada rincian obat pada order ini.</td>
                             </tr>
-                            <tr>
-                                <td class="align-middle">
-                                    <h6 class="mb-0 text-nowrap">Mobile App Development</h6>
-                                    <p class="mb-0">Includes responsive navigation</p>
-                                </td>
-                                <td class="align-middle text-center">8</td>
-                                <td class="align-middle text-end">$5,00.00</td>
-                                <td class="align-middle text-end">$4,000.00</td>
-                            </tr>
-                            <tr>
-                                <td class="align-middle">
-                                    <h6 class="mb-0 text-nowrap">Web App Development</h6>
-                                    <p class="mb-0">Includes react spa</p>
-                                </td>
-                                <td class="align-middle text-center">6</td>
-                                <td class="align-middle text-end">$2,000.00</td>
-                                <td class="align-middle text-end">$12,000.00</td>
-                            </tr>
+                            @endif
                         </tbody>
                     </table>
                 </div>
+
+                <!-- Bagian Total Pembayaran -->
                 <div class="row justify-content-end">
-                    <div class="col-auto">
+                    <div class="col-md-5">
                         <table class="table table-sm table-borderless fs--1 text-end">
                             <tbody>
                                 <tr>
-                                    <th class="text-900">Subtotal:</th>
-                                    <td class="fw-semi-bold">$18,230.00 </td>
+                                    <th class="text-muted">Subtotal:</th>
+                                    <td class="fw-bold text-dark">@currency($subtotalTotal)</td>
                                 </tr>
                                 <tr>
-                                    <th class="text-900">Tax 8%:</th>
-                                    <td class="fw-semi-bold">$1458.40</td>
+                                    <th class="text-muted">Diskon / PPN:</th>
+                                    <td class="fw-bold text-dark">Rp 0</td>
                                 </tr>
-                                <tr class="border-top">
-                                    <th class="text-900">Total:</th>
-                                    <td class="fw-semi-bold">$19688.40</td>
-                                </tr>
-                                <tr class="border-top border-top-2 fw-bolder text-900">
-                                    <th>Amount Due:</th>
-                                    <td>$19688.40</td>
+                                <tr class="border-top border-dark">
+                                    <th class="text-dark fw-bolder fs-2 pt-2">Total Pembayaran:</th>
+                                    <td class="fw-bolder text-danger fs-2 pt-2">@currency($subtotalTotal)</td>
                                 </tr>
                             </tbody>
                         </table>
                     </div>
                 </div>
+
             </div>
-            <!-- <div class="card-footer bg-light">
-                <p class="fs--1 mb-0"><strong>Notes: </strong>We really appreciate your business and if there’s anything
-                    else we can do, please let us know!</p>
-            </div> -->
+
+            <!-- Footer Catatan Nota -->
+            <div class="card-footer bg-light border-top border-dark p-3">
+                <p class="fs--1 mb-0 text-muted"><strong>Catatan: </strong>Terima kasih atas kunjungan dan pembelian Anda di unit farmasi kami. Barang yang sudah dibeli tidak dapat ditukar/dikembalikan.</p>
+            </div>
         </div>
     </div>
 </div>
-<div class="modal-footer px-4 bg-300">
+<div class="modal-footer px-4 bg-light border-top border-dark">
+    <button type="button" class="btn retro-btn btn-secondary btn-sm px-4 fw-bold" data-bs-dismiss="modal">Tutup</button>
 </div>

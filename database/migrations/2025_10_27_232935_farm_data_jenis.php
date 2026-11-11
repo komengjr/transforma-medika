@@ -21,6 +21,14 @@ class FarmDataJenis extends Migration
             $table->text('farm_data_jenis_desc');
             $table->timestamps();
         });
+        Schema::create('farm_data_satuan', function (Blueprint $table) {
+            $table->id('id_farm_data_satuan');
+            $table->string('farm_data_satuan_code')->unique();
+            $table->string('farm_data_satuan_name');
+            $table->string('farm_data_satuan_jenis');
+            $table->text('farm_data_satuan_desc');
+            $table->timestamps();
+        });
     }
 
     /**
@@ -31,5 +39,6 @@ class FarmDataJenis extends Migration
     public function down()
     {
         Schema::dropIfExists('farm_data_jenis');
+        Schema::dropIfExists('farm_data_satuan');
     }
 }

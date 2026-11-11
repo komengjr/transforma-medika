@@ -1,128 +1,223 @@
 @extends('layouts.layouts')
+
 @section('base.css')
 <link rel="stylesheet" href="https://cdn.datatables.net/2.2.2/css/dataTables.bootstrap5.css">
 <link rel="stylesheet" href="https://cdn.datatables.net/responsive/3.0.4/css/responsive.bootstrap5.css">
 <link href="{{ asset('vendors/choices/choices.min.css') }}" rel="stylesheet" />
+
+<style>
+    /* =========================================
+       RETRO / NEUBRUTALISM THEME STYLES
+       ========================================= */
+    :root {
+        --retro-dark: #1e1e24;
+        --retro-yellow: #ffde59;
+        --retro-pink: #ffa6c9;
+        --retro-cyan: #8bf0fa;
+        --retro-orange: #ff914d;
+        --retro-green: #c1ff72;
+        --retro-purple: #c8b6ff;
+        --retro-bg: #f4f0ea;
+        --retro-border: 3px solid var(--retro-dark);
+        --retro-shadow: 5px 5px 0px var(--retro-dark);
+        --retro-shadow-sm: 3px 3px 0px var(--retro-dark);
+    }
+
+    body {
+        background-color: var(--retro-bg);
+    }
+
+    /* Retro Cards */
+    .retro-card {
+        border: var(--retro-border);
+        border-radius: 12px;
+        box-shadow: var(--retro-shadow);
+        background-color: #ffffff;
+        overflow: hidden;
+    }
+
+    /* Retro Header Banner */
+    .retro-header-banner {
+        background: linear-gradient(135deg, var(--retro-pink) 0%, var(--retro-orange) 100%);
+        border: var(--retro-border);
+        border-radius: 12px;
+        box-shadow: var(--retro-shadow);
+        color: var(--retro-dark);
+    }
+
+    /* Retro Buttons */
+    .retro-btn {
+        font-weight: 800 !important;
+        border: 2px solid var(--retro-dark);
+        box-shadow: var(--retro-shadow-sm);
+        border-radius: 6px;
+        transition: all 0.1s ease-in-out;
+        text-transform: uppercase;
+        letter-spacing: 0.5px;
+        cursor: pointer;
+    }
+
+    .retro-btn:active {
+        transform: translate(3px, 3px);
+        box-shadow: 0px 0px 0px var(--retro-dark);
+    }
+
+    .retro-btn-primary {
+        background-color: var(--retro-cyan);
+        color: var(--retro-dark);
+    }
+
+    .retro-btn-primary:hover {
+        background-color: #6ce0ed;
+        color: var(--retro-dark);
+    }
+
+    .retro-btn-warning {
+        background-color: var(--retro-yellow);
+        color: var(--retro-dark);
+    }
+
+    .retro-btn-warning:hover {
+        background-color: #e6c84c;
+        color: var(--retro-dark);
+    }
+
+    .retro-btn-light {
+        background-color: #ffffff;
+        color: var(--retro-dark);
+    }
+
+    .retro-btn-light:hover {
+        background-color: #f0f0f0;
+        color: var(--retro-dark);
+    }
+
+    /* Table Styling */
+    .retro-table-header {
+        background-color: var(--retro-dark);
+        color: var(--retro-green);
+        border-bottom: 3px solid var(--retro-dark);
+        font-weight: bold;
+        text-transform: uppercase;
+        letter-spacing: 1px;
+    }
+
+    #example tbody tr {
+        border-bottom: 2px solid var(--retro-dark);
+        transition: background 0.2s;
+    }
+
+    #example tbody tr:hover {
+        background-color: var(--retro-yellow) !important;
+    }
+
+    .retro-badge {
+        border: 2px solid var(--retro-dark);
+        border-radius: 6px;
+        padding: 4px 8px;
+        font-weight: 800;
+        box-shadow: 2px 2px 0px var(--retro-dark);
+        text-transform: uppercase;
+        display: inline-block;
+    }
+
+    /* DataTables Customization */
+    .dataTables_wrapper .dataTables_filter input {
+        border: 2px solid var(--retro-dark);
+        border-radius: 6px;
+        box-shadow: 2px 2px 0px var(--retro-dark);
+        padding: 4px 10px;
+        font-weight: 600;
+        outline: none;
+    }
+</style>
 @endsection
+
 @section('content')
-<div class="row mb-3">
+<!-- HEADER BANNER -->
+<div class="row mb-4">
     <div class="col">
-        <div class="card bg-200 shadow border border-primary">
+        <div class="card retro-header-banner p-1">
             <div class="row gx-0 flex-between-center">
-                <div class="col-sm-auto d-flex align-items-center border-bottom">
-                    <img class="ms-3 mx-3 m-2" src="{{ asset('img/kategori.png') }}" alt="" width="50" />
-                    <div>
-                        <h6 class="text-primary fs--1 mb-0 pt-2">Welcome to </h6>
-                        <h4 class="text-primary fw-bold mb-1">TRANS <span class="text-primary fw-medium">Medical
-                                System</span></h4>
+                <div class="col-sm-auto d-flex align-items-center p-3">
+                    <div style="background: white; border: 2px solid #1e1e24; border-radius: 50%; padding: 8px; box-shadow: 3px 3px 0px #1e1e24;" class="me-3">
+                        <img src="{{ asset('img/kategori.png') }}" alt="" width="45" />
                     </div>
-                    <img class="ms-n4 d-none d-lg-block "
-                        src="{{ asset('asset/img/illustrations/crm-line-chart.png') }}" alt="" width="150" />
-                </div>
-                <div class="col-xl-auto px-3 py-2">
-                    <h6 class="text-primary fs--1 mb-0">Menu : </h6>
-                    <h4 class="text-primary fw-bold mb-0">Specimen <span class="text-primary fw-medium">Pemeriksaan</span>
-                    </h4>
+                    <div>
+                        <h6 class="fs--1 mb-0 fw-bold" style="color: rgba(30, 30, 36, 0.7);">MANAJEMEN LABORATORIUM</h6>
+                        <h3 class="fw-bolder mb-0" style="color: var(--retro-dark); text-shadow: 1px 1px 0px white;">SPESIMEN <span class="fw-normal">PEMERIKSAAN</span></h3>
+                    </div>
                 </div>
             </div>
         </div>
     </div>
 </div>
-{{-- <div class="card mb-3"><img class="card-img-top" src="../../assets/img/generic/13.jpg" alt="" />
-        <div class="card-body">
-            <div class="row justify-content-between align-items-center">
-                <div class="col">
-                    <div class="d-flex">
-                        <div class="calendar me-2"><span class="calendar-month">Dec</span><span class="calendar-day">31
-                            </span></div>
-                        <div class="flex-1 fs--1">
-                            <h5 class="fs-0">FREE New Year's Eve Midnight Harbor Fireworks</h5>
-                            <p class="mb-0">by <a href="#!">Boston Harbor Now</a></p><span
-                                class="fs-0 text-warning fw-semi-bold">$49.99 – $89.99</span>
-                        </div>
-                    </div>
-                </div>
-                <div class="col-md-auto mt-4 mt-md-0">
-                    <button class="btn btn-falcon-default btn-sm me-2" type="button"><span
-                            class="fas fa-heart text-danger me-1"></span>235</button>
-                    <button class="btn btn-falcon-default btn-sm me-2" type="button"><span
-                            class="fas fa-share-alt me-1"></span>Share</button>
-                    <button class="btn btn-falcon-primary btn-sm px-4 px-sm-5" type="button">Register</button>
-                </div>
-            </div>
-        </div>
-    </div> --}}
-<div class="row g-3">
+
+<div class="row g-4">
+    <!-- TABEL PEMERIKSAAN (KIRI) -->
     <div class="col-lg-8">
-        <div class="sticky-sidebar">
-            <div class="card mb-3 mb-lg-0">
-                <div class="card-header bg-300">
-                    <h5 class="mb-0">Data Pemeriksaan</h5>
-                </div>
-                <div class="card-body fs--1">
-                    <table id="example" class="table table-striped nowrap" style="width:100%">
-                        <thead class="bg-200 text-700">
+        <div class="retro-card mb-3 mb-lg-0">
+            <div class="card-header py-3 px-4 d-flex justify-content-between align-items-center" style="background-color: var(--retro-dark);">
+                <h5 class="mb-0 fw-bolder" style="color: var(--retro-cyan);">
+                    <span class="fas fa-microscope me-2"></span> Data Master Pemeriksaan
+                </h5>
+            </div>
+            <div class="card-body p-4" style="background-color: #ffffff;">
+                <div class="table-responsive">
+                    <table id="example" class="table align-middle nowrap fw-bold" style="width:100%; border: 2px solid var(--retro-dark);">
+                        <thead class="retro-table-header">
                             <tr>
-                                <th>No</th>
-                                <th>Kategori Pemeriksaan</th>
-                                <th>Nama Pemeriksaan</th>
-                                <th>Jenis Pemeriksaan</th>
-                                <th>Action</th>
+                                <th class="text-center py-3" style="width: 50px;">No</th>
+                                <th class="py-3">Kode</th>
+                                <th class="py-3">Tipe Layanan</th>
+                                <th class="py-3">Nama Pemeriksaan</th>
+                                <th class="text-center py-3" style="width: 100px;">Action</th>
                             </tr>
                         </thead>
-                        <tbody>
-                            @php
-                            $no = 1;
-                            @endphp
+                        <tbody style="color: var(--retro-dark);">
+                            @php $no = 1; @endphp
                             @foreach ($data as $datas)
                             <tr>
-                                <td>{{ $no++ }}</td>
-                                <td>{{ $datas->t_pemeriksaan_cat_name }}</td>
-                                <td>{{ $datas->t_pemeriksaan_data_name }}</td>
-                                <td>{{ $datas->t_pemeriksaan_list_name }}</td>
-                                <td>
-                                    <button class="btn btn-sm btn-falcon-primary" id="button-pilih-specimen" data-code="{{ $datas->t_pemeriksaan_list_code  }}"><span class="fas fa-align-left me-1"
-                                            data-fa-transform="shrink-3"></span>Option</button>
+                                <td class="text-center">{{ $no++ }}</td>
+                                <td><span class="retro-badge" style="background-color: var(--retro-bg);">{{ $datas->kode_layanan }}</span></td>
+                                <td class="text-uppercase">{{ $datas->nama_tipe }}</td>
+                                <td class="text-uppercase" style="font-size: 1.05rem;">{{ $datas->nama_layanan }}</td>
+                                <td class="text-center">
+                                    <button class="btn btn-sm retro-btn retro-btn-warning" id="button-pilih-specimen" data-code="{{ $datas->id }}">
+                                        <i class="fas fa-flask me-1"></i> PILIH
+                                    </button>
                                 </td>
                             </tr>
                             @endforeach
                         </tbody>
                     </table>
                 </div>
-                <div class="card-footer bg-light  border-top">
-                    <!-- <a class="btn btn-link d-block w-100" href="../../app/events/event-list.html">All Events<span
-                            class="fas fa-chevron-right ms-1 fs--2"></span></a> -->
-                </div>
             </div>
         </div>
     </div>
+
+    <!-- PANEL DETAIL SPESIMEN (KANAN) -->
     <div class="col-lg-4">
-        <div class="card mb-3 mb-lg-0">
-            <div class="card mb-3 mb-lg-0">
-                <div class="card-header bg-300">
-                    <h5 class="mb-0">Data Specimen</h5>
+        <div class="retro-card mb-3 mb-lg-0">
+            <div class="card-header py-3 px-4" style="background-color: var(--retro-yellow); border-bottom: 3px solid var(--retro-dark);">
+                <h5 class="mb-0 fw-bolder" style="color: var(--retro-dark);">
+                    <i class="fas fa-vial me-2"></i> Data Specimen
+                </h5>
+            </div>
+            <div class="card-body p-4" style="background-color: #ffffff;">
+                <div id="menu-master-specimen">
+                    <div class="text-center py-5 text-muted">
+                        <i class="fas fa-arrow-left fs-3 d-block mb-2 text-primary"></i>
+                        <em class="fw-bold">Silakan klik tombol "Pilih" pada salah satu pemeriksaan di sebelah kiri untuk mengatur spesimen.</em>
+                    </div>
                 </div>
-                <span id="menu-master-specimen"></span>
-
             </div>
         </div>
     </div>
-
 </div>
 @endsection
+
 @section('base.js')
-<div class="modal fade" id="modal-pemeriksaan" data-bs-keyboard="false" data-bs-backdrop="static" tabindex="-1"
-    aria-labelledby="staticBackdropLabel" aria-hidden="false">
-    <div class="modal-dialog modal-dialog-centered modal-lg" role="document">
-        <div class="modal-content border-0">
-            <div class="position-absolute top-0 end-0 mt-3 me-3 z-index-1">
-                <button class="btn-close btn btn-sm btn-circle d-flex flex-center transition-base"
-                    data-bs-dismiss="modal" aria-label="Close"></button>
-            </div>
-            <div id="menu-pemeriksaan"></div>
-        </div>
-    </div>
-</div>
 <script src="https://cdn.datatables.net/2.2.2/js/dataTables.js"></script>
 <script src="https://cdn.datatables.net/2.2.2/js/dataTables.bootstrap5.js"></script>
 <script src="https://cdn.datatables.net/responsive/3.0.4/js/dataTables.responsive.js"></script>
@@ -131,47 +226,62 @@
 <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
 
 <script>
-    new DataTable('#example', {
-        responsive: true
-    });
-</script>
-<script>
-    new window.Choices(document.querySelector(".choices-single-jenis"));
-</script>
-<script>
-    $(document).on("click", "#button-pilih-specimen", function(e) {
-        e.preventDefault();
-        var code = $(this).data("code");
-        $('#menu-master-specimen').html(
-            '<div class="spinner-border my-3" style="display: block; margin-left: auto; margin-right: auto;" role="status"><span class="visually-hidden">Loading...</span></div>'
-        );
-        $.ajax({
-            url: "{{ route('master_pemeriksaan_specimen_detail') }}",
-            type: "POST",
-            cache: false,
-            data: {
-                "_token": "{{ csrf_token() }}",
-                "code": code
-            },
-            dataType: 'html',
-        }).done(function(data) {
-            $('#menu-master-specimen').html(data);
-        }).fail(function() {
-            $('#menu-master-specimen').html('eror');
+    $(document).ready(function() {
+        new DataTable('#example', {
+            responsive: true,
+            language: {
+                search: "CARI DATA:",
+                lengthMenu: "TAMPIL _MENU_ DATA",
+                info: "MENAMPILKAN _START_ S/D _END_ DARI _TOTAL_ PEMERIKSAAN",
+                paginate: {
+                    first: "AWAL",
+                    last: "AKHIR",
+                    next: "❯",
+                    previous: "❮"
+                }
+            }
         });
-    });
-    $(document).on("click", "#button-simpan-data-specimen-pemeriksaan", function(e) {
-        e.preventDefault();
-        var code = $(this).data("code");
-        var specimen = document.getElementById('data_specimen').value;
-        if (specimen == "") {
-            Swal.fire({
-                title: 'Error!',
-                text: 'Do you want to continue',
-                icon: 'error',
-                confirmButtonText: 'Ok'
+
+        // AJAX Load Detail / Form Specimen Berdasarkan ID Pemeriksaan
+        $(document).on("click", "#button-pilih-specimen", function(e) {
+            e.preventDefault();
+            var code = $(this).data("code"); // Mengambil ID master pemeriksaan
+
+            $('#menu-master-specimen').html(
+                '<div class="text-center p-5"><div class="spinner-border" style="color: var(--retro-pink); width: 3rem; height: 3rem;" role="status"></div><p class="mt-3 fw-bold" style="color: var(--retro-dark);">MEMUAT DATA SPESIMEN...</p></div>'
+            );
+
+            $.ajax({
+                url: "{{ route('master_pemeriksaan_specimen_detail') }}",
+                type: "POST",
+                cache: false,
+                data: {
+                    "_token": "{{ csrf_token() }}",
+                    "code": code
+                },
+                dataType: 'html',
+            }).done(function(data) {
+                $('#menu-master-specimen').html(data);
+            }).fail(function() {
+                $('#menu-master-specimen').html('<div class="alert alert-danger fw-bold border-dark shadow-sm">Gagal memuat data spesimen dari server.</div>');
             });
-        } else {
+        });
+
+        // AJAX Simpan Specimen ke Pemeriksaan
+        $(document).on("click", "#button-simpan-data-specimen-pemeriksaan", function(e) {
+            e.preventDefault();
+            var code = $(this).data("code");
+            var specimen = $('#data_specimen').val();
+
+            if (!specimen) {
+                Swal.fire({
+                    title: 'Peringatan!',
+                    text: 'Silakan pilih spesimen terlebih dahulu.',
+                    icon: 'warning',
+                    confirmButtonText: 'Ok'
+                });
+                return;
+            }
 
             $.ajax({
                 url: "{{ route('master_pemeriksaan_specimen_save') }}",
@@ -184,57 +294,32 @@
                 },
                 dataType: 'html',
             }).done(function(data) {
-                if (data == 1) {
-                    $('#menu-master-specimen-detail').html(
-                        '<div class="spinner-border my-3" style="display: block; margin-left: auto; margin-right: auto;" role="status"><span class="visually-hidden">Loading...</span></div>'
-                    );
-                    $('#menu-master-specimen-detail').html(data);
-                } else if (data == 0) {
+                if (data.trim() == "0") {
                     Swal.fire({
-                        title: 'Error!',
-                        text: 'Specimen Is There',
-                        icon: 'error',
+                        title: 'Perhatian!',
+                        text: 'Spesimen tersebut sudah terdaftar pada pemeriksaan ini.',
+                        icon: 'info',
                         confirmButtonText: 'Ok'
                     });
                 } else {
-                    $('#menu-master-specimen-detail').html(
-                        '<div class="spinner-border my-3" style="display: block; margin-left: auto; margin-right: auto;" role="status"><span class="visually-hidden">Loading...</span></div>'
-                    );
-                    $('#menu-master-specimen-detail').html(data);
+                    $('#menu-master-specimen').html(data);
+                    Swal.fire({
+                        title: 'Berhasil!',
+                        text: 'Data spesimen berhasil disimpan.',
+                        icon: 'success',
+                        timer: 1500,
+                        showConfirmButton: false
+                    });
                 }
             }).fail(function() {
-                $('#menu-master-specimen-detail').html('eror');
+                Swal.fire({
+                    title: 'Error!',
+                    text: 'Terjadi kesalahan pada server.',
+                    icon: 'error',
+                    confirmButtonText: 'Ok'
+                });
             });
-        }
-    });
-    $('#master_pemeriksaan').on("change", function() {
-        var dataid = document.getElementById('master_pemeriksaan').value;
-        if (dataid == '') {
-            Lobibox.notify('warning', {
-                pauseDelayOnHover: true,
-                continueDelayOnInactiveTab: true,
-                position: 'top right',
-                icon: 'fas fa-info-circle',
-                msg: 'Pastikan Master Sudah dipilih'
-            });
-            $("#menu-master-pemeriksaan").html('');
-            $("#menu-group-pemeriksaan").html('');
-        } else {
-            $.ajax({
-                url: "{{ route('master_pemeriksaan_harga_master') }}",
-                type: "POST",
-                cache: false,
-                data: {
-                    "_token": "{{ csrf_token() }}",
-                    "code": dataid,
-                },
-                dataType: 'html',
-            }).done(function(data) {
-                $("#menu-master-pemeriksaan").html(data);
-            }).fail(function() {
-                console.log('eror');
-            });
-        }
+        });
     });
 </script>
 @endsection

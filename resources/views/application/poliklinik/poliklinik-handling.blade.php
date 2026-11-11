@@ -2,164 +2,203 @@
 
 @section('base.css')
 <link rel="stylesheet" href="https://cdn.datatables.net/2.2.2/css/dataTables.bootstrap5.css">
-<link rel="stylesheet" href="https://cdn.datatables.net/responsive/3.0.4/css/responsive.bootstrap5.css">
 <link href="{{ asset('vendors/choices/choices.min.css') }}" rel="stylesheet" />
 <style>
-    /* Styling Header & Theme Poliklinik */
-    .bg-poliklinik-gradient {
-        background: linear-gradient(135deg, #0d9488 0%, #0284c7 100%) !important;
+    /* =========================================
+       RETRO / NEUBRUTALISM THEME STYLES
+       ========================================= */
+    :root {
+        --retro-dark: #1e1e24;
+        --retro-yellow: #ffde59;
+        --retro-cyan: #8bf0fa;
+        --retro-orange: #ff914d;
+        --retro-green: #c1ff72;
+        --retro-purple: #c8b6ff;
+        --retro-bg: #f4f0ea;
+        --retro-border: 3px solid var(--retro-dark);
+        --retro-shadow: 4px 4px 0px var(--retro-dark);
+        --retro-shadow-hover: 6px 6px 0px var(--retro-dark);
     }
 
-    .text-poliklinik {
-        color: #0d9488 !important;
+    .card-retro {
+        border: var(--retro-border);
+        border-radius: 12px;
+        background: #ffffff;
+        box-shadow: var(--retro-shadow);
+        overflow: hidden;
+    }
+
+    /* Filter Form */
+    .form-control-retro,
+    .form-select-retro {
+        border: 2px solid var(--retro-dark) !important;
+        border-radius: 6px !important;
+        font-weight: 700;
+        color: var(--retro-dark);
+        background: #ffffff;
+    }
+
+    .form-control-retro:focus,
+    .form-select-retro:focus {
+        box-shadow: 3px 3px 0px var(--retro-dark);
+        border-color: var(--retro-dark) !important;
+    }
+
+    .btn-retro {
+        border: 2px solid var(--retro-dark);
+        box-shadow: 3px 3px 0px var(--retro-dark);
+        border-radius: 6px;
+        font-weight: 800;
+        text-transform: uppercase;
+        transition: all 0.1s;
+    }
+
+    .btn-retro:hover,
+    .btn-retro:active {
+        transform: translate(2px, 2px);
+        box-shadow: 0px 0px 0px var(--retro-dark);
     }
 
     /* Styling List Patient Card */
     .patient-card-item {
         cursor: pointer;
-        transition: all 0.25s ease-in-out;
-        border-left: 4px solid #0d9488 !important;
+        transition: all 0.1s ease-in-out;
+        border: 2px solid var(--retro-dark) !important;
         background-color: #ffffff;
+        border-radius: 8px;
+        margin-bottom: 12px;
+        box-shadow: 3px 3px 0px var(--retro-dark);
     }
 
     .patient-card-item:hover {
-        transform: translateY(-2px);
-        box-shadow: 0 4px 12px rgba(13, 148, 136, 0.15) !important;
-        border-color: #0284c7 !important;
-        background-color: #f0fdfa !important;
+        background-color: var(--retro-yellow);
+        transform: translate(-2px, -2px);
+        box-shadow: 5px 5px 0px var(--retro-dark);
     }
 
     .patient-card-item.active-patient {
-        background: linear-gradient(135deg, #0d9488 0%, #0284c7 100%) !important;
-        color: #ffffff !important;
-        border-left: 4px solid #042f2e !important;
-        box-shadow: 0 4px 15px rgba(13, 148, 136, 0.3) !important;
+        background-color: var(--retro-cyan) !important;
+        border: 3px solid var(--retro-dark) !important;
+        box-shadow: 5px 5px 0px var(--retro-dark) !important;
+        transform: translate(-2px, -2px);
     }
 
-    .patient-card-item.active-patient .text-muted,
-    .patient-card-item.active-patient .text-dark,
-    .patient-card-item.active-patient .text-poliklinik,
-    .patient-card-item.active-patient .patient-title {
-        color: #ffffff !important;
-    }
-
-    .patient-card-item.active-patient .badge-poli {
-        background-color: rgba(255, 255, 255, 0.2) !important;
-        color: #ffffff !important;
-    }
-
-    .badge-poli {
-        background-color: #ccfbf1;
-        color: #0f766e;
-        font-weight: 600;
+    .badge-retro {
+        border: 2px solid var(--retro-dark);
+        background: #ffffff;
+        color: var(--retro-dark);
+        font-weight: 800;
+        box-shadow: 2px 2px 0px var(--retro-dark);
     }
 </style>
 @endsection
 
 @section('content')
 <!-- Banner Header -->
-<div class="row mb-3">
+<div class="row mb-4">
     <div class="col-12">
-        <div class="card border-0 shadow-lg rounded-4 overflow-hidden position-relative"
-            style="background: linear-gradient(135deg, #1f6f92 0%, #203a43 50%, #2c5364 100%);">
-
-            <!-- Hiasan Blur Glowing Circle -->
-            <div class="position-absolute rounded-circle bg-primary opacity-25 blur-3xl"
-                style="width: 250px; height: 250px; top: -80px; right: 10%; filter: blur(60px);"></div>
-            <div class="position-absolute rounded-circle bg-info opacity-25 blur-3xl"
-                style="width: 200px; height: 200px; bottom: -80px; left: -50px; filter: blur(50px);"></div>
-
-            <div class="card-body p-4 text-white position-relative z-1">
-                <div class="row align-items-center gy-3">
-
-                    <!-- Brand & App Label -->
-                    <div class="col-lg-7 d-flex align-items-center">
-                        <div class="p-2 bg-opacity-10 rounded-4 shadow-sm me-3 border-opacity-10 d-flex align-items-center justify-content-center backdrop-blur"
-                            style="width: 65px; height: 65px; backdrop-filter: blur(10px);">
-                            <img src="{{ asset('img/lab.png') }}" alt="Logo" class="img-fluid drop-shadow" width="42" />
-                        </div>
-                        <div>
-                            <div class="d-flex align-items-center gap-2 mb-1">
-                                <span class="badge bg-primary text-dark fw-bold px-2 py-1 rounded-pill" style="font-size: 0.68rem; letter-spacing: 0.5px;">
-                                    <i class="fas fa-shield-alt me-1 text-info"></i> <span class="text-white" style="font-size: 0.75rem;">v2.4 Medical Suite</span>
-                                </span>
-                            </div>
-                            <h3 class="text-white fw-extrabold mb-0 tracking-tight" style="font-size: 1.4rem;">
-                                Welcome to {{ Env('APP_LABEL')}} <span class="text-info fw-light">Management System</span>
-                            </h3>
-                        </div>
+        <div class="card-retro" style="background-color: var(--retro-purple);">
+            <div class="card-body p-4 d-flex justify-content-between align-items-center flex-wrap gap-3">
+                <div class="d-flex align-items-center">
+                    <div class="p-3 bg-white border border-dark rounded-3 me-3 text-dark d-flex align-items-center justify-content-center" style="box-shadow: 3px 3px 0px var(--retro-dark); border-width: 2px !important;">
+                        <img src="{{ asset('img/lab.png') }}" alt="Logo" width="45" />
                     </div>
-
-                    <!-- Module Badge / Quick Nav -->
-                    <div class="col-lg-5 text-lg-end border-start-lg border-white border-opacity-10 ps-lg-4">
-                        <!-- <span class="text-white-50 text-uppercase fw-semibold d-block mb-1" style="font-size: 0.7rem; letter-spacing: 1px;">Module Aktif</span> -->
-                        <div class="d-inline-flex align-items-center bg-white bg-opacity-10 border border-white border-opacity-20 px-3 py-2 rounded-pill backdrop-blur">
-                            <!-- <span class="p-1 bg-success rounded-circle me-2 animate-pulse" style="width: 8px; height: 8px;"></span> -->
-                            <h6 class="text-primary fw-bold mb-0" style="font-size: 0.95rem;">
-                                <i class="fas fa-file-alt me-1"></i> Data Poliklinik Handling
-                            </h6>
-                        </div>
+                    <div>
+                        <span class="badge badge-retro bg-white mb-2">v2.4 Medical Suite</span>
+                        <h2 class="fw-bolder mb-0 text-dark" style="letter-spacing: -1px;">Poliklinik Handling System</h2>
                     </div>
-
+                </div>
+                <div class="text-end">
+                    <span class="badge bg-warning text-dark px-4 py-2 fs-2 border border-dark border-2" style="box-shadow: 3px 3px 0px var(--retro-dark);">
+                        <i class="fas fa-calendar-check me-2"></i> {{ date('d F Y') }}
+                    </span>
                 </div>
             </div>
         </div>
     </div>
 </div>
 
-
 <!-- Main Content Split Area -->
-<div class="row g-3">
-    <!-- Sidebar Patient List -->
-    <div class="col-lg-4">
+<div class="row g-4">
+    <!-- Sidebar Patient List & Filters -->
+    <div class="col-lg-5">
         <div class="sticky-sidebar">
-            <div class="card shadow-sm border-0 rounded-3 overflow-hidden">
-                <!-- Header Daftar Handling bertema Poliklinik -->
-                <div class="card-header bg-poliklinik-gradient text-white py-3 px-3 d-flex align-items-center justify-content-between">
-                    <div class="d-flex align-items-center">
-                        <i class="fas fa-user-injury fs-1 me-2"></i>
-                        <h5 class="mb-0 text-white fw-bold fs-0">Daftar Antrean Handling</h5>
-                    </div>
-                    <span class="badge bg-white text-dark rounded-pill px-2 py-1 fs--1 shadow-sm">
-                        {{ count($data) }} Pasien
-                    </span>
+            <div class="card-retro mb-4">
+                <div class="card-header border-bottom border-dark border-2 p-3 d-flex justify-content-between align-items-center" style="background-color: var(--retro-cyan);">
+                    <h5 class="mb-0 fw-bolder text-dark"><i class="fas fa-filter me-2"></i> Filter Pencarian</h5>
                 </div>
-
-                <div class="card-body bg-light p-3">
-                    <!-- Search / Scan Input -->
-                    <div class="mb-3">
-                        <div class="input-group shadow-sm">
-                            <span class="input-group-text bg-white border-end-0 text-poliklinik">
-                                <i class="fas fa-qrcode"></i>
-                            </span>
-                            <input type="text" name="nik" class="form-control border-start-0 bg-white" id="nik" placeholder="Scan Barcode / Cari Pasien..." autofocus>
+                <div class="card-body p-3">
+                    <!-- Form Filter -->
+                    <form method="GET" action="{{ url()->current() }}">
+                        <div class="row g-2">
+                            <div class="col-6">
+                                <label class="fw-bold text-dark fs--1 mb-1">Mulai Tanggal</label>
+                                <input type="date" name="start_date" class="form-control form-control-retro form-control-sm" value="{{ $request->start_date ?? date('Y-m-d') }}">
+                            </div>
+                            <div class="col-6">
+                                <label class="fw-bold text-dark fs--1 mb-1">Sampai Tanggal</label>
+                                <input type="date" name="end_date" class="form-control form-control-retro form-control-sm" value="{{ $request->end_date ?? date('Y-m-d') }}">
+                            </div>
+                            <div class="col-12 mt-2">
+                                <label class="fw-bold text-dark fs--1 mb-1">Poliklinik</label>
+                                <select name="poli_id" class="form-select form-select-retro form-select-sm">
+                                    <option value="">-- Semua Poliklinik --</option>
+                                    @foreach($polis ?? [] as $poli)
+                                    <option value="{{ $poli->id }}" {{ ($request->poli_id == $poli->id) ? 'selected' : '' }}>
+                                        {{ $poli->nama_poli }}
+                                    </option>
+                                    @endforeach
+                                </select>
+                            </div>
+                            <div class="col-12 mt-2">
+                                <label class="fw-bold text-dark fs--1 mb-1">Pencarian No. Reg / Nama / RM</label>
+                                <div class="input-group input-group-sm">
+                                    <span class="input-group-text bg-light border-dark border-2 fw-bold text-dark"><i class="fas fa-search"></i></span>
+                                    <input type="text" name="search_query" class="form-control form-control-retro" value="{{ $request->search_query }}" placeholder="Ketik keyword...">
+                                </div>
+                            </div>
+                            <div class="col-12 mt-3 d-grid">
+                                <button type="submit" class="btn btn-primary btn-retro bg-dark text-white border-dark"><i class="fas fa-search me-1"></i> Terapkan Filter</button>
+                            </div>
                         </div>
-                    </div>
+                    </form>
+                </div>
+            </div>
 
+            <div class="card-retro">
+                <div class="card-header border-bottom border-dark border-2 p-3 d-flex justify-content-between align-items-center" style="background-color: var(--retro-yellow);">
+                    <h5 class="mb-0 fw-bolder text-dark"><i class="fas fa-user-clock me-2"></i> Antrean Pasien</h5>
+                    <span class="badge badge-retro">{{ count($data) }} Pasien</span>
+                </div>
+                <div class="card-body bg-light p-3">
                     <!-- Patients List -->
-                    <div class="patient-list-container pe-1" style="max-height: 68vh; overflow-y: auto;">
+                    <div class="patient-list-container pe-1" style="max-height: 50vh; overflow-y: auto;">
                         @forelse ($data as $datas)
-                        <div class="card border-0 shadow-sm mb-2 patient-card-item button-handling-pasien-poli" data-code="{{ $datas->d_reg_order_code }}">
-                            <div class="card-body fs--1 py-2 px-3">
-                                <div class="d-flex justify-content-between align-items-start mb-1">
-                                    <div class="fw-bold fs-0 patient-title text-dark">{{ $datas->master_patient_name }}</div>
-                                    <span class="badge badge-poli rounded-pill fs--2 px-2 py-1">
-                                        {{ $datas->m_poli_name }}
+                        <div class="patient-card-item button-handling-pasien-poli" data-code="{{ $datas->no_registrasi }}">
+                            <div class="card-body py-2 px-3">
+                                <div class="d-flex justify-content-between align-items-start mb-2">
+                                    <div>
+                                        <div class="fw-bolder fs-0 text-dark">{{ $datas->master_patient_name }}</div>
+                                        <div class="fw-bold fs--2 text-dark opacity-75"><i class="fas fa-qrcode"></i> RM: {{ $datas->master_patient_code }}</div>
+                                    </div>
+                                    <span class="badge badge-retro px-2 py-1 fs--2" style="background-color: var(--retro-orange);">
+                                        {{ $datas->m_poli_name ?? 'Poli Umum' }}
                                     </span>
                                 </div>
-                                <div class="text-muted fs--1">
-                                    <div class="mb-1">
-                                        <i class="fas fa-hashtag me-1 text-poliklinik"></i>Reg: <strong class="text-poliklinik">{{ $datas->d_reg_order_code }}</strong>
+                                <div class="border-top border-dark pt-2 mt-2">
+                                    <div class="fw-bold text-dark fs--1 mb-1">
+                                        <i class="fas fa-hashtag me-1"></i> Reg: {{ $datas->no_registrasi }}
                                     </div>
-                                    <div>
-                                        <i class="fas fa-user-md me-1 opacity-75"></i>Dokter: <strong class="text-dark">{{ $datas->master_doctor_name }}</strong>
+                                    <div class="fw-bold text-dark fs--1">
+                                        <i class="fas fa-user-md me-1"></i> Dr. {{ $datas->master_doctor_name ?? '-' }}
                                     </div>
                                 </div>
                             </div>
                         </div>
                         @empty
-                        <div class="alert alert-info text-center mb-0 border-0 shadow-sm" role="alert">
-                            <i class="fas fa-info-circle me-1"></i> Tidak ada data antrean pasien.
+                        <div class="card-retro border-dark text-center p-4" style="background-color: #f1f1f1;">
+                            <i class="fas fa-inbox fa-3x text-dark opacity-50 mb-2"></i>
+                            <h6 class="fw-bolder text-dark mb-0">Tidak ada data antrean.</h6>
                         </div>
                         @endforelse
                     </div>
@@ -169,13 +208,13 @@
     </div>
 
     <!-- Detail Handling Area -->
-    <div class="col-lg-8">
+    <div class="col-lg-7">
         <div id="menu-detail-handling">
-            <div class="card shadow-sm border text-center py-5">
+            <div class="card-retro border-dark text-center py-5 h-100 d-flex align-items-center justify-content-center">
                 <div class="card-body">
-                    <i class="fas fa-user-clock fa-3x text-poliklinik mb-3"></i>
-                    <h5 class="text-600">Pilih Pasien dari Daftar</h5>
-                    <p class="text-500 mb-0">Klik pada salah satu kartu pasien di sebelah kiri untuk melihat detail penanganan.</p>
+                    <i class="fas fa-hand-pointer fa-4x text-dark mb-4 animate-pulse"></i>
+                    <h3 class="fw-bolder text-dark">Pilih Pasien dari Antrean</h3>
+                    <p class="fw-bold text-dark opacity-75 mb-0">Klik pada salah satu kartu pasien di sebelah kiri untuk melihat form dan memberikan penanganan medis.</p>
                 </div>
             </div>
         </div>
@@ -184,58 +223,25 @@
 @endsection
 
 @section('base.js')
-<!-- Modals -->
-<div class="modal fade" id="modal-poliklinik-full" data-bs-keyboard="false" data-bs-backdrop="static" tabindex="-1" aria-hidden="true">
-    <div class="modal-dialog modal-dialog-centered" role="document" style="max-width: 95%;">
-        <div class="modal-content border-0">
-            <div class="position-absolute top-0 end-0 mt-3 me-3 z-index-1">
-                <button class="btn-close btn btn-sm btn-circle d-flex flex-center transition-base" data-bs-dismiss="modal" aria-label="Close"></button>
-            </div>
-            <div id="menu-poliklinik-full"></div>
-        </div>
-    </div>
-</div>
-
-<div class="modal fade" id="modal-poliklinik" data-bs-keyboard="false" data-bs-backdrop="static" tabindex="-1" aria-hidden="true">
-    <div class="modal-dialog modal-dialog-centered modal-xl" role="document">
-        <div class="modal-content border-0">
-            <div class="position-absolute top-0 end-0 mt-3 me-3 z-index-1">
-                <button class="btn-close btn btn-sm btn-circle d-flex flex-center transition-base" data-bs-dismiss="modal" aria-label="Close"></button>
-            </div>
-            <div id="menu-poliklinik"></div>
-        </div>
-    </div>
-</div>
-
-<!-- Scripts -->
 <script src="https://cdn.datatables.net/2.2.2/js/dataTables.js"></script>
 <script src="https://cdn.datatables.net/2.2.2/js/dataTables.bootstrap5.js"></script>
-<script src="https://cdn.datatables.net/responsive/3.0.4/js/dataTables.responsive.js"></script>
-<script src="https://cdn.datatables.net/responsive/3.0.4/js/responsive.bootstrap5.js"></script>
 <script src="{{ asset('vendors/choices/choices.min.js') }}"></script>
 <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
 
 <script>
     $(document).ready(function() {
-        // Spinner indicator helper
         const loaderHtml = `
-            <div class="d-flex justify-content-center align-items-center py-5">
-                <div class="spinner-border text-teal" style="color: #0d9488;" role="status">
+            <div class="d-flex justify-content-center align-items-center py-5 h-100">
+                <div class="spinner-border text-dark" style="width: 3rem; height: 3rem; border-width: 5px;" role="status">
                     <span class="visually-hidden">Loading...</span>
                 </div>
             </div>`;
-
-        // DataTables Config
-        if ($('#example').length) {
-            new DataTable('#example', {
-                responsive: true
-            });
-        }
 
         // Handling Load Patient Detail
         $(document).on("click", ".button-handling-pasien-poli", function(e) {
             e.preventDefault();
             const $this = $(this);
+            // Ambil nomor registrasi dari parameter
             const code = $this.data("code");
 
             $(".button-handling-pasien-poli").removeClass("active-patient");
@@ -243,6 +249,7 @@
 
             $('#menu-detail-handling').html(loaderHtml);
 
+            // Pastikan URL route mengarah ke controller detail handling yang telah diperbarui
             $.ajax({
                 url: "{{ route('data_registrasi_poliklinik_handling_detail') }}",
                 type: "POST",
@@ -255,150 +262,11 @@
                 $('#menu-detail-handling').html(data);
             }).fail(function() {
                 $('#menu-detail-handling').html(`
-                    <div class="alert alert-danger" role="alert">
-                        Gagal memuat detail pasien. Silakan coba lagi.
+                    <div class="card-retro border-dark bg-danger p-4 text-center">
+                        <h4 class="fw-bolder text-white">Gagal Memuat Data!</h4>
+                        <p class="text-white fw-bold mb-0">Terjadi kesalahan pada server. Silakan coba lagi.</p>
                     </div>
                 `);
-            });
-        });
-
-        // Handling Order Layanan Dokter
-        $(document).on("click", "#button-order-layanan-dokter", function(e) {
-            e.preventDefault();
-            const code = $(this).data("code");
-            const reg = $(this).data("reg");
-
-            $('#menu-order-layanan-dokter').html(loaderHtml);
-
-            $.ajax({
-                url: "{{ route('data_registrasi_poliklinik_handling_order_layanan') }}",
-                type: "POST",
-                data: {
-                    "_token": "{{ csrf_token() }}",
-                    "code": code,
-                    "reg": reg,
-                },
-                dataType: 'html'
-            }).done(function(data) {
-                $('#menu-order-layanan-dokter').html(data);
-            }).fail(function() {
-                $('#menu-order-layanan-dokter').html('<div class="alert alert-danger">Terjadi kesalahan sistem.</div>');
-            });
-        });
-
-        // Save Diagnosa Umum
-        $(document).on("click", "#button-simpan-data-diagnosa-umum", function(e) {
-            e.preventDefault();
-            const name = $('#data-name').val();
-            const desc = $('#data-desc').val();
-            const id = $('#code_gigi').val();
-
-            if (!name || !desc) {
-                Swal.fire({
-                    icon: "error",
-                    title: "Peringatan",
-                    text: "Harap isi Nama dan Deskripsi Diagnosa terlebih dahulu!"
-                });
-                return;
-            }
-
-            $('#menu-diagnosa-umum').html(loaderHtml);
-
-            $.ajax({
-                url: "{{ route('data_registrasi_poliklinik_save_diagnosa') }}",
-                type: "POST",
-                data: {
-                    "_token": "{{ csrf_token() }}",
-                    "name": name,
-                    "desc": desc,
-                    "id": id,
-                },
-                dataType: 'html'
-            }).done(function(data) {
-                $('#data-name').val('');
-                $('#data-desc').val('');
-                $('#menu-diagnosa-umum').html(data);
-            }).fail(function() {
-                Swal.fire({
-                    icon: "error",
-                    title: "Gagal",
-                    text: "Gagal menyimpan diagnosa."
-                });
-            });
-        });
-
-        // Save Diagnosa Pasien Poli Final
-        $(document).on("click", "#button-save-data-diagnosa-pasien-poli", function(e) {
-            e.preventDefault();
-            const id = $('#code_gigi').val();
-
-            Swal.fire({
-                title: "Apakah Anda Yakin?",
-                text: "Pastikan seluruh data pasien telah diisi dengan benar!",
-                icon: "warning",
-                showCancelButton: true,
-                cancelButtonText: "Batal",
-                confirmButtonText: "Ya, Proses!",
-                customClass: {
-                    confirmButton: "btn btn-success me-2",
-                    cancelButton: "btn btn-danger"
-                },
-                buttonsStyling: false,
-                reverseButtons: true
-            }).then((result) => {
-                if (result.isConfirmed) {
-                    $('#menu-pasien-poliklinik').html(loaderHtml);
-
-                    $.ajax({
-                        url: "{{ route('data_registrasi_poliklinik_save_diagnosa_pasien_poli') }}",
-                        type: "POST",
-                        data: {
-                            "_token": "{{ csrf_token() }}",
-                            "id": id,
-                        },
-                        dataType: 'html'
-                    }).done(function() {
-                        Swal.fire({
-                            title: "Berhasil!",
-                            text: "Pasien berhasil ditangani.",
-                            icon: "success"
-                        }).then(() => {
-                            location.reload();
-                        });
-                    }).fail(function() {
-                        Swal.fire({
-                            icon: "error",
-                            title: "Gagal",
-                            text: "Terjadi kesalahan saat memproses data."
-                        });
-                    });
-                }
-            });
-        });
-
-        // Load Data Penunjang
-        $(document).on("click", "#button-penunjang-poliklinik", function(e) {
-            e.preventDefault();
-            const id = $('#code_gigi').val();
-
-            $('#menu-poliklinik').html(loaderHtml);
-
-            $.ajax({
-                url: "{{ route('data_registrasi_poliklinik_data_penunjang') }}",
-                type: "POST",
-                data: {
-                    "_token": "{{ csrf_token() }}",
-                    "id": id,
-                },
-                dataType: 'html'
-            }).done(function(data) {
-                $('#menu-poliklinik').html(data);
-            }).fail(function() {
-                Swal.fire({
-                    icon: "error",
-                    title: "Gagal",
-                    text: "Gagal memuat data penunjang."
-                });
             });
         });
     });

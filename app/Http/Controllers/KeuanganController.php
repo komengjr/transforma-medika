@@ -8,6 +8,7 @@ use App\Models\DRegOrderList;
 use App\Models\DRegOrderRadList;
 use Barryvdh\DomPDF\Facade\Pdf;
 use Illuminate\Http\Request;
+use Illuminate\Support\Carbon;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Hash;
@@ -56,13 +57,394 @@ class KeuanganController extends Controller
     {
         if ($this->url_akses($akses, $id) == true) {
             $pay = DB::table('m_pay')->get();
+            // Mengambil data kelompok pelanggan / sub penjamin untuk opsi filter
+            $subPenjamins = DB::table('medical_sub_penjamin')->get();
+
+            // --- TAMBAHAN BARU: Ambil data EDC / Rekening aktif ---
+            $edcList = DB::table('medical_master_edc')->where('is_active', 1)->get();
+
             return view('application.keuangan.menu-cashier', [
-                'akses' => $akses,
-                'code' => $id,
-                'pay' => $pay
+                'akses'         => $akses,
+                'code'          => $id,
+                'pay'           => $pay,
+                'subPenjamins'  => $subPenjamins,
+                'edcList'       => $edcList // <--- Kirim ke view
             ]);
         } else {
             return Redirect::to('dashboard/home');
+        }
+    }
+    public function keuangan_menu_cashier_list_all_patient(Request $request)
+    {
+        // Menerima parameter filter dari frontend
+        $startDate = $request->input('start_date', date('Y-m-d'));
+        $endDate   = $request->input('end_date', date('Y-m-d'));
+        $status    = $request->input('status');     // 'Lunas', 'Belum Lunas', atau kosong (Semua)
+        $penjamin  = $request->input('penjamin');   // ID sub_penjamin_id
+        $keyword   = $request->input('keyword');    // Nama atau No Reg / RM
+
+        // Kueri Utama berpusat pada Registrasi
+        $query = DB::table('medical_registrasi as reg')
+            ->join('medical_patient as p', 'reg.pasien_id', '=', 'p.id')
+            ->leftJoin('medical_sub_penjamin as sp', 'reg.sub_penjamin_id', '=', 'sp.id')
+            ->leftJoin('medical_transaksi as trx', 'trx.registrasi_id', '=', 'reg.id')
+            ->select([
+                'reg.id as registrasi_id',
+                'reg.no_registrasi as d_reg_order_code',
+                'reg.tanggal_registrasi',
+                'p.pid as rm_code',
+                'p.nama as patient_name',
+                'sp.nama_sub_penjamin as t_layanan_cat_code',
+                'trx.metode_bayar',
+                'trx.dilunasi_oleh',
+                'trx.status_pembayaran as trx_status_pembayaran',
+                'trx.total_tagihan as total_semua',
+                'trx.sisa_tagihan as total_belum_lunas'
+            ])
+            // Hanya tampilkan yang sudah memiliki transaksi / tagihan
+            ->whereNotNull('trx.id');
+
+        // Filter Rentang Tanggal
+        if ($startDate && $endDate) {
+            $query->whereBetween('reg.tanggal_registrasi', [
+                $startDate . ' 00:00:00',
+                $endDate . ' 23:59:59'
+            ]);
+        }
+
+        // Filter Status Pembayaran
+        if (!empty($status)) {
+            if (strtolower($status) === 'belum lunas') {
+                $query->where('trx.status_pembayaran', '!=', 'LUNAS');
+            } elseif (strtolower($status) === 'lunas') {
+                $query->where('trx.status_pembayaran', 'LUNAS');
+            }
+        }
+
+        // Filter Kelompok Pelanggan (Sub Penjamin)
+        if (!empty($penjamin)) {
+            $query->where('reg.sub_penjamin_id', $penjamin);
+        }
+
+        // Filter Keyword (No Reg, Nama Pasien, atau No RM)
+        if (!empty($keyword)) {
+            $query->where(function ($q) use ($keyword) {
+                $q->where('reg.no_registrasi', 'like', "%{$keyword}%")
+                    ->orWhere('p.nama', 'like', "%{$keyword}%")
+                    ->orWhere('p.pid', 'like', "%{$keyword}%");
+            });
+        }
+
+        $data = $query->orderBy('reg.tanggal_registrasi', 'DESC')->get();
+
+        $formatted = $data->map(function ($item) {
+            $isUnpaid = ($item->trx_status_pembayaran !== 'LUNAS');
+
+            // Jika belum lunas, tampilkan sisa hutangnya. Jika lunas, tampilkan histori total pembayarannya.
+            $tagihanTampil = $isUnpaid ? $item->total_belum_lunas : $item->total_semua;
+
+            return [
+                'registrasi_id'      => $item->registrasi_id,
+                'd_reg_order_code'   => $item->d_reg_order_code,
+                'rm_code'            => $item->rm_code,
+                'patient_name'       => $item->patient_name,
+                't_layanan_cat_code' => $item->t_layanan_cat_code ?? '-',
+                'total_tagihan'      => (float) $tagihanTampil,
+                'status_pembayaran'  => $item->trx_status_pembayaran,
+                'metode_bayar'       => $isUnpaid ? '-' : ($item->metode_bayar ?? '-'),
+                'user_pelunas'       => $isUnpaid ? '-' : ($item->dilunasi_oleh ?? '-'),
+                'tanggal_registrasi' => $item->tanggal_registrasi
+            ];
+        });
+
+        return response()->json([
+            'success' => true,
+            'data'    => $formatted
+        ]);
+    }
+    public function keuangan_menu_cashier_list_all_patient_old1(Request $request)
+    {
+        // Menerima parameter filter dari frontend
+        $startDate = $request->input('start_date', date('Y-m-d'));
+        $endDate   = $request->input('end_date', date('Y-m-d'));
+        $status    = $request->input('status');     // 'Lunas', 'Belum Lunas', atau kosong (Semua)
+        $penjamin  = $request->input('penjamin');   // ID sub_penjamin_id
+        $keyword   = $request->input('keyword');    // Nama atau No Reg / RM
+
+        // 1. Sub-Query Tindakan (Hitung Total & Sisa Belum Lunas)
+        $subTindakan = DB::table('medical_transaksi_detail as td')
+            ->join('medical_transaksi as t', 'td.transaksi_id', '=', 't.id')
+            ->select(
+                't.registrasi_id',
+                DB::raw('SUM(td.harga_akhir) as total_tindakan'),
+                DB::raw("SUM(CASE WHEN td.status_pembayaran = 'BELUM LUNAS' THEN td.harga_akhir ELSE 0 END) as unpaid_tindakan")
+            )
+            ->where('td.status_pemeriksaan', '!=', 'BATAL')
+            ->groupBy('t.registrasi_id');
+
+        // 2. Sub-Query Obat Farmasi (Hitung Total & Sisa Belum Lunas)
+        $subObat = DB::table('medical_ranap_resep as rr')
+            ->select(
+                'rr.registrasi_id',
+                DB::raw('SUM(rr.qty * rr.harga) as total_obat'),
+                DB::raw("SUM(CASE WHEN rr.status_pembayaran = 'BELUM LUNAS' THEN (rr.qty * rr.harga) ELSE 0 END) as unpaid_obat")
+            )
+            ->where('rr.status_verifikasi', 'Verified')
+            ->groupBy('rr.registrasi_id');
+
+        // 3. Kueri Utama berpusat pada Registrasi
+        $query = DB::table('medical_registrasi as reg')
+            ->join('medical_patient as p', 'reg.pasien_id', '=', 'p.id')
+            ->leftJoin('medical_sub_penjamin as sp', 'reg.sub_penjamin_id', '=', 'sp.id')
+            ->leftJoin('medical_transaksi as trx', 'trx.registrasi_id', '=', 'reg.id')
+            ->leftJoinSub($subTindakan, 'tnd', function ($join) {
+                $join->on('reg.id', '=', 'tnd.registrasi_id');
+            })
+            ->leftJoinSub($subObat, 'obt', function ($join) {
+                $join->on('reg.id', '=', 'obt.registrasi_id');
+            })
+            ->select([
+                'reg.id as registrasi_id',
+                'reg.no_registrasi as d_reg_order_code',
+                'reg.tanggal_registrasi',
+                'p.pid as rm_code',
+                'p.nama as patient_name',
+                'sp.nama_sub_penjamin as t_layanan_cat_code',
+                'trx.metode_bayar',
+                'trx.dilunasi_oleh',
+                // Kalkulasi Semua
+                DB::raw('(COALESCE(tnd.total_tindakan, 0) + COALESCE(obt.total_obat, 0)) as total_semua'),
+                // Kalkulasi Belum Lunas Saja
+                DB::raw('(COALESCE(tnd.unpaid_tindakan, 0) + COALESCE(obt.unpaid_obat, 0)) as total_belum_lunas')
+            ])
+            // Filter Dasar: Hanya tampilkan pasien yang memiliki tagihan valid (>0)
+            ->whereRaw('(COALESCE(tnd.total_tindakan, 0) + COALESCE(obt.total_obat, 0)) > 0');
+
+        // 4. Filter Rentang Tanggal
+        if ($startDate && $endDate) {
+            $query->whereBetween('reg.tanggal_registrasi', [
+                $startDate . ' 00:00:00',
+                $endDate . ' 23:59:59'
+            ]);
+        }
+
+        // 5. Filter Status Pembayaran Berdasarkan Tagihan Detail (Unpaid Item)
+        if (!empty($status)) {
+            if (strtolower($status) === 'belum lunas') {
+                // Pasien masih memiliki item (obat/tindakan) yang BELUM LUNAS
+                $query->whereRaw('(COALESCE(tnd.unpaid_tindakan, 0) + COALESCE(obt.unpaid_obat, 0)) > 0');
+            } elseif (strtolower($status) === 'lunas') {
+                // Semua item sudah LUNAS (Total tagihan ada, tapi nilai unpaid = 0)
+                $query->whereRaw('(COALESCE(tnd.unpaid_tindakan, 0) + COALESCE(obt.unpaid_obat, 0)) = 0');
+            }
+        }
+
+        // 6. Filter Kelompok Pelanggan (Sub Penjamin)
+        if (!empty($penjamin)) {
+            $query->where('reg.sub_penjamin_id', $penjamin);
+        }
+
+        // 7. Filter Keyword (No Reg, Nama Pasien, atau No RM)
+        if (!empty($keyword)) {
+            $query->where(function ($q) use ($keyword) {
+                $q->where('reg.no_registrasi', 'like', "%{$keyword}%")
+                    ->orWhere('p.nama', 'like', "%{$keyword}%")
+                    ->orWhere('p.pid', 'like', "%{$keyword}%");
+            });
+        }
+
+        $data = $query->orderBy('reg.tanggal_registrasi', 'DESC')->get();
+
+        $formatted = $data->map(function ($item) {
+            // Logika Status: Jika masih ada tagihan unpaid, statusnya 'BELUM LUNAS'
+            $isUnpaid = $item->total_belum_lunas > 0;
+            $statusPembayaran = $isUnpaid ? 'BELUM LUNAS' : 'LUNAS';
+
+            // Tagihan Tampil:
+            // Jika kasir membuka pasien belum lunas, yang ditampilkan HANYA sisa yang harus dibayar.
+            // Jika lunas (history), tampilkan total keseluruhannya.
+            $tagihanTampil = $isUnpaid ? $item->total_belum_lunas : $item->total_semua;
+
+            return [
+                'registrasi_id'      => $item->registrasi_id,
+                'd_reg_order_code'   => $item->d_reg_order_code,
+                'rm_code'            => $item->rm_code,
+                'patient_name'       => $item->patient_name,
+                't_layanan_cat_code' => $item->t_layanan_cat_code ?? '-',
+                'total_tagihan'      => (float) $tagihanTampil,
+                'status_pembayaran'  => $statusPembayaran,
+                'metode_bayar'       => $isUnpaid ? '-' : ($item->metode_bayar ?? '-'),
+                'user_pelunas'       => $isUnpaid ? '-' : ($item->dilunasi_oleh ?? '-'),
+                'tanggal_registrasi' => $item->tanggal_registrasi
+            ];
+        });
+
+        return response()->json([
+            'success' => true,
+            'data'    => $formatted
+        ]);
+    }
+    public function getDetailTagihanKasir($regId)
+    {
+        try {
+            // 1. Ambil Data Pasien & Registrasi
+            $registrasi = DB::table('medical_registrasi as reg')
+                ->join('medical_patient as p', 'reg.pasien_id', '=', 'p.id')
+                ->select('reg.id as registrasi_id', 'reg.no_registrasi', 'p.nama', 'p.pid')
+                ->where('reg.id', $regId)
+                ->first();
+
+            if (!$registrasi) {
+                return response()->json(['success' => false, 'message' => 'Data registrasi tidak ditemukan.']);
+            }
+
+            // 2. Ambil Header Transaksi Utama
+            $transaksi = DB::table('medical_transaksi')
+                ->where('registrasi_id', $regId)
+                ->first();
+
+            $tindakan = collect([]);
+            $obat = collect([]);
+            $totalTindakan = 0;
+            $totalObat = 0;
+            $grandTotal = 0;
+            $statusBayar = 'BELUM LUNAS';
+
+            if ($transaksi) {
+                // 3. Ambil Rincian Transaksi yang belum dibayar atau sedang diproses
+                $details = DB::table('medical_transaksi_detail as td')
+                    ->select(
+                        'td.id',
+                        'td.jenis_item',
+                        'td.nama_item as item',
+                        'td.qty',
+                        'td.harga_akhir as harga', // Di database terbaru, harga_akhir adalah Subtotal per baris
+                        'td.status_pembayaran'
+                    )
+                    ->where('td.transaksi_id', $transaksi->id)
+                    ->whereNotIn('td.status_pemeriksaan', ['BATAL'])
+                    ->where('td.status_pembayaran', 'BELUM LUNAS') // Filter rolling bill
+                    ->get();
+
+                // Pisahkan koleksi berdasarkan jenisnya
+                $tindakan = $details->where('jenis_item', '!=', 'OBAT')->values();
+                $obat     = $details->where('jenis_item', 'OBAT')->values();
+
+                // Sum total berdasarkan harga_akhir (karena harga_akhir = qty * harga satuan)
+                $totalTindakan = $tindakan->sum('harga');
+                $totalObat     = $obat->sum('harga');
+
+                // 4. Hitung Grand Total Sisa Belum Lunas
+                $grandTotal = $transaksi->sisa_tagihan;
+
+                // Tentukan status lunas untuk antarmuka UI
+                $statusBayar = ($grandTotal > 0 || $transaksi->status_pembayaran !== 'LUNAS') ? 'BELUM LUNAS' : 'LUNAS';
+            }
+
+            return response()->json([
+                'success'        => true,
+                'pasien'         => $registrasi,
+                'transaksi'      => [
+                    'id'                => $transaksi ? $transaksi->id : null,
+                    'status_pembayaran' => $statusBayar
+                ],
+                'tindakan'       => $tindakan,
+                'total_tindakan' => (float) $totalTindakan,
+                'obat'           => $obat,
+                'total_obat'     => (float) $totalObat,
+                'grand_total'    => (float) $grandTotal
+            ]);
+        } catch (\Exception $e) {
+            return response()->json([
+                'success' => false,
+                'message' => 'Terjadi kesalahan sistem: ' . $e->getMessage()
+            ]);
+        }
+    }
+    public function getDetailTagihanKasir_old($regId)
+    {
+        try {
+            // 1. Ambil Data Pasien & Registrasi
+            $registrasi = DB::table('medical_registrasi as reg')
+                ->join('medical_patient as p', 'reg.pasien_id', '=', 'p.id')
+                ->select('reg.id as registrasi_id', 'reg.no_registrasi', 'p.nama', 'p.pid')
+                ->where('reg.id', $regId)
+                ->first();
+
+            if (!$registrasi) {
+                return response()->json(['success' => false, 'message' => 'Data registrasi tidak ditemukan.']);
+            }
+
+            // 2. Ambil Header Transaksi (Jika sudah di-generate di pendaftaran/poli)
+            $transaksi = DB::table('medical_transaksi')
+                ->where('registrasi_id', $regId)
+                ->first();
+
+            // 3. Ambil Rincian Tindakan (Hanya yang BELUM LUNAS dan TIDAK BATAL)
+            // 3. Ambil Rincian Tindakan (Hanya yang BELUM LUNAS dan TIDAK BATAL)
+            $tindakan = collect([]);
+            $totalTindakan = 0;
+
+            if ($transaksi) {
+                $tindakan = DB::table('medical_transaksi_detail as td')
+                    ->leftJoin('medical_master_pemeriksaan as mp', 'td.master_pemeriksaan_id', '=', 'mp.id')
+                    ->select(
+                        // Gunakan COALESCE: Jika nama_layanan null, ambil dari kategori_biaya (misal: 'JASA_DOKTER')
+                        DB::raw("COALESCE(mp.nama_layanan, td.kategori_biaya) as item"),
+                        'td.harga_akhir as harga',
+                        'td.status_pembayaran'
+                    )
+                    ->where('td.transaksi_id', $transaksi->id)
+                    ->whereNotIn('td.status_pemeriksaan', ['BATAL']) // Agar SELESAI & MENUNGGU masuk
+                    ->where('td.status_pembayaran', 'BELUM LUNAS') // Filter rolling bill
+                    ->get();
+
+                $totalTindakan = $tindakan->sum('harga');
+            }
+
+            // 4. Ambil Rincian Resep Obat (Hanya yang Verified dan BELUM LUNAS)
+            $obat = DB::table('medical_ranap_resep as rr')
+                ->join('farm_data_obat as fo', 'rr.farm_data_obat_code', '=', 'fo.farm_data_obat_code')
+                ->select(
+                    'fo.farm_data_obat_name as item',
+                    'rr.qty',
+                    'rr.harga',
+                    'rr.status_pembayaran'
+                )
+                ->where('rr.registrasi_id', $regId)
+                ->where('rr.status_verifikasi', 'Verified')    // Sudah di-ACC Farmasi / Dokter
+                ->where('rr.status_pembayaran', 'BELUM LUNAS') // Filter rolling bill
+                ->get();
+
+            $totalObat = $obat->sum(function ($item) {
+                return $item->qty * $item->harga;
+            });
+
+            // 5. Hitung Grand Total
+            $grandTotal = $totalTindakan + $totalObat;
+
+            // 6. Tentukan Status Bayar untuk ditampilkan di UI
+            // Jika grand total 0 (artinya semua sudah dibayar lunas sebelumnya), set LUNAS
+            $statusBayar = ($grandTotal > 0) ? 'BELUM LUNAS' : 'LUNAS';
+
+            return response()->json([
+                'success'        => true,
+                'pasien'         => $registrasi,
+                'transaksi'      => [
+                    'id'                => $transaksi ? $transaksi->id : null,
+                    'status_pembayaran' => $statusBayar
+                ],
+                'tindakan'       => $tindakan,
+                'total_tindakan' => $totalTindakan,
+                'obat'           => $obat,
+                'total_obat'     => $totalObat,
+                'grand_total'    => $grandTotal
+            ]);
+        } catch (\Exception $e) {
+            return response()->json([
+                'success' => false,
+                'message' => 'Terjadi kesalahan sistem: ' . $e->getMessage()
+            ]);
         }
     }
     public function keuangan_menu_cashier_find(Request $request)
@@ -101,7 +483,7 @@ class KeuanganController extends Controller
             ->get();
         return view('application.keuangan.menu-cashier.find-data-tagihan', ['data' => $data]);
     }
-    public function keuangan_menu_cashier_list_all_patient()
+    public function keuangan_menu_cashier_list_all_patient_old()
     {
         try {
             // Hitung tagihan menggantung di tabel Laboratorium ter-join ke Jembatan Order List
@@ -238,139 +620,158 @@ class KeuanganController extends Controller
     }
     public function keuangan_menu_cashier_proses_payment(Request $request)
     {
-        // 1. Ambil data input dari request JSON front-end
-        $dRegOrderCode = $request->input('d_reg_order_code'); // Kode order puncak (misal: ORD-001)
-        $metodePembayaran = $request->input('metode_pembayaran'); // Mengisi d_reg_order_payment_card
-        $items = $request->input('items'); // Array objek berisi ID dan kategori item
+        // Tangkap input (mendukung parameter registrasi_id atau d_reg_order_code dari JS lama)
+        $regId       = $request->input('registrasi_id') ?? $request->input('d_reg_order_code');
+        $metodeBayar = $request->input('metode_pembayaran') ?? $request->input('metode_bayar'); // CASH, DEBIT, CREDIT
+        $jumlahBayar = floatval($request->input('jumlah_bayar') ?? $request->input('nominal_bayar', 0));
+        $edcId       = $request->input('edc_id');
+        $noReferensi = $request->input('no_referensi');
 
-        if (empty($items)) {
-            return response()->json(['success' => false, 'message' => 'Silakan pilih minimal satu item tindakan untuk dibayar!'], 400);
+        // 1. VALIDASI: Pastikan metode pembayaran dikirim dan valid
+        if (empty($metodeBayar) || !in_array($metodeBayar, ['CASH', 'DEBIT', 'CREDIT', 'DEBIT/TRANSFER'])) {
+            return response()->json([
+                'success' => false,
+                'message' => 'Peringatan: Silakan pilih salah satu metode pembayaran terlebih dahulu!'
+            ], 400);
         }
 
-        if (!$dRegOrderCode) {
-            return response()->json(['success' => false, 'message' => 'Kode order puncak tidak valid.'], 400);
-        }
+        // Ambil data user yang sedang login saat ini
+        $currentUser   = Auth::user();
+        $namaUserLogin = $currentUser ? ($currentUser->name ?? $currentUser->username ?? 'Kasir') : 'Sistem Kasir';
+        $userIdLogin   = $currentUser ? ($currentUser->userid ?? $currentUser->id ?? null) : null;
 
-        // Mulai transaksi database (jika di tengah jalan ada error, data otomatis di-rollback/batal)
         DB::beginTransaction();
-
         try {
-            // Generasi nomor kwitansi/invoice unik terpusat untuk sesi pembayaran ini
-            $paymentCode = 'INV-' . date('Ymd') . '-' . strtoupper(Str::random(5));
-
-            // Variabel penampung akumulasi total uang riil yang dibayarkan saat membuat invoice ini
-            $grandTotalInvoiceIni = 0;
-
-            // Variabel pembantu untuk mencatat d_reg_order_list_code terakhir yang terlibat
-            $lastOrderListCode = null;
-
-            // 2. Loop & Update status item tindakan sekaligus hitung akumulasi harga bersihnya
-            foreach ($items as $item) {
-                if ($item['kategori'] === 'Layanan Laboratorium') {
-                    // Cari data asli di DB untuk mengambil log price & discount (menghindari manipulasi front-end)
-                    $labItem = DB::table('d_reg_order_lab_list')
-                        ->where('id_d_reg_order_lab_list', $item['id'])
-                        ->first();
-
-                    if ($labItem) {
-                        $lastOrderListCode = $labItem->d_reg_order_lab_code;
-
-                        // Hitung harga bersih item ini (Harga - Diskon)
-                        $biayaBersih = $labItem->order_lab_log_price - $labItem->order_lab_log_discount;
-                        $grandTotalInvoiceIni += $biayaBersih;
-
-                        // Ubah status item menjadi lunas
-                        DB::table('d_reg_order_lab_list')
-                            ->where('id_d_reg_order_lab_list', $item['id'])
-                            ->update(['status_pembayaran' => 'Lunas']);
-                    }
-                } elseif ($item['kategori'] === 'Layanan Radiologi') {
-                    $radItem = DB::table('d_reg_order_rad_list')
-                        ->where('id_d_reg_order_rad_list', $item['id'])
-                        ->first();
-
-                    if ($radItem) {
-                        $lastOrderListCode = $radItem->d_reg_order_rad_code;
-
-                        $biayaBersih = $radItem->order_rad_log_price - $radItem->order_rad_log_discount;
-                        $grandTotalInvoiceIni += $biayaBersih;
-
-                        DB::table('d_reg_order_rad_list')
-                            ->where('id_d_reg_order_rad_list', $item['id'])
-                            ->update(['status_pembayaran' => 'Lunas']);
-                    }
-                } elseif ($item['kategori'] === 'Layanan Poliklinik') {
-                    $radItem = DB::table('d_reg_order_poli_list')
-                        ->where('id_d_reg_order_poli_list', $item['id'])
-                        ->first();
-
-                    if ($radItem) {
-                        $lastOrderListCode = $radItem->d_reg_order_poli_code;
-
-                        $biayaBersih = $radItem->order_poli_log_price - $radItem->order_poli_log_discount;
-                        $grandTotalInvoiceIni += $biayaBersih;
-
-                        DB::table('d_reg_order_poli_list')
-                            ->where('id_d_reg_order_poli_list', $item['id'])
-                            ->update(['status_pembayaran' => 'Lunas']);
-                    }
-                }
+            // 2. Ambil data Registrasi untuk memastikan data valid
+            $registrasi = DB::table('medical_registrasi')->where('id', $regId)->orWhere('no_registrasi', $regId)->first();
+            if (!$registrasi) {
+                return response()->json([
+                    'success' => false,
+                    'message' => 'Data registrasi pasien tidak ditemukan!'
+                ], 404);
             }
 
-            // 3. Simpan riwayat transaksi ke tabel d_reg_order_payment (Cukup 1 baris per nota invoice)
-            DB::table('d_reg_order_payment')->insert([
-                'd_reg_order_payment_code'  => $paymentCode,
-                'd_reg_order_code'          => $dRegOrderCode,
-                'd_reg_order_list_code'     => $lastOrderListCode ?? '-', // Kode jembatan d_reg_order_list
-                'd_reg_order_payment_card'  => $metodePembayaran, // Simpan Tunai/Debit/QRIS
-                'd_reg_order_payment_total' => $grandTotalInvoiceIni, // <--- TOTAL RIIL YANG DIBAYAR PASIEN PADA INVOICE INI
-                'd_reg_order_payment_date'  => date('Y-m-d H:i:s'),
-                'd_reg_order_payment_user'  => auth()->user()->name ?? 'System_Kasir',
-                'created_at'                => now(),
-                'updated_at'                => now()
-            ]);
-
-            // 4. SISTEM CHECK otomatis pelunasan tingkat puncak (d_reg_order)
-            $cekLabSisa = DB::table('d_reg_order_lab_list')
-                ->join('d_reg_order_list', 'd_reg_order_lab_list.d_reg_order_lab_code', '=', 'd_reg_order_list.d_reg_order_list_code')
-                ->where('d_reg_order_list.d_reg_order_code', $dRegOrderCode)
-                ->where('d_reg_order_lab_list.status_pembayaran', '!=', 'Lunas')
-                ->exists();
-
-            $cekRadSisa = DB::table('d_reg_order_rad_list')
-                ->join('d_reg_order_list', 'd_reg_order_rad_list.d_reg_order_rad_code', '=', 'd_reg_order_list.d_reg_order_list_code')
-                ->where('d_reg_order_list.d_reg_order_code', $dRegOrderCode)
-                ->where('d_reg_order_rad_list.status_pembayaran', '!=', 'Lunas')
-                ->exists();
-
-            $cekPoliSisa = DB::table('d_reg_order_poli_list')
-                ->join('d_reg_order_list', 'd_reg_order_poli_list.d_reg_order_poli_code', '=', 'd_reg_order_list.d_reg_order_list_code')
-                ->where('d_reg_order_list.d_reg_order_code', $dRegOrderCode)
-                ->where('d_reg_order_poli_list.status_pembayaran', '!=', 'Lunas')
-                ->exists();
-
-            if (!$cekLabSisa && !$cekRadSisa && !$cekPoliSisa) {
-                DB::table('d_reg_order')
-                    ->where('d_reg_order_code', $dRegOrderCode)
-                    ->update(['d_reg_order_status' => 'Lunas']);
+            // 3. Ambil data Header Transaksi (Jika belum ada, buat baru)
+            $transaksi = DB::table('medical_transaksi')->where('registrasi_id', $registrasi->id)->first();
+            if (!$transaksi) {
+                $transaksiId = DB::table('medical_transaksi')->insertGetId([
+                    'registrasi_id'     => $registrasi->id,
+                    'total_tagihan'     => 0,
+                    'total_bayar'       => 0,
+                    'sisa_tagihan'      => 0,
+                    'metode_bayar'      => $metodeBayar,
+                    'status_pembayaran' => 'BELUM LUNAS',
+                    'created_at'        => now(),
+                    'updated_at'        => now()
+                ]);
+                $transaksi = DB::table('medical_transaksi')->where('id', $transaksiId)->first();
             }
 
-            // Jika Poli, lab dan rad sudah tidak ada yang "Belum Lunas", tandai berkas pasien lunas total
-            // Semua operasi aman, kunci perubahan ke database
+            // 4. Hitung TOTAL TAGIHAN YANG BELUM LUNAS SAAT INI (Tindakan + Obat)
+            $unpaidTindakan = DB::table('medical_transaksi_detail')
+                ->where('transaksi_id', $transaksi->id)
+                ->where('status_pemeriksaan', '!=', 'BATAL')
+                ->where('status_pembayaran', 'BELUM LUNAS')
+                ->sum('harga_akhir');
+
+            $unpaidObat = DB::table('medical_ranap_resep')
+                ->where('registrasi_id', $registrasi->id)
+                ->where('status_verifikasi', 'Verified')
+                ->where('status_pembayaran', 'BELUM LUNAS')
+                ->sum(DB::raw('qty * harga'));
+
+            $totalTagihanSekarang = floatval($unpaidTindakan + $unpaidObat);
+
+            if ($totalTagihanSekarang <= 0) {
+                return response()->json([
+                    'success'    => false,
+                    'alert_type' => 'warning',
+                    'message'    => 'Tidak ada tagihan yang belum lunas untuk pasien ini.'
+                ], 400);
+            }
+
+            // 5. VALIDASI NOMINAL PEMBAYARAN
+            if ($jumlahBayar <= 0) {
+                return response()->json([
+                    'success'    => false,
+                    'alert_type' => 'warning',
+                    'message'    => 'Peringatan: Masukkan nominal pembayaran yang valid!'
+                ], 400);
+            }
+
+            if ($jumlahBayar < $totalTagihanSekarang) {
+                $kurang = $totalTagihanSekarang - $jumlahBayar;
+                return response()->json([
+                    'success'    => false,
+                    'alert_type' => 'warning',
+                    'message'    => 'Peringatan: Nominal pembayaran kurang dari Total Tagihan! Kekurangan: Rp ' . number_format($kurang, 0, ',', '.')
+                ], 400);
+            }
+
+            // 6. UPDATE ITEM MENJADI LUNAS (Kunci Item Tindakan & Obat)
+            DB::table('medical_transaksi_detail')
+                ->where('transaksi_id', $transaksi->id)
+                ->where('status_pemeriksaan', '!=', 'BATAL')
+                ->where('status_pembayaran', 'BELUM LUNAS')
+                ->update([
+                    'status_pembayaran' => 'LUNAS',
+                    'waktu_bayar'       => now(),
+                    'updated_at'        => now()
+                ]);
+
+            DB::table('medical_ranap_resep')
+                ->where('registrasi_id', $registrasi->id)
+                ->where('status_verifikasi', 'Verified')
+                ->where('status_pembayaran', 'BELUM LUNAS')
+                ->update([
+                    'transaksi_id'      => $transaksi->id, // Ikat resep ini ke nota
+                    'status_pembayaran' => 'LUNAS',
+                    'waktu_bayar'       => now(),
+                    'updated_at'        => now()
+                ]);
+
+            // 7. KALKULASI & UPDATE HEADER TRANSAKSI KESELURUHAN (Termasuk histori sebelumnya)
+            $allTindakan = DB::table('medical_transaksi_detail')
+                ->where('transaksi_id', $transaksi->id)
+                ->where('status_pemeriksaan', '!=', 'BATAL')
+                ->sum('harga_akhir');
+
+            $allObat = DB::table('medical_ranap_resep')
+                ->where('registrasi_id', $registrasi->id)
+                ->where('status_verifikasi', 'Verified')
+                ->sum(DB::raw('qty * harga'));
+
+            $grandTotalHistori = floatval($allTindakan + $allObat);
+            $akumulasiBayar    = floatval($transaksi->total_bayar) + $jumlahBayar;
+
+            DB::table('medical_transaksi')
+                ->where('id', $transaksi->id)
+                ->update([
+                    'total_tagihan'     => $grandTotalHistori,
+                    'total_bayar'       => $akumulasiBayar,
+                    'sisa_tagihan'      => 0, // Karena lunas penuh
+                    'status_pembayaran' => 'LUNAS',
+                    'metode_bayar'      => $metodeBayar,
+                    'edc_id'            => $edcId,
+                    'no_referensi'      => $noReferensi,
+                    'dilunasi_oleh'     => $userIdLogin,
+                    'waktu_lunas'       => now(),
+                    'updated_at'        => now()
+                ]);
+
             DB::commit();
 
             return response()->json([
-                'success' => true,
-                'message' => 'Pembayaran berhasil disimpan!',
-                'invoice_code' => $paymentCode,
-                'total_dibayar' => $grandTotalInvoiceIni
-            ], 200);
+                'success'       => true,
+                'message'       => 'Pembayaran berhasil dilunaskan oleh ' . $namaUserLogin,
+                'total_dibayar' => $jumlahBayar,
+                'user_pelunas'  => $namaUserLogin
+            ]);
         } catch (\Exception $e) {
-            // Jika terjadi kegagalan sistem, batalkan seluruh update status di atas
             DB::rollBack();
             return response()->json([
                 'success' => false,
-                'message' => 'Terjadi kesalahan sistem: ' . $e->getMessage()
+                'message' => 'Gagal memproses pembayaran: ' . $e->getMessage()
             ], 500);
         }
     }
@@ -440,93 +841,81 @@ class KeuanganController extends Controller
     public function downloadReceiptPdf($orderCode)
     {
         try {
-            // 1. Ambil data utama Order/Registrasi & Pasien
-            $order = DB::table('d_reg_order as r')
-                ->leftJoin('master_patient as pt', 'r.d_reg_order_rm', '=', 'pt.master_patient_code')
+            // 1. Ambil data utama Registrasi, Transaksi, Pasien, Dokter, dan Sub Penjamin
+            $transaksi = DB::table('medical_registrasi as reg')
+                ->join('medical_patient as pt', 'reg.pasien_id', '=', 'pt.id')
+                ->join('medical_transaksi as t', 'reg.id', '=', 't.registrasi_id')
+                ->leftJoin('medical_master_doctor as doc_pengirim', 'doc_pengirim.id', '=', 'reg.doctor_id') // Sesuaikan jika ada kolom dokter pengirim/pemeriksa
+                ->leftJoin('medical_master_doctor as doc_poli', 'doc_poli.id', '=', 'reg.doctor_poli_id')
+                ->leftJoin('medical_sub_penjamin as sp', 'reg.sub_penjamin_id', '=', 'sp.id')
                 ->select(
-                    'r.*',
-                    'pt.master_patient_code',
-                    'pt.master_patient_name',
-                    'pt.master_patient_alamat'
+                    'reg.id as registrasi_id',
+                    'reg.no_registrasi',
+                    'reg.tanggal_registrasi',
+                    'reg.jenis_layanan',
+                    'reg.metode_pengiriman',
+                    'reg.janji_hasil',
+                    'pt.pid',
+                    'pt.nama as nama_pasien',
+                    'pt.alamat',
+                    'pt.jk',
+                    'pt.tgl_lahir',
+                    'sp.nama_sub_penjamin as agreement',
+                    't.id as transaksi_id',
+                    't.total_tagihan',
+                    't.total_bayar',
+                    't.metode_bayar',
+                    't.status_pembayaran',
+                    'doc_pengirim.nama_lengkap as nama_dokter_pengirim',
+                    'doc_poli.nama_lengkap as nama_dokter_poli'
                 )
-                ->where('r.d_reg_order_code', $orderCode)
+                ->where('reg.no_registrasi', $orderCode)
                 ->first();
 
-            if (!$order) {
+            if (!$transaksi) {
                 return response()->json([
                     'success' => false,
                     'message' => 'Data order registrasi tidak ditemukan.'
                 ], 404);
             }
 
-            // 2. Query Item List dengan Join ke Lab, Rad, dan Poli
-            $allItems = DB::table('d_reg_order_list as l')
-                // Join ke detail Lab
-                ->leftJoin('d_reg_order_lab_list as lab', 'l.d_reg_order_list_code', '=', 'lab.d_reg_order_lab_code')
-                ->leftJoin('p_sales_data as s_lab', 'lab.p_sales_data_code', '=', 's_lab.p_sales_data_code')
+            // 2. Hitung Umur Pasien Berdasarkan Tanggal Lahir
+            $umur = '-';
+            if (!empty($transaksi->tgl_lahir)) {
+                $umur = \Carbon\Carbon::parse($transaksi->tgl_lahir)->age;
+            }
+            $transaksi->umur = $umur;
 
-                // Join ke detail Rad
-                ->leftJoin('d_reg_order_rad_list as rad', 'l.d_reg_order_list_code', '=', 'rad.d_reg_order_rad_code')
-                ->leftJoin('p_sales_data as s_rad', 'rad.p_sales_data_code', '=', 's_rad.p_sales_data_code')
-
-                // Join ke detail Poli
-                ->leftJoin('d_reg_order_poli_list as poli', 'l.d_reg_order_list_code', '=', 'poli.d_reg_order_poli_code')
-                ->leftJoin('p_sales_data as s_poli', 'poli.p_sales_data_code', '=', 's_poli.p_sales_data_code')
-
-                // Join ke Payment khusus log tanggal/metode
-                ->leftJoin('d_reg_order_payment as p', 'l.d_reg_order_list_code', '=', 'p.d_reg_order_list_code')
-
+            // 3. Ambil Detail Item Pemeriksaan
+            $details = DB::table('medical_transaksi_detail as td')
+                ->join('medical_master_pemeriksaan as mp', 'td.master_pemeriksaan_id', '=', 'mp.id')
+                ->where('td.transaksi_id', $transaksi->transaksi_id)
                 ->select(
-                    'l.d_reg_order_list_code',
-                    'l.t_layanan_cat_code',
-
-                    // Nama Item / Layanan
-                    DB::raw("COALESCE(s_lab.p_sales_data_name, s_rad.p_sales_data_name, s_poli.p_sales_data_name, CONCAT('Layanan ', l.t_layanan_cat_code)) as item_name"),
-
-                    // Harga Log
-                    DB::raw("COALESCE(lab.order_lab_log_price, rad.order_rad_log_price, poli.order_poli_log_price, 0) as price"),
-
-                    // Diskon Log
-                    DB::raw("COALESCE(lab.order_lab_log_discount, rad.order_rad_log_discount, poli.order_poli_log_discount, 0) as discount"),
-
-                    'p.d_reg_order_payment_code',
-                    'p.d_reg_order_payment_date',
-                    'p.d_reg_order_payment_card',
-
-                    // PENGECEKAN STATUS LUNAS DARI MASING-MASING TABEL LIST
-                    DB::raw("
-                CASE
-                    WHEN COALESCE(lab.status_pembayaran, rad.status_pembayaran, poli.status_pembayaran, '') IN ('LUNAS', 'PAID', '1', 1) THEN 'LUNAS'
-                    ELSE 'BELUM BAYAR'
-                END as status_bayar
-            ")
+                    'td.id as detail_id',
+                    'td.no_pemeriksaan',
+                    'mp.nama_layanan',
+                    'td.harga_dasar',
+                    'td.diskon',
+                    'td.biaya_cito',
+                    'td.harga_akhir',
+                    'td.status_pemeriksaan'
                 )
-                ->where('l.d_reg_order_code', $orderCode)
                 ->get();
 
-            // 3. FILTER STATUS LUNAS DAN DISTINCT/UNIQUE BERDASARKAN NAMA PEMERIKSAAN / KODE ITEM
-            $items = $allItems->where('status_bayar', 'LUNAS')
-                ->unique('item_name') // <--- DI-DISTINCT KAN BERDASARKAN NAMA PEMERIKSAAN
-                ->values();
-
-            // Cek jika tidak ada 1 pun item yang lunas
-            if ($items->isEmpty()) {
+            if ($details->isEmpty()) {
                 return response()->json([
                     'success' => false,
-                    'message' => 'Belum ada transaksi item yang lunas untuk dicetak pada order ini.'
+                    'message' => 'Tidak ada item pemeriksaan ditemukan pada transaksi ini.'
                 ], 404);
             }
 
-            // 4. Hitung Total Pelunasan Murni dari 2 Item Unik Tersebut
-            $totalLunas = $items->sum(function ($item) {
-                return $item->price - $item->discount;
-            });
+            // 4. Render ke PDF View menggunakan DomPDF
+            $pdf = \Barryvdh\DomPDF\Facade\Pdf::loadView('application.keuangan.menu-cashier.report.bukti_pembayaran', [
+                'transaksi' => $transaksi,
+                'details'   => $details
+            ])->setPaper('a4', 'portrait');
 
-            // 5. Render ke PDF View
-            $pdf = Pdf::loadView('application.keuangan.menu-cashier.report.bukti_pembayaran', compact('order', 'items', 'totalLunas'))
-                ->setPaper('a5', 'landscape');
-
-            return $pdf->download("Kuitansi_Lunas_{$orderCode}.pdf");
+            return $pdf->download("Nota_Pembayaran_{$orderCode}.pdf");
         } catch (\Exception $e) {
             return response()->json([
                 'success' => false,
@@ -534,24 +923,345 @@ class KeuanganController extends Controller
             ], 500);
         }
     }
+
+    // 1. Ambil daftar transaksi lunas yang dilunasi oleh petugas keuangan login tapi belum dibuatkan laporan
+    public function getBelumDilaporkanKeuangan(Request $request)
+    {
+        try {
+            $userId = (string) Auth::user()->userid;
+
+            $data = DB::table('medical_registrasi')
+                ->leftJoin('medical_patient', 'medical_registrasi.pasien_id', '=', 'medical_patient.id')
+                ->leftJoin('medical_master_poli', 'medical_registrasi.poli_id', '=', 'medical_master_poli.id')
+                ->leftJoin('medical_master_doctor', 'medical_registrasi.doctor_id', '=', 'medical_master_doctor.id')
+                ->join('medical_transaksi', 'medical_transaksi.registrasi_id', '=', 'medical_registrasi.id')
+                // Filter: Hanya yang dilunasi oleh user keuangan yang sedang login
+                ->where('medical_transaksi.dilunasi_oleh', $userId)
+                ->where('medical_transaksi.status_pembayaran', 'LUNAS')
+                // Pastikan belum pernah masuk ke laporan keuangan manapun
+                ->whereNotExists(function ($query) {
+                    $query->select(DB::raw(1))
+                        ->from('medical_laporan_keuangan_detail')
+                        ->whereColumn('medical_laporan_keuangan_detail.transaksi_id', 'medical_transaksi.id');
+                })
+                ->select(
+                    'medical_transaksi.id as transaksi_id',
+                    'medical_registrasi.tanggal_registrasi',
+                    'medical_registrasi.no_registrasi',
+                    'medical_registrasi.jenis_layanan',
+                    'medical_patient.nama as nama_pasien',
+                    'medical_patient.pid',
+                    'medical_master_poli.nama_poli',
+                    'medical_master_doctor.nama_lengkap as nama_dokter',
+                    'medical_transaksi.metode_bayar',
+                    'medical_transaksi.total_tagihan'
+                )
+                ->orderBy('medical_registrasi.tanggal_registrasi', 'asc')
+                ->get()
+                ->map(function ($item) {
+                    return [
+                        'transaksi_id' => $item->transaksi_id,
+                        'tanggal_registrasi' => Carbon::parse($item->tanggal_registrasi)->format('d-m-Y H:i'),
+                        'no_registrasi' => $item->no_registrasi ?? '-',
+                        'nama_pasien' => $item->nama_pasien ?? 'Pasien Umum',
+                        'pid' => $item->pid ?? '-',
+                        'layanan' => str_replace('_', ' ', $item->jenis_layanan),
+                        'poli' => $item->nama_poli ?? '-',
+                        'nama_dokter' => $item->nama_dokter ?? '-',
+                        'metode_bayar' => $item->metode_bayar ?? 'CASH',
+                        'total_tagihan' => $item->total_tagihan ?? 0,
+                    ];
+                });
+
+            return response()->json([
+                'success' => true,
+                'data' => $data
+            ]);
+        } catch (\Exception $e) {
+            return response()->json([
+                'success' => false,
+                'message' => 'Terjadi kesalahan: ' . $e->getMessage()
+            ], 500);
+        }
+    }
+
+    // 2. Simpan laporan keuangan yang dibuat oleh bagian keuangan
+    public function storeLaporanKeuanganKeuangan(Request $request)
+    {
+        DB::beginTransaction();
+        try {
+            $userId = (string) Auth::user()->userid;
+            $transaksiIds = $request->input('transaksi_ids', []);
+
+            if (empty($transaksiIds)) {
+                return response()->json(['success' => false, 'message' => 'Tidak ada transaksi yang dipilih untuk dilaporkan!'], 400);
+            }
+
+            // Validasi: Pastikan transaksi benar-benar dilunasi oleh user ini dan statusnya LUNAS
+            $invalidTransaksi = DB::table('medical_transaksi')
+                ->whereIn('id', $transaksiIds)
+                ->where(function ($query) use ($userId) {
+                    $query->where('dilunasi_oleh', '!=', $userId)
+                        ->orWhere('status_pembayaran', '!=', 'LUNAS');
+                })
+                ->exists();
+
+            if ($invalidTransaksi) {
+                return response()->json([
+                    'success' => false,
+                    'message' => 'Beberapa transaksi yang dipilih tidak valid atau bukan hasil pelunasan Anda!'
+                ], 400);
+            }
+
+            $totalSetoran = DB::table('medical_transaksi')->whereIn('id', $transaksiIds)->sum('total_tagihan');
+            $noLaporan = 'LAP-KEU-' . date('Ymd') . '-' . rand(1000, 9999);
+
+            // Simpan ke master laporan keuangan
+            $laporanId = DB::table('medical_laporan_keuangan')->insertGetId([
+                'no_laporan'        => $noLaporan,
+                'user_id'           => $userId,
+                'total_setoran'     => $totalSetoran,
+                'jumlah_transaksi'  => count($transaksiIds),
+                'status_verifikasi' => 'PENDING', // Karena dibuat langsung oleh keuangan
+                'created_at'        => now(),
+                'updated_at'        => now(),
+            ]);
+
+            // Simpan ke detail pivot
+            $detailData = [];
+            foreach ($transaksiIds as $txId) {
+                $detailData[] = [
+                    'laporan_id'   => $laporanId,
+                    'transaksi_id' => $txId,
+                ];
+            }
+            DB::table('medical_laporan_keuangan_detail')->insert($detailData);
+
+            // Catat log trail
+            DB::table('medical_laporan_keuangan_log')->insert([
+                'laporan_id' => $laporanId,
+                'user_id'    => $userId,
+                'aksi'       => 'DISETUJUI',
+                'catatan'    => 'Laporan keuangan pelunasan piutang/transaksi dibuat langsung oleh bagian keuangan.',
+                'created_at' => now(),
+                'updated_at' => now(),
+            ]);
+
+            DB::commit();
+
+            return response()->json([
+                'success'    => true,
+                'message'    => 'Laporan keuangan berhasil dibuat dengan No Nota: ' . $noLaporan,
+                'no_laporan' => $noLaporan
+            ]);
+        } catch (\Exception $e) {
+            DB::rollBack();
+            return response()->json([
+                'success' => false,
+                'message' => 'Gagal memproses laporan: ' . $e->getMessage()
+            ], 500);
+        }
+    }
     // PERNERIMAAN TRANSAKSI
     public function keuangan_penerimaan_transaksi($akses, $id)
     {
         if ($this->url_akses_sub($akses, $id) == true) {
-            $data = DB::table('d_reg_order')
-                ->join('master_patient', 'master_patient.master_patient_code', '=', 'd_reg_order.d_reg_order_rm')
-                ->get();
-            return view('application.keuangan.transaksi-penerimaan', ['akses' => $akses, 'data' => $data, 'code' => $id]);
+            return view('application.keuangan.transaksi-penerimaan', [
+                'akses' => $akses,
+                'code' => $id
+            ]);
         } else {
             return Redirect::to('dashboard/home');
         }
     }
+
+    // Method untuk menangani AJAX Filter Data Table Keuangan
+    public function keuangan_penerimaan_get_data(Request $request)
+    {
+        $query = DB::table('medical_laporan_keuangan as lk')
+            ->leftJoin('user_mains as u_penyetor', 'lk.user_id', '=', 'u_penyetor.userid')
+            ->leftJoin('user_mains as u_pemeriksa', 'lk.diperiksa_oleh', '=', 'u_pemeriksa.userid')
+            ->select(
+                'lk.*',
+                'u_penyetor.fullname as nama_penyetor',
+                'u_pemeriksa.fullname as nama_pemeriksa'
+            );
+
+        // Filter Tanggal Awal & Tanggal Akhir (berdasarkan created_at atau tanggal laporan)
+        if (!empty($request->tgl_awal) && !empty($request->tgl_akhir)) {
+            $query->whereDate('lk.created_at', '>=', $request->tgl_awal)
+                ->whereDate('lk.created_at', '<=', $request->tgl_akhir);
+        }
+
+        // Filter Berdasarkan No Laporan
+        if (!empty($request->no_laporan)) {
+            $query->where('lk.no_laporan', 'LIKE', '%' . $request->no_laporan . '%');
+        }
+
+        // Filter Berdasarkan Nama Penyetor (fullname atau userid)
+        if (!empty($request->nama_penyetor)) {
+            $query->where(function ($q) use ($request) {
+                $q->where('u_penyetor.fullname', 'LIKE', '%' . $request->nama_penyetor . '%')
+                    ->orWhere('lk.user_id', 'LIKE', '%' . $request->nama_penyetor . '%');
+            });
+        }
+
+        $data = $query->orderBy('lk.created_at', 'DESC')->get()->map(function ($item) {
+            return [
+                'id'                => $item->id,
+                'no_laporan'        => $item->no_laporan,
+                // Menampilkan fullname penyetor (jika kosong, fallback ke user_id aslinya)
+                'user_id'           => $item->nama_penyetor ?? $item->user_id,
+                'total_setoran'     => $item->total_setoran,
+                'jumlah_transaksi'  => $item->jumlah_transaksi,
+                'status_verifikasi' => $item->status_verifikasi,
+                // Menampilkan fullname pemeriksa/keuangan (jika kosong, fallback ke diperiksa_oleh aslinya)
+                'diperiksa_oleh'    => $item->nama_pemeriksa ?? $item->diperiksa_oleh ?? null,
+                'waktu_diperiksa'   => $item->waktu_diperiksa ? \Carbon\Carbon::parse($item->waktu_diperiksa)->format('d-m-Y H:i') : null,
+                'catatan'           => $item->catatan ?? null,
+                'created_at'        => $item->created_at,
+            ];
+        });
+
+        return response()->json([
+            'success' => true,
+            'data'    => $data
+        ]);
+    }
     public function keuangan_penerimaan_proses_transaksi(Request $request)
     {
-        $data = DB::table('d_reg_order')
-            ->join('master_patient', 'master_patient.master_patient_code', '=', 'd_reg_order.d_reg_order_rm')
-            ->where('d_reg_order.d_reg_order_code', $request->code)
+        // 1. Ambil data laporan keuangan utama berdasarkan ID laporan
+        $laporan = DB::table('medical_laporan_keuangan')
+            ->where('id', $request->code)
             ->first();
-        return view('application.keuangan.transaksi-penerimaan.form-proses-transaksi', ['data' => $data]);
+
+        // 2. Ambil daftar transaksi yang terikat pada laporan ini melalui tabel pivot medical_laporan_keuangan_detail
+        $transaksiList = DB::table('medical_laporan_keuangan_detail')
+            ->join('medical_transaksi', 'medical_transaksi.id', '=', 'medical_laporan_keuangan_detail.transaksi_id')
+            ->join('medical_registrasi', 'medical_registrasi.id', '=', 'medical_transaksi.registrasi_id')
+            ->join('medical_patient', 'medical_patient.id', '=', 'medical_registrasi.pasien_id')
+            // Left join ke Sub Penjamin menggunakan tabel 'medical_sub_penjamin'
+            ->leftJoin('medical_sub_penjamin', 'medical_sub_penjamin.id', '=', 'medical_registrasi.sub_penjamin_id')
+            // Left join ke Master Dokter Pemeriksa
+            ->leftJoin('medical_master_doctor', 'medical_master_doctor.id', '=', 'medical_registrasi.doctor_poli_id')
+            ->where('medical_laporan_keuangan_detail.laporan_id', $request->code)
+            ->select(
+                'medical_transaksi.*',
+                'medical_registrasi.no_registrasi',
+                'medical_registrasi.jenis_layanan',
+                'medical_registrasi.tanggal_registrasi',
+                'medical_patient.id as pasien_id',
+                'medical_patient.pid',
+                'medical_patient.awalan',
+                'medical_patient.nama',
+                'medical_patient.akhiran',
+                'medical_patient.jk',
+                'medical_patient.tempat_lahir',
+                'medical_patient.tgl_lahir',
+                'medical_patient.no_hp',
+                'medical_patient.no_id', // NIK KTP / SIM
+                'medical_patient.alamat',
+                'medical_patient.foto', // Base64 atau path foto
+                // Memanggil kolom dari tabel medical_sub_penjamin
+                'medical_sub_penjamin.nama_sub_penjamin',
+                'medical_master_doctor.nama_lengkap as nama_dokter_pemeriksa'
+            )
+            ->get();
+
+        // 3. Looping setiap transaksi untuk mengambil rincian item pemeriksaannya (medical_transaksi_detail)
+        foreach ($transaksiList as $trx) {
+            $trx->items_pemeriksaan = DB::table('medical_transaksi_detail')
+                ->leftJoin('medical_master_pemeriksaan', 'medical_master_pemeriksaan.id', '=', 'medical_transaksi_detail.master_pemeriksaan_id')
+                ->where('medical_transaksi_detail.transaksi_id', $trx->id)
+                ->select(
+                    'medical_transaksi_detail.*',
+                    'medical_master_pemeriksaan.nama_layanan'
+                )
+                ->get();
+        }
+
+        // Ambil sampel data pasien pertama untuk ditampilkan pada header profil form
+        $dataPasien = $transaksiList->first();
+
+        return view('application.keuangan.transaksi-penerimaan.form-proses-transaksi', [
+            'laporan'       => $laporan,
+            'transaksiList' => $transaksiList,
+            'data'          => $dataPasien
+        ]);
+    }
+    public function verifikasiLaporanSetoran(Request $request)
+    {
+        DB::beginTransaction();
+        try {
+            $userId = (string) Auth::user()->userid; // ID Petugas Keuangan yang login
+            $laporanId = $request->input('laporan_id');
+            $catatan = $request->input('catatan', 'Laporan keuangan telah diverifikasi dan disetujui.');
+
+            if (empty($laporanId)) {
+                return response()->json(['success' => false, 'message' => 'ID Laporan tidak ditemukan!'], 400);
+            }
+
+            // 1. Ambil data laporan
+            $laporan = DB::table('medical_laporan_keuangan')->where('id', $laporanId)->first();
+
+            if (!$laporan) {
+                return response()->json(['success' => false, 'message' => 'Data laporan keuangan tidak ditemukan!'], 404);
+            }
+
+            if ($laporan->status_verifikasi === 'DISETUJUI') {
+                return response()->json(['success' => false, 'message' => 'Laporan ini sudah pernah disetujui sebelumnya!'], 400);
+            }
+
+            // 2. Update status verifikasi pada tabel master laporan keuangan
+            DB::table('medical_laporan_keuangan')
+                ->where('id', $laporanId)
+                ->update([
+                    'status_verifikasi' => 'DISETUJUI',
+                    'diperiksa_oleh'    => $userId,
+                    'waktu_diperiksa'   => now(),
+                    'catatan_verifikasi'           => $catatan, // <--- Tambahkan ini jika kolomnya ada di tabel medical_laporan_keuangan
+                    'updated_at'        => now()
+                ]);
+
+            // 3. Catat rekam jejak audit (Log Trail) siapa yang menyetujui
+            DB::table('medical_laporan_keuangan_log')->insert([
+                'laporan_id' => $laporanId,
+                'user_id'    => $userId, // ID Petugas Keuangan
+                'aksi'       => 'DISETUJUI',
+                'catatan'    => $catatan,
+                'created_at' => now(),
+                'updated_at' => now(),
+            ]);
+
+            // 4. (Opsional) Pastikan semua transaksi yang terikat pada laporan ini
+            // tercatat waktu lunas dan dilunasi oleh petugas keuangan jika belum
+            $transaksiIds = DB::table('medical_laporan_keuangan_detail')
+                ->where('laporan_id', $laporanId)
+                ->pluck('transaksi_id');
+
+            if (!empty($transaksiIds)) {
+                DB::table('medical_transaksi')
+                    ->whereIn('id', $transaksiIds)
+                    ->whereNull('dilunasi_oleh')
+                    ->update([
+                        'dilunasi_oleh' => $userId,
+                        'waktu_lunas'   => now(),
+                        'updated_at'    => now()
+                    ]);
+            }
+
+            DB::commit();
+
+            return response()->json([
+                'success' => true,
+                'message' => 'Laporan setoran berhasil disetujui dan diverifikasi oleh bagian keuangan!'
+            ]);
+        } catch (\Exception $e) {
+            DB::rollBack();
+            return response()->json([
+                'success' => false,
+                'message' => 'Gagal memverifikasi laporan: ' . $e->getMessage()
+            ], 500);
+        }
     }
 }

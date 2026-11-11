@@ -7,95 +7,202 @@
 <link href="{{ asset('vendors/flatpickr/flatpickr.min.css') }}" rel="stylesheet" />
 <link href="https://cdn.jsdelivr.net/npm/select2@4.1.0-rc.0/dist/css/select2.min.css" rel="stylesheet" />
 <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/select2-bootstrap-5-theme@1.3.0/dist/select2-bootstrap-5-theme.min.css" />
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
+
 <style>
-    /* Hero Banner Header Compact */
-    .hero-header {
-        background: var(--primary-gradient);
+    /* =========================================
+       RETRO / NEUBRUTALISM THEME STYLES
+       ========================================= */
+    :root {
+        --retro-dark: #1e1e24;
+        --retro-yellow: #ffde59;
+        --retro-pink: #ffa6c9;
+        --retro-cyan: #8bf0fa;
+        --retro-orange: #ff914d;
+        --retro-green: #c1ff72;
+        --retro-purple: #c8b6ff;
+        --retro-bg: #f4f0ea;
+        --retro-border: 3px solid var(--retro-dark);
+        --retro-shadow: 5px 5px 0px var(--retro-dark);
+        --retro-shadow-sm: 3px 3px 0px var(--retro-dark);
+    }
+
+    body {
+        /* background-color: var(--retro-bg); */
+    }
+
+    /* Retro Cards & Banners */
+    .retro-card {
+        border: var(--retro-border);
         border-radius: 12px;
-        color: #ffffff;
-        box-shadow: 0 4px 15px rgba(79, 70, 229, 0.25);
-        position: relative;
+        box-shadow: var(--retro-shadow);
+        /* background-color: #ffffff; */
         overflow: hidden;
     }
 
-    .hero-header h3 {
-        font-size: 1.35rem;
-    }
-
-    /* Card Custom */
-    .card-modern {
-        border: none;
+    .retro-header-banner {
+        background: linear-gradient(135deg, var(--retro-yellow) 0%, var(--retro-orange) 100%);
+        border: var(--retro-border);
         border-radius: 12px;
+        box-shadow: var(--retro-shadow);
+        color: var(--retro-dark);
     }
 
-    /* Table Styling Compact */
-    .table-custom {
-        font-size: 0.8rem;
-    }
-
-    .table-custom thead th {
-        background: #f8fbfc;
-        font-size: 0.68rem;
+    /* Retro Buttons */
+    .retro-btn {
+        font-weight: 800 !important;
+        border: 2px solid var(--retro-dark);
+        box-shadow: var(--retro-shadow-sm);
+        border-radius: 6px;
+        transition: all 0.1s ease-in-out;
         text-transform: uppercase;
-        letter-spacing: 1.5px;
-        font-weight: 700;
-        padding: 18px 12px;
-        border: none;
+        letter-spacing: 0.5px;
+        cursor: pointer;
     }
 
-    .table-custom tbody tr {
-        background: #ffffff;
-        transition: all 0.2s ease-in-out;
+    .retro-btn:active {
+        transform: translate(3px, 3px);
+        box-shadow: 0px 0px 0px var(--retro-dark);
     }
 
-    .table-custom tbody tr:hover {
-        background-color: #f1f5f9 !important;
+    .retro-btn-primary {
+        background-color: var(--retro-cyan);
+        color: var(--retro-dark);
     }
 
-    .table-custom td {
-        padding: 8px 12px;
-        vertical-align: middle;
-        border-top: 1px solid #f1f5f9;
-        border-bottom: 1px solid #f1f5f9;
+    .retro-btn-primary:hover {
+        background-color: #6ce0ed;
+        color: var(--retro-dark);
     }
 
-    .custom-loader {
-        display: flex;
-        flex-direction: column;
-        align-items: center;
-        justify-content: center;
-        padding: 20px 0;
+    .retro-btn-warning {
+        background-color: var(--retro-yellow);
+        color: var(--retro-dark);
     }
 
-    /* Floating Field Filter Style */
+    .retro-btn-warning:hover {
+        background-color: #e6c84c;
+        color: var(--retro-dark);
+    }
+
+    .retro-btn-success {
+        background-color: var(--retro-green);
+        color: var(--retro-dark);
+    }
+
+    .retro-btn-success:hover {
+        background-color: #b0f55b;
+        color: var(--retro-dark);
+    }
+
+    .retro-btn-danger {
+        background-color: var(--retro-pink);
+        color: var(--retro-dark);
+    }
+
+    /* Inputs, Selects & Floating Filters */
+    .filter-bar-container {
+        background-color: #ffffff;
+        border: var(--retro-border);
+        border-radius: 12px;
+        padding: 15px 20px;
+        margin-bottom: 20px;
+        box-shadow: var(--retro-shadow-sm);
+    }
+
     .form-floating-custom {
         position: relative;
     }
 
     .form-floating-custom label {
         position: absolute;
-        top: 3px;
-        left: 10px;
-        font-size: 0.68rem;
-        color: #6c757d;
+        top: 2px;
+        left: 8px;
+        font-size: 0.65rem;
+        font-weight: 800;
+        color: var(--retro-dark);
         pointer-events: none;
-        z-index: 5 !important;
-        background: transparent !important;
+        z-index: 5;
+        background: transparent;
     }
 
-    .form-floating-custom .form-control,
-    .form-floating-custom .form-select {
-        padding-top: 16px;
-        padding-bottom: 4px;
-        padding-left: 10px;
+    .retro-input,
+    .form-control,
+    .form-select {
+        border: 2px solid var(--retro-dark) !important;
+        border-radius: 6px !important;
+        box-shadow: 2px 2px 0px var(--retro-dark) !important;
+        font-weight: 700 !important;
+        color: var(--retro-dark) !important;
+        background-color: #ffffff !important;
+        padding-top: 16px !important;
+        padding-bottom: 4px !important;
+        font-size: 0.8rem !important;
+    }
+
+    .retro-input:focus,
+    .form-control:focus,
+    .form-select:focus {
+        border-color: var(--retro-dark) !important;
+        box-shadow: 4px 4px 0px var(--retro-dark) !important;
+        outline: none;
+    }
+
+    /* ========================================================= */
+    /* TABEL DENGAN GARIS TEGAS PADA SETIAP KOLOM & BARIS         */
+    /* ========================================================= */
+    .table-custom {
         font-size: 0.8rem;
-        font-weight: 600;
-        height: 42px;
-        border-color: #ced4da;
-        border-radius: 6px;
+        border-collapse: collapse !important;
+        width: 100%;
     }
 
-    /* Penyesuaian Khusus Select2 Floating Label */
+    .table-custom thead th {
+        background-color: var(--retro-dark) !important;
+        color: var(--retro-green) !important;
+        font-size: 0.75rem;
+        font-weight: 800;
+        text-transform: uppercase;
+        border: 2px solid var(--retro-dark) !important;
+        padding: 12px 10px;
+        letter-spacing: 0.5px;
+        text-align: center;
+    }
+
+    .table-custom tbody tr {
+        transition: background 0.2s;
+    }
+
+    .table-custom tbody tr:hover {
+        background-color: var(--retro-yellow) !important;
+    }
+
+    .table-custom td {
+        border: 2px solid var(--retro-dark) !important;
+        /* Garis vertikal & horizontal tegas antar kolom */
+        font-weight: 700;
+        color: var(--retro-dark);
+        padding: 10px;
+        vertical-align: middle;
+        background-color: #ffffff;
+    }
+
+    .table-custom tbody tr:hover td {
+        background-color: var(--retro-yellow) !important;
+    }
+
+    .retro-badge {
+        border: 2px solid var(--retro-dark);
+        border-radius: 6px;
+        padding: 4px 8px;
+        font-weight: 800;
+        box-shadow: 2px 2px 0px var(--retro-dark);
+        text-transform: uppercase;
+        display: inline-block;
+        font-size: 0.7rem;
+    }
+
+    /* Select2 Retro Styling */
     .form-floating-custom .select2-container--bootstrap-5 .select2-selection {
         height: 42px !important;
         padding-top: 14px !important;
@@ -103,59 +210,53 @@
         padding-left: 6px !important;
         border-radius: 6px !important;
         background-color: #fff !important;
-        border: 1px solid #ced4da !important;
+        border: 2px solid var(--retro-dark) !important;
+        box-shadow: 2px 2px 0px var(--retro-dark) !important;
     }
 
     .form-floating-custom .select2-container--bootstrap-5 .select2-selection--single .select2-selection__rendered {
         font-size: 0.8rem !important;
-        font-weight: 600 !important;
-        color: #212529 !important;
+        font-weight: 700 !important;
+        color: var(--retro-dark) !important;
         padding-left: 4px !important;
         line-height: 1.5 !important;
     }
 
     .form-floating-custom .select2-container--bootstrap-5 .select2-selection--single .select2-selection__arrow {
-        top: 6px !important;
+        top: 8px !important;
     }
 </style>
 @endsection
 
 @section('content')
 <!-- HEADER HERO BANNER -->
-<div class="row mb-3">
+<div class="row mb-4">
     <div class="col-12">
-        <div class="card border-0 shadow-lg rounded-4 overflow-hidden position-relative"
-            style="background: linear-gradient(135deg, #1f6f92 0%, #203a43 50%, #2c5364 100%);">
-
-            <div class="position-absolute rounded-circle bg-primary opacity-25 blur-3xl"
-                style="width: 250px; height: 250px; top: -80px; right: 10%; filter: blur(60px);"></div>
-            <div class="position-absolute rounded-circle bg-info opacity-25 blur-3xl"
-                style="width: 200px; height: 200px; bottom: -80px; left: -50px; filter: blur(50px);"></div>
-
-            <div class="card-body p-4 text-white position-relative z-1">
+        <div class="card retro-header-banner p-1">
+            <div class="card-body p-4 text-dark position-relative z-1">
                 <div class="row align-items-center gy-3">
                     <div class="col-lg-7 d-flex align-items-center">
-                        <div class="p-2 bg-opacity-10 rounded-4 shadow-sm me-3 border border-white border-opacity-10 d-flex align-items-center justify-content-center backdrop-blur"
-                            style="width: 65px; height: 65px; backdrop-filter: blur(10px);">
-                            <img src="{{ asset('img/dashboard.png') }}" alt="Logo" class="img-fluid drop-shadow" width="42" />
+                        <div class="p-2 rounded-4 shadow-sm me-3 d-flex align-items-center justify-content-center"
+                            style="width: 65px; height: 65px; background: white; border: 2px solid var(--retro-dark); box-shadow: 3px 3px 0px var(--retro-dark);">
+                            <img src="{{ asset('img/dashboard.png') }}" alt="Logo" class="img-fluid" width="42" />
                         </div>
                         <div>
                             <div class="d-flex align-items-center gap-2 mb-1">
-                                <span class="badge bg-warning text-dark fw-bold px-2 py-1 rounded-pill" style="font-size: 0.68rem; letter-spacing: 0.5px;">
+                                <span class="retro-badge" style="background-color: var(--retro-cyan); color: var(--retro-dark);">
                                     <i class="fas fa-bolt me-1"></i> LIVE SYSTEM
                                 </span>
-                                <span class="text-white-50" style="font-size: 0.75rem;">v2.4 Medical Suite</span>
+                                <span class="text-dark fw-bold" style="font-size: 0.75rem;">v2.4 Medical Suite</span>
                             </div>
-                            <h3 class="text-white fw-extrabold mb-0 tracking-tight" style="font-size: 1.4rem;">
-                                Welcome to {{ Env('APP_LABEL')}} <span class="text-info fw-light">Management System</span>
+                            <h3 class="fw-bolder mb-0 text-dark" style="font-size: 1.4rem; text-shadow: 1px 1px 0px white;">
+                                Welcome to {{ Env('APP_LABEL')}} <span class="fw-normal">Management System</span>
                             </h3>
                         </div>
                     </div>
 
-                    <div class="col-lg-5 text-lg-end border-start-lg border-white border-opacity-10 ps-lg-4">
-                        <div class="d-inline-flex align-items-center bg-white bg-opacity-10 border border-white border-opacity-20 px-3 py-2 rounded-pill backdrop-blur">
-                            <h6 class="text-warning fw-bold mb-0" style="font-size: 0.95rem;">
-                                <i class="fas fa-user-shield me-1"></i> Verifikasi Data Pasien
+                    <div class="col-lg-5 text-lg-end">
+                        <div class="d-inline-flex align-items-center bg-white px-3 py-2 rounded-pill" style="border: 2px solid var(--retro-dark); box-shadow: 3px 3px 0px var(--retro-dark);">
+                            <h6 class="fw-bolder mb-0 text-dark" style="font-size: 0.95rem;">
+                                <i class="fas fa-user-shield me-1 text-warning"></i> Verifikasi Data Pasien
                             </h6>
                         </div>
                     </div>
@@ -166,21 +267,21 @@
 </div>
 
 <!-- MAIN DATA TABLE CARD -->
-<div class="card card-modern mb-4">
-    <div class="card-header bg-white border-bottom border-light py-3 px-3 rounded-top-4">
+<div class="retro-card mb-4">
+    <div class="card-header bg-white border-bottom border-dark py-3 px-3">
         <div class="row align-items-center g-2">
             <!-- TOMBOL AKSI UTAMA -->
             <div class="col-12 col-md-auto d-flex align-items-center justify-content-between gap-2">
-                <button class="btn btn-sm btn-primary rounded-3 px-3 py-2 d-flex align-items-center gap-1" style="height: 42px;"
+                <button class="btn btn-sm retro-btn retro-btn-primary px-3 py-2 d-flex align-items-center gap-1" style="height: 42px;"
                     type="button" id="button-refresh-data" data-bs-toggle="tooltip" title="Refresh Data Hari Ini">
                     <i class="fas fa-sync-alt"></i>
-                    <span class="d-sm-inline fw-semibold ms-1">Refresh Data</span>
+                    <span class="d-sm-inline fw-bold ms-1">Refresh Data</span>
                 </button>
 
-                <button class="btn btn-sm btn-outline-secondary rounded-3 px-3 py-2 d-md-none d-flex align-items-center gap-1" style="height: 42px;"
+                <button class="btn btn-sm retro-btn retro-btn-warning px-3 py-2 d-md-none d-flex align-items-center gap-1" style="height: 42px;"
                     type="button" data-bs-toggle="collapse" data-bs-target="#collapseFilterMobile">
-                    <i class="fas fa-filter text-primary"></i>
-                    <span class="fw-semibold">Filter</span>
+                    <i class="fas fa-filter"></i>
+                    <span class="fw-bold">Filter</span>
                     <i class="fas fa-chevron-down ms-1"></i>
                 </button>
             </div>
@@ -191,25 +292,25 @@
                     <div class="col-12 col-sm-6 col-md">
                         <div class="form-floating-custom">
                             <label>Tanggal Awal</label>
-                            <input type="text" class="form-control datetimepicker" id="filter_tgl_awal" value="{{ date('Y-m-d') }}" placeholder="YYYY-MM-DD" data-options='{"dateFormat":"Y-m-d","disableMobile":true}'>
+                            <input type="text" class="form-control datetimepicker retro-input" id="filter_tgl_awal" value="{{ date('Y-m-d') }}" placeholder="YYYY-MM-DD" data-options='{"dateFormat":"Y-m-d","disableMobile":true}'>
                         </div>
                     </div>
                     <div class="col-12 col-sm-6 col-md">
                         <div class="form-floating-custom">
                             <label>Tanggal Akhir</label>
-                            <input type="text" class="form-control datetimepicker" id="filter_tgl_akhir" value="{{ date('Y-m-d') }}" placeholder="YYYY-MM-DD" data-options='{"dateFormat":"Y-m-d","disableMobile":true}'>
+                            <input type="text" class="form-control datetimepicker retro-input" id="filter_tgl_akhir" value="{{ date('Y-m-d') }}" placeholder="YYYY-MM-DD" data-options='{"dateFormat":"Y-m-d","disableMobile":true}'>
                         </div>
                     </div>
                     <div class="col-12 col-sm-6 col-md">
                         <div class="form-floating-custom">
                             <label>No Reg / Nama</label>
-                            <input type="text" class="form-control" id="filter_search" placeholder="Cari Reg/Nama...">
+                            <input type="text" class="form-control retro-input" id="filter_search" placeholder="Cari Reg/Nama...">
                         </div>
                     </div>
                     <div class="col-12 col-sm-6 col-md">
                         <div class="form-floating-custom">
                             <label>Dokter</label>
-                            <select class="form-select" id="filter_dokter">
+                            <select class="form-select retro-input" id="filter_dokter">
                                 <option value="">Semua Dokter</option>
                             </select>
                         </div>
@@ -217,7 +318,7 @@
                     <div class="col-12 col-sm-6 col-md">
                         <div class="form-floating-custom">
                             <label>Kel. Pelanggan</label>
-                            <select class="form-select" id="filter_penjamin">
+                            <select class="form-select retro-input" id="filter_penjamin">
                                 <option value="">Semua Kelompok</option>
                             </select>
                         </div>
@@ -225,7 +326,7 @@
                     <div class="col-12 col-sm-6 col-md">
                         <div class="form-floating-custom">
                             <label>Pemeriksaan</label>
-                            <select class="form-select" id="filter_pemeriksaan">
+                            <select class="form-select retro-input" id="filter_pemeriksaan">
                                 <option value="">Semua Pemeriksaan</option>
                             </select>
                         </div>
@@ -237,9 +338,10 @@
 
     <div class="card-body p-3">
         <div class="table-responsive">
-            <table id="example" class="table table-custom align-middle mb-0" style="width:100%">
-                <thead class="bg-primary">
-                    <tr class="text-white">
+            <!-- Tabel dengan garis tegas pada setiap kolom (border grid) -->
+            <table id="example" class="table table-custom align-middle mb-0 table-bordered" style="width:100%; border: 2px solid var(--retro-dark);">
+                <thead>
+                    <tr>
                         <th width="5%" class="text-center">#</th>
                         <th width="5%" class="text-center">No</th>
                         <th width="18%">No. Registrasi & Petugas</th>
@@ -261,9 +363,9 @@
 <!-- MODAL VERIFIKASI DATA -->
 <div class="modal fade" id="modal-registrasi" data-bs-keyboard="false" data-bs-backdrop="static" tabindex="-1" aria-hidden="true">
     <div class="modal-dialog modal-dialog-centered modal-xl" role="document">
-        <div class="modal-content border-0 shadow-lg rounded-4 overflow-hidden">
+        <div class="modal-content retro-card border-0">
             <div class="position-absolute top-0 end-0 mt-3 me-3 z-index-1">
-                <button class="btn-close btn btn-sm btn-circle d-flex flex-center transition-base" data-bs-dismiss="modal" aria-label="Close"></button>
+                <button class="btn-close btn btn-sm btn-circle bg-light d-flex flex-center transition-base" data-bs-dismiss="modal" aria-label="Close" style="border: 2px solid var(--retro-dark);"></button>
             </div>
             <div id="menu-registrasi"></div>
         </div>
@@ -311,7 +413,7 @@
                 },
                 {
                     data: 'no',
-                    className: 'align-middle'
+                    className: 'align-middle text-center'
                 },
                 {
                     data: 'no_reg',
@@ -331,7 +433,7 @@
                 },
                 {
                     data: 'janji_hasil',
-                    className: 'align-middle'
+                    className: 'align-middle text-center'
                 },
                 {
                     data: 'pemeriksaan',
@@ -339,7 +441,7 @@
                 },
                 {
                     data: 'pengiriman',
-                    className: 'align-middle'
+                    className: 'align-middle text-center'
                 },
                 {
                     data: 'total',
@@ -357,7 +459,7 @@
                     next: "<i class='fas fa-chevron-right'></i>",
                     previous: "<i class='fas fa-chevron-left'></i>"
                 },
-                processing: `<div class="custom-loader"><div class="spinner-border text-primary mb-2" role="status"></div><span class="fw-bold text-primary small">Memuat data...</span></div>`
+                processing: `<div class="custom-loader py-3 text-center"><div class="spinner-border text-dark mb-2" role="status"></div><span class="fw-bold text-dark small">Memuat data...</span></div>`
             }
         });
 
@@ -434,7 +536,7 @@
         e.preventDefault();
         var code = $(this).data("code");
         $('#menu-registrasi').html(
-            '<div class="text-center my-5"><div class="spinner-border text-primary" role="status"><span class="visually-hidden">Loading...</span></div><p class="mt-2 text-muted fs--1">Memuat data registrasi...</p></div>'
+            '<div class="text-center my-5"><div class="spinner-border text-dark" role="status"></div><p class="mt-2 text-dark fw-bold fs--1">Memuat data registrasi...</p></div>'
         );
         $.ajax({
             url: "{{ route('menu_pelayanan_verifikasi_registrasi_data') }}",
@@ -459,8 +561,8 @@
 
         const swalWithBootstrapButtons = Swal.mixin({
             customClass: {
-                confirmButton: "btn btn-danger px-4 rounded-pill ms-2",
-                cancelButton: "btn btn-light px-4 rounded-pill"
+                confirmButton: "btn retro-btn retro-btn-danger px-4 ms-2",
+                cancelButton: "btn retro-btn btn-secondary px-4"
             },
             buttonsStyling: false
         });
@@ -486,7 +588,6 @@
             }
         }).then((result) => {
             if (result.isConfirmed) {
-                // Menangkap input alasan dari user
                 const alasanBatal = result.value;
 
                 $.ajax({
@@ -496,7 +597,7 @@
                     data: {
                         "_token": "{{ csrf_token() }}",
                         "code": code,
-                        "alasan": alasanBatal // Mengirim alasan ke controller
+                        "alasan": alasanBatal
                     },
                     dataType: 'html',
                 }).done(function(data) {
@@ -505,7 +606,7 @@
                         text: "Registrasi telah dibatalkan.",
                         icon: "success"
                     });
-                    table.draw(); // Refresh tabel setelah batal
+                    table.draw();
                 }).fail(function() {
                     swalWithBootstrapButtons.fire({
                         title: "Gagal",

@@ -7,78 +7,159 @@
 <link href="{{ asset('vendors/flatpickr/flatpickr.min.css') }}" rel="stylesheet" />
 <link href="https://cdn.jsdelivr.net/npm/select2@4.1.0-rc.0/dist/css/select2.min.css" rel="stylesheet" />
 <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/select2-bootstrap-5-theme@1.3.0/dist/select2-bootstrap-5-theme.min.css" />
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
+
 <style>
+    /* =========================================
+       RETRO / NEUBRUTALISM THEME STYLES
+       ========================================= */
+    :root {
+        --retro-dark: #1e1e24;
+        --retro-yellow: #ffde59;
+        --retro-pink: #ffa6c9;
+        --retro-cyan: #8bf0fa;
+        --retro-orange: #ff914d;
+        --retro-green: #c1ff72;
+        --retro-purple: #c8b6ff;
+        --retro-bg: #f4f0ea;
+        --retro-border: 3px solid var(--retro-dark);
+        --retro-shadow: 5px 5px 0px var(--retro-dark);
+        --retro-shadow-sm: 3px 3px 0px var(--retro-dark);
+    }
+
+    body {
+        /* background-color: var(--retro-bg); */
+        color: var(--retro-dark);
+    }
+
+    /* Retro Cards & Banners */
+    .retro-card {
+        border: var(--retro-border);
+        border-radius: 12px;
+        box-shadow: var(--retro-shadow);
+        background-color: #ffffff;
+        overflow: hidden;
+    }
+
+    .retro-header-banner {
+        background: linear-gradient(135deg, var(--retro-cyan) 0%, var(--retro-purple) 100%);
+        border: var(--retro-border);
+        border-radius: 12px;
+        box-shadow: var(--retro-shadow);
+        color: var(--retro-dark);
+    }
+
+    /* Retro Buttons */
+    .retro-btn {
+        font-weight: 800 !important;
+        border: 2px solid var(--retro-dark);
+        box-shadow: var(--retro-shadow-sm);
+        border-radius: 6px;
+        transition: all 0.1s ease-in-out;
+        text-transform: uppercase;
+        letter-spacing: 0.5px;
+        cursor: pointer;
+    }
+
+    .retro-btn:active {
+        transform: translate(3px, 3px);
+        box-shadow: 0px 0px 0px var(--retro-dark);
+    }
+
+    .retro-badge {
+        border: 2px solid var(--retro-dark);
+        border-radius: 6px;
+        padding: 4px 8px;
+        font-weight: 800;
+        box-shadow: 2px 2px 0px var(--retro-dark);
+        text-transform: uppercase;
+        display: inline-block;
+        font-size: 0.7rem;
+    }
+
+    /* Custom Table Styling Retro */
     .table-custom thead th {
-        font-weight: 600;
+        font-weight: 800;
         text-transform: uppercase;
         font-size: 0.75rem;
         letter-spacing: 0.5px;
-        background-color: #0369a1 !important;
-        color: #ffffff !important;
-        border-bottom: 2px solid #dee2e6;
+        background-color: var(--retro-dark) !important;
+        color: var(--retro-green) !important;
+        border: 2px solid var(--retro-dark) !important;
     }
 
+    .table-custom tbody td {
+        border: 2px solid var(--retro-dark) !important;
+        font-weight: 700;
+        color: var(--retro-dark);
+        background-color: #ffffff;
+    }
+
+    .table-custom tbody tr:hover td {
+        background-color: var(--retro-cyan) !important;
+    }
+
+    /* Soft Badges Retro */
     .badge-soft-danger {
-        background-color: #fde8e8;
-        color: #e02424;
+        background-color: var(--retro-pink);
+        color: var(--retro-dark);
+        border: 1.5px solid var(--retro-dark);
     }
 
     .badge-soft-warning {
-        background-color: #fef3c7;
-        color: #d97706;
+        background-color: var(--retro-yellow);
+        color: var(--retro-dark);
+        border: 1.5px solid var(--retro-dark);
     }
 
     .badge-soft-info {
-        background-color: #e0f2fe;
-        color: #0284c7;
+        background-color: var(--retro-cyan);
+        color: var(--retro-dark);
+        border: 1.5px solid var(--retro-dark);
     }
 
     .badge-soft-success {
-        background-color: #def7ec;
-        color: #03543f;
+        background-color: var(--retro-green);
+        color: var(--retro-dark);
+        border: 1.5px solid var(--retro-dark);
     }
 
     .badge-soft-primary {
-        background-color: #e1effe;
-        color: #1e429f;
+        background-color: var(--retro-purple);
+        color: var(--retro-dark);
+        border: 1.5px solid var(--retro-dark);
     }
 
     .list-pemeriksaan-tag {
         display: inline-block;
-        background-color: #f1f5f9;
-        color: #334155;
+        background-color: var(--retro-bg);
+        color: var(--retro-dark);
         padding: 2px 8px;
         border-radius: 4px;
+        border: 1.5px solid var(--retro-dark);
         font-size: 0.75rem;
         margin: 1px;
-        font-weight: 500;
+        font-weight: 700;
     }
 
     .code-block {
-        font-family: SFMono-Regular, Menlo, Monaco, Consolas, "Liberation Mono", "Courier New", monospace;
+        font-family: SFMono-Regular, Menlo, Monaco, Consolas, monospace;
         font-size: 0.8rem;
-        font-weight: 600;
+        font-weight: 800;
     }
 
-    .custom-loader {
-        display: flex;
-        flex-direction: column;
-        align-items: center;
-        justify-content: center;
-        padding: 25px 0;
-    }
-
-    /* Floating Field Filter Style */
+    /* Floating Field Filter Style Retro */
     .form-floating-custom {
         position: relative;
     }
 
     .form-floating-custom label {
         position: absolute;
-        top: 3px;
-        left: 10px;
+        top: 2px;
+        left: 8px;
         font-size: 0.68rem;
-        color: #6c757d;
+        color: var(--retro-dark);
+        font-weight: 800;
         pointer-events: none;
         z-index: 5 !important;
         background: transparent !important;
@@ -90,10 +171,13 @@
         padding-bottom: 4px;
         padding-left: 10px;
         font-size: 0.8rem;
-        font-weight: 600;
+        font-weight: 700;
         height: 42px;
-        border-color: #ced4da;
-        border-radius: 6px;
+        border: 2px solid var(--retro-dark) !important;
+        border-radius: 6px !important;
+        box-shadow: 2px 2px 0px var(--retro-dark);
+        background-color: #fff !important;
+        color: var(--retro-dark) !important;
     }
 
     /* Penyesuaian Select2 Floating Label */
@@ -104,13 +188,14 @@
         padding-left: 6px !important;
         border-radius: 6px !important;
         background-color: #fff !important;
-        border: 1px solid #ced4da !important;
+        border: 2px solid var(--retro-dark) !important;
+        box-shadow: 2px 2px 0px var(--retro-dark);
     }
 
     .form-floating-custom .select2-container--bootstrap-5 .select2-selection--single .select2-selection__rendered {
         font-size: 0.8rem !important;
-        font-weight: 600 !important;
-        color: #212529 !important;
+        font-weight: 700 !important;
+        color: var(--retro-dark) !important;
         padding-left: 4px !important;
         line-height: 1.5 !important;
     }
@@ -123,39 +208,32 @@
 
 @section('content')
 <!-- BREADCRUMB & HERO HEADER -->
-<div class="row mb-3">
+<div class="row mb-4">
     <div class="col-12">
-        <div class="card border-0 shadow-lg rounded-4 overflow-hidden position-relative"
-            style="background: linear-gradient(135deg, #0f172a 0%, #1e293b 50%, #0369a1 100%);">
-
-            <div class="position-absolute rounded-circle bg-primary opacity-25 blur-3xl"
-                style="width: 250px; height: 250px; top: -80px; right: 10%; filter: blur(60px);"></div>
-            <div class="position-absolute rounded-circle bg-info opacity-25 blur-3xl"
-                style="width: 200px; height: 200px; bottom: -80px; left: -50px; filter: blur(50px);"></div>
-
-            <div class="card-body p-4 text-white position-relative z-1">
+        <div class="card retro-header-banner p-1">
+            <div class="card-body p-4 text-dark position-relative z-1">
                 <div class="row align-items-center gy-3">
                     <div class="col-lg-7 d-flex align-items-center">
-                        <div class="p-2 bg-opacity-10 rounded-4 shadow-sm me-3 border-opacity-10 d-flex align-items-center justify-content-center backdrop-blur"
-                            style="width: 65px; height: 65px; backdrop-filter: blur(10px);">
-                            <img src="{{ asset('img/rad.png') }}" alt="Logo" class="img-fluid drop-shadow" width="42" />
+                        <div class="p-2 rounded-4 me-3 d-flex align-items-center justify-content-center"
+                            style="width: 65px; height: 65px; background: white; border: 2px solid var(--retro-dark); box-shadow: 3px 3px 0px var(--retro-dark);">
+                            <img src="{{ asset('img/rad.png') }}" alt="Logo" class="img-fluid" width="42" />
                         </div>
                         <div>
                             <div class="d-flex align-items-center gap-2 mb-1">
-                                <span class="badge bg-info text-dark fw-bold px-2 py-1 rounded-pill" style="font-size: 0.68rem; letter-spacing: 0.5px;">
-                                    <i class="fas fa-radiation me-1"></i> <span class="text-white" style="font-size: 0.75rem;">v2.4 Medical Suite</span>
+                                <span class="retro-badge" style="background-color: var(--retro-yellow); color: var(--retro-dark);">
+                                    <i class="fas fa-radiation me-1"></i> v2.4 Medical Suite
                                 </span>
                             </div>
-                            <h3 class="text-white fw-extrabold mb-0 tracking-tight" style="font-size: 1.4rem;">
-                                Welcome to {{ Env('APP_LABEL')}} <span class="text-info fw-light">Management System</span>
+                            <h3 class="fw-bolder mb-0 text-dark" style="font-size: 1.4rem; text-shadow: 1px 1px 0px white;">
+                                Welcome to {{ Env('APP_LABEL')}} <span class="fw-normal">Management System</span>
                             </h3>
                         </div>
                     </div>
 
-                    <div class="col-lg-5 text-lg-end border-start-lg border-white border-opacity-10 ps-lg-4">
-                        <div class="d-inline-flex align-items-center bg-white bg-opacity-10 border border-white border-opacity-20 px-3 py-2 rounded-pill backdrop-blur">
-                            <h6 class="text-info fw-bold mb-0" style="font-size: 0.95rem;">
-                                <i class="fas fa-radiation me-1"></i> Data Registrasi Radiologi
+                    <div class="col-lg-5 text-lg-end">
+                        <div class="d-inline-flex align-items-center bg-white px-3 py-2 rounded-pill" style="border: 2px solid var(--retro-dark); box-shadow: 3px 3px 0px var(--retro-dark);">
+                            <h6 class="fw-bolder mb-0 text-dark" style="font-size: 0.95rem;">
+                                <i class="fas fa-radiation me-1 text-danger"></i> Data Registrasi Radiologi
                             </h6>
                         </div>
                     </div>
@@ -166,30 +244,30 @@
 </div>
 
 <!-- MAIN DATA TABLE CARD -->
-<div class="card shadow-sm border-0 mb-4">
+<div class="retro-card mb-4">
     <!-- CARD HEADER TOOLBAR & FILTER -->
-    <div class="card-header bg-white border-bottom border-light py-3 px-3 rounded-top-4">
+    <div class="card-header bg-white border-bottom border-dark py-3 px-3 rounded-top-4" style="background-color: var(--retro-yellow);">
         <div class="row align-items-center g-2">
 
             <!-- TOMBOL UTAMA (Refresh & Mobile Toggle) -->
             <div class="col-12 col-md-auto d-flex align-items-center justify-content-between gap-2">
-                <button class="btn btn-sm btn-info text-white rounded-3 px-3 py-2 d-flex align-items-center gap-1" style="height: 42px;"
+                <button class="btn btn-sm retro-btn px-3 py-2 d-flex align-items-center gap-1" style="height: 42px; background-color: var(--retro-cyan);"
                     type="button" id="btn-refresh-rad" data-bs-toggle="tooltip" title="Refresh Data Hari Ini">
                     <i class="fas fa-sync-alt"></i>
-                    <span class="d-sm-inline fw-semibold ms-1">Refresh Data</span>
+                    <span class="d-sm-inline fw-bolder ms-1">Refresh Data</span>
                 </button>
 
-                <button class="btn btn-sm btn-outline-secondary rounded-3 px-3 py-2 d-md-none d-flex align-items-center gap-1" style="height: 42px;"
+                <button class="btn btn-sm retro-btn px-3 py-2 d-md-none d-flex align-items-center gap-1 bg-white" style="height: 42px;"
                     type="button" data-bs-toggle="collapse" data-bs-target="#collapseFilterMobile" aria-expanded="false" aria-controls="collapseFilterMobile">
-                    <i class="fas fa-filter text-info"></i>
-                    <span class="fw-semibold">Filter</span>
+                    <i class="fas fa-filter text-dark"></i>
+                    <span class="fw-bolder">Filter</span>
                     <i class="fas fa-chevron-down ms-1"></i>
                 </button>
             </div>
 
             <!-- CONTAINER DERETAN FILTER -->
             <div class="col-12 col-md collapse d-md-block" id="collapseFilterMobile">
-                <div class="row g-2 align-items-center mt-2 mt-md-0 pt-2 pt-md-0 border-top border-md-0">
+                <div class="row g-2 align-items-center mt-2 mt-md-0 pt-2 pt-md-0 border-top border-dark border-md-0" style="border-top-width: 2px !important;">
 
                     <!-- Filter Tanggal Awal -->
                     <div class="col-12 col-sm-6 col-md">
@@ -255,11 +333,11 @@
     </div>
 
     <!-- CARD BODY / TABLE -->
-    <div class="card-body p-3">
+    <div class="card-body p-3 bg-white">
         <div class="table-responsive">
-            <table id="example" class="table table-hover table-custom align-middle mb-0" style="width:100%">
+            <table id="example" class="table table-hover table-custom align-middle mb-0" style="width:100%; border: 2px solid var(--retro-dark);">
                 <thead>
-                    <tr class="bg-400">
+                    <tr>
                         <th class="text-center" style="width: 5%;">No</th>
                         <th style="width: 18%;">No Registrasi</th>
                         <th style="width: 20%;">Nama Pasien</th>
@@ -281,9 +359,9 @@
 <!-- MODALS -->
 <div class="modal fade" id="modal-radiologi" data-bs-keyboard="false" data-bs-backdrop="static" tabindex="-1" aria-hidden="true">
     <div class="modal-dialog modal-dialog-centered modal-xl">
-        <div class="modal-content border-0 shadow-lg">
+        <div class="modal-content retro-card border-0">
             <div class="position-absolute top-0 end-0 mt-3 me-3 z-index-1">
-                <button class="btn-close btn btn-sm btn-circle d-flex flex-center transition-base" data-bs-dismiss="modal" aria-label="Close"></button>
+                <button class="btn-close btn btn-sm btn-circle d-flex flex-center transition-base" data-bs-dismiss="modal" aria-label="Close" style="border: 2px solid var(--retro-dark); border-radius: 50%; padding: 5px; box-shadow: 2px 2px 0px var(--retro-dark); background-color: var(--retro-yellow);"></button>
             </div>
             <div id="menu-radiologi" class="p-3"></div>
         </div>
@@ -330,7 +408,7 @@
             },
             columns: [{
                     data: 'no',
-                    className: 'text-center fw-bold text-secondary',
+                    className: 'text-center fw-bolder text-dark',
                     orderable: false,
                     searchable: false
                 },
@@ -380,9 +458,9 @@
                     previous: "<i class='fas fa-chevron-left'></i>"
                 },
                 processing: `
-                    <div class="custom-loader">
-                        <div class="spinner-border text-info mb-2" style="width: 2.2rem; height: 2.2rem;" role="status"></div>
-                        <span class="fw-bold text-info small">Memuat data radiologi...</span>
+                    <div class="custom-loader py-4">
+                        <div class="spinner-border text-dark mb-2" style="width: 2.2rem; height: 2.2rem;" role="status"></div>
+                        <span class="fw-bolder text-dark small">Memuat data radiologi...</span>
                     </div>
                 `
             },
@@ -419,10 +497,10 @@
     // LOADING SPINNER HTML HELPER
     const loadingSpinner = `
         <div class="text-center py-5">
-            <div class="spinner-border text-info" role="status" style="width: 3rem; height: 3rem;">
+            <div class="spinner-border text-dark" role="status" style="width: 3rem; height: 3rem;">
                 <span class="visually-hidden">Loading...</span>
             </div>
-            <p class="text-muted mt-3 mb-0 fw-medium">Memuat data pemeriksaan...</p>
+            <p class="text-dark mt-3 mb-0 fw-bold">Memuat data pemeriksaan...</p>
         </div>
     `;
 
@@ -444,7 +522,7 @@
         }).done(function(data) {
             $('#menu-radiologi').html(data);
         }).fail(function() {
-            $('#menu-radiologi').html('<div class="alert alert-danger m-4" role="alert"><i class="fas fa-exclamation-triangle me-2"></i>Gagal memuat data. Silakan coba lagi.</div>');
+            $('#menu-radiologi').html('<div class="alert alert-danger m-4 fw-bold border-2 border-dark" role="alert"><i class="fas fa-exclamation-triangle me-2"></i>Gagal memuat data. Silakan coba lagi.</div>');
         });
     });
 </script>

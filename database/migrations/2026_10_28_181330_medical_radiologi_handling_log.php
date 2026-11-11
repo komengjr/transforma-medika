@@ -75,6 +75,45 @@ class MedicalRadiologiHandlingLog extends Migration
 
             $table->timestamps();
         });
+        Schema::create('medical_master_pemeriksaan_parameter', function (Blueprint $table) {
+            $table->id();
+
+            // 1. Buat kolomnya terlebih dahulu
+            $table->unsignedBigInteger('master_pemeriksaan_id');
+
+            // 2. Relasi ke tabel Master Layanan/Pemeriksaan dengan nama constraint custom yang lebih pendek
+            $table->foreign('master_pemeriksaan_id', 'fk_master_pem_param')
+                ->references('id')
+                ->on('medical_master_pemeriksaan')
+                ->onDelete('cascade');
+
+            // Kode unik parameter (Misal: PARAM-COR-01, PARAM-PULMO-01)
+            $table->string('kode_parameter')->index();
+
+            // Nama organ / parameter yang diperiksa (Misal: Cor, Pulmo, Sinus, Ginjal Kanan)
+            $table->string('nama_parameter');
+
+            // Pengaturan UI Form (text, textarea, select, dsb)
+            $table->enum('tipe_input', ['text', 'textarea', 'select', 'number'])->default('textarea');
+
+            // Jika tipe_input = 'select', simpan opsi dipisah koma (Misal: "Normal, Kardiomegali, Efusi Pleura")
+            $table->text('opsi_input')->nullable();
+
+            // Pengaturan tinggi kotak teks di UI (bila textarea)
+            $table->integer('baris_textarea')->default(3)->comment('Jumlah baris textarea di layar');
+
+            // Satuan dan Nilai Normal (Opsional, lebih sering dipakai di Lab, tapi kadang Radiologi butuh untuk ukuran organ)
+            $table->string('satuan')->nullable()->comment('Misal: cm, mm');
+            $table->string('nilai_rujukan')->nullable()->comment('Misal: < 2 cm');
+
+            // Urutan tampil di form
+            $table->integer('urutan')->default(1)->comment('Urutan parameter di form ekspertise');
+
+            // Status aktif
+            $table->boolean('is_active')->default(true);
+
+            $table->timestamps();
+        });
     }
 
     /**
@@ -87,5 +126,6 @@ class MedicalRadiologiHandlingLog extends Migration
         Schema::dropIfExists('medical_radiologi_handling_log');
         Schema::dropIfExists('medical_radiologi_hasil');
         Schema::dropIfExists('medical_radiologi_hasil_detail');
+        Schema::dropIfExists('medical_master_pemeriksaan_parameter');
     }
 }

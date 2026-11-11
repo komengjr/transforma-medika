@@ -1,98 +1,255 @@
 @extends('layouts.layouts')
 
-@section('content')
+@section('base.css')
+<!-- CDN SweetAlert2 CSS -->
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/sweetalert2@11/dist/sweetalert2.min.css">
+
 <style>
-    /* Custom Styling untuk Tampilan Kalender Mingguan */
+    /* =========================================
+       RETRO / NEUBRUTALISM THEME STYLES
+       ========================================= */
+    :root {
+        --retro-dark: #1e1e24;
+        --retro-yellow: #ffde59;
+        --retro-pink: #ffa6c9;
+        --retro-cyan: #8bf0fa;
+        --retro-orange: #ff914d;
+        --retro-green: #c1ff72;
+        --retro-purple: #c8b6ff;
+        --retro-bg: #f4f0ea;
+        --retro-border: 3px solid var(--retro-dark);
+        --retro-shadow: 5px 5px 0px var(--retro-dark);
+        --retro-shadow-sm: 3px 3px 0px var(--retro-dark);
+    }
+
+    body {
+        background-color: var(--retro-bg);
+    }
+
+    /* Retro Cards */
+    .retro-card {
+        border: var(--retro-border);
+        border-radius: 12px;
+        box-shadow: var(--retro-shadow);
+        background-color: #ffffff;
+        overflow: hidden;
+    }
+
+    /* Retro Header Banner */
+    .retro-header-banner {
+        background: linear-gradient(135deg, var(--retro-purple) 0%, var(--retro-cyan) 100%);
+        border: var(--retro-border);
+        border-radius: 12px;
+        box-shadow: var(--retro-shadow);
+        color: var(--retro-dark);
+    }
+
+    /* Retro Buttons */
+    .retro-btn {
+        font-weight: 800 !important;
+        border: 2px solid var(--retro-dark);
+        box-shadow: var(--retro-shadow-sm);
+        border-radius: 6px;
+        transition: all 0.1s ease-in-out;
+        text-transform: uppercase;
+        letter-spacing: 0.5px;
+        cursor: pointer;
+    }
+
+    .retro-btn:active {
+        transform: translate(3px, 3px);
+        box-shadow: 0px 0px 0px var(--retro-dark);
+    }
+
+    .retro-btn-primary {
+        background-color: var(--retro-cyan);
+        color: var(--retro-dark);
+    }
+
+    .retro-btn-primary:hover {
+        background-color: #6ce0ed;
+        color: var(--retro-dark);
+    }
+
+    .retro-btn-warning {
+        background-color: var(--retro-yellow);
+        color: var(--retro-dark);
+    }
+
+    .retro-btn-warning:hover {
+        background-color: #e6c84c;
+        color: var(--retro-dark);
+    }
+
+    .retro-btn-success {
+        background-color: var(--retro-green);
+        color: var(--retro-dark);
+    }
+
+    .retro-btn-success:hover {
+        background-color: #b0f55b;
+        color: var(--retro-dark);
+    }
+
+    .retro-btn-light {
+        background-color: #ffffff;
+        color: var(--retro-dark);
+    }
+
+    .retro-btn-light:hover {
+        background-color: #f0f0f0;
+        color: var(--retro-dark);
+    }
+
+    .retro-btn-danger {
+        background-color: var(--retro-pink);
+        color: var(--retro-dark);
+    }
+
+    /* Inputs & Selects */
+    .retro-input,
+    .form-control,
+    .form-select {
+        border: 2px solid var(--retro-dark) !important;
+        border-radius: 6px !important;
+        box-shadow: 2px 2px 0px var(--retro-dark) !important;
+        font-weight: 700 !important;
+        color: var(--retro-dark) !important;
+    }
+
+    .retro-input:focus,
+    .form-control:focus,
+    .form-select:focus {
+        border-color: var(--retro-dark) !important;
+        box-shadow: 4px 4px 0px var(--retro-dark) !important;
+        outline: none;
+    }
+
+    /* Kalender Grid Layout */
     .calendar-wrapper {
         display: grid;
         grid-template-columns: repeat(7, 1fr);
-        gap: 12px;
+        gap: 1rem;
         min-width: 900px;
     }
 
-    .day-column {
-        background-color: #f8f9fa;
-        border-radius: 10px;
-        padding: 10px;
-        min-height: 480px;
-        border: 1px solid #e9ecef;
-    }
-
-    .day-header {
-        font-weight: 700;
-        text-align: center;
-        padding-bottom: 8px;
-        margin-bottom: 12px;
-        border-bottom: 2px solid #dee2e6;
-        color: #495057;
-    }
-
     .schedule-card {
-        background: #ffffff;
-        border-radius: 8px;
-        padding: 10px;
-        margin-bottom: 10px;
-        border-left: 4px solid #0d6efd;
-        box-shadow: 0 2px 4px rgba(0, 0, 0, 0.05);
         transition: transform 0.2s ease, box-shadow 0.2s ease;
+        border: 2px solid var(--retro-dark) !important;
+        border-radius: 8px !important;
+        box-shadow: 2px 2px 0px var(--retro-dark);
     }
 
     .schedule-card:hover {
-        transform: translateY(-2px);
-        box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+        transform: translateY(-3px);
+        box-shadow: 4px 4px 0px var(--retro-dark) !important;
     }
 
-    .doc-name {
-        font-weight: 600;
-        font-size: 0.85rem;
-        color: #212529;
-        line-height: 1.2;
+    /* Scrollbar minimalis untuk tabel kalender */
+    .custom-scroll::-webkit-scrollbar {
+        height: 8px;
     }
 
-    .poli-badge {
-        font-size: 0.7rem;
-        font-weight: 600;
+    .custom-scroll::-webkit-scrollbar-track {
+        background: #ffffff;
+        border: 2px solid var(--retro-dark);
+        border-radius: 8px;
     }
 
-    .time-badge {
-        font-size: 0.75rem;
-        color: #6c757d;
+    .custom-scroll::-webkit-scrollbar-thumb {
+        background: var(--retro-orange);
+        border: 2px solid var(--retro-dark);
+        border-radius: 8px;
+    }
+
+    /* Table Styling */
+    .retro-table-header {
+        background-color: var(--retro-dark);
+        color: var(--retro-green);
+        border-bottom: 3px solid var(--retro-dark);
+        font-weight: bold;
+        text-transform: uppercase;
+        letter-spacing: 1px;
+    }
+
+    #scheduleTableBody tr {
+        border-bottom: 2px solid var(--retro-dark);
+        transition: background 0.2s;
+    }
+
+    #scheduleTableBody tr:hover {
+        background-color: var(--retro-yellow) !important;
+    }
+
+    .retro-badge {
+        border: 2px solid var(--retro-dark);
+        border-radius: 6px;
+        padding: 4px 8px;
+        font-weight: 800;
+        box-shadow: 2px 2px 0px var(--retro-dark);
+        text-transform: uppercase;
+        display: inline-block;
+    }
+
+    /* Modal Styling */
+    .retro-modal-content {
+        border: var(--retro-border);
+        border-radius: 12px;
+        box-shadow: 8px 8px 0px var(--retro-dark);
+        background-color: #ffffff;
     }
 </style>
+@endsection
 
-<div class="container-fluid py-4">
-    <!-- Header Page -->
-    <div class="d-flex justify-content-between align-items-center mb-4">
-        <div>
-            <h4 class="fw-bold mb-1">Jadwal Praktek Dokter</h4>
-            <p class="text-muted small mb-0">Kelola operasional jadwal dan kuota dokter poliklinik</p>
-        </div>
-        <button class="btn btn-primary shadow-sm rounded-pill px-3" onclick="openAddModal()">
-            <i class="bi bi-plus-lg me-1"></i> Tambah Jadwal
-        </button>
-    </div>
-
-    <div class="row g-4">
-        <!-- SEBELAH KIRI: Panel Filter & Quick Stats -->
-        <div class="col-lg-3">
-            <div class="card border-0 shadow-sm rounded-3 mb-3">
-                <div class="card-header bg-white py-3 border-0">
-                    <h6 class="fw-bold mb-0 text-dark"><i class="bi bi-funnel me-2 text-primary"></i>Filter Data</h6>
+@section('content')
+<!-- HTML5 SEMANTIC: HEADER -->
+<header class="mb-4">
+    <div class="card retro-header-banner p-1">
+        <div class="row gx-0 flex-between-center">
+            <div class="col-sm-auto d-flex align-items-center p-3">
+                <div style="background: white; border: 2px solid #1e1e24; border-radius: 50%; padding: 8px; box-shadow: 3px 3px 0px #1e1e24;" class="me-3">
+                    <img src="{{ asset('img/doctor.png') }}" alt="Doctor Icon" width="45" />
                 </div>
-                <div class="card-body pt-0">
+                <div>
+                    <h6 class="fs--1 mb-0 fw-bold" style="color: rgba(30, 30, 36, 0.7); letter-spacing: 1px;">MANAJEMEN OPERASIONAL</h6>
+                    <h3 class="fw-bolder mb-0" style="color: var(--retro-dark); text-shadow: 1px 1px 0px white;">JADWAL <span class="fw-normal">PRAKTEK</span></h3>
+                </div>
+            </div>
+            <div class="col-xl-auto px-4 py-2 text-end">
+                <button class="btn retro-btn retro-btn-warning" onclick="openAddModal()">
+                    <i class="fas fa-plus me-1"></i> Tambah Jadwal
+                </button>
+            </div>
+        </div>
+    </div>
+</header>
+
+<!-- HTML5 SEMANTIC: MAIN CONTENT -->
+<main>
+    <div class="row g-4">
+        <!-- HTML5 SEMANTIC: ASIDE (Sidebar Filter & Info) -->
+        <div class="col-lg-3">
+            <!-- Filter Card -->
+            <div class="retro-card mb-4">
+                <div class="card-header py-3 px-4 border-bottom border-dark" style="background-color: var(--retro-dark); color: var(--retro-cyan);">
+                    <h6 class="fw-bolder mb-0">
+                        <i class="fas fa-filter me-2"></i>FILTER DATA
+                    </h6>
+                </div>
+                <div class="card-body p-4" style="background-color: #ffffff;">
                     <div class="mb-3">
-                        <label class="form-label small fw-semibold">Poliklinik</label>
-                        <select id="filter_poli" class="form-select form-select-sm" onchange="loadScheduleTable()">
+                        <label class="form-label fs--1 fw-bolder text-dark">POLIKLINIK</label>
+                        <select id="filter_poli" class="form-select retro-input" onchange="loadScheduleTable()">
                             <option value="">-- Semua Poliklinik --</option>
                             @foreach($poliklinik as $p)
-                            <option value="{{ $p->m_poli_code }}">{{ $p->m_poli_name }}</option>
+                            <option value="{{ $p->id }}">{{ $p->nama_poli }}</option>
                             @endforeach
                         </select>
                     </div>
 
-                    <div class="mb-3">
-                        <label class="form-label small fw-semibold">Hari</label>
-                        <select id="filter_hari" class="form-select form-select-sm" onchange="loadScheduleTable()">
+                    <div class="mb-4">
+                        <label class="form-label fs--1 fw-bolder text-dark">HARI</label>
+                        <select id="filter_hari" class="form-select retro-input" onchange="loadScheduleTable()">
                             <option value="">-- Semua Hari --</option>
                             <option value="Senin">Senin</option>
                             <option value="Selasa">Selasa</option>
@@ -104,58 +261,64 @@
                         </select>
                     </div>
 
-                    <button class="btn btn-outline-secondary btn-sm w-100" onclick="resetFilter()">
-                        <i class="bi bi-arrow-counterclockwise me-1"></i> Reset Filter
+                    <button class="btn retro-btn retro-btn-danger w-100 fw-bold" onclick="resetFilter()">
+                        <i class="fas fa-sync-alt me-1"></i> RESET FILTER
                     </button>
                 </div>
             </div>
 
-            <!-- Card Informasi Singkat -->
-            <div class="card border-0 shadow-sm rounded-3 bg-primary text-white p-3">
-                <div class="d-flex align-items-center">
-                    <div class="fs-1 me-3"><i class="bi bi-calendar2-check"></i></div>
+            <!-- Widget Info -->
+            <article class="retro-card" style="background-color: var(--retro-orange);">
+                <div class="card-body d-flex align-items-center p-4">
+                    <div class="fs-1 me-3 text-dark">
+                        <i class="fas fa-calendar-check"></i>
+                    </div>
                     <div>
-                        <span class="d-block text-white-50 small">Total Jadwal</span>
-                        <h4 class="fw-bold mb-0" id="totalScheduleCount">0</h4>
+                        <span class="d-block small fw-bolder text-dark opacity-75">TOTAL JADWAL AKTIF</span>
+                        <h3 class="fw-bolder mb-0 text-dark" id="totalScheduleCount">0</h3>
                     </div>
                 </div>
-            </div>
+            </article>
         </div>
 
-        <!-- SEBELAH KANAN: Tampilan Kalender Mingguan / Tabel -->
+        <!-- HTML5 SEMANTIC: SECTION (Konten Utama Tabel/Kalender) -->
         <div class="col-lg-9">
-            <div class="card border-0 shadow-sm rounded-3">
-                <div class="card-header bg-white py-3 d-flex justify-content-between align-items-center border-0">
-                    <h6 class="fw-bold mb-0 text-dark" id="viewTitle"><i class="bi bi-calendar3 me-2 text-primary"></i>Kalender Mingguan</h6>
+            <div class="retro-card h-100">
+                <div class="card-header py-3 px-4 border-bottom border-dark d-flex justify-content-between align-items-center flex-wrap gap-2" style="background-color: #ffffff;">
+                    <h5 class="fw-bolder mb-0 text-dark" id="viewTitle">
+                        <i class="fas fa-calendar-alt me-2 text-primary"></i>Kalender Mingguan
+                    </h5>
 
-                    <!-- Toggle View (Kalender / Tabel) -->
-                    <ul class="nav nav-pills nav-fill bg-light p-1 rounded-pill" id="pills-tab" role="tablist" style="font-size: 0.85rem;">
+                    <!-- Toggle Nav Pills -->
+                    <ul class="nav nav-pills p-1 rounded-pill border border-dark bg-light shadow-sm" id="pills-tab" role="tablist">
                         <li class="nav-item" role="presentation">
-                            <button class="nav-link active rounded-pill py-1 px-3" id="pills-calendar-tab" data-bs-toggle="pill" data-bs-target="#pills-calendar" type="button" role="tab" onclick="changeViewTitle('Kalender Mingguan')">
-                                <i class="bi bi-grid-3x3-gap-fill me-1"></i> Kalender
+                            <button class="nav-link active rounded-pill py-1 px-3 fw-bolder small" id="pills-calendar-tab" data-bs-toggle="pill" data-bs-target="#pills-calendar" type="button" role="tab" onclick="changeViewTitle('Kalender Mingguan')" style="background-color: var(--retro-cyan) !important; color: var(--retro-dark) !important; border: 2px solid var(--retro-dark);">
+                                <i class="fas fa-th-large me-1"></i> Kalender
                             </button>
                         </li>
                         <li class="nav-item" role="presentation">
-                            <button class="nav-link rounded-pill py-1 px-3" id="pills-table-tab" data-bs-toggle="pill" data-bs-target="#pills-table" type="button" role="tab" onclick="changeViewTitle('Tabel Daftar Jadwal')">
-                                <i class="bi bi-table me-1"></i> Tabel
+                            <button class="nav-link rounded-pill py-1 px-3 fw-bolder small text-dark" id="pills-table-tab" data-bs-toggle="pill" data-bs-target="#pills-table" type="button" role="tab" onclick="changeViewTitle('Tabel Daftar Jadwal')">
+                                <i class="fas fa-list me-1"></i> Tabel
                             </button>
                         </li>
                     </ul>
                 </div>
 
-                <div class="card-body p-3">
+                <div class="card-body p-3" style="background-color: #ffffff;">
                     <div class="tab-content" id="pills-tabContent">
 
                         <!-- TAB 1: Kalender Mingguan -->
                         <div class="tab-pane fade show active" id="pills-calendar" role="tabpanel">
-                            <div class="table-responsive">
+                            <div class="overflow-auto custom-scroll pb-3 px-1">
                                 <div class="calendar-wrapper">
                                     @php $days = ['Senin', 'Selasa', 'Rabu', 'Kamis', 'Jumat', 'Sabtu', 'Minggu']; @endphp
                                     @foreach($days as $day)
-                                    <div class="day-column">
-                                        <div class="day-header">{{ $day }}</div>
-                                        <div class="day-content" id="col-day-{{ $day }}">
-                                            <div class="text-center py-4 text-muted small">Memuat...</div>
+                                    <div class="rounded-3 p-2 border border-dark bg-light shadow-sm">
+                                        <div class="fw-bolder text-center border-bottom border-dark pb-2 mb-3 text-dark" style="background-color: var(--retro-yellow); border-radius: 4px; padding: 4px;">
+                                            {{ $day }}
+                                        </div>
+                                        <div id="col-day-{{ $day }}">
+                                            <div class="text-center py-4 text-muted small fw-bold">Memuat...</div>
                                         </div>
                                     </div>
                                     @endforeach
@@ -166,21 +329,21 @@
                         <!-- TAB 2: Tabel Ringkasan -->
                         <div class="tab-pane fade" id="pills-table" role="tabpanel">
                             <div class="table-responsive">
-                                <table class="table table-hover align-middle mb-0">
-                                    <thead class="table-light">
+                                <table class="table align-middle w-100 m-0 fw-bold" style="border: 2px solid var(--retro-dark);">
+                                    <thead class="retro-table-header">
                                         <tr>
-                                            <th class="ps-3">Poliklinik</th>
-                                            <th>Dokter</th>
-                                            <th>Hari</th>
-                                            <th>Jam Praktek</th>
-                                            <th>Kuota</th>
-                                            <th>Status</th>
-                                            <th class="text-end pe-3">Aksi</th>
+                                            <th class="py-3">Poliklinik</th>
+                                            <th class="py-3">Dokter</th>
+                                            <th class="py-3">Hari</th>
+                                            <th class="py-3">Jam Praktek</th>
+                                            <th class="py-3">Kuota</th>
+                                            <th class="py-3">Status</th>
+                                            <th class="text-end py-3">Aksi</th>
                                         </tr>
                                     </thead>
-                                    <tbody id="scheduleTableBody">
+                                    <tbody id="scheduleTableBody" style="color: var(--retro-dark);">
                                         <tr>
-                                            <td colspan="7" class="text-center py-4 text-muted">Memuat data...</td>
+                                            <td colspan="7" class="text-center py-5 text-muted">Memuat data...</td>
                                         </tr>
                                     </tbody>
                                 </table>
@@ -192,37 +355,39 @@
             </div>
         </div>
     </div>
-</div>
+</main>
 
-<!-- Modal Tambah Jadwal -->
-<div class="modal fade" id="modalJadwal" tabindex="-1" aria-hidden="true">
+<!-- HTML5 SEMANTIC: MODAL (Dialog) -->
+<div class="modal fade" id="modalJadwal" tabindex="-1" aria-hidden="true" data-bs-backdrop="static">
     <div class="modal-dialog modal-dialog-centered">
-        <div class="modal-content border-0 shadow">
-            <div class="modal-header bg-light">
-                <h5 class="modal-title fw-bold">Tambah Jadwal Dokter</h5>
-                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+        <div class="modal-content retro-modal-content">
+            <div class="modal-header py-3 px-4" style="background-color: var(--retro-yellow); border-bottom: 3px solid var(--retro-dark); color: var(--retro-dark);">
+                <h5 class="modal-title fw-bolder">
+                    <i class="fas fa-user-clock me-2"></i> Tambah Jadwal Dokter
+                </h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close" style="filter: brightness(0); border: 2px solid #1e1e24; border-radius: 50%; padding: 5px; box-shadow: 2px 2px 0px #1e1e24;"></button>
             </div>
             <form id="formJadwal" onsubmit="saveSchedule(event)">
                 @csrf
-                <div class="modal-body">
+                <div class="modal-body p-4" style="background-color: var(--retro-bg);">
                     <div class="mb-3">
-                        <label class="form-label fw-semibold">Poliklinik <span class="text-danger">*</span></label>
-                        <select id="m_poli_code" name="m_poli_code" class="form-select" onchange="onModalPoliChange()" required>
+                        <label class="form-label fw-bolder text-dark">Poliklinik <span class="text-danger">*</span></label>
+                        <select id="poli_id" name="poli_id" class="form-select retro-input" onchange="onModalPoliChange()" required>
                             <option value="">-- Pilih Poliklinik --</option>
                             @foreach($poliklinik as $p)
-                            <option value="{{ $p->m_poli_code }}">{{ $p->m_poli_name }}</option>
+                            <option value="{{ $p->id }}">{{ $p->nama_poli }}</option>
                             @endforeach
                         </select>
                     </div>
                     <div class="mb-3">
-                        <label class="form-label fw-semibold">Dokter <span class="text-danger">*</span></label>
-                        <select id="m_poli_doctor_id" name="m_poli_doctor_id" class="form-select" disabled required>
+                        <label class="form-label fw-bolder text-dark">Dokter <span class="text-danger">*</span></label>
+                        <select id="doctor_id" name="doctor_id" class="form-select retro-input" disabled required>
                             <option value="">-- Pilih Poliklinik Terlebih Dahulu --</option>
                         </select>
                     </div>
                     <div class="mb-3">
-                        <label class="form-label fw-semibold">Hari Praktek <span class="text-danger">*</span></label>
-                        <select id="day_name" name="day_name" class="form-select" required>
+                        <label class="form-label fw-bolder text-dark">Hari Praktek <span class="text-danger">*</span></label>
+                        <select id="day_name" name="day_name" class="form-select retro-input" required>
                             <option value="">-- Pilih Hari --</option>
                             <option value="Senin">Senin</option>
                             <option value="Selasa">Selasa</option>
@@ -233,24 +398,26 @@
                             <option value="Minggu">Minggu</option>
                         </select>
                     </div>
-                    <div class="row g-2 mb-3">
+                    <div class="row g-3 mb-3">
                         <div class="col-6">
-                            <label class="form-label fw-semibold">Jam Mulai <span class="text-danger">*</span></label>
-                            <input type="time" name="time_start" class="form-control" required>
+                            <label class="form-label fw-bolder text-dark">Jam Mulai <span class="text-danger">*</span></label>
+                            <input type="time" name="time_start" class="form-control retro-input" required>
                         </div>
                         <div class="col-6">
-                            <label class="form-label fw-semibold">Jam Selesai <span class="text-danger">*</span></label>
-                            <input type="time" name="time_end" class="form-control" required>
+                            <label class="form-label fw-bolder text-dark">Jam Selesai <span class="text-danger">*</span></label>
+                            <input type="time" name="time_end" class="form-control retro-input" required>
                         </div>
                     </div>
-                    <div class="mb-3">
-                        <label class="form-label fw-semibold">Kuota Pasien <span class="text-danger">*</span></label>
-                        <input type="number" name="quota" class="form-control" min="1" placeholder="Contoh: 20" required>
+                    <div class="mb-2">
+                        <label class="form-label fw-bolder text-dark">Kuota Pasien <span class="text-danger">*</span></label>
+                        <input type="number" name="quota" class="form-control retro-input" min="1" placeholder="Contoh: 20" required>
                     </div>
                 </div>
-                <div class="modal-footer border-0 bg-light">
-                    <button type="button" class="btn btn-light" data-bs-dismiss="modal">Batal</button>
-                    <button type="submit" class="btn btn-primary px-4" id="btnSave">Simpan Jadwal</button>
+                <div class="modal-footer bg-white border-top border-dark">
+                    <button type="button" class="btn retro-btn retro-btn-light" data-bs-dismiss="modal">Batal</button>
+                    <button type="submit" class="btn retro-btn retro-btn-primary" id="btnSave">
+                        <i class="fas fa-save me-1"></i> Simpan Jadwal
+                    </button>
                 </div>
             </form>
         </div>
@@ -275,38 +442,33 @@
     });
 
     function changeViewTitle(title) {
-        const icon = title === 'Kalender Mingguan' ? 'bi-calendar3' : 'bi-table';
-        document.getElementById('viewTitle').innerHTML = `<i class="bi ${icon} me-2 text-primary"></i>${title}`;
+        const icon = title === 'Kalender Mingguan' ? 'fa-calendar-alt' : 'fa-list';
+        document.getElementById('viewTitle').innerHTML = `<i class="fas ${icon} me-2 text-primary"></i>${title}`;
     }
 
     function openAddModal() {
         document.getElementById('formJadwal').reset();
-        const docSelect = document.getElementById('m_poli_doctor_id');
+        const docSelect = document.getElementById('doctor_id');
         if (docSelect) {
             docSelect.innerHTML = '<option value="">-- Pilih Poliklinik Terlebih Dahulu --</option>';
             docSelect.disabled = true;
         }
-
         if (modalJadwal) {
-            modalJadwal.show();
-        } else {
-            const modalElement = document.getElementById('modalJadwal');
-            modalJadwal = new bootstrap.Modal(modalElement);
             modalJadwal.show();
         }
     }
 
     function loadScheduleTable() {
-        const poli = document.getElementById('filter_poli').value;
+        const poliId = document.getElementById('filter_poli').value;
         const day = document.getElementById('filter_hari').value;
 
-        // Reset Tampilan Kalender per Kolom
+        // Kosongkan kalender grid
         daysList.forEach(d => {
             const col = document.getElementById(`col-day-${d}`);
             if (col) col.innerHTML = '';
         });
 
-        const url = `{{ route('master_jadwal_doctor_poliklinik_getSchedules') }}?m_poli_code=${encodeURIComponent(poli)}&day_name=${encodeURIComponent(day)}`;
+        const url = `{{ route('master_jadwal_doctor_poliklinik_getSchedules') }}?poli_id=${encodeURIComponent(poliId)}&day_name=${encodeURIComponent(day)}`;
 
         fetch(url)
             .then(res => res.json())
@@ -315,12 +477,12 @@
                 tbody.innerHTML = '';
 
                 if (!res.data || !Array.isArray(res.data) || res.data.length === 0) {
-                    tbody.innerHTML = `<tr><td colspan="7" class="text-center py-4 text-muted">Belum ada jadwal praktek terdaftar.</td></tr>`;
+                    tbody.innerHTML = `<tr><td colspan="7" class="text-center py-5 text-muted fw-bold">Belum ada jadwal praktek terdaftar.</td></tr>`;
                     document.getElementById('totalScheduleCount').innerText = '0';
 
                     daysList.forEach(d => {
                         const col = document.getElementById(`col-day-${d}`);
-                        if (col) col.innerHTML = `<div class="text-center py-4 text-muted small">Tidak ada jadwal</div>`;
+                        if (col) col.innerHTML = `<div class="text-center py-4 text-muted small fw-bold">Tidak ada jadwal</div>`;
                     });
                     return;
                 }
@@ -328,69 +490,73 @@
                 document.getElementById('totalScheduleCount').innerText = res.data.length;
 
                 res.data.forEach(item => {
-                    const fullName = `${item.master_doctor_title_f || ''} ${item.master_doctor_name} ${item.master_doctor_title_e || ''}`.trim();
-                    const statusText = item.status || item.schedule_status || 'AKTIF';
-                    const badgeClass = statusText === 'AKTIF' ? 'bg-success' : 'bg-secondary';
+                    const fullName = item.nama_lengkap || item.master_doctor_name || 'Dokter';
+                    const poliName = item.nama_poli || item.m_poli_name || 'Poli';
+                    const statusText = item.is_active || item.status === 'AKTIF' ? 'AKTIF' : 'NON-AKTIF';
+                    const badgeClass = statusText === 'AKTIF' ? 'background-color: var(--retro-green); color: var(--retro-dark);' : 'background-color: #e9ecef; color: var(--retro-dark);';
                     const scheduleId = item.id_schedule || item.id;
-                    const timeStart = item.time_start ? item.time_start.substring(0, 5) : '-';
-                    const timeEnd = item.time_end ? item.time_end.substring(0, 5) : '-';
+                    const timeStart = item.time_start || item.jam_mulai ? (item.time_start || item.jam_mulai).substring(0, 5) : '-';
+                    const timeEnd = item.time_end || item.jam_selesai ? (item.time_end || item.jam_selesai).substring(0, 5) : '-';
+                    const dayName = item.day_name || item.hari_praktek;
+                    const quota = item.quota || item.kuota_pasien;
 
-                    // 1. Render Tabel
+                    // 1. Render Baris Tabel
                     tbody.innerHTML += `
                         <tr>
-                            <td class="ps-3 fw-bold text-dark">${item.m_poli_name}</td>
-                            <td>${fullName}</td>
-                            <td><span class="badge bg-light text-dark border">${item.day_name}</span></td>
-                            <td><i class="bi bi-clock me-1 text-primary"></i>${timeStart} - ${timeEnd}</td>
-                            <td><span class="badge bg-info text-dark">${item.quota} Pasien</span></td>
-                            <td><span class="badge ${badgeClass}">${statusText}</span></td>
-                            <td class="text-end pe-3">
-                                <button class="btn btn-sm btn-outline-danger" onclick="deleteSchedule(${scheduleId})">
-                                    <i class="bi bi-trash"></i>
+                            <td class="fw-bolder text-dark">${poliName}</td>
+                            <td class="fw-bold text-dark">${fullName}</td>
+                            <td><span class="retro-badge" style="background-color: var(--retro-cyan); color: var(--retro-dark);">${dayName}</span></td>
+                            <td><i class="fas fa-clock me-1 text-dark"></i> ${timeStart} - ${timeEnd}</td>
+                            <td><span class="retro-badge" style="background-color: var(--retro-yellow); color: var(--retro-dark);">${quota} Pasien</span></td>
+                            <td><span class="retro-badge" style="${badgeClass}">${statusText}</span></td>
+                            <td class="text-end">
+                                <button class="btn btn-sm retro-btn retro-btn-danger" onclick="deleteSchedule(${scheduleId})" title="Hapus Jadwal" style="padding: 2px 8px;">
+                                    <i class="fas fa-trash-alt"></i>
                                 </button>
                             </td>
                         </tr>
                     `;
 
                     // 2. Render Kolom Kalender
-                    const dayCol = document.getElementById(`col-day-${item.day_name}`);
+                    const dayCol = document.getElementById(`col-day-${dayName}`);
                     if (dayCol) {
                         dayCol.innerHTML += `
-                            <div class="schedule-card position-relative">
-                                <span class="badge bg-primary-subtle text-primary border border-primary-subtle poli-badge mb-1">${item.m_poli_name}</span>
-                                <div class="doc-name mb-1">${fullName}</div>
-                                <div class="time-badge d-flex align-items-center justify-content-between">
-                                    <span><i class="bi bi-clock me-1"></i>${timeStart} - ${timeEnd}</span>
-                                    <span class="badge bg-light text-dark border">${item.quota} Q</span>
+                            <article class="schedule-card card bg-white mb-2 p-2 position-relative">
+                                <span class="retro-badge mb-2" style="background-color: var(--retro-cyan); color: var(--retro-dark); font-size: 0.7rem; width: fit-content;">${poliName}</span>
+                                <h6 class="fw-bolder fs--1 mb-2 text-dark text-uppercase" style="line-height: 1.2;">${fullName}</h6>
+
+                                <div class="d-flex align-items-center justify-content-between small text-dark fw-bold" style="font-size: 0.75rem;">
+                                    <span><i class="fas fa-clock me-1"></i>${timeStart}-${timeEnd}</span>
+                                    <span class="retro-badge py-0 px-1" style="background-color: var(--retro-yellow); font-size: 0.65rem;">${quota} Q</span>
                                 </div>
-                                <button class="btn btn-link text-danger p-0 position-absolute top-0 end-0 me-2 mt-1" style="font-size:0.75rem;" onclick="deleteSchedule(${scheduleId})" title="Hapus Jadwal">
-                                    <i class="bi bi-x-lg"></i>
+
+                                <button class="btn btn-sm text-danger p-0 position-absolute top-0 end-0 me-2 mt-1 fw-bold" onclick="deleteSchedule(${scheduleId})" title="Hapus">
+                                    <i class="fas fa-times fs-6"></i>
                                 </button>
-                            </div>
+                            </article>
                         `;
                     }
                 });
 
-                // Set status kosong untuk hari yang tidak memiliki jadwal
+                // Isi tulisan kosong jika tidak ada jadwal
                 daysList.forEach(d => {
                     const col = document.getElementById(`col-day-${d}`);
                     if (col && col.innerHTML.trim() === '') {
-                        col.innerHTML = `<div class="text-center py-4 text-muted small">Tidak ada jadwal</div>`;
+                        col.innerHTML = `<div class="text-center py-4 text-muted small fw-bold">Tidak ada jadwal</div>`;
                     }
                 });
-
             })
             .catch(err => {
                 console.error("Gagal memuat data jadwal:", err);
-                document.getElementById('scheduleTableBody').innerHTML = `<tr><td colspan="7" class="text-center py-4 text-danger">Gagal memuat data jadwal.</td></tr>`;
+                document.getElementById('scheduleTableBody').innerHTML = `<tr><td colspan="7" class="text-center py-4 text-danger fw-bold">Gagal memuat data jadwal.</td></tr>`;
             });
     }
 
     function onModalPoliChange() {
-        const poliCode = document.getElementById('m_poli_code').value;
-        const docSelect = document.getElementById('m_poli_doctor_id');
+        const poliId = document.getElementById('poli_id').value;
+        const docSelect = document.getElementById('doctor_id');
 
-        if (!poliCode) {
+        if (!poliId) {
             docSelect.innerHTML = '<option value="">-- Pilih Poliklinik Terlebih Dahulu --</option>';
             docSelect.disabled = true;
             return;
@@ -399,7 +565,7 @@
         docSelect.innerHTML = '<option value="">Memuat data dokter...</option>';
         docSelect.disabled = true;
 
-        const url = `{{ route('master_jadwal_doctor_poliklinik_getDoctorsByPoli') }}?m_poli_code=${encodeURIComponent(poliCode)}`;
+        const url = `{{ route('master_jadwal_doctor_poliklinik_getDoctorsByPoli') }}?poli_id=${encodeURIComponent(poliId)}`;
 
         fetch(url)
             .then(res => res.json())
@@ -408,8 +574,9 @@
 
                 if (res.data && Array.isArray(res.data) && res.data.length > 0) {
                     res.data.forEach(doc => {
-                        const fullName = `${doc.master_doctor_title_f || ''} ${doc.master_doctor_name} ${doc.master_doctor_title_e || ''}`.trim();
-                        docSelect.innerHTML += `<option value="${doc.m_poli_doctor_id}">${fullName}</option>`;
+                        const fullName = doc.nama_lengkap || doc.master_doctor_name || 'Dokter';
+                        const docId = doc.id || doc.doctor_id;
+                        docSelect.innerHTML += `<option value="${docId}">${fullName}</option>`;
                     });
                     docSelect.disabled = false;
                 } else {
@@ -429,6 +596,7 @@
         const formData = new FormData(form);
         const btnSave = document.getElementById('btnSave');
 
+        // Normalisasi format jam agar sesuai standard SQL (H:i)
         ['time_start', 'time_end'].forEach(field => {
             const value = formData.get(field);
             if (value) {
@@ -465,13 +633,11 @@
             })
             .then(res => {
                 btnSave.disabled = false;
-                btnSave.innerHTML = 'Simpan Jadwal';
+                btnSave.innerHTML = '<i class="fas fa-save me-1"></i> Simpan Jadwal';
 
                 if (res.status === 'success') {
-                    const modalEl = document.getElementById('modalJadwal');
-                    const instance = bootstrap.Modal.getInstance(modalEl) || modalJadwal;
-                    if (instance) {
-                        instance.hide();
+                    if (modalJadwal) {
+                        modalJadwal.hide();
                     }
 
                     Swal.fire({
@@ -494,7 +660,7 @@
             })
             .catch(err => {
                 btnSave.disabled = false;
-                btnSave.innerHTML = 'Simpan Jadwal';
+                btnSave.innerHTML = '<i class="fas fa-save me-1"></i> Simpan Jadwal';
 
                 Swal.fire({
                     icon: 'error',
@@ -510,7 +676,7 @@
             text: "Data jadwal yang dihapus tidak dapat dikembalikan!",
             icon: 'warning',
             showCancelButton: true,
-            confirmButtonColor: '#d33',
+            confirmButtonColor: '#1e1e24',
             cancelButtonColor: '#6c757d',
             confirmButtonText: 'Ya, Hapus!',
             cancelButtonText: 'Batal'
@@ -524,7 +690,7 @@
                             "X-CSRF-TOKEN": "{{ csrf_token() }}"
                         },
                         body: JSON.stringify({
-                            id_schedule: id // <-- Sesuaikan nama key menjadi id_schedule
+                            id_schedule: id
                         })
                     })
                     .then(res => res.json())

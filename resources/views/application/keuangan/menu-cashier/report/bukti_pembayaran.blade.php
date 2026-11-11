@@ -3,217 +3,32 @@
 
 <head>
     <meta charset="UTF-8">
-    <title>Invoice Pembayaran - {{ $order->d_reg_order_code }}</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Nota Pembayaran - {{ $transaksi->no_registrasi }}</title>
     <style>
         @page {
-            margin: 18px 22px;
+            size: A5 portrait;
+            margin: 10mm;
+            /* Memberikan margin keliling di semua sisi kertas */
         }
 
+        html,
         body {
-            font-family: 'Helvetica Neue', Helvetica, 'DejaVu Sans', Arial, sans-serif;
-            font-size: 8.5pt;
-            color: #1e293b;
-            line-height: 1.35;
-        }
+            height: 100%;
 
-        /* Font khusus format Angka / Akuntansi */
-        .accounting-font {
-            font-family: 'Courier New', Courier, 'Lucida Console', monospace;
-            font-weight: bold;
-            letter-spacing: -0.5px;
-        }
-
-        /* Header Section */
-        .header-table {
-            width: 100%;
-            border-collapse: collapse;
-            border-bottom: 2.5px solid #0f172a;
-            padding-bottom: 8px;
-            margin-bottom: 12px;
-        }
-
-        .company-name {
-            font-size: 13pt;
-            font-weight: 800;
-            color: #0f172a;
-            text-transform: uppercase;
-            letter-spacing: 0.5px;
-        }
-
-        .company-sub {
-            font-size: 7.5pt;
-            color: #64748b;
-            margin-top: 2px;
-        }
-
-        .invoice-title-box {
-            text-align: right;
-            vertical-align: top;
-        }
-
-        .invoice-title-box h2 {
-            margin: 0;
-            font-size: 14pt;
-            font-weight: 800;
-            color: #1e3a8a;
-            text-transform: uppercase;
-            letter-spacing: 1.5px;
-        }
-
-        .status-badge {
-            display: inline-block;
-            background-color: #16a34a;
-            color: #ffffff;
-            font-size: 7pt;
-            font-weight: bold;
-            padding: 2px 8px;
-            border-radius: 3px;
-            margin-top: 4px;
-            text-transform: uppercase;
-            letter-spacing: 0.5px;
-        }
-
-        /* Metadata & Info Section */
-        .info-container {
-            width: 100%;
-            border-collapse: collapse;
-            margin-bottom: 14px;
-            background-color: #f8fafc;
-            border: 1px solid #e2e8f0;
-            border-radius: 4px;
-        }
-
-        .info-container td {
-            padding: 8px 10px;
-            vertical-align: top;
-            width: 50%;
-        }
-
-        .info-block-title {
-            font-size: 7pt;
-            font-weight: bold;
-            color: #64748b;
-            text-transform: uppercase;
-            margin-bottom: 5px;
-            border-bottom: 1px solid #cbd5e1;
-            padding-bottom: 2px;
-        }
-
-        .meta-table {
-            width: 100%;
-            border-collapse: collapse;
-        }
-
-        .meta-table td {
-            padding: 2px 0;
+            font-family: Arial, Helvetica, sans-serif;
             font-size: 8pt;
+            color: #000;
+            background: #fff;
+            line-height: 1.15;
         }
 
-        .meta-label {
-            color: #475569;
-            width: 85px;
-        }
-
-        .meta-value {
-            font-weight: bold;
-            color: #0f172a;
-        }
-
-        /* Items Table */
-        .items-table {
+        .receipt-container {
             width: 100%;
-            border-collapse: collapse;
-            margin-bottom: 10px;
+            max-width: 100%;
+            box-sizing: border-box;
         }
 
-        .items-table th {
-            background-color: #1e293b;
-            color: #ffffff;
-            text-transform: uppercase;
-            font-size: 7pt;
-            font-weight: bold;
-            padding: 6px 8px;
-            border: 1px solid #1e293b;
-            text-align: left;
-            letter-spacing: 0.5px;
-        }
-
-        .items-table td {
-            padding: 5px 8px;
-            border-bottom: 1px solid #e2e8f0;
-            border-left: 1px solid #f1f5f9;
-            border-right: 1px solid #f1f5f9;
-            font-size: 8pt;
-        }
-
-        .items-table tbody tr:nth-child(even) {
-            background-color: #f8fafc;
-        }
-
-        /* Financial Summary Box */
-        .summary-table {
-            width: 100%;
-            border-collapse: collapse;
-            margin-top: 6px;
-        }
-
-        .summary-notes {
-            width: 55%;
-            vertical-align: top;
-            padding-right: 15px;
-            font-size: 7.5pt;
-            color: #64748b;
-        }
-
-        .summary-calculation {
-            width: 45%;
-            vertical-align: top;
-        }
-
-        .calc-table {
-            width: 100%;
-            border-collapse: collapse;
-        }
-
-        .calc-table td {
-            padding: 3px 6px;
-            font-size: 8pt;
-        }
-
-        .calc-label {
-            text-align: right;
-            color: #475569;
-            font-weight: 500;
-        }
-
-        .calc-value {
-            text-align: right;
-            width: 110px;
-        }
-
-        /* Accounting Grand Total Box */
-        .grand-total-row td {
-            border-top: 1.5px solid #0f172a;
-            border-bottom: 3.5px double #0f172a;
-            /* Garis ganda khas standar akuntansi */
-            padding: 6px 6px !important;
-            background-color: #f1f5f9;
-        }
-
-        .grand-total-label {
-            font-weight: bold;
-            color: #0f172a;
-            text-transform: uppercase;
-            font-size: 8.5pt;
-        }
-
-        .grand-total-amount {
-            font-size: 10.5pt;
-            font-weight: bold;
-            color: #0f172a;
-        }
-
-        /* Alignment & Helpers */
         .text-center {
             text-align: center;
         }
@@ -222,195 +37,347 @@
             text-align: right;
         }
 
+        .text-start {
+            text-align: left;
+        }
+
         .fw-bold {
             font-weight: bold;
         }
 
-        /* Signatures */
-        .footer-table {
-            width: 100%;
-            margin-top: 20px;
-            border-collapse: collapse;
+        .fst-italic {
+            font-style: italic;
         }
 
-        .footer-table td {
-            text-align: center;
+        .line-solid {
+            border-top: 1.5px solid #000;
+            border-bottom: 1px solid #000;
+            height: 1px;
+            margin: 4px 0;
+        }
+
+        .line-dotted {
+            border-top: 1px dashed #000;
+            margin: 2px 0;
+        }
+
+        .form-code {
+            text-align: right;
             font-size: 7.5pt;
-            vertical-align: bottom;
-        }
-
-        .sign-space {
-            height: 38px;
-        }
-
-        .sign-line {
-            border-bottom: 1px solid #0f172a;
-            display: inline-block;
-            width: 170px;
             margin-bottom: 2px;
+        }
+
+        .nota-title {
+            font-size: 11pt;
+            font-weight: bold;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+            margin: 0 0 2px 0;
+        }
+
+        .info-table {
+            width: 100%;
+            border-collapse: collapse;
+            margin-bottom: 6px;
+            font-size: 8pt;
+        }
+
+        .info-table td {
+            padding: 1.5px 0;
+            vertical-align: top;
+        }
+
+        .info-table .col-label {
+            width: 18%;
+        }
+
+        .info-table .col-colon {
+            width: 2%;
+            text-align: center;
+        }
+
+        .info-table .col-value {
+            width: 30%;
+            padding-right: 5px;
+        }
+
+        .item-table {
+            width: 100%;
+            border-collapse: collapse;
+            margin-top: 2px;
+        }
+
+        .item-table th {
+            border-top: 1.5px solid #000;
+            border-bottom: 1.5px solid #000;
+            padding: 3px 2px;
+            font-size: 8pt;
+        }
+
+        .item-table td {
+            padding: 2.5px 2px;
+            vertical-align: top;
+            font-size: 8pt;
+        }
+
+        .box-lunas {
+            border: 2px solid #000;
+            display: inline-block;
+            padding: 2px 18px;
+            font-size: 10pt;
+            font-weight: 900;
+            letter-spacing: 1.5px;
+        }
+
+        .signature-table {
+            width: 100%;
+            border-collapse: collapse;
+            margin-top: 8px;
+            font-size: 8pt;
+        }
+
+        .signature-table td {
+            width: 50%;
+            text-align: center;
+            vertical-align: top;
+        }
+
+        .footer-text {
+            text-align: center;
+            font-style: italic;
+            font-size: 6.5pt;
+            margin-top: 6px;
+            border-top: 1px solid #ddd;
+            padding-top: 3px;
+        }
+
+        .bottom-meta {
+            width: 100%;
+            display: table;
+            font-size: 7pt;
+            margin-top: 3px;
+        }
+
+        .bottom-meta div {
+            display: table-cell;
         }
     </style>
 </head>
 
 <body>
 
-    <!-- Header Instansi & Judul Dokumen -->
-    <table class="header-table">
-        <tr>
-            <td width="55%">
-                <div class="company-name">{{ config('app.name', 'RUMAH SAKIT / KLINIK') }}</div>
-                <div class="company-sub">Bukti Pembayaran Sektor Keuangan & Kasir Resmi</div>
-            </td>
-            <td width="45%" class="invoice-title-box">
-                <h2>INVOICE LUNAS</h2>
-                <div class="status-badge">PAID / LUNAS</div>
-            </td>
-        </tr>
-    </table>
+    <div class="receipt-container">
 
-    <!-- Informasi Pasien & Metrik Transaksi -->
-    <table class="info-container">
-        <tr>
-            <td>
-                <div class="info-block-title">Diterbitkan Untuk (Pasien):</div>
-                <table class="meta-table">
-                    <tr>
-                        <td class="meta-label" style="width: 105px;">No. Rekam Medis</td>
-                        <td width="8" style="width: 15px;">:</td>
-                        <td class="meta-value accounting-font">{{ $order->master_patient_code ?? '-' }}</td>
-                    </tr>
-                    <tr>
-                        <td class="meta-label">Nama Pasien</td>
-                        <td tyle="width: 5px;">:</td>
-                        <td class="meta-value">{{ $order->master_patient_name ?? '-' }}</td>
-                    </tr>
-                    <tr>
-                        <td class="meta-label">Alamat Pasien</td>
-                        <td tyle="width: 5px;">:</td>
-                        <td class="meta-value" style="font-size: 7.5pt;">{{ $order->master_patient_alamat ?? '-' }}</td>
-                    </tr>
-                </table>
-            </td>
-            <td style="border-left: 1px solid #e2e8f0;">
-                <div class="info-block-title">Rincian Transaksi:</div>
-                <table class="meta-table">
-                    <tr>
-                        <td class="meta-label" style="width: 105px;">No. Registrasi/Order</td>
-                        <td width="8" style="width: 15px;">:</td>
-                        <td class="meta-value accounting-font">{{ $order->d_reg_order_code }}</td>
-                    </tr>
-                    <tr>
-                        <td class="meta-label">Tanggal Bayar</td>
-                        <td>:</td>
-                        <td class="meta-value">
-                            {{ isset($items[0]->d_reg_order_payment_date) ? date('d/m/Y H:i', strtotime($items[0]->d_reg_order_payment_date)) : date('d/m/Y H:i') }}
-                        </td>
-                    </tr>
-                    <tr>
-                        <td class="meta-label">Metode Pembayaran</td>
-                        <td>:</td>
-                        <td class="meta-value">{{ $items[0]->d_reg_order_payment_card ?? 'TUNAI' }}</td>
-                    </tr>
-                </table>
-            </td>
-        </tr>
-    </table>
+        <div class="form-code">YAN.33-FRM-CR-01.1/05</div>
 
-    <!-- Tabel Detail Rincian Item (HANYA ITEM LUNAS) -->
-    <table class="items-table">
-        <thead>
+        <div class="text-center" style="margin-bottom: 6px;">
+            <h2 class="nota-title">NOTA PEMBAYARAN</h2>
+            <div style="font-size: 8pt;">No. Nota : {{ $transaksi->no_registrasi }}</div>
+        </div>
+
+        <table class="info-table">
             <tr>
-                <th width="4%" class="text-center">No</th>
-                <th width="16%">Kategori</th>
-                <th>Deskripsi Layanan / Tindakan</th>
-                <th width="18%" class="text-end">Harga (Rp)</th>
-                <th width="15%" class="text-end">Diskon (Rp)</th>
-                <th width="20%" class="text-end">Subtotal (Rp)</th>
+                <td class="col-label">Nama Pelanggan</td>
+                <td class="col-colon">:</td>
+                <td class="col-value fw-bold">Sdr {{ strtoupper($transaksi->nama_pasien) }}</td>
+
+                <td class="col-label">ID Pelanggan</td>
+                <td class="col-colon">:</td>
+                <td class="col-value">{{ $transaksi->pid }}</td>
             </tr>
-        </thead>
-        <tbody>
-            @php
-            $grandGross = 0;
-            $grandDiscount = 0;
-            @endphp
-            @forelse($items as $index => $item)
-            @php
-            $hargaAwal = $item->price;
-            $diskon = $item->discount;
-            $subtotal = $hargaAwal - $diskon;
-
-            $grandGross += $hargaAwal;
-            $grandDiscount += $diskon;
-            @endphp
             <tr>
-                <td class="text-center accounting-font">{{ $index + 1 }}</td>
-                <td><span class="fw-bold" style="color: #334155;">{{ $item->t_layanan_cat_code }}</span></td>
-                <td>{{ $item->item_name }}</td>
-                <td class="text-end accounting-font">{{ number_format($hargaAwal, 0, ',', '.') }}</td>
-                <td class="text-end accounting-font" style="color: #dc2626;">
-                    {{ $diskon > 0 ? '(' . number_format($diskon, 0, ',', '.') . ')' : '-' }}
+                <td class="col-label">Umur/J. Kelamin</td>
+                <td class="col-colon">:</td>
+                <td class="col-value">{{ $transaksi->umur ?? '-' }} tahun / {{ $transaksi->jk == 'L' ? 'L' : 'P' }}</td>
+
+                <td class="col-label">No. Reg</td>
+                <td class="col-colon">:</td>
+                <td class="col-value">{{ $transaksi->no_registrasi }}</td>
+            </tr>
+            <tr>
+                <td class="col-label">Alamat</td>
+                <td class="col-colon">:</td>
+                <td class="col-value">{{ $transaksi->alamat ?? '-' }}</td>
+
+                <td class="col-label">Pengirim</td>
+                <td class="col-colon">:</td>
+                <td class="col-value">{{ $transaksi->nama_dokter_pengirim ?? '-' }}</td>
+            </tr>
+            <tr>
+                <td class="col-label">Kel. Pelanggan</td>
+                <td class="col-colon">:</td>
+                <td class="col-value">{{ $transaksi->agreement ?? 'PASIEN KLINISI' }}</td>
+
+                <td class="col-label">Tanggal</td>
+                <td class="col-colon">:</td>
+                <td class="col-value">{{ date('d-m-Y H:i:s', strtotime($transaksi->tanggal_registrasi)) }}</td>
+            </tr>
+        </table>
+
+        <table class="item-table">
+            <thead>
+                <tr>
+                    <th class="text-start fst-italic fw-bold" style="width: 52%;">PEMERIKSAAN</th>
+                    <th class="text-end fst-italic fw-bold" style="width: 16%;">BRUTO</th>
+                    <th class="text-end fst-italic fw-bold" style="width: 16%;">DISKON</th>
+                    <th class="text-end fst-italic fw-bold" style="width: 16%;">HARGA</th>
+                </tr>
+            </thead>
+            <tbody>
+                @php
+                $totalBruto = 0;
+                $totalDiskon = 0;
+                $subtotalNet = 0;
+                @endphp
+                @foreach($details as $item)
+                @php
+                $hargaDasar = ($item->harga_dasar ?? 0) + ($item->biaya_cito ?? 0);
+                $diskon = $item->diskon ?? 0;
+                $hargaAkhir = $item->harga_akhir ?? ($hargaDasar - $diskon);
+
+                $totalBruto += $hargaDasar;
+                $totalDiskon += $diskon;
+                $subtotalNet += $hargaAkhir;
+                @endphp
+                <tr>
+                    <td>{{ $item->nama_layanan }}</td>
+                    <td class="text-end">{{ number_format($hargaDasar, 0, ',', '.') }}</td>
+                    <td class="text-end">{{ number_format($diskon, 0, ',', '.') }}</td>
+                    <td class="text-end">{{ number_format($hargaAkhir, 0, ',', '.') }}</td>
+                </tr>
+                @endforeach
+            </tbody>
+        </table>
+
+        <div class="line-solid" style="margin-top: 3px;"></div>
+
+        <!-- Sub Total -->
+        <table style="width: 100%; border-collapse: collapse; font-size: 8pt;">
+            <tr>
+                <td class="fw-bold fst-italic" style="width: 52%;">Sub Total</td>
+                <td class="text-end fw-bold" style="width: 16%;">{{ number_format($totalBruto, 0, ',', '.') }}</td>
+                <td class="text-end fw-bold" style="width: 16%;">{{ number_format($totalDiskon, 0, ',', '.') }}</td>
+                <td class="text-end fw-bold" style="width: 16%;">{{ number_format($subtotalNet, 0, ',', '.') }}</td>
+            </tr>
+        </table>
+
+        <div class="line-dotted"></div>
+
+        <!-- Pembulatan -->
+        <table style="width: 100%; border-collapse: collapse; font-size: 8pt;">
+            <tr>
+                <td class="fw-bold fst-italic" style="width: 84%;">Pembulatan</td>
+                <td class="text-end" style="width: 16%;">0</td>
+            </tr>
+        </table>
+
+        <div class="line-dotted"></div>
+
+        <!-- Grand Total -->
+        <table style="width: 100%; border-collapse: collapse; font-size: 8pt;">
+            <tr>
+                <td class="fw-bold fst-italic" style="width: 84%;">Grand Total</td>
+                <td class="text-end fw-bold" style="width: 16%;">{{ number_format($subtotalNet, 0, ',', '.') }}</td>
+            </tr>
+        </table>
+
+        <div class="line-dotted"></div>
+
+        <!-- Pembayaran -->
+        <table style="width: 100%; border-collapse: collapse; font-size: 8pt;">
+            <tr>
+                <td class="fw-bold fst-italic" style="width: 84%;">Pembayaran</td>
+                <td class="text-end" style="width: 16%;"></td>
+            </tr>
+            <tr>
+                <td>{{ ucfirst(strtolower($transaksi->metode_bayar ?? 'Cash')) }}</td>
+                <td class="text-end">{{ number_format($transaksi->total_bayar, 0, ',', '.') }}</td>
+            </tr>
+        </table>
+
+        <div class="line-dotted"></div>
+
+        <!-- Total Pembayaran & Kembalian -->
+        <table style="width: 100%; border-collapse: collapse; font-size: 8pt;">
+            <tr>
+                <td class="fw-bold fst-italic text-uppercase" style="width: 84%;">TOTAL PEMBAYARAN</td>
+                <td class="text-end fw-bold" style="width: 16%;">{{ number_format($transaksi->total_tagihan, 0, ',', '.') }}</td>
+            </tr>
+            <tr>
+                <td class="fw-bold fst-italic">Kembalian</td>
+                @php
+                $kembalian = $transaksi->total_bayar > $transaksi->total_tagihan ? ($transaksi->total_bayar - $transaksi->total_tagihan) : 0;
+                @endphp
+                <td class="text-end">{{ number_format($kembalian, 0, ',', '.') }}</td>
+            </tr>
+        </table>
+
+        <!-- Informasi Pemeriksaan & Hasil -->
+        <div style="margin-top: 3px; font-size: 8pt;">
+            <div class="fw-bold fst-italic">Hasil Pemeriksaan :</div>
+            <div>Ambil Sendiri</div>
+            <div style="margin-top: 1px;"><span class="fw-bold">Whatsapp Pasien :</span> {{ $transaksi->no_hp ?? '-' }}</div>
+            <div class="fw-bold fst-italic" style="margin-top: 1px;">Hasil Selesai :</div>
+            <div>{{ $transaksi->janji_hasil ? date('d-m-Y H:i:s', strtotime($transaksi->janji_hasil)) : 'Menunggu Info Lab' }}</div>
+        </div>
+
+        <!-- Catatan / NB -->
+        <div style="font-style: italic; font-size: 6pt; margin-top: 3px; line-height: 1.15;">
+            NB:<br>
+            - Nota harap dibawa saat ambil hasil<br>
+            - Hasil harap diambil paling lambat 1(satu) minggu setelah tanggal janji hasil<br>
+            - Pembatalan tidak bisa dilakukan bila pemeriksaan sudah dilakukan. pembatalan pemeriksaan yang belum dilakukan sebelum lewat bulan dikenakan biaya pembatalan sebesar 10% dan 25% setelah lewat bulan<br>
+            - Pembatalan tidak bisa dilakukan untuk semua program PROMO
+        </div>
+
+        <!-- Kotak LUNAS dan Tanggal -->
+        <table style="width: 100%; margin-top: 4px; border-collapse: collapse;">
+            <tr>
+                <td style="width: 40%; vertical-align: top;">
+                    @if(strtoupper($transaksi->status_pembayaran ?? '') == 'LUNAS')
+                    <div class="box-lunas">LUNAS</div>
+                    @endif
                 </td>
-                <td class="text-end accounting-font fw-bold">{{ number_format($subtotal, 0, ',', '.') }}</td>
-            </tr>
-            @empty
-            <tr>
-                <td colspan="6" class="text-center" style="padding: 15px; color: #94a3b8;">
-                    Tidak ada item transaksi berstatus lunas yang dapat ditampilkan.
+                <td style="width: 60%; text-align: right; font-size: 7.5pt; vertical-align: bottom;">
+                    Pontianak, {{ date('d-m-Y H:i:s') }}
                 </td>
             </tr>
-            @endforelse
-        </tbody>
-    </table>
+        </table>
 
-    <!-- Ringkasan Perhitungan Akuntansi -->
-    <table class="summary-table">
-        <tr>
-            <td class="summary-notes">
-                <div style="font-weight: bold; color: #334155; margin-bottom: 3px;">Catatan Pembayaran:</div>
-                <ul style="margin: 0; padding-left: 12px; line-height: 1.4;">
-                    <li>Kuitansi ini hanya mencantumkan item layanan yang telah <b>LUNAS</b> ditagihkan.</li>
-                    <li>Bukti pembayaran sah dikeluarkannya dokumen secara komputerisasi tanpa memerlukan cap basah.</li>
-                </ul>
-            </td>
-            <td class="summary-calculation">
-                <table class="calc-table">
-                    <tr>
-                        <td class="calc-label">Total Kotor (Gross):</td>
-                        <td class="calc-value accounting-font">Rp {{ number_format($grandGross, 0, ',', '.') }}</td>
-                    </tr>
-                    <tr>
-                        <td class="calc-label">Total Diskon:</td>
-                        <td class="calc-value accounting-font" style="color: #dc2626;">
-                            {{ $grandDiscount > 0 ? '- Rp ' . number_format($grandDiscount, 0, ',', '.') : 'Rp 0' }}
-                        </td>
-                    </tr>
-                    <tr class="grand-total-row">
-                        <td class="calc-label grand-total-label">Total Pelunasan Netto:</td>
-                        <td class="calc-value grand-total-amount accounting-font">
-                            Rp {{ number_format($totalLunas, 0, ',', '.') }}
-                        </td>
-                    </tr>
-                </table>
-            </td>
-        </tr>
-    </table>
+        <div style="font-size: 7.5pt; margin-top: 2px;">
+            Kami menyetujui bahwa hasil pemeriksaan dikirim melalui media elektronik WhatsApp No.{{ $transaksi->no_hp ?? '-' }}
+        </div>
 
-    <!-- Tanda Tangan & Footer -->
-    <table class="footer-table">
-        <tr>
-            <td width="60%" style="text-align: left; vertical-align: bottom;">
-                <div style="font-size: 7pt; color: #64748b;">
-                    <i>Waktu Cetak Dokumen: {{ date('d-m-Y H:i:s') }} WIB</i>
-                </div>
-            </td>
-            <td width="40%">
-                <div>Kasir / Officer Keuangan,</div>
-                <div class="sign-space"></div>
-                <div class="sign-line"></div>
-                <div class="fw-bold" style="font-size: 8.5pt;">{{ auth()->user()->name ?? 'Petugas Kasir' }}</div>
-            </td>
-        </tr>
-    </table>
+        <!-- Tanda Tangan Pelanggan & Petugas -->
+        <table class="signature-table">
+            <tr>
+                <td>
+                    <br><br><br>
+                    <div style="text-decoration: underline; font-weight: bold;">
+                        Sdr {{ strtoupper($transaksi->nama_pasien) }}
+                    </div>
+                </td>
+                <td>
+                    <br><br><br>
+                    <div style="text-decoration: underline; font-weight: bold;">
+                        {{ optional(auth()->user())->name ?? 'Petugas Kasir' }}
+                    </div>
+                </td>
+            </tr>
+        </table>
+
+        <!-- FOOTER -->
+        <div class="footer-text">
+            Terima kasih Anda telah melakukan pemeriksaan di LAb. Klinis "PRAMITA". Sampaikan kesan dan saran Anda terhadap kualitas hasil & layanan kami melalui WhatsApp ke no. 0852-5172-0189
+        </div>
+
+        <div class="bottom-meta">
+            <div style="text-align: left;">Dicetak Oleh : {{ optional(auth()->user())->name ?? 'Petugas Kasir' }}</div>
+            <div style="text-align: center;">1 / 1</div>
+            <div style="text-align: right;">{{ date('d M Y H.i') }}</div>
+        </div>
+
+    </div>
 
 </body>
 

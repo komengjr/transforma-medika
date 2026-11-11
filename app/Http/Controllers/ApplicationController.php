@@ -9,10 +9,12 @@ use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Hash;
 use Illuminate\Support\Facades\Redirect;
+use Illuminate\Support\Facades\Validator;
 use Illuminate\Support\Str;
 use League\CommonMark\Extension\CommonMark\Node\Inline\Code;
 use Maatwebsite\Excel\Facades\Excel;
 use Session;
+
 class ApplicationController extends Controller
 {
     public function __construct()
@@ -310,7 +312,6 @@ class ApplicationController extends Controller
         } else {
             return Redirect::to('dashboard/home');
         }
-
     }
     public function master_pemeriksaan_add(Request $request)
     {
@@ -328,14 +329,71 @@ class ApplicationController extends Controller
     }
     public function master_pemeriksaan_update(Request $request)
     {
-        $data = DB::table('master_pemeriksaan')->where('master_pemeriksaan_code', $request->code)->first();
-        return view('application.master-data.pemeriksaan.form-update', ['data' => $data]);
+        // Ambil data pemeriksaan berdasarkan kode_layanan
+        $data = DB::table('medical_master_pemeriksaan')
+            ->where('kode_layanan', $request->code)
+            ->first();
+
+        // Ambil daftar tipe layanan untuk opsi select
+        $cat = DB::table('medical_tipe_layanan')
+            ->where('is_active', true)
+            ->get();
+
+        return view('application.master-data.pemeriksaan.form-update', [
+            'data' => $data,
+            'cat'  => $cat
+        ]);
     }
     public function master_pemeriksaan_update_save(Request $request)
     {
-        DB::table('master_pemeriksaan')->where('master_pemeriksaan_code', $request->code)->update([
-            'master_pemeriksaan_name' => $request->nama
+        // 1. Validasi Input form edit
+        $validator = Validator::make($request->all(), [
+            'kode_layanan'    => 'required|exists:medical_master_pemeriksaan,kode_layanan',
+            'tipe_layanan_id' => 'required',
+            'nama_layanan'    => 'required',
+            'harga'           => 'required|numeric',
+            'is_active'       => 'required'
         ]);
-        return redirect()->back()->withSuccess('Great! Berhasil Menambahkan Data Pemeriksaan');
+
+        // Jika validasi gagal, kembalikan pesan error dalam format JSON
+        if ($validator->fails()) {
+            return response()->json([
+                'status'  => 'error',
+                'message' => $validator->errors()->first()
+            ], 422);
+        }
+
+        try {
+            // 2. Lakukan Update Data ke tabel yang baru (medical_master_pemeriksaan)
+            DB::table('medical_master_pemeriksaan')
+                ->where('kode_layanan', $request->kode_layanan)
+                ->update([
+                    'tipe_layanan_id'      => $request->tipe_layanan_id,
+                    'nama_layanan'         => $request->nama_layanan,
+                    'is_paket'             => $request->is_paket,
+                    'harga'                => $request->harga,
+                    'estimasi_waktu_menit' => $request->estimasi_waktu_menit,
+                    'is_active'            => $request->is_active,
+                    'updated_at'           => now(),
+                ]);
+
+            // 3. Ambil data ter-update beserta nama tipe layanannya untuk dikembalikan ke View (agar DataTables bisa update baris otomatis)
+            $updatedData = DB::table('medical_master_pemeriksaan')
+                ->join('medical_tipe_layanan', 'medical_tipe_layanan.id', '=', 'medical_master_pemeriksaan.tipe_layanan_id')
+                ->where('medical_master_pemeriksaan.kode_layanan', $request->kode_layanan)
+                ->select('medical_master_pemeriksaan.*', 'medical_tipe_layanan.nama_tipe')
+                ->first();
+
+            return response()->json([
+                'status'  => 'success',
+                'message' => 'Data Pemeriksaan berhasil diperbarui!',
+                'data'    => $updatedData
+            ], 200);
+        } catch (\Exception $e) {
+            return response()->json([
+                'status'  => 'error',
+                'message' => 'Terjadi Kesalahan: ' . $e->getMessage()
+            ], 500);
+        }
     }
 }

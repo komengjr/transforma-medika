@@ -4,50 +4,81 @@
 <link rel="stylesheet" href="https://cdn.datatables.net/2.2.2/css/dataTables.bootstrap5.css">
 <link rel="stylesheet" href="https://cdn.datatables.net/responsive/3.0.4/css/responsive.bootstrap5.css">
 <link href="{{ asset('vendors/flatpickr/flatpickr.min.css') }}" rel="stylesheet" />
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
 
 <style>
-    /* Hero Header Radiologi */
-    .rad-hero-header {
-        background: linear-gradient(135deg, #0f172a 0%, #1e293b 60%, #0369a1 100%);
-        border: 1px solid rgba(56, 189, 248, 0.2);
-        border-radius: 8px;
-        color: #ffffff;
-        box-shadow: 0 4px 15px rgba(15, 23, 42, 0.2);
-        position: relative;
+    /* =========================================
+       RETRO / NEUBRUTALISM THEME STYLES
+       ========================================= */
+    :root {
+        --retro-dark: #1e1e24;
+        --retro-yellow: #ffde59;
+        --retro-pink: #ffa6c9;
+        --retro-cyan: #8bf0fa;
+        --retro-orange: #ff914d;
+        --retro-green: #c1ff72;
+        --retro-purple: #c8b6ff;
+        --retro-bg: #f4f0ea;
+        --retro-border: 3px solid var(--retro-dark);
+        --retro-shadow: 5px 5px 0px var(--retro-dark);
+        --retro-shadow-sm: 3px 3px 0px var(--retro-dark);
+    }
+
+    body {
+        /* background-color: var(--retro-bg); */
+        color: var(--retro-dark);
+        font-family: 'Plus Jakarta Sans', sans-serif;
+    }
+
+    /* Retro Cards & Banners */
+    .retro-card {
+        border: var(--retro-border);
+        border-radius: 12px;
+        box-shadow: var(--retro-shadow);
+        background-color: #ffffff;
         overflow: hidden;
-        margin-bottom: 15px;
     }
 
-    .rad-hero-header::before {
-        content: '';
-        position: absolute;
-        top: -50%;
-        right: -10%;
-        width: 250px;
-        height: 250px;
-        background: radial-gradient(circle, rgba(56, 189, 248, 0.25) 0%, transparent 70%);
-        pointer-events: none;
+    .retro-header-banner {
+        background: linear-gradient(135deg, var(--retro-cyan) 0%, var(--retro-purple) 100%);
+        border: var(--retro-border);
+        border-radius: 12px;
+        box-shadow: var(--retro-shadow);
+        color: var(--retro-dark);
     }
 
-    /* Filter Bar Atas */
+    .retro-badge {
+        border: 2px solid var(--retro-dark);
+        border-radius: 6px;
+        padding: 4px 8px;
+        font-weight: 800;
+        box-shadow: 2px 2px 0px var(--retro-dark);
+        text-transform: uppercase;
+        display: inline-block;
+        font-size: 0.7rem;
+    }
+
+    /* Filter Bar Atas Retro */
     .filter-wrapper {
         background: #ffffff;
-        border: 1px solid #d1d5db;
-        padding: 10px;
+        border: var(--retro-border);
+        box-shadow: var(--retro-shadow-sm);
+        padding: 15px;
         display: flex;
-        gap: 10px;
+        gap: 12px;
         align-items: center;
-        margin-bottom: 15px;
-        border-radius: 4px;
+        margin-bottom: 20px;
+        border-radius: 10px;
     }
 
     .custom-input-box {
-        border: 1px solid #9ca3af;
-        border-radius: 3px;
+        border: 2px solid var(--retro-dark);
+        border-radius: 6px;
         padding: 18px 10px 4px 10px;
         position: relative;
         background: #fff;
         flex: 1;
+        box-shadow: 2px 2px 0px var(--retro-dark);
     }
 
     .custom-input-box label {
@@ -55,8 +86,10 @@
         top: 2px;
         left: 8px;
         font-size: 10px;
-        color: #6b7280;
+        color: var(--retro-dark);
+        font-weight: 800;
         pointer-events: none;
+        text-transform: uppercase;
     }
 
     .custom-input-box input,
@@ -66,123 +99,143 @@
         width: 100%;
         background: transparent;
         font-size: 13px;
-        color: #374151;
+        font-weight: 700;
+        color: var(--retro-dark);
         padding: 0;
     }
 
     .btn-search-green {
-        background-color: #4caf50;
-        color: white;
-        border: none;
-        border-radius: 3px;
-        padding: 0 20px;
-        height: 42px;
+        background-color: var(--retro-green);
+        color: var(--retro-dark);
+        font-weight: 800;
+        border: 2px solid var(--retro-dark);
+        box-shadow: var(--retro-shadow-sm);
+        border-radius: 6px;
+        padding: 0 22px;
+        height: 44px;
         display: flex;
         align-items: center;
         justify-content: center;
         cursor: pointer;
-        transition: 0.2s;
+        transition: 0.1s;
     }
 
-    .btn-search-green:hover {
-        background-color: #43a047;
+    .btn-search-green:hover,
+    .btn-search-green:active {
+        transform: translate(2px, 2px);
+        box-shadow: 0px 0px 0px var(--retro-dark);
+        background-color: #b0f55b;
     }
 
     /* Layout Panel Kiri & Kanan */
     .layout-container {
         display: flex;
-        gap: 15px;
+        gap: 20px;
         align-items: flex-start;
     }
 
     .panel-kiri {
         flex: 0 0 45%;
         background: #ffffff;
-        border: 1px solid #d1d5db;
-        padding: 5px;
+        border: var(--retro-border);
+        box-shadow: var(--retro-shadow);
+        border-radius: 12px;
+        padding: 8px;
+        overflow: hidden;
     }
 
     .panel-kanan {
         flex: 1;
         display: flex;
         flex-direction: column;
-        gap: 10px;
+        gap: 15px;
     }
 
     /* Tabel Kiri */
     .table-pasien {
         width: 100%;
-        border-collapse: collapse;
+        border-collapse: separate;
+        border-spacing: 0;
     }
 
     .table-pasien th {
-        background-color: #85c1e9;
-        color: #ffffff;
+        background-color: var(--retro-dark);
+        color: var(--retro-green);
         font-size: 11px;
-        font-weight: 700;
+        font-weight: 800;
         text-transform: uppercase;
         padding: 12px 10px;
         text-align: left;
+        border: 2px solid var(--retro-dark);
     }
 
     .table-pasien td {
-        border-bottom: 1px solid #e5e7eb;
-        padding: 10px;
+        border: 2px solid var(--retro-dark);
+        border-top: none;
+        padding: 12px 10px;
         font-size: 12px;
-        color: #374151;
+        font-weight: 700;
+        color: var(--retro-dark);
+        background-color: #ffffff;
         cursor: pointer;
     }
 
     .table-pasien tr:hover td {
-        background-color: #f3f4f6;
+        background-color: var(--retro-cyan);
     }
 
     .table-pasien tr.active-row td {
-        background-color: #e0f2fe;
-        border-right: 5px solid #0284c7;
+        background-color: var(--retro-yellow);
+        border-left: 5px solid var(--retro-dark);
     }
 
-    /* Panel Kanan (Biru & Hijau) */
+    /* Panel Kanan (Biru & Hijau Retro) */
     .box-biru {
-        background-color: #03a9f4;
-        padding: 15px 20px;
-        border: 1px solid #0288d1;
+        background-color: var(--retro-cyan);
+        border: var(--retro-border);
+        border-radius: 12px;
+        box-shadow: var(--retro-shadow);
+        padding: 20px;
     }
 
     .box-hijau {
-        background-color: #e8f5e9;
-        border: 1px solid #c8e6c9;
-        border-right: 6px solid #1976d2;
-        padding: 15px 20px;
-        min-height: 150px;
+        background-color: #ffffff;
+        border: var(--retro-border);
+        border-radius: 12px;
+        box-shadow: var(--retro-shadow);
+        padding: 20px;
+        min-height: 180px;
     }
 
     .box-hijau h6 {
-        color: #1b5e20;
-        font-weight: bold;
-        font-family: monospace;
-        font-size: 14px;
-        margin: 0;
+        color: var(--retro-dark);
+        font-weight: 800;
+        font-size: 15px;
+        margin: 0 0 15px 0;
+        text-transform: uppercase;
     }
 
     .input-group-biru {
         display: flex;
         flex-direction: column;
-        margin-bottom: 10px;
+        margin-bottom: 12px;
     }
 
     .input-group-biru label {
         font-size: 11px;
-        color: rgba(255, 255, 255, 0.8);
-        margin-bottom: 2px;
+        color: var(--retro-dark);
+        font-weight: 800;
+        margin-bottom: 4px;
+        text-transform: uppercase;
     }
 
     .input-underline {
         border: none;
-        border-bottom: 1px solid rgba(255, 255, 255, 0.5);
+        border-bottom: 2px solid var(--retro-dark);
         background: transparent;
-        color: #ffffff;
+        color: var(--retro-dark);
         font-size: 13px;
+        font-weight: 800;
         padding-bottom: 4px;
         width: 100%;
         outline: none;
@@ -201,25 +254,35 @@
 
 @section('content')
 
-<!-- HERO HEADER -->
-<div class="row mb-0">
+<!-- HERO HEADER (Gaya Retro Konsisten) -->
+<div class="row mb-4">
     <div class="col-12">
-        <div class="rad-hero-header p-3">
-            <div class="d-flex align-items-center justify-content-between flex-wrap gap-3">
-                <div class="d-flex align-items-center">
-                    <div class="p-2 bg-white bg-opacity-10 rounded-3 me-3 border border-white-50 d-flex align-items-center justify-content-center"
-                        style="width: 55px; height: 55px; backdrop-filter: blur(8px);">
-                        <img src="{{ asset('img/rad.png') }}" alt="Radiology Logo" class="img-fluid" width="35" />
-                    </div>
-                    <div>
-                        <div class="d-flex align-items-center gap-2 mb-1">
-                            <span class="badge bg-info bg-opacity-20 text-cyan px-2 py-1 rounded-pill fw-semibold" style="font-size: 0.65rem; color: #fffdfc;">
-                                <i class="fas fa-radiation me-1"></i> MEDICAL SUITE v2.4
-                            </span>
+        <div class="card retro-header-banner p-1">
+            <div class="card-body p-4 text-dark position-relative z-1">
+                <div class="row align-items-center gy-3">
+                    <div class="col-lg-7 d-flex align-items-center">
+                        <div class="p-2 rounded-4 me-3 d-flex align-items-center justify-content-center"
+                            style="width: 65px; height: 65px; background: white; border: 2px solid var(--retro-dark); box-shadow: 3px 3px 0px var(--retro-dark);">
+                            <img src="{{ asset('img/rad.png') }}" alt="Logo" class="img-fluid" width="42" />
                         </div>
-                        <h4 class="fw-bold mb-0 text-white" style="font-size: 1.2rem;">
-                            Proses <span style="color: #38bdf8;">Handling Radiologi</span>
-                        </h4>
+                        <div>
+                            <div class="d-flex align-items-center gap-2 mb-1">
+                                <span class="retro-badge" style="background-color: var(--retro-yellow); color: var(--retro-dark);">
+                                    <i class="fas fa-radiation me-1"></i> v2.4 Medical Suite
+                                </span>
+                            </div>
+                            <h3 class="fw-bolder mb-0 text-dark" style="font-size: 1.4rem; text-shadow: 1px 1px 0px white;">
+                                Welcome to {{ Env('APP_LABEL')}} <span class="fw-normal">Management System</span>
+                            </h3>
+                        </div>
+                    </div>
+
+                    <div class="col-lg-5 text-lg-end">
+                        <div class="d-inline-flex align-items-center bg-white px-3 py-2 rounded-pill" style="border: 2px solid var(--retro-dark); box-shadow: 3px 3px 0px var(--retro-dark);">
+                            <h6 class="fw-bolder mb-0 text-dark" style="font-size: 0.95rem;">
+                                <i class="fas fa-radiation me-1 text-danger"></i> Proses Handling Radiologi
+                            </h6>
+                        </div>
                     </div>
                 </div>
             </div>
@@ -258,7 +321,7 @@
         </select>
     </div>
 
-    <!-- Pemeriksaan (Dahulu Station) -->
+    <!-- Pemeriksaan -->
     <div class="custom-input-box" style="flex: 1;">
         <label>Pemeriksaan</label>
         <select name="pemeriksaan">
@@ -271,7 +334,7 @@
     </div>
 
     <!-- Tombol Submit Form -->
-    <button type="submit" class="btn-search-green">
+    <button type="submit" class="btn-search-green" title="Cari Data">
         <i class="fas fa-search"></i>
     </button>
 </form>
@@ -291,10 +354,9 @@
                         <th>STATUS</th>
                     </tr>
                 </thead>
-                <!-- ID tbody untuk me-render data via AJAX -->
                 <tbody id="tbody-pasien">
                     <tr>
-                        <td colspan="5" class="text-center py-4 text-muted">
+                        <td colspan="5" class="text-center py-4 fw-bold text-dark">
                             <i class="fas fa-spinner fa-spin me-2"></i> Memuat data pasien...
                         </td>
                     </tr>
@@ -346,7 +408,7 @@
 
         <div class="box-hijau">
             <h6>Daftar Pemeriksaan</h6>
-            <div class="text-center mt-5 text-muted opacity-50">
+            <div class="text-center mt-5 text-dark fw-bold opacity-50">
                 <i class="fas fa-hand-pointer fa-2x mb-2"></i>
                 <p class="small">Silakan pilih data pasien pada tabel di sebelah kiri</p>
             </div>
@@ -366,16 +428,14 @@
         function loadDataPasien() {
             var formData = $('#form-filter-handling').serialize();
 
-            // Set loading text
             $('#tbody-pasien').html(`
                 <tr>
-                    <td colspan="5" class="text-center py-4 text-muted">
+                    <td colspan="5" class="text-center py-4 fw-bold text-dark">
                         <i class="fas fa-spinner fa-spin me-2"></i> Mencari data...
                     </td>
                 </tr>
             `);
 
-            // Hit route get data
             $.ajax({
                 url: "{{ route('radiologi.get_data_handling') }}",
                 type: "GET",
@@ -386,15 +446,15 @@
                         $.each(response.data, function(index, val) {
                             var statusBadge = '';
                             if (val.status_pemeriksaan == 'MENUNGGU') {
-                                statusBadge = '<span class="badge bg-danger rounded-0" style="font-size: 0.6rem;">Antrean</span>';
+                                statusBadge = '<span class="badge bg-danger border border-dark rounded-2" style="font-size: 0.65rem;">Antrean</span>';
                             } else {
-                                statusBadge = '<span class="badge bg-warning text-dark rounded-0" style="font-size: 0.6rem;">' + val.status_pemeriksaan + '</span>';
+                                statusBadge = '<span class="badge bg-warning text-dark border border-dark rounded-2" style="font-size: 0.65rem;">' + val.status_pemeriksaan + '</span>';
                             }
 
                             html += `
                                 <tr class="row-patient" data-code="${val.registrasi_id}">
                                     <td>${val.tanggal_registrasi}</td>
-                                    <td class="fw-bold">${val.no_registrasi}</td>
+                                    <td class="fw-bolder">${val.no_registrasi}</td>
                                     <td>${val.penjamin}</td>
                                     <td>${val.master_patient_name}</td>
                                     <td>${statusBadge}</td>
@@ -404,7 +464,7 @@
                     } else {
                         html = `
                             <tr>
-                                <td colspan="5" style="text-align: center; color: #6b7280; padding: 25px;">
+                                <td colspan="5" style="text-align: center; color: var(--retro-dark); padding: 25px; font-weight: bold;">
                                     <i class="fas fa-folder-open fa-2x mb-2 opacity-50"></i><br>
                                     Data antrean tidak ditemukan.
                                 </td>
@@ -414,7 +474,7 @@
                     $('#tbody-pasien').html(html);
                 },
                 error: function() {
-                    $('#tbody-pasien').html('<tr><td colspan="5" class="text-center text-danger py-4">Gagal mengambil data dari server. Periksa koneksi atau route.</td></tr>');
+                    $('#tbody-pasien').html('<tr><td colspan="5" class="text-center text-danger fw-bold py-4">Gagal mengambil data dari server. Periksa koneksi atau route.</td></tr>');
                 }
             });
         }
@@ -422,30 +482,27 @@
         // 2. Load otomatis saat halaman pertama dibuka
         loadDataPasien();
 
-        // 3. Trigger ajax pencarian ketika form disubmit (Tombol Kaca Pembesar)
+        // 3. Trigger ajax pencarian ketika form disubmit
         $('#form-filter-handling').on('submit', function(e) {
-            e.preventDefault(); // Cegah reload halaman penuh
+            e.preventDefault();
             loadDataPasien();
         });
 
         // 4. Klik Baris Pasien di Kiri untuk buka form handling di Kanan
         $(document).on("click", ".row-patient", function(e) {
             e.preventDefault();
-            var code = $(this).data("code"); // registrasi_id
+            var code = $(this).data("code");
 
-            // Highlight baris yang dipilih
             $(".row-patient").removeClass("active-row");
             $(this).addClass("active-row");
 
-            // Tampilkan Loading di Panel Kanan
             $('#menu-detail-handling').html(`
-                <div class="text-center py-5" style="background: white; border: 1px solid #ddd; flex: 1;">
-                    <div class="spinner-border text-primary" role="status"></div>
-                    <p class="mt-2 text-muted small">Memuat data pemeriksaan...</p>
+                <div class="text-center py-5" style="background: white; border: 2px solid var(--retro-dark); box-shadow: var(--retro-shadow-sm); border-radius: 12px; flex: 1;">
+                    <div class="spinner-border text-dark" role="status"></div>
+                    <p class="mt-2 text-dark fw-bold small">Memuat data pemeriksaan...</p>
                 </div>
             `);
 
-            // Panggil form detail handling
             $.ajax({
                 url: "{{ route('menu_radiologi_handling_pasien') }}",
                 type: "POST",
@@ -459,7 +516,7 @@
                 $('#menu-detail-handling').html(data);
             }).fail(function() {
                 $('#menu-detail-handling').html(`
-                    <div class="alert alert-danger m-0 border-0 rounded-0">
+                    <div class="alert alert-danger m-0 fw-bold border-2 border-dark rounded-3">
                         Gagal memuat data. Periksa koneksi internet.
                     </div>
                 `);
