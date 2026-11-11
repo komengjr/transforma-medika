@@ -295,7 +295,6 @@ Route::prefix('master-data')->group(function () {
     Route::post('master-penjamin/store-sub', [MasterDataController::class, 'store_sub_penjamin'])->name('sub_penjamin_store');
     Route::put('master-penjamin/update-sub/{id}', [MasterDataController::class, 'update_sub_penjamin'])->name('sub_penjamin_update');
     Route::delete('master-penjamin/delete-sub/{id}', [MasterDataController::class, 'delete_sub_penjamin'])->name('sub_penjamin_delete');
-    Route::get('master-penjamin/tarif-penjamin', [MasterDataController::class, 'tarif_penjamin'])->name('master_tarif_penjamin');
     Route::post('master-penjamin/tarif-poli/store', [MasterDataController::class, 'store_tarif_poli'])->name('tarif_poli_store');
     Route::put('master-penjamin/tarif-poli/update/{id}', [MasterDataController::class, 'update_tarif_poli'])->name('tarif_poli_update');
     Route::post('master-penjamin/tarif-rawatinap/store', [MasterDataController::class, 'store_tarif_rawatinap'])->name('tarif_rawatinap_store');
