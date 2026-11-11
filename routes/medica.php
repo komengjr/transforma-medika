@@ -221,7 +221,6 @@ Route::prefix('poliklinik')->group(function () {
 });
 // RANAP
 Route::prefix('ranap')->group(function () {
-    Route::get('/registrasi/{akses}/{id}', [RanapController::class, 'data_registrasi_ranap'])->name('data_registrasi_ranap');
     Route::get('/registrasi/table', [RanapController::class, 'data_registrasi_ranap_table'])->name('data_registrasi_ranap_table');
     Route::post('/handling/form', [RanapController::class, 'ranap_handling_form'])->name('ranap.handling.form');
     Route::post('/handling/store', [RanapController::class, 'ranap_handling_store'])->name('ranap.handling.store');
