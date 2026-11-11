@@ -239,7 +239,7 @@ Route::prefix('ranap')->group(function () {
 
     Route::get('/ranap/handling/detail', [RanapController::class, 'getDetailHandlingRanap'])->name('ranap.detail.handling');
     Route::post('/ranap/handling/verifikasi-granular', [RanapController::class, 'prosesVerifikasiHandling'])->name('ranap.proses.verifikasi.handling');
-    Route::post('/ranap/handling/verify-order-soap', [RanapController::class, 'verifyOrderSoap'])->name('ranap.verify.order');
+    Route::post('/ranap/handling/verify-order-soap', [RanapController::class, 'verifyOrderSoap'])->name('ranap.verify.orders');
 });
 Route::get('/pelayanan/get-specimen-barcode/{registrasi_id}', [PelayananController::class, 'getSpecimenBarcodeList'])->name('get_specimen_barcode_list');
 Route::get('/pelayanan/get-filter-options', [PelayananController::class, 'getFilterOptions'])->name('get_filter_options');
