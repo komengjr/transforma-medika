@@ -82,7 +82,32 @@
         color: #ffffff;
     }
 
-    /* Filter Form Inputs */
+    .form-control {
+        border: 1px solid var(--ent-grid-border) !important;
+        border-radius: 10px !important;
+        font-weight: 600 !important;
+        color: var(--bs-body-color) !important;
+        background-color: var(--bs-body-bg) !important;
+        font-size: 0.82rem !important;
+        min-height: 38px;
+        transition: all 0.2s ease;
+    }
+
+    .ent-input,
+    .form-select {
+        border: 1px solid var(--ent-grid-border) !important;
+        border-radius: 10px !important;
+        font-weight: 600 !important;
+        color: var(--bs-body-color) !important;
+        background-color: var(--bs-body-bg) !important;
+        padding-top: 18px !important;
+        padding-bottom: 5px !important;
+        padding-left: 11px !important;
+        font-size: 0.8rem !important;
+        height: 44px !important;
+        transition: all 0.2s ease;
+    }
+
     .form-control-ent,
     .form-select-ent {
         border: 1px solid var(--ent-grid-border) !important;

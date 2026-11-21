@@ -131,8 +131,18 @@
         background: transparent;
     }
 
+    .form-control {
+        border: 1px solid var(--ent-grid-border) !important;
+        border-radius: 10px !important;
+        font-weight: 600 !important;
+        color: var(--bs-body-color) !important;
+        background-color: var(--bs-body-bg) !important;
+        font-size: 0.82rem !important;
+        min-height: 38px;
+        transition: all 0.2s ease;
+    }
+
     .ent-input,
-    .form-control,
     .form-select {
         border: 1px solid var(--ent-grid-border) !important;
         border-radius: 10px !important;

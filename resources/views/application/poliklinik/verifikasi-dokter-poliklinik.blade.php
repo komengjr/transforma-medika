@@ -143,8 +143,18 @@
         background: transparent;
     }
 
+    .form-control {
+        border: 1px solid var(--ent-grid-border) !important;
+        border-radius: 10px !important;
+        font-weight: 600 !important;
+        color: var(--bs-body-color) !important;
+        background-color: var(--bs-body-bg) !important;
+        font-size: 0.82rem !important;
+        min-height: 38px;
+        transition: all 0.2s ease;
+    }
+
     .ent-input,
-    .form-control,
     .form-select {
         border: 1px solid var(--ent-grid-border) !important;
         border-radius: 10px !important;
@@ -565,7 +575,7 @@
     <div class="modal-dialog modal-dialog-centered modal-xl" role="document">
         <div class="modal-content modal-ent-content">
             <div class="position-absolute top-0 end-0 mt-3 me-3" style="z-index: 10;">
-                <button class="btn-close shadow-sm rounded-circle p-2" data-bs-dismiss="modal" aria-label="Close"></button>
+                <!-- <button class="btn-close shadow-sm rounded-circle p-2" data-bs-dismiss="modal" aria-label="Close"></button> -->
             </div>
             <div id="menu-poliklinik"></div>
         </div>

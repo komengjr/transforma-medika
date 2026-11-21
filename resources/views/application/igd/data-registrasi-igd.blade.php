@@ -13,7 +13,7 @@
 <style>
     /* =========================================
        MODERN ENTERPRISE HEALTHCARE UI STYLES
-       (SYNCED WITH LIST-PASIEN-REGISTRASI UI)
+       (ADAPTIVE LIGHT & DARK MODE BOOTSTRAP 5)
        ========================================= */
     :root {
         --ent-indigo: #4f46e5;
@@ -24,6 +24,22 @@
         --ent-sky: #0284c7;
         --ent-amber: #d97706;
         --ent-rose: #e11d48;
+        --ent-solid-bg: #ffffff;
+        --ent-solid-text: #0f172a;
+        --ent-action-bg: #eef2ff;
+        --ent-action-color: #3730a3;
+        --ent-action-hover-bg: #4f46e5;
+        --ent-action-hover-color: #ffffff;
+    }
+
+    [data-bs-theme="dark"],
+    .dark {
+        --ent-solid-bg: #0f172a;
+        --ent-solid-text: #f8fafc;
+        --ent-action-bg: #1e293b;
+        --ent-action-color: #a5b4fc;
+        --ent-action-hover-bg: #4f46e5;
+        --ent-action-hover-color: #ffffff;
     }
 
     body {
@@ -35,13 +51,17 @@
         border: 1px solid var(--ent-grid-border);
         border-radius: 16px;
         box-shadow: 0 4px 20px -2px rgba(15, 23, 42, 0.08);
-        background-color: transparent;
+        background-color: var(--bs-body-bg, var(--ent-solid-bg));
         overflow: hidden;
     }
 
-    .ent-card > .card-header {
-        background-color: transparent !important;
+    .ent-card>.card-header {
+        background-color: rgba(79, 70, 229, 0.05) !important;
         border-bottom: 1px solid var(--ent-grid-border) !important;
+    }
+
+    .ent-table-surface {
+        background-color: var(--bs-body-bg, var(--ent-solid-bg));
     }
 
     /* Hero Banner */
@@ -131,8 +151,19 @@
         background: transparent;
     }
 
+
+    .form-control {
+        border: 1px solid var(--ent-grid-border) !important;
+        border-radius: 10px !important;
+        font-weight: 600 !important;
+        color: var(--bs-body-color) !important;
+        background-color: var(--bs-body-bg) !important;
+        font-size: 0.82rem !important;
+        min-height: 38px;
+        transition: all 0.2s ease;
+    }
+
     .ent-input,
-    .form-control,
     .form-select {
         border: 1px solid var(--ent-grid-border) !important;
         border-radius: 10px !important;
@@ -152,31 +183,33 @@
     .form-select:focus {
         border-color: var(--ent-indigo) !important;
         box-shadow: 0 0 0 3.5px rgba(79, 70, 229, 0.15) !important;
-        outline: none;
+        /* outline: none; */
     }
 
-    /* Select2 Adaptive Styling */
+    /* Select2 Adaptive & Solid Dropdown Styling */
     .form-floating-custom .select2-container--bootstrap-5 .select2-selection {
         height: 44px !important;
         padding-top: 16px !important;
         padding-bottom: 4px !important;
         padding-left: 8px !important;
         border-radius: 10px !important;
-        background-color: var(--bs-body-bg) !important;
+        background-color: var(--ent-solid-bg) !important;
         border: 1px solid var(--ent-grid-border) !important;
+        opacity: 1 !important;
         transition: all 0.2s ease;
     }
 
     .form-floating-custom .select2-container--bootstrap-5.select2-container--focus .select2-selection,
     .form-floating-custom .select2-container--bootstrap-5.select2-container--open .select2-selection {
         border-color: var(--ent-indigo) !important;
+        background-color: var(--ent-solid-bg) !important;
         box-shadow: 0 0 0 3.5px rgba(79, 70, 229, 0.15) !important;
     }
 
     .form-floating-custom .select2-container--bootstrap-5 .select2-selection--single .select2-selection__rendered {
         font-size: 0.8rem !important;
         font-weight: 600 !important;
-        color: var(--bs-body-color) !important;
+        color: var(--ent-solid-text) !important;
         padding-left: 3px !important;
         line-height: 1.5 !important;
     }
@@ -185,19 +218,48 @@
         top: 10px !important;
     }
 
+    .select2-container--bootstrap-5 .select2-dropdown {
+        border: 1px solid var(--ent-grid-border) !important;
+        border-radius: 10px !important;
+        background-color: var(--ent-solid-bg) !important;
+        color: var(--ent-solid-text) !important;
+        opacity: 1 !important;
+        box-shadow: 0 12px 28px -6px rgba(15, 23, 42, 0.24) !important;
+    }
+
+    .select2-container--bootstrap-5 .select2-search--dropdown,
+    .select2-container--bootstrap-5 .select2-results__options,
+    .select2-container--bootstrap-5 .select2-results__option {
+        background-color: var(--ent-solid-bg) !important;
+        color: var(--ent-solid-text) !important;
+    }
+
+    .select2-container--bootstrap-5 .select2-search--dropdown .select2-search__field {
+        border: 1px solid var(--ent-grid-border) !important;
+        border-radius: 8px !important;
+        background-color: var(--ent-solid-bg) !important;
+        color: var(--ent-solid-text) !important;
+        font-size: 0.8rem !important;
+    }
+
+    .select2-container--bootstrap-5 .select2-results__option--highlighted,
+    .select2-container--bootstrap-5 .select2-results__option--selected {
+        background-color: var(--ent-indigo) !important;
+        color: #ffffff !important;
+    }
+
     /* =========================================================
-       WHITE TABLE WITH COLORED GRID BORDERS & FULL ACTION CELL
+       ADAPTIVE TABLE WITH COLORED GRID BORDERS & SOLID ACTION CELL
        ========================================================= */
     .table-custom {
         width: 100% !important;
         border-collapse: collapse !important;
         margin-bottom: 0 !important;
-
     }
 
     .table-custom thead th {
-        /* background-color: #f1f5f9 !important; */
-        color: #0f172a !important;
+        background-color: rgba(79, 70, 229, 0.11) !important;
+        color: var(--bs-body-color) !important;
         font-size: 0.72rem;
         font-weight: 700;
         text-transform: uppercase;
@@ -216,24 +278,23 @@
     }
 
     .table-custom tbody tr {
-        /* background-color: #ffffff !important; */
         transition: background-color 0.15s ease;
         height: 1px;
     }
 
     .table-custom tbody tr:hover,
-    .table-custom tbody tr:hover td {
-        background-color: rgba(79, 70, 229, 0.05) !important;
+    .table-custom tbody tr:hover td:not(.action-cell-full) {
+        background-color: rgba(79, 70, 229, 0.06) !important;
     }
 
     .table-custom td {
-        /* background-color: #ffffff !important; */
         border: 1px solid var(--ent-grid-border) !important;
         font-weight: 500;
-        color: #0f172a !important;
+        color: var(--bs-body-color) !important;
         padding: 11px 12px;
         vertical-align: middle;
         font-size: 0.83rem;
+        background-color: transparent;
     }
 
     .table-custom tbody td:first-child {
@@ -244,18 +305,19 @@
         border-right: none !important;
     }
 
-    /* FULL-CELL ACTION BUTTON STYLING */
+    /* SOLID FULL-CELL ACTION BUTTON STYLING (NON-TRANSPARENT) */
     .table-custom td.action-cell-full {
         padding: 0 !important;
         height: 100%;
         vertical-align: stretch !important;
+        background-color: var(--ent-action-bg) !important;
     }
 
-    .table-custom td.action-cell-full > .btn,
-    .table-custom td.action-cell-full > .btn-group,
-    .table-custom td.action-cell-full > .dropdown,
-    .table-custom td.action-cell-full > a,
-    .table-custom td.action-cell-full > button {
+    .table-custom td.action-cell-full>.btn,
+    .table-custom td.action-cell-full>.btn-group,
+    .table-custom td.action-cell-full>.dropdown,
+    .table-custom td.action-cell-full>a,
+    .table-custom td.action-cell-full>button {
         display: flex !important;
         align-items: center;
         justify-content: center;
@@ -265,37 +327,40 @@
         border-radius: 0 !important;
         margin: 0 !important;
         border: none !important;
-        background-color: rgba(79, 70, 229, 0.12) !important;
-        color: #4f46e5 !important;
+        background-color: var(--ent-action-bg) !important;
+        color: var(--ent-action-color) !important;
+        opacity: 1 !important;
         font-weight: 700 !important;
         font-size: 0.8rem !important;
-        box-shadow: none !important;
-        transition: all 0.15s ease;
+        box-shadow: inset 0 0 0 1px rgba(79, 70, 229, 0.16);
+        transition: background-color 0.15s ease, color 0.15s ease;
     }
 
-    .table-custom td.action-cell-full > .btn:hover,
-    .table-custom td.action-cell-full > a:hover,
-    .table-custom td.action-cell-full > button:hover {
-        background-color: var(--ent-indigo) !important;
-        /* color: #ffffff !important; */
+    .table-custom td.action-cell-full>.btn:hover,
+    .table-custom td.action-cell-full>a:hover,
+    .table-custom td.action-cell-full>button:hover,
+    .table-custom tbody tr:hover td.action-cell-full>.btn,
+    .table-custom tbody tr:hover td.action-cell-full>a,
+    .table-custom tbody tr:hover td.action-cell-full>button {
+        background-color: var(--ent-action-hover-bg) !important;
+        color: var(--ent-action-hover-color) !important;
+        opacity: 1 !important;
     }
 
     /* DataTables Top & Bottom Controls Padding */
-    #table-registrasi-igd_wrapper > .row:first-child,
+    #table-registrasi-igd_wrapper>.row:first-child,
     #table-registrasi-igd_wrapper .dt-layout-row:first-child {
         padding: 16px 20px 12px 20px;
         margin: 0 !important;
-        /* background-color: #ffffff; */
-        color: #0f172a;
+        color: var(--bs-body-color);
     }
 
-    #table-registrasi-igd_wrapper > .row:last-child,
+    #table-registrasi-igd_wrapper>.row:last-child,
     #table-registrasi-igd_wrapper .dt-layout-row:last-child {
         padding: 14px 20px 18px 20px;
         margin: 0 !important;
         border-top: 1px solid var(--ent-grid-border);
-        /* background-color: #ffffff; */
-        color: #0f172a;
+        color: var(--bs-body-color);
     }
 
     #table-registrasi-igd_wrapper .dt-layout-table {
@@ -309,8 +374,8 @@
         padding: 6px 12px !important;
         font-size: 0.82rem !important;
         height: 36px !important;
-        /* background-color: #ffffff !important; */
-        color: #0f172a !important;
+        background-color: var(--bs-body-bg) !important;
+        color: var(--bs-body-color) !important;
     }
 
     #table-registrasi-igd_wrapper .dataTables_filter input:focus,
@@ -327,20 +392,20 @@
         padding: 4px 28px 4px 10px !important;
         height: 34px !important;
         font-size: 0.82rem !important;
-        /* background-color: #ffffff !important; */
-        color: #0f172a !important;
+        background-color: var(--bs-body-bg) !important;
+        color: var(--bs-body-color) !important;
     }
 
     .page-item.active .page-link {
         background-color: var(--ent-indigo) !important;
         border-color: var(--ent-indigo) !important;
-        /* color: #ffffff !important; */
+        color: #ffffff !important;
         border-radius: 8px;
     }
 
     .page-link {
-        color: #0f172a;
-        background-color: #ffffff;
+        color: var(--bs-body-color);
+        background-color: var(--bs-body-bg);
         border-radius: 8px;
         margin: 0 2px;
         border: 1px solid var(--ent-grid-border);
@@ -364,7 +429,7 @@
         border: 1px solid var(--ent-grid-border) !important;
         border-radius: 18px !important;
         box-shadow: 0 25px 50px -12px rgba(15, 23, 42, 0.35) !important;
-        background-color: var(--bs-body-bg);
+        background-color: var(--bs-body-bg, var(--ent-solid-bg));
         color: var(--bs-body-color);
         overflow: hidden;
     }
@@ -388,10 +453,10 @@
                                 <span class="ent-badge" style="background: rgba(244, 63, 94, 0.22); border: 1px solid rgba(244, 63, 94, 0.45); color: #fda4af;">
                                     <i class="fas fa-heartbeat me-1"></i> UNIT GAWAT DARURAT
                                 </span>
-                                <span style="color: #94a3b8; font-size: 0.75rem; font-weight: 600;">Emergency & Triage Care</span>
+                                <span style="color: #94a3b8; font-size: 0.75rem; font-weight: 600;">Emergency &amp; Triage Care</span>
                             </div>
                             <h4 class="fw-bold mb-0 text-white" style="letter-spacing: -0.02em;">
-                                List Registrasi & <span class="fw-normal" style="color: #cbd5e1;">Penanganan IGD</span>
+                                List Registrasi &amp; <span class="fw-normal" style="color: #cbd5e1;">Penanganan IGD</span>
                             </h4>
                         </div>
                     </div>
@@ -409,7 +474,7 @@
     </div>
 </div>
 
-<!-- MAIN DATA TABLE CARD (TRANSPARENT FILTER HEADER + WHITE TABLE BODY + COLORED GRID) -->
+<!-- MAIN DATA TABLE CARD -->
 <div class="ent-card mb-3">
     <div class="card-header py-3 px-3 px-md-4">
         <form id="form-filter" onsubmit="event.preventDefault(); reloadTable();" class="row align-items-center g-2">
@@ -517,14 +582,14 @@
         </form>
     </div>
 
-    <div class="card-body p-0 bg-white">
+    <div class="card-body p-0 ent-table-surface">
         <div class="table-responsive pb-3">
             <table id="table-registrasi-igd" class="table table-custom align-middle w-100 mb-0 pb-3">
                 <thead>
                     <tr>
                         <th class="text-center" style="width: 50px;">No</th>
                         <th>No. Registrasi</th>
-                        <th>Pasien & RM</th>
+                        <th>Pasien &amp; RM</th>
                         <th>Tanggal Masuk</th>
                         <th>Dokter Pemeriksa</th>
                         <th>Ruangan / Poli IGD</th>
@@ -546,9 +611,7 @@
 <div class="modal fade" id="modal-handling-igd" data-bs-keyboard="false" data-bs-backdrop="static" tabindex="-1" aria-hidden="true">
     <div class="modal-dialog modal-dialog-centered modal-xl" role="document">
         <div class="modal-content modal-ent-content">
-            <div class="position-absolute top-0 end-0 mt-3 me-3" style="z-index: 10;">
-                <!-- <button class="btn-close shadow-sm rounded-circle p-2" data-bs-dismiss="modal" aria-label="Close"></button> -->
-            </div>
+            <div class="position-absolute top-0 end-0 mt-3 me-3" style="z-index: 10;"></div>
             <div id="menu-handling-igd"></div>
         </div>
     </div>
@@ -566,7 +629,6 @@
 <script>
     let tableIgd;
     $(document).ready(function() {
-        // Inisialisasi Select2 Filter
         $('#poli_id, #dokter, #sub_penjamin_id').select2({
             theme: 'bootstrap-5',
             width: '100%',
@@ -656,7 +718,6 @@
             }
         });
 
-        // Otomatis reload tabel saat filter berubah
         $('#start_date, #end_date, #poli_id, #dokter, #sub_penjamin_id').on('change', function() {
             reloadTable();
         });
@@ -665,7 +726,6 @@
             reloadTable();
         });
 
-        // Reset & Refresh Data
         $('#button-refresh-igd').on('click', function(e) {
             e.preventDefault();
             const today = new Date().toISOString().split('T')[0];
@@ -683,7 +743,6 @@
         tableIgd.ajax.reload(null, false);
     }
 
-    // Event handler klik tombol handling pada tabel (kompatibel dengan selector lama & baru)
     $(document).on("click", "#table-registrasi-igd .retro-btn-primary, #table-registrasi-igd .action-cell-full .btn, #table-registrasi-igd .action-cell-full button, #table-registrasi-igd .action-cell-full a", function(e) {
         e.preventDefault();
         var code = $(this).data("code");

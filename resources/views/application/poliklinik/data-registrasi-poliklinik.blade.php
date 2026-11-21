@@ -50,7 +50,7 @@
         overflow: hidden;
     }
 
-    .ent-card > .card-header {
+    .ent-card>.card-header {
         border-bottom: 1px solid var(--ent-grid-border) !important;
     }
 
@@ -143,8 +143,18 @@
         z-index: 5;
     }
 
+    .form-control {
+        border: 1px solid var(--ent-grid-border) !important;
+        border-radius: 10px !important;
+        font-weight: 600 !important;
+        color: var(--bs-body-color) !important;
+        background-color: var(--bs-body-bg) !important;
+        font-size: 0.82rem !important;
+        min-height: 38px;
+        transition: all 0.2s ease;
+    }
+
     .ent-input,
-    .form-control,
     .form-select {
         border: 1px solid var(--ent-grid-border) !important;
         border-radius: 10px !important;
@@ -285,17 +295,17 @@
         background-color: var(--ent-action-bg) !important;
     }
 
-    .table-custom td.action-cell-full > .dropdown,
-    .table-custom td.action-cell-full > .btn-group {
+    .table-custom td.action-cell-full>.dropdown,
+    .table-custom td.action-cell-full>.btn-group {
         display: flex !important;
         width: 100% !important;
         height: 100% !important;
         background-color: var(--ent-action-bg);
     }
 
-    .table-custom td.action-cell-full .dropdown > .btn,
-    .table-custom td.action-cell-full .btn-group > .btn,
-    .table-custom td.action-cell-full > .btn {
+    .table-custom td.action-cell-full .dropdown>.btn,
+    .table-custom td.action-cell-full .btn-group>.btn,
+    .table-custom td.action-cell-full>.btn {
         display: flex !important;
         align-items: center;
         justify-content: center;
@@ -312,25 +322,25 @@
         transition: background-color 0.15s ease, color 0.15s ease;
     }
 
-    .table-custom td.action-cell-full .dropdown > .btn:hover,
-    .table-custom td.action-cell-full .dropdown > .btn:focus,
-    .table-custom td.action-cell-full .dropdown > .btn.show,
-    .table-custom td.action-cell-full .btn-group > .btn:hover,
-    .table-custom td.action-cell-full > .btn:hover,
-    .table-custom tbody tr:hover td.action-cell-full .dropdown > .btn {
+    .table-custom td.action-cell-full .dropdown>.btn:hover,
+    .table-custom td.action-cell-full .dropdown>.btn:focus,
+    .table-custom td.action-cell-full .dropdown>.btn.show,
+    .table-custom td.action-cell-full .btn-group>.btn:hover,
+    .table-custom td.action-cell-full>.btn:hover,
+    .table-custom tbody tr:hover td.action-cell-full .dropdown>.btn {
         background-color: var(--ent-action-hover-bg) !important;
         color: var(--ent-action-hover-color) !important;
         opacity: 1 !important;
     }
 
     /* DataTables Top & Bottom Controls Padding */
-    #example_wrapper > .row:first-child,
+    #example_wrapper>.row:first-child,
     #example_wrapper .dt-layout-row:first-child {
         padding: 16px 20px 12px 20px;
         margin: 0 !important;
     }
 
-    #example_wrapper > .row:last-child,
+    #example_wrapper>.row:last-child,
     #example_wrapper .dt-layout-row:last-child {
         padding: 14px 20px 18px 20px;
         margin: 0 !important;
