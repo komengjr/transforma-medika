@@ -3,6 +3,9 @@
 @section('base.css')
 <link rel="stylesheet" href="https://cdn.datatables.net/2.2.2/css/dataTables.bootstrap5.css">
 <link href="{{ asset('vendors/choices/choices.min.css') }}" rel="stylesheet" />
+<link href="https://cdn.jsdelivr.net/npm/select2@4.1.0-rc.0/dist/css/select2.min.css" rel="stylesheet" />
+<link href="https://cdn.jsdelivr.net/npm/select2-bootstrap-5-theme@1.3.0/dist/select2-bootstrap-5-theme.min.css" rel="stylesheet" />
+<link href="https://cdn.jsdelivr.net/npm/flatpickr/dist/flatpickr.min.css" rel="stylesheet" />
 <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
 <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&family=JetBrains+Mono:wght@500;700&display=swap" rel="stylesheet">
 
@@ -20,6 +23,14 @@
         --ent-sky: #0284c7;
         --ent-amber: #d97706;
         --ent-rose: #e11d48;
+        --ent-solid-bg: #ffffff;
+        --ent-solid-text: #0f172a;
+    }
+
+    [data-bs-theme="dark"],
+    .dark {
+        --ent-solid-bg: #0f172a;
+        --ent-solid-text: #f8fafc;
     }
 
     body {
@@ -77,8 +88,8 @@
         border: 1px solid var(--ent-grid-border) !important;
         border-radius: 10px !important;
         font-weight: 600;
-        color: var(--bs-body-color) !important;
-        background-color: var(--bs-body-bg) !important;
+        color: var(--ent-solid-text) !important;
+        background-color: var(--ent-solid-bg) !important;
         font-size: 0.82rem;
         transition: all 0.2s ease;
     }
@@ -88,6 +99,76 @@
         box-shadow: 0 0 0 3.5px rgba(79, 70, 229, 0.15) !important;
         border-color: var(--ent-indigo) !important;
         outline: none;
+    }
+
+    /* Flatpickr & Select2 Solid / Absolut Styling */
+    .flatpickr-input[readonly] {
+        background-color: var(--ent-solid-bg) !important;
+        cursor: pointer;
+    }
+
+    .select2-container--bootstrap-5 .select2-selection {
+        border: 1px solid var(--ent-grid-border) !important;
+        border-radius: 10px !important;
+        font-weight: 600;
+        color: var(--ent-solid-text) !important;
+        background-color: var(--ent-solid-bg) !important;
+        opacity: 1 !important;
+        font-size: 0.82rem;
+        min-height: 36px;
+        padding-top: 0.22rem;
+        padding-bottom: 0.22rem;
+        transition: all 0.2s ease;
+    }
+
+    .select2-container--bootstrap-5 .select2-selection--single .select2-selection__rendered {
+        color: var(--ent-solid-text) !important;
+    }
+
+    .select2-container--bootstrap-5.select2-container--focus .select2-selection,
+    .select2-container--bootstrap-5.select2-container--open .select2-selection {
+        border-color: var(--ent-indigo) !important;
+        background-color: var(--ent-solid-bg) !important;
+        box-shadow: 0 0 0 3.5px rgba(79, 70, 229, 0.15) !important;
+    }
+
+    .select2-container--bootstrap-5 .select2-dropdown {
+        border: 1px solid var(--ent-grid-border) !important;
+        border-radius: 10px !important;
+        background-color: var(--ent-solid-bg) !important;
+        color: var(--ent-solid-text) !important;
+        opacity: 1 !important;
+        font-size: 0.82rem;
+        box-shadow: 0 12px 28px -6px rgba(15, 23, 42, 0.24) !important;
+    }
+
+    .select2-container--bootstrap-5 .select2-search--dropdown {
+        background-color: var(--ent-solid-bg) !important;
+    }
+
+    .select2-container--bootstrap-5 .select2-search--dropdown .select2-search__field {
+        border: 1px solid var(--ent-grid-border) !important;
+        border-radius: 8px !important;
+        background-color: var(--ent-solid-bg) !important;
+        color: var(--ent-solid-text) !important;
+        opacity: 1 !important;
+        font-size: 0.82rem;
+    }
+
+    .select2-container--bootstrap-5 .select2-results__options {
+        background-color: var(--ent-solid-bg) !important;
+        color: var(--ent-solid-text) !important;
+    }
+
+    .select2-container--bootstrap-5 .select2-results__option {
+        background-color: var(--ent-solid-bg) !important;
+        color: var(--ent-solid-text) !important;
+    }
+
+    .select2-container--bootstrap-5 .select2-results__option--highlighted,
+    .select2-container--bootstrap-5 .select2-results__option--selected {
+        background-color: var(--ent-indigo) !important;
+        color: #ffffff !important;
     }
 
     .input-group-text-ent {
@@ -211,7 +292,7 @@
                             </span>
                             <span style="color: #94a3b8; font-size: 0.75rem; font-weight: 600;">Unit Pelayanan Rawat Jalan</span>
                         </div>
-                        <h4 class="fw-bold mb-0 text-white" style="letter-spacing: -0.02em;">Poliklinik Handling System</h4>
+                        <h4 class="fw-bold mb-0" style="letter-spacing: -0.02em; color: #ffffff;">Poliklinik Handling System</h4>
                     </div>
                 </div>
                 <div class="text-end">
@@ -237,21 +318,21 @@
                         <i class="fas fa-filter text-primary"></i> Filter Pencarian
                     </h6>
                 </div>
-                <div class="card-body p-3  bg-white">
+                <div class="card-body p-3 bg-white">
                     <!-- Form Filter -->
                     <form method="GET" action="{{ url()->current() }}">
                         <div class="row g-2.5">
                             <div class="col-6">
                                 <label class="fw-semibold small text-uppercase opacity-75 mb-1" style="font-size: 0.68rem;">Mulai Tanggal</label>
-                                <input type="date" name="start_date" class="form-control form-control-ent form-control-sm" value="{{ $request->start_date ?? date('Y-m-d') }}">
+                                <input type="text" id="start_date" name="start_date" class="form-control form-control-ent form-control-sm flatpickr-date" value="{{ $request->start_date ?? date('Y-m-d') }}" placeholder="Pilih tanggal...">
                             </div>
                             <div class="col-6">
                                 <label class="fw-semibold small text-uppercase opacity-75 mb-1" style="font-size: 0.68rem;">Sampai Tanggal</label>
-                                <input type="date" name="end_date" class="form-control form-control-ent form-control-sm" value="{{ $request->end_date ?? date('Y-m-d') }}">
+                                <input type="text" id="end_date" name="end_date" class="form-control form-control-ent form-control-sm flatpickr-date" value="{{ $request->end_date ?? date('Y-m-d') }}" placeholder="Pilih tanggal...">
                             </div>
                             <div class="col-12 mt-2">
                                 <label class="fw-semibold small text-uppercase opacity-75 mb-1" style="font-size: 0.68rem;">Poliklinik</label>
-                                <select name="poli_id" class="form-select form-select-ent form-select-sm">
+                                <select id="poli_id" name="poli_id" class="form-select form-select-ent form-select-sm select2-poli">
                                     <option value="">-- Semua Poliklinik --</option>
                                     @foreach($polis ?? [] as $poli)
                                     <option value="{{ $poli->id }}" {{ ($request->poli_id == $poli->id) ? 'selected' : '' }}>
@@ -287,7 +368,7 @@
                         {{ count($data) }} Pasien
                     </span>
                 </div>
-                <div class="card-body p-3  bg-white">
+                <div class="card-body p-3 bg-white">
                     <!-- Patients List -->
                     <div class="patient-list-container pe-1" style="max-height: 52vh; overflow-y: auto;">
                         @forelse ($data as $datas)
@@ -349,10 +430,30 @@
 <script src="https://cdn.datatables.net/2.2.2/js/dataTables.js"></script>
 <script src="https://cdn.datatables.net/2.2.2/js/dataTables.bootstrap5.js"></script>
 <script src="{{ asset('vendors/choices/choices.min.js') }}"></script>
+<script src="https://cdn.jsdelivr.net/npm/select2@4.1.0-rc.0/dist/js/select2.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/flatpickr"></script>
+<script src="https://cdn.jsdelivr.net/npm/flatpickr/dist/l10n/id.js"></script>
 <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
 
 <script>
     $(document).ready(function() {
+        // Inisialisasi Select2 pada dropdown Poliklinik agar bisa diketik/dicari
+        $('.select2-poli').select2({
+            theme: 'bootstrap-5',
+            placeholder: '-- Semua Poliklinik --',
+            allowClear: true,
+            width: '100%'
+        });
+
+        // Inisialisasi Flatpickr pada input tanggal
+        flatpickr('.flatpickr-date', {
+            locale: 'id',
+            dateFormat: 'Y-m-d',
+            altInput: true,
+            altFormat: 'd-m-Y',
+            allowInput: true
+        });
+
         const loaderHtml = `
             <div class="ent-card d-flex flex-column justify-content-center align-items-center py-5 h-100" style="min-height: 460px;">
                 <div class="spinner-border text-primary mb-3" style="width: 2.6rem; height: 2.6rem;" role="status">
@@ -365,7 +466,6 @@
         $(document).on("click", ".button-handling-pasien-poli", function(e) {
             e.preventDefault();
             const $this = $(this);
-            // Ambil nomor registrasi dari parameter
             const code = $this.data("code");
 
             $(".button-handling-pasien-poli").removeClass("active-patient");
@@ -373,7 +473,6 @@
 
             $('#menu-detail-handling').html(loaderHtml);
 
-            // Pastikan URL route mengarah ke controller detail handling yang telah diperbarui
             $.ajax({
                 url: "{{ route('data_registrasi_poliklinik_handling_detail') }}",
                 type: "POST",

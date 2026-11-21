@@ -49,7 +49,7 @@
     <link href="{{ asset('asset/css/user-rtl.min.css') }}" rel="stylesheet" id="user-style-rtl">
     <link href="{{ asset('asset/css/user.min.css') }}" rel="stylesheet" id="user-style-default">
 
-    <!-- Custom Global Font, Search & Mobile Floating Navbar Styling -->
+    <!-- Custom Global Font, Search & Top Navbar Profile Bar Styling -->
     <style>
         body,
         .font-base,
@@ -71,28 +71,60 @@
             font-family: 'Outfit', sans-serif !important;
         }
 
+        /* Top navbar tetap fixed di atas pada layar mobile maupun desktop */
+        .navbar-top {
+            position: sticky;
+            top: 0;
+            z-index: 1030;
+            min-height: 58px;
+        }
+
+        /* Presisi posisi icon search dan teks di dalam input */
+        .navbar-menu-search-box .search-box {
+            position: relative;
+            width: 100%;
+        }
+
+        .navbar-menu-search-box .search-box-icon {
+            position: absolute;
+            left: 0.78rem;
+            top: 50%;
+            transform: translateY(-50%);
+            font-size: 0.82rem;
+            line-height: 1;
+            pointer-events: none;
+            z-index: 4;
+            transition: opacity 0.15s ease;
+        }
+
+        .navbar-menu-search-box .search-input {
+            padding-left: 2.15rem !important;
+            padding-right: 1.95rem !important;
+            line-height: 1.25;
+        }
+
         /* Sembunyikan icon search saat user mengetik agar tidak mengganggu teks */
         .search-box.has-query .search-box-icon {
             opacity: 0 !important;
             visibility: hidden !important;
-            pointer-events: none;
-            transition: opacity 0.15s ease;
         }
 
         .search-box.has-query .search-input {
             padding-left: 0.85rem !important;
         }
 
-        /* Flex search-box mobile agar menyesuaikan ruang secara otomatis */
+        /* Search-box tengah pada mode flex */
         .mobile-search-flex {
             min-width: 0;
             flex: 1 1 auto;
+            display: flex;
+            align-items: center;
         }
 
         .mobile-search-flex .search-input {
             height: 36px;
-            font-size: 0.85rem;
-            padding-right: 1.9rem;
+            font-size: 0.84rem;
+            border-radius: 999px;
         }
 
         .mobile-search-flex .dropdown-menu {
@@ -135,53 +167,44 @@
             line-height: 1.3;
         }
 
-        /* Tombol melayang pojok kanan bawah dengan gambar profile di mobile */
-        .mobile-fab-container {
-            position: fixed;
-            right: 18px;
-            bottom: 18px;
-            z-index: 1055;
-        }
-
-        .mobile-fab-btn {
-            width: 52px;
-            height: 52px;
+        /* Tombol profil di ujung kanan atas mode mobile sejajar di tengah */
+        .mobile-top-profile-btn {
+            width: 36px;
+            height: 36px;
             border-radius: 50%;
             padding: 0;
-            box-shadow: 0 10px 25px rgba(15, 23, 42, 0.25);
-            display: flex;
+            overflow: hidden;
+            border: 2px solid rgba(44, 123, 229, 0.35);
+            display: inline-flex;
             align-items: center;
             justify-content: center;
-            font-size: 1.15rem;
-            overflow: hidden;
-            border: 2px solid #fff;
-            transition: transform 0.2s ease, box-shadow 0.2s ease;
+            transition: transform 0.15s ease, border-color 0.15s ease;
         }
 
-        .mobile-fab-btn img {
+        .mobile-top-profile-btn img {
             width: 100%;
             height: 100%;
             object-fit: cover;
             border-radius: 50%;
         }
 
-        .mobile-fab-btn:active {
-            transform: scale(0.95);
+        .mobile-top-profile-btn:hover {
+            border-color: #2c7be5;
         }
 
-        /* Floating navbar bergaya pesan yang muncul di atas tombol */
+        /* Floating bar / panel profil & aksi yang muncul di bawah kanan atas saat ikon profil diklik */
         .mobile-message-navbar {
             position: fixed;
-            right: 18px;
-            bottom: 80px;
+            right: 12px;
+            top: 62px;
             width: 280px;
-            max-width: calc(100vw - 36px);
+            max-width: calc(100vw - 24px);
             z-index: 1060;
             border-radius: 18px;
             box-shadow: 0 16px 38px rgba(15, 23, 42, 0.18);
-            transform-origin: bottom right;
+            transform-origin: top right;
             opacity: 0;
-            transform: translateY(12px) scale(0.95);
+            transform: translateY(-10px) scale(0.95);
             pointer-events: none;
             transition: opacity 0.2s ease, transform 0.2s cubic-bezier(0.16, 1, 0.3, 1);
         }
@@ -437,16 +460,17 @@
 
                 <nav class="navbar navbar-light navbar-glass navbar-top navbar-expand">
                     <div class="d-flex align-items-center w-100 gap-2">
-                        <button class="btn navbar-toggler-humburger-icon navbar-toggler flex-shrink-0" type="button" data-bs-toggle="collapse" data-bs-target="#navbarVerticalCollapse" aria-controls="navbarVerticalCollapse" aria-expanded="false" aria-label="Toggle Navigation">
+                        <!-- KIRI: COLSPAN / TOGGLE SIDEBAR -->
+                        <button class="btn navbar-toggler-humburger-icon navbar-toggler flex-shrink-0 my-0" type="button" data-bs-toggle="collapse" data-bs-target="#navbarVerticalCollapse" aria-controls="navbarVerticalCollapse" aria-expanded="false" aria-label="Toggle Navigation">
                             <span class="navbar-toggle-icon"><span class="toggle-line"></span></span>
                         </button>
 
-                        <!-- MOBILE: SEARCH BOX MENU (FLEX OTOMATIS) -->
-                        <div class="d-block d-lg-none navbar-menu-search-box mobile-search-flex" id="navbarMenuSearchBoxMobile">
+                        <!-- TENGAH (MOBILE): SEARCH BOX MENU PRESISI DI TENGAH -->
+                        <div class="d-lg-none navbar-menu-search-box mobile-search-flex" id="navbarMenuSearchBoxMobile">
                             <div class="search-box" data-list='{"valueNames":["title"]}'>
-                                <form class="position-relative" data-bs-toggle="search" data-bs-display="static" onsubmit="return false;">
+                                <form class="position-relative d-flex align-items-center m-0" data-bs-toggle="search" data-bs-display="static" onsubmit="return false;">
                                     <input class="form-control search-input fuzzy-search navbar-menu-search-input" id="navbarMenuSearchInputMobile" type="search" placeholder="Cari menu..." aria-label="Search" autocomplete="off" />
-                                    <!-- <span class="fas fa-search search-box-icon"></span> -->
+                                    <span class="fas fa-search search-box-icon"></span>
                                 </form>
                                 <div class="btn-close-falcon-container position-absolute end-0 top-50 translate-middle shadow-none" data-bs-dismiss="search">
                                     <div class="btn-close-falcon" aria-label="Close"></div>
@@ -473,13 +497,13 @@
                             </div>
                         </div>
 
-                        <!-- DESKTOP: SEARCH BOX MENU -->
-                        <ul class="navbar-nav align-items-center d-none d-lg-block mb-0">
+                        <!-- TENGAH (DESKTOP): SEARCH BOX MENU -->
+                        <ul class="navbar-nav align-items-center d-none d-lg-flex mb-0">
                             <li class="nav-item">
                                 <div class="search-box navbar-menu-search-box" id="navbarMenuSearchBox" data-list='{"valueNames":["title"]}'>
-                                    <form class="position-relative" data-bs-toggle="search" data-bs-display="static" onsubmit="return false;">
+                                    <form class="position-relative d-flex align-items-center m-0" data-bs-toggle="search" data-bs-display="static" onsubmit="return false;">
                                         <input class="form-control search-input fuzzy-search navbar-menu-search-input" id="navbarMenuSearchInput" type="search" placeholder="Cari menu..." aria-label="Search" autocomplete="off" />
-                                        <!-- <span class="fas fa-search search-box-icon"></span> -->
+                                        <span class="fas fa-search search-box-icon"></span>
                                     </form>
                                     <div class="btn-close-falcon-container position-absolute end-0 top-50 translate-middle shadow-none" data-bs-dismiss="search">
                                         <div class="btn-close-falcon" aria-label="Close"></div>
@@ -507,7 +531,15 @@
                             </li>
                         </ul>
 
-                        <!-- DESKTOP: 3 BUTTON KANAN -->
+                        <!-- KANAN ATAS UJUNG (MOBILE): ICON PROFIL PEMICU BAR PROFIL -->
+                        <div class="d-flex align-items-center d-lg-none flex-shrink-0">
+                            <button class="btn mobile-top-profile-btn" id="mobileFabToggleBtn" type="button" aria-expanded="false" aria-label="Buka Bar Profil & Menu">
+                                <img src="{{ asset('img/pp.png') }}" alt="Profile" id="mobileFabProfileImg" />
+                                <!-- <span class="fas fa-times d-none" id="mobileFabCloseIcon"></span> -->
+                            </button>
+                        </div>
+
+                        <!-- KANAN ATAS UJUNG (DESKTOP): 3 BUTTON KANAN -->
                         <ul class="navbar-nav navbar-nav-icons ms-auto flex-row align-items-center d-none d-lg-flex flex-shrink-0 mb-0">
                             <li class="nav-item">
                                 <div class="theme-control-toggle fa-icon-wait px-2">
@@ -565,6 +597,100 @@
                     </div>
                 </nav>
 
+                <!-- MOBILE: BAR PROFIL & AKSI MUNCUL DI BAWAH KANAN ATAS -->
+                <div class="d-lg-none">
+                    <div class="mobile-message-navbar bg-white dark__bg-1000 border" id="mobileMessageNavbar">
+                        <div class="mobile-message-header d-flex align-items-center justify-content-between">
+                            <div class="d-flex align-items-center gap-2 min-w-0">
+                                <img class="rounded-circle border border-white flex-shrink-0" src="{{ asset('img/pp.png') }}" alt="" width="34" height="34" />
+                                <div class="min-w-0">
+                                    <div class="fw-semibold fs--1 text-truncate">{{ Auth::user()->fullname }}</div>
+                                    <div class="fs--2 opacity-75">Quick Menu</div>
+                                </div>
+                            </div>
+                            <button class="btn btn-sm text-white p-1" type="button" id="closeMobileMessageNavbar" aria-label="Tutup">
+                                <span class="fas fa-times"></span>
+                            </button>
+                        </div>
+
+                        <div class="mobile-message-item justify-content-between">
+                            <div class="d-flex align-items-center gap-2">
+                                <span class="mobile-message-icon-badge bg-soft-primary text-primary">
+                                    <span class="fas fa-adjust"></span>
+                                </span>
+                                <span class="fs--1 fw-medium">Tema Tampilan</span>
+                            </div>
+                            <div class="theme-control-toggle fa-icon-wait">
+                                <input class="form-check-input ms-0 theme-control-toggle-input" id="themeControlToggleMobile" type="checkbox" data-theme-control="theme" value="dark" />
+                                <label class="mb-0 theme-control-toggle-label theme-control-toggle-light" for="themeControlToggleMobile" title="Switch to light theme"><span class="fas fa-sun fs-0"></span></label>
+                                <label class="mb-0 theme-control-toggle-label theme-control-toggle-dark" for="themeControlToggleMobile" title="Switch to dark theme"><span class="fas fa-moon fs-0"></span></label>
+                            </div>
+                        </div>
+
+                        <a class="mobile-message-item" href="#navbarDropdownNotification" onclick="$('#mobileMessageNavbar').removeClass('show'); $('#navbarDropdownNotification').dropdown('toggle');">
+                            <span class="mobile-message-icon-badge bg-soft-info text-info">
+                                <span class="fas fa-bell"></span>
+                            </span>
+                            <div class="flex-1">
+                                <div class="fs--1 fw-medium">Notifications</div>
+                                <div class="fs--2 text-500">Lihat pemberitahuan terbaru</div>
+                            </div>
+                        </a>
+
+                        <a class="mobile-message-item" href="#!" id="button-setup-notification-mobile" data-bs-toggle="modal" data-bs-target="#modal-template-sm">
+                            <span class="mobile-message-icon-badge bg-soft-warning text-warning">
+                                <span class="fas fa-cogs"></span>
+                            </span>
+                            <div class="flex-1">
+                                <div class="fs--1 fw-medium">Set Notification</div>
+                                <div class="fs--2 text-500">Atur preferensi notifikasi</div>
+                            </div>
+                        </a>
+
+                        <a class="mobile-message-item" href="#" id="button-setup-profil-mobile" data-bs-toggle="modal" data-bs-target="#modal-template-xl">
+                            <span class="mobile-message-icon-badge bg-soft-success text-success">
+                                <span class="fas fa-user-cog"></span>
+                            </span>
+                            <div class="flex-1">
+                                <div class="fs--1 fw-medium">Profile &amp; account</div>
+                                <div class="fs--2 text-500">Kelola profil akun</div>
+                            </div>
+                        </a>
+
+                        <a class="mobile-message-item" href="#settings-offcanvas" data-bs-toggle="offcanvas" onclick="$('#mobileMessageNavbar').removeClass('show');">
+                            <span class="mobile-message-icon-badge bg-soft-primary text-primary">
+                                <span class="fas fa-sliders-h"></span>
+                            </span>
+                            <div class="flex-1">
+                                <div class="fs--1 fw-medium">Setting</div>
+                                <div class="fs--2 text-500">Pengaturan layout &amp; tema</div>
+                            </div>
+                        </a>
+
+                        @if (Auth::user()->access_code == 'master')
+                        <a class="mobile-message-item" href="{{route('master_dashboard')}}">
+                            <span class="mobile-message-icon-badge bg-soft-danger text-danger">
+                                <span class="fas fa-th-large"></span>
+                            </span>
+                            <div class="flex-1">
+                                <div class="fs--1 fw-medium">Master Page</div>
+                                <div class="fs--2 text-500">Panel administrator</div>
+                            </div>
+                        </a>
+                        @endif
+
+                        <a class="mobile-message-item" href="{{ route('logout') }}">
+                            <span class="mobile-message-icon-badge bg-soft-secondary text-700">
+                                <span class="fab fa-keycdn"></span>
+                            </span>
+                            <div class="flex-1">
+                                <div class="fs--1 fw-medium text-danger">Logout</div>
+                                <div class="fs--2 text-500">Keluar dari sesi</div>
+                            </div>
+                        </a>
+                    </div>
+                </div>
+
                 <form id="logout-form" action="{{ route('logout') }}" method="POST" class="d-none">
                     @csrf
                 </form>
@@ -587,107 +713,6 @@
             </div>
         </div>
     </main>
-
-    <!-- MOBILE: FLOATING MESSAGE NAVBAR & PROFILE BOTTOM-RIGHT BUTTON -->
-    <div class="d-lg-none">
-        <div class="mobile-message-navbar bg-white dark__bg-1000 border" id="mobileMessageNavbar">
-            <div class="mobile-message-header d-flex align-items-center justify-content-between">
-                <div class="d-flex align-items-center gap-2 min-w-0">
-                    <img class="rounded-circle border border-white flex-shrink-0" src="{{ asset('img/pp.png') }}" alt="" width="34" height="34" />
-                    <div class="min-w-0">
-                        <div class="fw-semibold fs--1 text-truncate">{{ Auth::user()->fullname }}</div>
-                        <div class="fs--2 opacity-75">Quick Menu</div>
-                    </div>
-                </div>
-                <button class="btn btn-sm text-white p-1" type="button" id="closeMobileMessageNavbar" aria-label="Tutup">
-                    <span class="fas fa-times"></span>
-                </button>
-            </div>
-
-            <div class="mobile-message-item justify-content-between">
-                <div class="d-flex align-items-center gap-2">
-                    <span class="mobile-message-icon-badge bg-soft-primary text-primary">
-                        <span class="fas fa-adjust"></span>
-                    </span>
-                    <span class="fs--1 fw-medium">Tema Tampilan</span>
-                </div>
-                <div class="theme-control-toggle fa-icon-wait">
-                    <input class="form-check-input ms-0 theme-control-toggle-input" id="themeControlToggleMobile" type="checkbox" data-theme-control="theme" value="dark" />
-                    <label class="mb-0 theme-control-toggle-label theme-control-toggle-light" for="themeControlToggleMobile" title="Switch to light theme"><span class="fas fa-sun fs-0"></span></label>
-                    <label class="mb-0 theme-control-toggle-label theme-control-toggle-dark" for="themeControlToggleMobile" title="Switch to dark theme"><span class="fas fa-moon fs-0"></span></label>
-                </div>
-            </div>
-
-            <a class="mobile-message-item" href="#navbarDropdownNotification" onclick="$('#mobileMessageNavbar').removeClass('show'); $('#navbarDropdownNotification').dropdown('toggle');">
-                <span class="mobile-message-icon-badge bg-soft-info text-info">
-                    <span class="fas fa-bell"></span>
-                </span>
-                <div class="flex-1">
-                    <div class="fs--1 fw-medium">Notifications</div>
-                    <div class="fs--2 text-500">Lihat pemberitahuan terbaru</div>
-                </div>
-            </a>
-
-            <a class="mobile-message-item" href="#!" id="button-setup-notification-mobile" data-bs-toggle="modal" data-bs-target="#modal-template-sm">
-                <span class="mobile-message-icon-badge bg-soft-warning text-warning">
-                    <span class="fas fa-cogs"></span>
-                </span>
-                <div class="flex-1">
-                    <div class="fs--1 fw-medium">Set Notification</div>
-                    <div class="fs--2 text-500">Atur preferensi notifikasi</div>
-                </div>
-            </a>
-
-            <a class="mobile-message-item" href="#" id="button-setup-profil-mobile" data-bs-toggle="modal" data-bs-target="#modal-template-xl">
-                <span class="mobile-message-icon-badge bg-soft-success text-success">
-                    <span class="fas fa-user-cog"></span>
-                </span>
-                <div class="flex-1">
-                    <div class="fs--1 fw-medium">Profile & account</div>
-                    <div class="fs--2 text-500">Kelola profil akun</div>
-                </div>
-            </a>
-
-            <a class="mobile-message-item" href="#settings-offcanvas" data-bs-toggle="offcanvas" onclick="$('#mobileMessageNavbar').removeClass('show');">
-                <span class="mobile-message-icon-badge bg-soft-primary text-primary">
-                    <span class="fas fa-sliders-h"></span>
-                </span>
-                <div class="flex-1">
-                    <div class="fs--1 fw-medium">Setting</div>
-                    <div class="fs--2 text-500">Pengaturan layout &amp; tema</div>
-                </div>
-            </a>
-
-            @if (Auth::user()->access_code == 'master')
-            <a class="mobile-message-item" href="{{route('master_dashboard')}}">
-                <span class="mobile-message-icon-badge bg-soft-danger text-danger">
-                    <span class="fas fa-th-large"></span>
-                </span>
-                <div class="flex-1">
-                    <div class="fs--1 fw-medium">Master Page</div>
-                    <div class="fs--2 text-500">Panel administrator</div>
-                </div>
-            </a>
-            @endif
-
-            <a class="mobile-message-item" href="{{ route('logout') }}">
-                <span class="mobile-message-icon-badge bg-soft-secondary text-700">
-                    <span class="fab fa-keycdn"></span>
-                </span>
-                <div class="flex-1">
-                    <div class="fs--1 fw-medium text-danger">Logout</div>
-                    <div class="fs--2 text-500">Keluar dari sesi</div>
-                </div>
-            </a>
-        </div>
-
-        <div class="mobile-fab-container">
-            <button class="btn btn-primary mobile-fab-btn" id="mobileFabToggleBtn" type="button" aria-expanded="false" aria-label="Buka Menu Profil & Pintas">
-                <img src="{{ asset('img/pp.png') }}" alt="Profile" id="mobileFabProfileImg" />
-                <span class="fas fa-times d-none" id="mobileFabCloseIcon"></span>
-            </button>
-        </div>
-    </div>
 
     <!-- Offcanvas Settings Panel -->
     <div class="offcanvas offcanvas-end settings-panel border-0" id="settings-offcanvas" tabindex="-1" aria-labelledby="settings-offcanvas">
@@ -843,7 +868,7 @@
     <script src="{{ asset('online/resumable.min.js') }}"></script>
     <script src="{{ asset('asset/notifications/js/notifications.min.js') }}"></script>
 
-    <!-- Search Box Menu Filter & Mobile Floating Message Navbar -->
+    <!-- Search Box Menu Filter & Top-Right Profile Bar -->
     <script>
         $(document).ready(function() {
             $('.navbar-menu-search-box').each(function() {
@@ -894,7 +919,7 @@
                 });
             });
 
-            // Toggle Floating Message Navbar (Mobile) dengan gambar profil
+            // Toggle Profile Bar (Mobile Kanan Atas)
             const $fabBtn = $('#mobileFabToggleBtn');
             const $fabProfileImg = $('#mobileFabProfileImg');
             const $fabCloseIcon = $('#mobileFabCloseIcon');

@@ -22,6 +22,20 @@
         --ent-sky: #0284c7;
         --ent-amber: #d97706;
         --ent-rose: #e11d48;
+        --ent-action-bg: #eef2ff;
+        --ent-action-color: #3730a3;
+        --ent-action-hover-bg: #4f46e5;
+        --ent-action-hover-color: #ffffff;
+        --ent-surface: #ffffff;
+    }
+
+    [data-bs-theme="dark"],
+    .dark {
+        --ent-action-bg: #1e293b;
+        --ent-action-color: #a5b4fc;
+        --ent-action-hover-bg: #4f46e5;
+        --ent-action-hover-color: #ffffff;
+        --ent-surface: #0f172a;
     }
 
     body {
@@ -33,13 +47,15 @@
         border: 1px solid var(--ent-grid-border);
         border-radius: 16px;
         box-shadow: 0 4px 20px -2px rgba(15, 23, 42, 0.08);
-        /* background-color: transparent; */
         overflow: hidden;
     }
 
-    .ent-card>.card-header {
-        /* background-color: transparent !important; */
+    .ent-card > .card-header {
         border-bottom: 1px solid var(--ent-grid-border) !important;
+    }
+
+    .ent-table-surface {
+        background-color: var(--bs-body-bg, var(--ent-surface));
     }
 
     /* Hero Banner */
@@ -60,7 +76,6 @@
         right: -5%;
         width: 340px;
         height: 340px;
-        /* background: radial-gradient(circle, rgba(56, 189, 248, 0.22) 0%, transparent 70%); */
         pointer-events: none;
     }
 
@@ -126,7 +141,6 @@
         color: var(--bs-secondary-color, #64748b);
         pointer-events: none;
         z-index: 5;
-        /* background: transparent; */
     }
 
     .ent-input,
@@ -206,17 +220,16 @@
     }
 
     /* =========================================================
-       TRANSPARENT TABLE WITH COLORED GRID BORDERS & FULL ACTION
+       TABLE WITH COLORED GRID BORDERS & SOLID ACTION BUTTON
        ========================================================= */
     .table-custom {
         width: 100% !important;
         border-collapse: collapse !important;
         margin-bottom: 0 !important;
-
     }
 
     .table-custom thead th {
-        background-color: rgba(79, 70, 229, 0.09) !important;
+        background-color: rgba(79, 70, 229, 0.12) !important;
         color: var(--bs-body-color) !important;
         font-size: 0.72rem;
         font-weight: 700;
@@ -237,18 +250,16 @@
     }
 
     .table-custom tbody tr {
-        /* background-color: transparent !important; */
         transition: background-color 0.15s ease;
         height: 1px;
     }
 
     .table-custom tbody tr:hover,
-    .table-custom tbody tr:hover td {
+    .table-custom tbody tr:hover td:not(.action-cell-full) {
         background-color: rgba(79, 70, 229, 0.07) !important;
     }
 
     .table-custom td {
-        /* background-color: transparent !important; */
         border: 1px solid var(--ent-grid-border) !important;
         font-weight: 500;
         color: var(--bs-body-color) !important;
@@ -266,23 +277,25 @@
         padding-right: 18px !important;
     }
 
-    /* FULL-CELL ACTION BUTTON STYLING */
+    /* SOLID FULL-CELL ACTION BUTTON STYLING (NON-TRANSPARENT) */
     .table-custom td.action-cell-full {
         padding: 0 !important;
         height: 100%;
         vertical-align: stretch !important;
+        background-color: var(--ent-action-bg) !important;
     }
 
-    .table-custom td.action-cell-full>.dropdown,
-    .table-custom td.action-cell-full>.btn-group {
+    .table-custom td.action-cell-full > .dropdown,
+    .table-custom td.action-cell-full > .btn-group {
         display: flex !important;
         width: 100% !important;
         height: 100% !important;
+        background-color: var(--ent-action-bg);
     }
 
-    .table-custom td.action-cell-full .dropdown>.btn,
-    .table-custom td.action-cell-full .btn-group>.btn,
-    .table-custom td.action-cell-full>.btn {
+    .table-custom td.action-cell-full .dropdown > .btn,
+    .table-custom td.action-cell-full .btn-group > .btn,
+    .table-custom td.action-cell-full > .btn {
         display: flex !important;
         align-items: center;
         justify-content: center;
@@ -292,32 +305,36 @@
         border-radius: 0 !important;
         margin: 0 !important;
         border: none !important;
-        background-color: rgba(79, 70, 229, 0.08);
-        color: #6366f1;
-        transition: all 0.15s ease;
+        background-color: var(--ent-action-bg) !important;
+        color: var(--ent-action-color) !important;
+        opacity: 1 !important;
+        box-shadow: inset 0 0 0 1px rgba(79, 70, 229, 0.16);
+        transition: background-color 0.15s ease, color 0.15s ease;
     }
 
-    .table-custom td.action-cell-full .dropdown>.btn:hover,
-    .table-custom td.action-cell-full .btn-group>.btn:hover,
-    .table-custom td.action-cell-full>.btn:hover {
-        background-color: var(--ent-indigo);
-        color: #ffffff;
+    .table-custom td.action-cell-full .dropdown > .btn:hover,
+    .table-custom td.action-cell-full .dropdown > .btn:focus,
+    .table-custom td.action-cell-full .dropdown > .btn.show,
+    .table-custom td.action-cell-full .btn-group > .btn:hover,
+    .table-custom td.action-cell-full > .btn:hover,
+    .table-custom tbody tr:hover td.action-cell-full .dropdown > .btn {
+        background-color: var(--ent-action-hover-bg) !important;
+        color: var(--ent-action-hover-color) !important;
+        opacity: 1 !important;
     }
 
-    /* DataTables Top & Bottom Controls Padding (Adaptive Transparent) */
-    #example_wrapper>.row:first-child,
+    /* DataTables Top & Bottom Controls Padding */
+    #example_wrapper > .row:first-child,
     #example_wrapper .dt-layout-row:first-child {
         padding: 16px 20px 12px 20px;
         margin: 0 !important;
-        /* background-color: transparent; */
     }
 
-    #example_wrapper>.row:last-child,
+    #example_wrapper > .row:last-child,
     #example_wrapper .dt-layout-row:last-child {
         padding: 14px 20px 18px 20px;
         margin: 0 !important;
         border-top: 1px solid var(--ent-grid-border);
-        /* background-color: transparent; */
     }
 
     #example_wrapper .dt-layout-table {
@@ -362,7 +379,6 @@
 
     .page-link {
         color: var(--bs-body-color);
-        /* background-color: transparent; */
         border-radius: 8px;
         margin: 0 2px;
         border: 1px solid var(--ent-grid-border);
@@ -375,14 +391,14 @@
         border: 1px solid var(--ent-grid-border) !important;
         border-radius: 12px !important;
         box-shadow: 0 10px 25px -5px rgba(15, 23, 42, 0.25) !important;
-        background-color: var(--bs-body-bg);
+        background-color: var(--bs-body-bg, #ffffff) !important;
     }
 
     .modal-ent-content {
         border: 1px solid var(--ent-grid-border) !important;
         border-radius: 18px !important;
         box-shadow: 0 25px 50px -12px rgba(15, 23, 42, 0.35) !important;
-        background-color: var(--bs-body-bg);
+        background-color: var(--bs-body-bg, #ffffff) !important;
         color: var(--bs-body-color);
         overflow: hidden;
     }
@@ -508,7 +524,7 @@
         </form>
     </div>
 
-    <div class="card-body p-0 bg-white">
+    <div class="card-body p-0 ent-table-surface">
         <div class="table-responsive pb-3">
             <table id="example" class="table table-custom align-middle mb-0 w-100">
                 <thead>
@@ -540,7 +556,7 @@
     <div class="modal-dialog modal-dialog-centered modal-xl">
         <div class="modal-content modal-ent-content">
             <div class="position-absolute top-0 end-0 mt-3 me-3" style="z-index: 10;">
-                <button class="btn-close shadow-sm rounded-circle p-2" data-bs-dismiss="modal" aria-label="Close"></button>
+                <!-- <button class="btn-close shadow-sm rounded-circle p-2" data-bs-dismiss="modal" aria-label="Close"></button> -->
             </div>
             <div id="menu-poliklinik"></div>
         </div>
