@@ -30,9 +30,14 @@ return [
         'region' => env('AWS_DEFAULT_REGION', 'us-east-1'),
     ],
     'orthanc' => [
-        'url' => env('ORTHANC_URL', 'http://192.168.61.249:8042'),
+        'url' => env('ORTHANC_URL', 'http://127.0.0.1:8042'),
         'username' => env('ORTHANC_USERNAME', 'orthanc'),
-        'password' => env('ORTHANC_PASWORD', 'orthanc'),
+        'password' => env('ORTHANC_PASWORD', 'orthanc123'),
     ],
+    // 'orthanc' => [
+    //     'url' => env('ORTHANC_URL', 'http://192.168.61.249:8042'),
+    //     'username' => env('ORTHANC_USERNAME', 'orthanc'),
+    //     'password' => env('ORTHANC_PASWORD', 'orthanc'),
+    // ],
 
 ];

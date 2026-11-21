@@ -24,10 +24,6 @@
         --retro-shadow-sm: 3px 3px 0px var(--retro-dark);
     }
 
-    body {
-        /* background-color: var(--retro-bg); */
-    }
-
     /* Retro Cards */
     .retro-card {
         border: var(--retro-border);
@@ -137,21 +133,6 @@
         border-bottom: 3px solid var(--retro-dark);
         padding: 12px 10px;
         letter-spacing: 0.5px;
-    }
-
-    .table-custom-gray thead th {
-        background-color: var(--retro-dark) !important;
-        color: var(--retro-cyan) !important;
-        font-size: 0.75rem;
-        font-weight: 800;
-        text-transform: uppercase;
-        border: 2px solid var(--retro-dark);
-        padding: 10px;
-    }
-
-    .table-custom-gray td {
-        border: 2px solid var(--retro-dark) !important;
-        font-weight: 700;
     }
 
     .table-hover tbody tr {
@@ -342,47 +323,47 @@
         </div>
     </div>
 
-    <!-- KOLOM KANAN: DETAIL TAGIHAN GABUNGAN & PEMBAYARAN -->
+    <!-- KOLOM KANAN: DETAIL TAGIHAN & PEMBAYARAN DISESUAIKAN PENJAMIN -->
     <div class="col-lg-6">
 
-        <!-- Tabel Rincian Tagihan Layanan & Obat (Dinamis via AJAX) -->
+        <!-- Tabel Rincian Tagihan Layanan & Tanggungan (Dinamis via AJAX) -->
         <div class="retro-card mb-3">
             <div class="card-header bg-warning border-bottom border-dark py-2 d-flex justify-content-between align-items-center">
-                <h6 class="mb-0 text-dark fw-bold"><i class="fas fa-file-invoice-dollar me-2"></i> Rincian Tagihan Pasien</h6>
+                <h6 class="mb-0 text-dark fw-bold"><i class="fas fa-file-invoice-dollar me-2"></i> Rincian Tagihan & Tanggungan</h6>
                 <span class="retro-badge bg-white text-dark" id="lbl-nama-pasien-tagihan">-</span>
             </div>
-            <div class="card-body p-0" style="max-height: 250px; overflow-y: auto; background-color: #f8f9fa;">
+            <div class="card-body p-0" style="max-height: 280px; overflow-y: auto; background-color: #f8f9fa;">
                 <table class="table table-sm table-bordered fs--1 align-middle mb-0 text-dark">
                     <thead class="table-dark" style="position: sticky; top: 0; z-index: 1;">
                         <tr>
-                            <th>Kategori Item</th>
-                            <th>Nama Tindakan / Obat</th>
-                            <th class="text-center">Qty</th>
-                            <th class="text-end">Harga</th>
+                            <th class="text-center" style="width: 45px;">Pilih</th>
+                            <th>Item / Layanan</th>
                             <th class="text-end">Subtotal</th>
+                            <th class="text-end text-danger">Tgg. Pasien</th>
+                            <th class="text-end text-success">Tgg. Prsh</th>
+                            <th class="text-center" style="width: 80px;">Aksi Split</th>
                         </tr>
                     </thead>
                     <tbody id="rincian-layanan-body" class="fw-bold">
                         <tr>
-                            <td colspan="5" class="text-center py-3 text-muted">Pilih pasien di tabel kiri untuk melihat rincian tagihan tindakan poli & obat.</td>
+                            <td colspan="6" class="text-center py-3 text-muted">Pilih pasien di tabel kiri untuk melihat rincian tagihan.</td>
                         </tr>
-                        <!-- Baris ini akan diisi via AJAX berdasarkan registrasi_id (Menggabungkan data medical_transaksi_detail & medical_ranap_resep) -->
                     </tbody>
                 </table>
             </div>
-            <div class="card-footer bg-light border-top border-dark text-end py-2">
-                <span class="fs--1 fw-bold text-muted me-2">Subtotal Tindakan: <span class="text-dark" id="lbl-sub-tindakan">Rp 0</span></span>
-                <span class="fs--1 fw-bold text-muted">Subtotal Obat: <span class="text-danger" id="lbl-sub-obat">Rp 0</span></span>
+            <div class="card-footer bg-light border-top border-dark d-flex justify-content-between py-2">
+                <span class="fs--1 fw-bold text-muted">Porsi Pasien: <span class="text-danger" id="lbl-total-tanggungan-pasien">Rp 0</span></span>
+                <span class="fs--1 fw-bold text-muted">Porsi Perusahaan: <span class="text-success" id="lbl-total-tanggungan-perusahaan">Rp 0</span></span>
             </div>
         </div>
 
-        <!-- Box Total Tagihan Besar -->
+        <!-- Box Total Tagihan Pasien -->
         <div class="total-tagihan-box mb-3">
             <div>
-                <h5 class="text-white fw-bold mb-0">Grand Total</h5>
-                <small class="text-white-50 fs--2">Status: <span id="lblStatusBayar" class="fw-bold text-warning">-</span></small>
+                <h5 class="text-white fw-bold mb-0">Total Wajib Bayar Pasien</h5>
+                <small class="text-white-50 fs--2">Pola: <span id="lblPolaTanggungan" class="fw-bold text-warning">-</span></small>
             </div>
-            <div class="total-tagihan-number" id="lblTotalTagihan">0</div>
+            <div class="total-tagihan-number" id="lblTotalTagihanPasien">0</div>
         </div>
 
         <!-- Bar Kontrol Cetak & Kartu Kontrol -->
@@ -402,15 +383,20 @@
             </button>
         </div>
 
-        <!-- Form Metode Pembayaran -->
+        <!-- Form Metode Pembayaran (Mendukung Full Pasien, Full Perusahaan, atau Split Bill) -->
         <div class="retro-card p-3 mb-3" id="panelMetodePembayaran">
+
+            <!-- Informasi Jika Full Perusahaan -->
+            <div id="alertFullPerusahaan" class="alert alert-success border border-dark fw-bold d-none text-center">
+                <i class="fas fa-building me-1"></i> Tagihan ini sepenuhnya ditanggung oleh Perusahaan/Asuransi (Masuk Piutang Perusahaan). Tidak ada pembayaran kasir dari pasien.
+            </div>
 
             <!-- Cash / Tunai -->
             <div class="payment-method-card" id="cardCash">
                 <div class="d-flex align-items-center justify-content-between mb-2">
                     <div class="form-check form-switch">
                         <input class="form-check-input" type="checkbox" id="toggleCash" onchange="toggleMetode('cash')" disabled style="border: 2px solid var(--retro-dark);">
-                        <label class="form-check-label fw-bold text-dark" for="toggleCash"><i class="fas fa-money-bill-wave text-success me-1"></i> Cash / Tunai</label>
+                        <label class="form-check-label fw-bold text-dark" for="toggleCash"><i class="fas fa-money-bill-wave text-success me-1"></i> Cash / Tunai (Porsi Pasien)</label>
                     </div>
                 </div>
                 <div class="row g-2">
@@ -434,7 +420,7 @@
                 <div class="d-flex align-items-center justify-content-between mb-2">
                     <div class="form-check form-switch">
                         <input class="form-check-input" type="checkbox" id="toggleDebit" onchange="toggleMetode('debit')" disabled style="border: 2px solid var(--retro-dark);">
-                        <label class="form-check-label fw-bold text-dark" for="toggleDebit"><i class="fas fa-credit-card text-primary me-1"></i> Debit / QRIS / Transfer</label>
+                        <label class="form-check-label fw-bold text-dark" for="toggleDebit"><i class="fas fa-credit-card text-primary me-1"></i> Debit / QRIS / Transfer (Porsi Pasien)</label>
                     </div>
                 </div>
                 <div class="row g-2">
@@ -457,7 +443,7 @@
 
             <!-- TOMBOL PROSES PAYMENT OLEH KASIR -->
             <button class="btn retro-btn retro-btn-success w-100 py-3 shadow-sm d-flex align-items-center justify-content-center gap-2 mt-3" id="btnProsesPayment" onclick="prosesPaymentKasir()" disabled>
-                <i class="fas fa-check-circle fs-5"></i> BAYAR SEKARANG
+                <i class="fas fa-check-circle fs-5"></i> PROSES PEMBAYARAN & PIUTANG
             </button>
 
         </div>
@@ -471,6 +457,7 @@
 <script>
     let selectedOrderCode = null;
     let currentDataList = [];
+    let currentDetailItems = []; // Menyimpan item aktif untuk pengaturan split manual
 
     $(document).ready(function() {
         loadAntreanKasir();
@@ -482,11 +469,11 @@
     });
 
     function hitungKembalian() {
-        let totalTagihanText = $('#lblTotalTagihan').text().replace(/\./g, '').replace(',', '.');
-        let totalTagihan = parseFloat(totalTagihanText) || 0;
+        let totalTagihanText = $('#lblTotalTagihanPasien').text().replace(/\./g, '').replace(',', '.');
+        let totalPasien = parseFloat(totalTagihanText) || 0;
         let bayar = parseFloat($('#inputCashJumlah').val()) || 0;
 
-        let kembalian = bayar - totalTagihan;
+        let kembalian = bayar - totalPasien;
         if (kembalian < 0) kembalian = 0;
 
         $('#inputCashKembali').val(kembalian.toLocaleString('id-ID'));
@@ -517,7 +504,6 @@
                     let html = '';
                     res.data.forEach((item) => {
                         let tglFormat = item.tanggal_registrasi ? item.tanggal_registrasi : '-';
-                        // Sesuaikan variabel id berdasarkan controller pendaftaran Anda
                         let regId = item.id || item.registrasi_id || item.d_reg_order_code;
                         html += `
                             <tr onclick="pilihPasienKasir('${regId}')" style="cursor: pointer;" id="row-${regId}">
@@ -550,73 +536,313 @@
         $(`#row-${regId}`).addClass('row-selected');
 
         $('#lbl-nama-pasien-tagihan').text('Memuat...');
-        $('#rincian-layanan-body').html(`<tr><td colspan="5" class="text-center py-3 text-muted">Memuat rincian tindakan dan obat...</td></tr>`);
+        $('#rincian-layanan-body').html(`<tr><td colspan="5" class="text-center py-3 text-muted">Memuat rincian tanggungan...</td></tr>`);
 
-        // AJAX memanggil controller backend untuk mengambil gabungan data tindakan poli & resep ranap
         $.ajax({
-            url: "/kasir/detail-tagihan/" + regId, // SESUAIKAN ROUTE CONTROLLER ANDA
+            url: "/kasir/detail-tagihan/" + regId,
             type: "GET",
             success: function(res) {
                 if (res.success) {
                     $('#lbl-nama-pasien-tagihan').text(res.pasien.nama);
-
-                    let htmlTagihan = '';
-                    // 1. Render Tindakan
-                    if (res.tindakan && res.tindakan.length > 0) {
-                        res.tindakan.forEach(t => {
-                            htmlTagihan += `
-                                <tr>
-                                    <td><span class="badge bg-primary">TINDAKAN/JASA</span></td>
-                                    <td>${t.item}</td>
-                                    <td class="text-center">1</td>
-                                    <td class="text-end">Rp ${Number(t.harga).toLocaleString('id-ID')}</td>
-                                    <td class="text-end text-primary">Rp ${Number(t.harga).toLocaleString('id-ID')}</td>
-                                </tr>
-                            `;
-                        });
-                    }
-
-                    // 2. Render Obat Farmasi
-                    if (res.obat && res.obat.length > 0) {
-                        res.obat.forEach(o => {
-                            let subtotalObat = parseFloat(o.harga) * parseFloat(o.qty);
-                            htmlTagihan += `
-                                <tr>
-                                    <td><span class="badge bg-danger">FARMASI/OBAT</span></td>
-                                    <td>${o.item}</td>
-                                    <td class="text-center">${o.qty}</td>
-                                    <td class="text-end">Rp ${Number(o.harga).toLocaleString('id-ID')}</td>
-                                    <td class="text-end text-danger">Rp ${subtotalObat.toLocaleString('id-ID')}</td>
-                                </tr>
-                            `;
-                        });
-                    }
-
-                    if (htmlTagihan === '') {
-                        htmlTagihan = `<tr><td colspan="5" class="text-center py-3 text-muted">Belum ada rincian tagihan (Tindakan/Resep).</td></tr>`;
-                    }
-
-                    $('#rincian-layanan-body').html(htmlTagihan);
-                    $('#lbl-sub-tindakan').text('Rp ' + Number(res.total_tindakan).toLocaleString('id-ID'));
-                    $('#lbl-sub-obat').text('Rp ' + Number(res.total_obat).toLocaleString('id-ID'));
-
-                    let grandTotal = parseFloat(res.grand_total) || 0;
-                    $('#lblTotalTagihan').text(grandTotal.toLocaleString('id-ID'));
-
-                    let statusBayar = res.transaksi && res.transaksi.status_pembayaran ? res.transaksi.status_pembayaran : 'BELUM LUNAS';
-                    $('#lblStatusBayar').text(statusBayar);
-
-                    if (statusBayar === 'LUNAS' || grandTotal === 0) {
-                        nonaktifkanMetodePembayaran(true);
-                    } else {
-                        nonaktifkanMetodePembayaran(false);
-                    }
+                    currentDetailItems = res.items || [];
+                    renderRincianTabel(res);
                 }
             },
             error: function() {
                 $('#rincian-layanan-body').html(`<tr><td colspan="5" class="text-center py-3 text-danger">Gagal menarik rincian tagihan.</td></tr>`);
             }
         });
+    }
+
+    function renderRincianTabel(res) {
+        let htmlTagihan = '';
+        let totalPasienAcc = 0;
+        let totalPrshAcc = 0;
+
+        if (currentDetailItems && currentDetailItems.length > 0) {
+            currentDetailItems.forEach((item, index) => {
+                let tggPasien = parseFloat(item.tanggungan_pasien) || 0;
+                let tggPrsh = parseFloat(item.tanggungan_perusahaan) || 0;
+                let isLunas = item.status_pembayaran === 'LUNAS';
+
+                if (!isLunas) {
+                    totalPasienAcc += tggPasien;
+                    totalPrshAcc += tggPrsh;
+                }
+
+                let checkboxHtml = isLunas ?
+                    '<span class="badge bg-success text-white">LUNAS</span>' :
+                    `<input type="checkbox" class="form-check-input item-pilih-lunas" value="${item.id}" data-pasien="${tggPasien}" checked onchange="hitungTotalPilihanBayar()" style="border: 2px solid var(--retro-dark); width: 18px; height: 18px; cursor: pointer;">`;
+
+                let splitButtonHtml = isLunas ?
+                    '-' :
+                    `<button type="button" class="btn btn-sm retro-btn retro-btn-warning px-2 py-1 fs--2" onclick="bukaModalAturSplitItem(${index})" title="Ubah Porsi Tanggungan">
+                        <i class="fas fa-sliders-h"></i> Split
+                    </button>`;
+
+                htmlTagihan += `
+                    <tr class="${isLunas ? 'table-success bg-opacity-10' : ''}">
+                        <td class="text-center">${checkboxHtml}</td>
+                        <td>
+                            <span class="badge bg-secondary mb-1">${item.jenis_item}</span>
+                            <div class="fw-bold">${item.nama_item} (Qty: ${item.qty})</div>
+                        </td>
+                        <td class="text-end">Rp ${Number(item.harga_akhir).toLocaleString('id-ID')}</td>
+                        <td class="text-end text-danger">Rp ${tggPasien.toLocaleString('id-ID')}</td>
+                        <td class="text-end text-success">Rp ${tggPrsh.toLocaleString('id-ID')}</td>
+                        <td class="text-center">${splitButtonHtml}</td>
+                    </tr>
+                `;
+            });
+        } else {
+            htmlTagihan = `<tr><td colspan="6" class="text-center py-3 text-muted">Tidak ada rincian item.</td></tr>`;
+        }
+
+        $('#rincian-layanan-body').html(htmlTagihan);
+        hitungTotalPilihanBayar();
+    }
+
+    function renderRincianTabelokalUpdate() {
+        let htmlTagihan = '';
+        let totalPasienAcc = 0;
+        let totalPrshAcc = 0;
+
+        currentDetailItems.forEach((item, index) => {
+            let tggPasien = parseFloat(item.tanggungan_pasien) || 0;
+            let tggPrsh = parseFloat(item.tanggungan_perusahaan) || 0;
+            let isLunas = item.status_pembayaran === 'LUNAS';
+
+            if (!isLunas) {
+                totalPasienAcc += tggPasien;
+                totalPrshAcc += tggPrsh;
+            }
+
+            // KUNCI UTAMA: Checkbox pelunasan HANYA MUNCUL jika ada porsi tanggungan pasien (> 0)
+            let checkboxHtml = '';
+            if (isLunas) {
+                checkboxHtml = '<span class="badge bg-success text-white">LUNAS</span>';
+            } else if (tggPasien > 0) {
+                checkboxHtml = `<input type="checkbox" class="form-check-input item-pilih-lunas" value="${item.id}" data-pasien="${tggPasien}" checked onchange="hitungTotalPilihanBayar()" style="border: 2px solid var(--retro-dark); width: 18px; height: 18px; cursor: pointer;">`;
+            } else {
+                checkboxHtml = '<span class="badge bg-secondary text-white" style="font-size: 0.65rem;">Ditanggung Perusahaan</span>';
+            }
+
+            let splitButtonHtml = isLunas ?
+                '-' :
+                `<button type="button" class="btn btn-sm retro-btn retro-btn-warning px-2 py-1 fs--2" onclick="bukaModalAturSplitItem(${index})" title="Ubah Porsi Tanggungan">
+                    <i class="fas fa-sliders-h"></i> Split
+                </button>`;
+
+            htmlTagihan += `
+                <tr class="${isLunas ? 'table-success bg-opacity-10' : ''}">
+                    <td class="text-center">${checkboxHtml}</td>
+                    <td>
+                        <span class="badge bg-secondary mb-1">${item.jenis_item}</span>
+                        <div class="fw-bold">${item.nama_item} (Qty: ${item.qty})</div>
+                    </td>
+                    <td class="text-end">Rp ${Number(item.harga_akhir).toLocaleString('id-ID')}</td>
+                    <td class="text-end text-danger">Rp ${tggPasien.toLocaleString('id-ID')}</td>
+                    <td class="text-end text-success">Rp ${tggPrsh.toLocaleString('id-ID')}</td>
+                    <td class="text-center">${splitButtonHtml}</td>
+                </tr>
+            `;
+        });
+
+        $('#rincian-layanan-body').html(htmlTagihan);
+        $('#lbl-total-tanggungan-pasien').text('Rp ' + totalPasienAcc.toLocaleString('id-ID'));
+        $('#lbl-total-tanggungan-perusahaan').text('Rp ' + totalPrshAcc.toLocaleString('id-ID'));
+        $('#lblTotalTagihanPasien').text(totalPasienAcc.toLocaleString('id-ID'));
+
+        if (totalPasienAcc <= 0) {
+            $('#alertFullPerusahaan').removeClass('d-none');
+            nonaktifkanMetodePembayaran(true);
+            $('#btnProsesPayment').prop('disabled', false);
+        } else {
+            $('#alertFullPerusahaan').addClass('d-none');
+            nonaktifkanMetodePembayaran(false);
+        }
+    }
+    // Fungsionalitas Memunculkan Modal Edit/Split Porsi per Item Layanan
+    function bukaModalAturSplitItem(index) {
+        let item = currentDetailItems[index];
+        let subtotal = parseFloat(item.harga_akhir) || 0;
+
+        Swal.fire({
+            title: `<div class="fs-5 fw-bold text-dark"><i class="fas fa-edit text-warning me-1"></i> Atur Porsi Item: ${item.nama_item}</div>`,
+            html: `
+                <div class="text-start fs--1">
+                    <p class="mb-2 text-muted fw-bold">Subtotal Item: Rp ${subtotal.toLocaleString('id-ID')}</p>
+                    <div class="mb-3">
+                        <label class="form-label fw-bold text-dark">Pilih Opsi Tanggungan Item Ini:</label>
+                        <select id="swal-opsi-pola" class="form-select retro-input mb-2" onchange="gantiOpsiPolaSwal(${subtotal})">
+                            <option value="FULL_PASIEN">Ditanggung Pasien 100%</option>
+                            <option value="FULL_PERUSAHAAN">Ditanggung Perusahaan 100%</option>
+                            <option value="CUSTOM">Custom Nominal (Split Manual)</option>
+                        </select>
+                    </div>
+                    <div id="wrapper-custom-nominal" style="display: none;">
+                        <div class="mb-2">
+                            <label class="form-label fw-bold text-danger">Nominal Tanggungan Pasien (Rp)</label>
+                            <input type="number" id="swal-input-tgg-pasien" class="form-control retro-input" value="${item.tanggungan_pasien}" onkeyup="hitungSisaPerusahaan(${subtotal})">
+                        </div>
+                        <div class="mb-2">
+                            <label class="form-label fw-bold text-success">Nominal Tanggungan Perusahaan (Rp)</label>
+                            <input type="number" id="swal-input-tgg-prsh" class="form-control retro-input bg-light" value="${item.tanggungan_perusahaan}" readonly>
+                        </div>
+                    </div>
+                </div>
+            `,
+            showCancelButton: true,
+            confirmButtonText: 'Simpan Porsi',
+            cancelButtonText: 'Batal',
+            confirmButtonColor: '#598f72',
+            cancelButtonColor: '#6c757d',
+            preConfirm: () => {
+                let opsi = $('#swal-opsi-pola').val();
+                let tggPsn = 0;
+                let tggPrsh = 0;
+
+                if (opsi === 'FULL_PASIEN') {
+                    tggPsn = subtotal;
+                    tggPrsh = 0;
+                } else if (opsi === 'FULL_PERUSAHAAN') {
+                    tggPsn = 0;
+                    tggPrsh = subtotal;
+                } else {
+                    tggPsn = parseFloat($('#swal-input-tgg-pasien').val()) || 0;
+                    tggPrsh = parseFloat($('#swal-input-tgg-prsh').val()) || 0;
+
+                    if (Math.round(tggPsn + tggPrsh) !== Math.round(subtotal)) {
+                        Swal.showValidationMessage('Total Tanggungan Pasien + Perusahaan harus sama dengan Subtotal Item!');
+                    }
+                }
+                return {
+                    tggPsn,
+                    tggPrsh
+                };
+            }
+        }).then((result) => {
+            if (result.isConfirmed) {
+                let newTggPsn = result.value.tggPsn;
+                let newTggPrsh = result.value.tggPrsh;
+
+                // Kirim via AJAX ke database
+                $.ajax({
+                    url: "{{ route('keuangan_menu_cashier_update_split') }}",
+                    type: "POST",
+                    data: {
+                        _token: "{{ csrf_token() }}",
+                        detail_id: item.id,
+                        tanggungan_pasien: newTggPsn,
+                        tanggungan_perusahaan: newTggPrsh
+                    },
+                    success: function(res) {
+                        if (res.success) {
+                            // Update lokal array item
+                            currentDetailItems[index].tanggungan_pasien = newTggPsn;
+                            currentDetailItems[index].tanggungan_perusahaan = newTggPrsh;
+
+                            // Render ulang tabel rincian
+                            renderRincianTabelokalUpdate();
+
+                            Swal.fire({
+                                icon: 'success',
+                                title: 'Berhasil',
+                                text: res.message,
+                                timer: 1200,
+                                showConfirmButton: false
+                            });
+                        } else {
+                            Swal.fire('Gagal', res.message, 'error');
+                        }
+                    },
+                    error: function() {
+                        Swal.fire('Error', 'Terjadi kesalahan server saat memperbarui split.', 'error');
+                    }
+                });
+            }
+        });
+    }
+
+    function gantiOpsiPolaSwal(subtotal) {
+        let val = $('#swal-opsi-pola').val();
+        if (val === 'CUSTOM') {
+            $('#wrapper-custom-nominal').show();
+        } else {
+            $('#wrapper-custom-nominal').hide();
+            if (val === 'FULL_PASIEN') {
+                $('#swal-input-tgg-pasien').val(subtotal);
+                $('#swal-input-tgg-prsh').val(0);
+            } else if (val === 'FULL_PERUSAHAAN') {
+                $('#swal-input-tgg-pasien').val(0);
+                $('#swal-input-tgg-prsh').val(subtotal);
+            }
+        }
+    }
+
+    function hitungSisaPerusahaan(subtotal) {
+        let tggPsn = parseFloat($('#swal-input-tgg-pasien').val()) || 0;
+        if (tggPsn > subtotal) {
+            tggPsn = subtotal;
+            $('#swal-input-tgg-pasien').val(subtotal);
+        }
+        let tggPrsh = subtotal - tggPsn;
+        $('#swal-input-tgg-prsh').val(tggPrsh);
+    }
+
+    function renderRincianTabel(res) {
+        let htmlTagihan = '';
+        let totalPasienAcc = 0;
+        let totalPrshAcc = 0;
+
+        if (currentDetailItems && currentDetailItems.length > 0) {
+            currentDetailItems.forEach((item, index) => {
+                let tggPasien = parseFloat(item.tanggungan_pasien) || 0;
+                let tggPrsh = parseFloat(item.tanggungan_perusahaan) || 0;
+                let isLunas = item.status_pembayaran === 'LUNAS';
+
+                if (!isLunas) {
+                    totalPasienAcc += tggPasien;
+                    totalPrshAcc += tggPrsh;
+                }
+
+                // KUNCI UTAMA: Checkbox pelunasan HANYA MUNCUL jika ada porsi tanggungan pasien (> 0)
+                let checkboxHtml = '';
+                if (isLunas) {
+                    checkboxHtml = '<span class="badge bg-success text-white">LUNAS</span>';
+                } else if (tggPasien > 0) {
+                    checkboxHtml = `<input type="checkbox" class="form-check-input item-pilih-lunas" value="${item.id}" data-pasien="${tggPasien}" checked onchange="hitungTotalPilihanBayar()" style="border: 2px solid var(--retro-dark); width: 18px; height: 18px; cursor: pointer;">`;
+                } else {
+                    // Jika tgg_pasien == 0 (murni ditanggung perusahaan), jangan munculkan checkbox agar tidak bisa dicentang/dilunaskan di kasir
+                    checkboxHtml = '<span class="badge bg-secondary text-white" style="font-size: 0.65rem;">Ditanggung Perusahaan</span>';
+                }
+
+                let splitButtonHtml = isLunas ?
+                    '-' :
+                    `<button type="button" class="btn btn-sm retro-btn retro-btn-warning px-2 py-1 fs--2" onclick="bukaModalAturSplitItem(${index})" title="Ubah Porsi Tanggungan">
+                        <i class="fas fa-sliders-h"></i> Split
+                    </button>`;
+
+                htmlTagihan += `
+                    <tr class="${isLunas ? 'table-success bg-opacity-10' : ''}">
+                        <td class="text-center">${checkboxHtml}</td>
+                        <td>
+                            <span class="badge bg-secondary mb-1">${item.jenis_item}</span>
+                            <div class="fw-bold">${item.nama_item} (Qty: ${item.qty})</div>
+                        </td>
+                        <td class="text-end">Rp ${Number(item.harga_akhir).toLocaleString('id-ID')}</td>
+                        <td class="text-end text-danger">Rp ${tggPasien.toLocaleString('id-ID')}</td>
+                        <td class="text-end text-success">Rp ${tggPrsh.toLocaleString('id-ID')}</td>
+                        <td class="text-center">${splitButtonHtml}</td>
+                    </tr>
+                `;
+            });
+        } else {
+            htmlTagihan = `<tr><td colspan="6" class="text-center py-3 text-muted">Tidak ada rincian item.</td></tr>`;
+        }
+
+        $('#rincian-layanan-body').html(htmlTagihan);
+        hitungTotalPilihanBayar();
     }
 
     function nonaktifkanMetodePembayaran(isDisable) {
@@ -637,7 +863,6 @@
     }
 
     function toggleMetode(type) {
-        // Matikan yang lain (Single Choice Payment)
         if (type === 'cash') {
             $('#toggleDebit').prop('checked', false);
             $('#inputDebitJumlah, #inputDebitRef').prop('disabled', true).val(0);
@@ -656,18 +881,44 @@
         }
 
         let adaYangDicentang = $('#toggleCash').is(':checked') || $('#toggleDebit').is(':checked');
-        $('#btnProsesPayment').prop('disabled', !adaYangDicentang);
+        let totalPasien = parseFloat($('#lblTotalTagihanPasien').text().replace(/\./g, '')) || 0;
+        $('#btnProsesPayment').prop('disabled', !(adaYangDicentang || totalPasien === 0));
     }
 
+    // Hitung total tagihan berdasarkan checkbox item yang dicentang kasir
+    function hitungTotalPilihanBayar() {
+        let totalPilihan = 0;
+        $('.item-pilih-lunas:checked').each(function() {
+            totalPilihan += parseFloat($(this).data('pasien')) || 0;
+        });
+
+        $('#lblTotalTagihanPasien').text(totalPilihan.toLocaleString('id-ID'));
+
+        let bayarInput = parseFloat($('#inputCashJumlah').val()) || 0;
+        if (bayarInput > 0) hitungKembalian();
+    }
+
+    // Fungsi proses pembayaran parsial yang dikirim ke route baru
     function prosesPaymentKasir() {
         if (!selectedOrderCode) {
             return Swal.fire('Perhatian', 'Pilih pasien dari daftar kunjungan terlebih dahulu!', 'warning');
         }
 
-        let metodePilih = '';
+        let selectedItemIds = [];
+        $('.item-pilih-lunas:checked').each(function() {
+            selectedItemIds.push($(this).val());
+        });
+
+        if (selectedItemIds.length === 0) {
+            return Swal.fire('Perhatian', 'Pilih/centang minimal 1 item layanan yang akan dilunaskan!', 'warning');
+        }
+
+        let metodePilih = 'CASH';
         let nominalBayar = 0;
         let edcId = null;
         let noRef = null;
+
+        let totalPilihanPasien = parseFloat($('#lblTotalTagihanPasien').text().replace(/\./g, '')) || 0;
 
         if ($('#toggleCash').is(':checked')) {
             metodePilih = 'CASH';
@@ -679,36 +930,29 @@
             noRef = $('#inputDebitRef').val();
         }
 
-        let totalTagihanText = $('#lblTotalTagihan').text().replace(/\./g, '').replace(',', '.');
-        let totalTagihan = parseFloat(totalTagihanText) || 0;
-
-        if (nominalBayar <= 0) {
-            return Swal.fire('Perhatian', 'Masukkan jumlah nominal pembayaran dengan benar!', 'warning');
-        }
-
-        if (nominalBayar < totalTagihan) {
-            let kurang = totalTagihan - nominalBayar;
-            return Swal.fire('Pembayaran Kurang', 'Nominal pembayaran kurang dari total tagihan sebesar Rp ' + kurang.toLocaleString('id-ID'), 'warning');
+        if (totalPilihanPasien > 0 && nominalBayar < totalPilihanPasien) {
+            return Swal.fire('Pembayaran Kurang', 'Nominal bayar kurang dari total item yang dicentang!', 'warning');
         }
 
         Swal.fire({
-            title: 'Konfirmasi Pelunasan',
-            text: `Proses tagihan gabungan untuk Reg ${selectedOrderCode} sebesar Rp ${totalTagihan.toLocaleString('id-ID')} (Pembayaran: Rp ${nominalBayar.toLocaleString('id-ID')})?`,
+            title: 'Konfirmasi Pembayaran Sebagian',
+            text: `Proses pelunasan item terpilih dan terbitkan nota pembayaran baru?`,
             icon: 'question',
             showCancelButton: true,
             confirmButtonColor: '#1e1e24',
             cancelButtonColor: '#6c757d',
-            confirmButtonText: 'Ya, Lunaskan!',
+            confirmButtonText: 'Ya, Proses & Cetak Nota!',
             cancelButtonText: 'Batal'
         }).then((result) => {
             if (result.isConfirmed) {
                 Swal.showLoading();
                 $.ajax({
-                    url: "{{ route('keuangan_menu_cashier_proses_payment') }}", // SESUAIKAN ROUTE CONTROLLER PAYMENT ANDA
+                    url: "{{ route('keuangan_menu_cashier_proses_payment_parsial') }}",
                     type: "POST",
                     data: {
                         _token: "{{ csrf_token() }}",
                         registrasi_id: selectedOrderCode,
+                        item_ids: selectedItemIds,
                         metode_bayar: metodePilih,
                         nominal_bayar: nominalBayar,
                         edc_id: edcId,
@@ -718,17 +962,24 @@
                         if (res.success) {
                             Swal.fire({
                                 icon: 'success',
-                                title: 'LUNAS!',
+                                title: 'Berhasil!',
                                 text: res.message,
+                                timer: 1500,
+                                showConfirmButton: false
+                            }).then(() => {
+                                // Buka nota transaksi pembayaran yang baru terbentuk di tab baru
+                                window.open(res.redirect_url, '_blank');
+                                loadAntreanKasir();
+                                pilihPasienKasir(selectedOrderCode);
                             });
-                            loadAntreanKasir();
-                            pilihPasienKasir(selectedOrderCode); // Reload status
                         } else {
                             Swal.fire('Gagal', res.message, 'error');
                         }
                     },
                     error: function(xhr) {
-                        Swal.fire('Gagal', 'Terjadi kesalahan server saat memproses.', 'error');
+                        let msg = 'Terjadi kesalahan server saat memproses.';
+                        if (xhr.responseJSON && xhr.responseJSON.message) msg = xhr.responseJSON.message;
+                        Swal.fire('Gagal', msg, 'error');
                     }
                 });
             }
@@ -753,8 +1004,6 @@
     // ====================================================================
     // FUNGSI LAPORAN KEUANGAN (KASIR KE ACCOUNTING)
     // ====================================================================
-
-    // Fungsi pemanggil modal buat laporan keuangan kasir oleh bagian keuangan
     function bukaModalBuatLaporanKeuangan() {
         Swal.fire({
             title: 'Memuat Data...',
@@ -802,10 +1051,8 @@
                                 rows = `<tr><td colspan="7" class="text-center py-4 text-muted fw-bold">Tidak ada transaksi lunas baru yang belum dilaporkan.</td></tr>`;
                             }
 
-                            // Tampilan Modal HTML ala Front Office (Retro Theme)
                             let htmlModal = `
                                 <div class="text-start">
-                                    <!-- TABEL UTAMA -->
                                     <div class="table-responsive border border-3 border-dark rounded-3 mb-3 shadow-sm" style="max-height: 400px; overflow-y: auto;">
                                         <table class="table table-hover align-middle mb-0 fs--1" style="background-color: #fff;">
                                             <thead class="text-dark" style="background-color: var(--retro-dark); color: var(--retro-green) !important; font-size: 0.7rem; border-bottom: 3px solid var(--retro-dark);">
@@ -825,7 +1072,6 @@
                                         </table>
                                     </div>
 
-                                    <!-- FOOTER PANEL SUMMARY & TOMBOL AKSI -->
                                     <div class="p-3 rounded-3 border border-3 border-dark bg-white d-flex flex-wrap justify-content-between align-items-center shadow-sm gap-2">
                                         <div class="d-flex gap-2">
                                             <div class="p-2 border border-2 border-dark rounded-2 bg-light text-center px-3">

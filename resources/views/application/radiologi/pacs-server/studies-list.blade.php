@@ -227,18 +227,16 @@
             <div class="form-check my-0 me-2 ms-1">
                 <input class="form-check-input" type="checkbox" id="check-all-pacs" style="cursor: pointer;">
             </div>
-            <button class="pacs-btn-icon" title="View"><i class="fas fa-eye"></i></button>
-            <button class="pacs-btn-icon" title="Grid 2x2"><i class="fas fa-table-cells-large"></i></button>
-            <button class="pacs-btn-icon" title="Layout 2 Columns"><i class="fas fa-columns"></i></button>
-            <button class="pacs-btn-icon" title="Grid 3x3"><i class="fas fa-border-all"></i></button>
-            <button class="pacs-btn-icon" title="3D / Anonymize"><i class="fas fa-shapes"></i></button>
-            <button class="pacs-btn-icon" title="Download DICOM"><i class="fas fa-download"></i></button>
-            <button class="pacs-btn-icon" title="Delete"><i class="fas fa-trash"></i></button>
-            <button class="pacs-btn-icon" title="Tags"><i class="fas fa-tag"></i></button>
+            <button type="button" class="pacs-btn-icon btn-toolbar-view" data-layout="1x1" title="Buka DICOM Viewer"><i class="fas fa-eye"></i></button>
+            <button type="button" class="pacs-btn-icon btn-toolbar-view" data-layout="2x2" title="Grid 2x2"><i class="fas fa-table-cells-large"></i></button>
+            <button type="button" class="pacs-btn-icon btn-toolbar-view" data-layout="1x2" title="Layout 2 Columns"><i class="fas fa-columns"></i></button>
+            <button type="button" class="pacs-btn-icon btn-toolbar-view" data-layout="3x3" title="Grid 3x3"><i class="fas fa-border-all"></i></button>
+            <button type="button" class="pacs-btn-icon" id="btn-toolbar-download" title="Download DICOM Archive (.zip)"><i class="fas fa-download"></i></button>
+            <button type="button" class="pacs-btn-icon" id="btn-toolbar-tags" title="Lihat Metadata DICOM"><i class="fas fa-tag"></i></button>
         </div>
         <div>
             <span class="badge bg-info bg-opacity-20 text-cyan border border-info border-opacity-25 px-3 py-2 fw-semibold" style="color: #38bdf8 !important;">
-                <i class="fa-solid fa-circle-info me-1"></i> Displaying recent PACS studies
+                <i class="fa-solid fa-circle-info me-1"></i> Displaying {{ count($studiesList) }} PACS studies
             </span>
         </div>
     </div>
@@ -261,19 +259,24 @@
                 </tr>
             </thead>
             <tbody>
-                @forelse($studiesList as $index => $study)
+                @foreach($studiesList as $index => $study)
                 <tr>
                     <td class="text-center" style="width: 40px;">
-                        <input class="form-check-input item-check" type="checkbox">
+                        <input class="form-check-input item-check" type="checkbox"
+                            data-uid="{{ $study['study_instance_uid'] ?? '' }}"
+                            data-orthanc-id="{{ $study['orthanc_study_id'] }}"
+                            data-viewer-url="{{ $study['viewer_url'] }}">
                     </td>
                     <td style="width: 10%;">
-                        <a href="{{ route('pacs_server_studies_show', $study['orthanc_study_id']) }}" target="_blank" class="text-info me-1" title="Lihat Studi">
+                        <a href="{{ $study['viewer_url'] }}" class="text-info me-1" title="Buka DICOM Viewer">
                             <i class="fa-solid fa-eye"></i>
                         </a>
                         <span class="text-muted small">{{ $study['patient_birth_date'] ?? '-' }}</span>
                     </td>
                     <td style="width: 20%;" class="fw-bold text-dark">
-                        {{ $study['patient_name'] ?? 'Anonim' }}
+                        <a href="{{ $study['viewer_url'] }}" class="text-decoration-none text-dark hover-text-info">
+                            {{ $study['patient_name'] ?? 'Anonim' }}
+                        </a>
                     </td>
                     <td style="width: 14%; font-family: monospace;" class="text-muted">
                         {{ $study['patient_id'] }}
@@ -282,11 +285,7 @@
                         {{ $study['study_description'] ?? '-' }}
                     </td>
                     <td style="width: 10%;" class="text-muted small">
-                        @if(isset($study['study_date']) && $study['study_date'] !== 'N/A' && strlen($study['study_date']) === 8)
-                        {{ $study['study_date'] }}
-                        @else
                         {{ $study['study_date'] ?? '-' }}
-                        @endif
                     </td>
                     <td style="width: 8%;">
                         <span class="modality-badge">{{ $study['modality'] ?? '-' }}</span>
@@ -298,23 +297,21 @@
                         <span class="badge bg-light text-dark border">{{ $study['series_count'] ?? '1' }}/{{ $study['instances_count'] ?? '1' }}</span>
                     </td>
                     <td class="text-center">
-                        <a href="{{ route('pacs_server_studies_show', $study['orthanc_study_id']) }}"
-                            target="_blank"
-                            class="btn btn-xs btn-outline-info pacs-btn-icon d-inline-flex align-items-center justify-content-center"
-                            title="Buka Preview DICOM">
-                            <i class="fas fa-eye"></i>
-                        </a>
+                        <div class="d-flex justify-content-center gap-1">
+                            <a href="{{ $study['viewer_url'] }}"
+                                class="btn btn-xs btn-outline-info pacs-btn-icon d-inline-flex align-items-center justify-content-center"
+                                title="Buka DICOM Viewer">
+                                <i class="fas fa-x-ray"></i>
+                            </a>
+                            <a href="{{ url('/pacs-proxy/studies/' . $study['orthanc_study_id'] . '/archive') }}"
+                                class="btn btn-xs btn-outline-secondary pacs-btn-icon d-inline-flex align-items-center justify-content-center"
+                                title="Download ZIP DICOM">
+                                <i class="fas fa-download"></i>
+                            </a>
+                        </div>
                     </td>
                 </tr>
-                @empty
-                <tr>
-                    <td colspan="10" class="text-center py-5 text-muted">
-                        <i class="fa-solid fa-folder-open fa-3x mb-3 text-300"></i>
-                        <h6 class="fw-bold text-dark mb-1">Tidak ada data ditemukan</h6>
-                        <p class="mb-0 small">Pemeriksaan belum tersedia pada server PACS Orthanc.</p>
-                    </td>
-                </tr>
-                @endforelse
+                @endforeach
             </tbody>
         </table>
     </div>
@@ -339,9 +336,19 @@
         // Inisialisasi DataTables
         var table = $('#pacsTable').DataTable({
             responsive: true,
-            dom: 'rtip', // Hilangkan search bar bawaan DataTables
+            dom: 'rtip',
             pageLength: 10,
-            ordering: false
+            ordering: false,
+            language: {
+                emptyTable: `
+                    <div class="text-center py-5 text-muted">
+                        <i class="fa-solid fa-folder-open fa-3x mb-3 text-300"></i>
+                        <h6 class="fw-bold text-dark mb-1">Tidak ada data ditemukan</h6>
+                        <p class="mb-0 small">Pemeriksaan belum tersedia pada server PACS Orthanc.</p>
+                    </div>
+                `,
+                zeroRecords: "Tidak ada data pemeriksaan yang cocok dengan filter pencarian."
+            }
         });
 
         // Event listener pencarian per kolom
@@ -359,6 +366,52 @@
         // Check All Checkbox
         $('#check-all-pacs').on('click', function() {
             $('.item-check').prop('checked', this.checked);
+        });
+
+        // Toolbar: Buka Viewer dari item yang dicentang
+        $('.btn-toolbar-view').on('click', function() {
+            var checked = $('.item-check:checked');
+            if (checked.length === 0) {
+                Swal.fire({
+                    icon: 'warning',
+                    title: 'Pilih Pemeriksaan',
+                    text: 'Centang minimal satu studi pasien terlebih dahulu untuk membuka viewer.'
+                });
+                return;
+            }
+            var layout = $(this).data('layout');
+            var targetUrl = checked.first().data('viewer-url') + '?layout=' + layout;
+            window.location.href = targetUrl;
+        });
+
+        // Toolbar: Download ZIP DICOM dari item yang dicentang
+        $('#btn-toolbar-download').on('click', function() {
+            var checked = $('.item-check:checked');
+            if (checked.length === 0) {
+                Swal.fire({
+                    icon: 'warning',
+                    title: 'Pilih Pemeriksaan',
+                    text: 'Centang studi yang ingin diunduh arsip DICOM-nya.'
+                });
+                return;
+            }
+            var orthancId = checked.first().data('orthanc-id');
+            window.location.href = "{{ url('/pacs-proxy/studies') }}/" + orthancId + "/archive";
+        });
+
+        // Toolbar: Lihat JSON Tags DICOM dari Orthanc Proxy
+        $('#btn-toolbar-tags').on('click', function() {
+            var checked = $('.item-check:checked');
+            if (checked.length === 0) {
+                Swal.fire({
+                    icon: 'warning',
+                    title: 'Pilih Pemeriksaan',
+                    text: 'Centang satu studi untuk melihat tag metadata DICOM.'
+                });
+                return;
+            }
+            var orthancId = checked.first().data('orthanc-id');
+            window.open("{{ url('/pacs-proxy/studies') }}/" + orthancId + "/shared-tags?simplify", "_blank");
         });
     });
 </script>

@@ -38,32 +38,59 @@ class MedicalRawatInap extends Migration
         Schema::create('medical_tarif_poli', function (Blueprint $table) {
             $table->id();
             $table->foreignId('poli_id')->constrained('medical_master_poli')->onDelete('cascade');
-            $table->foreignId('sub_penjamin_id')->nullable()->constrained('medical_sub_penjamin')->onDelete('cascade'); // Agar bisa bedakan tarif Umum vs BPJS/Asuransi
+            $table->foreignId('sub_penjamin_id')->nullable()->constrained('medical_sub_penjamin')->onDelete('cascade');
 
             // Kategori Biaya: 'ADMINISTRASI', 'JASA_DOKTER'
             $table->string('kategori_biaya', 50);
-            $table->string('nama_tarif'); // Contoh: "Biaya Administrasi Pendaftaran", "Jasa Konsultasi Dokter Spesialis"
+            $table->string('nama_tarif'); // Contoh: "Biaya Administrasi", "Jasa Konsultasi"
             $table->decimal('tarif', 15, 2)->default(0);
+
+            // --- NEW: SKEMA TANGGUNGAN KHUSUS PER TARIF ---
+            $table->string('pola_tanggungan')->default('IKUT_ATURAN_INDUK')
+                ->comment('IKUT_ATURAN_INDUK, FULL_PASIEN, FULL_PERUSAHAAN, SPLIT_PERSENTASE, SPLIT_PLAFON');
+            $table->decimal('tanggungan_perusahaan_persen', 5, 2)->default(0.00);
+            $table->decimal('tanggungan_perusahaan_maksimal_rp', 15, 2)->default(0.00);
+            // ----------------------------------------------
 
             $table->boolean('is_active')->default(true);
             $table->timestamps();
         });
+
         Schema::create('medical_tarif_rawatinap', function (Blueprint $table) {
             $table->id();
             $table->string('kelas'); // Contoh: Kelas 1, Kelas 2, VIP, VVIP
-            $table->foreignId('sub_penjamin_id')->constrained('medical_sub_penjamin')->onDelete('cascade'); // Link langsung ke sub penjamin
-            $table->decimal('tarif_kamar_per_hari', 15, 2)->default(0); // Tarif akomodasi kamar
-            $table->decimal('tarif_visite_dokter_per_hari', 15, 2)->default(0); // Jika visite dokter include
-            $table->decimal('tarif_asuhan_keperawatan_per_hari', 15, 2)->default(0); // Jika askep include
+            $table->foreignId('sub_penjamin_id')->constrained('medical_sub_penjamin')->onDelete('cascade');
+
+            $table->decimal('tarif_kamar_per_hari', 15, 2)->default(0);
+            $table->decimal('tarif_visite_dokter_per_hari', 15, 2)->default(0);
+            $table->decimal('tarif_asuhan_keperawatan_per_hari', 15, 2)->default(0);
+
+            // --- NEW: SKEMA TANGGUNGAN KHUSUS PER TARIF ---
+            $table->string('pola_tanggungan')->default('IKUT_ATURAN_INDUK')
+                ->comment('IKUT_ATURAN_INDUK, FULL_PASIEN, FULL_PERUSAHAAN, SPLIT_PERSENTASE, SPLIT_PLAFON');
+            $table->decimal('tanggungan_perusahaan_persen', 5, 2)->default(0.00);
+            $table->decimal('tanggungan_perusahaan_maksimal_rp', 15, 2)->default(0.00);
+            // ----------------------------------------------
+
             $table->boolean('is_active')->default(true);
             $table->timestamps();
         });
+
         Schema::create('medical_tarif_igd', function (Blueprint $table) {
             $table->id();
-            $table->foreignId('sub_penjamin_id')->constrained('medical_sub_penjamin')->onDelete('cascade'); // Link langsung ke sub penjamin
-            $table->string('kategori_biaya', 50); // Contoh: ADMINISTRASI, JASA_DOKTER_IGD, SARANA_IGD
-            $table->string('nama_tarif'); // Contoh: Biaya Administrasi IGD, Jasa Konsultasi Dokter Jaga IGD
-            $table->decimal('tarif', 15, 2)->default(0); // Nominal biaya
+            $table->foreignId('sub_penjamin_id')->constrained('medical_sub_penjamin')->onDelete('cascade');
+
+            $table->string('kategori_biaya', 50); // ADMINISTRASI, JASA_DOKTER_IGD, SARANA_IGD
+            $table->string('nama_tarif');
+            $table->decimal('tarif', 15, 2)->default(0);
+
+            // --- NEW: SKEMA TANGGUNGAN KHUSUS PER TARIF ---
+            $table->string('pola_tanggungan')->default('IKUT_ATURAN_INDUK')
+                ->comment('IKUT_ATURAN_INDUK, FULL_PASIEN, FULL_PERUSAHAAN, SPLIT_PERSENTASE, SPLIT_PLAFON');
+            $table->decimal('tanggungan_perusahaan_persen', 5, 2)->default(0.00);
+            $table->decimal('tanggungan_perusahaan_maksimal_rp', 15, 2)->default(0.00);
+            // ----------------------------------------------
+
             $table->boolean('is_active')->default(true);
             $table->timestamps();
         });

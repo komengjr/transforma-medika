@@ -1464,63 +1464,64 @@ class RadiologiController extends Controller
     public function pacs_server_studies_list($akses, $id)
     {
         if ($this->url_akses_sub($akses, $id) == true) {
-            $baseUrl = config('services.orthanc.url');
-            $username = config('services.orthanc.username'); // Opsional jika pakai auth
-            $password = config('services.orthanc.password'); // Opsional jika pakai auth
+            $baseUrl  = rtrim(config('services.orthanc.url'), '/');
+            $username = config('services.orthanc.username');
+            $password = config('services.orthanc.password');
 
             $studiesList = [];
 
             try {
-                // Menyiapkan HTTP Request ke Orthanc
                 $http = Http::timeout(10);
 
-                // Tambahkan Basic Auth jika diset di .env
                 if ($username && $password) {
                     $http->withBasicAuth($username, $password);
                 }
 
-                // Gunakan endpoint /tools/find dengan MINTA TAG ModalitiesInStudy
                 $response = $http->post("{$baseUrl}/tools/find", [
                     'Level'         => 'Study',
-                    'Query'         => (object)[], // Kosongkan untuk mengambil SEMUA study
-                    'Expand'        => true,       // true = sertakan detail tag DICOM pasien
-                    'RequestedTags' => ['ModalitiesInStudy'] // <--- INI KUNCINYA agar Modality (CR, DX, CT) langsung keluar
+                    'Query'         => (object)[],
+                    'Expand'        => true,
+                    'RequestedTags' => ['ModalitiesInStudy']
                 ]);
 
                 if ($response->successful()) {
                     $studies = $response->json() ?? [];
 
                     foreach ($studies as $study) {
-                        // 1. Ambil Modality dari RequestedTags atau MainDicomTags
                         $modality = $study['RequestedTags']['ModalitiesInStudy']
                             ?? $study['MainDicomTags']['ModalitiesInStudy']
                             ?? null;
 
-                        // Jika masih null/array, format menjadi string (misal "CR" atau "CR, DX")
                         if (is_array($modality)) {
                             $modality = implode(', ', $modality);
                         } elseif (!$modality) {
-                            $modality = 'CR'; // Fallback default
+                            $modality = 'CR';
                         }
 
-                        // 2. Hitung jumlah instance/gambar DICOM keseluruhan
                         $instancesCount = 0;
                         if (isset($study['Series']) && is_array($study['Series'])) {
-                            // Biasanya jumlah instance estimasi dari series
                             $instancesCount = count($study['Series']);
                         }
 
+                        // Wajib diambil untuk membuka Stone Web Viewer / OHIF Viewer
+                        $studyInstanceUid = $study['MainDicomTags']['StudyInstanceUID'] ?? '';
+
                         $studiesList[] = [
                             'orthanc_study_id'   => $study['ID'],
+                            'study_instance_uid' => $studyInstanceUid, // <--- TAMBAHAN PENTING UNTUK VIEWER
                             'patient_id'         => $study['PatientMainDicomTags']['PatientID'] ?? '-',
                             'patient_name'       => $study['PatientMainDicomTags']['PatientName'] ?? 'anon',
                             'patient_birth_date' => $study['PatientMainDicomTags']['PatientBirthDate'] ?? '-',
                             'study_description'  => $study['MainDicomTags']['StudyDescription'] ?? '-',
                             'study_date'         => $study['MainDicomTags']['StudyDate'] ?? '-',
-                            'modality'           => $modality, // <--- Sudah berisi CR, DX, CT, MR, dll.
+                            'modality'           => $modality,
                             'accession_number'   => $study['MainDicomTags']['AccessionNumber'] ?? '-',
                             'series_count'       => count($study['Series'] ?? []),
                             'instances_count'    => $instancesCount,
+                            // URL langsung siap pakai untuk tombol di tabel Blade
+                            'viewer_url'         => $studyInstanceUid
+                                ? route('pacs.viewer', ['akses' => $akses, 'id' => $id, 'uid' => $studyInstanceUid])
+                                : '#',
                         ];
                     }
                 } else {
@@ -1530,9 +1531,96 @@ class RadiologiController extends Controller
                 Log::error("Gagal terhubung ke Orthanc: " . $e->getMessage());
             }
 
-            return view('application.radiologi.pacs-server.studies-list', compact('studiesList'), ['akses' => $akses, 'code' => $id]);
+            return view('application.radiologi.pacs-server.studies-list', compact('studiesList'), [
+                'akses' => $akses,
+                'code'  => $id
+            ]);
         } else {
             return Redirect::to('dashboard/home');
+        }
+    }
+    public function pacs_server_viewer($akses, $id, $uid)
+    {
+        if ($this->url_akses_sub($akses, $id) == true) {
+            // Mengarahkan ke path ohif/viewer sesuai dengan endpoint Orthanc Anda
+            // Kembali menggunakan Stone Web Viewer yang lebih ringan di dalam iframe
+            $iframeUrl = url("/pacs-proxy/stone-webviewer/index.html?study=" . $uid);
+
+            return view('application.radiologi.pacs-server.studies-show', [
+                'akses'     => $akses,
+                'code'      => $id,
+                'uid'       => $uid,
+                'studyId'   => $uid,
+                'iframeUrl' => $iframeUrl,
+                'viewerUrl' => $iframeUrl,
+            ]);
+        } else {
+            return Redirect::to('dashboard/home');
+        }
+    }
+
+    public function orthanc_proxy(Request $request, $path = '')
+    {
+        $baseUrl  = rtrim(config('services.orthanc.url'), '/');
+        $username = config('services.orthanc.username');
+        $password = config('services.orthanc.password');
+
+        $targetUrl = "{$baseUrl}/{$path}";
+        if ($request->getQueryString()) {
+            $targetUrl .= '?' . $request->getQueryString();
+        }
+
+        try {
+            $http = Http::timeout(120); // Ditingkatkan ke 120 detik untuk mengantisipasi file DICOM/WADO berukuran besar
+
+            if ($username && $password) {
+                $http->withBasicAuth($username, $password);
+            }
+
+            // 1. Tangkap dan teruskan SEMUA header penting dari browser/client ke Orthanc
+            $headers = [];
+            $forwardHeaders = ['accept', 'accept-encoding', 'accept-language', 'range', 'content-type', 'cache-control', 'pragma'];
+
+            foreach ($forwardHeaders as $headerName) {
+                if ($request->hasHeader($headerName)) {
+                    $headers[$headerName] = $request->header($headerName);
+                }
+            }
+            // Fallback default jika accept kosong
+            if (!isset($headers['accept'])) {
+                $headers['accept'] = '*/*';
+            }
+
+            $response = $http->withHeaders($headers)
+                ->send($request->method(), $targetUrl, [
+                    'body' => $request->getContent(),
+                ]);
+
+            $contentType = $response->header('Content-Type') ?? 'application/octet-stream';
+            $body = $response->body();
+
+            // 2. Suntikkan CSS kustom hanya jika tipe dokumen adalah HTML utama
+            if (str_contains(strtolower($contentType), 'text/html') && file_exists(public_path('css/custom-orthanc-viewer.css'))) {
+                $customCssTag = '<link rel="stylesheet" href="' . asset('css/custom-orthanc-viewer.css') . '?v=' . time() . '">';
+                $body = str_replace('</head>', $customCssTag . '</head>', $body);
+            }
+
+            // 3. Buat objek response Laravel
+            $laravelResponse = response($body, $response->status())
+                ->header('Content-Type', $contentType);
+
+            // 4. Teruskan header respons penting dari Orthanc (seperti Range, Length, Cache)
+            $responseHeadersToPass = ['Accept-Ranges', 'Content-Range', 'Content-Length', 'ETag', 'Last-Modified'];
+            foreach ($responseHeadersToPass as $resHeader) {
+                if ($response->hasHeader($resHeader)) {
+                    $laravelResponse->header($resHeader, $response->header($resHeader));
+                }
+            }
+
+            return $laravelResponse;
+        } catch (\Exception $e) {
+            Log::error("Orthanc Proxy Error ({$path}): " . $e->getMessage());
+            return response('Gagal memuat data dari PACS Server: ' . $e->getMessage(), 502);
         }
     }
     public function pacs_server_studies_show(Request $request, $studyId)

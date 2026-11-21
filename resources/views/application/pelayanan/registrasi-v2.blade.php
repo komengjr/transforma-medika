@@ -544,10 +544,10 @@
                     </div>
                 </div>
 
-                <div class="row g-4">
+                <div class="row g-3">
                     <!-- KIRI: PROFIL PASIEN -->
                     <div class="col-lg-7">
-                        <div class="card h-100">
+                        <div class="card mb-3">
                             <div class="card-header header-blue d-flex justify-content-between align-items-center">
                                 <span><i class="fas fa-id-card me-2"></i> Data Profil Pasien</span>
                                 <span class="badge bg-white text-dark border border-dark rounded-2 px-2 py-1 shadow-sm fw-bold"><i class="fas fa-check-circle me-1 text-success"></i> Terverifikasi</span>
@@ -638,20 +638,55 @@
                                                     <textarea id="displayAlamat" class="form-control bg-light" rows="2" placeholder="Alamat Lengkap" readonly></textarea>
                                                 </div>
                                             </div>
-                                            <div class="col-12 mt-2">
+                                            <div class="col-5 mt-2">
                                                 <div class="input-group input-group-sm">
                                                     <span class="input-group-text align-items-start pt-2"><i class="fas fa-sticky-note"></i></span>
                                                     <textarea id="displayCatatan" class="form-control bg-light" rows="1" placeholder="Catatan Tambahan Pasien" readonly></textarea>
                                                 </div>
                                             </div>
-                                            <div class="col-12 mt-3 pt-3 border-top border-dark">
-                                                <label class="form-label small fw-bold text-dark mb-1">Keluhan Medis / Diagnosa Awal</label>
+                                            <div class="col-7 mt-2">
+                                                <!-- <label class="form-label small fw-bold text-dark mb-1">Keluhan Medis / Diagnosa Awal</label> -->
                                                 <div class="input-group">
                                                     <span class="input-group-text"><i class="fas fa-stethoscope"></i></span>
                                                     <input type="text" id="input_keluhan" class="form-control" placeholder="Ketik keluhan di sini...">
                                                 </div>
                                             </div>
                                         </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="card mb-2">
+                            <div class="card-header header-blue"><i class="fas fa-paper-plane me-2"></i> Pengiriman Hasil</div>
+                            <div class="card-body p-3">
+                                <div class="row g-2">
+                                    <div class="col-3">
+                                        <label class="form-check p-2 rounded-2 d-flex flex-column align-items-center justify-content-center text-center h-100 mb-0" style="cursor: pointer; border: 2px solid var(--retro-dark); background: #fff;">
+                                            <input class="form-check-input ms-0 mb-1 mt-0 border-2 border-dark" type="checkbox" name="pengiriman[]" value="whatsapp" checked>
+                                            <i class="fab fa-whatsapp text-success mb-1 fs-5"></i>
+                                            <span class="fw-bold text-dark" style="font-size: 0.65rem;">WhatsApp</span>
+                                        </label>
+                                    </div>
+                                    <div class="col-3">
+                                        <label class="form-check p-2 rounded-2 d-flex flex-column align-items-center justify-content-center text-center h-100 mb-0" style="cursor: pointer; border: 2px solid var(--retro-dark); background: #fff;">
+                                            <input class="form-check-input ms-0 mb-1 mt-0 border-2 border-dark" type="checkbox" name="pengiriman[]" value="email">
+                                            <i class="fas fa-envelope text-danger mb-1 fs-5"></i>
+                                            <span class="fw-bold text-dark" style="font-size: 0.65rem;">Email</span>
+                                        </label>
+                                    </div>
+                                    <div class="col-3">
+                                        <label class="form-check p-2 rounded-2 d-flex flex-column align-items-center justify-content-center text-center h-100 mb-0" style="cursor: pointer; border: 2px solid var(--retro-dark); background: #fff;">
+                                            <input class="form-check-input ms-0 mb-1 mt-0 border-2 border-dark" type="checkbox" name="pengiriman[]" value="satusehat" checked>
+                                            <i class="fas fa-heartbeat text-info mb-1 fs-5"></i>
+                                            <span class="fw-bold text-dark" style="font-size: 0.65rem;">Satu Sehat</span>
+                                        </label>
+                                    </div>
+                                    <div class="col-3">
+                                        <label class="form-check p-2 rounded-2 d-flex flex-column align-items-center justify-content-center text-center h-100 mb-0" style="cursor: pointer; border: 2px solid var(--retro-dark); background: #fff;">
+                                            <input class="form-check-input ms-0 mb-1 mt-0 border-2 border-dark" type="checkbox" name="pengiriman[]" value="cetak_fisik">
+                                            <i class="fas fa-print text-secondary mb-1 fs-5"></i>
+                                            <span class="fw-bold text-dark" style="font-size: 0.65rem;">Cetak Kertas</span>
+                                        </label>
                                     </div>
                                 </div>
                             </div>
@@ -688,6 +723,7 @@
                                 </div>
 
                                 <!-- UPDATE: PENJAMIN UTAMA & SUB PENJAMIN DIPINDAH KESINI -->
+                                <!-- UPDATE: PENJAMIN UTAMA & SUB PENJAMIN -->
                                 <div class="row">
                                     <div class="col-md-6">
                                         <label class="form-label fw-bold text-dark small text-uppercase mb-1">Tipe Penjamin Utama</label>
@@ -710,6 +746,39 @@
                                         </div>
                                     </div>
                                 </div>
+
+                                <!-- CONTAINER INFORMASI SUB PENJAMIN (Muncul otomatis saat Sub Penjamin dipilih) -->
+                                <div id="info_sub_penjamin" class="mt-3 p-3 rounded bg-light border border-dark shadow-sm" style="display: none;">
+                                    <h6 class="fw-bolder text-dark mb-3 border-bottom border-dark pb-2"><i class="fas fa-info-circle me-1"></i> Informasi Rekanan / Asuransi</h6>
+                                    <div class="row g-3" style="font-size: 0.85rem;">
+
+                                        <div class="col-md-12">
+                                            <label class="fw-bold text-muted mb-0 small text-uppercase">Person in Charge (PIC)</label>
+                                            <div id="info_pic_list" class="fw-bold text-dark d-flex flex-column gap-1">
+                                                <!-- Diisi via JS -->
+                                            </div>
+                                        </div>
+
+                                        <div class="col-md-6 border-end border-dark">
+                                            <label class="fw-bold text-muted mb-0 small text-uppercase">Tipe Pembayaran / Penagihan</label>
+                                            <div class="d-flex align-items-center gap-2 mt-1">
+                                                <span id="info_tipe_pembayaran" class="badge bg-white text-dark border border-dark fw-bold px-2 py-1 shadow-sm"></span>
+                                            </div>
+                                            <div id="info_jatuh_tempo_wrapper" class="mt-1" style="display: none;">
+                                                <span class="text-danger fw-bold small"><i class="fas fa-calendar-times me-1"></i> Jatuh Tempo: <span id="info_jatuh_tempo"></span> Hari</span>
+                                            </div>
+                                        </div>
+
+                                        <div class="col-md-6">
+                                            <label class="fw-bold text-muted mb-0 small text-uppercase">Catatan Pelayanan Khusus</label>
+                                            <div id="info_catatan_pelayanan" class="fw-bold text-dark mt-1 fst-italic">
+                                                <!-- Diisi via JS -->
+                                            </div>
+                                        </div>
+
+                                    </div>
+                                </div>
+                                <!-- END UPDATE -->
                                 <!-- END UPDATE -->
 
                                 <div class="mt-4 pt-3 border-top border-dark">
@@ -732,41 +801,7 @@
                             </div>
                         </div>
 
-                        <div class="card mb-3">
-                            <div class="card-header header-blue"><i class="fas fa-paper-plane me-2"></i> Pengiriman Hasil</div>
-                            <div class="card-body p-3">
-                                <div class="row g-2">
-                                    <div class="col-3">
-                                        <label class="form-check p-2 rounded-2 d-flex flex-column align-items-center justify-content-center text-center h-100 mb-0" style="cursor: pointer; border: 2px solid var(--retro-dark); background: #fff;">
-                                            <input class="form-check-input ms-0 mb-1 mt-0 border-2 border-dark" type="checkbox" name="pengiriman[]" value="whatsapp" checked>
-                                            <i class="fab fa-whatsapp text-success mb-1 fs-5"></i>
-                                            <span class="fw-bold text-dark" style="font-size: 0.65rem;">WhatsApp</span>
-                                        </label>
-                                    </div>
-                                    <div class="col-3">
-                                        <label class="form-check p-2 rounded-2 d-flex flex-column align-items-center justify-content-center text-center h-100 mb-0" style="cursor: pointer; border: 2px solid var(--retro-dark); background: #fff;">
-                                            <input class="form-check-input ms-0 mb-1 mt-0 border-2 border-dark" type="checkbox" name="pengiriman[]" value="email">
-                                            <i class="fas fa-envelope text-danger mb-1 fs-5"></i>
-                                            <span class="fw-bold text-dark" style="font-size: 0.65rem;">Email</span>
-                                        </label>
-                                    </div>
-                                    <div class="col-3">
-                                        <label class="form-check p-2 rounded-2 d-flex flex-column align-items-center justify-content-center text-center h-100 mb-0" style="cursor: pointer; border: 2px solid var(--retro-dark); background: #fff;">
-                                            <input class="form-check-input ms-0 mb-1 mt-0 border-2 border-dark" type="checkbox" name="pengiriman[]" value="satusehat" checked>
-                                            <i class="fas fa-heartbeat text-info mb-1 fs-5"></i>
-                                            <span class="fw-bold text-dark" style="font-size: 0.65rem;">Satu Sehat</span>
-                                        </label>
-                                    </div>
-                                    <div class="col-3">
-                                        <label class="form-check p-2 rounded-2 d-flex flex-column align-items-center justify-content-center text-center h-100 mb-0" style="cursor: pointer; border: 2px solid var(--retro-dark); background: #fff;">
-                                            <input class="form-check-input ms-0 mb-1 mt-0 border-2 border-dark" type="checkbox" name="pengiriman[]" value="cetak_fisik">
-                                            <i class="fas fa-print text-secondary mb-1 fs-5"></i>
-                                            <span class="fw-bold text-dark" style="font-size: 0.65rem;">Cetak Kertas</span>
-                                        </label>
-                                    </div>
-                                </div>
-                            </div>
-                        </div>
+
                     </div>
                 </div>
 
@@ -1636,8 +1671,6 @@
                 document.getElementById('input_doctor_poli').innerHTML = '<option value="" disabled selected>Pilih Poli & Tanggal Terlebih Dahulu...</option>';
                 $('#input_doctor_igd').val('').trigger('change');
             }
-
-            muatTarifOtomatisPoli();
         }
 
         function loadBedTersedia() {
@@ -2070,12 +2103,12 @@
             const penjaminId = document.getElementById('pilih_penjamin').value;
             const wrapperSub = document.getElementById('wrapper_sub_penjamin');
             const selectSub = $('#pilih_sub_penjamin');
+            const infoSub = document.getElementById('info_sub_penjamin'); // Elemen Info
 
-            // Kosongkan dulu pilihan sub penjamin
             selectSub.html('<option value="" disabled selected>Memuat sub penjamin...</option>').trigger('change');
+            infoSub.style.display = 'none'; // Sembunyikan info saat penjamin utama ganti
 
             if (penjaminId) {
-                // Fetch sub penjamin berdasarkan penjamin utama yang dipilih
                 fetch(`/penjamin/get-sub?penjamin_id=${penjaminId}`, {
                         headers: {
                             'X-Requested-With': 'XMLHttpRequest',
@@ -2087,13 +2120,15 @@
                         selectSub.html('<option value="" disabled selected>Pilih Sub Penjamin...</option>');
                         if (res.success && res.data.length > 0) {
                             wrapperSub.style.display = 'block';
+                            loadedSubPenjaminData = res.data; // Simpan datanya ke variabel global array
+
                             res.data.forEach(sub => {
                                 const option = new Option(sub.nama_sub_penjamin, sub.id, false, false);
                                 selectSub.append(option);
                             });
                         } else {
-                            // Jika tidak ada sub penjamin, sembunyikan wrapper
                             wrapperSub.style.display = 'none';
+                            loadedSubPenjaminData = [];
                         }
                         selectSub.trigger('change');
                     })
@@ -2112,8 +2147,73 @@
         }
 
         function handleSubPenjaminChange() {
-            loadPemeriksaanData();
-            muatTarifOtomatisPoli();
+            const subId = document.getElementById('pilih_sub_penjamin').value;
+            const infoSub = document.getElementById('info_sub_penjamin');
+
+            if (subId) {
+                // Cari data sub penjamin dari array yang sudah diload
+                const subData = loadedSubPenjaminData.find(s => s.id == subId || s.sub_penjamin_id == subId);
+
+                if (subData) {
+                    // Tampilkan Blok Informasi
+                    infoSub.style.display = 'block';
+
+                    // Tampilkan PIC
+                    const picListEl = document.getElementById('info_pic_list');
+                    if (subData.pics && subData.pics.length > 0) {
+                        let picHtml = '';
+                        subData.pics.forEach(pic => {
+                            let isPrimary = pic.is_primary == 1 ? '<span class="badge bg-danger ms-1" style="font-size:0.6rem;">Utama</span>' : '';
+                            picHtml += `<div><i class="fas fa-user-tie text-muted me-1"></i> ${pic.nama_pic} <small class="text-muted">(${pic.telepon || '-'})</small> ${isPrimary}</div>`;
+                        });
+                        picListEl.innerHTML = picHtml;
+                    } else {
+                        picListEl.innerHTML = '<span class="text-danger fst-italic">Belum ada data PIC yang didaftarkan.</span>';
+                    }
+
+                    // Tampilkan Tipe Pembayaran
+                    let tipePay = (subData.tipe_pembayaran || 'CASH_DI_AWAL').replace(/_/g, ' ');
+                    document.getElementById('info_tipe_pembayaran').innerText = tipePay;
+
+                    if (subData.tipe_pembayaran === 'CORPORATE_BILLING' || subData.tipe_pembayaran === 'INSURANCE_CLAIM') {
+                        document.getElementById('info_jatuh_tempo_wrapper').style.display = 'block';
+                        document.getElementById('info_jatuh_tempo').innerText = subData.jatuh_tempo_hari || 30;
+
+                        // [SOLUSI STEP 3] - Otomatis pilih metode bayar "Piutang" di tab Administrasi
+                        $('#pay-piutang').prop('checked', true);
+                    } else {
+                        document.getElementById('info_jatuh_tempo_wrapper').style.display = 'none';
+
+                        // [SOLUSI STEP 3] - Otomatis pilih metode bayar "Cash"
+                        $('#pay-cash').prop('checked', true);
+                    }
+                    updateBayarDisplay(); // Update UI nota pembayaran
+
+                    // Tampilkan Catatan Pelayanan
+                    let catatan = subData.catatan_pelayanan || '-';
+                    document.getElementById('info_catatan_pelayanan').innerText = catatan;
+
+                    // [SOLUSI STEP 1] - Sesuaikan Pengiriman Hasil
+                    // Reset checkbox pengiriman
+                    $('input[name="pengiriman[]"]').prop('checked', false);
+
+                    // Aturan default: Satu Sehat selalu aktif
+                    $('input[name="pengiriman[]"][value="satusehat"]').prop('checked', true);
+
+                    // Centang otomatis berdasarkan data sub penjamin
+                    if (subData.izin_kirim_hasil_pasien == 1 || !subData.tipe_pembayaran || subData.tipe_pembayaran === 'CASH_DI_AWAL') {
+                        $('input[name="pengiriman[]"][value="whatsapp"]').prop('checked', true);
+                    }
+                    if (subData.is_eresult_company == 1 || subData.is_eresult_personal == 1) {
+                        $('input[name="pengiriman[]"][value="email"]').prop('checked', true);
+                    }
+                }
+
+                loadPemeriksaanData();
+                muatTarifOtomatisPoli();
+            } else {
+                infoSub.style.display = 'none';
+            }
         }
 
         function handlePoliChange() {
@@ -2126,7 +2226,8 @@
             const ruanganId = document.getElementById('input_ruangan_id') ? document.getElementById('input_ruangan_id').value : '';
             const subPenjaminId = document.getElementById('pilih_sub_penjamin').value;
 
-            orderItems = orderItems.filter(item => item.kategori_biaya !== 'ADMINISTRASI' && item.kategori_biaya !== 'JASA_DOKTER' && item.kategori_biaya !== 'KAMAR_INAP' && item.kategori_biaya !== 'KEPERAWATAN');
+            // [SOLUSI STEP 2] - Bersihkan semua tarif yang dihasilkan otomatis sebelumnya
+            orderItems = orderItems.filter(item => !item.is_auto_tarif);
 
             if (!subPenjaminId || (jenisLayanan === 'RAWAT_JALAN' && !poliId) || (jenisLayanan === 'RAWAT_INAP' && !ruanganId)) {
                 renderTableOrder();
@@ -2148,7 +2249,8 @@
                                 harga_akhir: parseFloat(tarifItem.tarif),
                                 harga_akhir_normal: parseFloat(tarifItem.tarif),
                                 kategori_biaya: tarifItem.kategori_biaya,
-                                is_paket: 0
+                                is_paket: 0,
+                                is_auto_tarif: true // Flag khusus penanda tarif ini ditarik otomatis
                             });
                         });
                     }

@@ -60,6 +60,7 @@ Route::prefix('{akses}/{id}/application')->group(function () {
     // KEUANGAN
     Route::get('keuangan/menu-kasir', [KeuanganController::class, 'keuangan_menu_cashier'])->name('keuangan_menu_cashier');
     Route::get('transaksi-keuangan/penerimaan-transaksi', [KeuanganController::class, 'keuangan_penerimaan_transaksi'])->name('keuangan_penerimaan_transaksi');
+    Route::get('transaksi-keuangan/penagihan-keuangan', [KeuanganController::class, 'penagihan_transaksi_keuangan'])->name('penagihan_transaksi_keuangan');
     Route::get('master-company', [ApplicationController::class, 'master_company'])->name('master_company');
     Route::get('mou-company', [ApplicationController::class, 'mou_company'])->name('mou_company');
     Route::get('agreement-perusahaan', [ApplicationController::class, 'agreement_perusahaan'])->name('agreement_perusahaan');
@@ -301,8 +302,31 @@ Route::prefix('master-data')->group(function () {
     Route::put('master-penjamin/tarif-rawatinap/update/{id}', [MasterDataController::class, 'update_tarif_rawatinap'])->name('tarif_rawatinap_update');
     Route::post('master-penjamin/tarif-igd/store', [MasterDataController::class, 'store_tarif_igd'])->name('tarif_igd_store');
     Route::put('master-penjamin/tarif-igd/update/{id}', [MasterDataController::class, 'update_tarif_igd'])->name('tarif_igd_update');
+
+    Route::get('/penjamin/get-sub/{id}', [MasterDataController::class, 'get_sub_penjamin'])->name('get_sub_penjamin_ajax');
+    Route::post('master-penjamin/nonaktifkan-sub/{id}', [MasterDataController::class, 'nonaktifkan_sub_penjamin'])->name('nonaktifkan_sub_penjamin');
+    // GET untuk me-load tabel
+    Route::get('master-penjamin/get-tarif/{sub_id}', [MasterDataController::class, 'getTarif']);
+    Route::get('master-penjamin/get-pemeriksaan/{sub_id}', [MasterDataController::class, 'getPemeriksaan']);
+
+    // POST untuk submit form (nanti digunakan form action AJAX)
+    Route::post('master-penjamin/store-tarif/{id}', [MasterDataController::class, 'storeTarif']);
+    Route::post('master-penjamin/store-pemeriksaan', [MasterDataController::class, 'storePemeriksaan']);
+    Route::post('master-penjamin/salin-tarif', [MasterDataController::class, 'salinTarif']);
+    Route::get('master-penjamin/get-all-sub', [MasterDataController::class, 'getAllSubPenjamin']);
+
+    // Route untuk mengambil data master penunjang / layanan
+    Route::get('/master-penjamin/polis-json', [MasterDataController::class, 'getPolisJson']);
+    Route::get('/master-penjamin/get-all', [MasterDataController::class, 'getRuanganAll']);
+    Route::get('/master-penjamin/bed-tersedia/{ruanganId}', [MasterDataController::class, 'getBedTersedia']);
+
+    Route::post('penjamin-price/generate-default', [MasterDataController::class, 'generateDefaultHarga'])->name('penjamin-price.generate-default');
+    Route::post('penjamin-price/copy-from-sub', [MasterDataController::class, 'copyFromSubPenjamin'])->name('penjamin-price.copy-from-sub');
+    Route::get('get-all-sub-penjamin-except/{id}', [MasterDataController::class, 'getAllSubPenjaminExcept']);
 });
 Route::get('/poliklinik/data-pasien-json', [PoliklinikController::class, 'getDataPasienPoliJson'])->name('poliklinik.data.json');
+
+
 Route::get('/pelayanan/dokter-berjadwal', [LayananMedisController::class, 'getDokterBerjadwal']);
 Route::get('/ruangan/bed-tersedia/{ruangan_id}', [LayananMedisController::class, 'getBedTersedia']);
 Route::get('/laporan/belum-dilaporkan', [LayananMedisController::class, 'getBelumDilaporkan'])->middleware('auth');
@@ -374,10 +398,25 @@ Route::prefix('application')->group(function () {
     Route::post('keuangan/menu-kasir/fix-payment', [KeuanganController::class, 'keuangan_menu_cashier_find_fix_payment'])->name('keuangan_menu_cashier_find_fix_payment');
     Route::post('transaksi-keuangan/penerimaan-transaksi/proses-transaksi', [KeuanganController::class, 'keuangan_penerimaan_proses_transaksi'])->name('keuangan_penerimaan_proses_transaksi');
     Route::post('/keuangan/penerimaan/get-data', [App\Http\Controllers\KeuanganController::class, 'keuangan_penerimaan_get_data'])->name('keuangan_penerimaan_get_data');
-    Route::get('/cashier/download-receipt-pdf/{orderCode}', [KeuanganController::class, 'downloadReceiptPdf'])->name('keuangan_menu_cashier_download_pdf');
+    // Route::get('/cashier/download-receipt-pdf/{orderCode}', [KeuanganController::class, 'downloadReceiptPdf'])->name('keuangan_menu_cashier_download_pdf');
     Route::get('/get-belum-dilaporkan-keuangan', [KeuanganController::class, 'getBelumDilaporkanKeuangan'])->name('keuangan.get_belum_dilaporkan_keuangan');
     Route::post('keuangan/store-laporan-keuangan-keuangan', [KeuanganController::class, 'storeLaporanKeuanganKeuangan'])->name('keuangan.store_laporan_keuangan_keuangan');
     Route::post('keuangan/verifikasi-laporan-setoran', [KeuanganController::class, 'verifikasiLaporanSetoran'])->name('keuangan.verifikasi_laporan_setoran');
+
+    // Route untuk memproses pembayaran kasir secara parsial (sebagian item)
+    Route::post('/kasir/update-split-item', [KeuanganController::class, 'updateSplitItem'])->name('keuangan_menu_cashier_update_split');
+    Route::post('/kasir/proses-payment-parsial', [KeuanganController::class, 'prosesPaymentParsial'])->name('keuangan_menu_cashier_proses_payment_parsial');
+    Route::get('/cashier/download-receipt-pdf/{transaksiId}', [KeuanganController::class, 'downloadReceiptPdf'])->name('pembayaran.nota');
+
+    Route::get('/api/penagihan/perusahaan', [KeuanganController::class, 'apiGetDaftarPenagihanPerusahaan'])->name('api.daftar.penagihan.perusahaan');
+    Route::post('/api/pelunasan/piutang-perusahaan', [KeuanganController::class, 'prosesPelunasanPiutangPerusahaan'])->name('api.pelunasan.piutang.perusahaan');
+    Route::post('/api/penagihan/buat-tagihan', [KeuanganController::class, 'buatTagihanPerusahaan'])->name('api.buat.tagihan.perusahaan');
+    Route::get('/api/penagihan/pasien-by-subpenjamin', [KeuanganController::class, 'getPasienBySubPenjamin'])->name('api.pasien.by.subpenjamin');
+    Route::post('/api/penagihan/rincian-item-transaksi', [KeuanganController::class, 'getRincianItemTransaksi'])->name('api.rincian.item.transaksi');
+    Route::get('/api/penagihan/detail/{id}', [KeuanganController::class, 'getDetailPenagihan'])->name('api.penagihan.detail');
+    Route::post('/api/penagihan/proses-pelunasan', [KeuanganController::class, 'prosesPelunasanPenagihanPerusahaan'])->name('api.pelunasan.penagihan.perusahaan');
+    Route::get('/penagihan/download-pdf/{id}', [KeuanganController::class, 'downloadPdfPenagihan'])->name('penagihan.download.pdf');
+    Route::post('/api/penagihan/kirim-pesan', [KeuanganController::class, 'kirimPesanTagihan'])->name('api.penagihan.kirim.pesan');
 });
 // MENU KEUANGAN
 Route::prefix('master')->group(function () {
@@ -414,3 +453,13 @@ Route::prefix('application')->group(function () {
     Route::post('verifikasi-poliklinik/dokumentasi-hasil/send-report', [PoliklinikController::class, 'verifikasi_poliklinik_dokumentasi_hasil_send_report'])->name('verifikasi_poliklinik_dokumentasi_hasil_send_report');
 });
 Route::get('/kasir/detail-tagihan/{regId}', [KeuanganController::class, 'getDetailTagihanKasir'])->name('kasir.detail_tagihan');
+
+
+// Pastikan berada di dalam grup middleware auth Anda
+Route::get('/pacs-server/{akses}/{id}/viewer/{uid}', [App\Http\Controllers\RadiologiController::class, 'pacs_server_viewer'])
+    ->name('pacs.viewer');
+
+Route::any('/pacs-proxy/{path?}', [RadiologiController::class, 'orthanc_proxy'])
+    ->where('path', '.*')
+    ->name('pacs.proxy');
+Route::get('/application/radiologi/pacs-server/{akses}/{id}/studies', [RadiologiController::class, 'pacs_studies_index'])->name('pacs.studies');

@@ -1107,6 +1107,108 @@ class MasterDataController extends Controller
         $layanan = DB::table('t_layanan_cat')->get();
         return view('application.master-data.pemeriksaan-harga.data-gorup-pemeriksaan', ['data' => $data, 'layanan' => $layanan]);
     }
+    // 1. Generate Default Harga (Hanya untuk pemeriksaan satuan / non-paket)
+    public function generateDefaultHarga(Request $request)
+    {
+        $subPenjaminId = $request->input('sub_penjamin_id');
+
+        if (!$subPenjaminId) {
+            return response()->json(['status' => 'error', 'message' => 'Sub Penjamin tidak valid.'], 422);
+        }
+
+        try {
+            // Ambil hanya master pemeriksaan yang aktif dan BUKAN PAKET (is_paket = 0 atau false)
+            $masterPemeriksaan = DB::table('medical_master_pemeriksaan')
+                ->where('is_active', true)
+                ->where('is_paket', 0) // <--- Batasi khusus non-paket
+                ->get();
+
+            foreach ($masterPemeriksaan as $item) {
+                $exists = DB::table('medical_penjamin_pemeriksaan')
+                    ->where('sub_penjamin_id', $subPenjaminId)
+                    ->where('master_pemeriksaan_id', $item->id)
+                    ->exists();
+
+                if (!$exists) {
+                    DB::table('medical_penjamin_pemeriksaan')->insert([
+                        'sub_penjamin_id' => $subPenjaminId,
+                        'master_pemeriksaan_id' => $item->id,
+                        'diskon' => 0,
+                        'created_at' => now(),
+                        'updated_at' => now(),
+                    ]);
+                }
+            }
+
+            return response()->json([
+                'status' => 'success',
+                'message' => 'Default harga pemeriksaan satuan berhasil di-generate!'
+            ]);
+        } catch (\Exception $e) {
+            return response()->json([
+                'status' => 'error',
+                'message' => 'Gagal generate harga: ' . $e->getMessage()
+            ], 500);
+        }
+    }
+
+    // 2. Salin Harga dari Sub Penjamin Lain (Hanya menyalin yang bukan paket)
+    public function copyFromSubPenjamin(Request $request)
+    {
+        $targetSubId = $request->input('target_sub_id');
+        $sumberSubId = $request->input('sumber_sub_id');
+
+        if (!$targetSubId || !$sumberSubId) {
+            return response()->json(['status' => 'error', 'message' => 'Data penjamin sumber atau target tidak lengkap.'], 422);
+        }
+
+        try {
+            // Ambil data harga dari sub penjamin sumber, lalu filter hanya yang master pemeriksaannya is_paket = 0
+            $sumberData = DB::table('medical_penjamin_pemeriksaan as mpp')
+                ->join('medical_master_pemeriksaan as mp', 'mpp.master_pemeriksaan_id', '=', 'mp.id')
+                ->where('mpp.sub_penjamin_id', $sumberSubId)
+                ->where('mp.is_paket', 0) // <--- Batasi khusus non-paket
+                ->select('mpp.master_pemeriksaan_id', 'mpp.diskon')
+                ->get();
+
+            foreach ($sumberData as $item) {
+                DB::table('medical_penjamin_pemeriksaan')->updateOrInsert(
+                    [
+                        'sub_penjamin_id' => $targetSubId,
+                        'master_pemeriksaan_id' => $item->master_pemeriksaan_id,
+                    ],
+                    [
+                        'diskon' => $item->diskon,
+                        'updated_at' => now(),
+                        'created_at' => now(),
+                    ]
+                );
+            }
+
+            return response()->json([
+                'status' => 'success',
+                'message' => 'Harga pemeriksaan satuan berhasil disalin dari sub penjamin lain!'
+            ]);
+        } catch (\Exception $e) {
+            return response()->json([
+                'status' => 'error',
+                'message' => 'Gagal menyalin harga: ' . $e->getMessage()
+            ], 500);
+        }
+    }
+
+    // 3. Mengambil list sub penjamin kecuali yang sedang aktif (untuk dropdown modal salin)
+    public function getAllSubPenjaminExcept($id)
+    {
+        $subPenjamin = DB::table('medical_sub_penjamin as sp')
+            ->join('medical_penjamin as p', 'sp.penjamin_id', '=', 'p.id')
+            ->where('sp.id', '!=', $id)
+            ->select('sp.id', 'sp.nama_sub_penjamin', 'p.nama_penjamin')
+            ->orderBy('sp.nama_sub_penjamin', 'ASC')
+            ->get();
+
+        return response()->json($subPenjamin);
+    }
     // MASTER SPECIMEN PEMERIKSAAN
     public function master_pemeriksaan_specimen($akses, $id)
     {
@@ -1431,27 +1533,13 @@ class MasterDataController extends Controller
     public function master_data_penjamin($akses, $id)
     {
         if ($this->url_akses_sub($akses, $id) == true) {
-            // Ambil seluruh data penjamin utama
             $penjaminUtama = DB::table('medical_penjamin')
-                ->select(['id', 'nama_penjamin'])
+                ->select(['id', 'nama_penjamin', 'jenis_kategori'])
                 ->orderBy('nama_penjamin', 'ASC')
-                ->get();
-
-            // Ambil seluruh data sub penjamin beserta relasinya ke penjamin utama
-            $subPenjamin = DB::table('medical_sub_penjamin as sp')
-                ->join('medical_penjamin as p', 'sp.penjamin_id', '=', 'p.id')
-                ->select([
-                    'sp.id as sub_penjamin_id',
-                    'sp.penjamin_id',
-                    'sp.nama_sub_penjamin',
-                    'p.nama_penjamin'
-                ])
-                ->orderBy('sp.nama_sub_penjamin', 'ASC')
                 ->get();
 
             return view('application.master-data.master-penjamin', [
                 'penjaminUtama' => $penjaminUtama,
-                'subPenjamin'   => $subPenjamin,
                 'akses'         => $akses,
                 'code'          => $id
             ]);
@@ -1459,9 +1547,251 @@ class MasterDataController extends Controller
             return Redirect::to('dashboard/home');
         }
     }
-    // ==========================================
-    // 1. PENJAMIN UTAMA (STORE & UPDATE)
-    // ==========================================
+
+    public function get_sub_penjamin($penjamin_id)
+    {
+        try {
+            $subPenjamin = DB::table('medical_sub_penjamin as sp')
+                ->join('medical_penjamin as p', 'sp.penjamin_id', '=', 'p.id')
+                ->where('sp.penjamin_id', $penjamin_id)
+                ->select([
+                    'sp.id as sub_penjamin_id',
+                    'sp.penjamin_id',
+                    'sp.nama_sub_penjamin',
+                    'p.nama_penjamin',
+                    'sp.no_ref',
+                    'sp.tgl_mulai',
+                    'sp.tgl_selesai',
+                    'sp.catatan_pelayanan',
+                    'sp.tipe_pembayaran',
+                    'sp.jatuh_tempo_hari',
+                    'sp.min_dp_persen',
+
+                    // --- SKEMA SPLIT BILLING & TANGGUNGAN (COVERAGE RULE) ---
+                    'sp.pola_tanggungan',
+                    'sp.tanggungan_perusahaan_persen',
+                    'sp.tanggungan_perusahaan_maksimal_rp',
+                    // -------------------------------------------------------
+
+                    'sp.alamat',
+                    'sp.telp_perusahaan',
+                    'sp.wajib_surat_garansi',
+                    'sp.status_aktif'
+                ])
+                ->orderBy('sp.nama_sub_penjamin', 'ASC')
+                ->get();
+
+            // Ambil ID Sub Penjamin untuk query relasi PIC
+            $subIds = $subPenjamin->pluck('sub_penjamin_id');
+
+            // Pengaman: Hanya jalankan query ke tabel PIC jika ada sub_penjamin ditemukan
+            $allPics = collect([]);
+            if ($subIds->count() > 0) {
+                $allPics = DB::table('medical_sub_penjamin_pics')
+                    ->whereIn('sub_penjamin_id', $subIds)
+                    ->get()
+                    ->groupBy('sub_penjamin_id');
+            }
+
+            // Gabungkan PIC ke masing-masing sub penjamin
+            foreach ($subPenjamin as $sub) {
+                $sub->pics = $allPics->get($sub->sub_penjamin_id, collect([]));
+            }
+
+            return response()->json([
+                'status' => 'success',
+                'data'   => $subPenjamin
+            ]);
+        } catch (\Exception $e) {
+            return response()->json([
+                'status'  => 'error',
+                'message' => $e->getMessage()
+            ], 500);
+        }
+    }
+    public function getAllSubPenjamin()
+    {
+        $subPenjamin = DB::table('medical_sub_penjamin as sp')
+            ->join('medical_penjamin as p', 'sp.penjamin_id', '=', 'p.id')
+            ->select('sp.id as sub_penjamin_id', 'sp.nama_sub_penjamin', 'p.nama_penjamin')
+            ->orderBy('sp.nama_sub_penjamin', 'ASC')
+            ->get();
+
+        return response()->json([
+            'status' => 'success',
+            'data'   => $subPenjamin
+        ]);
+    }
+    public function getTarif($sub_id)
+    {
+
+        $igd = DB::table('medical_tarif_igd')->where('sub_penjamin_id', $sub_id)->where('is_active', 1)->get();
+
+        // Bisa join ke tabel medical_master_poli jika ingin nama polinya tampil
+        $poli = DB::table('medical_tarif_poli')->where('sub_penjamin_id', $sub_id)->where('is_active', 1)->get();
+
+        $ranap = DB::table('medical_tarif_rawatinap')->where('sub_penjamin_id', $sub_id)->where('is_active', 1)->get();
+
+        return response()->json([
+            'status' => 'success',
+            'data' => [
+                'igd' => $igd,
+                'poli' => $poli,
+                'ranap' => $ranap,
+            ]
+        ]);
+    }
+    public function storeTarif(Request $request, $sub_id)
+    {
+        // Tangkap data berdasarkan kategori layanan yang dikirim dari form
+        $kategori = $request->input('kategori_layanan');
+
+        // --- NEW: Tangkap Input Skema Tanggungan Khusus (Berlaku untuk semua layanan) ---
+        $polaTanggungan       = $request->input('pola_tanggungan') ?? 'IKUT_ATURAN_INDUK';
+        $tanggunganPersen     = $request->input('tanggungan_perusahaan_persen') ?: 0;
+        $tanggunganMaksimalRp = $request->input('tanggungan_perusahaan_maksimal_rp') ?: 0;
+        // ---------------------------------------------------------------------------------
+
+        try {
+            if ($kategori === 'IGD') {
+                DB::table('medical_tarif_igd')->insert([
+                    'sub_penjamin_id' => $sub_id,
+                    'kategori_biaya'  => $request->input('igd_kategori_biaya'),
+                    'nama_tarif'      => $request->input('igd_nama_tarif'),
+                    'tarif'           => $request->input('igd_tarif') ?: 0,
+
+                    // Insert Skema Tanggungan
+                    'pola_tanggungan'                   => $polaTanggungan,
+                    'tanggungan_perusahaan_persen'      => $tanggunganPersen,
+                    'tanggungan_perusahaan_maksimal_rp' => $tanggunganMaksimalRp,
+
+                    'is_active'       => 1,
+                    'created_at'      => now(),
+                    'updated_at'      => now(),
+                ]);
+            } elseif ($kategori === 'POLI') {
+                DB::table('medical_tarif_poli')->insert([
+                    'sub_penjamin_id' => $sub_id,
+                    'poli_id'         => $request->input('poli_id'),
+                    'kategori_biaya'  => $request->input('poli_kategori_biaya'),
+                    'nama_tarif'      => $request->input('poli_nama_tarif'),
+                    'tarif'           => $request->input('poli_tarif') ?: 0,
+
+                    // Insert Skema Tanggungan
+                    'pola_tanggungan'                   => $polaTanggungan,
+                    'tanggungan_perusahaan_persen'      => $tanggunganPersen,
+                    'tanggungan_perusahaan_maksimal_rp' => $tanggunganMaksimalRp,
+
+                    'is_active'       => 1,
+                    'created_at'      => now(),
+                    'updated_at'      => now(),
+                ]);
+            } elseif ($kategori === 'RANAP') {
+                DB::table('medical_tarif_rawatinap')->insert([
+                    'sub_penjamin_id'                   => $sub_id,
+                    'kelas'                             => $request->input('ranap_kelas'),
+                    'tarif_kamar_per_hari'              => $request->input('ranap_tarif_kamar') ?? 0,
+                    'tarif_visite_dokter_per_hari'      => $request->input('ranap_tarif_visite') ?? 0,
+                    'tarif_asuhan_keperawatan_per_hari' => $request->input('ranap_tarif_askep') ?? 0,
+
+                    // Insert Skema Tanggungan
+                    'pola_tanggungan'                   => $polaTanggungan,
+                    'tanggungan_perusahaan_persen'      => $tanggunganPersen,
+                    'tanggungan_perusahaan_maksimal_rp' => $tanggunganMaksimalRp,
+
+                    'is_active'                         => 1,
+                    'created_at'                        => now(),
+                    'updated_at'                        => now(),
+                ]);
+            }
+
+            return response()->json([
+                'status'  => 'success',
+                'message' => 'Tarif berhasil disimpan'
+            ]);
+        } catch (\Exception $e) {
+            return response()->json([
+                'status'  => 'error',
+                'message' => 'Gagal menyimpan tarif: ' . $e->getMessage()
+            ], 500);
+        }
+    }
+    public function salinTarif(Request $request)
+    {
+        $sumberId = $request->input('sumber_sub_id');
+        $targetId = $request->input('target_sub_id');
+
+        try {
+            // 1. Salin Tarif IGD
+            $tarifIgd = DB::table('medical_tarif_igd')->where('sub_penjamin_id', $sumberId)->get();
+            foreach ($tarifIgd as $item) {
+                DB::table('medical_tarif_igd')->insert([
+                    'sub_penjamin_id' => $targetId,
+                    'kategori_biaya'  => $item->kategori_biaya,
+                    'nama_tarif'      => $item->nama_tarif,
+                    'tarif'           => $item->tarif,
+                    'is_active'       => $item->is_active,
+                    'created_at'      => now(),
+                    'updated_at'      => now(),
+                ]);
+            }
+
+            // 2. Salin Tarif Poli
+            $tarifPoli = DB::table('medical_tarif_poli')->where('sub_penjamin_id', $sumberId)->get();
+            foreach ($tarifPoli as $item) {
+                DB::table('medical_tarif_poli')->insert([
+                    'poli_id'         => $item->poli_id,
+                    'sub_penjamin_id' => $targetId,
+                    'kategori_biaya'  => $item->kategori_biaya,
+                    'nama_tarif'      => $item->nama_tarif,
+                    'tarif'           => $item->tarif,
+                    'is_active'       => $item->is_active,
+                    'created_at'      => now(),
+                    'updated_at'      => now(),
+                ]);
+            }
+
+            // 3. Salin Tarif Rawat Inap
+            $tarifRanap = DB::table('medical_tarif_rawatinap')->where('sub_penjamin_id', $sumberId)->get();
+            foreach ($tarifRanap as $item) {
+                DB::table('medical_tarif_rawatinap')->insert([
+                    'kelas'                             => $item->kelas,
+                    'sub_penjamin_id'                   => $targetId,
+                    'tarif_kamar_per_hari'              => $item->tarif_kamar_per_hari,
+                    'tarif_visite_dokter_per_hari'      => $item->tarif_visite_dokter_per_hari,
+                    'tarif_asuhan_keperawatan_per_hari' => $item->tarif_asuhan_keperawatan_per_hari,
+                    'is_active'                         => $item->is_active,
+                    'created_at'                        => now(),
+                    'updated_at'                        => now(),
+                ]);
+            }
+
+            return response()->json([
+                'status'  => 'success',
+                'message' => 'Data tarif berhasil disalin dari sub penjamin lain.'
+            ]);
+        } catch (\Exception $e) {
+            return response()->json([
+                'status'  => 'error',
+                'message' => $e->getMessage()
+            ], 500);
+        }
+    }
+    public function nonaktifkan_sub_penjamin($id)
+    {
+        try {
+            DB::table('medical_sub_penjamin')
+                ->where('id', $id)
+                ->update([
+                    'status_aktif' => 0,
+                    'updated_at' => now()
+                ]);
+
+            return back()->with('success', 'Status Sub Penjamin berhasil dinonaktifkan. Anda sekarang dapat mengubah datanya.');
+        } catch (\Exception $e) {
+            return back()->with('error', 'Gagal menonaktifkan status: ' . $e->getMessage());
+        }
+    }
     public function store_penjamin_utama(Request $request)
     {
         $request->validate([
@@ -1480,7 +1810,6 @@ class MasterDataController extends Controller
             return back()->with('error', 'Terjadi kesalahan: ' . $e->getMessage());
         }
     }
-
     public function update_penjamin_utama(Request $request, $id)
     {
         $request->validate([
@@ -1500,48 +1829,191 @@ class MasterDataController extends Controller
             return back()->with('error', 'Terjadi kesalahan: ' . $e->getMessage());
         }
     }
-
-    // ==========================================
-    // 2. SUB PENJAMIN (STORE & UPDATE)
-    // ==========================================
     public function store_sub_penjamin(Request $request)
     {
-        $request->validate([
-            'penjamin_id'       => 'required|exists:medical_penjamin,id',
-            'nama_sub_penjamin' => 'required|string|max:255'
-        ]);
-
         try {
-            DB::table('medical_sub_penjamin')->insert([
-                'penjamin_id'       => $request->penjamin_id,
-                'nama_sub_penjamin' => $request->nama_sub_penjamin,
-                'created_at'        => now(),
-                'updated_at'        => now(),
+            DB::beginTransaction();
+
+            $subPenjaminId = DB::table('medical_sub_penjamin')->insertGetId([
+                'penjamin_id'         => $request->penjamin_id,
+                'nama_sub_penjamin'   => $request->nama_sub_penjamin,
+
+                // --- IDENTITAS & KONTRAK ---
+                'no_ref'              => $request->no_ref,
+                'tgl_mulai'           => $request->tgl_mulai,
+                'tgl_selesai'         => $request->tgl_selesai,
+                'catatan_pelayanan'   => $request->catatan_pelayanan,
+
+                // --- PENGATURAN PEMBAYARAN & KEUANGAN ---
+                'tipe_pembayaran'     => $request->tipe_pembayaran ?? 'CASH_DI_AWAL',
+                'jatuh_tempo_hari'    => $request->jatuh_tempo_hari ?: 30,
+                'min_dp_persen'       => $request->min_dp_persen ?: 0.00,
+
+                // --- SKEMA SPLIT BILLING & TANGGUNGAN (COVERAGE RULE) ---
+                'pola_tanggungan'                    => $request->pola_tanggungan ?? 'FULL_PASIEN',
+                'tanggungan_perusahaan_persen'       => $request->tanggungan_perusahaan_persen ?: 0.00,
+                'tanggungan_perusahaan_maksimal_rp'  => $request->tanggungan_perusahaan_maksimal_rp ?: 0.00,
+
+                // --- KONTAK & ALAMAT UTAMA ---
+                'alamat'              => $request->alamat,
+                'telp_perusahaan'     => $request->telp_perusahaan,
+
+                // --- SYARAT & KETENTUAN KHUSUS ---
+                'wajib_surat_garansi' => $request->has('wajib_surat_garansi') ? 1 : 0,
+                'status_aktif'        => $request->has('status_aktif') ? 1 : 0,
+
+                'created_at'          => now(),
+                'updated_at'          => now()
             ]);
 
-            return back()->with('success', 'Sub penjamin berhasil ditambahkan.');
+            // Simpan Data Multi-PIC
+            if ($request->has('pics') && is_array($request->pics)) {
+                $picsData = [];
+                foreach ($request->pics as $pic) {
+                    if (!empty($pic['nama_pic'])) {
+                        $picsData[] = [
+                            'sub_penjamin_id' => $subPenjaminId,
+                            'nama_pic'        => $pic['nama_pic'],
+                            'telepon'         => $pic['telepon'] ?? null,
+                            'email'           => $pic['email'] ?? null,
+                            'created_at'      => now(),
+                            'updated_at'      => now()
+                        ];
+                    }
+                }
+                if (!empty($picsData)) {
+                    DB::table('medical_sub_penjamin_pics')->insert($picsData);
+                }
+            }
+
+            DB::commit();
+            return redirect()->back()->with('success', 'Sub Penjamin berhasil ditambahkan.');
         } catch (\Exception $e) {
-            return back()->with('error', 'Terjadi kesalahan: ' . $e->getMessage());
+            DB::rollBack();
+            return redirect()->back()->with('error', 'Gagal menyimpan data: ' . $e->getMessage());
+        }
+    }
+    public function update_sub_penjamin(Request $request, $id)
+    {
+        try {
+            DB::beginTransaction();
+
+            // Update data utama sub penjamin
+            DB::table('medical_sub_penjamin')->where('id', $id)->update([
+                'nama_sub_penjamin'   => $request->nama_sub_penjamin,
+
+                // --- IDENTITAS & KONTRAK ---
+                'no_ref'              => $request->no_ref,
+                'tgl_mulai'           => $request->tgl_mulai,
+                'tgl_selesai'         => $request->tgl_selesai,
+                'catatan_pelayanan'   => $request->catatan_pelayanan,
+
+                // --- PENGATURAN PEMBAYARAN & KEUANGAN ---
+                'tipe_pembayaran'     => $request->tipe_pembayaran ?? 'CASH_DI_AWAL',
+                'jatuh_tempo_hari'    => $request->jatuh_tempo_hari ?: 30,
+                'min_dp_persen'       => $request->min_dp_persen ?: 0.00,
+
+                // --- SKEMA SPLIT BILLING & TANGGUNGAN (COVERAGE RULE) ---
+                'pola_tanggungan'                    => $request->pola_tanggungan ?? 'FULL_PASIEN',
+                'tanggungan_perusahaan_persen'       => $request->tanggungan_perusahaan_persen ?: 0.00,
+                'tanggungan_perusahaan_maksimal_rp'  => $request->tanggungan_perusahaan_maksimal_rp ?: 0.00,
+
+                // --- KONTAK & ALAMAT UTAMA ---
+                'alamat'              => $request->alamat,
+                'telp_perusahaan'     => $request->telp_perusahaan,
+
+                // --- SYARAT & KETENTUAN KHUSUS ---
+                'wajib_surat_garansi' => $request->has('wajib_surat_garansi') ? 1 : 0,
+                'status_aktif'        => $request->has('status_aktif') ? 1 : 0,
+
+                'updated_at'          => now()
+            ]);
+
+            // Hapus data PIC lama dan masukkan yang baru (Sync manual)
+            DB::table('medical_sub_penjamin_pics')->where('sub_penjamin_id', $id)->delete();
+
+            if ($request->has('pics') && is_array($request->pics)) {
+                $picsData = [];
+                foreach ($request->pics as $pic) {
+                    if (!empty($pic['nama_pic'])) {
+                        $picsData[] = [
+                            'sub_penjamin_id' => $id,
+                            'nama_pic'        => $pic['nama_pic'],
+                            'telepon'         => $pic['telepon'] ?? null,
+                            'email'           => $pic['email'] ?? null,
+                            'created_at'      => now(),
+                            'updated_at'      => now()
+                        ];
+                    }
+                }
+                if (!empty($picsData)) {
+                    DB::table('medical_sub_penjamin_pics')->insert($picsData);
+                }
+            }
+
+            DB::commit();
+            return redirect()->back()->with('success', 'Data Sub Penjamin berhasil diperbarui.');
+        } catch (\Exception $e) {
+            DB::rollBack();
+            return redirect()->back()->with('error', 'Gagal memperbarui data: ' . $e->getMessage());
         }
     }
 
-    public function update_sub_penjamin(Request $request, $id)
+    public function getPolisJson(Request $request)
     {
-        $request->validate([
-            'nama_sub_penjamin' => 'required|string|max:255'
-        ]);
-
         try {
-            DB::table('medical_sub_penjamin')
-                ->where('id', $id)
-                ->update([
-                    'nama_sub_penjamin' => $request->nama_sub_penjamin,
-                    'updated_at'        => now(),
-                ]);
+            // Sesuaikan nama tabel dengan database Anda (contoh: medical_master_poli)
+            $polis = DB::table('medical_master_poli')->get();
 
-            return back()->with('success', 'Sub penjamin berhasil diperbarui.');
+            return response()->json([
+                'success' => true,
+                'data'    => $polis
+            ]);
         } catch (\Exception $e) {
-            return back()->with('error', 'Terjadi kesalahan: ' . $e->getMessage());
+            return response()->json([
+                'success' => false,
+                'message' => 'Gagal memuat data poli: ' . $e->getMessage()
+            ], 500);
+        }
+    }
+
+    // Ambil semua daftar Ruangan Rawat Inap
+    public function getRuanganAll(Request $request)
+    {
+        try {
+            // Sesuaikan nama tabel (contoh: medical_master_ruangan)
+            $ruangan = DB::table('medical_master_ruangan')->get();
+
+            return response()->json([
+                'success' => true,
+                'data'    => $ruangan
+            ]);
+        } catch (\Exception $e) {
+            return response()->json([
+                'success' => false,
+                'message' => 'Gagal memuat data ruangan: ' . $e->getMessage()
+            ], 500);
+        }
+    }
+
+    // Ambil daftar Bed berdasarkan ID Ruangan
+    public function getBedTersedia($ruanganId)
+    {
+        try {
+            // Sesuaikan nama tabel (contoh: medical_master_bed)
+            $beds = DB::table('medical_master_bed')
+                ->where('ruangan_id', $ruanganId)
+                ->get();
+
+            return response()->json([
+                'success' => true,
+                'data'    => $beds
+            ]);
+        } catch (\Exception $e) {
+            return response()->json([
+                'success' => false,
+                'message' => 'Gagal memuat data bed: ' . $e->getMessage()
+            ], 500);
         }
     }
     // PENJUALAN KATEGORI

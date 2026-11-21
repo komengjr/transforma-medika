@@ -275,8 +275,20 @@
                 <span class="retro-badge" style="background-color: var(--retro-cyan); color: var(--retro-dark);" id="totalBadge">Total: 0 Data</span>
             </div>
 
+            <!-- CONTAINER TOMBOL AKSI & FILTER TIPE LAYANAN -->
             <div class="card-body p-3 border-bottom border-dark" style="background-color: #fff;">
-                <div class="row align-items-center">
+                <div class="row align-items-center g-3">
+                    <!-- 2 TOMBOL BARU DI ATAS FILTER -->
+                    <div class="col-12 d-flex flex-wrap gap-2 pb-2 border-bottom border-dark">
+                        <button type="button" class="btn btn-sm retro-btn retro-btn-warning" id="btnOpenDefaultHarga">
+                            <i class="bi bi-magic me-1"></i> Buat Default Harga
+                        </button>
+                        <button type="button" class="btn btn-sm retro-btn retro-btn-primary" id="btnOpenSalinHarga">
+                            <i class="bi bi-files me-1"></i> Salin Harga dari Sub Penjamin Lain
+                        </button>
+                    </div>
+
+                    <!-- FILTER BERDASARKAN TIPE LAYANAN -->
                     <div class="col-md-6">
                         <label class="form-label fw-bolder text-dark small mb-1">FILTER BERDASARKAN TIPE LAYANAN:</label>
                         <select id="filter_tipe_layanan" class="form-select form-select-sm retro-input">
@@ -358,7 +370,59 @@
         </div>
     </div>
 </div>
+<!-- MODAL BUAT DEFAULT HARGA -->
+<div class="modal fade" id="modalDefaultHarga" tabindex="-1" aria-hidden="true">
+    <div class="modal-dialog modal-dialog-centered">
+        <div class="modal-content retro-modal-content">
+            <div class="modal-header py-3 px-4" style="background-color: var(--retro-yellow); border-bottom: 3px solid var(--retro-dark); color: var(--retro-dark);">
+                <h5 class="modal-title fw-bolder"><i class="bi bi-magic me-2"></i>Generate Default Harga</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close" style="filter: brightness(0); border: 2px solid #1e1e24; border-radius: 50%; padding: 5px; box-shadow: 2px 2px 0px #1e1e24;"></button>
+            </div>
+            <div class="modal-body p-4" style="background-color: var(--retro-bg);">
+                <div class="alert mb-3" style="background-color: var(--retro-cyan); border: 2px solid var(--retro-dark); box-shadow: 3px 3px 0px var(--retro-dark); color: var(--retro-dark);">
+                    <small class="fw-bold">Fitur ini akan menyamakan tarif sub penjamin aktif ini dengan <strong>Harga Dasar (Master Pemeriksaan)</strong> tanpa diskon (Diskon = 0) untuk semua item pemeriksaan yang belum di-setting.</small>
+                </div>
+                <p class="fw-bold text-dark">Sub Penjamin Aktif: <span id="lblSubPenjaminDefault" class="text-danger"></span></p>
+            </div>
+            <div class="modal-footer bg-white border-top border-dark">
+                <button type="button" class="btn retro-btn retro-btn-light" data-bs-dismiss="modal">Batal</button>
+                <button type="button" class="btn retro-btn retro-btn-primary" id="btnExecuteDefaultHarga">
+                    <i class="bi bi-check-circle me-1"></i> Proses Generate
+                </button>
+            </div>
+        </div>
+    </div>
+</div>
 
+<!-- MODAL SALIN HARGA DARI SUB PENJAMIN LAIN -->
+<div class="modal fade" id="modalSalinHarga" tabindex="-1" aria-hidden="true">
+    <div class="modal-dialog modal-dialog-centered">
+        <div class="modal-content retro-modal-content">
+            <div class="modal-header py-3 px-4" style="background-color: var(--retro-orange); border-bottom: 3px solid var(--retro-dark); color: var(--retro-dark);">
+                <h5 class="modal-title fw-bolder"><i class="bi bi-files me-2"></i>Salin Harga dari Sub Penjamin Lain</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close" style="filter: brightness(0); border: 2px solid #1e1e24; border-radius: 50%; padding: 5px; box-shadow: 2px 2px 0px #1e1e24;"></button>
+            </div>
+            <div class="modal-body p-4" style="background-color: var(--retro-bg);">
+                <div class="mb-3">
+                    <label for="sumber_sub_penjamin_id" class="form-label fw-bolder text-dark">Pilih Sub Penjamin Sumber <span class="text-danger">*</span></label>
+                    <select class="form-select retro-input" id="sumber_sub_penjamin_id">
+                        <option value="">-- Pilih Sub Penjamin Sumber --</option>
+                        @foreach($penjaminList as $p)
+                        <!-- Opsi sub penjamin akan dimuat dinamis atau dirender via JS -->
+                        @endforeach
+                    </select>
+                </div>
+                <small class="text-muted fw-bold">Semua data tarif dan diskon dari sub penjamin sumber akan diduplikasi ke sub penjamin yang sedang aktif saat ini.</small>
+            </div>
+            <div class="modal-footer bg-white border-top border-dark">
+                <button type="button" class="btn retro-btn retro-btn-light" data-bs-dismiss="modal">Batal</button>
+                <button type="button" class="btn retro-btn retro-btn-primary" id="btnExecuteSalinHarga">
+                    <i class="bi bi-check-circle me-1"></i> Salin Sekarang
+                </button>
+            </div>
+        </div>
+    </div>
+</div>
 <!-- Select2 JS -->
 <script src="https://cdn.jsdelivr.net/npm/select2@4.1.0-rc.0/dist/js/select2.min.js"></script>
 
@@ -670,6 +734,112 @@
             $('html, body').animate({
                 scrollTop: $('#priceForm').offset().top - 100
             }, 300);
+        });
+
+        // Tombol Buat Default Harga
+        $('#btnOpenDefaultHarga').on('click', function() {
+            const subId = subPenjaminSelect.val();
+            const subName = subPenjaminSelect.find('option:selected').text();
+
+            if (!subId) {
+                alert('Silakan pilih Sub Penjamin terlebih dahulu!');
+                return;
+            }
+
+            $('#lblSubPenjaminDefault').text(subName);
+            const modal = new bootstrap.Modal(document.getElementById('modalDefaultHarga'));
+            modal.show();
+        });
+
+        $('#btnExecuteDefaultHarga').on('click', function() {
+            const subId = subPenjaminSelect.val();
+            const btn = $(this);
+            btn.prop('disabled', true).html('<span class="spinner-border spinner-border-sm me-1"></span> Memproses...');
+
+            fetch("{{ route('penjamin-price.generate-default') }}", {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                        'X-CSRF-TOKEN': csrfToken,
+                        'X-Requested-With': 'XMLHttpRequest',
+                        'Accept': 'application/json'
+                    },
+                    body: JSON.stringify({
+                        sub_penjamin_id: subId
+                    })
+                })
+                .then(async res => {
+                    const data = await res.json();
+                    if (!res.ok) alert("Gagal men-generate default harga.");
+                    else {
+                        alert(data.message);
+                        bootstrap.Modal.getInstance(document.getElementById('modalDefaultHarga')).hide();
+                        filterTableData();
+                    }
+                })
+                .catch(err => console.error(err))
+                .finally(() => btn.prop('disabled', false).html('<i class="bi bi-check-circle me-1"></i> Proses Generate'));
+        });
+
+        // Tombol Salin Harga dari Sub Penjamin Lain
+        $('#btnOpenSalinHarga').on('click', function() {
+            const subId = subPenjaminSelect.val();
+            if (!subId) {
+                alert('Silakan pilih Sub Penjamin target terlebih dahulu!');
+                return;
+            }
+
+            // Ambil data sub penjamin lain untuk dropdown sumber
+            fetch(`/master-data/get-all-sub-penjamin-except/${subId}`)
+                .then(res => res.json())
+                .then(data => {
+                    const sumberSelect = $('#sumber_sub_penjamin_id');
+                    sumberSelect.html('<option value="">-- Pilih Sub Penjamin Sumber --</option>');
+                    data.forEach(item => {
+                        sumberSelect.append(new Option(`${item.nama_sub_penjamin} (${item.nama_penjamin})`, item.id));
+                    });
+                    const modal = new bootstrap.Modal(document.getElementById('modalSalinHarga'));
+                    modal.show();
+                })
+                .catch(err => console.error(err));
+        });
+
+        $('#btnExecuteSalinHarga').on('click', function() {
+            const targetSubId = subPenjaminSelect.val();
+            const sumberSubId = $('#sumber_sub_penjamin_id').val();
+
+            if (!sumberSubId) {
+                alert('Pilih sub penjamin sumber terlebih dahulu!');
+                return;
+            }
+
+            const btn = $(this);
+            btn.prop('disabled', true).html('<span class="spinner-border spinner-border-sm me-1"></span> Menyalin...');
+
+            fetch("{{ route('penjamin-price.copy-from-sub') }}", {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                        'X-CSRF-TOKEN': csrfToken,
+                        'X-Requested-With': 'XMLHttpRequest',
+                        'Accept': 'application/json'
+                    },
+                    body: JSON.stringify({
+                        target_sub_id: targetSubId,
+                        sumber_sub_id: sumberSubId
+                    })
+                })
+                .then(async res => {
+                    const data = await res.json();
+                    if (!res.ok) alert("Gagal menyalin harga.");
+                    else {
+                        alert(data.message);
+                        bootstrap.Modal.getInstance(document.getElementById('modalSalinHarga')).hide();
+                        filterTableData();
+                    }
+                })
+                .catch(err => console.error(err))
+                .finally(() => btn.prop('disabled', false).html('<i class="bi bi-check-circle me-1"></i> Salin Sekarang'));
         });
     });
 </script>

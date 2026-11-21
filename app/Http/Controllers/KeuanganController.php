@@ -303,62 +303,69 @@ class KeuanganController extends Controller
                 ->where('registrasi_id', $regId)
                 ->first();
 
-            $tindakan = collect([]);
-            $obat = collect([]);
-            $totalTindakan = 0;
-            $totalObat = 0;
+            $items = collect([]);
+            $totalTanggunganPasien = 0;
+            $totalTanggunganPerusahaan = 0;
             $grandTotal = 0;
+            $polaTanggungan = 'FULL_PASIEN';
             $statusBayar = 'BELUM LUNAS';
 
             if ($transaksi) {
-                // 3. Ambil Rincian Transaksi yang belum dibayar atau sedang diproses
-                $details = DB::table('medical_transaksi_detail as td')
+                // 3. Ambil Rincian Transaksi beserta Kolom Tanggungan Penjamin (Pasien vs Perusahaan)
+                $items = DB::table('medical_transaksi_detail as td')
                     ->select(
                         'td.id',
                         'td.jenis_item',
-                        'td.nama_item as item',
+                        'td.nama_item',
                         'td.qty',
-                        'td.harga_akhir as harga', // Di database terbaru, harga_akhir adalah Subtotal per baris
+                        'td.harga_akhir', // Total harga item (qty * harga satuan)
+                        'td.tanggungan_pasien',
+                        'td.tanggungan_perusahaan',
                         'td.status_pembayaran'
                     )
                     ->where('td.transaksi_id', $transaksi->id)
                     ->whereNotIn('td.status_pemeriksaan', ['BATAL'])
-                    ->where('td.status_pembayaran', 'BELUM LUNAS') // Filter rolling bill
+                    ->where('td.status_pembayaran', 'BELUM LUNAS')
                     ->get();
 
-                // Pisahkan koleksi berdasarkan jenisnya
-                $tindakan = $details->where('jenis_item', '!=', 'OBAT')->values();
-                $obat     = $details->where('jenis_item', 'OBAT')->values();
+                // Hitung akumulasi porsi masing-masing
+                $totalTanggunganPasien = $items->sum('tanggungan_pasien');
+                $totalTanggunganPerusahaan = $items->sum('tanggungan_perusahaan');
 
-                // Sum total berdasarkan harga_akhir (karena harga_akhir = qty * harga satuan)
-                $totalTindakan = $tindakan->sum('harga');
-                $totalObat     = $obat->sum('harga');
+                // Grand total yang harus dibayar oleh kasir (mengacu ke porsi pasien)
+                $grandTotal = $totalTanggunganPasien;
 
-                // 4. Hitung Grand Total Sisa Belum Lunas
-                $grandTotal = $transaksi->sisa_tagihan;
+                // Tentukan pola penjamin berdasarkan data header/transaksi atau kalkulasi porsi
+                if ($totalTanggunganPasien > 0 && $totalTanggunganPerusahaan > 0) {
+                    $polaTanggungan = 'SPLIT_BILL';
+                } elseif ($totalTanggunganPasien == 0 && $totalTanggunganPerusahaan > 0) {
+                    $polaTanggungan = 'FULL_PERUSAHAAN';
+                } else {
+                    $polaTanggungan = 'FULL_PASIEN';
+                }
 
                 // Tentukan status lunas untuk antarmuka UI
                 $statusBayar = ($grandTotal > 0 || $transaksi->status_pembayaran !== 'LUNAS') ? 'BELUM LUNAS' : 'LUNAS';
             }
 
             return response()->json([
-                'success'        => true,
-                'pasien'         => $registrasi,
-                'transaksi'      => [
-                    'id'                => $transaksi ? $transaksi->id : null,
-                    'status_pembayaran' => $statusBayar
+                'success'                    => true,
+                'pasien'                     => $registrasi,
+                'transaksi'                  => [
+                    'id'                     => $transaksi ? $transaksi->id : null,
+                    'status_pembayaran'      => $statusBayar
                 ],
-                'tindakan'       => $tindakan,
-                'total_tindakan' => (float) $totalTindakan,
-                'obat'           => $obat,
-                'total_obat'     => (float) $totalObat,
-                'grand_total'    => (float) $grandTotal
+                'items'                      => $items,
+                'total_tanggungan_pasien'    => (float) $totalTanggunganPasien,
+                'total_tanggungan_perusahaan' => (float) $totalTanggunganPerusahaan,
+                'pola_tanggungan'            => $polaTanggungan,
+                'grand_total'                => (float) $grandTotal
             ]);
         } catch (\Exception $e) {
             return response()->json([
                 'success' => false,
                 'message' => 'Terjadi kesalahan sistem: ' . $e->getMessage()
-            ]);
+            ], 500);
         }
     }
     public function getDetailTagihanKasir_old($regId)
@@ -838,6 +845,164 @@ class KeuanganController extends Controller
             return 0;
         }
     }
+    public function updateSplitItem(Request $request)
+    {
+        $request->validate([
+            'detail_id'             => 'required|numeric',
+            'tanggungan_pasien'     => 'required|numeric',
+            'tanggungan_perusahaan' => 'required|numeric',
+        ]);
+
+        try {
+            DB::beginTransaction();
+
+            $detailId = $request->detail_id;
+            $tggPasien = (float) $request->tanggungan_pasien;
+            $tggPerusahaan = (float) $request->tanggungan_perusahaan;
+
+            // Ambil data detail transaksi
+            $detail = DB::table('medical_transaksi_detail')->where('id', $detailId)->first();
+            if (!$detail) {
+                return response()->json(['success' => false, 'message' => 'Item detail tidak ditemukan.'], 404);
+            }
+
+            // Validasi agar total tanggungan tidak melebihi harga akhir item
+            $hargaAkhir = (float) $detail->harga_akhir;
+            if (round($tggPasien + $tggPerusahaan, 2) != round($hargaAkhir, 2)) {
+                return response()->json([
+                    'success' => false,
+                    'message' => 'Total tanggungan pasien dan perusahaan harus sama dengan subtotal item (Rp ' . number_format($hargaAkhir, 0, ',', '.') . ')'
+                ], 400);
+            }
+
+            // Update porsi tanggungan pada item detail tersebut
+            DB::table('medical_transaksi_detail')
+                ->where('id', $detailId)
+                ->update([
+                    'tanggungan_pasien'     => $tggPasien,
+                    'tanggungan_perusahaan' => $tggPerusahaan,
+                    'updated_at'            => now()
+                ]);
+
+            // Hitung ulang total tanggungan keseluruhan di tabel header transaksi utama
+            $transaksiId = $detail->transaksi_id;
+            if ($transaksiId) {
+                $sumPasien = DB::table('medical_transaksi_detail')->where('transaksi_id', $transaksiId)->sum('tanggungan_pasien');
+                $sumPerusahaan = DB::table('medical_transaksi_detail')->where('transaksi_id', $transaksiId)->sum('tanggungan_perusahaan');
+
+                DB::table('medical_transaksi')
+                    ->where('id', $transaksiId)
+                    ->update([
+                        'tanggungan_pasien'     => $sumPasien,
+                        'tanggungan_perusahaan' => $sumPerusahaan,
+                        'sisa_tagihan'          => $sumPerusahaan, // Menyesuaikan sisa piutang perusahaan
+                        'updated_at'            => now()
+                    ]);
+            }
+
+            DB::commit();
+
+            return response()->json([
+                'success' => true,
+                'message' => 'Porsi split berhasil diperbarui dan disimpan ke database!'
+            ]);
+        } catch (\Exception $e) {
+            DB::rollBack();
+            return response()->json([
+                'success' => false,
+                'message' => 'Gagal memperbarui porsi split: ' . $e->getMessage()
+            ], 500);
+        }
+    }
+    public function prosesPaymentParsial(Request $request)
+    {
+        $request->validate([
+            'registrasi_id' => 'required',
+            'metode_bayar'  => 'required|string',
+            'nominal_bayar' => 'required|numeric',
+            'item_ids'      => 'required|array', // ID detail item yang dicentang untuk dilunaskan
+            'edc_id'        => 'nullable|numeric',
+            'no_referensi'  => 'nullable|string',
+        ]);
+
+        try {
+            DB::beginTransaction();
+
+            $userId = Auth::user()->userid ?? 'SYSTEM';
+            $registrasiId = $request->registrasi_id;
+
+            // Ambil data registrasi utama
+            $registrasi = DB::table('medical_registrasi')->where('id', $registrasiId)->first();
+            if (!$registrasi) {
+                return response()->json(['success' => false, 'message' => 'Data registrasi tidak ditemukan.'], 404);
+            }
+
+            // Ambil item-item detail yang dipilih kasir untuk dilunaskan pada pembayaran ini
+            $selectedDetails = DB::table('medical_transaksi_detail')
+                ->whereIn('id', $request->item_ids)
+                ->where('status_pembayaran', '!=', 'LUNAS')
+                ->get();
+
+            if ($selectedDetails->isEmpty()) {
+                return response()->json(['success' => false, 'message' => 'Tidak ada item valid yang dipilih atau item sudah lunas.'], 400);
+            }
+
+            // Hitung total tagihan dari item yang dipilih pada sesi pembayaran ini
+            $subtotalBayarSesiIni = $selectedDetails->sum('tanggungan_pasien');
+            $nominalBayarPasien = (float) $request->nominal_bayar;
+
+            if ($nominalBayarPasien < $subtotalBayarSesiIni) {
+                return response()->json([
+                    'success' => false,
+                    'message' => 'Nominal bayar kurang dari total item porsi pasien yang dipilih (Rp ' . number_format($subtotalBayarSesiIni, 0, ',', '.') . ')'
+                ], 400);
+            }
+
+            // 1. BUAT RECORD TRANSAKSI BARU KHUSUS UNTUK SESI PEMBAYARAN INI (Menerbitkan Nota ke-1, ke-2, dst)
+            $transaksiBaruId = DB::table('medical_transaksi')->insertGetId([
+                'registrasi_id'         => $registrasiId,
+                'total_tagihan'         => $subtotalBayarSesiIni,
+                'tanggungan_pasien'     => $subtotalBayarSesiIni,
+                'tanggungan_perusahaan' => 0, // Perusahaan ditangani terpisah atau sesuai alur piutang
+                'total_bayar'           => $nominalBayarPasien,
+                'sisa_tagihan'          => 0,
+                'metode_bayar'          => $request->metode_bayar,
+                'status_pembayaran'     => 'LUNAS', // Karena sesi ini dibayar lunas oleh pasien
+                'dibuat_oleh'           => $userId,
+                'dilunasi_oleh'         => $userId,
+                'waktu_lunas'           => now(),
+                'created_at'            => now(),
+                'updated_at'            => now(),
+            ]);
+
+            // 2. UPDATE STATUS ITEM DETAIL MENJADI LUNAS DAN KAITKAN KE TRANSAKSI PEMBAYARAN INI
+            foreach ($selectedDetails as $detail) {
+                DB::table('medical_transaksi_detail')
+                    ->where('id', $detail->id)
+                    ->update([
+                        'transaksi_id'        => $transaksiBaruId, // Pindahkan/catat ke transaksi pembayaran nota ini
+                        'status_pembayaran'   => 'LUNAS',
+                        'waktu_bayar'         => now(),
+                        'updated_at'          => now()
+                    ]);
+            }
+
+            DB::commit();
+
+            return response()->json([
+                'success'      => true,
+                'message'      => 'Pembayaran berhasil diproses dan nota pembayaran diterbitkan!',
+                'transaksi_id' => $transaksiBaruId,
+                'redirect_url' => route('pembayaran.nota', $transaksiBaruId)
+            ]);
+        } catch (\Exception $e) {
+            DB::rollBack();
+            return response()->json([
+                'success' => false,
+                'message' => 'Gagal memproses pembayaran parsial: ' . $e->getMessage()
+            ], 500);
+        }
+    }
     public function downloadReceiptPdf($orderCode)
     {
         try {
@@ -1262,6 +1427,509 @@ class KeuanganController extends Controller
                 'success' => false,
                 'message' => 'Gagal memverifikasi laporan: ' . $e->getMessage()
             ], 500);
+        }
+    }
+    // PENAGIHAN TRANSAKSI KEUANGAN
+    public function penagihan_transaksi_keuangan($akses, $id)
+    {
+        if ($this->url_akses_sub($akses, $id) == true) {
+            // Ambil daftar sub penjamin/perusahaan untuk filter dropdown
+            $subPenjamins = DB::table('medical_sub_penjamin')->orderBy('nama_sub_penjamin', 'asc')->get();
+
+            return view('application.keuangan.penagihan-transaksi-keuangan', [
+                'akses' => $akses,
+                'code' => $id,
+                'subPenjamins' => $subPenjamins
+            ]);
+        } else {
+            return Redirect::to('dashboard/home');
+        }
+    }
+    public function apiGetPenagihanPerusahaan(Request $request)
+    {
+        try {
+            $startDate = $request->input('start_date', date('Y-m-d'));
+            $endDate = $request->input('end_date', date('Y-m-d'));
+            $penjaminId = $request->input('penjamin');
+            $status = $request->input('status', 'BELUM LUNAS'); // Default belum lunas/tertangguhkan
+            $keyword = $request->input('keyword');
+
+            $query = DB::table('medical_transaksi as mt')
+                ->join('medical_registrasi as mr', 'mt.registrasi_id', '=', 'mr.id')
+                ->join('medical_patient as mp', 'mr.pasien_id', '=', 'mp.id')
+                ->leftJoin('medical_sub_penjamin as msp', 'mr.sub_penjamin_id', '=', 'msp.id')
+                ->select(
+                    'mt.id as transaksi_id',
+                    'mt.registrasi_id',
+                    'mr.no_registrasi',
+                    'mr.tanggal_registrasi',
+                    'mp.pid',
+                    'mp.nama as nama_pasien',
+                    'mp.title',
+                    'mp.awalan',
+                    'mp.akhiran',
+                    'msp.nama_sub_penjamin',
+                    'mt.total_tagihan',
+                    'mt.tanggungan_pasien',
+                    'mt.tanggungan_perusahaan',
+                    'mt.sisa_tagihan',
+                    'mt.status_pembayaran',
+                    'mt.metode_bayar'
+                )
+                ->where('mt.tanggungan_perusahaan', '>', 0) // Hanya transaksi yang memiliki tanggungan perusahaan
+                ->when($startDate && $endDate, function ($q) use ($startDate, $endDate) {
+                    $q->whereDate('mr.tanggal_registrasi', '>=', $startDate)
+                        ->whereDate('mr.tanggal_registrasi', '<=', $endDate);
+                })
+                ->when($penjaminId, function ($q) use ($penjaminId) {
+                    $q->where('mr.sub_penjamin_id', $penjaminId);
+                })
+                ->when($status, function ($q) use ($status) {
+                    if ($status !== 'SEMUA') {
+                        if ($status === 'BELUM LUNAS') {
+                            $q->where(function ($sub) {
+                                $sub->where('mt.status_pembayaran', '!=', 'LUNAS')
+                                    ->orWhereNull('mt.status_pembayaran');
+                            });
+                        } else {
+                            $q->where('mt.status_pembayaran', 'like', "%{$status}%");
+                        }
+                    }
+                })
+                ->when($keyword, function ($q) use ($keyword) {
+                    $q->where(function ($sub) use ($keyword) {
+                        $sub->where('mr.no_registrasi', 'like', "%{$keyword}%")
+                            ->orWhere('mp.nama', 'like', "%{$keyword}%")
+                            ->orWhere('mp.pid', 'like', "%{$keyword}%");
+                    });
+                })
+                ->orderBy('mr.tanggal_registrasi', 'desc');
+
+            $data = $query->get()->map(function ($item) {
+                // Format nama lengkap pasien menggunakan title, awalan, dan akhiran dari tabel medical_patient
+                $item->nama_pasien_lengkap = trim(($item->title ? $item->title . ' ' : '') . $item->nama_pasien . ($item->akhiran ? ', ' . $item->akhiran : ''));
+                return $item;
+            });
+
+            return response()->json([
+                'success' => true,
+                'data' => $data
+            ]);
+        } catch (\Exception $e) {
+            return response()->json([
+                'success' => false,
+                'message' => 'Gagal memuat data penagihan: ' . $e->getMessage()
+            ], 500);
+        }
+    }
+    public function apiGetDaftarPenagihanPerusahaan(Request $request)
+    {
+        try {
+            $penjaminId = $request->input('penjamin');
+            $noTagihan = $request->input('keyword');
+            $status = $request->input('status', 'DRAFT');
+
+            $query = DB::table('medical_penagihan_perusahaan as mpp')
+                ->join('medical_sub_penjamin as msp', 'mpp.sub_penjamin_id', '=', 'msp.id')
+                ->select(
+                    'mpp.id as penagihan_id',
+                    'mpp.no_tagihan',
+                    'mpp.tanggal_tagihan',
+                    'mpp.status_tagihan',
+                    'mpp.total_tagihan',
+                    'msp.nama_sub_penjamin'
+                )
+                ->when($penjaminId, function ($q) use ($penjaminId) {
+                    $q->where('mpp.sub_penjamin_id', $penjaminId);
+                })
+                ->when($noTagihan, function ($q) use ($noTagihan) {
+                    $q->where('mpp.no_tagihan', 'like', "%{$noTagihan}%");
+                })
+                ->when($status, function ($q) use ($status) {
+                    if ($status !== 'SEMUA') {
+                        $q->where('mpp.status_tagihan', $status);
+                    }
+                })
+                ->orderBy('mpp.id', 'desc');
+
+            $data = $query->get();
+
+            return response()->json([
+                'success' => true,
+                'data' => $data
+            ]);
+        } catch (\Exception $e) {
+            return response()->json([
+                'success' => false,
+                'message' => 'Gagal memuat daftar penagihan: ' . $e->getMessage()
+            ], 500);
+        }
+    }
+    public function prosesPelunasanPiutangPerusahaan(Request $request)
+    {
+        $request->validate([
+            'transaksi_id' => 'required|numeric',
+            'metode_bayar' => 'required|string', // Transfer / Giro / Piutang Lunas
+            'nominal_bayar' => 'required|numeric',
+            'no_referensi' => 'nullable|string'
+        ]);
+
+        try {
+            DB::beginTransaction();
+
+            $userId = Auth::user()->userid ?? 'SYSTEM';
+            $transaksiId = $request->transaksi_id;
+
+            $transaksi = DB::table('medical_transaksi')->where('id', $transaksiId)->first();
+            if (!$transaksi) {
+                return response()->json(['success' => false, 'message' => 'Data transaksi tidak ditemukan.'], 404);
+            }
+
+            // Update status pembayaran piutang perusahaan menjadi lunas
+            DB::table('medical_transaksi')
+                ->where('id', $transaksiId)
+                ->update([
+                    'total_bayar' => DB::raw('total_bayar + ' . $request->nominal_bayar),
+                    'sisa_tagihan' => 0,
+                    'status_pembayaran' => 'LUNAS',
+                    'dilunasi_oleh' => $userId,
+                    'waktu_lunas' => now(),
+                    'updated_at' => now()
+                ]);
+
+            // Update detail item yang tanggungan perusahaannya belum lunas
+            DB::table('medical_transaksi_detail')
+                ->where('transaksi_id', $transaksiId)
+                ->where('tanggungan_perusahaan', '>', 0)
+                ->update([
+                    'status_pembayaran' => 'LUNAS',
+                    'waktu_bayar' => now(),
+                    'updated_at' => now()
+                ]);
+
+            DB::commit();
+
+            return response()->json([
+                'success' => true,
+                'message' => 'Pelunasan piutang perusahaan berhasil dicatat dan diselesaikan!'
+            ]);
+        } catch (\Exception $e) {
+            DB::rollBack();
+            return response()->json([
+                'success' => false,
+                'message' => 'Gagal memproses pelunasan: ' . $e->getMessage()
+            ], 500);
+        }
+    }
+    public function buatTagihanPerusahaan(Request $request)
+    {
+        $request->validate([
+            'sub_penjamin_id' => 'required|numeric',
+            'tanggal_tagihan' => 'required|date',
+            'transaksi_ids'   => 'required|array', // Menerima array ID transaksi pasien yang dicentang
+        ]);
+
+        try {
+            DB::beginTransaction();
+
+            $tanggalHariIni = date('Ymd');
+            $lastTagihan = DB::table('medical_penagihan_perusahaan')
+                ->where('no_tagihan', 'like', "TGH-{$tanggalHariIni}-%")
+                ->orderBy('id', 'desc')
+                ->first();
+
+            $noUrut = $lastTagihan ? (int) substr($lastTagihan->no_tagihan, -4) + 1 : 1;
+            $noTagihanBaru = 'TGH-' . $tanggalHariIni . '-' . str_pad($noUrut, 4, '0', STR_PAD_LEFT);
+
+            $userId = Auth::user()->userid ?? 'SYSTEM';
+
+            // Hitung total tanggungan perusahaan dari transaksi yang dipilih
+            $totalTagihanPrsh = DB::table('medical_transaksi')
+                ->whereIn('id', $request->transaksi_ids)
+                ->sum('tanggungan_perusahaan');
+
+            // Simpan Header Tagihan
+            $tagihanId = DB::table('medical_penagihan_perusahaan')->insertGetId([
+                'no_tagihan'      => $noTagihanBaru,
+                'tanggal_tagihan' => $request->tanggal_tagihan,
+                'sub_penjamin_id' => $request->sub_penjamin_id,
+                'total_tagihan'   => $totalTagihanPrsh,
+                'status_tagihan'  => 'DRAFT',
+                'dibuat_oleh'     => $userId,
+                'created_at'      => now(),
+                'updated_at'      => now(),
+            ]);
+
+            // Simpan Detail Transaksi ke Tagihan
+            foreach ($request->transaksi_ids as $transaksiId) {
+                DB::table('medical_penagihan_detail')->insert([
+                    'penagihan_id' => $tagihanId,
+                    'transaksi_id' => $transaksiId,
+                    'created_at'   => now(),
+                    'updated_at'   => now(),
+                ]);
+            }
+
+            DB::commit();
+
+            return response()->json([
+                'success'    => true,
+                'message'    => 'Nomor tagihan berhasil dibuat dan nota pasien berhasil dimasukkan!',
+                'tagihan_id' => $tagihanId,
+                'no_tagihan' => $noTagihanBaru
+            ]);
+        } catch (\Exception $e) {
+            DB::rollBack();
+            return response()->json([
+                'success' => false,
+                'message' => 'Gagal membuat tagihan: ' . $e->getMessage()
+            ], 500);
+        }
+    }
+
+    // 2. Ambil Daftar Pasien / Transaksi Piutang Berdasarkan Sub Penjamin yang Belum Ditagih
+    public function getPasienBySubPenjamin(Request $request)
+    {
+        try {
+            $subPenjaminId = $request->input('sub_penjamin_id');
+
+            // Ambil ID transaksi yang sudah terdaftar di penagihan manapun
+            $transaksiSudahDitagih = DB::table('medical_penagihan_detail')->pluck('transaksi_id');
+
+            $data = DB::table('medical_transaksi as mt')
+                ->join('medical_registrasi as mr', 'mt.registrasi_id', '=', 'mr.id')
+                ->join('medical_patient as mp', 'mr.pasien_id', '=', 'mp.id')
+                ->select(
+                    'mt.id as transaksi_id',
+                    'mr.no_registrasi',
+                    'mr.tanggal_registrasi',
+                    'mp.pid',
+                    'mp.nama as nama_pasien',
+                    'mp.title',
+                    'mp.akhiran',
+                    'mt.tanggungan_perusahaan',
+                    'mt.status_pembayaran'
+                )
+                ->where('mr.sub_penjamin_id', $subPenjaminId)
+                ->where('mt.tanggungan_perusahaan', '>', 0)
+                ->where('mt.status_pembayaran', '!=', 'LUNAS')
+                ->whereNotIn('mt.id', $transaksiSudahDitagih) // KUNCI UTAMA: Agar tidak bisa masuk penagihan lain
+                ->get()
+                ->map(function ($item) {
+                    $item->nama_lengkap = trim(($item->title ? $item->title . ' ' : '') . $item->nama_pasien . ($item->akhiran ? ', ' . $item->akhiran : ''));
+                    return $item;
+                });
+
+            return response()->json([
+                'success' => true,
+                'data'    => $data
+            ]);
+        } catch (\Exception $e) {
+            return response()->json([
+                'success' => false,
+                'message' => 'Gagal memuat data pasien: ' . $e->getMessage()
+            ], 500);
+        }
+    }
+    public function getRincianItemTransaksi(Request $request)
+    {
+        try {
+            $transaksiIds = $request->input('transaksi_ids', []);
+
+            if (empty($transaksiIds)) {
+                return response()->json([
+                    'success' => true,
+                    'items'   => [],
+                    'total'   => 0
+                ]);
+            }
+
+            $items = DB::table('medical_transaksi_detail')
+                ->whereIn('transaksi_id', $transaksiIds)
+                ->where('tanggungan_perusahaan', '>', 0)
+                ->select(
+                    'id',
+                    'transaksi_id',
+                    'jenis_item', // Misal: TINDAKAN, OBAT, ADMINISTRASI, KAMAR_INAP, dll
+                    'nama_item',
+                    'qty',
+                    'harga_akhir',
+                    'tanggungan_perusahaan'
+                )
+                ->get();
+
+            $totalNominalPerusahaan = $items->sum('tanggungan_perusahaan');
+
+            return response()->json([
+                'success' => true,
+                'items'   => $items,
+                'total'   => $totalNominalPerusahaan
+            ]);
+        } catch (\Exception $e) {
+            return response()->json([
+                'success' => false,
+                'message' => 'Gagal memuat rincian item: ' . $e->getMessage()
+            ], 500);
+        }
+    }
+    public function getDetailPenagihan($id)
+    {
+        try {
+            $data = DB::table('medical_penagihan_perusahaan as mpp')
+                ->join('medical_sub_penjamin as msp', 'mpp.sub_penjamin_id', '=', 'msp.id')
+                ->select('mpp.*', 'msp.nama_sub_penjamin', 'msp.telp_perusahaan', 'msp.alamat')
+                ->where('mpp.id', $id)
+                ->first();
+
+            if (!$data) {
+                return response()->json(['success' => false, 'message' => 'Data penagihan tidak ditemukan.'], 404);
+            }
+
+            return response()->json(['success' => true, 'data' => $data]);
+        } catch (\Exception $e) {
+            return response()->json(['success' => false, 'message' => $e->getMessage()], 500);
+        }
+    }
+
+    // Pelunasan seluruh transaksi dalam 1 nomor penagihan
+    public function prosesPelunasanPenagihanPerusahaan(Request $request)
+    {
+        $request->validate([
+            'penagihan_id' => 'required|numeric',
+            'metode_bayar' => 'required|string',
+            'no_referensi' => 'nullable|string'
+        ]);
+
+        try {
+            DB::beginTransaction();
+
+            $penagihanId = $request->penagihan_id;
+
+            // Ambil semua transaksi_id yang terikat pada penagihan ini
+            $transaksiIds = DB::table('medical_penagihan_detail')
+                ->where('penagihan_id', $penagihanId)
+                ->pluck('transaksi_id');
+
+            // Update status header penagihan menjadi LUNAS
+            DB::table('medical_penagihan_perusahaan')
+                ->where('id', $penagihanId)
+                ->update([
+                    'status_tagihan' => 'LUNAS',
+                    'updated_at' => now()
+                ]);
+
+            // Update status transaksi utama & item detail terkait menjadi LUNAS
+            foreach ($transaksiIds as $tId) {
+                DB::table('medical_transaksi')->where('id', $tId)->update([
+                    'sisa_tagihan' => 0,
+                    'status_pembayaran' => 'LUNAS',
+                    'waktu_lunas' => now()
+                ]);
+                DB::table('medical_transaksi_detail')->where('transaksi_id', $tId)->update([
+                    'status_pembayaran' => 'LUNAS',
+                    'waktu_bayar' => now()
+                ]);
+            }
+
+            DB::commit();
+
+            return response()->json([
+                'success' => true,
+                'message' => 'Pelunasan seluruh tagihan perusahaan berhasil diproses!'
+            ]);
+        } catch (\Exception $e) {
+            DB::rollBack();
+            return response()->json(['success' => false, 'message' => $e->getMessage()], 500);
+        }
+    }
+
+    // Generate PDF Tagihan (Bisa menggunakan DomPDF atau library PDF laravel)
+    public function downloadPdfPenagihan($id)
+    {
+        // Ambil header penagihan dan informasi perusahaan/sub penjamin
+        $penagihan = DB::table('medical_penagihan_perusahaan as mpp')
+            ->join('medical_sub_penjamin as msp', 'mpp.sub_penjamin_id', '=', 'msp.id')
+            ->select('mpp.*', 'msp.nama_sub_penjamin', 'msp.alamat', 'msp.telp_perusahaan')
+            ->where('mpp.id', $id)
+            ->first();
+
+        if (!$penagihan) {
+            abort(404, 'Data penagihan tidak ditemukan.');
+        }
+
+        // Ambil daftar transaksi pasien yang masuk dalam penagihan ini
+        $details = DB::table('medical_penagihan_detail as mpd')
+            ->join('medical_transaksi as mt', 'mpd.transaksi_id', '=', 'mt.id')
+            ->join('medical_registrasi as mr', 'mt.registrasi_id', '=', 'mr.id')
+            ->join('medical_patient as mp', 'mr.pasien_id', '=', 'mp.id')
+            ->select(
+                'mt.id as transaksi_id',
+                'mr.no_registrasi',
+                'mr.tanggal_registrasi',
+                'mp.pid',
+                'mp.nama as nama_pasien',
+                'mp.title',
+                'mp.akhiran',
+                'mt.tanggungan_perusahaan'
+            )
+            ->where('mpd.penagihan_id', $id)
+            ->get()
+            ->map(function ($pasien) {
+                // Format nama lengkap pasien
+                $pasien->nama_lengkap = trim(($pasien->title ? $pasien->title . ' ' : '') . $pasien->nama_pasien . ($pasien->akhiran ? ', ' . $pasien->akhiran : ''));
+
+                // Ambil rincian item (tindakan & obat) per transaksi pasien
+                $pasien->items = DB::table('medical_transaksi_detail')
+                    ->where('transaksi_id', $pasien->transaksi_id)
+                    ->where('tanggungan_perusahaan', '>', 0)
+                    ->select('jenis_item', 'nama_item', 'qty', 'tanggungan_perusahaan')
+                    ->get();
+
+                return $pasien;
+            });
+
+        // Return view template cetak / PDF
+        return view('application.keuangan.penagihan-keuangan.pdf.pdf-tagihan-template', compact('penagihan', 'details'));
+    }
+
+    public function kirimPesanTagihan(Request $request)
+    {
+        $penagihanId = $request->penagihan_id;
+        $tipe = $request->tipe_pengiriman;
+
+        $penagihan = DB::table('medical_penagihan_perusahaan as mpp')
+            ->join('medical_sub_penjamin as msp', 'mpp.sub_penjamin_id', '=', 'msp.id')
+            ->select('mpp.*', 'msp.nama_sub_penjamin', 'msp.telp_perusahaan')
+            ->where('mpp.id', $penagihanId)
+            ->first();
+
+        if (!$penagihan) {
+            return response()->json(['success' => false, 'message' => 'Data penagihan tidak ditemukan.'], 404);
+        }
+
+        if ($tipe === 'whatsapp') {
+            // Mengambil nomor telepon dari kolom telp_perusahaan
+            $noTelp = preg_replace('/[^0-9]/', '', $penagihan->telp_perusahaan ?? '');
+
+            if (empty($noTelp)) {
+                return response()->json(['success' => false, 'message' => 'Nomor telepon / WhatsApp perusahaan belum diatur pada data sub penjamin.'], 400);
+            }
+
+            if (substr($noTelp, 0, 1) === '0') {
+                $noTelp = '62' . substr($noTelp, 1);
+            }
+
+            $pesan = urlencode("Halo *{$penagihan->nama_sub_penjamin}*,\n\nBerikut disampaikan tagihan medis dengan No: *{$penagihan->no_tagihan}* sebesar *Rp " . number_format($penagihan->total_tagihan, 0, ',', '.') . "*.\nMohon segera dilakukan pelunasan. Terima kasih.");
+
+            return response()->json([
+                'success' => true,
+                'whatsapp_url' => "https://api.whatsapp.com/send?phone={$noTelp}&text={$pesan}"
+            ]);
+        } else {
+            return response()->json([
+                'success' => true,
+                'message' => 'Fitur pengiriman Email belum dikonfigurasi.'
+            ]);
         }
     }
 }

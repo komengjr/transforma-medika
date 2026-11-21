@@ -124,6 +124,355 @@ class LayananMedisController extends Controller
                 'updated_at'         => now(),
             ]);
 
+            // 4.1 JIKA RAWAT INAP (RANAP), SIMPAN KE TABEL medical_rawat_inap & UPDATE STATUS BED
+            $jenisLayananUpper = strtoupper($request->jenis_layanan);
+            if (in_array($jenisLayananUpper, ['RAWAT_INAP', 'RANAP'])) {
+                if ($request->bed_id) {
+                    DB::table('medical_rawat_inap')->insert([
+                        'registrasi_id'  => $registrasiId,
+                        'ruangan_bed_id' => $request->bed_id,
+                        'kode_dokter'    => $dokterPemeriksa,
+                        'tgl_masuk'      => now(),
+                        'tgl_keluar'     => null,
+                        'status_pulang'  => null,
+                        'created_at'     => now(),
+                        'updated_at'     => now(),
+                    ]);
+
+                    DB::table('medical_master_bed')
+                        ->where('id', $request->bed_id)
+                        ->update([
+                            'status'     => 'TERISI',
+                            'updated_at' => now()
+                        ]);
+                }
+            }
+
+            // AMBIL ATURAN DEFAULT SUB PENJAMIN JIKA ADA (SEBAGAI FALLBACK JIKA ITEM TIDAK MEMBAWA POLA TANGGUNGAN)
+            $subPenjaminDefault = null;
+            if ($request->filled('sub_penjamin_id')) {
+                $subPenjaminDefault = DB::table('medical_sub_penjamin')
+                    ->where('id', $request->sub_penjamin_id)
+                    ->first();
+            }
+
+            // 5. KALKULASI TOTAL TAGIHAN & SPLIT TANGGUNGAN (PASIEN VS PERUSAHAAN)
+            $metodeBayar = strtoupper($request->metode_bayar);
+            $totalTagihanGlobal = $request->total_tagihan;
+
+            // Variabel penampung akumulasi split
+            $totalTanggunganPasien = 0;
+            $totalTanggunganPerusahaan = 0;
+
+            // Array penampung sementara untuk detail item sebelum di-insert
+            $processedItems = [];
+
+            foreach ($request->items as $item) {
+                $hargaAkhirItem = isset($item['harga_akhir']) ? (float) $item['harga_akhir'] : 0;
+
+                // Tentukan aturan tanggungan per item:
+                // Prioritas 1: Dari item payload JavaScript
+                // Prioritas 2: Dari pengaturan Sub Penjamin di Database
+                // Prioritas 3: Default 'FULL_PASIEN'
+                $polaTanggungan = $item['pola_tanggungan'] ?? ($subPenjaminDefault->pola_tanggungan ?? 'FULL_PASIEN');
+
+                $tanggunganPerusahaanItem = 0;
+                $tanggunganPasienItem = $hargaAkhirItem;
+
+                if ($polaTanggungan === 'FULL_PERUSAHAAN') {
+                    $tanggunganPerusahaanItem = $hargaAkhirItem;
+                    $tanggunganPasienItem = 0;
+                } elseif ($polaTanggungan === 'SPLIT_PERSENTASE') {
+                    $persen = isset($item['tanggungan_perusahaan_persen'])
+                        ? (float) $item['tanggungan_perusahaan_persen']
+                        : ($subPenjaminDefault->tanggungan_perusahaan_persen ?? 0);
+
+                    $tanggunganPerusahaanItem = $hargaAkhirItem * ($persen / 100);
+                    $tanggunganPasienItem = $hargaAkhirItem - $tanggunganPerusahaanItem;
+                } elseif ($polaTanggungan === 'SPLIT_PLAFON') {
+                    $plafon = isset($item['tanggungan_perusahaan_maksimal_rp'])
+                        ? (float) $item['tanggungan_perusahaan_maksimal_rp']
+                        : ($subPenjaminDefault->tanggungan_perusahaan_maksimal_rp ?? 0);
+
+                    $tanggunganPerusahaanItem = min($hargaAkhirItem, $plafon);
+                    $tanggunganPasienItem = $hargaAkhirItem - $tanggunganPerusahaanItem;
+                }
+
+                $totalTanggunganPasien += $tanggunganPasienItem;
+                $totalTanggunganPerusahaan += $tanggunganPerusahaanItem;
+
+                $item['calculated_tanggungan_pasien'] = $tanggunganPasienItem;
+                $item['calculated_tanggungan_perusahaan'] = $tanggunganPerusahaanItem;
+                $processedItems[] = $item;
+            }
+
+            // Jika metode bayar piutang penuh
+            if ($metodeBayar === 'PIUTANG') {
+                $totalBayar = 0;
+                $sisaTagihan = $totalTagihanGlobal;
+                $statusPembayaran = 'BELUM LUNAS';
+                $waktuLunas = null;
+                $dibuatOleh = null;
+            } else {
+                // Jika pasien melakukan pembayaran langsung (Cash / Transfer / QRIS)
+                $totalBayar = $totalTanggunganPasien;
+                $sisaTagihan = $totalTanggunganPerusahaan;
+
+                if ($totalTanggunganPerusahaan > 0 && $totalTanggunganPasien > 0) {
+                    $statusPembayaran = 'SEBAGIAN'; // Split Payment / Partial
+                    $metodeBayar = 'SPLIT (' . $request->metode_bayar . ' & Piutang Perusahaan)';
+                } elseif ($totalTanggunganPerusahaan > 0 && $totalTanggunganPasien == 0) {
+                    $statusPembayaran = 'BELUM LUNAS'; // Full ditanggung perusahaan
+                } else {
+                    $statusPembayaran = 'LUNAS'; // Full ditanggung pasien
+                }
+
+                $waktuLunas = ($statusPembayaran === 'LUNAS') ? now() : null;
+                $dibuatOleh = $userId;
+            }
+
+            // SIMPAN HEADER TRANSAKSI UTAMA
+            $transaksiId = DB::table('medical_transaksi')->insertGetId([
+                'registrasi_id'         => $registrasiId,
+                'total_tagihan'         => $totalTagihanGlobal,
+                'tanggungan_pasien'     => $totalTanggunganPasien,
+                'tanggungan_perusahaan' => $totalTanggunganPerusahaan,
+                'total_bayar'           => $totalBayar,
+                'sisa_tagihan'          => $sisaTagihan,
+                'metode_bayar'          => $metodeBayar,
+                'status_pembayaran'     => $statusPembayaran,
+                'dibuat_oleh'           => $dibuatOleh,
+                'dilunasi_oleh'         => null,
+                'waktu_lunas'           => $waktuLunas,
+                'created_at'            => now(),
+                'updated_at'            => now(),
+            ]);
+
+            // 6. SIMPAN DETAIL ITEM PEMERIKSAAN DENGAN PROPORSI TANGGUNGAN
+            $tanggalFormat = date('dmy');
+
+            foreach ($processedItems as $item) {
+                $kategoriBiaya = $item['kategori_biaya'] ?? 'TINDAKAN';
+                $tngPasienItem = $item['calculated_tanggungan_pasien'];
+                $tngPrshItem = $item['calculated_tanggungan_perusahaan'];
+
+                // Status pembayaran item spesifik
+                $itemStatusBayar = ($statusPembayaran === 'LUNAS' || ($statusPembayaran === 'SEBAGIAN' && $tngPasienItem == 0)) ? 'LUNAS' : 'BELUM LUNAS';
+                $itemWaktuBayar = ($itemStatusBayar === 'LUNAS') ? now() : null;
+
+                // Item non-tindakan medis (Termasuk KAMAR_INAP, ADMINISTRASI, dll)
+                if (in_array($kategoriBiaya, ['ADMINISTRASI', 'JASA_DOKTER', 'KAMAR_INAP', 'KEPERAWATAN'])) {
+                    DB::table('medical_transaksi_detail')->insert([
+                        'transaksi_id'          => $transaksiId,
+                        'jenis_item'            => $kategoriBiaya,
+                        'nama_item'             => $item['nama_item'] ?? 'Biaya ' . $kategoriBiaya,
+                        'master_pemeriksaan_id' => null,
+                        'no_pemeriksaan'        => null,
+                        'qty'                   => 1,
+                        'harga_dasar'           => $item['harga_dasar'],
+                        'diskon'                => $item['diskon'] ?? 0,
+                        'is_cito'               => 0,
+                        'biaya_cito'            => 0,
+                        'harga_akhir'           => $item['harga_akhir'],
+                        'tanggungan_pasien'     => $tngPasienItem,
+                        'tanggungan_perusahaan' => $tngPrshItem,
+                        'status_pemeriksaan'    => 'SELESAI',
+                        'status_pembayaran'     => $itemStatusBayar,
+                        'waktu_bayar'           => $itemWaktuBayar,
+                        'created_at'            => now(),
+                        'updated_at'            => now(),
+                    ]);
+                    continue;
+                }
+
+                $isCitoItem = (isset($item['is_cito']) && ($item['is_cito'] == 1 || $item['is_cito'] === '1' || $item['is_cito'] === true)) ? 1 : 0;
+                $biayaCitoItem = isset($item['biaya_cito']) ? (float) $item['biaya_cito'] : 0;
+
+                if (!isset($item['id'])) {
+                    continue;
+                }
+
+                $masterId = str_replace('tarif_', '', $item['id']);
+                $master = DB::table('medical_master_pemeriksaan as mp')
+                    ->leftJoin('medical_tipe_layanan as tl', 'mp.tipe_layanan_id', '=', 'tl.id')
+                    ->select('mp.id', 'mp.nama_layanan', 'mp.is_paket', 'tl.prefix')
+                    ->where('mp.id', $masterId)
+                    ->first();
+
+                if ($master) {
+                    $prefix = strtoupper($master->prefix ?? 'ORD');
+
+                    $lastOrder = DB::table('medical_transaksi_detail')
+                        ->where('no_pemeriksaan', 'like', "{$prefix}{$tanggalFormat}%")
+                        ->orderBy('id', 'desc')
+                        ->first();
+
+                    $noUrutOrder = $lastOrder ? (int) substr($lastOrder->no_pemeriksaan, -4) + 1 : 1;
+                    $noPemeriksaanBaru = $prefix . $tanggalFormat . str_pad($noUrutOrder, 4, '0', STR_PAD_LEFT);
+
+                    // A. SIMPAN ITEM UTAMA TINDAKAN MEDIS
+                    DB::table('medical_transaksi_detail')->insert([
+                        'transaksi_id'          => $transaksiId,
+                        'jenis_item'            => 'TINDAKAN',
+                        'nama_item'             => $master->nama_layanan,
+                        'master_pemeriksaan_id' => $master->id,
+                        'no_pemeriksaan'        => $noPemeriksaanBaru,
+                        'qty'                   => 1,
+                        'harga_dasar'           => $item['harga_dasar'],
+                        'diskon'                => $item['diskon'] ?? 0,
+                        'is_cito'               => $isCitoItem,
+                        'biaya_cito'            => $biayaCitoItem,
+                        'harga_akhir'           => $item['harga_akhir'],
+                        'tanggungan_pasien'     => $tngPasienItem,
+                        'tanggungan_perusahaan' => $tngPrshItem,
+                        'status_pemeriksaan'    => 'MENUNGGU',
+                        'status_pembayaran'     => $itemStatusBayar,
+                        'waktu_bayar'           => $itemWaktuBayar,
+                        'created_at'            => now(),
+                        'updated_at'            => now(),
+                    ]);
+
+                    // B. JIKA ITEM ADALAH PAKET: Simpan komponen di dalam paket
+                    if ($master->is_paket == 1 || $master->is_paket == true) {
+                        $subItems = DB::table('medical_paket_detail as pd')
+                            ->join('medical_master_pemeriksaan as sub_mp', 'pd.pemeriksaan_id', '=', 'sub_mp.id')
+                            ->leftJoin('medical_tipe_layanan as sub_tl', 'sub_mp.tipe_layanan_id', '=', 'sub_tl.id')
+                            ->where('pd.paket_id', $master->id)
+                            ->select('sub_mp.id as sub_id', 'sub_mp.nama_layanan as sub_nama', 'sub_tl.prefix as sub_prefix')
+                            ->get();
+
+                        foreach ($subItems as $sub) {
+                            $subPrefix = strtoupper($sub->sub_prefix ?? 'LAB');
+
+                            $lastOrderSub = DB::table('medical_transaksi_detail')
+                                ->where('no_pemeriksaan', 'like', "{$subPrefix}{$tanggalFormat}%")
+                                ->orderBy('id', 'desc')
+                                ->first();
+
+                            $noUrutOrderSub = $lastOrderSub ? (int) substr($lastOrderSub->no_pemeriksaan, -4) + 1 : 1;
+                            $noPemeriksaanSub = $subPrefix . $tanggalFormat . str_pad($noUrutOrderSub, 4, '0', STR_PAD_LEFT);
+
+                            DB::table('medical_transaksi_detail')->insert([
+                                'transaksi_id'          => $transaksiId,
+                                'jenis_item'            => 'TINDAKAN',
+                                'nama_item'             => $sub->sub_nama,
+                                'master_pemeriksaan_id' => $sub->sub_id,
+                                'no_pemeriksaan'        => $noPemeriksaanSub,
+                                'qty'                   => 1,
+                                'harga_dasar'           => 0,
+                                'diskon'                => 0,
+                                'is_cito'               => $isCitoItem,
+                                'biaya_cito'            => 0,
+                                'harga_akhir'           => 0,
+                                'tanggungan_pasien'     => 0,
+                                'tanggungan_perusahaan' => 0,
+                                'status_pemeriksaan'    => 'MENUNGGU',
+                                'status_pembayaran'     => $itemStatusBayar,
+                                'waktu_bayar'           => $itemWaktuBayar,
+                                'created_at'            => now(),
+                                'updated_at'            => now(),
+                            ]);
+                        }
+                    }
+                }
+            }
+
+            DB::commit();
+
+            return response()->json([
+                'success'       => true,
+                'message'       => 'Registrasi dan transaksi berhasil disimpan!',
+                'transaksi_id'  => $transaksiId,
+                'no_registrasi' => $noRegistrasiBaru,
+                'redirect_url'  => route('pembayaran.nota', $transaksiId)
+            ]);
+        } catch (\Exception $e) {
+            DB::rollback();
+            return response()->json([
+                'success'       => false,
+                'message'       => 'Gagal memproses transaksi: ' . $e->getMessage()
+            ], 500);
+        }
+    }
+    public function prosesDanCetak_old2(Request $request)
+    {
+        // 1. SESUAIKAN VALIDASI DENGAN PAYLOAD JAVASCRIPT
+        $request->validate([
+            'pasien_id'       => 'required',
+            'jenis_layanan'   => 'required|string',
+            'poli_id'         => 'nullable|numeric',
+            'ruangan_id'      => 'nullable|numeric',
+            'bed_id'          => 'nullable|numeric',
+            'doctor_id'       => 'nullable|numeric', // Dokter Pengirim
+            'doctor_poli_id'  => 'nullable|numeric', // Dokter Pemeriksa Rawat Jalan
+            'doctor_igd_id'   => 'nullable|numeric', // Dokter Jaga IGD
+            'sub_penjamin_id' => 'nullable|numeric',
+            'tipe_fpp_id'     => 'nullable|numeric',
+            'keluhan_medis'   => 'nullable|string',
+            'tanggal_periksa' => 'nullable|date',
+            'items'           => 'required|array',
+            'total_tagihan'   => 'required|numeric',
+            'metode_bayar'    => 'required|string',
+            'bahasa_hasil'    => 'nullable|array',
+            'pengiriman'      => 'nullable|array',
+            'is_cito'         => 'nullable',
+            'edc_data'        => 'nullable|array',   // Array data untuk pembayaran EDC
+        ]);
+
+        try {
+            DB::beginTransaction();
+
+            $userId = Auth::user()->userid ?? 'SYSTEM';
+
+            // 2. TANGKAP FLAG CITO GLOBAL
+            $isCitoGlobal = $request->input('is_cito', 0);
+
+            if ($isCitoGlobal == 0) {
+                foreach ($request->items as $item) {
+                    if (isset($item['is_cito']) && ($item['is_cito'] == 1 || $item['is_cito'] === '1' || $item['is_cito'] === true)) {
+                        $isCitoGlobal = 1;
+                        break;
+                    }
+                }
+            }
+
+            // 3. GENERATE NO REGISTRASI OTOMOTIS (Format: REG-YYYYMMDD-XXXX)
+            $tanggalHariIni = date('Ymd');
+            $lastReg = DB::table('medical_registrasi')
+                ->where('no_registrasi', 'like', "REG-{$tanggalHariIni}-%")
+                ->orderBy('id', 'desc')
+                ->first();
+
+            $noUrutReg = $lastReg ? (int) substr($lastReg->no_registrasi, -4) + 1 : 1;
+            $noRegistrasiBaru = 'REG-' . $tanggalHariIni . '-' . str_pad($noUrutReg, 4, '0', STR_PAD_LEFT);
+
+            // Gabungkan Dokter Pemeriksa (Bisa dari Poli, IGD, atau Dokter Utama)
+            $dokterPemeriksa = $request->doctor_poli_id ?? $request->doctor_igd_id ?? $request->doctor_id ?? null;
+
+            // 4. SIMPAN DATA KE TABEL REGISTRASI
+            $registrasiId = DB::table('medical_registrasi')->insertGetId([
+                'no_registrasi'      => $noRegistrasiBaru,
+                'pasien_id'          => $request->pasien_id,
+                'jenis_layanan'      => $request->jenis_layanan,
+                'poli_id'            => $request->poli_id ?? null,
+                'ruangan_id'         => $request->ruangan_id ?? null,
+                'bed_id'             => $request->bed_id ?? null,
+                'doctor_id'          => $request->doctor_id ?? null,
+                'doctor_poli_id'     => $dokterPemeriksa,
+                'sub_penjamin_id'    => $request->sub_penjamin_id ?? null,
+                'tipe_fpp_id'        => $request->tipe_fpp_id ?? null,
+                'janji_hasil'        => $request->tanggal_periksa ?? null,
+                'keluhan_medis'      => $request->keluhan_medis ?? null,
+                'bahasa_hasil'       => $request->has('bahasa_hasil') ? json_encode($request->bahasa_hasil) : null,
+                'metode_pengiriman'  => $request->has('pengiriman') ? json_encode($request->pengiriman) : null,
+                'is_cito'            => $isCitoGlobal,
+                'user_id'            => $userId,
+                'tanggal_registrasi' => now(),
+                'status_kunjungan'   => 'MENUNGGU',
+                'created_at'         => now(),
+                'updated_at'         => now(),
+            ]);
+
             // 4.1 JIKA LAYANAN RAWAT INAP (RANAP), SIMPAN KE TABEL medical_rawat_inap & UPDATE STATUS BED
             $jenisLayananUpper = strtoupper($request->jenis_layanan);
             if (in_array($jenisLayananUpper, ['RAWAT_INAP', 'RANAP'])) {
@@ -865,50 +1214,32 @@ class LayananMedisController extends Controller
 
             // Jika Rawat Jalan, pastikan poli_id sudah dipilih
             if ($jenisLayanan === 'RAWAT_JALAN' && !$poliId) {
-                return response()->json([
-                    'success' => true,
-                    'data'    => [] // Belum mengembalikan tarif jika poli belum dipilih
-                ]);
+                return response()->json(['success' => true, 'data' => []]);
             }
 
             // Jika Rawat Inap, pastikan ruangan_id sudah dipilih
             if ($jenisLayanan === 'RAWAT_INAP' && !$ruanganId) {
-                return response()->json([
-                    'success' => true,
-                    'data'    => [] // Belum mengembalikan tarif jika ruangan belum dipilih
-                ]);
+                return response()->json(['success' => true, 'data' => []]);
             }
 
-            // 1. RAWAT JALAN
+            // ==========================================
+            // 1. TARIF RAWAT JALAN (POLIKLINIK)
+            // ==========================================
             if ($jenisLayanan === 'RAWAT_JALAN') {
-                $query = DB::table('medical_tarif_poli')
+                $tarifList = DB::table('medical_tarif_poli')
                     ->where('poli_id', $poliId)
-                    ->where('is_active', 1);
-
-                if ($subPenjaminId) {
-                    // Perluasan kondisi filter, antisipasi jika sub_penjamin_id bernilai 0 atau string kosong
-                    $query->where(function ($q) use ($subPenjaminId) {
-                        $q->where('sub_penjamin_id', $subPenjaminId)
-                            ->orWhereNull('sub_penjamin_id')
-                            ->orWhere('sub_penjamin_id', 0)
-                            ->orWhere('sub_penjamin_id', '');
-                    });
-                }
-
-                $tarifList = $query->select(
-                    'id',
-                    'nama_tarif',
-                    'tarif',
-                    'kategori_biaya'
-                )->get();
-
-                // FALLBACK / DUMMY: Jika database kosong, beri nilai simulasi agar tabel HTML terisi
-                if ($tarifList->isEmpty()) {
-                    $tarifList = [
-                        (object) ['id' => 901, 'nama_tarif' => 'Administrasi Pendaftaran Poli', 'tarif' => 15000, 'kategori_biaya' => 'ADMINISTRASI'],
-                        (object) ['id' => 902, 'nama_tarif' => 'Jasa Pemeriksaan & Konsultasi Dokter', 'tarif' => 75000, 'kategori_biaya' => 'JASA_DOKTER']
-                    ];
-                }
+                    ->where('sub_penjamin_id', $subPenjaminId) // Ambil murni berdasarkan Sub Penjamin
+                    ->where('is_active', 1)
+                    ->select(
+                        'id',
+                        'nama_tarif',
+                        'tarif',
+                        'kategori_biaya',
+                        'pola_tanggungan',
+                        'tanggungan_perusahaan_persen',
+                        'tanggungan_perusahaan_maksimal_rp'
+                    )
+                    ->get();
 
                 return response()->json([
                     'success' => true,
@@ -916,10 +1247,12 @@ class LayananMedisController extends Controller
                 ]);
             }
 
-            // 2. RAWAT INAP
+            // ==========================================
+            // 2. TARIF RAWAT INAP
+            // ==========================================
             if ($jenisLayanan === 'RAWAT_INAP') {
+                // Cek data ruangan
                 $ruangan = DB::table('medical_master_ruangan')->where('id', $ruanganId)->first();
-
                 if (!$ruangan) {
                     return response()->json([
                         'success' => false,
@@ -927,18 +1260,16 @@ class LayananMedisController extends Controller
                     ], 404);
                 }
 
+                // Ambil tarif berdasarkan kelas ruangan dan sub penjamin
                 $tarifInap = DB::table('medical_tarif_rawatinap')
                     ->where('kelas', $ruangan->kelas)
-                    ->where(function ($q) use ($subPenjaminId) {
-                        $q->where('sub_penjamin_id', $subPenjaminId)
-                            ->orWhereNull('sub_penjamin_id')
-                            ->orWhere('sub_penjamin_id', 0);
-                    })
+                    ->where('sub_penjamin_id', $subPenjaminId)
                     ->where('is_active', 1)
                     ->first();
 
                 $tarifList = [];
 
+                // Jika ada tarif untuk kelas dan sub penjamin ini, pecah ke dalam rincian order
                 if ($tarifInap) {
                     if ($tarifInap->tarif_kamar_per_hari > 0) {
                         $tarifList[] = (object) [
@@ -966,13 +1297,6 @@ class LayananMedisController extends Controller
                             'kategori_biaya' => 'KEPERAWATAN'
                         ];
                     }
-                } else {
-                    // FALLBACK / DUMMY RAWAT INAP
-                    $tarifList = [
-                        (object) ['id' => 'sim_1', 'nama_tarif' => 'Akomodasi Kamar (' . $ruangan->nama_ruangan . ') / Hari', 'tarif' => 250000, 'kategori_biaya' => 'KAMAR_INAP'],
-                        (object) ['id' => 'sim_2', 'nama_tarif' => 'Visite Dokter Harian', 'tarif' => 100000, 'kategori_biaya' => 'JASA_DOKTER'],
-                        (object) ['id' => 'sim_3', 'nama_tarif' => 'Asuhan Keperawatan / Hari', 'tarif' => 50000, 'kategori_biaya' => 'KEPERAWATAN'],
-                    ];
                 }
 
                 return response()->json([
@@ -981,13 +1305,23 @@ class LayananMedisController extends Controller
                 ]);
             }
 
-            // 3. IGD / GAWAT DARURAT (Otomatis memunculkan tarif dasar IGD)
+            // ==========================================
+            // 3. TARIF IGD / GAWAT DARURAT
+            // ==========================================
             if ($jenisLayanan === 'IGD') {
-                $tarifList = [
-                    (object) ['id' => 991, 'nama_tarif' => 'Administrasi Gawat Darurat (IGD)', 'tarif' => 35000, 'kategori_biaya' => 'ADMINISTRASI'],
-                    (object) ['id' => 992, 'nama_tarif' => 'Jasa Pemeriksaan Dokter Jaga', 'tarif' => 125000, 'kategori_biaya' => 'JASA_DOKTER'],
-                    (object) ['id' => 993, 'nama_tarif' => 'Observasi IGD (< 6 Jam)', 'tarif' => 50000, 'kategori_biaya' => 'TINDAKAN']
-                ];
+                $tarifList = DB::table('medical_tarif_igd')
+                    ->where('sub_penjamin_id', $subPenjaminId) // Ambil tarif berdasarkan sub penjamin
+                    ->where('is_active', 1)
+                    ->select(
+                        'id',
+                        'nama_tarif',
+                        'tarif',
+                        'kategori_biaya',
+                        'pola_tanggungan',
+                        'tanggungan_perusahaan_persen',
+                        'tanggungan_perusahaan_maksimal_rp'
+                    )
+                    ->get();
 
                 return response()->json([
                     'success' => true,
@@ -995,11 +1329,8 @@ class LayananMedisController extends Controller
                 ]);
             }
 
-            // Default kembalian jika tipe tidak dikenali
-            return response()->json([
-                'success' => true,
-                'data'    => []
-            ]);
+            // Default response jika jenis layanan tidak dikenali
+            return response()->json(['success' => true, 'data' => []]);
         } catch (\Exception $e) {
             return response()->json([
                 'success' => false,
@@ -1403,7 +1734,7 @@ class LayananMedisController extends Controller
     public function getSub(Request $request)
     {
         try {
-            $penjaminId = $request->input('penjamin_id');
+            $penjaminId = $request->input('penjamin_id') ?? $request->query('penjamin_id');
 
             if (!$penjaminId) {
                 return response()->json([
@@ -1412,15 +1743,30 @@ class LayananMedisController extends Controller
                 ], 400);
             }
 
-            $data = DB::table('medical_sub_penjamin')
+            // 1. Ambil data sub penjamin secara lengkap (semua kolom agar info jatuh tempo dll terbawa)
+            $subPenjamins = DB::table('medical_sub_penjamin')
                 ->where('penjamin_id', $penjaminId)
-                ->select('id', 'nama_sub_penjamin')
+                ->where('status_aktif', 1) // Pastikan hanya meload yang aktif
                 ->orderBy('nama_sub_penjamin', 'ASC')
                 ->get();
 
+            // 2. Ambil data PIC yang terkait dengan sub penjamin yang ditemukan
+            $subPenjaminIds = $subPenjamins->pluck('id');
+
+            $pics = DB::table('medical_sub_penjamin_pics')
+                ->whereIn('sub_penjamin_id', $subPenjaminIds)
+                ->get()
+                ->groupBy('sub_penjamin_id');
+
+            // 3. Mapping/Gabungkan array PIC ke dalam properti 'pics' di setiap objek sub penjamin
+            $subPenjamins->map(function ($sub) use ($pics) {
+                $sub->pics = $pics->get($sub->id, []);
+                return $sub;
+            });
+
             return response()->json([
                 'success' => true,
-                'data'    => $data
+                'data'    => $subPenjamins
             ]);
         } catch (\Exception $e) {
             return response()->json([
