@@ -220,7 +220,7 @@ Route::prefix('koperasi/')->group(function (): void {
     Route::post('master-koperasi/data-coa/add-level', [KoperasiController::class, 'master_koperasi_data_coa_add_level'])->name('master_koperasi_data_coa_add_level');
     Route::post('master-koperasi/data-coa/save-level', [KoperasiController::class, 'master_koperasi_data_coa_save_level'])->name('master_koperasi_data_coa_save_level');
     Route::post('master-koperasi/data-coa/update-level', [KoperasiController::class, 'master_koperasi_data_coa_update_level'])->name('master_koperasi_data_coa_update_level');
-    Route::post('master-koperasi/data-coa/update-level/save', [KoperasiController::class, 'master_koperasi_data_coa_update_save_level'])->name('master_accounting_coa_update_save_level');
+    Route::post('master-koperasi/data-coa/update-level/save', [KoperasiController::class, 'master_koperasi_data_coa_update_save_level'])->name('master_koperasi_data_coa_update_save_level');
     Route::post('master-koperasi/data-coa/sinkronisasi', [KoperasiController::class, 'master_koperasi_data_coa_sinskronisasi'])->name('master_koperasi_data_coa_sinskronisasi');
     Route::post('master-koperasi/data-coa/sinkronisasi-proses', [KoperasiController::class, 'master_koperasi_data_coa_sinskronisasi_proses'])->name('master_koperasi_data_coa_sinskronisasi_proses');
 
