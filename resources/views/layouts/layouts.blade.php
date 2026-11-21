@@ -49,7 +49,7 @@
     <link href="{{ asset('asset/css/user-rtl.min.css') }}" rel="stylesheet" id="user-style-rtl">
     <link href="{{ asset('asset/css/user.min.css') }}" rel="stylesheet" id="user-style-default">
 
-    <!-- Custom Global Font Styling -->
+    <!-- Custom Global Font, Search & Mobile Floating Navbar Styling -->
     <style>
         body,
         .font-base,
@@ -69,6 +69,166 @@
         .navbar-vertical-label,
         .nav-link-text {
             font-family: 'Outfit', sans-serif !important;
+        }
+
+        /* Sembunyikan icon search saat user mengetik agar tidak mengganggu teks */
+        .search-box.has-query .search-box-icon {
+            opacity: 0 !important;
+            visibility: hidden !important;
+            pointer-events: none;
+            transition: opacity 0.15s ease;
+        }
+
+        .search-box.has-query .search-input {
+            padding-left: 0.85rem !important;
+        }
+
+        /* Flex search-box mobile agar menyesuaikan ruang secara otomatis */
+        .mobile-search-flex {
+            min-width: 0;
+            flex: 1 1 auto;
+        }
+
+        .mobile-search-flex .search-input {
+            height: 36px;
+            font-size: 0.85rem;
+            padding-right: 1.9rem;
+        }
+
+        .mobile-search-flex .dropdown-menu {
+            width: 300px;
+            max-width: calc(100vw - 24px);
+            min-width: unset !important;
+        }
+
+        /* Teks menu pada search-box menurun ke bawah agar tidak terpotong ke kanan */
+        .navbar-menu-search-box .dropdown-menu {
+            min-width: 320px;
+        }
+
+        .navbar-menu-search-box .scrollbar.list {
+            overflow-x: hidden !important;
+        }
+
+        .navbar-menu-search-box .navbar-menu-result {
+            white-space: normal !important;
+            word-break: break-word;
+        }
+
+        .navbar-menu-search-box .title {
+            white-space: normal !important;
+            line-height: 1.35;
+        }
+
+        .search-menu-breadcrumb {
+            display: block;
+            font-size: 0.72rem;
+            color: #64748b;
+            line-height: 1.25;
+            margin-bottom: 2px;
+        }
+
+        .search-menu-name {
+            display: block;
+            font-size: 0.83rem;
+            font-weight: 600;
+            line-height: 1.3;
+        }
+
+        /* Tombol melayang pojok kanan bawah dengan gambar profile di mobile */
+        .mobile-fab-container {
+            position: fixed;
+            right: 18px;
+            bottom: 18px;
+            z-index: 1055;
+        }
+
+        .mobile-fab-btn {
+            width: 52px;
+            height: 52px;
+            border-radius: 50%;
+            padding: 0;
+            box-shadow: 0 10px 25px rgba(15, 23, 42, 0.25);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 1.15rem;
+            overflow: hidden;
+            border: 2px solid #fff;
+            transition: transform 0.2s ease, box-shadow 0.2s ease;
+        }
+
+        .mobile-fab-btn img {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+            border-radius: 50%;
+        }
+
+        .mobile-fab-btn:active {
+            transform: scale(0.95);
+        }
+
+        /* Floating navbar bergaya pesan yang muncul di atas tombol */
+        .mobile-message-navbar {
+            position: fixed;
+            right: 18px;
+            bottom: 80px;
+            width: 280px;
+            max-width: calc(100vw - 36px);
+            z-index: 1060;
+            border-radius: 18px;
+            box-shadow: 0 16px 38px rgba(15, 23, 42, 0.18);
+            transform-origin: bottom right;
+            opacity: 0;
+            transform: translateY(12px) scale(0.95);
+            pointer-events: none;
+            transition: opacity 0.2s ease, transform 0.2s cubic-bezier(0.16, 1, 0.3, 1);
+        }
+
+        .mobile-message-navbar.show {
+            opacity: 1;
+            transform: translateY(0) scale(1);
+            pointer-events: auto;
+        }
+
+        .mobile-message-header {
+            background: linear-gradient(135deg, #2c7be5 0%, #1a5bb8 100%);
+            color: #fff;
+            border-top-left-radius: 18px;
+            border-top-right-radius: 18px;
+            padding: 12px 14px;
+        }
+
+        .mobile-message-item {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            padding: 10px 14px;
+            color: inherit;
+            text-decoration: none;
+            border-bottom: 1px solid rgba(0, 0, 0, 0.05);
+            transition: background-color 0.15s ease;
+        }
+
+        .mobile-message-item:last-child {
+            border-bottom: 0;
+            border-bottom-left-radius: 18px;
+            border-bottom-right-radius: 18px;
+        }
+
+        .mobile-message-item:hover {
+            background-color: rgba(44, 123, 229, 0.07);
+        }
+
+        .mobile-message-icon-badge {
+            width: 34px;
+            height: 34px;
+            border-radius: 10px;
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            flex-shrink: 0;
         }
     </style>
 
@@ -229,98 +389,180 @@
             </nav>
 
             <div class="content">
+                @php
+                $searchableMenus = collect([
+                    [
+                        'path' => 'Dashboard',
+                        'name' => 'Back to Home',
+                        'url' => route('dashboard.home'),
+                        'icon' => 'fab fa-dashcube'
+                    ]
+                ]);
+
+                foreach ($menu as $menus) {
+                    $subMenuSearch = DB::table('z_menu_user')
+                        ->join('z_menu_sub', 'z_menu_sub.menu_sub_code', '=', 'z_menu_user.menu_sub_code')
+                        ->where('z_menu_user.access_code', Auth::user()->access_code)
+                        ->where('z_menu_sub.menu_code', $menus->menu_code)
+                        ->orderBy('z_menu_sub.id_menu_sub', 'ASC')
+                        ->get();
+
+                    foreach ($subMenuSearch as $sub_menus) {
+                        if ($sub_menus->menu_sub_option == 'dropdown') {
+                            $mainSubs = DB::table('z_menu_sub_main')
+                                ->join('z_menu_user_sub', 'z_menu_user_sub.menu_main_sub_code', '=', 'z_menu_sub_main.menu_main_sub_code')
+                                ->where('z_menu_sub_main.menu_sub_code', $sub_menus->menu_sub_code)
+                                ->where('z_menu_user_sub.access_code', Auth::user()->access_code)
+                                ->get();
+
+                            foreach ($mainSubs as $item) {
+                                $searchableMenus->push([
+                                    'path' => $menus->menu_name . ' • ' . $sub_menus->menu_sub_name,
+                                    'name' => $item->menu_main_sub_name,
+                                    'url' => url($item->menu_main_sub_code . '/' . $item->menu_main_sub_link),
+                                    'icon' => $item->menu_main_sub_icon ?: $sub_menus->menu_sub_icon
+                                ]);
+                            }
+                        } else {
+                            $searchableMenus->push([
+                                'path' => $menus->menu_name,
+                                'name' => $sub_menus->menu_sub_name,
+                                'url' => url($sub_menus->menu_sub_code . '/' . $sub_menus->menu_sub_link),
+                                'icon' => $sub_menus->menu_sub_icon
+                            ]);
+                        }
+                    }
+                }
+                @endphp
+
                 <nav class="navbar navbar-light navbar-glass navbar-top navbar-expand">
-                    <button class="btn navbar-toggler-humburger-icon navbar-toggler me-1 me-sm-3" type="button" data-bs-toggle="collapse" data-bs-target="#navbarVerticalCollapse" aria-controls="navbarVerticalCollapse" aria-expanded="false" aria-label="Toggle Navigation">
-                        <span class="navbar-toggle-icon"><span class="toggle-line"></span></span>
-                    </button>
-                    <a class="navbar-brand me-1 me-sm-3" href="{{ route('dashboard.home') }}">
-                        <div class="d-flex align-items-center">
-                            <img class="mx-0" src="{{ asset('img/system-panel.png') }}" alt="" width="155" />
-                            <span class="fs-2 text-linkedin"></span>
-                        </div>
-                    </a>
-                    <ul class="navbar-nav align-items-center d-none d-lg-block">
-                        <li class="nav-item">
+                    <div class="d-flex align-items-center w-100 gap-2">
+                        <button class="btn navbar-toggler-humburger-icon navbar-toggler flex-shrink-0" type="button" data-bs-toggle="collapse" data-bs-target="#navbarVerticalCollapse" aria-controls="navbarVerticalCollapse" aria-expanded="false" aria-label="Toggle Navigation">
+                            <span class="navbar-toggle-icon"><span class="toggle-line"></span></span>
+                        </button>
+
+                        <!-- MOBILE: SEARCH BOX MENU (FLEX OTOMATIS) -->
+                        <div class="d-block d-lg-none navbar-menu-search-box mobile-search-flex" id="navbarMenuSearchBoxMobile">
                             <div class="search-box" data-list='{"valueNames":["title"]}'>
-                                <form class="position-relative" data-bs-toggle="search" data-bs-display="static">
-                                    <input class="form-control search-input fuzzy-search" type="search" placeholder="Search..." aria-label="Search" />
-                                    <span class="fas fa-search search-box-icon"></span>
+                                <form class="position-relative" data-bs-toggle="search" data-bs-display="static" onsubmit="return false;">
+                                    <input class="form-control search-input fuzzy-search navbar-menu-search-input" id="navbarMenuSearchInputMobile" type="search" placeholder="Cari menu..." aria-label="Search" autocomplete="off" />
+                                    <!-- <span class="fas fa-search search-box-icon"></span> -->
                                 </form>
                                 <div class="btn-close-falcon-container position-absolute end-0 top-50 translate-middle shadow-none" data-bs-dismiss="search">
                                     <div class="btn-close-falcon" aria-label="Close"></div>
                                 </div>
-                                <div class="dropdown-menu border font-base start-0 mt-2 py-0 overflow-hidden w-100">
-                                    <div class="scrollbar list py-3" style="max-height: 24rem;">
-                                        <h6 class="dropdown-header fw-medium text-uppercase px-card fs--2 pt-0 pb-2">Recently Browsed</h6>
-                                        <a class="dropdown-item fs--1 px-card py-1 hover-primary" href="#">
-                                            <div class="d-flex align-items-center">
-                                                <span class="fas fa-circle me-2 text-300 fs--2"></span>
-                                                <div class="fw-normal title">Pages <span class="fas fa-chevron-right mx-1 text-500 fs--2" data-fa-transform="shrink-2"></span> Dashboard</div>
+                                <div class="dropdown-menu border font-base start-0 mt-2 py-0 overflow-hidden">
+                                    <div class="scrollbar list py-2" style="max-height: 24rem;">
+                                        <h6 class="dropdown-header fw-medium text-uppercase px-card fs--2 pt-1 pb-2">Daftar Menu</h6>
+                                        @foreach ($searchableMenus as $mItem)
+                                        <a class="dropdown-item fs--1 px-card py-2 hover-primary navbar-menu-result" href="{{ $mItem['url'] }}">
+                                            <div class="d-flex align-items-start">
+                                                <span class="{{ $mItem['icon'] ?: 'fas fa-circle' }} me-2 mt-1 text-primary fs--1 flex-shrink-0"></span>
+                                                <div>
+                                                    <span class="search-menu-breadcrumb">{{ $mItem['path'] }}</span>
+                                                    <span class="search-menu-name title">{{ $mItem['path'] }} - {{ $mItem['name'] }}</span>
+                                                </div>
                                             </div>
                                         </a>
-                                        <hr class="bg-200 dark__bg-900" />
+                                        @endforeach
                                     </div>
-                                    <div class="text-center mt-n3">
-                                        <p class="fallback fw-bold fs-1 d-none">No Result Found.</p>
+                                    <div class="text-center py-2 d-none navbar-search-no-result">
+                                        <p class="fallback fw-bold fs--1 mb-0 text-500">Menu tidak ditemukan.</p>
                                     </div>
                                 </div>
                             </div>
-                        </li>
-                    </ul>
-                    <ul class="navbar-nav navbar-nav-icons ms-auto flex-row align-items-center">
-                        <li class="nav-item">
-                            <div class="theme-control-toggle fa-icon-wait px-2">
-                                <input class="form-check-input ms-0 theme-control-toggle-input" id="themeControlToggle" type="checkbox" data-theme-control="theme" value="dark" />
-                                <label class="mb-0 theme-control-toggle-label theme-control-toggle-light" for="themeControlToggle" data-bs-toggle="tooltip" data-bs-placement="left" title="Switch to light theme"><span class="fas fa-sun fs-0"></span></label>
-                                <label class="mb-0 theme-control-toggle-label theme-control-toggle-dark" for="themeControlToggle" data-bs-toggle="tooltip" data-bs-placement="left" title="Switch to dark theme"><span class="fas fa-moon fs-0"></span></label>
-                            </div>
-                        </li>
-                        <li class="nav-item dropdown">
-                            <a class="nav-link notification-indicator notification-indicator-primary px-0 fa-icon-wait" id="navbarDropdownNotification" href="#" role="button" data-bs-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
-                                <span class="fas fa-bell" data-fa-transform="shrink-6" style="font-size: 33px;"></span>
-                            </a>
-                            <div class="dropdown-menu dropdown-menu-end dropdown-menu-card dropdown-menu-notification" aria-labelledby="navbarDropdownNotification">
-                                <div class="card card-notification shadow-none">
-                                    <div class="card-header">
-                                        <div class="row justify-content-between align-items-center">
-                                            <div class="col-auto">
-                                                <h6 class="card-header-title mb-0">Notifications</h6>
-                                            </div>
-                                            <div class="col-auto ps-0 ps-sm-3"><a class="card-link fw-normal" href="#">Mark all as read</a></div>
+                        </div>
+
+                        <!-- DESKTOP: SEARCH BOX MENU -->
+                        <ul class="navbar-nav align-items-center d-none d-lg-block mb-0">
+                            <li class="nav-item">
+                                <div class="search-box navbar-menu-search-box" id="navbarMenuSearchBox" data-list='{"valueNames":["title"]}'>
+                                    <form class="position-relative" data-bs-toggle="search" data-bs-display="static" onsubmit="return false;">
+                                        <input class="form-control search-input fuzzy-search navbar-menu-search-input" id="navbarMenuSearchInput" type="search" placeholder="Cari menu..." aria-label="Search" autocomplete="off" />
+                                        <!-- <span class="fas fa-search search-box-icon"></span> -->
+                                    </form>
+                                    <div class="btn-close-falcon-container position-absolute end-0 top-50 translate-middle shadow-none" data-bs-dismiss="search">
+                                        <div class="btn-close-falcon" aria-label="Close"></div>
+                                    </div>
+                                    <div class="dropdown-menu border font-base start-0 mt-2 py-0 overflow-hidden w-100">
+                                        <div class="scrollbar list py-2" style="max-height: 24rem;">
+                                            <h6 class="dropdown-header fw-medium text-uppercase px-card fs--2 pt-1 pb-2">Daftar Menu</h6>
+                                            @foreach ($searchableMenus as $mItem)
+                                            <a class="dropdown-item fs--1 px-card py-2 hover-primary navbar-menu-result" href="{{ $mItem['url'] }}">
+                                                <div class="d-flex align-items-start">
+                                                    <span class="{{ $mItem['icon'] ?: 'fas fa-circle' }} me-2 mt-1 text-primary fs--1 flex-shrink-0"></span>
+                                                    <div>
+                                                        <span class="search-menu-breadcrumb">{{ $mItem['path'] }}</span>
+                                                        <span class="search-menu-name title">{{ $mItem['path'] }} - {{ $mItem['name'] }}</span>
+                                                    </div>
+                                                </div>
+                                            </a>
+                                            @endforeach
+                                        </div>
+                                        <div class="text-center py-2 d-none navbar-search-no-result">
+                                            <p class="fallback fw-bold fs--1 mb-0 text-500">Menu tidak ditemukan.</p>
                                         </div>
                                     </div>
-                                    <div class="scrollbar-overlay" style="max-height:19rem" id="show-notification"></div>
-                                    <div class="card-footer text-center border-top"><a class="card-link d-block" href="../app/social/notifications.html">View all</a></div>
                                 </div>
-                            </div>
-                        </li>
-                        <li class="nav-item dropdown">
-                            <a class="nav-link pe-0" id="navbarDropdownUser" href="#" role="button" data-bs-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
-                                <div class="avatar avatar-xl">
-                                    <img class="rounded-circle" src="{{ asset('img/pp.png') }}" alt="" />
+                            </li>
+                        </ul>
+
+                        <!-- DESKTOP: 3 BUTTON KANAN -->
+                        <ul class="navbar-nav navbar-nav-icons ms-auto flex-row align-items-center d-none d-lg-flex flex-shrink-0 mb-0">
+                            <li class="nav-item">
+                                <div class="theme-control-toggle fa-icon-wait px-2">
+                                    <input class="form-check-input ms-0 theme-control-toggle-input" id="themeControlToggle" type="checkbox" data-theme-control="theme" value="dark" />
+                                    <label class="mb-0 theme-control-toggle-label theme-control-toggle-light" for="themeControlToggle" data-bs-toggle="tooltip" data-bs-placement="left" title="Switch to light theme"><span class="fas fa-sun fs-0"></span></label>
+                                    <label class="mb-0 theme-control-toggle-label theme-control-toggle-dark" for="themeControlToggle" data-bs-toggle="tooltip" data-bs-placement="left" title="Switch to dark theme"><span class="fas fa-moon fs-0"></span></label>
                                 </div>
-                            </a>
-                            <div class="dropdown-menu dropdown-menu-end py-0" aria-labelledby="navbarDropdownUser">
-                                <div class="bg-white dark__bg-1000 rounded-2 py-2">
-                                    <a class="dropdown-item text-primary text-center">{{ Auth::user()->fullname }}</a>
-                                    <div class="dropdown-divider"></div>
-                                    <a class="dropdown-item" href="#!" id="button-setup-notification" data-bs-toggle="modal" data-bs-target="#modal-template-sm">
-                                        <span class="fas fa-cogs me-1 text-warning"></span> Set Notification
-                                    </a>
-                                    <a class="dropdown-item" href="#" id="button-setup-profil" data-bs-toggle="modal" data-bs-target="#modal-template-xl">
-                                        <span class="fas fa-user-cog me-1 text-info"></span> Profile & account
-                                    </a>
-                                    @if (Auth::user()->access_code == 'master')
-                                    <a class="dropdown-item" href="{{route('master_dashboard')}}">
-                                        <span class="fas fa-th-large me-2 text-danger"></span> Master Page
-                                    </a>
-                                    @endif
-                                    <div class="dropdown-divider"></div>
-                                    <a class="dropdown-item" href="{{ route('logout') }}"><span class="fab fa-keycdn"></span> Logout</a>
+                            </li>
+                            <li class="nav-item dropdown">
+                                <a class="nav-link notification-indicator notification-indicator-primary px-0 fa-icon-wait" id="navbarDropdownNotification" href="#" role="button" data-bs-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+                                    <span class="fas fa-bell" data-fa-transform="shrink-6" style="font-size: 33px;"></span>
+                                </a>
+                                <div class="dropdown-menu dropdown-menu-end dropdown-menu-card dropdown-menu-notification" aria-labelledby="navbarDropdownNotification">
+                                    <div class="card card-notification shadow-none">
+                                        <div class="card-header">
+                                            <div class="row justify-content-between align-items-center">
+                                                <div class="col-auto">
+                                                    <h6 class="card-header-title mb-0">Notifications</h6>
+                                                </div>
+                                                <div class="col-auto ps-0 ps-sm-3"><a class="card-link fw-normal" href="#">Mark all as read</a></div>
+                                            </div>
+                                        </div>
+                                        <div class="scrollbar-overlay" style="max-height:19rem" id="show-notification"></div>
+                                        <div class="card-footer text-center border-top"><a class="card-link d-block" href="../app/social/notifications.html">View all</a></div>
+                                    </div>
                                 </div>
-                            </div>
-                        </li>
-                    </ul>
+                            </li>
+                            <li class="nav-item dropdown">
+                                <a class="nav-link pe-0" id="navbarDropdownUser" href="#" role="button" data-bs-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+                                    <div class="avatar avatar-xl">
+                                        <img class="rounded-circle" src="{{ asset('img/pp.png') }}" alt="" />
+                                    </div>
+                                </a>
+                                <div class="dropdown-menu dropdown-menu-end py-0" aria-labelledby="navbarDropdownUser">
+                                    <div class="bg-white dark__bg-1000 rounded-2 py-2">
+                                        <a class="dropdown-item text-primary text-center">{{ Auth::user()->fullname }}</a>
+                                        <div class="dropdown-divider"></div>
+                                        <a class="dropdown-item" href="#!" id="button-setup-notification" data-bs-toggle="modal" data-bs-target="#modal-template-sm">
+                                            <span class="fas fa-cogs me-1 text-warning"></span> Set Notification
+                                        </a>
+                                        <a class="dropdown-item" href="#" id="button-setup-profil" data-bs-toggle="modal" data-bs-target="#modal-template-xl">
+                                            <span class="fas fa-user-cog me-1 text-info"></span> Profile & account
+                                        </a>
+                                        @if (Auth::user()->access_code == 'master')
+                                        <a class="dropdown-item" href="{{route('master_dashboard')}}">
+                                            <span class="fas fa-th-large me-2 text-danger"></span> Master Page
+                                        </a>
+                                        @endif
+                                        <div class="dropdown-divider"></div>
+                                        <a class="dropdown-item" href="{{ route('logout') }}"><span class="fab fa-keycdn"></span> Logout</a>
+                                    </div>
+                                </div>
+                            </li>
+                        </ul>
+                    </div>
                 </nav>
 
                 <form id="logout-form" action="{{ route('logout') }}" method="POST" class="d-none">
@@ -345,6 +587,107 @@
             </div>
         </div>
     </main>
+
+    <!-- MOBILE: FLOATING MESSAGE NAVBAR & PROFILE BOTTOM-RIGHT BUTTON -->
+    <div class="d-lg-none">
+        <div class="mobile-message-navbar bg-white dark__bg-1000 border" id="mobileMessageNavbar">
+            <div class="mobile-message-header d-flex align-items-center justify-content-between">
+                <div class="d-flex align-items-center gap-2 min-w-0">
+                    <img class="rounded-circle border border-white flex-shrink-0" src="{{ asset('img/pp.png') }}" alt="" width="34" height="34" />
+                    <div class="min-w-0">
+                        <div class="fw-semibold fs--1 text-truncate">{{ Auth::user()->fullname }}</div>
+                        <div class="fs--2 opacity-75">Quick Menu</div>
+                    </div>
+                </div>
+                <button class="btn btn-sm text-white p-1" type="button" id="closeMobileMessageNavbar" aria-label="Tutup">
+                    <span class="fas fa-times"></span>
+                </button>
+            </div>
+
+            <div class="mobile-message-item justify-content-between">
+                <div class="d-flex align-items-center gap-2">
+                    <span class="mobile-message-icon-badge bg-soft-primary text-primary">
+                        <span class="fas fa-adjust"></span>
+                    </span>
+                    <span class="fs--1 fw-medium">Tema Tampilan</span>
+                </div>
+                <div class="theme-control-toggle fa-icon-wait">
+                    <input class="form-check-input ms-0 theme-control-toggle-input" id="themeControlToggleMobile" type="checkbox" data-theme-control="theme" value="dark" />
+                    <label class="mb-0 theme-control-toggle-label theme-control-toggle-light" for="themeControlToggleMobile" title="Switch to light theme"><span class="fas fa-sun fs-0"></span></label>
+                    <label class="mb-0 theme-control-toggle-label theme-control-toggle-dark" for="themeControlToggleMobile" title="Switch to dark theme"><span class="fas fa-moon fs-0"></span></label>
+                </div>
+            </div>
+
+            <a class="mobile-message-item" href="#navbarDropdownNotification" onclick="$('#mobileMessageNavbar').removeClass('show'); $('#navbarDropdownNotification').dropdown('toggle');">
+                <span class="mobile-message-icon-badge bg-soft-info text-info">
+                    <span class="fas fa-bell"></span>
+                </span>
+                <div class="flex-1">
+                    <div class="fs--1 fw-medium">Notifications</div>
+                    <div class="fs--2 text-500">Lihat pemberitahuan terbaru</div>
+                </div>
+            </a>
+
+            <a class="mobile-message-item" href="#!" id="button-setup-notification-mobile" data-bs-toggle="modal" data-bs-target="#modal-template-sm">
+                <span class="mobile-message-icon-badge bg-soft-warning text-warning">
+                    <span class="fas fa-cogs"></span>
+                </span>
+                <div class="flex-1">
+                    <div class="fs--1 fw-medium">Set Notification</div>
+                    <div class="fs--2 text-500">Atur preferensi notifikasi</div>
+                </div>
+            </a>
+
+            <a class="mobile-message-item" href="#" id="button-setup-profil-mobile" data-bs-toggle="modal" data-bs-target="#modal-template-xl">
+                <span class="mobile-message-icon-badge bg-soft-success text-success">
+                    <span class="fas fa-user-cog"></span>
+                </span>
+                <div class="flex-1">
+                    <div class="fs--1 fw-medium">Profile & account</div>
+                    <div class="fs--2 text-500">Kelola profil akun</div>
+                </div>
+            </a>
+
+            <a class="mobile-message-item" href="#settings-offcanvas" data-bs-toggle="offcanvas" onclick="$('#mobileMessageNavbar').removeClass('show');">
+                <span class="mobile-message-icon-badge bg-soft-primary text-primary">
+                    <span class="fas fa-sliders-h"></span>
+                </span>
+                <div class="flex-1">
+                    <div class="fs--1 fw-medium">Setting</div>
+                    <div class="fs--2 text-500">Pengaturan layout &amp; tema</div>
+                </div>
+            </a>
+
+            @if (Auth::user()->access_code == 'master')
+            <a class="mobile-message-item" href="{{route('master_dashboard')}}">
+                <span class="mobile-message-icon-badge bg-soft-danger text-danger">
+                    <span class="fas fa-th-large"></span>
+                </span>
+                <div class="flex-1">
+                    <div class="fs--1 fw-medium">Master Page</div>
+                    <div class="fs--2 text-500">Panel administrator</div>
+                </div>
+            </a>
+            @endif
+
+            <a class="mobile-message-item" href="{{ route('logout') }}">
+                <span class="mobile-message-icon-badge bg-soft-secondary text-700">
+                    <span class="fab fa-keycdn"></span>
+                </span>
+                <div class="flex-1">
+                    <div class="fs--1 fw-medium text-danger">Logout</div>
+                    <div class="fs--2 text-500">Keluar dari sesi</div>
+                </div>
+            </a>
+        </div>
+
+        <div class="mobile-fab-container">
+            <button class="btn btn-primary mobile-fab-btn" id="mobileFabToggleBtn" type="button" aria-expanded="false" aria-label="Buka Menu Profil & Pintas">
+                <img src="{{ asset('img/pp.png') }}" alt="Profile" id="mobileFabProfileImg" />
+                <span class="fas fa-times d-none" id="mobileFabCloseIcon"></span>
+            </button>
+        </div>
+    </div>
 
     <!-- Offcanvas Settings Panel -->
     <div class="offcanvas offcanvas-end settings-panel border-0" id="settings-offcanvas" tabindex="-1" aria-labelledby="settings-offcanvas">
@@ -436,7 +779,8 @@
         </div>
     </div>
 
-    <a class="card setting-toggle" href="#settings-offcanvas" data-bs-toggle="offcanvas">
+    <!-- DESKTOP: SETTING TOGGLE -->
+    <a class="card setting-toggle d-none d-lg-block" href="#settings-offcanvas" data-bs-toggle="offcanvas">
         <div class="card-body d-flex align-items-center py-md-2 px-2 py-1">
             <div class="bg-soft-primary position-relative rounded-start" style="height:34px;width:28px">
                 <div class="settings-popover">
@@ -498,6 +842,95 @@
     <script src="{{ asset('asset/js/theme.js') }}"></script>
     <script src="{{ asset('online/resumable.min.js') }}"></script>
     <script src="{{ asset('asset/notifications/js/notifications.min.js') }}"></script>
+
+    <!-- Search Box Menu Filter & Mobile Floating Message Navbar -->
+    <script>
+        $(document).ready(function() {
+            $('.navbar-menu-search-box').each(function() {
+                const $box = $(this);
+                const $searchContainer = $box.find('.search-box');
+                const $input = $box.find('.navbar-menu-search-input');
+                const $dropdown = $box.find('.dropdown-menu');
+                const $noResult = $box.find('.navbar-search-no-result');
+
+                function toggleSearchIcon() {
+                    const hasVal = ($input.val() || '').trim().length > 0;
+                    $searchContainer.toggleClass('has-query', hasVal);
+                }
+
+                function filterMenus() {
+                    const q = ($input.val() || '').toLowerCase().trim();
+                    let visible = 0;
+
+                    toggleSearchIcon();
+
+                    $box.find('.navbar-menu-result').each(function() {
+                        const $row = $(this);
+                        const text = ($row.find('.title').text() || '').toLowerCase();
+                        const pathText = ($row.find('.search-menu-breadcrumb').text() || '').toLowerCase();
+                        const matched = q === '' || text.indexOf(q) !== -1 || pathText.indexOf(q) !== -1;
+
+                        $row.css('display', matched ? '' : 'none');
+                        if (matched) visible++;
+                    });
+
+                    $noResult.toggleClass('d-none', visible > 0);
+                }
+
+                $input.on('input focus', function() {
+                    filterMenus();
+                    $dropdown.addClass('show');
+                });
+
+                $box.find('.btn-close-falcon').on('click', function() {
+                    $input.val('');
+                    filterMenus();
+                });
+
+                $(document).on('click', function(e) {
+                    if (!$(e.target).closest($box).length) {
+                        $dropdown.removeClass('show');
+                    }
+                });
+            });
+
+            // Toggle Floating Message Navbar (Mobile) dengan gambar profil
+            const $fabBtn = $('#mobileFabToggleBtn');
+            const $fabProfileImg = $('#mobileFabProfileImg');
+            const $fabCloseIcon = $('#mobileFabCloseIcon');
+            const $msgNav = $('#mobileMessageNavbar');
+
+            function setMobileMessageOpen(open) {
+                $msgNav.toggleClass('show', open);
+                $fabBtn.attr('aria-expanded', open ? 'true' : 'false');
+                if (open) {
+                    $fabProfileImg.addClass('d-none');
+                    $fabCloseIcon.removeClass('d-none');
+                } else {
+                    $fabProfileImg.removeClass('d-none');
+                    $fabCloseIcon.addClass('d-none');
+                }
+            }
+
+            $fabBtn.on('click', function(e) {
+                e.stopPropagation();
+                const isOpen = $msgNav.hasClass('show');
+                setMobileMessageOpen(!isOpen);
+            });
+
+            $('#closeMobileMessageNavbar').on('click', function(e) {
+                e.stopPropagation();
+                setMobileMessageOpen(false);
+            });
+
+            $(document).on('click', function(e) {
+                if (!$(e.target).closest('#mobileMessageNavbar, #mobileFabToggleBtn').length) {
+                    setMobileMessageOpen(false);
+                }
+            });
+        });
+    </script>
+
     @yield('base.js')
 
     @if (session('success'))

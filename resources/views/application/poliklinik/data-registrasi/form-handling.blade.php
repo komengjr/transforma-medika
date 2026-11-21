@@ -13,7 +13,7 @@
         </span>
     </div>
 
-    <div class="p-4">
+    <div class="p-4 bg-white">
         <div class="row g-4">
             <!-- Profil Foto Pasien -->
             <div class="col-md-3 col-lg-2 d-flex justify-content-center align-items-start">

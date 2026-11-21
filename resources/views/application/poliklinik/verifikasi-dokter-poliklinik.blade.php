@@ -1,175 +1,554 @@
 @extends('layouts.layouts')
+
 @section('base.css')
 <link rel="stylesheet" href="https://cdn.datatables.net/2.2.2/css/dataTables.bootstrap5.css">
 <link rel="stylesheet" href="https://cdn.datatables.net/responsive/3.0.4/css/responsive.bootstrap5.css">
 <link href="{{ asset('vendors/choices/choices.min.css') }}" rel="stylesheet" />
+<link href="{{ asset('vendors/flatpickr/flatpickr.min.css') }}" rel="stylesheet" />
+<link href="https://cdn.jsdelivr.net/npm/select2@4.1.0-rc.0/dist/css/select2.min.css" rel="stylesheet" />
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/select2-bootstrap-5-theme@1.3.0/dist/select2-bootstrap-5-theme.min.css" />
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
+<link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&family=JetBrains+Mono:wght@500;700&display=swap" rel="stylesheet">
+
 <style>
-    /* --- TEMA RETRO / NEUBRUTALISM --- */
-    .retro-wrap {
-        --retro-dark: #1e1e24;
-        --retro-yellow: #ffde59;
-        --retro-cyan: #8bf0fa;
-        --retro-green: #c1ff72;
-        --retro-purple: #c8b6ff;
-        --retro-orange: #ff914d;
-        --retro-bg: #f4f0ea;
+    /* =========================================
+       MODERN ENTERPRISE HEALTHCARE UI STYLES
+       (ADAPTIVE LIGHT & DARK MODE BOOTSTRAP 5)
+       ========================================= */
+    :root {
+        --ent-indigo: #4f46e5;
+        --ent-indigo-dark: #4338ca;
+        --ent-indigo-soft: rgba(79, 70, 229, 0.12);
+        --ent-grid-border: rgba(99, 102, 241, 0.28);
+        --ent-emerald: #059669;
+        --ent-sky: #0284c7;
+        --ent-amber: #d97706;
+        --ent-rose: #e11d48;
     }
 
-    .retro-wrap .card-retro {
-        border: 3px solid var(--retro-dark);
+    body {
+        font-family: 'Plus Jakarta Sans', sans-serif;
+    }
+
+    /* Adaptive Enterprise Card */
+    .ent-card {
+        border: 1px solid var(--ent-grid-border);
+        border-radius: 16px;
+        box-shadow: 0 4px 20px -2px rgba(15, 23, 42, 0.08);
+        background-color: transparent;
+        overflow: hidden;
+    }
+
+    .ent-card>.card-header {
+        background-color: transparent !important;
+        border-bottom: 1px solid var(--ent-grid-border) !important;
+    }
+
+    /* Hero Banner */
+    .ent-header-banner {
+        background: linear-gradient(135deg, #0f172a 0%, #1e1b4b 55%, #312e81 100%);
+        border: 1px solid rgba(99, 102, 241, 0.35);
+        border-radius: 16px;
+        box-shadow: 0 12px 28px -6px rgba(15, 23, 42, 0.22);
+        color: #ffffff;
+        position: relative;
+        overflow: hidden;
+    }
+
+    .ent-header-banner::before {
+        content: '';
+        position: absolute;
+        top: -50%;
+        right: -5%;
+        width: 340px;
+        height: 340px;
+        background: radial-gradient(circle, rgba(56, 189, 248, 0.22) 0%, transparent 70%);
+        pointer-events: none;
+    }
+
+    .ent-glass-pill {
+        background: rgba(255, 255, 255, 0.09);
+        backdrop-filter: blur(8px);
+        border: 1px solid rgba(255, 255, 255, 0.16);
         border-radius: 12px;
-        box-shadow: 4px 4px 0px var(--retro-dark);
-        background: #ffffff;
-        margin-bottom: 1rem;
+        color: #ffffff;
     }
 
-    .retro-wrap .form-control,
-    .retro-wrap .form-select {
-        border: 2px solid var(--retro-dark) !important;
-        background-color: #ffffff;
+    /* Modern Buttons */
+    .ent-btn {
+        font-weight: 600 !important;
+        border-radius: 10px;
+        transition: all 0.18s ease;
+        letter-spacing: 0.01em;
+        cursor: pointer;
+        font-size: 0.82rem;
+    }
+
+    .ent-btn:hover {
+        transform: translateY(-1px);
+    }
+
+    .ent-btn-primary {
+        background: linear-gradient(135deg, #4f46e5 0%, #4338ca 100%);
+        border: none;
+        color: #ffffff;
+        box-shadow: 0 4px 12px rgba(79, 70, 229, 0.25);
+    }
+
+    .ent-btn-primary:hover {
+        box-shadow: 0 6px 16px rgba(79, 70, 229, 0.35);
+        color: #ffffff;
+    }
+
+    .ent-btn-warning {
+        background-color: rgba(245, 158, 11, 0.15);
+        border: 1px solid rgba(245, 158, 11, 0.4);
+        color: #d97706;
+    }
+
+    .ent-btn-warning:hover {
+        background-color: #f59e0b;
+        border-color: #f59e0b;
+        color: #ffffff;
+    }
+
+    .ent-btn-outline {
+        border: 1px solid var(--ent-grid-border);
+        background-color: transparent;
+        color: var(--bs-body-color);
+    }
+
+    .ent-btn-outline:hover {
+        background-color: rgba(79, 70, 229, 0.08);
+        border-color: var(--ent-indigo);
+        color: var(--bs-body-color);
+    }
+
+    /* Adaptive Floating Filters */
+    .form-floating-custom {
+        position: relative;
+    }
+
+    .form-floating-custom label {
+        position: absolute;
+        top: 5px;
+        left: 11px;
+        font-size: 0.64rem;
         font-weight: 700;
-        color: var(--retro-dark);
-    }
-
-    .retro-wrap .form-control:focus,
-    .retro-wrap .form-select:focus {
-        box-shadow: 3px 3px 0px var(--retro-dark);
-        border-color: var(--retro-dark) !important;
-    }
-
-    .retro-wrap .btn-retro {
-        font-weight: 800;
         text-transform: uppercase;
-        border: 2px solid var(--retro-dark);
-        box-shadow: 3px 3px 0px var(--retro-dark);
-        border-radius: 6px;
-        transition: all 0.1s;
+        letter-spacing: 0.03em;
+        color: var(--bs-secondary-color, #64748b);
+        pointer-events: none;
+        z-index: 5;
+        background: transparent;
     }
 
-    .retro-wrap .btn-retro:hover {
-        transform: translate(2px, 2px);
-        box-shadow: 0px 0px 0px var(--retro-dark);
+    .ent-input,
+    .form-control,
+    .form-select {
+        border: 1px solid var(--ent-grid-border) !important;
+        border-radius: 10px !important;
+        font-weight: 600 !important;
+        color: var(--bs-body-color) !important;
+        background-color: var(--bs-body-bg) !important;
+        padding-top: 18px !important;
+        padding-bottom: 5px !important;
+        padding-left: 11px !important;
+        font-size: 0.8rem !important;
+        height: 44px !important;
+        transition: all 0.2s ease;
     }
 
-    .retro-wrap .table-retro th {
-        background-color: var(--retro-dark);
-        /* color: #fff; */
-        border: 2px solid var(--retro-dark);
-        text-transform: uppercase;
-        font-size: 0.85rem;
+    .ent-input:focus,
+    .form-control:focus,
+    .form-select:focus {
+        border-color: var(--ent-indigo) !important;
+        box-shadow: 0 0 0 3.5px rgba(79, 70, 229, 0.15) !important;
+        outline: none;
     }
 
-    .retro-wrap .table-retro td {
-        border: 2px solid var(--retro-dark);
+    /* Select2 Adaptive Styling */
+    .form-floating-custom .select2-container--bootstrap-5 .select2-selection {
+        height: 44px !important;
+        padding-top: 16px !important;
+        padding-bottom: 4px !important;
+        padding-left: 8px !important;
+        border-radius: 10px !important;
+        background-color: var(--bs-body-bg) !important;
+        border: 1px solid var(--ent-grid-border) !important;
+        transition: all 0.2s ease;
+    }
+
+    .form-floating-custom .select2-container--bootstrap-5.select2-container--focus .select2-selection,
+    .form-floating-custom .select2-container--bootstrap-5.select2-container--open .select2-selection {
+        border-color: var(--ent-indigo) !important;
+        box-shadow: 0 0 0 3.5px rgba(79, 70, 229, 0.15) !important;
+    }
+
+    .form-floating-custom .select2-container--bootstrap-5 .select2-selection--single .select2-selection__rendered {
+        font-size: 0.8rem !important;
+        font-weight: 600 !important;
+        color: var(--bs-body-color) !important;
+        padding-left: 3px !important;
+        line-height: 1.5 !important;
+    }
+
+    .form-floating-custom .select2-container--bootstrap-5 .select2-selection--single .select2-selection__arrow {
+        top: 10px !important;
+    }
+
+    /* =========================================================
+       TRANSPARENT TABLE WITH COLORED GRID BORDERS & FULL ACTION
+       ========================================================= */
+    .table-custom {
+        width: 100% !important;
+        border-collapse: collapse !important;
+        margin-bottom: 0 !important;
+        background-color: transparent !important;
+        --bs-table-bg: transparent;
+        --bs-table-accent-bg: transparent;
+        --bs-table-striped-bg: rgba(99, 102, 241, 0.03);
+        --bs-table-hover-bg: rgba(79, 70, 229, 0.08);
+        --bs-table-color: var(--bs-body-color);
+        --bs-table-border-color: var(--ent-grid-border);
+    }
+
+    .table-custom thead th {
+        background-color: rgba(79, 70, 229, 0.09) !important;
+        color: var(--bs-body-color) !important;
+        font-size: 0.72rem;
         font-weight: 700;
+        text-transform: uppercase;
+        border: 1px solid var(--ent-grid-border) !important;
+        border-bottom: 2px solid rgba(79, 70, 229, 0.45) !important;
+        padding: 13px 12px;
+        letter-spacing: 0.04em;
+    }
+
+    .table-custom thead th:first-child {
+        border-left: none !important;
+    }
+
+    .table-custom thead th:last-child {
+        border-right: none !important;
+        padding-right: 18px !important;
+    }
+
+    .table-custom tbody tr {
+        background-color: transparent !important;
+        transition: background-color 0.15s ease;
+        height: 1px;
+    }
+
+    .table-custom tbody tr:hover {
+        background-color: rgba(79, 70, 229, 0.07) !important;
+    }
+
+    .table-custom td {
+        background-color: transparent !important;
+        border: 1px solid var(--ent-grid-border) !important;
+        font-weight: 500;
+        color: var(--bs-body-color) !important;
+        padding: 11px 12px;
         vertical-align: middle;
+        font-size: 0.83rem;
+    }
+
+    .table-custom tbody td:first-child {
+        border-left: none !important;
+    }
+
+    .table-custom tbody td:last-child {
+        border-right: none !important;
+    }
+
+    /* FULL-CELL ACTION BUTTON STYLING */
+    .table-custom td.action-cell-full {
+        padding: 0 !important;
+        height: 100%;
+        vertical-align: stretch !important;
+    }
+
+    .table-custom td.action-cell-full>.btn,
+    .table-custom td.action-cell-full>.btn-group,
+    .table-custom td.action-cell-full>.dropdown,
+    .table-custom td.action-cell-full>a,
+    .table-custom td.action-cell-full>button {
+        display: flex !important;
+        align-items: center;
+        justify-content: center;
+        width: 100% !important;
+        height: 100% !important;
+        min-height: 52px;
+        border-radius: 0 !important;
+        margin: 0 !important;
+        border: none !important;
+        background-color: rgba(79, 70, 229, 0.12);
+        color: #4f46e5;
+        font-weight: 700;
+        font-size: 0.8rem;
+        transition: all 0.15s ease;
+    }
+
+    .table-custom td.action-cell-full>button:hover,
+    .table-custom td.action-cell-full>.btn:hover {
+        background-color: var(--ent-indigo);
+        color: #ffffff;
+    }
+
+    /* DataTables Top & Bottom Controls Padding (Adaptive Transparent) */
+    #example_wrapper>.row:first-child,
+    #example_wrapper .dt-layout-row:first-child {
+        padding: 16px 20px 12px 20px;
+        margin: 0 !important;
+        background-color: transparent;
+    }
+
+    #example_wrapper>.row:last-child,
+    #example_wrapper .dt-layout-row:last-child {
+        padding: 14px 20px 18px 20px;
+        margin: 0 !important;
+        border-top: 1px solid var(--ent-grid-border);
+        background-color: transparent;
+    }
+
+    #example_wrapper .dt-layout-table {
+        margin: 0 !important;
+    }
+
+    #example_wrapper .dataTables_filter input,
+    #example_wrapper .dt-search input {
+        border: 1px solid var(--ent-grid-border) !important;
+        border-radius: 10px !important;
+        padding: 6px 12px !important;
+        font-size: 0.82rem !important;
+        height: 36px !important;
+        background-color: var(--bs-body-bg) !important;
+        color: var(--bs-body-color) !important;
+    }
+
+    #example_wrapper .dataTables_filter input:focus,
+    #example_wrapper .dt-search input:focus {
+        border-color: var(--ent-indigo) !important;
+        box-shadow: 0 0 0 3px rgba(79, 70, 229, 0.15) !important;
+        outline: none;
+    }
+
+    #example_wrapper .dataTables_length select,
+    #example_wrapper .dt-length select {
+        border: 1px solid var(--ent-grid-border) !important;
+        border-radius: 8px !important;
+        padding: 4px 28px 4px 10px !important;
+        height: 34px !important;
+        font-size: 0.82rem !important;
+        background-color: var(--bs-body-bg) !important;
+        color: var(--bs-body-color) !important;
+    }
+
+    .page-item.active .page-link {
+        background-color: var(--ent-indigo) !important;
+        border-color: var(--ent-indigo) !important;
+        color: #ffffff !important;
+        border-radius: 8px;
+    }
+
+    .page-link {
+        color: var(--bs-body-color);
+        background-color: transparent;
+        border-radius: 8px;
+        margin: 0 2px;
+        border: 1px solid var(--ent-grid-border);
+        font-weight: 600;
+        font-size: 0.8rem;
+    }
+
+    .ent-badge {
+        border-radius: 9999px;
+        padding: 4px 10px;
+        font-weight: 700;
+        text-transform: uppercase;
+        display: inline-flex;
+        align-items: center;
+        font-size: 0.68rem;
+        letter-spacing: 0.03em;
+    }
+
+    /* Modal Adaptive Enterprise */
+    .modal-ent-content {
+        border: 1px solid var(--ent-grid-border) !important;
+        border-radius: 18px !important;
+        box-shadow: 0 25px 50px -12px rgba(15, 23, 42, 0.35) !important;
+        background-color: var(--bs-body-bg);
+        color: var(--bs-body-color);
+        overflow: hidden;
     }
 </style>
 @endsection
 
 @section('content')
-<div class="retro-wrap">
-    <!-- Header Banner -->
-    <div class="row mb-3">
-        <div class="col">
-            <div class="card-retro p-3 d-flex flex-row align-items-center justify-content-between" style="background-color: var(--retro-yellow);">
-                <div class="d-flex align-items-center">
-                    <img class="mx-3" src="{{ asset('img/verif.png') }}" alt="" width="70" />
-                    <div>
-                        <h6 class="text-dark fs--1 mb-0 fw-bold">MANAGEMENT SYSTEM</h6>
-                        <h3 class="text-dark fw-bolder mb-0">Verifikasi Dokter Poliklinik</h3>
+<!-- HEADER HERO BANNER ENTERPRISE -->
+<div class="row mb-3">
+    <div class="col-12">
+        <div class="card ent-header-banner p-1">
+            <div class="card-body p-3 p-md-4 text-white position-relative" style="z-index: 2;">
+                <div class="row align-items-center gy-3">
+                    <div class="col-lg-8 d-flex align-items-center">
+                        <div class="ent-glass-pill me-3 d-flex align-items-center justify-content-center flex-shrink-0"
+                            style="width: 60px; height: 60px;">
+                            <img src="{{ asset('img/verif.png') }}" alt="Verifikasi Logo" class="img-fluid" width="38" />
+                        </div>
+                        <div>
+                            <div class="d-flex align-items-center gap-2 mb-1">
+                                <span class="ent-badge" style="background: rgba(56, 189, 248, 0.2); border: 1px solid rgba(56, 189, 248, 0.4); color: #7dd3fc;">
+                                    <i class="fas fa-user-md me-1"></i> LIVE SYSTEM
+                                </span>
+                                <span style="color: #94a3b8; font-size: 0.75rem; font-weight: 600;">Otorisasi Medis Poliklinik</span>
+                            </div>
+                            <h4 class="fw-bold mb-0 text-white" style="letter-spacing: -0.02em;">
+                                Verifikasi Dokter <span class="fw-normal" style="color: #cbd5e1;">Poliklinik</span>
+                            </h4>
+                        </div>
+                    </div>
+
+                    <div class="col-lg-4 text-lg-end">
+                        <div class="ent-glass-pill d-inline-flex align-items-center px-3 py-2">
+                            <h6 class="fw-bold mb-0 text-white" style="font-size: 0.9rem;">
+                                <i class="fas fa-clipboard-check me-2 text-info"></i> Daftar Pasien Menunggu Verifikasi
+                            </h6>
+                        </div>
                     </div>
                 </div>
             </div>
         </div>
     </div>
+</div>
 
-    <!-- Filter & Pencarian Section -->
-    <div class="card-retro mb-4">
-        <div class="card-header border-bottom border-dark border-3 py-3" style="background-color: var(--retro-cyan);">
-            <h5 class="mb-0 fw-bolder text-dark"><i class="fas fa-filter me-2"></i> Filter Data Pasien</h5>
-        </div>
-        <div class="card-body p-4 bg-white">
-            <form method="GET" action="" class="row g-3">
-                <!-- Filter Range Tanggal -->
-                <div class="col-md-4">
-                    <label class="form-label fw-bold text-dark">Range Tanggal Registrasi</label>
-                    <div class="input-group">
-                        <input type="date" name="start_date" class="form-control form-control-retro" value="{{ request('start_date', date('Y-m-d')) }}">
-                        <span class="input-group-text fw-bold border-dark border-2 bg-warning">s/d</span>
-                        <input type="date" name="end_date" class="form-control form-control-retro" value="{{ request('end_date', date('Y-m-d')) }}">
+<!-- MAIN DATA TABLE CARD (TRANSPARENT HEADER + WHITE TABLE BODY + COLORED GRID) -->
+<div class="ent-card mb-3">
+    <div class="card-header py-3 px-3 px-md-4">
+        <form method="GET" action="" class="row align-items-center g-2">
+
+            <!-- TOMBOL AKSI UTAMA & TOGGLE FILTER MOBILE -->
+            <div class="col-12 col-md-auto d-flex align-items-center justify-content-between gap-2">
+                <a href="{{ url()->current() }}" class="btn btn-sm ent-btn ent-btn-primary px-3 py-2 d-flex align-items-center gap-2" style="height: 44px;"
+                    data-bs-toggle="tooltip" title="Reset & Refresh Data Hari Ini">
+                    <i class="fas fa-sync-alt"></i>
+                    <span class="d-sm-inline fw-semibold">Reset Data</span>
+                </a>
+
+                <button class="btn btn-sm ent-btn ent-btn-warning px-3 py-2 d-md-none d-flex align-items-center gap-1" style="height: 44px;"
+                    type="button" data-bs-toggle="collapse" data-bs-target="#collapseFilterMobile" aria-expanded="false" aria-controls="collapseFilterMobile">
+                    <i class="fas fa-filter"></i>
+                    <span>Filter</span>
+                    <i class="fas fa-chevron-down ms-1"></i>
+                </button>
+            </div>
+
+            <!-- CONTAINER DERETAN FILTER -->
+            <div class="col-12 col-md collapse d-md-block" id="collapseFilterMobile">
+                <div class="row g-2 align-items-center mt-2 mt-md-0 pt-2 pt-md-0 border-top border-md-0">
+
+                    <!-- Filter Tanggal Awal -->
+                    <div class="col-12 col-sm-6 col-md-3">
+                        <div class="form-floating-custom">
+                            <label>Tanggal Awal</label>
+                            <input type="text" name="start_date" class="form-control datetimepicker ent-input" value="{{ request('start_date', date('Y-m-d')) }}" placeholder="YYYY-MM-DD" data-options='{"dateFormat":"Y-m-d","disableMobile":true}'>
+                        </div>
                     </div>
-                </div>
 
-                <!-- Filter Pilihan Poliklinik -->
-                <div class="col-md-4">
-                    <label class="form-label fw-bold text-dark">Pilih Poliklinik</label>
-                    <select name="poli_id" class="form-select form-select-retro">
-                        <option value="">-- Semua Poliklinik --</option>
-                        @foreach($polis ?? [] as $p)
-                        <option value="{{ $p->id }}" {{ request('poli_id') == $p->id ? 'selected' : '' }}>
-                            {{ $p->nama_poli }}
-                        </option>
-                        @endforeach
-                    </select>
-                </div>
+                    <!-- Filter Tanggal Akhir -->
+                    <div class="col-12 col-sm-6 col-md-3">
+                        <div class="form-floating-custom">
+                            <label>Tanggal Akhir</label>
+                            <input type="text" name="end_date" class="form-control datetimepicker ent-input" value="{{ request('end_date', date('Y-m-d')) }}" placeholder="YYYY-MM-DD" data-options='{"dateFormat":"Y-m-d","disableMobile":true}'>
+                        </div>
+                    </div>
 
-                <!-- Tombol Aksi Filter -->
-                <div class="col-md-4 d-flex align-items-end gap-2">
-                    <button type="submit" class="btn btn-dark btn-retro w-50" style="background-color: var(--retro-dark); color: #fff;">
-                        <i class="fas fa-search me-1"></i> Filter
-                    </button>
-                    <a href="{{ url()->current() }}" class="btn btn-light btn-retro w-50 border-dark">
-                        <i class="fas fa-sync-alt me-1"></i> Reset
-                    </a>
+                    <!-- Filter Poliklinik -->
+                    <div class="col-12 col-sm-6 col-md-4">
+                        <div class="form-floating-custom">
+                            <label>Pilih Poliklinik</label>
+                            <select name="poli_id" class="form-select ent-input" id="filter_poli_id">
+                                <option value="">Semua Poliklinik</option>
+                                @foreach($polis ?? [] as $p)
+                                <option value="{{ $p->id }}" {{ request('poli_id') == $p->id ? 'selected' : '' }}>
+                                    {{ $p->nama_poli }}
+                                </option>
+                                @endforeach
+                            </select>
+                        </div>
+                    </div>
+
+                    <!-- Tombol Submit Filter -->
+                    <div class="col-12 col-sm-6 col-md-2">
+                        <button type="submit" class="btn btn-sm ent-btn ent-btn-primary w-100 d-flex align-items-center justify-content-center gap-2" style="height: 44px;">
+                            <i class="fas fa-search"></i>
+                            <span class="fw-semibold">Filter</span>
+                        </button>
+                    </div>
+
                 </div>
-            </form>
-        </div>
+            </div>
+
+        </form>
     </div>
 
-    <!-- Tabel Daftar Pasien -->
-    <div class="card-retro">
-        <div class="card-header border-bottom border-dark border-3 py-3" style="background-color: var(--retro-purple);">
-            <h5 class="mb-0 fw-bolder text-dark"><i class="fas fa-list-alt me-2"></i> Daftar Pasien Menunggu Verifikasi</h5>
-        </div>
-        <div class="card-body p-4 bg-white">
-            <table id="example" class="table table-retro w-100">
+    <div class="card-body p-0 bg-white">
+        <div class="table-responsive pb-3">
+            <table id="example" class="table table-custom align-middle pb-3 w-100">
                 <thead>
                     <tr>
                         <th width="5%" class="text-center">No</th>
                         <th width="15%">No Registrasi</th>
                         <th width="20%">Nama Pasien</th>
-                        <th width="15%">Tanggal Reg</th>
-                        <th width="15%">Poliklinik</th>
+                        <th width="14%">Tanggal Reg</th>
+                        <th width="14%">Poliklinik</th>
                         <th width="15%">Dokter Pemeriksa</th>
                         <th width="10%" class="text-center">Status</th>
-                        <th width="5%" class="text-center">Aksi</th>
+                        <th width="7%" class="text-center">Aksi</th>
                     </tr>
                 </thead>
                 <tbody>
                     @php $no = 1; @endphp
                     @foreach ($data as $datas)
                     <tr>
-                        <td class="text-center">{{ $no++ }}</td>
-                        <td class="fw-bold"><span class="badge bg-warning text-dark border border-dark">{{ $datas->no_registrasi }}</span></td>
+                        <td class="text-center fw-semibold">{{ $no++ }}</td>
                         <td>
-                            <div class="fw-bolder">{{ $datas->master_patient_name }}</div>
-                            <div class="fs--1 text-muted">RM: {{ $datas->master_patient_code }}</div>
+                            <span class="ent-badge" style="background: rgba(79, 70, 229, 0.14); color: #4f46e5; border: 1px solid rgba(79, 70, 229, 0.35); font-family: 'JetBrains Mono', monospace; font-size: 0.74rem;">
+                                {{ $datas->no_registrasi }}
+                            </span>
                         </td>
-                        <td>{{ $datas->tanggal_registrasi }}</td>
-                        <td><span class="badge bg-light text-dark border border-dark">{{ $datas->m_poli_name ?? '-' }}</span></td>
-                        <td><i class="fas fa-user-md me-1 text-primary"></i> {{ $datas->master_doctor_name ?? 'Belum Ditentukan' }}</td>
+                        <td>
+                            <div class="fw-bold">{{ $datas->master_patient_name }}</div>
+                            <div class="opacity-75 fw-semibold mt-0.5" style="font-size: 0.72rem; font-family: 'JetBrains Mono', monospace;">
+                                <i class="fas fa-qrcode text-primary me-1"></i>RM: {{ $datas->master_patient_code }}
+                            </div>
+                        </td>
+                        <td class="fw-semibold" style="font-size: 0.8rem;">{{ $datas->tanggal_registrasi }}</td>
+                        <td>
+                            <span class="ent-badge" style="background: rgba(14, 165, 233, 0.14); color: #0284c7; border: 1px solid rgba(14, 165, 233, 0.35);">
+                                {{ $datas->m_poli_name ?? '-' }}
+                            </span>
+                        </td>
+                        <td class="fw-semibold">
+                            <i class="fas fa-user-md me-1 text-primary"></i> {{ $datas->master_doctor_name ?? 'Belum Ditentukan' }}
+                        </td>
                         <td class="text-center">
                             @if (isset($datas->status_verifikasi_dokter) && $datas->status_verifikasi_dokter == 'Verified')
-                            <span class="badge bg-success border border-dark text-dark">Verified</span>
+                            <span class="ent-badge" style="background: rgba(16, 185, 129, 0.15); color: #059669; border: 1px solid rgba(16, 185, 129, 0.35);">
+                                <i class="fas fa-check-circle me-1"></i> Verified
+                            </span>
                             @else
-                            <span class="badge bg-danger border border-dark text-white">Not Verified</span>
+                            <span class="ent-badge" style="background: rgba(244, 63, 94, 0.15); color: #e11d48; border: 1px solid rgba(244, 63, 94, 0.35);">
+                                <i class="fas fa-clock me-1"></i> Not Verified
+                            </span>
                             @endif
                         </td>
-                        <td class="text-center">
-                            <button class="btn btn-sm btn-retro text-dark px-3" style="background-color: var(--retro-cyan);"
+                        <td class="action-cell-full text-center">
+                            <button class="btn"
                                 data-bs-toggle="modal" data-bs-target="#modal-poliklinik"
-                                id="button-proses-verifikasi" data-code="{{ $datas->no_registrasi }}">
+                                id="button-proses-verifikasi" data-code="{{ $datas->no_registrasi }}"
+                                title="Verifikasi Pemeriksaan">
                                 <i class="fas fa-stethoscope me-1"></i> Verifikasi
                             </button>
                         </td>
@@ -184,9 +563,9 @@
 <!-- Modal Form Handling -->
 <div class="modal fade" id="modal-poliklinik" data-bs-keyboard="false" data-bs-backdrop="static" tabindex="-1" aria-hidden="true">
     <div class="modal-dialog modal-dialog-centered modal-xl" role="document">
-        <div class="modal-content border-3 border-dark" style="border-radius: 12px; overflow: hidden;">
-            <div class="position-absolute top-0 end-0 mt-3 me-3 z-index-1">
-                <button class="btn-close btn btn-sm btn-circle bg-danger text-white border border-dark" data-bs-dismiss="modal" aria-label="Close"></button>
+        <div class="modal-content modal-ent-content">
+            <div class="position-absolute top-0 end-0 mt-3 me-3" style="z-index: 10;">
+                <button class="btn-close shadow-sm rounded-circle p-2" data-bs-dismiss="modal" aria-label="Close"></button>
             </div>
             <div id="menu-poliklinik"></div>
         </div>
@@ -197,10 +576,36 @@
 @section('base.js')
 <script src="https://cdn.datatables.net/2.2.2/js/dataTables.js"></script>
 <script src="https://cdn.datatables.net/2.2.2/js/dataTables.bootstrap5.js"></script>
+<script src="https://cdn.datatables.net/responsive/3.0.4/js/dataTables.responsive.js"></script>
+<script src="https://cdn.datatables.net/responsive/3.0.4/js/responsive.bootstrap5.js"></script>
+<script src="{{ asset('vendors/choices/choices.min.js') }}"></script>
+<script src="{{ asset('asset/js/flatpickr.js') }}"></script>
+<script src="https://cdn.jsdelivr.net/npm/select2@4.1.0-rc.0/dist/js/select2.min.js"></script>
 <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
 <script>
-    new DataTable('#example', {
-        responsive: true
+    $(document).ready(function() {
+        $('#filter_poli_id').select2({
+            theme: 'bootstrap-5',
+            width: '100%',
+            allowClear: true,
+            placeholder: 'Semua Poliklinik'
+        });
+
+        new DataTable('#example', {
+            responsive: true,
+            language: {
+                search: "_INPUT_",
+                searchPlaceholder: "Cari nama, RM, atau No Reg...",
+                lengthMenu: "Tampilkan _MENU_ data",
+                info: "Menampilkan _START_ - _END_ dari _TOTAL_ pasien",
+                paginate: {
+                    first: "Awal",
+                    last: "Akhir",
+                    next: "<i class='fas fa-chevron-right'></i>",
+                    previous: "<i class='fas fa-chevron-left'></i>"
+                }
+            }
+        });
     });
 
     // Klik Tombol Verifikasi (Membuka Form Handling Detail)
@@ -208,7 +613,7 @@
         e.preventDefault();
         var code = $(this).data("code");
         $('#menu-poliklinik').html(
-            '<div class="text-center p-5"><div class="spinner-border text-dark" role="status"></div><h5 class="mt-2 fw-bold">Memuat Form Pemeriksaan...</h5></div>'
+            '<div class="custom-loader py-5 text-center"><div class="spinner-border text-primary mb-2" role="status"></div><span class="fw-semibold small d-block">Memuat Form Pemeriksaan...</span></div>'
         );
         $.ajax({
             url: "{{ route('verifikasi_poliklinik_dokter_detail') }}",
@@ -222,7 +627,7 @@
         }).done(function(data) {
             $('#menu-poliklinik').html(data);
         }).fail(function() {
-            $('#menu-poliklinik').html('<div class="alert alert-danger m-3 text-center fw-bold">Gagal memuat form verifikasi.</div>');
+            $('#menu-poliklinik').html('<div class="alert alert-danger m-4 rounded-3 text-center fw-semibold"><i class="fas fa-exclamation-triangle me-2"></i> Gagal memuat form verifikasi.</div>');
         });
     });
 
@@ -238,8 +643,8 @@
             confirmButtonText: "Ya, Verifikasi!",
             cancelButtonText: "Batal",
             customClass: {
-                confirmButton: "btn btn-success btn-retro mx-2",
-                cancelButton: "btn btn-danger btn-retro mx-2"
+                confirmButton: "btn btn-success px-4 mx-2",
+                cancelButton: "btn btn-outline-secondary px-4 mx-2"
             },
             buttonsStyling: false
         }).then((result) => {
@@ -277,7 +682,8 @@
                                     Swal.fire({
                                         title: "Berhasil Terverifikasi!",
                                         text: "Pemeriksaan pasien poli telah disetujui oleh dokter.",
-                                        icon: "success"
+                                        icon: "success",
+                                        confirmButtonColor: "#4f46e5"
                                     }).then(() => {
                                         $('.modal').modal('hide');
                                         location.reload();

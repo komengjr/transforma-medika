@@ -6,236 +6,415 @@
 <link href="{{ asset('vendors/choices/choices.min.css') }}" rel="stylesheet" />
 <link href="{{ asset('vendors/flatpickr/flatpickr.min.css') }}" rel="stylesheet" />
 <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
+<link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&family=JetBrains+Mono:wght@500;700&display=swap" rel="stylesheet">
 
 <style>
     /* =========================================
-       RETRO / NEUBRUTALISM THEME STYLES
+       MODERN ENTERPRISE HEALTHCARE UI STYLES
+       (ADAPTIVE LIGHT & DARK MODE BOOTSTRAP 5)
        ========================================= */
     :root {
-        --retro-dark: #1e1e24;
-        --retro-yellow: #ffde59;
-        --retro-pink: #ffa6c9;
-        --retro-cyan: #8bf0fa;
-        --retro-orange: #ff914d;
-        --retro-green: #c1ff72;
-        --retro-purple: #c8b6ff;
-        --retro-bg: #f4f0ea;
-        --retro-border: 3px solid var(--retro-dark);
-        --retro-shadow: 5px 5px 0px var(--retro-dark);
-        --retro-shadow-sm: 3px 3px 0px var(--retro-dark);
+        --ent-indigo: #4f46e5;
+        --ent-indigo-dark: #4338ca;
+        --ent-indigo-soft: rgba(79, 70, 229, 0.12);
+        --ent-grid-border: rgba(99, 102, 241, 0.28);
+        --ent-emerald: #059669;
+        --ent-sky: #0284c7;
+        --ent-amber: #d97706;
+        --ent-rose: #e11d48;
     }
 
     body {
-        /* background-color: var(--retro-bg); */
+        font-family: 'Plus Jakarta Sans', sans-serif;
     }
 
-    /* Retro Cards & Banners */
-    .retro-card {
-        border: var(--retro-border);
-        border-radius: 12px;
-        box-shadow: var(--retro-shadow);
-        /* background-color: #ffffff; */
+    /* Adaptive Enterprise Card */
+    .ent-card {
+        border: 1px solid var(--ent-grid-border);
+        border-radius: 16px;
+        box-shadow: 0 4px 20px -2px rgba(15, 23, 42, 0.08);
+        /* background-color: transparent; */
         overflow: hidden;
     }
 
-    .retro-header-banner {
-        background: linear-gradient(135deg, var(--retro-yellow) 0%, var(--retro-orange) 100%);
-        border: var(--retro-border);
+    .ent-card>.card-header {
+        /* background-color: transparent !important; */
+        border-bottom: 1px solid var(--ent-grid-border) !important;
+    }
+
+    /* Hero Banner */
+    .ent-header-banner {
+        background: linear-gradient(135deg, #0f172a 0%, #1e1b4b 55%, #312e81 100%);
+        border: 1px solid rgba(99, 102, 241, 0.35);
+        border-radius: 16px;
+        box-shadow: 0 12px 28px -6px rgba(15, 23, 42, 0.22);
+        color: #ffffff;
+        position: relative;
+        overflow: hidden;
+    }
+
+    .ent-header-banner::before {
+        content: '';
+        position: absolute;
+        top: -50%;
+        right: -5%;
+        width: 340px;
+        height: 340px;
+        /* background: radial-gradient(circle, rgba(56, 189, 248, 0.22) 0%, transparent 70%); */
+        pointer-events: none;
+    }
+
+    .ent-glass-pill {
+        background: rgba(255, 255, 255, 0.09);
+        backdrop-filter: blur(8px);
+        border: 1px solid rgba(255, 255, 255, 0.16);
         border-radius: 12px;
-        box-shadow: var(--retro-shadow);
-        color: var(--retro-dark);
+        color: #ffffff;
     }
 
-    /* Retro Buttons */
-    .retro-btn {
-        font-weight: 800 !important;
-        border: 2px solid var(--retro-dark);
-        box-shadow: var(--retro-shadow-sm);
-        border-radius: 6px;
-        transition: all 0.1s ease-in-out;
-        text-transform: uppercase;
-        letter-spacing: 0.5px;
+    /* Modern Buttons */
+    .ent-btn {
+        font-weight: 600 !important;
+        border-radius: 10px;
+        transition: all 0.18s ease;
+        letter-spacing: 0.01em;
         cursor: pointer;
+        font-size: 0.82rem;
     }
 
-    .retro-btn:active {
-        transform: translate(3px, 3px);
-        box-shadow: 0px 0px 0px var(--retro-dark);
+    .ent-btn:hover {
+        transform: translateY(-1px);
     }
 
-    .retro-btn-primary {
-        background-color: var(--retro-cyan);
-        color: var(--retro-dark);
+    .ent-btn-primary {
+        background: linear-gradient(135deg, #4f46e5 0%, #4338ca 100%);
+        border: none;
+        color: #ffffff;
+        box-shadow: 0 4px 12px rgba(79, 70, 229, 0.25);
     }
 
-    .retro-btn-primary:hover {
-        background-color: #6ce0ed;
-        color: var(--retro-dark);
+    .ent-btn-primary:hover {
+        box-shadow: 0 6px 16px rgba(79, 70, 229, 0.35);
+        color: #ffffff;
     }
 
-    .retro-btn-warning {
-        background-color: var(--retro-yellow);
-        color: var(--retro-dark);
+    .ent-btn-warning {
+        background-color: rgba(245, 158, 11, 0.15);
+        border: 1px solid rgba(245, 158, 11, 0.4);
+        color: #d97706;
     }
 
-    .retro-btn-warning:hover {
-        background-color: #e6c84c;
-        color: var(--retro-dark);
+    .ent-btn-warning:hover {
+        background-color: #f59e0b;
+        border-color: #f59e0b;
+        color: #ffffff;
     }
 
-    .retro-btn-success {
-        background-color: var(--retro-green);
-        color: var(--retro-dark);
+    /* Adaptive Floating Filters */
+    .form-floating-custom {
+        position: relative;
     }
 
-    .retro-btn-success:hover {
-        background-color: #b0f55b;
-        color: var(--retro-dark);
+    .form-floating-custom label {
+        position: absolute;
+        top: 5px;
+        left: 11px;
+        font-size: 0.64rem;
+        font-weight: 700;
+        text-transform: uppercase;
+        letter-spacing: 0.03em;
+        color: var(--bs-secondary-color, #64748b);
+        pointer-events: none;
+        z-index: 5;
+        /* background: transparent; */
     }
 
-    .retro-btn-danger {
-        background-color: var(--retro-pink);
-        color: var(--retro-dark);
-    }
-
-    /* Inputs, Selects & Filters */
-    .retro-input,
+    .ent-input,
     .form-control,
     .form-select {
-        border: 2px solid var(--retro-dark) !important;
-        border-radius: 6px !important;
-        box-shadow: 2px 2px 0px var(--retro-dark) !important;
-        font-weight: 700 !important;
-        color: var(--retro-dark) !important;
-        background-color: #ffffff !important;
+        border: 1px solid var(--ent-grid-border) !important;
+        border-radius: 10px !important;
+        font-weight: 600 !important;
+        color: var(--bs-body-color) !important;
+        background-color: var(--bs-body-bg) !important;
+        padding-top: 18px !important;
+        padding-bottom: 5px !important;
+        padding-left: 11px !important;
         font-size: 0.8rem !important;
+        height: 44px !important;
+        transition: all 0.2s ease;
     }
 
-    .retro-input:focus,
+    .ent-input:focus,
     .form-control:focus,
     .form-select:focus {
-        border-color: var(--retro-dark) !important;
-        box-shadow: 4px 4px 0px var(--retro-dark) !important;
+        border-color: var(--ent-indigo) !important;
+        box-shadow: 0 0 0 3.5px rgba(79, 70, 229, 0.15) !important;
         outline: none;
     }
 
     /* Avatar Pasien */
     .patient-avatar {
-        width: 32px;
-        height: 32px;
-        border-radius: 8px;
-        background-color: var(--retro-cyan);
-        border: 2px solid var(--retro-dark);
+        width: 36px;
+        height: 36px;
+        border-radius: 10px;
+        background: linear-gradient(135deg, rgba(79, 70, 229, 0.18), rgba(2, 132, 199, 0.18));
+        border: 1px solid rgba(99, 102, 241, 0.35);
         display: flex;
         align-items: center;
         justify-content: center;
-        font-weight: 900;
-        color: var(--retro-dark);
+        font-weight: 700;
+        color: #6366f1;
         font-size: 0.75rem;
-        box-shadow: 2px 2px 0px var(--retro-dark);
+        flex-shrink: 0;
     }
 
-    /* Badge Pengiriman */
+    /* Soft Badges */
+    .ent-badge {
+        border-radius: 9999px;
+        padding: 4px 10px;
+        font-weight: 700;
+        text-transform: uppercase;
+        display: inline-flex;
+        align-items: center;
+        font-size: 0.68rem;
+        letter-spacing: 0.03em;
+    }
+
     .badge-wa {
-        background-color: #25d366 !important;
-        color: #fff !important;
-        border: 1.5px solid var(--retro-dark);
+        background-color: rgba(16, 185, 129, 0.15) !important;
+        color: #10b981 !important;
+        border: 1px solid rgba(16, 185, 129, 0.35);
     }
 
     .badge-email {
-        background-color: #ea4335 !important;
-        color: #fff !important;
-        border: 1.5px solid var(--retro-dark);
+        background-color: rgba(244, 63, 94, 0.15) !important;
+        color: #f43f5e !important;
+        border: 1px solid rgba(244, 63, 94, 0.35);
     }
 
     .badge-ss {
-        background-color: #00bcd4 !important;
-        color: #fff !important;
-        border: 1.5px solid var(--retro-dark);
+        background-color: rgba(14, 165, 233, 0.15) !important;
+        color: #0ea5e9 !important;
+        border: 1px solid rgba(14, 165, 233, 0.35);
     }
 
     .badge-print {
-        background-color: #6c757d !important;
-        color: #fff !important;
-        border: 1.5px solid var(--retro-dark);
+        background-color: rgba(100, 116, 139, 0.15) !important;
+        color: var(--bs-secondary-color, #94a3b8) !important;
+        border: 1px solid rgba(100, 116, 139, 0.35);
     }
 
-    .retro-badge {
-        border: 2px solid var(--retro-dark);
-        border-radius: 6px;
-        padding: 4px 8px;
-        font-weight: 800;
-        box-shadow: 2px 2px 0px var(--retro-dark);
-        text-transform: uppercase;
-        display: inline-block;
-        font-size: 0.7rem;
-    }
-
-    /* ========================================================= */
-    /* TABEL DENGAN GARIS TEGAS PADA SETIAP KOLOM & BARIS         */
-    /* ========================================================= */
+    /* =========================================================
+       TRANSPARENT TABLE WITH COLORED GRID BORDERS & FULL ACTION
+       ========================================================= */
     .table-custom {
-        font-size: 0.8rem;
+        width: 100% !important;
         border-collapse: collapse !important;
-        width: 100%;
+        margin-bottom: 0 !important;
+
     }
 
     .table-custom thead th {
-        background-color: var(--retro-dark) !important;
-        color: var(--retro-green) !important;
-        font-size: 0.75rem;
-        font-weight: 800;
+        background-color: rgba(79, 70, 229, 0.09) !important;
+        color: var(--bs-body-color) !important;
+        font-size: 0.72rem;
+        font-weight: 700;
         text-transform: uppercase;
-        border: 2px solid var(--retro-dark) !important;
-        padding: 12px 10px;
-        letter-spacing: 0.5px;
-        text-align: center;
+        border: 1px solid var(--ent-grid-border) !important;
+        border-bottom: 2px solid rgba(79, 70, 229, 0.45) !important;
+        padding: 13px 12px;
+        letter-spacing: 0.04em;
+    }
+
+    .table-custom thead th:first-child {
+        border-left: none !important;
+    }
+
+    .table-custom thead th:last-child {
+        border-right: none !important;
+        padding-right: 18px !important;
     }
 
     .table-custom tbody tr {
-        transition: background 0.2s;
+        /* background-color: transparent !important; */
+        transition: background-color 0.15s ease;
+        height: 1px;
     }
 
+    .table-custom tbody tr:hover,
     .table-custom tbody tr:hover td {
-        background-color: var(--retro-yellow) !important;
+        background-color: rgba(79, 70, 229, 0.07) !important;
     }
 
     .table-custom td {
-        border: 2px solid var(--retro-dark) !important;
-        font-weight: 700;
-        color: var(--retro-dark);
-        padding: 10px;
+        /* background-color: transparent !important; */
+        border: 1px solid var(--ent-grid-border) !important;
+        font-weight: 500;
+        color: var(--bs-body-color) !important;
+        padding: 11px 12px;
         vertical-align: middle;
-        background-color: #ffffff;
+        font-size: 0.83rem;
+    }
+
+    .table-custom tbody td:first-child {
+        border-left: none !important;
+    }
+
+    .table-custom tbody td:last-child {
+        border-right: none !important;
+        padding-right: 18px !important;
+    }
+
+    /* FULL-CELL ACTION BUTTON STYLING */
+    .table-custom td.action-cell-full {
+        padding: 0 !important;
+        height: 100%;
+        vertical-align: stretch !important;
+    }
+
+    .table-custom td.action-cell-full>.dropdown,
+    .table-custom td.action-cell-full>.btn-group {
+        display: flex !important;
+        width: 100% !important;
+        height: 100% !important;
+    }
+
+    .table-custom td.action-cell-full .dropdown>.btn,
+    .table-custom td.action-cell-full .btn-group>.btn,
+    .table-custom td.action-cell-full>.btn {
+        display: flex !important;
+        align-items: center;
+        justify-content: center;
+        width: 100% !important;
+        height: 100% !important;
+        min-height: 56px;
+        border-radius: 0 !important;
+        margin: 0 !important;
+        border: none !important;
+        background-color: rgba(79, 70, 229, 0.08);
+        color: #6366f1;
+        transition: all 0.15s ease;
+    }
+
+    .table-custom td.action-cell-full .dropdown>.btn:hover,
+    .table-custom td.action-cell-full .btn-group>.btn:hover,
+    .table-custom td.action-cell-full>.btn:hover {
+        background-color: var(--ent-indigo);
+        color: #ffffff;
+    }
+
+    /* DataTables Top & Bottom Controls Padding (Adaptive Transparent) */
+    #example_wrapper>.row:first-child,
+    #example_wrapper .dt-layout-row:first-child {
+        padding: 16px 20px 12px 20px;
+        margin: 0 !important;
+        /* background-color: transparent; */
+    }
+
+    #example_wrapper>.row:last-child,
+    #example_wrapper .dt-layout-row:last-child {
+        padding: 14px 20px 18px 20px;
+        margin: 0 !important;
+        border-top: 1px solid var(--ent-grid-border);
+        /* background-color: transparent; */
+    }
+
+    #example_wrapper .dt-layout-table {
+        margin: 0 !important;
+    }
+
+    #example_wrapper .dataTables_filter input,
+    #example_wrapper .dt-search input {
+        border: 1px solid var(--ent-grid-border) !important;
+        border-radius: 10px !important;
+        padding: 6px 12px !important;
+        font-size: 0.82rem !important;
+        height: 36px !important;
+        background-color: var(--bs-body-bg) !important;
+        color: var(--bs-body-color) !important;
+    }
+
+    #example_wrapper .dataTables_filter input:focus,
+    #example_wrapper .dt-search input:focus {
+        border-color: var(--ent-indigo) !important;
+        box-shadow: 0 0 0 3px rgba(79, 70, 229, 0.15) !important;
+        outline: none;
+    }
+
+    #example_wrapper .dataTables_length select,
+    #example_wrapper .dt-length select {
+        border: 1px solid var(--ent-grid-border) !important;
+        border-radius: 8px !important;
+        padding: 4px 28px 4px 10px !important;
+        height: 34px !important;
+        font-size: 0.82rem !important;
+        background-color: var(--bs-body-bg) !important;
+        color: var(--bs-body-color) !important;
+    }
+
+    .page-item.active .page-link {
+        background-color: var(--ent-indigo) !important;
+        border-color: var(--ent-indigo) !important;
+        color: #ffffff !important;
+        border-radius: 8px;
+    }
+
+    .page-link {
+        color: var(--bs-body-color);
+        /* background-color: transparent; */
+        border-radius: 8px;
+        margin: 0 2px;
+        border: 1px solid var(--ent-grid-border);
+        font-weight: 600;
+        font-size: 0.8rem;
+    }
+
+    /* Dropdown & Modal Adaptive */
+    .ent-dropdown-menu {
+        border: 1px solid var(--ent-grid-border) !important;
+        border-radius: 12px !important;
+        box-shadow: 0 10px 25px -5px rgba(15, 23, 42, 0.25) !important;
+        background-color: var(--bs-body-bg);
+    }
+
+    .modal-ent-content {
+        border: 1px solid var(--ent-grid-border) !important;
+        border-radius: 18px !important;
+        box-shadow: 0 25px 50px -12px rgba(15, 23, 42, 0.35) !important;
+        background-color: var(--bs-body-bg);
+        color: var(--bs-body-color);
+        overflow: hidden;
     }
 </style>
 @endsection
 
 @section('content')
-<!-- Banner Header Retro -->
-<div class="row mb-4">
+<!-- Banner Header Enterprise -->
+<div class="row mb-3">
     <div class="col-12">
-        <div class="card retro-header-banner p-1">
-            <div class="card-body p-4 text-dark position-relative z-1">
-                <div class="row align-items-center">
-                    <div class="col-md-7">
-                        <div class="d-flex align-items-center">
-                            <div class="p-2 rounded-4 me-3 d-flex align-items-center justify-content-center"
-                                style="width: 65px; height: 65px; background: white; border: 2px solid var(--retro-dark); box-shadow: 3px 3px 0px var(--retro-dark);">
-                                <img src="{{ asset('img/poliklikink.png') }}" alt="Poli Logo" width="45" />
-                            </div>
-                            <div>
-                                <span class="retro-badge mb-1" style="background-color: var(--retro-cyan); color: var(--retro-dark);">
-                                    <i class="fas fa-hospital-user me-1"></i> {{ env('APP_LABEL', 'HIS') }} System
+        <div class="card ent-header-banner p-1">
+            <div class="card-body p-3 p-md-4 text-white position-relative" style="z-index: 2;">
+                <div class="row align-items-center gy-3">
+                    <div class="col-lg-8 d-flex align-items-center">
+                        <div class="ent-glass-pill me-3 d-flex align-items-center justify-content-center flex-shrink-0"
+                            style="width: 60px; height: 60px;">
+                            <img src="{{ asset('img/poliklikink.png') }}" alt="Poli Logo" width="40" />
+                        </div>
+                        <div>
+                            <div class="d-flex align-items-center gap-2 mb-1">
+                                <span class="ent-badge" style="background: rgba(56, 189, 248, 0.2); border: 1px solid rgba(56, 189, 248, 0.4); color: #7dd3fc;">
+                                    <i class="fas fa-hospital-user me-1"></i> {{ env('APP_LABEL', 'HIS') }} SYSTEM
                                 </span>
-                                <h4 class="mb-0 fw-bolder text-dark">Pendaftaran Poliklinik</h4>
-                                <p class="text-dark fs--1 mb-0 fw-bold opacity-75">Kelola dan proses pendaftaran pasien poliklinik secara real-time.</p>
+                                <span style="color: #94a3b8; font-size: 0.75rem; font-weight: 600;">Poliklinik Rawat Jalan</span>
                             </div>
+                            <h4 class="mb-0 fw-bold text-white" style="letter-spacing: -0.02em;">Pendaftaran Poliklinik</h4>
+                            <p class="mb-0 small" style="color: #cbd5e1;">Kelola dan proses pendaftaran pasien poliklinik secara real-time.</p>
                         </div>
                     </div>
-                    <div class="col-md-5 text-md-end mt-3 mt-md-0">
-                        <button class="btn retro-btn retro-btn-primary btn-sm px-3 py-2" onclick="loadTableData();" data-bs-toggle="tooltip" title="Refresh Data">
-                            <span class="fas fa-sync-alt me-1"></span> Refresh
+                    <div class="col-lg-4 text-lg-end">
+                        <button class="btn ent-btn ent-btn-primary px-3.5 py-2" onclick="loadTableData();" data-bs-toggle="tooltip" title="Refresh Data">
+                            <span class="fas fa-sync-alt me-1"></span> Refresh Data
                         </button>
                     </div>
                 </div>
@@ -244,89 +423,106 @@
     </div>
 </div>
 
-<!-- Filter Bar Atas -->
-<div class="retro-card mb-4 p-3">
-    <form id="form-filter" onsubmit="event.preventDefault(); loadTableData();">
-        <div class="row g-2 align-items-center">
-            <!-- Tombol Refresh -->
-            <div class="col-auto">
-                <button type="button" onclick="loadTableData()" class="btn retro-btn retro-btn-primary btn-sm px-3 fw-bold d-flex align-items-center gap-1" style="height: 38px;">
-                    <i class="fas fa-sync-alt"></i> Refresh
-                </button>
-            </div>
+<!-- Main Table Card with Integrated Filter Bar -->
+<div class="ent-card mb-3">
+    <div class="card-header py-3 px-3 px-md-4">
+        <form id="form-filter" onsubmit="event.preventDefault(); loadTableData();">
+            <div class="row g-2 align-items-center">
+                <!-- Tombol Refresh -->
+                <div class="col-auto">
+                    <button type="button" onclick="loadTableData()" class="btn ent-btn ent-btn-primary px-3 fw-semibold d-flex align-items-center gap-2" style="height: 44px;">
+                        <i class="fas fa-sync-alt"></i> Refresh
+                    </button>
+                </div>
 
-            <!-- Tanggal Awal -->
-            <div class="col-md">
-                <input class="form-control form-control-sm retro-input" type="date" id="start_date" name="start_date" value="{{ $startDate }}" />
-            </div>
+                <!-- Tanggal Awal -->
+                <div class="col-12 col-sm-6 col-md">
+                    <div class="form-floating-custom">
+                        <label>Tanggal Awal</label>
+                        <input class="form-control ent-input" type="date" id="start_date" name="start_date" value="{{ $startDate }}" />
+                    </div>
+                </div>
 
-            <!-- Tanggal Akhir -->
-            <div class="col-md">
-                <input class="form-control form-control-sm retro-input" type="date" id="end_date" name="end_date" value="{{ $endDate }}" />
-            </div>
+                <!-- Tanggal Akhir -->
+                <div class="col-12 col-sm-6 col-md">
+                    <div class="form-floating-custom">
+                        <label>Tanggal Akhir</label>
+                        <input class="form-control ent-input" type="date" id="end_date" name="end_date" value="{{ $endDate }}" />
+                    </div>
+                </div>
 
-            <!-- No Reg / Nama -->
-            <div class="col-md">
-                <input class="form-control form-control-sm retro-input" type="text" id="keyword" name="keyword" placeholder="Cari Reg/Nama..." />
-            </div>
+                <!-- No Reg / Nama -->
+                <div class="col-12 col-sm-6 col-md">
+                    <div class="form-floating-custom">
+                        <label>No Reg / Nama</label>
+                        <input class="form-control ent-input" type="text" id="keyword" name="keyword" placeholder="Cari Reg / Nama..." />
+                    </div>
+                </div>
 
-            <!-- Poli -->
-            <div class="col-md">
-                <select class="form-select form-select-sm retro-input" id="poli_id" name="poli_id">
-                    <option value="">Semua Poli</option>
-                    @foreach ($polis as $poli)
-                    <option value="{{ $poli->id }}">{{ $poli->nama_poli }}</option>
-                    @endforeach
-                </select>
-            </div>
+                <!-- Poli -->
+                <div class="col-12 col-sm-6 col-md">
+                    <div class="form-floating-custom">
+                        <label>Poliklinik</label>
+                        <select class="form-select ent-input" id="poli_id" name="poli_id">
+                            <option value="">Semua Poli</option>
+                            @foreach ($polis as $poli)
+                            <option value="{{ $poli->id }}">{{ $poli->nama_poli }}</option>
+                            @endforeach
+                        </select>
+                    </div>
+                </div>
 
-            <!-- Dokter -->
-            <div class="col-md">
-                <select class="form-select form-select-sm retro-input" id="dokter" name="dokter">
-                    <option value="">Semua Dokter</option>
-                    @foreach ($doctors as $doc)
-                    <option value="{{ $doc->master_doctor_name }}">{{ $doc->master_doctor_name }}</option>
-                    @endforeach
-                </select>
-            </div>
+                <!-- Dokter -->
+                <div class="col-12 col-sm-6 col-md">
+                    <div class="form-floating-custom">
+                        <label>Dokter</label>
+                        <select class="form-select ent-input" id="dokter" name="dokter">
+                            <option value="">Semua Dokter</option>
+                            @foreach ($doctors as $doc)
+                            <option value="{{ $doc->master_doctor_name }}">{{ $doc->master_doctor_name }}</option>
+                            @endforeach
+                        </select>
+                    </div>
+                </div>
 
-            <!-- Kel. Pelanggan (Sub Penjamin) -->
-            <div class="col-md">
-                <select class="form-select form-select-sm retro-input" id="sub_penjamin_id" name="sub_penjamin_id">
-                    <option value="">Semua Kelompok</option>
-                    @foreach ($subPenjamins as $sp)
-                    <option value="{{ $sp->id }}">{{ $sp->nama_sub_penjamin }}</option>
-                    @endforeach
-                </select>
-            </div>
+                <!-- Kel. Pelanggan (Sub Penjamin) -->
+                <div class="col-12 col-sm-6 col-md">
+                    <div class="form-floating-custom">
+                        <label>Kel. Pelanggan</label>
+                        <select class="form-select ent-input" id="sub_penjamin_id" name="sub_penjamin_id">
+                            <option value="">Semua Kelompok</option>
+                            @foreach ($subPenjamins as $sp)
+                            <option value="{{ $sp->id }}">{{ $sp->nama_sub_penjamin }}</option>
+                            @endforeach
+                        </select>
+                    </div>
+                </div>
 
-            <!-- Tombol Submit Filter -->
-            <div class="col-auto">
-                <button type="submit" class="btn retro-btn retro-btn-warning btn-sm px-3" style="height: 38px;">
-                    <i class="fas fa-search"></i>
-                </button>
+                <!-- Tombol Submit Filter -->
+                <div class="col-auto">
+                    <button type="submit" class="btn ent-btn ent-btn-warning px-3 d-flex align-items-center justify-content-center" style="height: 44px;" title="Terapkan Filter">
+                        <i class="fas fa-search"></i>
+                    </button>
+                </div>
             </div>
-        </div>
-    </form>
-</div>
+        </form>
+    </div>
 
-<!-- Main Table Card -->
-<div class="retro-card mb-4">
-    <div class="card-body p-0">
-        <div class="table-responsive">
-            <table id="example" class="table table-custom align-middle fs--1 mb-0 w-100 table-bordered" style="border: 2px solid var(--retro-dark);">
+    <div class="card-body p-0 bg-white">
+        <div class="table-responsive pb-3">
+            <table id="example" class="table table-custom align-middle mb-0 w-100">
                 <thead>
                     <tr>
                         <th class="text-center" style="width: 4%;">#</th>
                         <th class="text-center" style="width: 5%;">NO</th>
-                        <th style="width: 18%;">NO. REGISTRASI & PETUGAS</th>
-                        <th style="width: 15%;">NAMA PASIEN</th>
-                        <th style="width: 12%;">PENJAMIN</th>
-                        <th style="width: 13%;">DOKTER</th>
+                        <th style="width: 17%;">NO. REGISTRASI & PETUGAS</th>
+                        <th style="width: 16%;">NAMA PASIEN</th>
+                        <th style="width: 11%;">PENJAMIN</th>
+                        <th style="width: 14%;">DOKTER</th>
                         <th style="width: 10%;">JANJI HASIL</th>
                         <th style="width: 12%;">POLIKLINIK / LAYANAN</th>
-                        <th style="width: 12%;">PENGIRIMAN</th>
-                        <th class="text-end" style="width: 9%;">TOTAL</th>
+                        <th style="width: 11%;">PENGIRIMAN</th>
+                        <th class="text-end" style="width: 10%;">TOTAL</th>
                     </tr>
                 </thead>
                 <tbody>
@@ -342,9 +538,9 @@
 <!-- Modal Poliklinik -->
 <div class="modal fade" id="modal-poliklinik" data-bs-keyboard="false" data-bs-backdrop="static" tabindex="-1">
     <div class="modal-dialog modal-dialog-centered modal-xl">
-        <div class="modal-content retro-card border-0">
-            <div class="position-absolute top-0 end-0 mt-3 me-3 z-index-1">
-                <button class="btn-close btn btn-sm btn-circle d-flex flex-center" data-bs-dismiss="modal" aria-label="Close" style="border: 2px solid var(--retro-dark); border-radius: 50%; padding: 5px; box-shadow: 2px 2px 0px var(--retro-dark); background-color: var(--retro-yellow);"></button>
+        <div class="modal-content modal-ent-content">
+            <div class="position-absolute top-0 end-0 mt-3 me-3" style="z-index: 10;">
+                <button class="btn-close shadow-sm rounded-circle p-2" data-bs-dismiss="modal" aria-label="Close"></button>
             </div>
             <div id="menu-poliklinik"></div>
         </div>
@@ -376,26 +572,26 @@
             },
             columns: [{
                     data: null,
-                    className: 'text-center',
+                    className: 'action-cell-full text-center align-middle',
                     render: function(data, type, row, meta) {
                         let btnHandling = '';
                         if (row.status_kunjungan === 'MENUNGGU') {
-                            btnHandling = `<li><a class="dropdown-item fw-bold" href="#" data-bs-toggle="modal" data-bs-target="#modal-poliklinik" id="button-proses-handling" data-code="${row.no_registrasi}"><i class="fas fa-stethoscope me-2 text-primary"></i> Proses Handling</a></li><li><hr class="dropdown-divider border-dark"></li>`;
+                            btnHandling = `<li><a class="dropdown-item fw-semibold py-2" href="#" data-bs-toggle="modal" data-bs-target="#modal-poliklinik" id="button-proses-handling" data-code="${row.no_registrasi}"><i class="fas fa-stethoscope me-2 text-primary"></i> Proses Handling</a></li><li><hr class="dropdown-divider"></li>`;
                         }
                         return `<div class="dropdown">
-                        <button class="btn retro-btn retro-btn-warning btn-sm p-1 shadow-sm" type="button" data-bs-toggle="dropdown" aria-expanded="false" style="width: 30px; height: 30px;">
+                        <button class="btn" type="button" data-bs-toggle="dropdown" aria-expanded="false" title="Menu Aksi">
                             <i class="fas fa-ellipsis-v"></i>
                         </button>
-                        <ul class="dropdown-menu shadow border-0 py-2" style="border: 2px solid var(--retro-dark) !important; border-radius: 8px !important; box-shadow: 4px 4px 0px var(--retro-dark) !important;">
+                        <ul class="dropdown-menu ent-dropdown-menu py-2">
                             ${btnHandling}
-                            <li><a class="dropdown-item fw-bold text-dark" href="#" data-bs-toggle="modal" data-bs-target="#modal-cabang" data-code="${row.id}"><i class="fas fa-history me-2 text-info"></i> Riwayat Pasien</a></li>
+                            <li><a class="dropdown-item fw-semibold py-2" href="#" data-bs-toggle="modal" data-bs-target="#modal-cabang" data-code="${row.id}"><i class="fas fa-history me-2 text-info"></i> Riwayat Pasien</a></li>
                         </ul>
                     </div>`;
                     }
                 },
                 {
                     data: null,
-                    className: 'text-center fw-bold',
+                    className: 'text-center fw-semibold',
                     render: function(data, type, row, meta) {
                         return meta.row + 1;
                     }
@@ -404,9 +600,9 @@
                     data: null,
                     render: function(data, type, row) {
                         let poliBadge = row.poli_nama ? ` - ${row.poli_nama}` : '';
-                        return `<div class="fw-bold text-dark">${row.no_registrasi}</div>
-                            <span class="badge bg-danger text-white fw-bold" style="font-size: 0.7rem; border: 1.5px solid var(--retro-dark);">${row.pasien_pid ?? ''}</span>
-                            <div class="mt-1"><span class="badge bg-primary text-white fw-bold" style="font-size: 0.65rem; border: 1.5px solid var(--retro-dark);"><i class="fas fa-hospital me-1"></i> ${row.jenis_layanan}${poliBadge}</span></div>`;
+                        return `<div class="fw-bold" style="font-family: 'JetBrains Mono', monospace; font-size: 0.82rem;">${row.no_registrasi}</div>
+                            <span class="ent-badge mt-1" style="background: rgba(225, 29, 72, 0.14); color: #f43f5e; border: 1px solid rgba(225, 29, 72, 0.3); font-size: 0.65rem;">${row.pasien_pid ?? ''}</span>
+                            <div class="mt-1"><span class="ent-badge" style="background: rgba(79, 70, 229, 0.14); color: #818cf8; border: 1px solid rgba(79, 70, 229, 0.3); font-size: 0.63rem;"><i class="fas fa-hospital me-1"></i> ${row.jenis_layanan}${poliBadge}</span></div>`;
                     }
                 },
                 {
@@ -421,11 +617,11 @@
                             minute: '2-digit'
                         }).replace(/\./g, '-') : '-';
                         return `<div class="d-flex align-items-center gap-2">
-                        <div class="patient-avatar shadow-sm">${initial}</div>
+                        <div class="patient-avatar">${initial}</div>
                         <div>
-                            <div class="fw-bolder text-dark text-uppercase" style="font-size: 0.85rem;">${row.pasien_nama}</div>
-                            <span class="badge bg-secondary text-white" style="font-size: 0.6rem; border: 1px solid var(--retro-dark);">${row.petugas_nama ?? 'system'}</span>
-                            <div class="text-muted fw-bold" style="font-size: 0.7rem;">${tglReg}</div>
+                            <div class="fw-bold text-uppercase" style="font-size: 0.84rem;">${row.pasien_nama}</div>
+                            <span class="ent-badge" style="background: rgba(100, 116, 139, 0.15); color: var(--bs-secondary-color, #94a3b8); border: 1px solid rgba(100, 116, 139, 0.3); font-size: 0.6rem; padding: 2px 7px;">${row.petugas_nama ?? 'system'}</span>
+                            <div class="opacity-75 fw-medium mt-0.5" style="font-size: 0.72rem;">${tglReg}</div>
                         </div>
                     </div>`;
                     }
@@ -433,7 +629,7 @@
                 {
                     data: 'agreement',
                     render: function(data) {
-                        return `<span class="fw-bolder text-primary" style="font-size: 0.85rem;">${data ?? '-'}</span>`;
+                        return `<span class="fw-bold" style="color: #6366f1; font-size: 0.83rem;">${data ?? '-'}</span>`;
                     }
                 },
                 {
@@ -441,10 +637,10 @@
                     render: function(data, type, row) {
                         let htmlDokter = '';
                         if (row.dokter_poli_nama) {
-                            htmlDokter += `<div class="fw-bold text-dark" style="font-size: 0.8rem;"><i class="fas fa-user-md text-primary me-1"></i> ${row.dokter_poli_nama}</div>`;
+                            htmlDokter += `<div class="fw-semibold" style="font-size: 0.8rem;"><i class="fas fa-user-md text-primary me-1"></i> ${row.dokter_poli_nama}</div>`;
                         }
                         if (row.dokter_pengirim_nama) {
-                            htmlDokter += `<div class="text-muted small mt-0.5 fw-bold">Pengirim: ${row.dokter_pengirim_nama}</div>`;
+                            htmlDokter += `<div class="opacity-75 small mt-0.5">Pengirim: ${row.dokter_pengirim_nama}</div>`;
                         }
                         if (!row.dokter_poli_nama && !row.dokter_pengirim_nama) {
                             htmlDokter += '-';
@@ -462,13 +658,13 @@
                             hour: '2-digit',
                             minute: '2-digit'
                         }).replace(/\./g, '-') : '-';
-                        return `<span class="text-dark fw-bold" style="font-size: 0.8rem;">${formatTgl}</span>`;
+                        return `<span class="fw-semibold" style="font-size: 0.8rem;">${formatTgl}</span>`;
                     }
                 },
                 {
                     data: null,
                     render: function(data, type, row) {
-                        return `<span class="text-dark fw-bold" style="font-size: 0.8rem;">${row.poli_nama ?? row.jenis_layanan}</span>`;
+                        return `<span class="fw-semibold" style="font-size: 0.8rem;">${row.poli_nama ?? row.jenis_layanan}</span>`;
                     }
                 },
                 {
@@ -479,10 +675,10 @@
                             let methods = JSON.parse(data) || [];
                             methods.forEach(m => {
                                 let mLower = m.toLowerCase();
-                                if (mLower === 'whatsapp') html += '<span class="badge badge-wa text-start py-1 px-2 fw-bold" style="font-size: 0.65rem;"><i class="fab fa-whatsapp me-1"></i> WHATSAPP</span>';
-                                else if (mLower === 'email') html += '<span class="badge badge-email text-start py-1 px-2 fw-bold" style="font-size: 0.65rem;"><i class="fas fa-envelope me-1"></i> EMAIL</span>';
-                                else if (mLower === 'satusehat') html += '<span class="badge badge-ss text-start py-1 px-2 fw-bold" style="font-size: 0.65rem;"><i class="fas fa-heartbeat me-1"></i> SATU SEHAT</span>';
-                                else if (mLower === 'cetak_fisik') html += '<span class="badge badge-print text-start py-1 px-2 fw-bold" style="font-size: 0.65rem;"><i class="fas fa-print me-1"></i> CETAK FISIK</span>';
+                                if (mLower === 'whatsapp') html += '<span class="ent-badge badge-wa text-start py-1 px-2" style="font-size: 0.64rem;"><i class="fab fa-whatsapp me-1"></i> WHATSAPP</span>';
+                                else if (mLower === 'email') html += '<span class="ent-badge badge-email text-start py-1 px-2" style="font-size: 0.64rem;"><i class="fas fa-envelope me-1"></i> EMAIL</span>';
+                                else if (mLower === 'satusehat') html += '<span class="ent-badge badge-ss text-start py-1 px-2" style="font-size: 0.64rem;"><i class="fas fa-heartbeat me-1"></i> SATU SEHAT</span>';
+                                else if (mLower === 'cetak_fisik') html += '<span class="ent-badge badge-print text-start py-1 px-2" style="font-size: 0.64rem;"><i class="fas fa-print me-1"></i> CETAK FISIK</span>';
                             });
                         } catch (e) {}
                         html += '</div>';
@@ -495,9 +691,9 @@
                     render: function(data, type, row) {
                         let total = Number(row.total_tagihan || 0).toLocaleString('id-ID');
                         let badgeStatus = row.status_pembayaran === 'LUNAS' ?
-                            '<span class="badge bg-success text-white px-2 py-1 fw-bold" style="font-size: 0.65rem; border: 1.5px solid var(--retro-dark);"><i class="fas fa-check-circle me-1"></i> LUNAS</span>' :
-                            '<span class="badge bg-warning text-dark px-2 py-1 fw-bold" style="font-size: 0.65rem; border: 1.5px solid var(--retro-dark);"><i class="fas fa-clock me-1"></i> BELUM LUNAS</span>';
-                        return `<div class="fw-bolder text-dark" style="font-size: 0.9rem;">${total}</div><div class="mt-1">${badgeStatus}</div>`;
+                            '<span class="ent-badge px-2 py-1" style="background: rgba(16, 185, 129, 0.15); color: #10b981; border: 1px solid rgba(16, 185, 129, 0.35); font-size: 0.64rem;"><i class="fas fa-check-circle me-1"></i> LUNAS</span>' :
+                            '<span class="ent-badge px-2 py-1" style="background: rgba(245, 158, 11, 0.15); color: #f59e0b; border: 1px solid rgba(245, 158, 11, 0.35); font-size: 0.64rem;"><i class="fas fa-clock me-1"></i> BELUM LUNAS</span>';
+                        return `<div class="fw-bold" style="font-size: 0.9rem;">${total}</div><div class="mt-1">${badgeStatus}</div>`;
                     }
                 }
             ]
@@ -529,7 +725,7 @@
         e.preventDefault();
         var code = $(this).data("code");
         $('#menu-poliklinik').html(
-            '<div class="py-5 text-center"><div class="spinner-border text-dark" role="status"><span class="visually-hidden">Loading...</span></div><p class="mt-2 text-dark fw-bold fs--1">Memuat Data Pasien...</p></div>'
+            '<div class="py-5 text-center"><div class="spinner-border text-primary" role="status"><span class="visually-hidden">Loading...</span></div><p class="mt-2 fw-semibold small">Memuat Data Pasien...</p></div>'
         );
         $.ajax({
             url: "{{ route('data_registrasi_poli_handling') ?? '#' }}",
@@ -543,7 +739,7 @@
         }).done(function(data) {
             $('#menu-poliklinik').html(data);
         }).fail(function() {
-            $('#menu-poliklinik').html('<div class="alert alert-danger m-3">Gagal memuat data. Silakan coba lagi.</div>');
+            $('#menu-poliklinik').html('<div class="alert alert-danger m-3 rounded-3">Gagal memuat data. Silakan coba lagi.</div>');
         });
     });
 </script>

@@ -1,47 +1,409 @@
-<div class="card retro-card border-0 mb-0">
-    <div class="card-header py-3 px-4 d-flex justify-content-between align-items-center" style="background-color: var(--retro-yellow); border-bottom: 3px solid var(--retro-dark);">
-        <h5 class="mb-0 text-dark fw-bolder">
-            <i class="fas fa-notes-medical me-2"></i> Form Handling Pasien IGD: <span class="text-danger">{{ $pasien->nama_pasien }}</span> (RM: {{ $pasien->pid }})
-        </h5>
-        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+<style>
+    /* =========================================
+       MODERN ENTERPRISE HANDLING IGD MODAL
+       (SYNCED WITH ENTERPRISE HEALTHCARE UI)
+       ========================================= */
+    .ent-igd-modal {
+        --ent-indigo: #4f46e5;
+        --ent-indigo-dark: #4338ca;
+        --ent-indigo-soft: rgba(79, 70, 229, 0.12);
+        --ent-grid-border: rgba(99, 102, 241, 0.28);
+        --ent-emerald: #059669;
+        --ent-sky: #0284c7;
+        --ent-amber: #d97706;
+        --ent-rose: #e11d48;
+        font-family: 'Plus Jakarta Sans', sans-serif;
+        color: var(--bs-body-color);
+        background-color: var(--bs-body-bg);
+        border: 1px solid var(--ent-grid-border) !important;
+        border-radius: 16px;
+        overflow: hidden;
+    }
+
+    .ent-igd-modal .ent-banner-top {
+        background: linear-gradient(135deg, #0f172a 0%, #1e1b4b 55%, #312e81 100%);
+        border-bottom: 1px solid rgba(99, 102, 241, 0.35);
+        color: #ffffff;
+        position: relative;
+        overflow: hidden;
+    }
+
+    .ent-igd-modal .ent-banner-top::before {
+        content: '';
+        position: absolute;
+        top: -50%;
+        right: -5%;
+        width: 340px;
+        height: 340px;
+        background: radial-gradient(circle, rgba(244, 63, 94, 0.22) 0%, transparent 70%);
+        pointer-events: none;
+    }
+
+    .ent-igd-modal .ent-glass-pill {
+        background: rgba(255, 255, 255, 0.09);
+        backdrop-filter: blur(8px);
+        border: 1px solid rgba(255, 255, 255, 0.16);
+        border-radius: 12px;
+        color: #ffffff;
+    }
+
+    .ent-igd-modal .ent-badge-pill {
+        border-radius: 9999px;
+        padding: 4px 10px;
+        font-weight: 700;
+        text-transform: uppercase;
+        font-size: 0.68rem;
+        letter-spacing: 0.03em;
+        display: inline-flex;
+        align-items: center;
+    }
+
+    .ent-igd-modal .ent-section-card {
+        border: 1px solid var(--ent-grid-border);
+        border-radius: 14px;
+        box-shadow: 0 4px 18px -2px rgba(15, 23, 42, 0.06);
+        background-color: var(--bs-body-bg);
+        overflow: hidden;
+    }
+
+    .ent-igd-modal .form-header-ent {
+        background-color: rgba(79, 70, 229, 0.09);
+        color: var(--bs-body-color);
+        padding: 12px 16px;
+        font-weight: 700;
+        font-size: 0.78rem;
+        text-transform: uppercase;
+        letter-spacing: 0.04em;
+        border-bottom: 1px solid var(--ent-grid-border);
+    }
+
+    .ent-igd-modal .form-label-ent {
+        font-size: 0.68rem;
+        font-weight: 700;
+        text-transform: uppercase;
+        letter-spacing: 0.03em;
+        color: var(--bs-secondary-color, #64748b);
+        margin-bottom: 5px;
+        display: block;
+    }
+
+    /* Modern Enterprise Nav Tabs */
+    .ent-igd-modal .ent-nav-tabs {
+        background-color: rgba(79, 70, 229, 0.06);
+        border: 1px solid var(--ent-grid-border);
+        border-radius: 12px;
+        padding: 5px;
+        gap: 6px;
+        display: flex;
+        flex-wrap: wrap;
+    }
+
+    .ent-igd-modal .ent-nav-tabs .nav-link {
+        border: none !important;
+        border-radius: 9px !important;
+        font-weight: 700;
+        font-size: 0.8rem;
+        color: var(--bs-body-color);
+        padding: 9px 14px;
+        transition: all 0.18s ease;
+        background: transparent;
+    }
+
+    .ent-igd-modal .ent-nav-tabs .nav-link:hover {
+        background-color: rgba(79, 70, 229, 0.1);
+        color: var(--ent-indigo);
+    }
+
+    .ent-igd-modal .ent-nav-tabs .nav-link.active {
+        background: linear-gradient(135deg, #4f46e5 0%, #4338ca 100%) !important;
+        color: #ffffff !important;
+        box-shadow: 0 4px 12px rgba(79, 70, 229, 0.28);
+    }
+
+    /* Form Controls */
+    .ent-igd-modal .ent-input,
+    .ent-igd-modal .form-control,
+    .ent-igd-modal .form-select {
+        border: 1px solid var(--ent-grid-border) !important;
+        background-color: var(--bs-body-bg) !important;
+        font-weight: 600 !important;
+        font-size: 0.82rem !important;
+        color: var(--bs-body-color) !important;
+        border-radius: 10px !important;
+        box-shadow: none !important;
+        padding: 8px 12px !important;
+        transition: all 0.2s ease;
+    }
+
+    .ent-igd-modal input.ent-input,
+    .ent-igd-modal select.ent-input {
+        height: 42px !important;
+    }
+
+    .ent-igd-modal .ent-input:focus,
+    .ent-igd-modal .form-control:focus,
+    .ent-igd-modal .form-select:focus,
+    .ent-igd-modal textarea:focus {
+        box-shadow: 0 0 0 3.5px rgba(79, 70, 229, 0.15) !important;
+        border-color: var(--ent-indigo) !important;
+        outline: none;
+    }
+
+    /* Choices.js Adaptive Styling */
+    .ent-igd-modal .choices {
+        margin-bottom: 0 !important;
+    }
+
+    .ent-igd-modal .choices__inner {
+        border: 1px solid var(--ent-grid-border) !important;
+        border-radius: 10px !important;
+        background-color: var(--bs-body-bg) !important;
+        color: var(--bs-body-color) !important;
+        min-height: 42px !important;
+        padding: 6px 12px !important;
+        font-weight: 600;
+        font-size: 0.82rem;
+        display: flex;
+        align-items: center;
+    }
+
+    .ent-igd-modal .is-focused .choices__inner,
+    .ent-igd-modal .is-open .choices__inner {
+        border-color: var(--ent-indigo) !important;
+        box-shadow: 0 0 0 3.5px rgba(79, 70, 229, 0.15) !important;
+    }
+
+    .ent-igd-modal .choices__list--dropdown {
+        border: 1px solid var(--ent-grid-border) !important;
+        border-radius: 10px !important;
+        background-color: var(--bs-body-bg) !important;
+        color: var(--bs-body-color) !important;
+        box-shadow: 0 10px 25px rgba(15, 23, 42, 0.18) !important;
+        z-index: 1060 !important;
+    }
+
+    /* Modern Buttons */
+    .ent-igd-modal .ent-btn {
+        font-weight: 600 !important;
+        border-radius: 10px;
+        transition: all 0.18s ease;
+        letter-spacing: 0.01em;
+        font-size: 0.82rem;
+        border: none;
+        box-shadow: none;
+    }
+
+    .ent-igd-modal .ent-btn:hover {
+        transform: translateY(-1px);
+    }
+
+    .ent-igd-modal .ent-btn-primary {
+        background: linear-gradient(135deg, #4f46e5 0%, #4338ca 100%);
+        color: #ffffff;
+        box-shadow: 0 4px 12px rgba(79, 70, 229, 0.25);
+    }
+
+    .ent-igd-modal .ent-btn-primary:hover {
+        box-shadow: 0 6px 16px rgba(79, 70, 229, 0.35);
+        color: #ffffff;
+    }
+
+    .ent-igd-modal .ent-btn-success {
+        background: linear-gradient(135deg, #059669 0%, #047857 100%);
+        color: #ffffff;
+        box-shadow: 0 4px 12px rgba(5, 150, 105, 0.25);
+    }
+
+    .ent-igd-modal .ent-btn-success:hover {
+        box-shadow: 0 6px 16px rgba(5, 150, 105, 0.35);
+        color: #ffffff;
+    }
+
+    .ent-igd-modal .ent-btn-warning {
+        background: linear-gradient(135deg, #f59e0b 0%, #d97706 100%);
+        color: #ffffff;
+        box-shadow: 0 4px 12px rgba(217, 119, 6, 0.25);
+    }
+
+    .ent-igd-modal .ent-btn-warning:hover {
+        box-shadow: 0 6px 16px rgba(217, 119, 6, 0.35);
+        color: #ffffff;
+    }
+
+    .ent-igd-modal .ent-btn-outline {
+        border: 1px solid var(--ent-grid-border);
+        background-color: transparent;
+        color: var(--bs-body-color);
+    }
+
+    .ent-igd-modal .ent-btn-outline:hover {
+        background-color: rgba(79, 70, 229, 0.08);
+        border-color: var(--ent-indigo);
+        color: var(--bs-body-color);
+    }
+
+    /* Enterprise Table with Colored Grid */
+    .ent-igd-modal .table-ent {
+        width: 100% !important;
+        border-collapse: collapse !important;
+        margin-bottom: 0 !important;
+        background-color: transparent !important;
+        --bs-table-bg: transparent;
+        --bs-table-accent-bg: transparent;
+        --bs-table-striped-bg: rgba(99, 102, 241, 0.03);
+        --bs-table-hover-bg: rgba(79, 70, 229, 0.07);
+        --bs-table-color: var(--bs-body-color);
+        --bs-table-border-color: var(--ent-grid-border);
+    }
+
+    .ent-igd-modal .table-ent thead th {
+        background-color: rgba(79, 70, 229, 0.09) !important;
+        color: var(--bs-body-color) !important;
+        font-size: 0.72rem;
+        font-weight: 700;
+        text-transform: uppercase;
+        border: 1px solid var(--ent-grid-border) !important;
+        border-bottom: 2px solid rgba(79, 70, 229, 0.45) !important;
+        padding: 11px 12px;
+        letter-spacing: 0.04em;
+    }
+
+    .ent-igd-modal .table-ent thead th:first-child {
+        border-left: none !important;
+    }
+
+    .ent-igd-modal .table-ent thead th:last-child {
+        border-right: none !important;
+    }
+
+    .ent-igd-modal .table-ent tbody td {
+        background-color: transparent !important;
+        border: 1px solid var(--ent-grid-border) !important;
+        font-weight: 500;
+        color: var(--bs-body-color) !important;
+        padding: 10px 12px;
+        vertical-align: middle;
+        font-size: 0.83rem;
+    }
+
+    .ent-igd-modal .table-ent tbody td:first-child {
+        border-left: none !important;
+    }
+
+    .ent-igd-modal .table-ent tbody td:last-child {
+        border-right: none !important;
+    }
+
+    .ent-igd-modal .table-ent tfoot td {
+        background-color: rgba(79, 70, 229, 0.06) !important;
+        border-top: 2px solid rgba(79, 70, 229, 0.45) !important;
+        border-bottom: none !important;
+        border-left: 1px solid var(--ent-grid-border) !important;
+        border-right: 1px solid var(--ent-grid-border) !important;
+        padding: 11px 12px;
+        color: var(--bs-body-color) !important;
+    }
+
+    .ent-igd-modal .table-ent tfoot td:first-child {
+        border-left: none !important;
+    }
+
+    .ent-igd-modal .table-ent tfoot td:last-child {
+        border-right: none !important;
+    }
+</style>
+
+<div class="modal-body p-0 ent-igd-modal">
+    <!-- HEADER HERO BANNER -->
+    <div class="ent-banner-top p-3 p-md-4">
+        <div class="row align-items-center gy-2 position-relative" style="z-index: 2;">
+            <div class="col-md-8 d-flex align-items-center">
+                <div class="ent-glass-pill me-3 d-flex align-items-center justify-content-center flex-shrink-0"
+                    style="width: 52px; height: 52px;">
+                    <i class="fas fa-notes-medical text-danger fs-5"></i>
+                </div>
+                <div>
+                    <div class="d-flex align-items-center gap-2 mb-1">
+                        <span class="ent-badge-pill" style="background: rgba(244, 63, 94, 0.22); border: 1px solid rgba(244, 63, 94, 0.45); color: #fda4af;">
+                            <i class="fas fa-ambulance me-1"></i> PENANGANAN IGD
+                        </span>
+                        <span style="color: #94a3b8; font-size: 0.75rem; font-weight: 600;">Emergency Medical Record</span>
+                    </div>
+                    <h5 class="mb-0 text-white fw-bold" style="letter-spacing: -0.02em;">
+                        {{ $pasien->nama_pasien }}
+                    </h5>
+                </div>
+            </div>
+            <div class="col-md-4 text-md-end pe-md-4">
+                <div class="ent-glass-pill d-inline-flex flex-column align-items-end px-3 py-2">
+                    <span class="fw-bold text-white" style="font-family: 'JetBrains Mono', monospace; font-size: 0.82rem;">
+                        <i class="fas fa-hashtag text-info me-1"></i>{{ $pasien->no_registrasi }}
+                    </span>
+                    <span style="color: #cbd5e1; font-family: 'JetBrains Mono', monospace; font-size: 0.72rem;">
+                        RM: {{ $pasien->pid }}
+                    </span>
+                </div>
+            </div>
+        </div>
     </div>
 
-    <div class="card-body p-4 bg-white">
-        <!-- Informasi Singkat Pasien -->
-        <div class="alert alert-light border border-dark mb-4 shadow-sm" style="border-radius: 8px;">
-            <div class="row g-2 fs--1">
-                <div class="col-md-3"><strong>No. Registrasi:</strong> <span class="text-danger fw-bold">{{ $pasien->no_registrasi }}</span></div>
-                <div class="col-md-3"><strong>Tgl Masuk:</strong> {{ date('d/m/Y H:i', strtotime($pasien->tanggal_registrasi)) }}</div>
-                <div class="col-md-3"><strong>Penjamin:</strong> {{ $pasien->nama_penjamin ?? 'Umum' }} - {{ $pasien->nama_sub_penjamin }}</div>
-                <div class="col-md-3"><strong>Dokter Jaga:</strong> {{ $pasien->nama_dokter ?? '-' }}</div>
+    <div class="p-3 p-md-4 bg-white">
+        <!-- INFORMASI SINGKAT PASIEN -->
+        <div class="ent-section-card p-3 mb-4" style="background-color: rgba(79, 70, 229, 0.04);">
+            <div class="row g-3 align-items-center">
+                <div class="col-6 col-md-3">
+                    <span class="form-label-ent">No. Registrasi</span>
+                    <span class="ent-badge-pill" style="background: rgba(244, 63, 94, 0.14); color: #e11d48; border: 1px solid rgba(244, 63, 94, 0.35); font-family: 'JetBrains Mono', monospace;">
+                        {{ $pasien->no_registrasi }}
+                    </span>
+                </div>
+                <div class="col-6 col-md-3">
+                    <span class="form-label-ent">Tanggal & Jam Masuk</span>
+                    <div class="fw-bold" style="font-size: 0.84rem;">
+                        <i class="far fa-clock text-primary me-1"></i>{{ date('d/m/Y H:i', strtotime($pasien->tanggal_registrasi)) }}
+                    </div>
+                </div>
+                <div class="col-6 col-md-3">
+                    <span class="form-label-ent">Penjamin / Kelompok</span>
+                    <div>
+                        <span class="ent-badge-pill" style="background: rgba(16, 185, 129, 0.14); color: #059669; border: 1px solid rgba(16, 185, 129, 0.35);">
+                            <i class="fas fa-shield-alt me-1"></i>{{ $pasien->nama_penjamin ?? 'Umum' }} - {{ $pasien->nama_sub_penjamin }}
+                        </span>
+                    </div>
+                </div>
+                <div class="col-6 col-md-3">
+                    <span class="form-label-ent">Dokter Jaga IGD</span>
+                    <div class="fw-bold" style="font-size: 0.84rem;">
+                        <i class="fas fa-user-md text-primary me-1"></i>{{ $pasien->nama_dokter ?? '-' }}
+                    </div>
+                </div>
             </div>
         </div>
 
-        <!-- Tab Navigasi Handling -->
-        <ul class="nav nav-tabs border-0 mb-3" id="handlingTab" role="tablist">
+        <!-- TAB NAVIGASI HANDLING -->
+        <ul class="nav ent-nav-tabs mb-4" id="handlingTab" role="tablist">
             <li class="nav-item" role="presentation">
-                <button class="nav-link active fw-bold" id="triase-tab" data-bs-toggle="tab" data-bs-target="#triase-pane" type="button" role="tab">
+                <button class="nav-link active" id="triase-tab" data-bs-toggle="tab" data-bs-target="#triase-pane" type="button" role="tab">
                     <i class="fas fa-heartbeat me-1"></i> 1. Triase & TTV
                 </button>
             </li>
             <li class="nav-item" role="presentation">
-                <button class="nav-link fw-bold" id="soap-tab" data-bs-toggle="tab" data-bs-target="#soap-pane" type="button" role="tab">
+                <button class="nav-link" id="soap-tab" data-bs-toggle="tab" data-bs-target="#soap-pane" type="button" role="tab">
                     <i class="fas fa-id-card me-1"></i> 2. Anamnesis (SOAP)
                 </button>
             </li>
             <li class="nav-item" role="presentation">
-                <button class="nav-link fw-bold" id="tindakan-tab" data-bs-toggle="tab" data-bs-target="#tindakan-pane" type="button" role="tab">
+                <button class="nav-link" id="tindakan-tab" data-bs-toggle="tab" data-bs-target="#tindakan-pane" type="button" role="tab">
                     <i class="fas fa-stethoscope me-1"></i> 3. Tindakan
                 </button>
             </li>
-            <!-- TAMBAHAN TAB E-RESEP OBAT -->
             <li class="nav-item" role="presentation">
-                <button class="nav-link fw-bold" id="resep-tab" data-bs-toggle="tab" data-bs-target="#resep-pane" type="button" role="tab">
+                <button class="nav-link" id="resep-tab" data-bs-toggle="tab" data-bs-target="#resep-pane" type="button" role="tab">
                     <i class="fas fa-pills me-1"></i> 4. E-Resep Obat
                 </button>
             </li>
             <li class="nav-item" role="presentation">
-                <button class="nav-link fw-bold" id="disposisi-tab" data-bs-toggle="tab" data-bs-target="#disposisi-pane" type="button" role="tab">
+                <button class="nav-link" id="disposisi-tab" data-bs-toggle="tab" data-bs-target="#disposisi-pane" type="button" role="tab">
                     <i class="fas fa-door-open me-1"></i> 5. Disposisi
                 </button>
             </li>
@@ -55,262 +417,302 @@
             <div class="tab-content" id="handlingTabContent">
                 <!-- PANE 1: TRIASE & TTV -->
                 <div class="tab-pane fade show active" id="triase-pane" role="tabpanel">
-                    <div class="row g-3">
-                        <div class="col-md-4">
-                            <label class="form-label fw-bold text-dark fs--1">Skala Triase</label>
-                            <select class="form-select retro-input" name="skala_triage">
-                                <option value="1" {{ optional($triase)->skala_triage == 1 ? 'selected' : '' }}>Level 1 - Resusitasi (Merah)</option>
-                                <option value="2" {{ optional($triase)->skala_triage == 2 ? 'selected' : '' }}>Level 2 - Emergent (Kuning)</option>
-                                <option value="3" {{ optional($triase)->skala_triage == 3 ? 'selected' : '' }}>Level 3 - Urgent (Hijau)</option>
-                                <option value="4" {{ optional($triase)->skala_triage == 4 ? 'selected' : '' }}>Level 4 - Semi Urgent / Non Urgent</option>
-                            </select>
+                    <div class="ent-section-card">
+                        <div class="form-header-ent d-flex align-items-center gap-2">
+                            <i class="fas fa-heartbeat text-danger"></i> Asesmen Triase & Tanda-Tanda Vital (TTV)
                         </div>
-                        <div class="col-md-8">
-                            <label class="form-label fw-bold text-dark fs--1">Keluhan Utama</label>
-                            <input type="text" class="form-control retro-input" name="keluhan_utama" value="{{ optional($triase)->keluhan_utama ?? $pasien->keluhan_medis }}" placeholder="Contoh: Nyeri dada sebelah kiri, sesak napas...">
-                        </div>
-                        <div class="col-md-3">
-                            <label class="form-label fw-bold text-dark fs--1">Tekanan Darah (mmHg)</label>
-                            <input type="text" class="form-control retro-input" name="tekanan_darah" value="{{ optional($triase)->tekanan_darah }}" placeholder="120/80">
-                        </div>
-                        <div class="col-md-3">
-                            <label class="form-label fw-bold text-dark fs--1">Nadi (x/menit)</label>
-                            <input type="text" class="form-control retro-input" name="nadi" value="{{ optional($triase)->nadi }}" placeholder="80">
-                        </div>
-                        <div class="col-md-3">
-                            <label class="form-label fw-bold text-dark fs--1">Suhu (°C)</label>
-                            <input type="text" class="form-control retro-input" name="suhu" value="{{ optional($triase)->suhu }}" placeholder="36.5">
-                        </div>
-                        <div class="col-md-3">
-                            <label class="form-label fw-bold text-dark fs--1">Saturasi Oksigen (%)</label>
-                            <input type="text" class="form-control retro-input" name="saturasi_oksigen" value="{{ optional($triase)->saturasi_oksigen }}" placeholder="98">
-                        </div>
-                        <div class="col-md-6">
-                            <label class="form-label fw-bold text-dark fs--1">Pernapasan (x/menit)</label>
-                            <input type="text" class="form-control retro-input" name="pernapasan" value="{{ optional($triase)->pernapasan }}" placeholder="20">
-                        </div>
-                        <div class="col-md-6">
-                            <label class="form-label fw-bold text-dark fs--1">Kesadaran (GCS / AVPU)</label>
-                            <input type="text" class="form-control retro-input" name="kesadaran" value="{{ optional($triase)->kesadaran }}" placeholder="Compos Mentis (E4V5M6)">
+                        <div class="card-body p-3 p-md-4">
+                            <div class="row g-3">
+                                <div class="col-md-4">
+                                    <label class="form-label-ent">Skala Triase</label>
+                                    <select class="form-select ent-input" name="skala_triage">
+                                        <option value="1" {{ optional($triase)->skala_triage == 1 ? 'selected' : '' }}>Level 1 - Resusitasi (Merah)</option>
+                                        <option value="2" {{ optional($triase)->skala_triage == 2 ? 'selected' : '' }}>Level 2 - Emergent (Kuning)</option>
+                                        <option value="3" {{ optional($triase)->skala_triage == 3 ? 'selected' : '' }}>Level 3 - Urgent (Hijau)</option>
+                                        <option value="4" {{ optional($triase)->skala_triage == 4 ? 'selected' : '' }}>Level 4 - Semi Urgent / Non Urgent</option>
+                                    </select>
+                                </div>
+                                <div class="col-md-8">
+                                    <label class="form-label-ent">Keluhan Utama</label>
+                                    <input type="text" class="form-control ent-input" name="keluhan_utama" value="{{ optional($triase)->keluhan_utama ?? $pasien->keluhan_medis }}" placeholder="Contoh: Nyeri dada sebelah kiri, sesak napas...">
+                                </div>
+                                <div class="col-md-3">
+                                    <label class="form-label-ent">Tekanan Darah (mmHg)</label>
+                                    <input type="text" class="form-control ent-input" name="tekanan_darah" value="{{ optional($triase)->tekanan_darah }}" placeholder="120/80">
+                                </div>
+                                <div class="col-md-3">
+                                    <label class="form-label-ent">Nadi (x/menit)</label>
+                                    <input type="text" class="form-control ent-input" name="nadi" value="{{ optional($triase)->nadi }}" placeholder="80">
+                                </div>
+                                <div class="col-md-3">
+                                    <label class="form-label-ent">Suhu (°C)</label>
+                                    <input type="text" class="form-control ent-input" name="suhu" value="{{ optional($triase)->suhu }}" placeholder="36.5">
+                                </div>
+                                <div class="col-md-3">
+                                    <label class="form-label-ent">Saturasi Oksigen (%)</label>
+                                    <input type="text" class="form-control ent-input" name="saturasi_oksigen" value="{{ optional($triase)->saturasi_oksigen }}" placeholder="98">
+                                </div>
+                                <div class="col-md-6">
+                                    <label class="form-label-ent">Pernapasan (x/menit)</label>
+                                    <input type="text" class="form-control ent-input" name="pernapasan" value="{{ optional($triase)->pernapasan }}" placeholder="20">
+                                </div>
+                                <div class="col-md-6">
+                                    <label class="form-label-ent">Kesadaran (GCS / AVPU)</label>
+                                    <input type="text" class="form-control ent-input" name="kesadaran" value="{{ optional($triase)->kesadaran }}" placeholder="Compos Mentis (E4V5M6)">
+                                </div>
+                            </div>
                         </div>
                     </div>
                 </div>
 
                 <!-- PANE 2: ANAMNESIS SOAP -->
                 <div class="tab-pane fade" id="soap-pane" role="tabpanel">
-                    <div class="row g-3">
-                        <div class="col-md-6">
-                            <label class="form-label fw-bold text-dark fs--1">Subjektif (Anamnesis)</label>
-                            <textarea class="form-control retro-input" name="subjektif" rows="3" placeholder="Keluhan tambahan riwayat penyakit...">{{ optional($soap)->subjektif }}</textarea>
+                    <div class="ent-section-card">
+                        <div class="form-header-ent d-flex align-items-center gap-2">
+                            <i class="fas fa-comment-medical text-info"></i> Catatan Perkembangan Pasien (SOAP)
                         </div>
-                        <div class="col-md-6">
-                            <label class="form-label fw-bold text-dark fs--1">Objektif (Pemeriksaan Fisik)</label>
-                            <textarea class="form-control retro-input" name="objektif" rows="3" placeholder="Hasil pemeriksaan fisik organ...">{{ optional($soap)->objektif }}</textarea>
-                        </div>
-                        <div class="col-md-6">
-                            <label class="form-label fw-bold text-dark fs--1">Asesmen (Diagnosis Kerja)</label>
-                            <textarea class="form-control retro-input" name="asesmen" rows="3" placeholder="Diagnosis medis...">{{ optional($soap)->asesmen }}</textarea>
-                        </div>
-                        <div class="col-md-6">
-                            <label class="form-label fw-bold text-dark fs--1">Planning (Rencana Terapi / Instruksi)</label>
-                            <textarea class="form-control retro-input" name="planning" rows="3" placeholder="Rencana pengobatan, diet, atau observasi...">{{ optional($soap)->planning }}</textarea>
+                        <div class="card-body p-3 p-md-4">
+                            <div class="row g-3">
+                                <div class="col-md-6">
+                                    <label class="form-label-ent">Subjektif (Anamnesis)</label>
+                                    <textarea class="form-control ent-input" name="subjektif" rows="3" placeholder="Keluhan tambahan riwayat penyakit...">{{ optional($soap)->subjektif }}</textarea>
+                                </div>
+                                <div class="col-md-6">
+                                    <label class="form-label-ent">Objektif (Pemeriksaan Fisik)</label>
+                                    <textarea class="form-control ent-input" name="objektif" rows="3" placeholder="Hasil pemeriksaan fisik organ...">{{ optional($soap)->objektif }}</textarea>
+                                </div>
+                                <div class="col-md-6">
+                                    <label class="form-label-ent">Asesmen (Diagnosis Kerja)</label>
+                                    <textarea class="form-control ent-input" name="asesmen" rows="3" placeholder="Diagnosis medis...">{{ optional($soap)->asesmen }}</textarea>
+                                </div>
+                                <div class="col-md-6">
+                                    <label class="form-label-ent">Planning (Rencana Terapi / Instruksi)</label>
+                                    <textarea class="form-control ent-input" name="planning" rows="3" placeholder="Rencana pengobatan, diet, atau observasi...">{{ optional($soap)->planning }}</textarea>
+                                </div>
+                            </div>
                         </div>
                     </div>
                 </div>
 
                 <!-- PANE 3: TINDAKAN & LAYANAN -->
                 <div class="tab-pane fade" id="tindakan-pane" role="tabpanel">
-                    <div class="p-3 bg-light border border-dark rounded mb-3">
-                        <div class="d-flex justify-content-between align-items-center mb-3">
-                            <h6 class="fw-bolder text-dark mb-0"><i class="fas fa-plus-circle me-1"></i> Order Pemeriksaan & Tindakan IGD</h6>
-                            <span class="badge bg-dark text-white fw-bold border border-secondary px-3 py-1">Tarif Berlaku: {{ $pasien->nama_sub_penjamin ?? 'UMUM' }}</span>
+                    <div class="ent-section-card mb-3">
+                        <div class="form-header-ent d-flex justify-content-between align-items-center flex-wrap gap-2">
+                            <span class="d-flex align-items-center gap-2">
+                                <i class="fas fa-plus-circle text-primary"></i> Order Pemeriksaan & Tindakan IGD
+                            </span>
+                            <span class="ent-badge-pill" style="background: rgba(14, 165, 233, 0.14); color: #0284c7; border: 1px solid rgba(14, 165, 233, 0.35);">
+                                Tarif Berlaku: {{ $pasien->nama_sub_penjamin ?? 'UMUM' }}
+                            </span>
                         </div>
-
-                        <div class="row g-3">
-                            <!-- Pilih Pemeriksaan / Tindakan -->
-                            <div class="col-md-9">
-                                <label class="form-label fw-bold text-dark fs--1">Cari Pemeriksaan / Tindakan Medis</label>
-                                <select class="form-select retro-input" id="select-master-tindakan" disabled>
-                                    <option value="">-- Memuat Data Layanan... --</option>
-                                </select>
-                            </div>
-
-                            <div class="col-md-3 d-flex align-items-end">
-                                <button type="button" class="btn retro-btn retro-btn-success w-100 fw-bold text-dark" id="btn-tambah-tindakan-list" style="height: 38px;">
-                                    <i class="fas fa-plus me-1"></i> Tambah Tindakan
-                                </button>
+                        <div class="card-body p-3">
+                            <div class="row g-3 align-items-end">
+                                <div class="col-md-9">
+                                    <label class="form-label-ent">Cari Pemeriksaan / Tindakan Medis</label>
+                                    <select class="form-select ent-input" id="select-master-tindakan" disabled>
+                                        <option value="">-- Memuat Data Layanan... --</option>
+                                    </select>
+                                </div>
+                                <div class="col-md-3">
+                                    <button type="button" class="btn ent-btn ent-btn-success w-100 d-flex align-items-center justify-content-center gap-2" id="btn-tambah-tindakan-list" style="height: 42px;">
+                                        <i class="fas fa-plus"></i> Tambah Tindakan
+                                    </button>
+                                </div>
                             </div>
                         </div>
                     </div>
 
-                    <div class="table-responsive">
-                        <table class="table table-bordered table-sm fs--1 table-custom align-middle mb-0" style="border: 2px solid var(--retro-dark);">
-                            <thead class="table-dark" style="background-color: var(--retro-dark); color: var(--retro-green);">
-                                <tr>
-                                    <th class="py-2 px-3 text-start">Nama Tindakan / Pemeriksaan</th>
-                                    <th class="py-2 px-3 text-end" style="width: 180px;">Tarif (Rp)</th>
-                                    <th class="py-2 px-3 text-center" style="width: 70px;">Aksi</th>
-                                </tr>
-                            </thead>
-                            <tbody id="tindakan-terpilih-tbody" class="bg-white">
-                                @forelse($tindakanList as $tindakan)
-                                <tr data-id="{{ $tindakan->master_pemeriksaan_id }}" data-tarif="{{ $tindakan->tarif ?? 0 }}">
-                                    <td class="fw-bold text-dark px-3 py-2">
-                                        {{ $tindakan->nama_layanan }}
-                                        <input type="hidden" name="tindakan_ids[]" value="{{ $tindakan->master_pemeriksaan_id }}">
-                                        <input type="hidden" name="tarif_tindakan[]" value="{{ $tindakan->tarif ?? 0 }}">
-                                    </td>
-                                    <td class="text-end fw-bold text-dark px-3 py-2">Rp {{ number_format($tindakan->tarif ?? 0, 0, ',', '.') }}</td>
-                                    <td class="text-center py-2">
-                                        <button type="button" class="btn btn-sm btn-danger py-0 px-1 btn-hapus-tindakan fw-bold">x</button>
-                                    </td>
-                                </tr>
-                                @empty
-                                <tr id="empty-row-tindakan">
-                                    <td colspan="3" class="text-center text-muted py-3 fw-bold">Belum ada tindakan atau pemeriksaan yang ditambahkan.</td>
-                                </tr>
-                                @endforelse
-                            </tbody>
-                            <tfoot class="bg-light">
-                                <tr style="border-top: 3px solid var(--retro-dark);">
-                                    <td class="text-end fw-bolder text-dark px-3 py-2 text-uppercase" style="font-size: 0.85rem;">Total Harga Tindakan:</td>
-                                    <td class="text-end fw-bolder text-danger px-3 py-2" id="total-tarif-text" style="font-size: 0.9rem;">Rp 0</td>
-                                    <td></td>
-                                </tr>
-                            </tfoot>
-                        </table>
+                    <div class="ent-section-card">
+                        <div class="table-responsive">
+                            <table class="table table-ent align-middle mb-0">
+                                <thead>
+                                    <tr>
+                                        <th class="text-start">Nama Tindakan / Pemeriksaan</th>
+                                        <th class="text-end" style="width: 190px;">Tarif (Rp)</th>
+                                        <th class="text-center" style="width: 80px;">Aksi</th>
+                                    </tr>
+                                </thead>
+                                <tbody id="tindakan-terpilih-tbody">
+                                    @forelse($tindakanList as $tindakan)
+                                    <tr data-id="{{ $tindakan->master_pemeriksaan_id }}" data-tarif="{{ $tindakan->tarif ?? 0 }}">
+                                        <td class="fw-semibold">
+                                            {{ $tindakan->nama_layanan }}
+                                            <input type="hidden" name="tindakan_ids[]" value="{{ $tindakan->master_pemeriksaan_id }}">
+                                            <input type="hidden" name="tarif_tindakan[]" value="{{ $tindakan->tarif ?? 0 }}">
+                                        </td>
+                                        <td class="text-end fw-bold" style="font-family: 'JetBrains Mono', monospace;">Rp {{ number_format($tindakan->tarif ?? 0, 0, ',', '.') }}</td>
+                                        <td class="text-center">
+                                            <button type="button" class="btn btn-sm btn-danger rounded-2 py-1 px-2 btn-hapus-tindakan" title="Hapus Tindakan">
+                                                <i class="fas fa-trash-alt"></i>
+                                            </button>
+                                        </td>
+                                    </tr>
+                                    @empty
+                                    <tr id="empty-row-tindakan">
+                                        <td colspan="3" class="text-center opacity-75 py-4 fw-semibold">Belum ada tindakan atau pemeriksaan yang ditambahkan.</td>
+                                    </tr>
+                                    @endforelse
+                                </tbody>
+                                <tfoot>
+                                    <tr>
+                                        <td class="text-end fw-bold text-uppercase" style="font-size: 0.8rem;">Total Harga Tindakan:</td>
+                                        <td class="text-end fw-bold text-danger" id="total-tarif-text" style="font-family: 'JetBrains Mono', monospace; font-size: 0.92rem;">Rp 0</td>
+                                        <td></td>
+                                    </tr>
+                                </tfoot>
+                            </table>
+                        </div>
                     </div>
                 </div>
 
                 <!-- PANE 4: E-RESEP OBAT -->
                 <div class="tab-pane fade" id="resep-pane" role="tabpanel">
-                    <div class="p-3 bg-light border border-dark rounded mb-3">
-                        <div class="d-flex justify-content-between align-items-center mb-3">
-                            <h6 class="fw-bolder text-dark mb-0"><i class="fas fa-plus-circle me-1"></i> Order E-Resep Obat IGD</h6>
-                            <span class="badge bg-dark text-white fw-bold border border-secondary px-3 py-1">Harga: {{ $pasien->nama_sub_penjamin ?? 'UMUM' }}</span>
+                    <div class="ent-section-card mb-3">
+                        <div class="form-header-ent d-flex justify-content-between align-items-center flex-wrap gap-2">
+                            <span class="d-flex align-items-center gap-2">
+                                <i class="fas fa-pills text-warning"></i> Order E-Resep Obat IGD
+                            </span>
+                            <span class="ent-badge-pill" style="background: rgba(245, 158, 11, 0.14); color: #d97706; border: 1px solid rgba(245, 158, 11, 0.35);">
+                                Harga: {{ $pasien->nama_sub_penjamin ?? 'UMUM' }}
+                            </span>
                         </div>
-
-                        <div class="row g-3">
-                            <div class="col-md-5">
-                                <label class="form-label fw-bold text-dark fs--1">Cari Obat Farmasi</label>
-                                <select class="form-select retro-input" id="select-master-obat">
-                                    <option value="">-- Cari atau Pilih Obat --</option>
-                                    @foreach($daftarObat ?? [] as $obat)
-                                    <option value="{{ $obat->farm_data_obat_code }}"
-                                        data-nama="{{ $obat->farm_data_obat_name }}"
-                                        data-satuan="{{ $obat->farm_data_obat_satuan }}"
-                                        data-harga="{{ $obat->harga_jual }}">
-                                        {{ $obat->farm_data_obat_name }} (Stok: {{ $obat->farm_data_obat_stok }}) - Rp {{ number_format($obat->harga_jual, 0, ',', '.') }}
-                                    </option>
-                                    @endforeach
-                                </select>
-                            </div>
-                            <div class="col-md-2">
-                                <label class="form-label fw-bold text-dark fs--1">Jumlah (Qty)</label>
-                                <input type="number" id="input_jumlah_obat" class="form-control retro-input text-center fw-bold" min="1" value="1">
-                            </div>
-                            <div class="col-md-3">
-                                <label class="form-label fw-bold text-dark fs--1">Signa / Aturan Pakai</label>
-                                <input type="text" id="input_signa_obat" class="form-control retro-input fw-bold" placeholder="Cth: 3 x 1">
-                            </div>
-                            <div class="col-md-2 d-flex align-items-end">
-                                <button type="button" class="btn retro-btn retro-btn-warning w-100 fw-bold text-dark" id="btn-tambah-resep-list" style="height: 38px;">
-                                    <i class="fas fa-plus me-1"></i> Resep
-                                </button>
+                        <div class="card-body p-3">
+                            <div class="row g-3 align-items-end">
+                                <div class="col-md-5">
+                                    <label class="form-label-ent">Cari Obat Farmasi</label>
+                                    <select class="form-select ent-input" id="select-master-obat">
+                                        <option value="">-- Cari atau Pilih Obat --</option>
+                                        @foreach($daftarObat ?? [] as $obat)
+                                        <option value="{{ $obat->farm_data_obat_code }}"
+                                            data-nama="{{ $obat->farm_data_obat_name }}"
+                                            data-satuan="{{ $obat->farm_data_obat_satuan }}"
+                                            data-harga="{{ $obat->harga_jual }}">
+                                            {{ $obat->farm_data_obat_name }} (Stok: {{ $obat->farm_data_obat_stok }}) - Rp {{ number_format($obat->harga_jual, 0, ',', '.') }}
+                                        </option>
+                                        @endforeach
+                                    </select>
+                                </div>
+                                <div class="col-md-2">
+                                    <label class="form-label-ent">Jumlah (Qty)</label>
+                                    <input type="number" id="input_jumlah_obat" class="form-control ent-input text-center" min="1" value="1">
+                                </div>
+                                <div class="col-md-3">
+                                    <label class="form-label-ent">Signa / Aturan Pakai</label>
+                                    <input type="text" id="input_signa_obat" class="form-control ent-input" placeholder="Cth: 3 x 1">
+                                </div>
+                                <div class="col-md-2">
+                                    <button type="button" class="btn ent-btn ent-btn-warning w-100 d-flex align-items-center justify-content-center gap-2" id="btn-tambah-resep-list" style="height: 42px;">
+                                        <i class="fas fa-plus"></i> Resep
+                                    </button>
+                                </div>
                             </div>
                         </div>
                     </div>
 
-                    <div class="table-responsive">
-                        <table class="table table-bordered table-sm fs--1 table-custom align-middle mb-0" style="border: 2px solid var(--retro-dark);">
-                            <thead class="table-dark" style="background-color: var(--retro-dark); color: var(--retro-yellow);">
-                                <tr>
-                                    <th class="py-2 px-3 text-start">Nama Obat</th>
-                                    <th class="py-2 px-3 text-center" style="width: 80px;">Qty</th>
-                                    <th class="py-2 px-3 text-start" style="width: 200px;">Aturan Pakai</th>
-                                    <th class="py-2 px-3 text-end" style="width: 150px;">Subtotal (Rp)</th>
-                                    <th class="py-2 px-3 text-center" style="width: 70px;">Aksi</th>
-                                </tr>
-                            </thead>
-                            <tbody id="resep-terpilih-tbody" class="bg-white">
-                                @forelse($resepList as $resep)
-                                <tr data-code="{{ $resep->farm_data_obat_code }}">
-                                    <td class="fw-bold text-dark px-3 py-2">
-                                        {{ $resep->farm_data_obat_name ?? 'Obat Farmasi' }}
-                                        <input type="hidden" name="resep_obat_code[]" value="{{ $resep->farm_data_obat_code }}">
-                                        <input type="hidden" name="resep_harga[]" value="{{ $resep->harga ?? 0 }}">
-                                    </td>
-                                    <td class="text-center fw-bold text-dark px-3 py-2">
-                                        {{ $resep->qty ?? 1 }} {{ $resep->farm_data_obat_satuan ?? '' }}
-                                        <input type="hidden" name="resep_jumlah[]" value="{{ $resep->qty ?? 1 }}">
-                                    </td>
-                                    <td class="fw-bold text-dark px-3 py-2">
-                                        {{ $resep->signa ?? '-' }}
-                                        <input type="hidden" name="resep_signa[]" value="{{ $resep->signa ?? '-' }}">
-                                    </td>
-                                    <td class="text-end fw-bold text-dark px-3 py-2 subtotal-obat">
-                                        Rp {{ number_format(($resep->qty ?? 1) * ($resep->harga ?? 0), 0, ',', '.') }}
-                                    </td>
-                                    <td class="text-center py-2">
-                                        <button type="button" class="btn btn-sm btn-danger py-0 px-1 btn-hapus-obat fw-bold">x</button>
-                                    </td>
-                                </tr>
-                                @empty
-                                <tr id="empty-row-obat">
-                                    <td colspan="5" class="text-center text-muted py-3 fw-bold">Belum ada resep obat yang ditambahkan.</td>
-                                </tr>
-                                @endforelse
-                            </tbody>
-                            <tfoot class="bg-light">
-                                <tr style="border-top: 3px solid var(--retro-dark);">
-                                    <td colspan="3" class="text-end fw-bolder text-dark px-3 py-2 text-uppercase" style="font-size: 0.85rem;">Total Harga Obat:</td>
-                                    <td class="text-end fw-bolder text-danger px-3 py-2" id="total-obat-text" style="font-size: 0.9rem;">Rp 0</td>
-                                    <td></td>
-                                </tr>
-                            </tfoot>
-                        </table>
+                    <div class="ent-section-card">
+                        <div class="table-responsive">
+                            <table class="table table-ent align-middle mb-0">
+                                <thead>
+                                    <tr>
+                                        <th class="text-start">Nama Obat</th>
+                                        <th class="text-center" style="width: 110px;">Qty</th>
+                                        <th class="text-start" style="width: 210px;">Aturan Pakai</th>
+                                        <th class="text-end" style="width: 160px;">Subtotal (Rp)</th>
+                                        <th class="text-center" style="width: 80px;">Aksi</th>
+                                    </tr>
+                                </thead>
+                                <tbody id="resep-terpilih-tbody">
+                                    @forelse($resepList as $resep)
+                                    <tr data-code="{{ $resep->farm_data_obat_code }}">
+                                        <td class="fw-semibold">
+                                            {{ $resep->farm_data_obat_name ?? 'Obat Farmasi' }}
+                                            <input type="hidden" name="resep_obat_code[]" value="{{ $resep->farm_data_obat_code }}">
+                                            <input type="hidden" name="resep_harga[]" value="{{ $resep->harga ?? 0 }}">
+                                        </td>
+                                        <td class="text-center fw-semibold">
+                                            {{ $resep->qty ?? 1 }} {{ $resep->farm_data_obat_satuan ?? '' }}
+                                            <input type="hidden" name="resep_jumlah[]" value="{{ $resep->qty ?? 1 }}">
+                                        </td>
+                                        <td>
+                                            {{ $resep->signa ?? '-' }}
+                                            <input type="hidden" name="resep_signa[]" value="{{ $resep->signa ?? '-' }}">
+                                        </td>
+                                        <td class="text-end fw-bold subtotal-obat" style="font-family: 'JetBrains Mono', monospace;">
+                                            Rp {{ number_format(($resep->qty ?? 1) * ($resep->harga ?? 0), 0, ',', '.') }}
+                                        </td>
+                                        <td class="text-center">
+                                            <button type="button" class="btn btn-sm btn-danger rounded-2 py-1 px-2 btn-hapus-obat" title="Hapus Obat">
+                                                <i class="fas fa-trash-alt"></i>
+                                            </button>
+                                        </td>
+                                    </tr>
+                                    @empty
+                                    <tr id="empty-row-obat">
+                                        <td colspan="5" class="text-center opacity-75 py-4 fw-semibold">Belum ada resep obat yang ditambahkan.</td>
+                                    </tr>
+                                    @endforelse
+                                </tbody>
+                                <tfoot>
+                                    <tr>
+                                        <td colspan="3" class="text-end fw-bold text-uppercase" style="font-size: 0.8rem;">Total Harga Obat:</td>
+                                        <td class="text-end fw-bold text-danger" id="total-obat-text" style="font-family: 'JetBrains Mono', monospace; font-size: 0.92rem;">Rp 0</td>
+                                        <td></td>
+                                    </tr>
+                                </tfoot>
+                            </table>
+                        </div>
                     </div>
                 </div>
 
                 <!-- PANE 5: DISPOSISI PASIEN -->
                 <div class="tab-pane fade" id="disposisi-pane" role="tabpanel">
-                    <div class="row g-3">
-                        <div class="col-md-6">
-                            <label class="form-label fw-bold text-dark fs--1">Status Kunjungan Akhir</label>
-                            <select class="form-select retro-input" name="status_kunjungan">
-                                <option value="PROSES" {{ $pasien->status_kunjungan == 'PROSES' ? 'selected' : '' }}>Dalam Penanganan / Observasi</option>
-                                <option value="SELESAI" {{ $pasien->status_kunjungan == 'SELESAI' ? 'selected' : '' }}>Selesai / Pulang / Rawat Inap</option>
-                            </select>
+                    <div class="ent-section-card">
+                        <div class="form-header-ent d-flex align-items-center gap-2">
+                            <i class="fas fa-door-open text-success"></i> Status Kunjungan & Disposisi Akhir Pasien
                         </div>
-                        <div class="col-md-6">
-                            <label class="form-label fw-bold text-dark fs--1">Tindak Lanjut / Disposisi (Verifikasi Akhir)</label>
-                            <select class="form-select retro-input" id="select-tindak-lanjut" name="tindak_lanjut">
-                                <option value="PULANG">Pulang (Berobat Jalan / Kontrol)</option>
-                                <option value="RAWAT_INAP">Pindah Rawat Inap (Otomatis Masuk Ranap)</option>
-                                <option value="RUJUK">Rujuk ke Rumah Sakit Lain</option>
-                                <option value="MENINGGAL">Meninggal Dunia</option>
-                            </select>
-                        </div>
-                        <div class="col-md-12" id="div-ruangan-inap" style="display: none;">
-                            <label class="form-label fw-bold text-dark fs--1 text-danger fw-bold"><i class="fas fa-bed me-1"></i> Pilih Ruangan & Bed / Kasur Rawat Inap</label>
-                            <select class="form-select retro-input border-danger" name="ruangan_bed_id">
-                                <option value="">-- Pilih Bed / Kasur Kosong --</option>
-                                @foreach($ruanganInap as $bed) <!-- Asumsikan variabel ini memuat data bed/ruangan -->
-                                <option value="{{ $bed->id }}">{{ $bed->nama_ruangan ?? 'Bangsal' }} - Bed: {{ $bed->nomor_bed ?? $bed->id }}</option>
-                                @endforeach
-                            </select>
-                        </div>
-                        <div class="col-md-12">
-                            <label class="form-label fw-bold text-dark fs--1">Catatan / Edukasi Pulang / Alasan Masuk Ranap</label>
-                            <textarea class="form-control retro-input" name="catatan_pulang" rows="3" placeholder="Instruksi dokter, indikasi rawat inap..."></textarea>
+                        <div class="card-body p-3 p-md-4">
+                            <div class="row g-3">
+                                <div class="col-md-6">
+                                    <label class="form-label-ent">Status Kunjungan Akhir</label>
+                                    <select class="form-select ent-input" name="status_kunjungan">
+                                        <option value="PROSES" {{ $pasien->status_kunjungan == 'PROSES' ? 'selected' : '' }}>Dalam Penanganan / Observasi</option>
+                                        <option value="SELESAI" {{ $pasien->status_kunjungan == 'SELESAI' ? 'selected' : '' }}>Selesai / Pulang / Rawat Inap</option>
+                                    </select>
+                                </div>
+                                <div class="col-md-6">
+                                    <label class="form-label-ent">Tindak Lanjut / Disposisi (Verifikasi Akhir)</label>
+                                    <select class="form-select ent-input" id="select-tindak-lanjut" name="tindak_lanjut">
+                                        <option value="PULANG">Pulang (Berobat Jalan / Kontrol)</option>
+                                        <option value="RAWAT_INAP">Pindah Rawat Inap (Otomatis Masuk Ranap)</option>
+                                        <option value="RUJUK">Rujuk ke Rumah Sakit Lain</option>
+                                        <option value="MENINGGAL">Meninggal Dunia</option>
+                                    </select>
+                                </div>
+                                <div class="col-md-12" id="div-ruangan-inap" style="display: none;">
+                                    <label class="form-label-ent text-danger"><i class="fas fa-bed me-1"></i> Pilih Ruangan & Bed / Kasur Rawat Inap</label>
+                                    <select class="form-select ent-input" name="ruangan_bed_id">
+                                        <option value="">-- Pilih Bed / Kasur Kosong --</option>
+                                        @foreach($ruanganInap as $bed)
+                                        <option value="{{ $bed->id }}">{{ $bed->nama_ruangan ?? 'Bangsal' }} - Bed: {{ $bed->nomor_bed ?? $bed->id }}</option>
+                                        @endforeach
+                                    </select>
+                                </div>
+                                <div class="col-md-12">
+                                    <label class="form-label-ent">Catatan / Edukasi Pulang / Alasan Masuk Ranap</label>
+                                    <textarea class="form-control ent-input" name="catatan_pulang" rows="3" placeholder="Instruksi dokter, indikasi rawat inap..."></textarea>
+                                </div>
+                            </div>
                         </div>
                     </div>
                 </div>
             </div>
 
-            <div class="d-flex justify-content-end gap-2 pt-3 mt-4 border-top border-dark">
-                <button type="button" class="btn retro-btn btn-light border border-dark btn-sm px-3 fw-bold text-dark" data-bs-dismiss="modal">Tutup</button>
-                <button type="button" class="btn retro-btn retro-btn-success btn-sm px-4 fw-bold text-dark" id="btn-simpan-handling">Simpan Handling IGD</button>
+            <!-- FOOTER ACTION BUTTONS -->
+            <div class="d-flex justify-content-end gap-2 pt-3 mt-4" style="border-top: 1px solid var(--ent-grid-border);">
+                <button type="button" class="btn ent-btn ent-btn-outline px-4 py-2" data-bs-dismiss="modal">Tutup</button>
+                <button type="button" class="btn ent-btn ent-btn-success px-4 py-2" id="btn-simpan-handling">
+                    <i class="fas fa-save me-1"></i> Simpan Handling IGD
+                </button>
             </div>
         </form>
     </div>
@@ -435,14 +837,16 @@
 
         let htmlRow = `
             <tr data-id="${idTindakan}" data-tarif="${tarifTindakan}">
-                <td class="fw-bold text-dark px-3 py-2">
+                <td class="fw-semibold">
                     ${namaPemeriksaan}
                     <input type="hidden" name="tindakan_ids[]" value="${idTindakan}">
                     <input type="hidden" name="tarif_tindakan[]" value="${tarifTindakan}">
                 </td>
-                <td class="text-end fw-bold text-dark px-3 py-2">Rp ${Number(tarifTindakan).toLocaleString('id-ID')}</td>
-                <td class="text-center py-2">
-                    <button type="button" class="btn btn-sm btn-danger py-0 px-1 btn-hapus-tindakan fw-bold">x</button>
+                <td class="text-end fw-bold" style="font-family: 'JetBrains Mono', monospace;">Rp ${Number(tarifTindakan).toLocaleString('id-ID')}</td>
+                <td class="text-center">
+                    <button type="button" class="btn btn-sm btn-danger rounded-2 py-1 px-2 btn-hapus-tindakan" title="Hapus Tindakan">
+                        <i class="fas fa-trash-alt"></i>
+                    </button>
                 </td>
             </tr>
         `;
@@ -457,7 +861,7 @@
     $(document).on('click', '.btn-hapus-tindakan', function() {
         $(this).closest('tr').remove();
         if ($('#tindakan-terpilih-tbody tr').length === 0) {
-            $('#tindakan-terpilih-tbody').html('<tr id="empty-row-tindakan"><td colspan="3" class="text-center text-muted py-3 fw-bold">Belum ada tindakan atau pemeriksaan yang ditambahkan.</td></tr>');
+            $('#tindakan-terpilih-tbody').html('<tr id="empty-row-tindakan"><td colspan="3" class="text-center opacity-75 py-4 fw-semibold">Belum ada tindakan atau pemeriksaan yang ditambahkan.</td></tr>');
         }
         hitungTotalTarif();
     });
@@ -525,22 +929,24 @@
 
         let htmlRow = `
             <tr data-code="${kodeObat}">
-                <td class="fw-bold text-dark px-3 py-2">
+                <td class="fw-semibold">
                     ${namaObat}
                     <input type="hidden" name="resep_obat_code[]" value="${kodeObat}">
                     <input type="hidden" name="resep_harga[]" value="${hargaObat}">
                 </td>
-                <td class="text-center fw-bold text-dark px-3 py-2">
+                <td class="text-center fw-semibold">
                     ${qty} ${satuanObat}
                     <input type="hidden" name="resep_jumlah[]" value="${qty}">
                 </td>
-                <td class="fw-bold text-dark px-3 py-2">
+                <td>
                     ${signa}
                     <input type="hidden" name="resep_signa[]" value="${signa}">
                 </td>
-                <td class="text-end fw-bold text-dark px-3 py-2 subtotal-obat">Rp ${subtotal.toLocaleString('id-ID')}</td>
-                <td class="text-center py-2">
-                    <button type="button" class="btn btn-sm btn-danger py-0 px-1 btn-hapus-obat fw-bold">x</button>
+                <td class="text-end fw-bold subtotal-obat" style="font-family: 'JetBrains Mono', monospace;">Rp ${subtotal.toLocaleString('id-ID')}</td>
+                <td class="text-center">
+                    <button type="button" class="btn btn-sm btn-danger rounded-2 py-1 px-2 btn-hapus-obat" title="Hapus Obat">
+                        <i class="fas fa-trash-alt"></i>
+                    </button>
                 </td>
             </tr>
         `;
@@ -558,7 +964,7 @@
     $(document).on('click', '.btn-hapus-obat', function() {
         $(this).closest('tr').remove();
         if ($('#resep-terpilih-tbody tr').length === 0) {
-            $('#resep-terpilih-tbody').html('<tr id="empty-row-obat"><td colspan="5" class="text-center text-muted py-3 fw-bold">Belum ada resep obat yang ditambahkan.</td></tr>');
+            $('#resep-terpilih-tbody').html('<tr id="empty-row-obat"><td colspan="5" class="text-center opacity-75 py-4 fw-semibold">Belum ada resep obat yang ditambahkan.</td></tr>');
         }
         hitungTotalObat();
     });
@@ -573,7 +979,7 @@
         let formData = form.serialize();
         let submitBtn = $(this);
 
-        submitBtn.prop('disabled', true).text('Menyimpan...');
+        submitBtn.prop('disabled', true).html('<i class="fas fa-spinner fa-spin me-1"></i> Menyimpan...');
 
         $.ajax({
             url: "{{ route('igd.handling.store') }}",
@@ -581,7 +987,7 @@
             data: formData,
             dataType: 'json',
             success: function(response) {
-                submitBtn.prop('disabled', false).text('Simpan Handling IGD');
+                submitBtn.prop('disabled', false).html('<i class="fas fa-save me-1"></i> Simpan Handling IGD');
 
                 if (response.success) {
                     Swal.fire({
@@ -591,8 +997,7 @@
                         timer: 1500,
                         showConfirmButton: false
                     }).then(() => {
-                        // Tutup modal dan refresh tabel data registrasi
-                        $('#modalHandlingIgd').modal('hide'); // Sesuaikan ID modal wrapper Anda jika berbeda
+                        $('#modal-handling-igd, #modalHandlingIgd').modal('hide');
                         if (typeof reloadTable === 'function') {
                             reloadTable();
                         } else {
@@ -608,7 +1013,7 @@
                 }
             },
             error: function(xhr) {
-                submitBtn.prop('disabled', false).text('Simpan Handling IGD');
+                submitBtn.prop('disabled', false).html('<i class="fas fa-save me-1"></i> Simpan Handling IGD');
 
                 let errorMessage = 'Terjadi kesalahan pada server.';
                 if (xhr.status === 422) {
@@ -647,7 +1052,7 @@
                 $('#div-ruangan-inap').slideDown();
             } else {
                 $('#div-ruangan-inap').slideUp();
-                $('select[name="ruangan_tujuan_id"]').val('');
+                $('select[name="ruangan_bed_id"]').val('');
             }
         });
     });

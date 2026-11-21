@@ -4,15 +4,15 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <!-- TAMBAHKAN CSRF TOKEN UNTUK AJAX -->
+    <!-- CSRF TOKEN UNTUK AJAX -->
     <meta name="csrf-token" content="{{ csrf_token() }}">
-    <title>Registrasi Pasien - Retro UI</title>
+    <title>Registrasi Pasien Satu Pintu - SIMRS</title>
     <!-- Bootstrap 5 CSS -->
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
     <!-- Font Awesome -->
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
     <!-- Google Fonts -->
-    <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@300;400;500;600;700;800&family=Space+Mono:wght@400;700&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&family=JetBrains+Mono:wght@500;700&display=swap" rel="stylesheet">
 
     <!-- Select2 CSS & Select2 Bootstrap 5 Theme -->
     <link href="https://cdn.jsdelivr.net/npm/select2@4.1.0-rc.0/dist/css/select2.min.css" rel="stylesheet" />
@@ -23,27 +23,33 @@
 
     <style>
         /* =========================================
-           RETRO / NEUBRUTALISM THEME STYLES
+           MODERN ENTERPRISE HEALTHCARE UI STYLES
            ========================================= */
         :root {
-            --retro-dark: #1e1e24;
-            --retro-yellow: #ffde59;
-            --retro-pink: #ffa6c9;
-            --retro-cyan: #8bf0fa;
-            --retro-orange: #ff914d;
-            --retro-green: #c1ff72;
-            --retro-purple: #c8b6ff;
-            --retro-bg: #f4f0ea;
-            --retro-border: 3px solid var(--retro-dark);
-            --retro-shadow: 5px 5px 0px var(--retro-dark);
-            --retro-shadow-sm: 3px 3px 0px var(--retro-dark);
+            --ent-indigo: #4f46e5;
+            --ent-indigo-dark: #4338ca;
+            --ent-indigo-soft: #eef2ff;
+            --ent-emerald: #059669;
+            --ent-emerald-soft: #d1fae5;
+            --ent-sky: #0284c7;
+            --ent-sky-soft: #e0f2fe;
+            --ent-amber: #d97706;
+            --ent-amber-soft: #fef3c7;
+            --ent-rose: #e11d48;
+            --ent-rose-soft: #ffe4e6;
+            --ent-slate-900: #0f172a;
+            --ent-slate-700: #334155;
+            --ent-slate-500: #64748b;
+            --ent-border: #e2e8f0;
+            --ent-bg: #f1f5f9;
         }
 
         body {
             font-family: 'Plus Jakarta Sans', sans-serif;
-            color: var(--retro-dark);
-            background-color: var(--retro-bg);
+            color: var(--ent-slate-900);
+            background-color: var(--ent-bg);
             min-height: 100vh;
+            font-size: 0.88rem;
         }
 
         h1,
@@ -52,14 +58,43 @@
         h4,
         h5,
         h6 {
-            font-weight: 800;
-            letter-spacing: -0.5px;
-            color: var(--retro-dark);
+            font-weight: 700;
+            letter-spacing: -0.02em;
+            color: var(--ent-slate-900);
+        }
+
+        /* Hero Top Banner */
+        .ent-hero-bar {
+            background: linear-gradient(135deg, #0f172a 0%, #1e1b4b 55%, #312e81 100%);
+            border-radius: 16px;
+            border: 1px solid rgba(99, 102, 241, 0.25);
+            box-shadow: 0 12px 28px -6px rgba(15, 23, 42, 0.18);
+            position: relative;
+            overflow: hidden;
+        }
+
+        .ent-hero-bar::before {
+            content: '';
+            position: absolute;
+            top: -50%;
+            right: -5%;
+            width: 340px;
+            height: 340px;
+            background: radial-gradient(circle, rgba(56, 189, 248, 0.22) 0%, transparent 70%);
+            pointer-events: none;
+        }
+
+        .ent-glass-pill {
+            background: rgba(255, 255, 255, 0.09);
+            backdrop-filter: blur(8px);
+            border: 1px solid rgba(255, 255, 255, 0.16);
+            border-radius: 12px;
+            color: #ffffff;
         }
 
         /* Stepper Navigation */
         .nav-pills {
-            gap: 15px;
+            gap: 14px;
         }
 
         .nav-pills .nav-item {
@@ -68,137 +103,163 @@
 
         .nav-pills .nav-link {
             background: #ffffff;
-            border-radius: 10px;
-            color: var(--retro-dark);
-            font-weight: 800;
-            padding: 16px 20px;
-            border: 2px solid var(--retro-dark);
-            box-shadow: var(--retro-shadow-sm);
-            transition: all 0.1s ease-in-out;
+            border-radius: 12px;
+            color: var(--ent-slate-700);
+            font-weight: 700;
+            padding: 14px 20px;
+            border: 1px solid var(--ent-border);
+            box-shadow: 0 2px 8px rgba(15, 23, 42, 0.04);
+            transition: all 0.2s ease;
             display: flex;
             align-items: center;
             justify-content: center;
             gap: 10px;
-            text-transform: uppercase;
             font-size: 0.85rem;
         }
 
         .nav-pills .nav-link:disabled {
-            opacity: 0.5;
+            opacity: 0.55;
             cursor: not-allowed;
-            filter: grayscale(100%);
             background: #e2e8f0;
+            color: #94a3b8;
             box-shadow: none;
         }
 
         .nav-pills .nav-link i {
-            font-size: 1.2rem;
+            font-size: 1.1rem;
         }
 
         .nav-pills .nav-link:not(:disabled):hover {
-            transform: translate(-2px, -2px);
-            box-shadow: 5px 5px 0px var(--retro-dark);
-            background: var(--retro-cyan);
+            transform: translateY(-2px);
+            border-color: #c7d2fe;
+            background: #f8fafc;
+            color: var(--ent-indigo);
         }
 
         .nav-pills .nav-link.active.step-1 {
-            background: var(--retro-cyan);
-            color: var(--retro-dark);
+            background: linear-gradient(135deg, #4f46e5 0%, #4338ca 100%);
+            color: #ffffff;
+            border-color: transparent;
+            box-shadow: 0 6px 16px -2px rgba(79, 70, 229, 0.35);
         }
 
         .nav-pills .nav-link.active.step-2 {
-            background: var(--retro-yellow);
-            color: var(--retro-dark);
+            background: linear-gradient(135deg, #0284c7 0%, #0369a1 100%);
+            color: #ffffff;
+            border-color: transparent;
+            box-shadow: 0 6px 16px -2px rgba(2, 132, 199, 0.35);
         }
 
         .nav-pills .nav-link.active.step-3 {
-            background: var(--retro-green);
-            color: var(--retro-dark);
+            background: linear-gradient(135deg, #10b981 0%, #059669 100%);
+            color: #ffffff;
+            border-color: transparent;
+            box-shadow: 0 6px 16px -2px rgba(5, 150, 105, 0.35);
         }
 
         /* Card Styles */
         .card {
-            border-radius: 12px;
-            border: 2px solid var(--retro-dark);
+            border-radius: 16px;
+            border: 1px solid var(--ent-border);
             background: #ffffff;
-            box-shadow: var(--retro-shadow);
+            box-shadow: 0 4px 20px -2px rgba(15, 23, 42, 0.05);
             overflow: hidden;
             margin-bottom: 20px;
         }
 
         .card-header {
-            font-weight: 800;
-            text-transform: uppercase;
-            letter-spacing: 0.5px;
-            border-bottom: 2px solid var(--retro-dark);
-            padding: 16px 20px;
-            font-size: 0.9rem;
+            font-weight: 700;
+            letter-spacing: 0.01em;
+            border-bottom: 1px solid var(--ent-border);
+            padding: 14px 20px;
+            font-size: 0.88rem;
+            background-color: #f8fafc;
+            color: var(--ent-slate-900);
         }
 
         .header-blue {
-            background-color: var(--retro-cyan);
-            color: var(--retro-dark);
+            background: linear-gradient(to right, #eef2ff, #f8fafc);
+            color: var(--ent-indigo-dark);
+            border-bottom: 1px solid #e0e7ff;
         }
 
         .header-teal {
-            background-color: var(--retro-green);
-            color: var(--retro-dark);
+            background: linear-gradient(to right, #ecfdf5, #f8fafc);
+            color: #065f46;
+            border-bottom: 1px solid #d1fae5;
         }
 
         .header-purple {
-            background-color: var(--retro-purple);
-            color: var(--retro-dark);
+            background: linear-gradient(to right, #f0f9ff, #f8fafc);
+            color: #075985;
+            border-bottom: 1px solid #e0f2fe;
         }
 
         /* Form Inputs & Select2 */
         .input-group-text {
-            background-color: var(--retro-bg);
-            border: 2px solid var(--retro-dark);
+            background-color: #f8fafc;
+            border: 1px solid #cbd5e1;
             border-right: none;
-            color: var(--retro-dark);
-            font-weight: bold;
-            border-top-left-radius: 6px;
-            border-bottom-left-radius: 6px;
+            color: var(--ent-slate-500);
+            font-weight: 600;
+            border-top-left-radius: 10px;
+            border-bottom-left-radius: 10px;
         }
 
         .form-control,
         .form-select {
-            border: 2px solid var(--retro-dark) !important;
-            border-radius: 6px !important;
+            border: 1px solid #cbd5e1 !important;
+            border-radius: 10px !important;
             background-color: #ffffff;
-            font-weight: 700;
-            color: var(--retro-dark);
+            font-weight: 500;
+            color: var(--ent-slate-900);
+            transition: all 0.2s ease;
+        }
+
+        .input-group>.form-control,
+        .input-group>.form-select {
+            border-top-left-radius: 0 !important;
+            border-bottom-left-radius: 0 !important;
+        }
+
+        .input-group>.form-control:not(:last-child),
+        .input-group>.form-select:not(:last-child) {
+            border-top-right-radius: 0 !important;
+            border-bottom-right-radius: 0 !important;
+        }
+
+        .form-control:read-only,
+        .form-control.bg-light {
+            background-color: #f8fafc !important;
+            color: var(--ent-slate-700);
         }
 
         .form-control:focus,
         .form-select:focus {
-            box-shadow: 2px 2px 0px var(--retro-dark);
-            border-color: var(--retro-dark) !important;
-            background-color: #fff;
-        }
-
-        .input-group {
-            border-radius: 6px;
-            transition: all 0.2s;
-        }
-
-        .input-group:focus-within {
-            box-shadow: 3px 3px 0px var(--retro-dark);
-            transform: translateY(-1px);
+            box-shadow: 0 0 0 3.5px rgba(79, 70, 229, 0.12) !important;
+            border-color: var(--ent-indigo) !important;
+            background-color: #ffffff;
         }
 
         .select2-container--bootstrap-5 .select2-selection {
-            border: 2px solid var(--retro-dark) !important;
-            border-radius: 6px !important;
+            border: 1px solid #cbd5e1 !important;
+            border-radius: 10px !important;
             background-color: #ffffff !important;
-            min-height: 45px;
-            font-weight: 700;
+            min-height: 40px;
+            font-weight: 500;
+            display: flex;
+            align-items: center;
+        }
+
+        .input-group>.select2-container--bootstrap-5 .select2-selection {
+            border-top-left-radius: 0 !important;
+            border-bottom-left-radius: 0 !important;
         }
 
         .select2-container--bootstrap-5.select2-container--focus .select2-selection,
         .select2-container--bootstrap-5.select2-container--open .select2-selection {
-            box-shadow: 2px 2px 0px var(--retro-dark) !important;
-            border-color: var(--retro-dark) !important;
+            box-shadow: 0 0 0 3.5px rgba(79, 70, 229, 0.12) !important;
+            border-color: var(--ent-indigo) !important;
         }
 
         .input-group>.select2-container--bootstrap-5 {
@@ -207,124 +268,179 @@
         }
 
         .avatar-wrapper {
-            width: 120px;
-            height: 120px;
+            width: 118px;
+            height: 118px;
             margin: 0 auto;
             border-radius: 50%;
-            background: var(--retro-bg);
+            background: linear-gradient(135deg, #eef2ff 0%, #e0e7ff 100%);
             display: flex;
             align-items: center;
             justify-content: center;
-            border: 3px solid var(--retro-dark);
-            box-shadow: var(--retro-shadow-sm);
+            border: 3px solid #ffffff;
+            box-shadow: 0 8px 20px -4px rgba(79, 70, 229, 0.2);
             position: relative;
         }
 
-        .table-custom thead {
-            background: var(--retro-dark);
-            color: var(--retro-green);
-        }
-
-        .table-custom th {
-            font-weight: 800;
+        /* Modern Tables */
+        .table-custom thead th {
+            background: #f1f5f9 !important;
+            color: var(--ent-slate-700) !important;
+            font-weight: 700;
             text-transform: uppercase;
-            font-size: 0.75rem;
-            padding: 14px 10px;
-            border: 2px solid var(--retro-dark);
+            font-size: 0.72rem;
+            letter-spacing: 0.04em;
+            padding: 12px 12px;
+            border-top: 1px solid var(--ent-border);
+            border-bottom: 1.5px solid #cbd5e1;
         }
 
         .table-custom tbody tr {
-            transition: all 0.1s;
+            transition: background-color 0.15s ease;
             background: #ffffff;
         }
 
         .table-custom tbody tr:hover {
-            background-color: var(--retro-cyan);
-            cursor: pointer;
+            background-color: #f8fafc;
         }
 
         .table-custom td {
-            padding: 14px 10px;
+            padding: 12px 12px;
             vertical-align: middle;
-            border: 2px solid var(--retro-dark);
-            font-weight: 700;
-            color: var(--retro-dark);
+            border-bottom: 1px solid #f1f5f9;
+            font-weight: 500;
+            color: var(--ent-slate-700);
         }
 
+        /* Modern Buttons */
         .btn {
-            font-weight: 800;
-            letter-spacing: 0.3px;
-            border-radius: 6px;
-            border: 2px solid var(--retro-dark);
-            box-shadow: var(--retro-shadow-sm);
-            transition: all 0.1s ease-in-out;
-            text-transform: uppercase;
-            font-size: 0.85rem;
+            font-weight: 600;
+            letter-spacing: 0.01em;
+            border-radius: 10px;
+            transition: all 0.18s ease;
+            font-size: 0.83rem;
         }
 
-        .btn:active,
-        .btn:hover {
-            transform: translate(2px, 2px);
-            box-shadow: 0px 0px 0px var(--retro-dark);
+        .btn:hover:not(:disabled) {
+            transform: translateY(-1px);
         }
 
         .btn-primary {
-            background-color: var(--retro-cyan);
-            color: var(--retro-dark);
+            background: linear-gradient(135deg, #4f46e5 0%, #4338ca 100%);
+            border: none;
+            color: #ffffff;
+            box-shadow: 0 4px 12px rgba(79, 70, 229, 0.25);
+        }
+
+        .btn-primary:hover {
+            box-shadow: 0 6px 16px rgba(79, 70, 229, 0.35);
+            color: #ffffff;
         }
 
         .btn-success {
-            background-color: var(--retro-green);
-            color: var(--retro-dark);
+            background: linear-gradient(135deg, #10b981 0%, #059669 100%);
+            border: none;
+            color: #ffffff;
+            box-shadow: 0 4px 12px rgba(5, 150, 105, 0.25);
+        }
+
+        .btn-success:hover:not(:disabled) {
+            box-shadow: 0 6px 16px rgba(5, 150, 105, 0.35);
+            color: #ffffff;
         }
 
         .btn-warning {
-            background-color: var(--retro-yellow);
-            color: var(--retro-dark);
+            background-color: #fef3c7;
+            border: 1px solid #fde68a;
+            color: #b45309;
+        }
+
+        .btn-warning:hover {
+            background-color: #f59e0b;
+            border-color: #f59e0b;
+            color: #ffffff;
         }
 
         .btn-danger {
-            background-color: var(--retro-pink);
-            color: var(--retro-dark);
+            background-color: #ffe4e6;
+            border: 1px solid #fecdd3;
+            color: #be123c;
+        }
+
+        .btn-danger:hover {
+            background-color: #e11d48;
+            border-color: #e11d48;
+            color: #ffffff;
         }
 
         .btn-info {
-            background-color: var(--retro-purple);
-            color: var(--retro-dark);
+            background-color: #e0f2fe;
+            border: 1px solid #bae6fd;
+            color: #0369a1;
+        }
+
+        .btn-info:hover {
+            background-color: #0284c7;
+            border-color: #0284c7;
+            color: #ffffff;
         }
 
         .btn-light {
             background-color: #ffffff;
-            color: var(--retro-dark);
+            border: 1px solid #cbd5e1;
+            color: var(--ent-slate-700);
+        }
+
+        .btn-light:hover {
+            background-color: #f8fafc;
+            border-color: #94a3b8;
+            color: var(--ent-slate-900);
+        }
+
+        /* Delivery Option Tiles */
+        .delivery-tile {
+            cursor: pointer;
+            border: 1.5px solid var(--ent-border);
+            background: #ffffff;
+            border-radius: 12px;
+            transition: all 0.18s ease;
+        }
+
+        .delivery-tile:hover {
+            border-color: #a5b4fc;
+            background: #f8fafc;
+        }
+
+        .delivery-tile:has(input:checked) {
+            border-color: var(--ent-indigo);
+            background: var(--ent-indigo-soft);
         }
 
         .req-field {
             display: none;
-            color: #d90429;
-            font-size: 0.75rem;
-            font-weight: 800;
+            color: #e11d48;
+            font-size: 0.74rem;
+            font-weight: 600;
             margin-top: 4px;
         }
 
         .form-control.border-danger,
         .form-select.border-danger {
-            border: 2px solid #d90429 !important;
+            border: 1.5px solid #e11d48 !important;
         }
 
         .camera-box {
             width: 100%;
             max-width: 220px;
             height: 220px;
-            background: var(--retro-bg);
-            border-radius: 10px;
+            background: #f8fafc;
+            border-radius: 14px;
             margin: 0 auto;
             overflow: hidden;
             display: flex;
             align-items: center;
             justify-content: center;
             position: relative;
-            border: 3px solid var(--retro-dark);
-            box-shadow: var(--retro-shadow-sm);
+            border: 2px dashed #cbd5e1;
         }
 
         .camera-box video,
@@ -337,16 +453,16 @@
             left: 0;
         }
 
-        /* CUSTOM NOTA PREVIEW DESIGN */
+        /* CUSTOM NOTA PREVIEW DESIGN (Thermal Receipt Look) */
         .invoice-paper {
             background-color: #fff;
-            border-radius: 4px;
-            padding: 20px;
-            border: 3px solid var(--retro-dark);
-            box-shadow: var(--retro-shadow);
+            border-radius: 12px;
+            padding: 22px;
+            border: 1px solid #cbd5e1;
+            box-shadow: 0 10px 25px -5px rgba(15, 23, 42, 0.08);
             position: relative;
-            font-family: 'Space Mono', monospace;
-            color: #000;
+            font-family: 'JetBrains Mono', monospace;
+            color: #0f172a;
         }
 
         .invoice-paper table {
@@ -361,51 +477,45 @@
             vertical-align: top;
         }
 
-        .invoice-line-solid {
-            border-top: 2px solid #000;
-            margin: 6px 0;
-        }
-
         .invoice-line-dashed {
-            border-top: 1px dashed #000;
+            border-top: 1px dashed #64748b;
             margin: 6px 0;
         }
 
         /* METODE PEMBAYARAN CARD */
         .payment-method-card {
-            border: 2px solid var(--retro-dark);
-            border-radius: 10px;
-            padding: 16px;
+            border: 1.5px solid var(--ent-border);
+            border-radius: 14px;
+            padding: 15px 18px;
             background: #fff;
             cursor: pointer;
-            box-shadow: var(--retro-shadow-sm);
-            transition: all 0.1s ease-in-out;
+            transition: all 0.18s ease;
             display: flex;
             align-items: center;
             gap: 15px;
         }
 
         .payment-method-card:hover {
-            transform: translate(-2px, -2px);
-            box-shadow: 5px 5px 0px var(--retro-dark);
+            border-color: #a5b4fc;
+            background-color: #f8fafc;
+            transform: translateY(-1px);
         }
 
         .payment-method-icon {
-            width: 45px;
-            height: 45px;
-            border-radius: 8px;
-            border: 2px solid var(--retro-dark);
+            width: 46px;
+            height: 46px;
+            border-radius: 12px;
             display: flex;
             align-items: center;
             justify-content: center;
-            font-size: 1.3rem;
-            background-color: var(--retro-yellow);
+            font-size: 1.25rem;
+            flex-shrink: 0;
         }
 
         .btn-check:checked+.payment-method-card {
-            border-color: var(--retro-dark);
-            background-color: var(--retro-cyan);
-            box-shadow: 4px 4px 0px var(--retro-dark);
+            border-color: var(--ent-indigo);
+            background-color: var(--ent-indigo-soft);
+            box-shadow: 0 4px 12px rgba(79, 70, 229, 0.12);
         }
 
         .btn-check:checked+.payment-method-card .check-indicator {
@@ -415,7 +525,7 @@
 
         .check-indicator {
             margin-left: auto;
-            color: var(--retro-dark);
+            color: var(--ent-indigo);
             font-size: 1.3rem;
             opacity: 0;
             transform: scale(0.5);
@@ -425,60 +535,93 @@
         /* MEMBER CARD */
         .member-card-container {
             width: 100%;
-            max-width: 380px;
+            max-width: 390px;
             margin: 0 auto;
-            border-radius: 16px;
-            background: var(--retro-yellow);
-            color: var(--retro-dark);
+            border-radius: 18px;
+            background: linear-gradient(135deg, #0f172a 0%, #1e1b4b 60%, #312e81 100%);
+            color: #ffffff;
             position: relative;
             overflow: hidden;
-            border: 3px solid var(--retro-dark);
-            box-shadow: var(--retro-shadow);
-            padding: 20px;
+            border: 1px solid rgba(255, 255, 255, 0.15);
+            box-shadow: 0 20px 35px -10px rgba(15, 23, 42, 0.45);
+            padding: 24px;
+        }
+
+        .member-card-container::after {
+            content: '';
+            position: absolute;
+            right: -30px;
+            bottom: -40px;
+            width: 160px;
+            height: 160px;
+            border-radius: 50%;
+            background: radial-gradient(circle, rgba(56, 189, 248, 0.28) 0%, transparent 70%);
         }
 
         .member-card-photo {
-            width: 80px;
-            height: 80px;
-            border-radius: 10px;
-            border: 2px solid var(--retro-dark);
-            background: #fff;
+            width: 78px;
+            height: 78px;
+            border-radius: 14px;
+            border: 2px solid rgba(255, 255, 255, 0.25);
+            background: rgba(255, 255, 255, 0.1);
             display: flex;
             align-items: center;
             justify-content: center;
-            box-shadow: 2px 2px 0px var(--retro-dark);
             flex-shrink: 0;
+        }
+
+        /* Modals */
+        .ent-modal-content {
+            border-radius: 18px !important;
+            border: 1px solid var(--ent-border) !important;
+            box-shadow: 0 25px 50px -12px rgba(15, 23, 42, 0.25) !important;
+            overflow: hidden;
+        }
+
+        .ent-modal-header {
+            background: linear-gradient(135deg, #0f172a 0%, #1e1b4b 100%);
+            color: #ffffff;
+            padding: 18px 24px;
+            border-bottom: 1px solid rgba(255, 255, 255, 0.1);
         }
     </style>
 </head>
 
 <body>
 
-    <div class="container-fluid py-4 px-4 px-md-5">
-        <!-- Title Area, User Login, Real-time Clock & Reset -->
-        <div class="d-flex align-items-center justify-content-between mb-4 flex-wrap gap-3">
-            <div class="d-flex align-items-center">
-                <div class="bg-white p-3 rounded-3 shadow-sm me-3 text-dark d-flex align-items-center justify-content-center" style="width: 60px; height: 60px; border: 2px solid var(--retro-dark); box-shadow: 3px 3px 0px var(--retro-dark); background-color: var(--retro-yellow);">
-                    <i class="fas fa-hospital fa-2x"></i>
+    <div class="container-fluid py-4 px-3 px-md-5">
+        <!-- HERO HEADER BAR: Title Area, User Login, Real-time Clock & Reset -->
+        <div class="ent-hero-bar p-3 p-md-4 mb-4">
+            <div class="d-flex align-items-center justify-content-between flex-wrap gap-3 position-relative" style="z-index: 2;">
+                <div class="d-flex align-items-center gap-3">
+                    <div class="ent-glass-pill d-flex align-items-center justify-content-center" style="width: 54px; height: 54px;">
+                        <i class="fas fa-hospital-alt fa-lg text-info"></i>
+                    </div>
+                    <div>
+                        <span class="badge rounded-pill mb-1" style="background: rgba(99, 102, 241, 0.3); border: 1px solid rgba(165, 180, 252, 0.35); color: #e0e7ff; font-size: 0.68rem;">
+                            <i class="fas fa-shield-alt me-1"></i> FRONT OFFICE & KASIR TERPADU
+                        </span>
+                        <h4 class="mb-0 fw-bold text-white">Registrasi Pasien <span style="color: #38bdf8;">Satu Pintu</span></h4>
+                        <small style="color: #cbd5e1;">Sistem Informasi Manajemen Rumah Sakit (SIMRS)</small>
+                    </div>
                 </div>
-                <div>
-                    <h3 class="mb-0 fw-bolder text-dark">Registrasi Pasien Satu Pintu</h3>
-                    <span class="text-dark fw-bold opacity-75">Sistem Informasi Manajemen Rumah Sakit (SIMRS)</span>
-                </div>
-            </div>
 
-            <div class="d-flex align-items-center gap-3 flex-wrap">
-                <div class="bg-white px-4 py-2 rounded-3 shadow-sm d-flex align-items-center gap-2" style="border: 2px solid var(--retro-dark); box-shadow: 3px 3px 0px var(--retro-dark);">
-                    <i class="fas fa-user-circle text-dark fs-5"></i>
-                    <span class="fw-bolder text-dark">{{ Auth::user()->name ?? 'Agus Prasetyo R.' }}</span>
+                <div class="d-flex align-items-center gap-2 gap-md-3 flex-wrap">
+                    <div class="ent-glass-pill px-3 py-2 d-flex align-items-center gap-2">
+                        <i class="fas fa-user-circle text-info fs-5"></i>
+                        <div>
+                            <small class="d-block" style="font-size: 0.62rem; color: #94a3b8; line-height: 1;">Petugas Aktif</small>
+                            <span class="fw-semibold" style="font-size: 0.84rem;">{{ Auth::user()->name ?? 'Agus Prasetyo R.' }}</span>
+                        </div>
+                    </div>
+                    <div class="ent-glass-pill px-3 py-2 d-flex align-items-center gap-2">
+                        <i class="fas fa-clock text-warning"></i>
+                        <span id="realtimeClock" class="fw-bold fs-6" style="font-variant-numeric: tabular-nums; font-family: 'JetBrains Mono', monospace;">00:00:00</span>
+                    </div>
+                    <button class="btn btn-danger px-3 py-2 fw-semibold" onclick="konfirmasiReset()" title="Mulai Registrasi Baru">
+                        <i class="fas fa-sync-alt me-1"></i> Reset
+                    </button>
                 </div>
-                <div class="bg-white px-4 py-2 rounded-3 shadow-sm d-flex align-items-center gap-2" style="border: 2px solid var(--retro-dark); box-shadow: 3px 3px 0px var(--retro-dark); background-color: var(--retro-cyan);">
-                    <i class="fas fa-clock text-dark"></i>
-                    <span id="realtimeClock" class="fw-bolder fs-5 text-dark" style="font-variant-numeric: tabular-nums;">00:00:00</span>
-                </div>
-                <button class="btn btn-danger px-4 py-2 fw-bold" onclick="konfirmasiReset()" title="Mulai Registrasi Baru">
-                    <i class="fas fa-sync-alt me-1"></i> Reset
-                </button>
             </div>
         </div>
 
@@ -486,7 +629,7 @@
         <ul class="nav nav-pills mb-4" id="registrationTabs" role="tablist">
             <li class="nav-item" role="presentation">
                 <button class="nav-link active step-1 w-100" id="tab-demografi" data-bs-toggle="pill" data-bs-target="#demografi" type="button" role="tab">
-                    <i class="fas fa-user-edit"></i> <span>1. Demografi</span>
+                    <i class="fas fa-user-edit"></i> <span>1. Demografi Pasien</span>
                 </button>
             </li>
             <li class="nav-item" role="presentation">
@@ -496,7 +639,7 @@
             </li>
             <li class="nav-item" role="presentation">
                 <button class="nav-link step-3 w-100" id="tab-pembayaran" data-bs-toggle="pill" data-bs-target="#pembayaran" type="button" role="tab" disabled>
-                    <i class="fas fa-file-invoice-dollar"></i> <span>3. Administrasi</span>
+                    <i class="fas fa-file-invoice-dollar"></i> <span>3. Administrasi & Kasir</span>
                 </button>
             </li>
         </ul>
@@ -508,39 +651,38 @@
             <!-- STEP 1: DEMOGRAFI -->
             <!-- ============================================== -->
             <div class="tab-pane fade show active" id="demografi" role="tabpanel">
-                <div class="card border-0 mb-4" style="background: #ffffff; border: 2px solid var(--retro-dark); box-shadow: var(--retro-shadow-sm);">
+                <!-- Action & Search Toolbar -->
+                <div class="card mb-4">
                     <div class="card-body p-3 d-flex flex-wrap align-items-center justify-content-between gap-3">
-
                         <!-- SISI KIRI: Aksi Pasien & Pencarian -->
                         <div class="d-flex flex-wrap align-items-center gap-2" style="flex: 1; min-width: 300px;">
-                            <button class="btn btn-primary rounded-circle shadow-sm d-flex align-items-center justify-content-center" style="width:45px; height:45px; flex-shrink: 0;" data-bs-toggle="modal" data-bs-target="#modalPasien" onclick="resetForm('modalPasien')" title="Tambah Pasien Baru">
+                            <button class="btn btn-primary rounded-circle d-flex align-items-center justify-content-center" style="width:42px; height:42px; flex-shrink: 0;" data-bs-toggle="modal" data-bs-target="#modalPasien" onclick="resetForm('modalPasien')" title="Tambah Pasien Baru">
                                 <i class="fas fa-plus"></i>
                             </button>
 
-                            <button class="btn btn-info text-dark rounded-circle shadow-sm d-flex align-items-center justify-content-center" style="width:45px; height:45px; flex-shrink: 0;" title="Scan KTP / E-KTP">
+                            <button class="btn btn-info rounded-circle d-flex align-items-center justify-content-center" style="width:42px; height:42px; flex-shrink: 0;" title="Scan KTP / E-KTP">
                                 <i class="fas fa-id-card"></i>
                             </button>
-                            <button class="btn btn-warning text-dark rounded-circle shadow-sm d-flex align-items-center justify-content-center" style="width:45px; height:45px; flex-shrink: 0;" title="Panggil Antrian" data-bs-toggle="modal" data-bs-target="#modalAntrian">
+                            <button class="btn btn-warning rounded-circle d-flex align-items-center justify-content-center" style="width:42px; height:42px; flex-shrink: 0;" title="Panggil Antrian" data-bs-toggle="modal" data-bs-target="#modalAntrian">
                                 <i class="fas fa-bullhorn"></i>
                             </button>
 
-                            <div class="input-group shadow-sm" style="flex: 1;">
+                            <div class="input-group" style="flex: 1;">
                                 <span class="input-group-text"><i class="fas fa-search"></i></span>
                                 <input type="text" id="searchKeyword" class="form-control" placeholder="Cari Nama / No. HP / NIK... (Min. 3 huruf)" onkeyup="if(event.keyCode === 13) cariPasien()">
-                                <button class="btn btn-primary px-4" type="button" onclick="cariPasien()">Cari</button>
+                                <button class="btn btn-primary px-4" type="button" onclick="cariPasien()">Cari Pasien</button>
                             </div>
                         </div>
 
                         <!-- SISI KANAN: Laporan & Tutup Kasir -->
                         <div class="d-flex flex-wrap align-items-center gap-2">
-                            <button class="btn btn-light shadow-sm fw-bold d-flex align-items-center gap-2" onclick="bukaLaporanPendaftaran()" title="Lihat daftar pasien yang didaftarkan akun ini">
-                                <i class="fas fa-clipboard-list"></i> Laporan Pendaftaran
+                            <button class="btn btn-light fw-semibold d-flex align-items-center gap-2 px-3 py-2" onclick="bukaLaporanPendaftaran()" title="Lihat daftar pasien yang didaftarkan akun ini">
+                                <i class="fas fa-clipboard-list text-primary"></i> Laporan Pendaftaran
                             </button>
-                            <button class="btn btn-danger shadow-sm fw-bold d-flex align-items-center gap-2" onclick="bukaModalCetakSetoran()" title="Cetak laporan setoran ke keuangan">
-                                <i class="fas fa-print"></i> Cetak Laporan Setor ke Keuangan
+                            <button class="btn btn-danger fw-semibold d-flex align-items-center gap-2 px-3 py-2" onclick="bukaModalCetakSetoran()" title="Cetak laporan setoran ke keuangan">
+                                <i class="fas fa-print"></i> Cetak Laporan Setoran
                             </button>
                         </div>
-
                     </div>
                 </div>
 
@@ -550,82 +692,84 @@
                         <div class="card mb-3">
                             <div class="card-header header-blue d-flex justify-content-between align-items-center">
                                 <span><i class="fas fa-id-card me-2"></i> Data Profil Pasien</span>
-                                <span class="badge bg-white text-dark border border-dark rounded-2 px-2 py-1 shadow-sm fw-bold"><i class="fas fa-check-circle me-1 text-success"></i> Terverifikasi</span>
+                                <span class="badge rounded-pill" style="background: #d1fae5; color: #065f46; border: 1px solid #a7f3d0; font-size: 0.72rem;">
+                                    <i class="fas fa-check-circle me-1"></i> Terverifikasi
+                                </span>
                             </div>
                             <div class="card-body p-3 p-xl-4">
-                                <div class="row align-items-start pt-2">
+                                <div class="row align-items-start pt-1">
                                     <div class="col-md-3 text-center mb-4 mb-md-0">
                                         <div class="avatar-wrapper mb-3">
                                             <img id="displayFoto" src="" alt="Foto Pasien" style="width:100%; height:100%; border-radius:50%; object-fit:cover; display:none;">
-                                            <i id="displayIcon" class="fas fa-user-tie fa-3x text-dark opacity-50"></i>
+                                            <i id="displayIcon" class="fas fa-user-tie fa-3x text-primary opacity-50"></i>
                                         </div>
                                         <div class="d-grid gap-2 px-1">
-                                            <button class="btn btn-light btn-sm fw-bold" data-bs-toggle="modal" data-bs-target="#modalPasien" onclick="populateEditForm()"><i class="fas fa-edit me-1"></i> Perbarui</button>
-                                            <button class="btn btn-warning btn-sm fw-bold text-dark" data-bs-toggle="modal" data-bs-target="#modalCetakKartu">
+                                            <button class="btn btn-light btn-sm" data-bs-toggle="modal" data-bs-target="#modalPasien" onclick="populateEditForm()"><i class="fas fa-edit me-1 text-primary"></i> Perbarui</button>
+                                            <button class="btn btn-warning btn-sm" data-bs-toggle="modal" data-bs-target="#modalCetakKartu">
                                                 <i class="fas fa-print me-1"></i> Cetak Kartu
                                             </button>
                                         </div>
                                     </div>
                                     <div class="col-md-9">
-                                        <div class="row g-2 form-control-sm">
+                                        <div class="row g-2">
                                             <div class="col-md-8">
-                                                <label class="form-label small fw-bold text-dark mb-0">Nama Lengkap & Title</label>
+                                                <label class="form-label small fw-semibold text-secondary mb-1">Nama Lengkap & Title</label>
                                                 <div class="input-group input-group-sm">
                                                     <span class="input-group-text"><i class="fas fa-user"></i></span>
                                                     <input type="text" id="displayNama" class="form-control fw-bold text-dark" readonly>
                                                 </div>
                                             </div>
                                             <div class="col-md-4">
-                                                <label class="form-label small fw-bold text-dark mb-0">PID Pasien</label>
+                                                <label class="form-label small fw-semibold text-secondary mb-1">PID Pasien</label>
                                                 <div class="input-group input-group-sm">
                                                     <span class="input-group-text"><i class="fas fa-qrcode"></i></span>
-                                                    <input type="text" id="displayPid" class="form-control text-dark fw-bold bg-light" readonly>
+                                                    <input type="text" id="displayPid" class="form-control text-primary fw-bold bg-light" readonly>
                                                 </div>
                                             </div>
                                             <div class="col-md-4">
-                                                <label class="form-label small fw-bold text-dark mb-0">No. ID (NIK/SIM/Paspor)</label>
+                                                <label class="form-label small fw-semibold text-secondary mb-1">No. ID (NIK/SIM/Paspor)</label>
                                                 <div class="input-group input-group-sm">
                                                     <span class="input-group-text"><i class="fas fa-id-badge"></i></span>
                                                     <input type="text" id="displayNik" class="form-control bg-light" readonly>
                                                 </div>
                                             </div>
                                             <div class="col-md-6">
-                                                <label class="form-label small fw-bold text-dark mb-0">Tempat, Tanggal Lahir (Umur)</label>
+                                                <label class="form-label small fw-semibold text-secondary mb-1">Tempat, Tanggal Lahir (Umur)</label>
                                                 <div class="input-group input-group-sm">
                                                     <span class="input-group-text"><i class="fas fa-calendar-alt"></i></span>
                                                     <input type="text" id="displayTglLahir" class="form-control bg-light" readonly>
                                                 </div>
                                             </div>
                                             <div class="col-md-2">
-                                                <label class="form-label small fw-bold text-dark mb-0">Gender</label>
+                                                <label class="form-label small fw-semibold text-secondary mb-1">Gender</label>
                                                 <div class="input-group input-group-sm">
                                                     <span class="input-group-text"><i class="fas fa-venus-mars"></i></span>
                                                     <input type="text" id="displayJk" class="form-control bg-light" readonly>
                                                 </div>
                                             </div>
                                             <div class="col-md-3">
-                                                <label class="form-label small fw-bold text-dark mb-0">Agama</label>
+                                                <label class="form-label small fw-semibold text-secondary mb-1">Agama</label>
                                                 <div class="input-group input-group-sm">
                                                     <span class="input-group-text"><i class="fas fa-pray"></i></span>
                                                     <input type="text" id="displayAgama" class="form-control bg-light" readonly>
                                                 </div>
                                             </div>
                                             <div class="col-md-3">
-                                                <label class="form-label small fw-bold text-dark mb-0">Pekerjaan (NIP)</label>
+                                                <label class="form-label small fw-semibold text-secondary mb-1">Pekerjaan (NIP)</label>
                                                 <div class="input-group input-group-sm">
                                                     <span class="input-group-text"><i class="fas fa-briefcase"></i></span>
                                                     <input type="text" id="displayPekerjaan" class="form-control bg-light" readonly>
                                                 </div>
                                             </div>
                                             <div class="col-md-3">
-                                                <label class="form-label small fw-bold text-dark mb-0">No. Telepon / HP</label>
+                                                <label class="form-label small fw-semibold text-secondary mb-1">No. Telepon / HP</label>
                                                 <div class="input-group input-group-sm">
                                                     <span class="input-group-text"><i class="fas fa-phone"></i></span>
                                                     <input type="text" id="displayNoHp" class="form-control bg-light" readonly>
                                                 </div>
                                             </div>
                                             <div class="col-md-3">
-                                                <label class="form-label small fw-bold text-dark mb-0">Email</label>
+                                                <label class="form-label small fw-semibold text-secondary mb-1">Email</label>
                                                 <div class="input-group input-group-sm">
                                                     <span class="input-group-text"><i class="fas fa-envelope"></i></span>
                                                     <input type="text" id="displayEmail" class="form-control bg-light" readonly>
@@ -645,10 +789,9 @@
                                                 </div>
                                             </div>
                                             <div class="col-7 mt-2">
-                                                <!-- <label class="form-label small fw-bold text-dark mb-1">Keluhan Medis / Diagnosa Awal</label> -->
-                                                <div class="input-group">
-                                                    <span class="input-group-text"><i class="fas fa-stethoscope"></i></span>
-                                                    <input type="text" id="input_keluhan" class="form-control" placeholder="Ketik keluhan di sini...">
+                                                <div class="input-group input-group-sm">
+                                                    <span class="input-group-text"><i class="fas fa-stethoscope text-primary"></i></span>
+                                                    <input type="text" id="input_keluhan" class="form-control" placeholder="Ketik keluhan awal di sini...">
                                                 </div>
                                             </div>
                                         </div>
@@ -656,36 +799,37 @@
                                 </div>
                             </div>
                         </div>
+
                         <div class="card mb-2">
-                            <div class="card-header header-blue"><i class="fas fa-paper-plane me-2"></i> Pengiriman Hasil</div>
+                            <div class="card-header header-blue"><i class="fas fa-paper-plane me-2"></i> Pengiriman Hasil Pemeriksaan</div>
                             <div class="card-body p-3">
                                 <div class="row g-2">
                                     <div class="col-3">
-                                        <label class="form-check p-2 rounded-2 d-flex flex-column align-items-center justify-content-center text-center h-100 mb-0" style="cursor: pointer; border: 2px solid var(--retro-dark); background: #fff;">
-                                            <input class="form-check-input ms-0 mb-1 mt-0 border-2 border-dark" type="checkbox" name="pengiriman[]" value="whatsapp" checked>
+                                        <label class="delivery-tile p-2 d-flex flex-column align-items-center justify-content-center text-center h-100 mb-0">
+                                            <input class="form-check-input ms-0 mb-1.5 mt-0" type="checkbox" name="pengiriman[]" value="whatsapp" checked>
                                             <i class="fab fa-whatsapp text-success mb-1 fs-5"></i>
-                                            <span class="fw-bold text-dark" style="font-size: 0.65rem;">WhatsApp</span>
+                                            <span class="fw-semibold text-dark" style="font-size: 0.72rem;">WhatsApp</span>
                                         </label>
                                     </div>
                                     <div class="col-3">
-                                        <label class="form-check p-2 rounded-2 d-flex flex-column align-items-center justify-content-center text-center h-100 mb-0" style="cursor: pointer; border: 2px solid var(--retro-dark); background: #fff;">
-                                            <input class="form-check-input ms-0 mb-1 mt-0 border-2 border-dark" type="checkbox" name="pengiriman[]" value="email">
+                                        <label class="delivery-tile p-2 d-flex flex-column align-items-center justify-content-center text-center h-100 mb-0">
+                                            <input class="form-check-input ms-0 mb-1.5 mt-0" type="checkbox" name="pengiriman[]" value="email">
                                             <i class="fas fa-envelope text-danger mb-1 fs-5"></i>
-                                            <span class="fw-bold text-dark" style="font-size: 0.65rem;">Email</span>
+                                            <span class="fw-semibold text-dark" style="font-size: 0.72rem;">Email</span>
                                         </label>
                                     </div>
                                     <div class="col-3">
-                                        <label class="form-check p-2 rounded-2 d-flex flex-column align-items-center justify-content-center text-center h-100 mb-0" style="cursor: pointer; border: 2px solid var(--retro-dark); background: #fff;">
-                                            <input class="form-check-input ms-0 mb-1 mt-0 border-2 border-dark" type="checkbox" name="pengiriman[]" value="satusehat" checked>
+                                        <label class="delivery-tile p-2 d-flex flex-column align-items-center justify-content-center text-center h-100 mb-0">
+                                            <input class="form-check-input ms-0 mb-1.5 mt-0" type="checkbox" name="pengiriman[]" value="satusehat" checked>
                                             <i class="fas fa-heartbeat text-info mb-1 fs-5"></i>
-                                            <span class="fw-bold text-dark" style="font-size: 0.65rem;">Satu Sehat</span>
+                                            <span class="fw-semibold text-dark" style="font-size: 0.72rem;">Satu Sehat</span>
                                         </label>
                                     </div>
                                     <div class="col-3">
-                                        <label class="form-check p-2 rounded-2 d-flex flex-column align-items-center justify-content-center text-center h-100 mb-0" style="cursor: pointer; border: 2px solid var(--retro-dark); background: #fff;">
-                                            <input class="form-check-input ms-0 mb-1 mt-0 border-2 border-dark" type="checkbox" name="pengiriman[]" value="cetak_fisik">
+                                        <label class="delivery-tile p-2 d-flex flex-column align-items-center justify-content-center text-center h-100 mb-0">
+                                            <input class="form-check-input ms-0 mb-1.5 mt-0" type="checkbox" name="pengiriman[]" value="cetak_fisik">
                                             <i class="fas fa-print text-secondary mb-1 fs-5"></i>
-                                            <span class="fw-bold text-dark" style="font-size: 0.65rem;">Cetak Kertas</span>
+                                            <span class="fw-semibold text-dark" style="font-size: 0.72rem;">Cetak Kertas</span>
                                         </label>
                                     </div>
                                 </div>
@@ -693,14 +837,14 @@
                         </div>
                     </div>
 
-                    <!-- KANAN: REFERENSI, BAHASA & PENGIRIMAN -->
+                    <!-- KANAN: REFERENSI, BAHASA & PENJAMIN -->
                     <div class="col-lg-5">
-                        <div class="card mb-3">
+                        <div class="card mb-3 h-100">
                             <div class="card-header header-teal"><i class="fas fa-hospital-user me-2"></i> Referensi & Penjamin</div>
                             <div class="card-body p-4">
                                 <div class="row">
                                     <div class="col-md-6">
-                                        <label class="form-label fw-bold text-dark small text-uppercase mb-1">Tipe FPP</label>
+                                        <label class="form-label fw-semibold text-secondary small text-uppercase mb-1">Tipe FPP</label>
                                         <div class="mb-3 input-group">
                                             <span class="input-group-text"><i class="fas fa-file-contract"></i></span>
                                             <select class="form-select select2-init" name="tipe_fpp_id" id="tipe_fpp_id">
@@ -712,34 +856,33 @@
                                     </div>
 
                                     <div class="col-md-6">
-                                        <label class="form-label fw-bold text-dark small text-uppercase mb-1">Dokter Pengirim</label>
+                                        <label class="form-label fw-semibold text-secondary small text-uppercase mb-1">Dokter Pengirim</label>
                                         <div class="mb-3 input-group">
                                             <span class="input-group-text"><i class="fas fa-user-md"></i></span>
                                             <select class="form-select select2-dokter-pengirim" name="dokter_id" id="input_dokter" style="width: 100%;">
-                                                <option value="" disabled selected>Pilih atau Cari Dokter Pengirim...</option>
+                                                <option value="" disabled selected>Pilih atau Cari Dokter...</option>
                                             </select>
                                         </div>
                                     </div>
                                 </div>
 
-                                <!-- UPDATE: PENJAMIN UTAMA & SUB PENJAMIN DIPINDAH KESINI -->
-                                <!-- UPDATE: PENJAMIN UTAMA & SUB PENJAMIN -->
+                                <!-- PENJAMIN UTAMA & SUB PENJAMIN -->
                                 <div class="row">
                                     <div class="col-md-6">
-                                        <label class="form-label fw-bold text-dark small text-uppercase mb-1">Tipe Penjamin Utama</label>
+                                        <label class="form-label fw-semibold text-secondary small text-uppercase mb-1">Tipe Penjamin Utama</label>
                                         <div class="mb-3 input-group">
                                             <span class="input-group-text"><i class="fas fa-hand-holding-heart"></i></span>
-                                            <select class="form-select select2-init fw-bold text-dark" id="pilih_penjamin" name="penjamin_id" onchange="toggleSubPenjamin()">
+                                            <select class="form-select select2-init fw-semibold text-dark" id="pilih_penjamin" name="penjamin_id" onchange="toggleSubPenjamin()">
                                                 <option value="" disabled selected>Memuat penjamin...</option>
                                             </select>
                                         </div>
                                     </div>
                                     <div class="col-md-6">
                                         <div id="wrapper_sub_penjamin" style="display: none;">
-                                            <label class="form-label fw-bold text-dark small text-uppercase mb-1">Sub Penjamin</label>
+                                            <label class="form-label fw-semibold text-secondary small text-uppercase mb-1">Sub Penjamin</label>
                                             <div class="mb-3 input-group">
                                                 <span class="input-group-text"><i class="fas fa-list-alt"></i></span>
-                                                <select class="form-select select2-init fw-bold text-dark" id="pilih_sub_penjamin" name="sub_penjamin_id" onchange="handleSubPenjaminChange()">
+                                                <select class="form-select select2-init fw-semibold text-dark" id="pilih_sub_penjamin" name="sub_penjamin_id" onchange="handleSubPenjaminChange()">
                                                     <option value="" disabled selected>Pilih Sub Penjamin...</option>
                                                 </select>
                                             </div>
@@ -747,67 +890,57 @@
                                     </div>
                                 </div>
 
-                                <!-- CONTAINER INFORMASI SUB PENJAMIN (Muncul otomatis saat Sub Penjamin dipilih) -->
-                                <div id="info_sub_penjamin" class="mt-3 p-3 rounded bg-light border border-dark shadow-sm" style="display: none;">
-                                    <h6 class="fw-bolder text-dark mb-3 border-bottom border-dark pb-2"><i class="fas fa-info-circle me-1"></i> Informasi Rekanan / Asuransi</h6>
-                                    <div class="row g-3" style="font-size: 0.85rem;">
-
+                                <!-- CONTAINER INFORMASI SUB PENJAMIN -->
+                                <div id="info_sub_penjamin" class="mt-2 p-3 rounded-3 border" style="display: none; background-color: #f8fafc; border-color: #cbd5e1 !important;">
+                                    <h6 class="fw-bold text-primary mb-3 border-bottom pb-2" style="font-size: 0.82rem;"><i class="fas fa-info-circle me-1"></i> Informasi Rekanan / Asuransi</h6>
+                                    <div class="row g-3" style="font-size: 0.82rem;">
                                         <div class="col-md-12">
-                                            <label class="fw-bold text-muted mb-0 small text-uppercase">Person in Charge (PIC)</label>
-                                            <div id="info_pic_list" class="fw-bold text-dark d-flex flex-column gap-1">
-                                                <!-- Diisi via JS -->
-                                            </div>
+                                            <label class="fw-semibold text-muted mb-1 small text-uppercase">Person in Charge (PIC)</label>
+                                            <div id="info_pic_list" class="fw-semibold text-dark d-flex flex-column gap-1"></div>
                                         </div>
 
-                                        <div class="col-md-6 border-end border-dark">
-                                            <label class="fw-bold text-muted mb-0 small text-uppercase">Tipe Pembayaran / Penagihan</label>
+                                        <div class="col-md-6 border-end">
+                                            <label class="fw-semibold text-muted mb-1 small text-uppercase">Tipe Pembayaran</label>
                                             <div class="d-flex align-items-center gap-2 mt-1">
-                                                <span id="info_tipe_pembayaran" class="badge bg-white text-dark border border-dark fw-bold px-2 py-1 shadow-sm"></span>
+                                                <span id="info_tipe_pembayaran" class="badge rounded-pill" style="background: #e0e7ff; color: #3730a3; border: 1px solid #c7d2fe;"></span>
                                             </div>
                                             <div id="info_jatuh_tempo_wrapper" class="mt-1" style="display: none;">
-                                                <span class="text-danger fw-bold small"><i class="fas fa-calendar-times me-1"></i> Jatuh Tempo: <span id="info_jatuh_tempo"></span> Hari</span>
+                                                <span class="text-danger fw-semibold small"><i class="fas fa-calendar-times me-1"></i> Jatuh Tempo: <span id="info_jatuh_tempo"></span> Hari</span>
                                             </div>
                                         </div>
 
                                         <div class="col-md-6">
-                                            <label class="fw-bold text-muted mb-0 small text-uppercase">Catatan Pelayanan Khusus</label>
-                                            <div id="info_catatan_pelayanan" class="fw-bold text-dark mt-1 fst-italic">
-                                                <!-- Diisi via JS -->
-                                            </div>
+                                            <label class="fw-semibold text-muted mb-1 small text-uppercase">Catatan Pelayanan</label>
+                                            <div id="info_catatan_pelayanan" class="fw-medium text-dark mt-1 fst-italic"></div>
                                         </div>
-
                                     </div>
                                 </div>
-                                <!-- END UPDATE -->
-                                <!-- END UPDATE -->
 
-                                <div class="mt-4 pt-3 border-top border-dark">
-                                    <label class="form-label fw-bold text-dark small text-uppercase mb-2">Bahasa Hasil (Pilih > 1)</label>
+                                <div class="mt-4 pt-3 border-top">
+                                    <label class="form-label fw-semibold text-secondary small text-uppercase mb-2">Bahasa Hasil (Pilih > 1)</label>
                                     <div class="d-flex flex-wrap gap-3">
-                                        <div class="form-check custom-checkbox">
-                                            <input class="form-check-input cursor-pointer shadow-sm border-2 border-dark" type="checkbox" name="bahasa_hasil[]" value="ID" id="lang_id" checked>
-                                            <label class="form-check-label cursor-pointer fw-bold" for="lang_id">Indonesia</label>
+                                        <div class="form-check">
+                                            <input class="form-check-input" type="checkbox" name="bahasa_hasil[]" value="ID" id="lang_id" checked>
+                                            <label class="form-check-label fw-semibold" for="lang_id">Indonesia</label>
                                         </div>
-                                        <div class="form-check custom-checkbox">
-                                            <input class="form-check-input cursor-pointer shadow-sm border-2 border-dark" type="checkbox" name="bahasa_hasil[]" value="EN" id="lang_en">
-                                            <label class="form-check-label cursor-pointer fw-bold" for="lang_en">English</label>
+                                        <div class="form-check">
+                                            <input class="form-check-input" type="checkbox" name="bahasa_hasil[]" value="EN" id="lang_en">
+                                            <label class="form-check-label fw-semibold" for="lang_en">English</label>
                                         </div>
-                                        <div class="form-check custom-checkbox">
-                                            <input class="form-check-input cursor-pointer shadow-sm border-2 border-dark" type="checkbox" name="bahasa_hasil[]" value="CN" id="lang_cn">
-                                            <label class="form-check-label cursor-pointer fw-bold" for="lang_cn">Mandarin</label>
+                                        <div class="form-check">
+                                            <input class="form-check-input" type="checkbox" name="bahasa_hasil[]" value="CN" id="lang_cn">
+                                            <label class="form-check-label fw-semibold" for="lang_cn">Mandarin</label>
                                         </div>
                                     </div>
                                 </div>
                             </div>
                         </div>
-
-
                     </div>
                 </div>
 
                 <div class="d-flex justify-content-end mt-4">
-                    <button class="btn btn-primary btn-lg px-5 py-3 d-flex align-items-center gap-2 fw-bold" onclick="nextTab('tab-pemeriksaan')">
-                        Lanjutkan ke Pemeriksaan <i class="fas fa-arrow-right"></i>
+                    <button class="btn btn-primary btn-lg px-5 py-2 d-flex align-items-center gap-2" onclick="nextTab('tab-pemeriksaan')">
+                        Lanjutkan ke Layanan Medis <i class="fas fa-arrow-right"></i>
                     </button>
                 </div>
             </div>
@@ -819,25 +952,24 @@
                 <div class="row g-4">
                     <div class="col-lg-4">
                         <div class="card mb-4">
-                            <div class="card-header header-purple"><i class="fas fa-briefcase-medical me-2"></i> Penjamin & Layanan Medis</div>
+                            <div class="card-header header-purple"><i class="fas fa-briefcase-medical me-2"></i> Unit & Jadwal Layanan</div>
                             <div class="card-body p-4">
                                 <div class="row">
                                     <div class="col-md-6">
-                                        <label class="form-label fw-bold text-dark small text-uppercase">Jenis Layanan</label>
+                                        <label class="form-label fw-semibold text-secondary small text-uppercase">Jenis Layanan</label>
                                         <div class="mb-3 input-group">
                                             <span class="input-group-text"><i class="fas fa-hospital"></i></span>
-                                            <select class="form-select fw-bold text-dark" name="jenis_layanan" id="input_jenis_layanan" onchange="toggleJenisLayanan()">
-                                                <option value="RAWAT_JALAN" selected>RAWAT JALAN / POLIKLINIK</option>
-                                                <option value="IGD">IGD (GAWAT DARURAT)</option>
+                                            <select class="form-select fw-semibold text-dark" name="jenis_layanan" id="input_jenis_layanan" onchange="toggleJenisLayanan()">
+                                                <option value="RAWAT_JALAN" selected>RAWAT JALAN</option>
+                                                <option value="IGD">IGD (DARURAT)</option>
                                                 <option value="RAWAT_INAP">RAWAT INAP</option>
                                             </select>
                                         </div>
                                     </div>
                                     <div class="col-md-6">
-                                        <label class="form-label fw-bold text-dark small text-uppercase">Tanggal Periksa</label>
+                                        <label class="form-label fw-semibold text-secondary small text-uppercase">Tanggal Periksa</label>
                                         <div class="mb-3 input-group">
                                             <span class="input-group-text"><i class="fas fa-calendar-day"></i></span>
-                                            <!-- UPDATE: Ditambahkan value otomatis ke hari ini -->
                                             <input type="date" id="input_tanggal_periksa" class="form-control" value="{{ date('Y-m-d') }}" onchange="loadDokterBerjadwal(); loadDokterIgd();">
                                         </div>
                                     </div>
@@ -845,7 +977,7 @@
 
                                 <!-- WRAPPER RAWAT JALAN -->
                                 <div id="wrapper_rawat_jalan">
-                                    <label class="form-label fw-bold text-dark small text-uppercase">Poliklinik Tujuan</label>
+                                    <label class="form-label fw-semibold text-secondary small text-uppercase">Poliklinik Tujuan</label>
                                     <div class="mb-3 input-group">
                                         <span class="input-group-text"><i class="fas fa-clinic-medical"></i></span>
                                         <select class="form-select select2-init" name="poli_id" id="input_poli_id" onchange="loadDokterBerjadwal(); handlePoliChange();">
@@ -863,7 +995,7 @@
                                         </select>
                                     </div>
 
-                                    <label class="form-label fw-bold text-dark small text-uppercase">Dokter Pemeriksa (Berjadwal)</label>
+                                    <label class="form-label fw-semibold text-secondary small text-uppercase">Dokter Pemeriksa (Berjadwal)</label>
                                     <div class="mb-3 input-group">
                                         <span class="input-group-text"><i class="fas fa-user-md"></i></span>
                                         <select class="form-select select2-init" name="doctor_poli_id" id="input_doctor_poli">
@@ -874,7 +1006,7 @@
 
                                 <!-- WRAPPER IGD -->
                                 <div id="wrapper_igd" style="display: none;">
-                                    <label class="form-label fw-bold text-dark small text-uppercase">Dokter Jaga IGD</label>
+                                    <label class="form-label fw-semibold text-secondary small text-uppercase">Dokter Jaga IGD</label>
                                     <div class="mb-3 input-group">
                                         <span class="input-group-text"><i class="fas fa-stethoscope"></i></span>
                                         <select class="form-select select2-init" name="doctor_igd_id" id="input_doctor_igd">
@@ -890,7 +1022,7 @@
 
                                 <!-- WRAPPER RAWAT INAP -->
                                 <div id="wrapper_rawat_inap" style="display: none;">
-                                    <label class="form-label fw-bold text-dark small text-uppercase">Pilih Ruangan</label>
+                                    <label class="form-label fw-semibold text-secondary small text-uppercase">Pilih Ruangan</label>
                                     <div class="mb-3 input-group">
                                         <span class="input-group-text"><i class="fas fa-door-open"></i></span>
                                         <select class="form-select select2-init" name="ruangan_id" id="input_ruangan_id" onchange="loadBedTersedia()">
@@ -906,7 +1038,7 @@
                                         </select>
                                     </div>
 
-                                    <label class="form-label fw-bold text-dark small text-uppercase">Pilih Bed (Tempat Tidur)</label>
+                                    <label class="form-label fw-semibold text-secondary small text-uppercase">Pilih Bed (Tempat Tidur)</label>
                                     <div class="mb-3 input-group">
                                         <span class="input-group-text"><i class="fas fa-bed"></i></span>
                                         <select class="form-select select2-init" name="bed_id" id="input_bed_id">
@@ -914,19 +1046,18 @@
                                         </select>
                                     </div>
                                 </div>
-                                <!-- BLOK PENJAMIN DARI SINI TELAH DIHAPUS DAN DIPINDAHKAN KE STEP 1 -->
                             </div>
                         </div>
 
                         <div class="card mb-4">
-                            <div class="card-header header-purple"><i class="fas fa-search-plus me-2"></i> Input Tindakan</div>
+                            <div class="card-header header-purple"><i class="fas fa-search-plus me-2"></i> Input Tindakan / Pemeriksaan</div>
                             <div class="card-body p-4">
-                                <div class="input-group input-group-lg shadow-sm align-items-center">
-                                    <span class="input-group-text" style="border-right: none; z-index: 10;"><i class="fas fa-search"></i></span>
-                                    <select class="form-select fs-6" id="input_pemeriksaan" disabled>
+                                <div class="input-group align-items-center">
+                                    <span class="input-group-text" style="z-index: 10;"><i class="fas fa-search"></i></span>
+                                    <select class="form-select" id="input_pemeriksaan" disabled>
                                         <option value="" disabled selected>Pilih Sub Penjamin Dulu...</option>
                                     </select>
-                                    <button class="btn btn-primary px-4 ms-1 rounded-end" style="z-index: 10;" onclick="tambahKeOrder()"><i class="fas fa-plus"></i></button>
+                                    <button class="btn btn-primary px-3 ms-1 rounded-3" style="z-index: 10; height: 40px;" onclick="tambahKeOrder()"><i class="fas fa-plus"></i></button>
                                 </div>
                             </div>
                         </div>
@@ -936,10 +1067,12 @@
                         <div class="card h-100 d-flex flex-column">
                             <div class="card-header header-blue d-flex justify-content-between align-items-center">
                                 <span><i class="fas fa-shopping-cart me-2"></i> Rincian Tindakan (Order)</span>
-                                <span class="badge bg-white text-dark border border-dark rounded-2 px-3 py-1 shadow-sm fw-bold" id="badge_order_count"><i class="fas fa-vial me-1"></i> 0 Item Dipilih</span>
+                                <span class="badge rounded-pill" style="background: #e0e7ff; color: #3730a3; border: 1px solid #c7d2fe;" id="badge_order_count">
+                                    <i class="fas fa-vial me-1"></i> 0 Item Dipilih
+                                </span>
                             </div>
 
-                            <div class="flex-grow-1" style="min-height: 300px;">
+                            <div class="flex-grow-1 table-responsive" style="min-height: 300px;">
                                 <table class="table table-custom mb-0 text-center align-middle" id="tabel_order_tindakan">
                                     <thead>
                                         <tr>
@@ -956,19 +1089,19 @@
                                     </tbody>
                                 </table>
                             </div>
-                            <div class="card-footer bg-white border-top border-dark d-flex justify-content-between align-items-center py-3 px-4">
-                                <span class="fw-bolder text-dark fs-5 text-uppercase">Estimasi Total:</span>
-                                <span class="fw-bolder text-dark fs-3" id="estimasi_total">Rp 0</span>
+                            <div class="card-footer bg-light border-top d-flex justify-content-between align-items-center py-3 px-4">
+                                <span class="fw-bold text-secondary fs-6 text-uppercase">Estimasi Total Tagihan:</span>
+                                <span class="fw-bolder text-primary fs-3" id="estimasi_total">Rp 0</span>
                             </div>
                         </div>
                     </div>
                 </div>
 
                 <div class="d-flex justify-content-between mt-4">
-                    <button class="btn btn-light shadow-sm px-4 text-dark fw-bold" onclick="prevTab('tab-demografi')">
+                    <button class="btn btn-light px-4 fw-semibold" onclick="prevTab('tab-demografi')">
                         <i class="fas fa-arrow-left me-2"></i> Kembali ke Demografi
                     </button>
-                    <button class="btn btn-primary btn-lg shadow px-5 py-3 d-flex align-items-center gap-2 fw-bold" onclick="prosesKePembayaran()">
+                    <button class="btn btn-primary btn-lg px-5 py-2 d-flex align-items-center gap-2" onclick="prosesKePembayaran()">
                         Proses Pembayaran <i class="fas fa-arrow-right"></i>
                     </button>
                 </div>
@@ -981,8 +1114,8 @@
                 <div class="row g-4 justify-content-center">
                     <div class="col-lg-5 col-md-6">
                         <div class="d-flex align-items-center mb-3">
-                            <i class="fas fa-print text-dark me-2"></i>
-                            <span class="text-dark fw-bold text-uppercase small">Preview Struk Cetak</span>
+                            <i class="fas fa-receipt text-primary me-2"></i>
+                            <span class="text-secondary fw-bold text-uppercase small">Preview Struk Cetak</span>
                         </div>
 
                         <!-- CUSTOM NOTA PREVIEW DESIGN -->
@@ -1030,7 +1163,7 @@
 
                             <table style="width: 100%; font-size: 10px; border-collapse: collapse; margin-bottom: 5px;">
                                 <thead>
-                                    <tr style="border-top: 2px solid #000; border-bottom: 2px solid #000;">
+                                    <tr style="border-top: 1.5px solid #0f172a; border-bottom: 1.5px solid #0f172a;">
                                         <th class="text-start fst-italic py-1" style="width: 52%;">PEMERIKSAAN</th>
                                         <th class="text-end fst-italic py-1" style="width: 16%;">BRUTO</th>
                                         <th class="text-end fst-italic py-1" style="width: 16%;">DISKON</th>
@@ -1116,8 +1249,8 @@
                                     </tr>
                                 </table>
 
-                                <div class="text-center fst-italic" style="font-size: 8.5px; margin-top: 15px; border-top: 1px solid #ddd; padding-top: 4px;">
-                                    xxxxxxx xxxxxxx xxxxxxx xxxxxxx xxxxxxx xxxxxxx xxxxxxx xxxxxxx xxxxxxx xxxxxxx xxxxxxx
+                                <div class="text-center fst-italic" style="font-size: 8.5px; margin-top: 15px; border-top: 1px solid #e2e8f0; padding-top: 4px;">
+                                    Terima kasih atas kepercayaan Anda menggunakan layanan kami
                                 </div>
 
                                 <div style="display: flex; justify-content: space-between; font-size: 8px; margin-top: 4px;">
@@ -1130,17 +1263,17 @@
                     </div>
 
                     <div class="col-lg-6 col-md-6">
-                        <div class="card border-0 shadow-lg p-4 p-xl-5 h-100">
-                            <h4 class="fw-bolder mb-1">Metode Pembayaran</h4>
-                            <p class="text-dark mb-4 fw-bold opacity-75">Pilih metode pembayaran yang digunakan oleh pasien.</p>
+                        <div class="card p-4 p-xl-5 h-100">
+                            <h5 class="fw-bold mb-1">Metode Pembayaran</h5>
+                            <p class="text-secondary mb-4 small">Pilih metode pembayaran atau penagihan yang digunakan oleh pasien.</p>
 
-                            <div class="d-flex flex-column gap-3 mb-5">
+                            <div class="d-flex flex-column gap-3 mb-4">
                                 <label class="position-relative">
                                     <input type="radio" class="btn-check" name="payment_method" value="Cash" id="pay-cash" autocomplete="off" checked onchange="updateBayarDisplay()">
                                     <div class="payment-method-card">
-                                        <div class="payment-method-icon"><i class="fas fa-money-bill-wave text-dark"></i></div>
+                                        <div class="payment-method-icon" style="background-color: #d1fae5; color: #059669;"><i class="fas fa-money-bill-wave"></i></div>
                                         <div>
-                                            <h6 class="mb-0 fw-bolder">Tunai (Cash)</h6><small class="text-dark fw-bold opacity-75">Pembayaran menggunakan uang fisik</small>
+                                            <h6 class="mb-0 fw-bold">Tunai (Cash)</h6><small class="text-secondary">Pembayaran menggunakan uang fisik</small>
                                         </div>
                                         <i class="fas fa-check-circle check-indicator"></i>
                                     </div>
@@ -1149,9 +1282,9 @@
                                 <label class="position-relative">
                                     <input type="radio" class="btn-check" name="payment_method" value="QRIS" id="pay-qris" autocomplete="off" onchange="updateBayarDisplay()">
                                     <div class="payment-method-card">
-                                        <div class="payment-method-icon" style="background-color: var(--retro-cyan);"><i class="fas fa-qrcode text-dark"></i></div>
+                                        <div class="payment-method-icon" style="background-color: #e0f2fe; color: #0284c7;"><i class="fas fa-qrcode"></i></div>
                                         <div>
-                                            <h6 class="mb-0 fw-bolder">QRIS (E-Wallet/M-Banking)</h6><small class="text-dark fw-bold opacity-75">Gopay, OVO, Dana, ShopeePay, dll</small>
+                                            <h6 class="mb-0 fw-bold">QRIS (E-Wallet / M-Banking)</h6><small class="text-secondary">Gopay, OVO, Dana, ShopeePay, Mobile Banking</small>
                                         </div>
                                         <i class="fas fa-check-circle check-indicator"></i>
                                     </div>
@@ -1160,9 +1293,9 @@
                                 <label class="position-relative">
                                     <input type="radio" class="btn-check" name="payment_method" value="EDC" id="pay-edc" autocomplete="off" onchange="updateBayarDisplay()">
                                     <div class="payment-method-card">
-                                        <div class="payment-method-icon" style="background-color: var(--retro-purple);"><i class="fas fa-credit-card text-dark"></i></div>
+                                        <div class="payment-method-icon" style="background-color: #eef2ff; color: #4f46e5;"><i class="fas fa-credit-card"></i></div>
                                         <div>
-                                            <h6 class="mb-0 fw-bolder">Kartu Debit / Kredit (EDC)</h6><small class="text-dark fw-bold opacity-75">Mesin EDC BCA, Mandiri, BNI, dll</small>
+                                            <h6 class="mb-0 fw-bold">Kartu Debit / Kredit (EDC)</h6><small class="text-secondary">Mesin EDC BCA, Mandiri, BNI, BRI</small>
                                         </div>
                                         <i class="fas fa-check-circle check-indicator"></i>
                                     </div>
@@ -1171,9 +1304,9 @@
                                 <label class="position-relative">
                                     <input type="radio" class="btn-check" name="payment_method" value="Piutang" id="pay-piutang" autocomplete="off" onchange="updateBayarDisplay()">
                                     <div class="payment-method-card">
-                                        <div class="payment-method-icon" style="background-color: var(--retro-orange);"><i class="fas fa-building text-dark"></i></div>
+                                        <div class="payment-method-icon" style="background-color: #fef3c7; color: #d97706;"><i class="fas fa-building"></i></div>
                                         <div>
-                                            <h6 class="mb-0 fw-bolder">Piutang (Perusahaan)</h6><small class="text-dark fw-bold opacity-75">Tagihan dibebankan ke instansi/perusahaan</small>
+                                            <h6 class="mb-0 fw-bold">Piutang (Perusahaan / Asuransi)</h6><small class="text-secondary">Tagihan dibebankan ke instansi rekanan</small>
                                         </div>
                                         <i class="fas fa-check-circle check-indicator"></i>
                                     </div>
@@ -1181,13 +1314,12 @@
                             </div>
 
                             <div class="mt-auto">
-                                <div class="p-3 rounded-3 d-flex justify-content-between align-items-center mb-4" style="background-color: var(--retro-cyan); border: 2px solid var(--retro-dark); box-shadow: 2px 2px 0px var(--retro-dark);">
-                                    <span class="fw-bolder text-dark">Tagihan Akhir:</span>
-                                    <span class="fw-bolder text-dark fs-4" id="tagihan-akhir-display">Rp 0</span>
+                                <div class="p-3.5 rounded-4 d-flex justify-content-between align-items-center mb-4" style="background: linear-gradient(135deg, #eef2ff 0%, #e0e7ff 100%); border: 1px solid #c7d2fe;">
+                                    <span class="fw-bold text-indigo-dark">Tagihan Akhir:</span>
+                                    <span class="fw-bolder text-primary fs-3" id="tagihan-akhir-display">Rp 0</span>
                                 </div>
 
-                                <button class="btn btn-success btn-lg w-100 py-3 fw-bold fs-5 d-flex justify-content-center align-items-center gap-2"
-                                    onclick="prosesBayar()">
+                                <button class="btn btn-success btn-lg w-100 py-3 fw-bold fs-6 d-flex justify-content-center align-items-center gap-2" onclick="prosesBayar()">
                                     <i class="fas fa-print"></i> PROSES & CETAK STRUK
                                 </button>
                             </div>
@@ -1196,8 +1328,8 @@
                 </div>
 
                 <div class="d-flex justify-content-start mt-4">
-                    <button class="btn btn-light shadow-sm px-4 text-dark fw-bold" onclick="prevTab('tab-pemeriksaan')">
-                        <i class="fas fa-arrow-left me-2"></i> Kembali ke Pemeriksaan
+                    <button class="btn btn-light px-4 fw-semibold" onclick="prevTab('tab-pemeriksaan')">
+                        <i class="fas fa-arrow-left me-2"></i> Kembali ke Layanan Medis
                     </button>
                 </div>
             </div>
@@ -1207,14 +1339,14 @@
     <!-- MODAL PENCARIAN PASIEN -->
     <div class="modal fade" id="modalPencarianPasien" tabindex="-1" aria-hidden="true">
         <div class="modal-dialog modal-xl modal-dialog-centered">
-            <div class="modal-content" style="border-radius: 12px; border: 3px solid var(--retro-dark); box-shadow: var(--retro-shadow); overflow: hidden;">
-                <div class="modal-header text-dark" style="background: var(--retro-yellow); border-bottom: 3px solid var(--retro-dark); padding: 20px 25px;">
-                    <h5 class="modal-title fw-bolder d-flex align-items-center">
-                        <i class="fas fa-users me-3 fa-lg"></i> Hasil Pencarian Pasien
-                    </h5>
-                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+            <div class="modal-content ent-modal-content">
+                <div class="ent-modal-header d-flex justify-content-between align-items-center">
+                    <h6 class="modal-title fw-bold text-white d-flex align-items-center mb-0">
+                        <i class="fas fa-users text-info me-2"></i> Hasil Pencarian Pasien
+                    </h6>
+                    <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal" aria-label="Close"></button>
                 </div>
-                <div class="modal-body p-0">
+                <div class="modal-body p-0 bg-white">
                     <table class="table table-hover table-custom mb-0 text-center align-middle" id="tableHasilPencarian" style="display: none;">
                         <thead>
                             <tr>
@@ -1228,16 +1360,16 @@
                         <tbody></tbody>
                     </table>
                     <div id="pencarianLoading" class="text-center p-5" style="display: none;">
-                        <div class="spinner-border text-dark" role="status"></div>
-                        <p class="mt-2 text-dark fw-bold">Mencari data pasien...</p>
+                        <div class="spinner-border text-primary" role="status"></div>
+                        <p class="mt-2 text-secondary fw-semibold">Mencari data pasien...</p>
                     </div>
                     <div id="pencarianKosong" class="text-center p-5" style="display: none;">
-                        <i class="fas fa-folder-open fa-4x text-dark mb-3 opacity-50"></i>
-                        <h5 class="text-dark fw-bold">Data pasien tidak ditemukan.</h5>
+                        <i class="fas fa-folder-open fa-3x text-secondary mb-3 opacity-50"></i>
+                        <h6 class="text-secondary fw-bold">Data pasien tidak ditemukan.</h6>
                     </div>
                 </div>
-                <div class="modal-footer bg-white border-top border-dark p-3">
-                    <button type="button" class="btn btn-light px-4 fw-bold" data-bs-dismiss="modal">Tutup</button>
+                <div class="modal-footer bg-light border-top p-3">
+                    <button type="button" class="btn btn-light px-4" data-bs-dismiss="modal">Tutup</button>
                 </div>
             </div>
         </div>
@@ -1246,37 +1378,46 @@
     <!-- MODAL TAMBAH & PERBARUI PASIEN -->
     <div class="modal fade" id="modalPasien" tabindex="-1" aria-hidden="true" data-bs-backdrop="static">
         <div class="modal-dialog modal-xl modal-dialog-centered">
-            <div class="modal-content" style="border-radius: 12px; border: 3px solid var(--retro-dark); box-shadow: var(--retro-shadow); overflow: hidden;">
-                <div class="modal-header text-dark" style="background: var(--retro-cyan); border-bottom: 3px solid var(--retro-dark); padding: 20px 25px;">
-                    <h5 class="modal-title fw-bolder d-flex align-items-center" id="modalPasienTitle">
-                        <i class="fas fa-user-plus me-3 fa-lg"></i> Form Data Pasien
-                    </h5>
-                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+            <div class="modal-content ent-modal-content">
+                <div class="ent-modal-header d-flex justify-content-between align-items-center">
+                    <h6 class="modal-title fw-bold text-white d-flex align-items-center mb-0" id="modalPasienTitle">
+                        <i class="fas fa-user-plus text-info me-2"></i> Form Data Pasien
+                    </h6>
+                    <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal" aria-label="Close" onclick="stopCamera()"></button>
                 </div>
-                <div class="modal-body p-4 bg-white modal-minimal-input">
+                <div class="modal-body p-4 bg-white" style="max-height: 78vh; overflow-y: auto;">
                     <form id="formPasien">
                         <input type="hidden" name="pasien_id" id="form_pasien_id" value="">
-                        <div class="row g-5">
+                        <div class="row g-4">
                             <div class="col-lg-7">
-                                <div class="row g-4 align-items-start">
-                                    <div class="col-md-3"><input type="text" name="awalan" id="form_awalan" class="form-control" placeholder="Awalan"></div>
+                                <div class="row g-3 align-items-start">
+                                    <div class="col-md-3">
+                                        <label class="form-label small fw-semibold text-secondary mb-1">Awalan</label>
+                                        <input type="text" name="awalan" id="form_awalan" class="form-control" placeholder="Dr. / Ir.">
+                                    </div>
                                     <div class="col-md-6">
-                                        <input type="text" name="nama" id="form_nama" class="form-control" placeholder="Nama Pasien" required>
+                                        <label class="form-label small fw-semibold text-secondary mb-1">Nama Pasien <span class="text-danger">*</span></label>
+                                        <input type="text" name="nama" id="form_nama" class="form-control" placeholder="Nama lengkap pasien" required>
                                         <span class="req-field">Harus diisi !</span>
                                     </div>
-                                    <div class="col-md-3"><input type="text" name="akhiran" id="form_akhiran" class="form-control" placeholder="Akhiran"></div>
+                                    <div class="col-md-3">
+                                        <label class="form-label small fw-semibold text-secondary mb-1">Akhiran</label>
+                                        <input type="text" name="akhiran" id="form_akhiran" class="form-control" placeholder="S.Kom / SH">
+                                    </div>
 
-                                    <div class="col-md-6 mt-4">
+                                    <div class="col-md-6">
+                                        <label class="form-label small fw-semibold text-secondary mb-1">Jenis Kelamin <span class="text-danger">*</span></label>
                                         <select name="jk" id="form_jk" class="form-select" required>
-                                            <option value="" disabled selected>Jenis Kelamin</option>
+                                            <option value="" disabled selected>Pilih Jenis Kelamin</option>
                                             <option value="L">Laki-laki</option>
                                             <option value="P">Perempuan</option>
                                         </select>
                                         <span class="req-field">Harus diisi !</span>
                                     </div>
-                                    <div class="col-md-6 mt-4">
+                                    <div class="col-md-6">
+                                        <label class="form-label small fw-semibold text-secondary mb-1">Title <span class="text-danger">*</span></label>
                                         <select name="title" id="form_title" class="form-select" required>
-                                            <option value="" disabled selected>Title</option>
+                                            <option value="" disabled selected>Pilih Title</option>
                                             <option value="tn">Tn.</option>
                                             <option value="ny">Ny.</option>
                                             <option value="nn">Nn.</option>
@@ -1286,16 +1427,24 @@
                                         <span class="req-field">Harus diisi !</span>
                                     </div>
 
-                                    <div class="col-md-4 mt-4"><input type="text" name="tempat_lahir" id="form_tempat_lahir" class="form-control" placeholder="Tempat Lahir"></div>
-                                    <div class="col-md-4 mt-4"><input type="number" name="umur" id="form_umur" class="form-control" placeholder="Umur"></div>
-                                    <div class="col-md-4 mt-4">
+                                    <div class="col-md-4">
+                                        <label class="form-label small fw-semibold text-secondary mb-1">Tempat Lahir</label>
+                                        <input type="text" name="tempat_lahir" id="form_tempat_lahir" class="form-control" placeholder="Kota lahir">
+                                    </div>
+                                    <div class="col-md-4">
+                                        <label class="form-label small fw-semibold text-secondary mb-1">Umur (Thn)</label>
+                                        <input type="number" name="umur" id="form_umur" class="form-control" placeholder="0">
+                                    </div>
+                                    <div class="col-md-4">
+                                        <label class="form-label small fw-semibold text-secondary mb-1">Tanggal Lahir <span class="text-danger">*</span></label>
                                         <input type="date" name="tgl_lahir" id="form_tgl_lahir" class="form-control" required>
                                         <span class="req-field">Harus diisi !</span>
                                     </div>
 
-                                    <div class="col-md-6 mt-4">
+                                    <div class="col-md-6">
+                                        <label class="form-label small fw-semibold text-secondary mb-1">Agama</label>
                                         <select name="agama" id="form_agama" class="form-select">
-                                            <option value="" disabled selected>Agama</option>
+                                            <option value="" disabled selected>Pilih Agama</option>
                                             <option value="Islam">Islam</option>
                                             <option value="Kristen Protestan">Kristen Protestan</option>
                                             <option value="Katolik">Katolik</option>
@@ -1304,16 +1453,23 @@
                                             <option value="Konghucu">Konghucu</option>
                                         </select>
                                     </div>
-                                    <div class="col-md-6 mt-4">
-                                        <input type="text" name="no_hp" id="form_no_hp" class="form-control" placeholder="No HP" required>
+                                    <div class="col-md-6">
+                                        <label class="form-label small fw-semibold text-secondary mb-1">No. HP / WhatsApp <span class="text-danger">*</span></label>
+                                        <input type="text" name="no_hp" id="form_no_hp" class="form-control" placeholder="08xxxxxxxxxx" required>
                                         <span class="req-field">Harus diisi !</span>
                                     </div>
 
-                                    <div class="col-md-12 mt-4"><input type="email" name="email" id="form_email" class="form-control" placeholder="Email"></div>
-                                    <div class="col-md-12 mt-4"><input type="text" name="pekerjaan" id="form_pekerjaan" class="form-control" placeholder="Pekerjaan"></div>
-                                    <div class="col-md-12 mt-4"><input type="text" name="nip" id="form_nip" class="form-control" placeholder="Nomor Induk Pegawai"></div>
+                                    <div class="col-md-6">
+                                        <label class="form-label small fw-semibold text-secondary mb-1">Email</label>
+                                        <input type="email" name="email" id="form_email" class="form-control" placeholder="email@domain.com">
+                                    </div>
+                                    <div class="col-md-6">
+                                        <label class="form-label small fw-semibold text-secondary mb-1">Pekerjaan</label>
+                                        <input type="text" name="pekerjaan" id="form_pekerjaan" class="form-control" placeholder="Pekerjaan pasien">
+                                    </div>
 
-                                    <div class="col-md-4 mt-4">
+                                    <div class="col-md-4">
+                                        <label class="form-label small fw-semibold text-secondary mb-1">Tipe ID</label>
                                         <select name="tipe_id" id="form_tipe_id" class="form-select">
                                             <option value="" disabled selected>Tipe ID</option>
                                             <option value="KTP">KTP</option>
@@ -1321,24 +1477,32 @@
                                             <option value="Paspor">Paspor</option>
                                         </select>
                                     </div>
-                                    <div class="col-md-8 mt-4"><input type="text" name="no_id" id="form_no_id" class="form-control" placeholder="Nomor ID"></div>
-                                    <div class="col-md-12 mt-4 mb-4"><input type="text" name="catatan" id="form_catatan" class="form-control" placeholder="Catatan Pasien"></div>
+                                    <div class="col-md-4">
+                                        <label class="form-label small fw-semibold text-secondary mb-1">Nomor ID (NIK)</label>
+                                        <input type="text" name="no_id" id="form_no_id" class="form-control" placeholder="16 digit NIK">
+                                    </div>
+                                    <div class="col-md-4">
+                                        <label class="form-label small fw-semibold text-secondary mb-1">NIP / No. Pegawai</label>
+                                        <input type="text" name="nip" id="form_nip" class="form-control" placeholder="Opsional">
+                                    </div>
+                                    <div class="col-md-12">
+                                        <label class="form-label small fw-semibold text-secondary mb-1">Catatan Pasien</label>
+                                        <input type="text" name="catatan" id="form_catatan" class="form-control" placeholder="Riwayat alergi atau catatan khusus">
+                                    </div>
                                 </div>
                             </div>
 
-                            <div class="col-lg-5 border-start border-dark" style="border-left-width: 2px !important;">
-                                <div class="row g-3 mb-4">
-                                    <div class="col-12 mt-4">
-                                        <label class="text-dark fw-bold mb-2" style="font-size: 1.1rem;">Alamat Lengkap</label>
-                                        <textarea name="alamat" id="form_alamat" class="form-control" rows="4" placeholder="Masukkan alamat lengkap..." required></textarea>
-                                        <span class="req-field">Harus diisi !</span>
-                                    </div>
+                            <div class="col-lg-5 border-start">
+                                <div class="mb-4">
+                                    <label class="form-label small fw-semibold text-secondary mb-1">Alamat Lengkap <span class="text-danger">*</span></label>
+                                    <textarea name="alamat" id="form_alamat" class="form-control" rows="4" placeholder="Masukkan alamat lengkap domisili..." required></textarea>
+                                    <span class="req-field">Harus diisi !</span>
                                 </div>
 
-                                <h6 class="fw-bolder mb-3 mt-5 text-dark">Ambil Foto Pasien</h6>
-                                <div class="text-center">
-                                    <div class="camera-box shadow-sm mb-3" id="camera-container">
-                                        <i class="fas fa-camera fa-3x text-dark opacity-25" id="camera-placeholder"></i>
+                                <div class="p-3 rounded-4 bg-light border text-center">
+                                    <h6 class="fw-bold mb-3 text-dark small text-uppercase"><i class="fas fa-camera text-primary me-1"></i> Foto Profil Pasien</h6>
+                                    <div class="camera-box mb-3" id="camera-container">
+                                        <i class="fas fa-camera fa-3x text-secondary opacity-25" id="camera-placeholder"></i>
                                         <video id="video-stream" autoplay playsinline style="display: none;"></video>
                                         <img id="photo-result" src="" style="display: none;">
                                     </div>
@@ -1346,19 +1510,19 @@
                                     <input type="hidden" name="patient_photo_base64" id="patient_photo_base64">
 
                                     <div class="d-flex justify-content-center gap-2">
-                                        <button type="button" class="btn btn-light btn-sm fw-bold" id="btn-open-cam" onclick="startCamera()"><i class="fas fa-video me-1"></i> Buka Kamera</button>
-                                        <button type="button" class="btn btn-primary btn-sm fw-bold shadow" id="btn-capture" style="display:none;" onclick="capturePhoto()"><i class="fas fa-camera me-1"></i> Jepret</button>
-                                        <button type="button" class="btn btn-warning btn-sm fw-bold text-dark" id="btn-retake" style="display:none;" onclick="retakePhoto()"><i class="fas fa-redo me-1"></i> Ulangi</button>
+                                        <button type="button" class="btn btn-light btn-sm" id="btn-open-cam" onclick="startCamera()"><i class="fas fa-video me-1 text-primary"></i> Buka Kamera</button>
+                                        <button type="button" class="btn btn-primary btn-sm" id="btn-capture" style="display:none;" onclick="capturePhoto()"><i class="fas fa-camera me-1"></i> Jepret</button>
+                                        <button type="button" class="btn btn-warning btn-sm" id="btn-retake" style="display:none;" onclick="retakePhoto()"><i class="fas fa-redo me-1"></i> Ulangi</button>
                                     </div>
                                 </div>
                             </div>
                         </div>
                     </form>
                 </div>
-                <div class="modal-footer bg-white border-top border-dark p-3 justify-content-between" style="border-top-width: 2px !important;">
-                    <button type="button" class="btn btn-light px-4 fw-bold" data-bs-dismiss="modal" onclick="stopCamera()">Batal</button>
-                    <button type="button" class="btn btn-success px-5 fw-bold shadow-sm" onclick="simpanDataPasien()">
-                        Simpan Data
+                <div class="modal-footer bg-light border-top p-3 justify-content-between">
+                    <button type="button" class="btn btn-light px-4" data-bs-dismiss="modal" onclick="stopCamera()">Batal</button>
+                    <button type="button" class="btn btn-success px-5" onclick="simpanDataPasien()">
+                        <i class="fas fa-save me-1"></i> Simpan Data Pasien
                     </button>
                 </div>
             </div>
@@ -1373,26 +1537,26 @@
                     <div class="member-card-container">
                         <div class="d-flex justify-content-between align-items-start mb-4">
                             <div>
-                                <h5 class="mb-0 fw-bolder" style="letter-spacing: 1px;">PRAMITA LAB</h5>
-                                <small class="fw-bold" style="opacity: 0.8; font-size: 0.75rem;">MEMBER CARD IDENTITY</small>
+                                <h5 class="mb-0 fw-bold text-white" style="letter-spacing: 1px;">PRAMITA LAB</h5>
+                                <small style="color: #94a3b8; font-size: 0.72rem; letter-spacing: 0.08em;">PATIENT MEMBER CARD</small>
                             </div>
-                            <i class="fas fa-heartbeat fa-2x text-dark opacity-75"></i>
+                            <i class="fas fa-heartbeat fa-2x text-info"></i>
                         </div>
                         <div class="d-flex gap-3 align-items-center">
                             <div class="member-card-photo">
-                                <i class="fas fa-user-tie fa-2x text-dark opacity-50"></i>
+                                <i class="fas fa-user-tie fa-2x text-white opacity-75"></i>
                             </div>
                             <div>
-                                <h6 class="fw-bolder mb-1 text-uppercase text-dark">Bambang Junaidi</h6>
-                                <div class="d-flex align-items-center gap-2 mb-1 fw-bold text-dark" style="font-size: 0.85rem;">
+                                <h6 class="fw-bold mb-1 text-uppercase text-white">Bambang Junaidi</h6>
+                                <div class="d-flex align-items-center gap-2 mb-1 fw-semibold text-info" style="font-size: 0.85rem; font-family: 'JetBrains Mono', monospace;">
                                     <i class="fas fa-qrcode"></i> <span>PID: P-1002</span>
                                 </div>
                             </div>
                         </div>
                     </div>
                     <div class="d-flex justify-content-center gap-3 mt-4">
-                        <button type="button" class="btn btn-light fw-bold px-4 shadow" data-bs-dismiss="modal">Tutup</button>
-                        <button type="button" class="btn btn-success fw-bold px-4 shadow" onclick="Swal.fire({icon: 'success', title: 'Sedang Memproses', text: 'Mencetak Kartu ke Printer PVC...', showConfirmButton: false, timer: 1500})">
+                        <button type="button" class="btn btn-light px-4" data-bs-dismiss="modal">Tutup</button>
+                        <button type="button" class="btn btn-success px-4" onclick="Swal.fire({icon: 'success', title: 'Sedang Memproses', text: 'Mencetak Kartu ke Printer PVC...', showConfirmButton: false, timer: 1500})">
                             <i class="fas fa-print me-2"></i> Print Kartu
                         </button>
                     </div>
@@ -1404,33 +1568,30 @@
     <!-- MODAL LAPORAN KEUANGAN / BELUM DILAPORKAN -->
     <div class="modal fade" id="modalLaporanPendaftaran" tabindex="-1" aria-hidden="true">
         <div class="modal-dialog modal-xl modal-dialog-centered" style="max-width: 95%;">
-            <div class="modal-content" style="border-radius: 12px; border: 3px solid var(--retro-dark); box-shadow: var(--retro-shadow); overflow: hidden;">
-
-                <!-- HEADER MODAL -->
-                <div class="modal-header text-dark" style="background: var(--retro-yellow); padding: 20px 25px; border-bottom: 3px solid var(--retro-dark);">
-                    <h5 class="modal-title fw-bolder d-flex align-items-center" style="letter-spacing: 0.5px;">
-                        <i class="fas fa-file-invoice-dollar me-3 fa-lg"></i> Rekap Transaksi Belum Dilaporkan ke Accounting
-                    </h5>
-                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+            <div class="modal-content ent-modal-content">
+                <div class="ent-modal-header d-flex justify-content-between align-items-center">
+                    <h6 class="modal-title fw-bold text-white d-flex align-items-center mb-0">
+                        <i class="fas fa-file-invoice-dollar text-info me-2"></i> Rekap Transaksi Belum Dilaporkan ke Accounting
+                    </h6>
+                    <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal" aria-label="Close"></button>
                 </div>
 
-                <!-- BODY MODAL -->
-                <div class="modal-body p-4" style="background-color: var(--retro-bg);">
-                    <div class="bg-white shadow-sm" style="border-radius: 8px; border: 2px solid var(--retro-dark); overflow: hidden;">
+                <div class="modal-body p-4 bg-light">
+                    <div class="bg-white rounded-4 border overflow-hidden shadow-sm">
                         <div style="max-height: 60vh; overflow-y: auto; overflow-x: hidden;">
-                            <table class="table table-hover align-middle mb-0 table-custom" id="tableLaporan" style="display: none; width: 100%; font-size: 0.9rem;">
+                            <table class="table table-hover align-middle mb-0 table-custom" id="tableLaporan" style="display: none; width: 100%; font-size: 0.85rem;">
                                 <thead class="sticky-top" style="z-index: 2;">
                                     <tr>
                                         <th class="text-center" style="width: 5%; padding: 14px;">
-                                            <input type="checkbox" id="selectAllCheckbox" class="form-check-input shadow-sm border-2 border-dark" style="cursor: pointer; transform: scale(1.2);" onclick="toggleSelectAll(this)">
+                                            <input type="checkbox" id="selectAllCheckbox" class="form-check-input" style="cursor: pointer;" onclick="toggleSelectAll(this)">
                                         </th>
-                                        <th class="small fw-bold" style="width: 14%;">TGL REGISTRASI</th>
-                                        <th class="small fw-bold" style="width: 16%;">NO. REGISTRASI</th>
-                                        <th class="small fw-bold text-start" style="width: 20%;">NAMA PASIEN (PID)</th>
-                                        <th class="small fw-bold" style="width: 15%;">JENIS LAYANAN</th>
-                                        <th class="small fw-bold" style="width: 10%;">DOKTER</th>
-                                        <th class="small fw-bold text-center" style="width: 5%;">METODE</th>
-                                        <th class="small fw-bold text-end" style="width: 15%; padding-right: 20px;">TOTAL TAGIHAN</th>
+                                        <th style="width: 14%;">TGL REGISTRASI</th>
+                                        <th style="width: 16%;">NO. REGISTRASI</th>
+                                        <th class="text-start" style="width: 20%;">NAMA PASIEN (PID)</th>
+                                        <th style="width: 15%;">JENIS LAYANAN</th>
+                                        <th style="width: 10%;">DOKTER</th>
+                                        <th class="text-center" style="width: 5%;">METODE</th>
+                                        <th class="text-end" style="width: 15%; padding-right: 20px;">TOTAL TAGIHAN</th>
                                     </tr>
                                 </thead>
                                 <tbody>
@@ -1440,43 +1601,39 @@
                         </div>
 
                         <div id="laporanLoading" class="text-center py-5">
-                            <div class="spinner-border text-dark mb-3" role="status" style="width: 3rem; height: 3rem;"></div>
-                            <h6 class="text-dark fw-bold">Menyiapkan data transaksi...</h6>
+                            <div class="spinner-border text-primary mb-3" role="status" style="width: 2.5rem; height: 2.5rem;"></div>
+                            <h6 class="text-secondary fw-semibold">Menyiapkan data transaksi...</h6>
                         </div>
 
                         <div id="laporanKosong" class="text-center py-5" style="display: none;">
-                            <div class="bg-white rounded-circle d-inline-flex align-items-center justify-content-center mb-3" style="width: 70px; height: 70px; border: 2px solid var(--retro-dark); box-shadow: 2px 2px 0px var(--retro-dark);">
-                                <i class="fas fa-check-double fa-2x text-success"></i>
+                            <div class="rounded-circle d-inline-flex align-items-center justify-content-center mb-3" style="width: 68px; height: 68px; background: #d1fae5; color: #059669;">
+                                <i class="fas fa-check-double fa-2x"></i>
                             </div>
-                            <h4 class="text-dark fw-bolder mb-1">Semua Bersih!</h4>
-                            <p class="text-dark fw-bold mb-0 opacity-75">Seluruh transaksi pendaftaran Anda sudah dilaporkan ke bagian keuangan.</p>
+                            <h5 class="text-dark fw-bold mb-1">Semua Bersih!</h5>
+                            <p class="text-secondary mb-0">Seluruh transaksi pendaftaran Anda sudah dilaporkan ke bagian keuangan.</p>
                         </div>
                     </div>
                 </div>
 
-                <!-- FOOTER MODAL -->
-                <div class="modal-footer bg-white border-top border-dark p-4 d-flex justify-content-between align-items-center" style="border-top-width: 2px !important;">
+                <div class="modal-footer bg-white border-top p-4 d-flex justify-content-between align-items-center">
                     <div class="d-flex align-items-center gap-4">
-                        <div class="bg-white rounded-3 px-3 py-2" style="border: 2px solid var(--retro-dark); box-shadow: 2px 2px 0px var(--retro-dark);">
-                            <span class="text-dark small fw-bold d-block mb-1 text-uppercase">Total Dipilih</span>
-                            <span class="fw-bolder text-dark fs-5"><span id="selectedCount">0</span> <small class="text-dark fs-6 fw-normal">Transaksi</small></span>
+                        <div class="bg-light rounded-3 px-3 py-2 border">
+                            <span class="text-secondary small fw-semibold d-block text-uppercase" style="font-size: 0.68rem;">Total Dipilih</span>
+                            <span class="fw-bold text-dark fs-5"><span id="selectedCount">0</span> <small class="text-secondary fs-6 fw-normal">Transaksi</small></span>
                         </div>
                         <div>
-                            <span class="text-dark small fw-bold d-block mb-1 text-uppercase">Total Setoran</span>
-                            <span id="totalPendapatanShift" class="fw-bolder text-dark fs-3">Rp 0</span>
+                            <span class="text-secondary small fw-semibold d-block text-uppercase" style="font-size: 0.68rem;">Total Setoran</span>
+                            <span id="totalPendapatanShift" class="fw-bolder text-primary fs-3">Rp 0</span>
                         </div>
                     </div>
 
-                    <div class="d-flex gap-3">
-                        <button type="button" class="btn btn-light px-4 py-2 fw-bold" data-bs-dismiss="modal">
-                            Batal
-                        </button>
-                        <button type="button" class="btn btn-success px-5 py-2 fw-bold shadow-sm d-flex align-items-center gap-2" id="btnKirimLaporan" onclick="kirimLaporanKeAccounting()" disabled>
+                    <div class="d-flex gap-2">
+                        <button type="button" class="btn btn-light px-4 py-2" data-bs-dismiss="modal">Batal</button>
+                        <button type="button" class="btn btn-success px-4 py-2 d-flex align-items-center gap-2" id="btnKirimLaporan" onclick="kirimLaporanKeAccounting()" disabled>
                             <i class="fas fa-paper-plane"></i> Buat Nota Laporan
                         </button>
                     </div>
                 </div>
-
             </div>
         </div>
     </div>
@@ -1484,44 +1641,45 @@
     <!-- MODAL PILIH NOTA LAPORAN UNTUK DICETAK -->
     <div class="modal fade" id="modalCetakSetoran" tabindex="-1" aria-hidden="true">
         <div class="modal-dialog modal-lg modal-dialog-centered">
-            <div class="modal-content" style="border-radius: 12px; border: 3px solid var(--retro-dark); box-shadow: var(--retro-shadow); overflow: hidden;">
-                <div class="modal-header text-dark" style="background: var(--retro-yellow); border-bottom: 3px solid var(--retro-dark); padding: 20px 25px;">
-                    <h5 class="modal-title fw-bolder d-flex align-items-center">
-                        <i class="fas fa-print me-3 fa-lg"></i> Cetak Nota Setoran Laporan Keuangan
-                    </h5>
-                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+            <div class="modal-content ent-modal-content">
+                <div class="ent-modal-header d-flex justify-content-between align-items-center">
+                    <h6 class="modal-title fw-bold text-white d-flex align-items-center mb-0">
+                        <i class="fas fa-print text-info me-2"></i> Cetak Nota Setoran Laporan Keuangan
+                    </h6>
+                    <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal" aria-label="Close"></button>
                 </div>
                 <div class="modal-body p-4 bg-white">
-                    <p class="text-dark fw-bold mb-3">Pilih nomor nota laporan setoran yang ingin dicetak untuk diserahkan ke bagian keuangan:</p>
+                    <p class="text-secondary mb-3">Pilih nomor nota laporan setoran yang ingin dicetak untuk diserahkan ke bagian keuangan:</p>
 
                     <div class="mb-3 input-group">
                         <span class="input-group-text"><i class="fas fa-file-invoice"></i></span>
-                        <select id="selectNoLaporan" class="form-select fw-bold">
+                        <select id="selectNoLaporan" class="form-select">
                             <option value="" disabled selected>Memuat daftar nota laporan...</option>
                         </select>
                     </div>
                 </div>
-                <div class="modal-footer bg-white border-top border-dark p-3" style="border-top-width: 2px !important;">
-                    <button type="button" class="btn btn-light px-4 fw-bold" data-bs-dismiss="modal">Tutup</button>
-                    <button type="button" class="btn btn-primary px-4 fw-bold shadow-sm" onclick="prosesPrintLaporan()">
+                <div class="modal-footer bg-light border-top p-3">
+                    <button type="button" class="btn btn-light px-4" data-bs-dismiss="modal">Tutup</button>
+                    <button type="button" class="btn btn-primary px-4" onclick="prosesPrintLaporan()">
                         <i class="fas fa-print me-1"></i> Cetak Sekarang
                     </button>
                 </div>
             </div>
         </div>
     </div>
+
     <!-- MODAL SIMULASI ANTRIAN -->
     <div class="modal fade" id="modalAntrian" tabindex="-1" aria-hidden="true">
         <div class="modal-dialog modal-lg modal-dialog-centered">
-            <div class="modal-content" style="border-radius: 12px; border: 3px solid var(--retro-dark); box-shadow: var(--retro-shadow); overflow: hidden;">
-                <div class="modal-header text-dark" style="background: var(--retro-orange); border-bottom: 3px solid var(--retro-dark); padding: 20px 25px;">
-                    <h5 class="modal-title fw-bolder d-flex align-items-center">
-                        <i class="fas fa-bullhorn me-3 fa-lg"></i> Panggil Antrian Pendaftaran
-                    </h5>
-                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+            <div class="modal-content ent-modal-content">
+                <div class="ent-modal-header d-flex justify-content-between align-items-center">
+                    <h6 class="modal-title fw-bold text-white d-flex align-items-center mb-0">
+                        <i class="fas fa-bullhorn text-warning me-2"></i> Panggil Antrian Pendaftaran
+                    </h6>
+                    <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal" aria-label="Close"></button>
                 </div>
                 <div class="modal-body p-4 bg-white">
-                    <div class="table-responsive border-2 border-dark rounded-3 overflow-hidden shadow-sm">
+                    <div class="table-responsive border rounded-3 overflow-hidden">
                         <table class="table table-hover table-custom mb-0 text-center align-middle">
                             <thead>
                                 <tr>
@@ -1533,21 +1691,21 @@
                             </thead>
                             <tbody>
                                 <tr>
-                                    <td><span class="fw-bolder fs-5 text-dark">A-001</span></td>
-                                    <td class="fw-bold">Poli Umum</td>
-                                    <td><span class="badge bg-warning text-dark border border-dark px-2 py-1 shadow-sm">Menunggu</span></td>
+                                    <td><span class="fw-bold fs-5 text-primary">A-001</span></td>
+                                    <td class="fw-semibold">Poli Umum</td>
+                                    <td><span class="badge rounded-pill" style="background: #fef3c7; color: #92400e; border: 1px solid #fde68a;">Menunggu</span></td>
                                     <td>
-                                        <button class="btn btn-sm btn-primary fw-bold shadow-sm" onclick="simulasiPanggilAntrian('A-001')">
+                                        <button class="btn btn-sm btn-primary" onclick="simulasiPanggilAntrian('A-001')">
                                             <i class="fas fa-volume-up me-1"></i> Panggil
                                         </button>
                                     </td>
                                 </tr>
                                 <tr>
-                                    <td><span class="fw-bolder fs-5 text-dark">B-012</span></td>
-                                    <td class="fw-bold">Poli Gigi</td>
-                                    <td><span class="badge bg-warning text-dark border border-dark px-2 py-1 shadow-sm">Menunggu</span></td>
+                                    <td><span class="fw-bold fs-5 text-primary">B-012</span></td>
+                                    <td class="fw-semibold">Poli Gigi</td>
+                                    <td><span class="badge rounded-pill" style="background: #fef3c7; color: #92400e; border: 1px solid #fde68a;">Menunggu</span></td>
                                     <td>
-                                        <button class="btn btn-sm btn-primary fw-bold shadow-sm" onclick="simulasiPanggilAntrian('B-012')">
+                                        <button class="btn btn-sm btn-primary" onclick="simulasiPanggilAntrian('B-012')">
                                             <i class="fas fa-volume-up me-1"></i> Panggil
                                         </button>
                                     </td>
@@ -1556,12 +1714,13 @@
                         </table>
                     </div>
                 </div>
-                <div class="modal-footer bg-white border-top border-dark p-3" style="border-top-width: 2px !important;">
-                    <button type="button" class="btn btn-light px-4 fw-bold shadow-sm" data-bs-dismiss="modal">Tutup</button>
+                <div class="modal-footer bg-light border-top p-3">
+                    <button type="button" class="btn btn-light px-4" data-bs-dismiss="modal">Tutup</button>
                 </div>
             </div>
         </div>
     </div>
+
     <!-- JQuery & Scripts -->
     <script src="https://code.jquery.com/jquery-3.7.0.min.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
@@ -1611,6 +1770,7 @@
         let orderItems = [];
         let pasienAktif = null;
         let dataPencarianGlobal = [];
+        let loadedSubPenjaminData = [];
         let stream = null;
         let totalTagihanGlobal = 0;
 
@@ -1722,7 +1882,6 @@
                 });
         }
 
-        // --- 4. UPDATE FUNGSI FETCH JADWAL DOKTER RAWAT JALAN ---
         function loadDokterBerjadwal() {
             const poliId = document.getElementById('input_poli_id').value;
             const tanggalPeriksa = document.getElementById('input_tanggal_periksa').value;
@@ -1737,7 +1896,6 @@
                 return;
             }
 
-            // Pastikan URL mengarah ke Route Controller yang benar
             fetch(`/poli/dokter-berjadwal?poli_id=${poliId}&tanggal=${tanggalPeriksa}`)
                 .then(response => response.json())
                 .then(res => {
@@ -1747,12 +1905,9 @@
                             const opt = document.createElement('option');
                             opt.value = item.doctor_id;
 
-                            // Format Jam Mulai dan Jam Selesai (Hanya ambil HH:MM)
                             let tStart = item.time_start ? item.time_start.substring(0, 5) : '00:00';
                             let tEnd = item.time_end ? item.time_end.substring(0, 5) : '00:00';
                             let quota = item.quota || 0;
-
-                            // PERBAIKAN DI SINI: Gunakan item.nama_lengkap (bukan item.nama_dokter)
                             let namaDokter = item.nama_lengkap || item.nama_dokter || 'Nama Dokter Tidak Diketahui';
 
                             opt.text = `${namaDokter} (${tStart} - ${tEnd} | Kuota: ${quota})`;
@@ -1764,9 +1919,7 @@
                     $('#input_doctor_poli').trigger('change');
                 })
                 .catch(err => {
-                    selectDokterPoli.innerHTML = `
-                <option value="" disabled selected>Gagal memuat jadwal...</option>
-            `;
+                    selectDokterPoli.innerHTML = `<option value="" disabled selected>Gagal memuat jadwal...</option>`;
                     $('#input_doctor_poli').trigger('change');
                 });
         }
@@ -1830,8 +1983,8 @@
                 text: "Semua data yang belum diproses akan hilang.",
                 icon: 'warning',
                 showCancelButton: true,
-                confirmButtonColor: '#ffa6c9',
-                cancelButtonColor: '#1e1e24',
+                confirmButtonColor: '#e11d48',
+                cancelButtonColor: '#475569',
                 confirmButtonText: 'Ya, Reset Halaman!',
                 cancelButtonText: 'Batal'
             }).then((result) => {
@@ -1886,7 +2039,8 @@
             if (!keyword || keyword.length < 3) return Swal.fire({
                 icon: 'warning',
                 title: 'Perhatian',
-                text: 'Minimal 3 karakter'
+                text: 'Minimal 3 karakter',
+                confirmButtonColor: '#4f46e5'
             });
 
             var modalSearch = new bootstrap.Modal(document.getElementById('modalPencarianPasien'));
@@ -1910,11 +2064,11 @@
                             const noHp = pasien.no_hp || '-';
                             const tr = document.createElement('tr');
                             tr.innerHTML = `
-                                <td class="fw-bold text-dark">${pasien.pid}</td>
-                                <td class="text-start fw-bold text-dark">${pasien.nama} <br><small class="text-dark fw-bold opacity-75">${jk} &bull; ${noHp}</small></td>
+                                <td class="fw-bold text-primary">${pasien.pid}</td>
+                                <td class="text-start fw-bold text-dark">${pasien.nama} <br><small class="text-secondary fw-normal">${jk} &bull; ${noHp}</small></td>
                                 <td>${pasien.tgl_lahir}</td>
                                 <td>${pasien.no_id || '-'}</td>
-                                <td><button class="btn btn-sm btn-primary rounded-pill px-3 shadow-sm fw-bold" onclick="pilihPasien(${index})">Pilih <i class="fas fa-check ms-1"></i></button></td>
+                                <td><button class="btn btn-sm btn-primary rounded-pill px-3" onclick="pilihPasien(${index})">Pilih <i class="fas fa-check ms-1"></i></button></td>
                             `;
                             tbody.appendChild(tr);
                         });
@@ -1933,13 +2087,12 @@
         }
 
         function pilihPasien(index) {
-            // Gunakan fungsi reusable
             tampilkanDataProfil(dataPencarianGlobal[index]);
             bootstrap.Modal.getInstance(document.getElementById('modalPencarianPasien')).hide();
         }
 
         function resetForm(modalId) {
-            document.getElementById('modalPasienTitle').innerHTML = '<i class="fas fa-user-plus me-3 fa-lg"></i> Form Registrasi Pasien Baru';
+            document.getElementById('modalPasienTitle').innerHTML = '<i class="fas fa-user-plus text-info me-2"></i> Form Registrasi Pasien Baru';
             document.getElementById('formPasien').reset();
             document.getElementById('form_pasien_id').value = "";
             retakePhoto();
@@ -1948,9 +2101,11 @@
         function populateEditForm() {
             if (!pasienAktif) return Swal.fire({
                 icon: 'info',
-                title: 'Pilih Pasien'
+                title: 'Pilih Pasien',
+                text: 'Cari atau tambahkan pasien terlebih dahulu.',
+                confirmButtonColor: '#4f46e5'
             });
-            document.getElementById('modalPasienTitle').innerHTML = '<i class="fas fa-user-edit me-3 fa-lg"></i> Form Perbarui Data Pasien';
+            document.getElementById('modalPasienTitle').innerHTML = '<i class="fas fa-user-edit text-warning me-2"></i> Form Perbarui Data Pasien';
             document.getElementById('form_pasien_id').value = pasienAktif.id;
             ['awalan', 'nama', 'akhiran', 'jk', 'title', 'tempat_lahir', 'umur', 'tgl_lahir', 'agama', 'no_hp', 'email', 'pekerjaan', 'nip', 'tipe_id', 'no_id', 'catatan', 'alamat'].forEach(field => {
                 const el = document.getElementById('form_' + field);
@@ -1966,7 +2121,8 @@
 
             if (!isFormValid) return Swal.fire({
                 icon: 'error',
-                title: 'Form Tidak Lengkap'
+                title: 'Form Tidak Lengkap',
+                text: 'Mohon lengkapi kolom bertanda bintang (*).'
             });
 
             const formData = new FormData(document.getElementById('formPasien'));
@@ -1989,8 +2145,6 @@
                     });
                     stopCamera();
                     bootstrap.Modal.getInstance(document.getElementById('modalPasien')).hide();
-
-                    // Gunakan fungsi reusable agar seluruh form langsung terisi otomatis
                     tampilkanDataProfil(data.data);
                 }
             });
@@ -2079,12 +2233,10 @@
                     selectPenjamin.html('<option value="" disabled selected>Pilih Penjamin...</option>');
                     if (res.success && res.data.length > 0) {
                         res.data.forEach(item => {
-                            // Sesuaikan property objek dari database (misal: id / nama_penjamin)
                             const option = new Option(item.nama_penjamin || item.penjamin, item.id || item.penjamin, false, false);
                             selectPenjamin.append(option);
                         });
                     } else {
-                        // Fallback jika data kosong
                         selectPenjamin.append(new Option('UMUM / PRIBADI', 'UMUM'));
                         selectPenjamin.append(new Option('BPJS Kesehatan', 'BPJS'));
                     }
@@ -2103,10 +2255,10 @@
             const penjaminId = document.getElementById('pilih_penjamin').value;
             const wrapperSub = document.getElementById('wrapper_sub_penjamin');
             const selectSub = $('#pilih_sub_penjamin');
-            const infoSub = document.getElementById('info_sub_penjamin'); // Elemen Info
+            const infoSub = document.getElementById('info_sub_penjamin');
 
             selectSub.html('<option value="" disabled selected>Memuat sub penjamin...</option>').trigger('change');
-            infoSub.style.display = 'none'; // Sembunyikan info saat penjamin utama ganti
+            infoSub.style.display = 'none';
 
             if (penjaminId) {
                 fetch(`/penjamin/get-sub?penjamin_id=${penjaminId}`, {
@@ -2120,7 +2272,7 @@
                         selectSub.html('<option value="" disabled selected>Pilih Sub Penjamin...</option>');
                         if (res.success && res.data.length > 0) {
                             wrapperSub.style.display = 'block';
-                            loadedSubPenjaminData = res.data; // Simpan datanya ke variabel global array
+                            loadedSubPenjaminData = res.data;
 
                             res.data.forEach(sub => {
                                 const option = new Option(sub.nama_sub_penjamin, sub.id, false, false);
@@ -2151,56 +2303,42 @@
             const infoSub = document.getElementById('info_sub_penjamin');
 
             if (subId) {
-                // Cari data sub penjamin dari array yang sudah diload
                 const subData = loadedSubPenjaminData.find(s => s.id == subId || s.sub_penjamin_id == subId);
 
                 if (subData) {
-                    // Tampilkan Blok Informasi
                     infoSub.style.display = 'block';
 
-                    // Tampilkan PIC
                     const picListEl = document.getElementById('info_pic_list');
                     if (subData.pics && subData.pics.length > 0) {
                         let picHtml = '';
                         subData.pics.forEach(pic => {
-                            let isPrimary = pic.is_primary == 1 ? '<span class="badge bg-danger ms-1" style="font-size:0.6rem;">Utama</span>' : '';
-                            picHtml += `<div><i class="fas fa-user-tie text-muted me-1"></i> ${pic.nama_pic} <small class="text-muted">(${pic.telepon || '-'})</small> ${isPrimary}</div>`;
+                            let isPrimary = pic.is_primary == 1 ? '<span class="badge rounded-pill ms-1" style="background:#ffe4e6; color:#be123c; font-size:0.62rem;">Utama</span>' : '';
+                            picHtml += `<div><i class="fas fa-user-tie text-primary me-1"></i> ${pic.nama_pic} <small class="text-muted">(${pic.telepon || '-'})</small> ${isPrimary}</div>`;
                         });
                         picListEl.innerHTML = picHtml;
                     } else {
                         picListEl.innerHTML = '<span class="text-danger fst-italic">Belum ada data PIC yang didaftarkan.</span>';
                     }
 
-                    // Tampilkan Tipe Pembayaran
                     let tipePay = (subData.tipe_pembayaran || 'CASH_DI_AWAL').replace(/_/g, ' ');
                     document.getElementById('info_tipe_pembayaran').innerText = tipePay;
 
                     if (subData.tipe_pembayaran === 'CORPORATE_BILLING' || subData.tipe_pembayaran === 'INSURANCE_CLAIM') {
                         document.getElementById('info_jatuh_tempo_wrapper').style.display = 'block';
                         document.getElementById('info_jatuh_tempo').innerText = subData.jatuh_tempo_hari || 30;
-
-                        // [SOLUSI STEP 3] - Otomatis pilih metode bayar "Piutang" di tab Administrasi
                         $('#pay-piutang').prop('checked', true);
                     } else {
                         document.getElementById('info_jatuh_tempo_wrapper').style.display = 'none';
-
-                        // [SOLUSI STEP 3] - Otomatis pilih metode bayar "Cash"
                         $('#pay-cash').prop('checked', true);
                     }
-                    updateBayarDisplay(); // Update UI nota pembayaran
+                    updateBayarDisplay();
 
-                    // Tampilkan Catatan Pelayanan
                     let catatan = subData.catatan_pelayanan || '-';
                     document.getElementById('info_catatan_pelayanan').innerText = catatan;
 
-                    // [SOLUSI STEP 1] - Sesuaikan Pengiriman Hasil
-                    // Reset checkbox pengiriman
                     $('input[name="pengiriman[]"]').prop('checked', false);
-
-                    // Aturan default: Satu Sehat selalu aktif
                     $('input[name="pengiriman[]"][value="satusehat"]').prop('checked', true);
 
-                    // Centang otomatis berdasarkan data sub penjamin
                     if (subData.izin_kirim_hasil_pasien == 1 || !subData.tipe_pembayaran || subData.tipe_pembayaran === 'CASH_DI_AWAL') {
                         $('input[name="pengiriman[]"][value="whatsapp"]').prop('checked', true);
                     }
@@ -2226,7 +2364,6 @@
             const ruanganId = document.getElementById('input_ruangan_id') ? document.getElementById('input_ruangan_id').value : '';
             const subPenjaminId = document.getElementById('pilih_sub_penjamin').value;
 
-            // [SOLUSI STEP 2] - Bersihkan semua tarif yang dihasilkan otomatis sebelumnya
             orderItems = orderItems.filter(item => !item.is_auto_tarif);
 
             if (!subPenjaminId || (jenisLayanan === 'RAWAT_JALAN' && !poliId) || (jenisLayanan === 'RAWAT_INAP' && !ruanganId)) {
@@ -2250,7 +2387,7 @@
                                 harga_akhir_normal: parseFloat(tarifItem.tarif),
                                 kategori_biaya: tarifItem.kategori_biaya,
                                 is_paket: 0,
-                                is_auto_tarif: true // Flag khusus penanda tarif ini ditarik otomatis
+                                is_auto_tarif: true
                             });
                         });
                     }
@@ -2289,7 +2426,8 @@
             const select = document.getElementById('input_pemeriksaan');
             if (!select.value) return Swal.fire({
                 icon: 'warning',
-                text: 'Pilih layanan terlebih dahulu!'
+                text: 'Pilih layanan terlebih dahulu!',
+                confirmButtonColor: '#4f46e5'
             });
 
             const selectedOption = select.options[select.selectedIndex];
@@ -2298,7 +2436,8 @@
             if (orderItems.some(item => String(item.id) === String(dataObj.id))) {
                 return Swal.fire({
                     icon: 'error',
-                    text: 'Sudah ada dalam rincian!'
+                    text: 'Layanan sudah ada dalam rincian!',
+                    confirmButtonColor: '#4f46e5'
                 });
             }
 
@@ -2345,16 +2484,16 @@
 
                 const tr = document.createElement('tr');
                 tr.innerHTML = `
-                    <td><div class="form-check d-flex justify-content-center m-0"><input class="form-check-input border-2 border-dark" type="checkbox" onchange="toggleCito('${item.id}', this.checked)" ${item.is_cito == 1 ? 'checked' : ''} ${item.kategori_biaya === 'ADMINISTRASI' || item.kategori_biaya === 'JASA_DOKTER' ? 'disabled' : ''}></div></td>
-                    <td class="text-start fw-bold text-dark">
+                    <td><div class="form-check d-flex justify-content-center m-0"><input class="form-check-input" type="checkbox" onchange="toggleCito('${item.id}', this.checked)" ${item.is_cito == 1 ? 'checked' : ''} ${item.kategori_biaya === 'ADMINISTRASI' || item.kategori_biaya === 'JASA_DOKTER' ? 'disabled' : ''}></div></td>
+                    <td class="text-start fw-semibold text-dark">
                         ${item.nama_layanan}
-                        ${item.kategori_biaya === 'ADMINISTRASI' ? '<span class="badge bg-secondary ms-2">ADMINISTRASI</span>' : ''}
-                        ${item.is_cito == 1 ? '<span class="badge bg-danger ms-1">CITO</span>' : ''}
+                        ${item.kategori_biaya === 'ADMINISTRASI' ? '<span class="badge rounded-pill ms-2" style="background:#f1f5f9; color:#475569; border:1px solid #cbd5e1; font-size:0.65rem;">ADMINISTRASI</span>' : ''}
+                        ${item.is_cito == 1 ? '<span class="badge rounded-pill ms-1" style="background:#ffe4e6; color:#be123c; border:1px solid #fecdd3; font-size:0.65rem;">CITO</span>' : ''}
                     </td>
                     <td>${hargaDasar.toLocaleString('id-ID')}</td>
                     <td>${diskon > 0 ? '-' + diskon.toLocaleString('id-ID') : '-'}</td>
-                    <td class="fw-bold text-dark">${hargaAkhir.toLocaleString('id-ID')} ${item.is_cito == 1 ? `<br><small class="text-danger fw-bold">+Rp ${item.biaya_cito.toLocaleString('id-ID')}</small>` : ''}</td>
-                    <td><button class="btn btn-light text-danger shadow-sm rounded-circle fw-bold" onclick="hapusOrder('${item.id}')"><i class="fas fa-trash-alt"></i></button></td>
+                    <td class="fw-bold text-dark">${hargaAkhir.toLocaleString('id-ID')} ${item.is_cito == 1 ? `<br><small class="text-danger fw-semibold">+Rp ${item.biaya_cito.toLocaleString('id-ID')}</small>` : ''}</td>
+                    <td><button class="btn btn-sm btn-danger rounded-circle" onclick="hapusOrder('${item.id}')"><i class="fas fa-trash-alt"></i></button></td>
                 `;
                 tbody.appendChild(tr);
             });
@@ -2366,11 +2505,13 @@
         function prosesKePembayaran() {
             if (!pasienAktif) return Swal.fire({
                 icon: 'error',
-                text: 'Pilih pasien pada Tahap 1 terlebih dahulu.'
+                text: 'Pilih pasien pada Tahap 1 terlebih dahulu.',
+                confirmButtonColor: '#4f46e5'
             }).then(() => prevTab('tab-demografi'));
             if (orderItems.length === 0) return Swal.fire({
                 icon: 'warning',
-                text: 'Tambahkan minimal 1 pemeriksaan.'
+                text: 'Tambahkan minimal 1 pemeriksaan.',
+                confirmButtonColor: '#4f46e5'
             });
 
             renderInvoice();
@@ -2403,7 +2544,7 @@
             document.getElementById('invoice-alamat').innerText = pasienAktif.alamat || '-';
 
             const pengirimText = $("#input_dokter option:selected").text();
-            document.getElementById('invoice-pengirim').innerText = (pengirimText && pengirimText !== 'Pilih atau Cari Dokter Pengirim...') ? pengirimText : '-';
+            document.getElementById('invoice-pengirim').innerText = (pengirimText && pengirimText !== 'Pilih atau Cari Dokter...') ? pengirimText : '-';
 
             const kelPelangganText = $("#pilih_sub_penjamin option:selected").text();
             document.getElementById('invoice-kel-pelanggan').innerText = (kelPelangganText && kelPelangganText !== 'Pilih Sub Penjamin...') ? kelPelangganText : 'PASIEN UMUM REGULER';
@@ -2454,19 +2595,19 @@
                 Swal.fire({
                     title: 'Pembayaran Tunai',
                     html: `
-                        <h3 class="text-dark fw-bold mb-3">Rp ${formattedTagihan}</h3>
-                        <label class="form-label fw-bold">Nominal Uang Pasien</label>
+                        <h3 class="text-primary fw-bold mb-3">Rp ${formattedTagihan}</h3>
+                        <label class="form-label fw-semibold">Nominal Uang Pasien</label>
                         <div class="input-group input-group-lg mb-2">
                             <span class="input-group-text fw-bold">Rp</span>
                             <input type="text" id="uang_pasien_formatted" class="form-control fw-bold text-center fs-4" placeholder="0" autocomplete="off">
                         </div>
                         <input type="hidden" id="uang_pasien" value="0">
-                        <small id="info_kembalian" class="text-dark fw-bold">Kembalian: Rp 0</small>
+                        <small id="info_kembalian" class="text-secondary fw-semibold">Kembalian: Rp 0</small>
                     `,
                     showCancelButton: true,
                     confirmButtonText: 'Bayar',
-                    confirmButtonColor: '#c1ff72',
-                    cancelButtonColor: '#1e1e24',
+                    confirmButtonColor: '#059669',
+                    cancelButtonColor: '#475569',
                     didOpen: () => {
                         const inputFormatted = document.getElementById('uang_pasien_formatted');
                         const inputHidden = document.getElementById('uang_pasien');
@@ -2482,7 +2623,7 @@
                                 if (kembalian >= 0) {
                                     infoKembalian.innerHTML = `Kembalian: <span class="text-success fw-bold">Rp ${kembalian.toLocaleString('id-ID')}</span>`;
                                 } else {
-                                    infoKembalian.innerHTML = `Uang pasien kurang Rp ${Math.abs(kembalian).toLocaleString('id-ID')}`;
+                                    infoKembalian.innerHTML = `<span class="text-danger">Uang pasien kurang Rp ${Math.abs(kembalian).toLocaleString('id-ID')}</span>`;
                                 }
                             } else {
                                 inputHidden.value = 0;
@@ -2513,10 +2654,10 @@
             } else if (method === 'QRIS') {
                 Swal.fire({
                     title: 'Scan QRIS',
-                    html: `<h4 class="text-dark fw-bold mb-3">Rp ${formattedTagihan}</h4><i class="fas fa-qrcode fa-5x mb-3"></i>`,
+                    html: `<h4 class="text-primary fw-bold mb-3">Rp ${formattedTagihan}</h4><i class="fas fa-qrcode fa-5x text-dark mb-3"></i>`,
                     showCancelButton: true,
                     confirmButtonText: 'Konfirmasi Sukses',
-                    confirmButtonColor: '#8bf0fa'
+                    confirmButtonColor: '#4f46e5'
                 }).then((res) => {
                     if (res.isConfirmed) cetakNotaResmi();
                 });
@@ -2550,15 +2691,15 @@
                             title: 'Mesin EDC',
                             html: `
                             <div class="text-start mb-3">
-                                <label class="form-label fw-bold small text-uppercase">Pilih Bank / Mesin EDC</label>
+                                <label class="form-label fw-semibold small text-uppercase">Pilih Bank / Mesin EDC</label>
                                 <select id="edc_bank_id" class="form-select mb-3">${optionsHtml}</select>
-                                <label class="form-label fw-bold small text-uppercase">Nomor Approval / Trace Number</label>
+                                <label class="form-label fw-semibold small text-uppercase">Nomor Approval / Trace Number</label>
                                 <input type="text" id="edc_approval" class="form-control" placeholder="Masukkan No Approval">
                             </div>
                         `,
                             showCancelButton: true,
                             confirmButtonText: 'Proses Pembayaran',
-                            confirmButtonColor: '#8bf0fa',
+                            confirmButtonColor: '#4f46e5',
                             preConfirm: () => {
                                 const edcId = document.getElementById('edc_bank_id').value;
                                 const approval = document.getElementById('edc_approval').value;
@@ -2593,10 +2734,10 @@
             } else if (method === 'Piutang') {
                 Swal.fire({
                     title: 'Piutang Perusahaan',
-                    html: `<h4 class="text-dark fw-bold mb-3">Rp ${formattedTagihan}</h4><p class="text-dark">Transaksi ini akan dicatat sebagai piutang instansi/perusahaan.</p>`,
+                    html: `<h4 class="text-primary fw-bold mb-3">Rp ${formattedTagihan}</h4><p class="text-secondary">Transaksi ini akan dicatat sebagai piutang instansi/perusahaan.</p>`,
                     showCancelButton: true,
                     confirmButtonText: 'Konfirmasi Piutang',
-                    confirmButtonColor: '#ffde59'
+                    confirmButtonColor: '#4f46e5'
                 }).then((res) => {
                     if (res.isConfirmed) cetakNotaResmi();
                 });
@@ -2671,8 +2812,8 @@
                         showCancelButton: true,
                         confirmButtonText: '<i class="fas fa-print"></i> Print Nota & Selesai',
                         cancelButtonText: 'Tutup & Mulai Baru',
-                        confirmButtonColor: '#8bf0fa',
-                        cancelButtonColor: '#1e1e24',
+                        confirmButtonColor: '#4f46e5',
+                        cancelButtonColor: '#475569',
                         allowOutsideClick: false
                     }).then((result) => {
                         if (result.isConfirmed && data.redirect_url) {
@@ -2709,7 +2850,7 @@
         function simulasiPanggilAntrian(noAntrian) {
             Swal.fire({
                 title: 'Memanggil Antrian',
-                html: `<h1 class="fw-bolder text-dark" style="font-size: 3rem;">${noAntrian}</h1><p class="fw-bold">Suara panggilan sedang diputar di ruang tunggu...</p>`,
+                html: `<h1 class="fw-bolder text-primary" style="font-size: 3rem;">${noAntrian}</h1><p class="fw-semibold text-secondary">Suara panggilan sedang diputar di ruang tunggu...</p>`,
                 icon: 'info',
                 timer: 3000,
                 showConfirmButton: false,
@@ -2753,30 +2894,30 @@
 
                             tr.innerHTML = `
                             <td class="text-center py-3">
-                                <input type="checkbox" class="form-check-input row-checkbox shadow-sm border-2 border-dark" value="${row.transaksi_id}" data-harga="${row.total_tagihan}" onchange="hitungTotalTerpilih()" style="cursor: pointer; transform: scale(1.2);">
+                                <input type="checkbox" class="form-check-input row-checkbox" value="${row.transaksi_id}" data-harga="${row.total_tagihan}" onchange="hitungTotalTerpilih()" style="cursor: pointer;">
                             </td>
                             <td>
                                 <div class="d-flex flex-column">
-                                    <span class="fw-bold text-dark"><i class="far fa-calendar-alt text-muted me-1"></i> ${datePart}</span>
-                                    <span class="text-dark small fw-bold opacity-75">${timePart}</span>
+                                    <span class="fw-semibold text-dark"><i class="far fa-calendar-alt text-muted me-1"></i> ${datePart}</span>
+                                    <span class="text-secondary small">${timePart}</span>
                                 </div>
                             </td>
                             <td>
-                                <span class="badge bg-white text-dark border border-dark fw-bold px-2 py-1">${row.no_registrasi || '-'}</span>
+                                <span class="badge rounded-pill" style="background:#eef2ff; color:#3730a3; border:1px solid #c7d2fe;">${row.no_registrasi || '-'}</span>
                             </td>
                             <td class="text-start">
                                 <div class="fw-bold text-dark text-wrap">${row.nama_pasien}</div>
-                                <div class="text-dark small fw-bold opacity-75"><i class="fas fa-qrcode me-1"></i>${row.pid}</div>
+                                <div class="text-secondary small"><i class="fas fa-qrcode me-1"></i>${row.pid}</div>
                             </td>
                             <td>
-                                <div class="fw-bold text-dark text-wrap">${row.layanan}</div>
-                                ${row.poli && row.poli !== '-' ? `<small class="text-dark fw-bold opacity-75">${row.poli}</small>` : ''}
+                                <div class="fw-semibold text-dark text-wrap">${row.layanan}</div>
+                                ${row.poli && row.poli !== '-' ? `<small class="text-secondary">${row.poli}</small>` : ''}
                             </td>
-                            <td class="text-wrap fw-bold">${row.nama_dokter || '-'}</td>
+                            <td class="text-wrap">${row.nama_dokter || '-'}</td>
                             <td class="text-center">
-                                <span class="badge rounded-pill bg-white text-dark border border-dark fw-bold px-3 py-1">${row.metode_bayar}</span>
+                                <span class="badge rounded-pill" style="background:#d1fae5; color:#065f46; border:1px solid #a7f3d0;">${row.metode_bayar}</span>
                             </td>
-                            <td class="fw-bolder text-dark text-end fs-6" style="padding-right: 20px;">
+                            <td class="fw-bold text-dark text-end fs-6" style="padding-right: 20px;">
                                 Rp ${parseFloat(row.total_tagihan).toLocaleString('id-ID')}
                             </td>
                         `;
@@ -2797,7 +2938,7 @@
         }
 
         function toggleSelectAll(source) {
-            checkboxes = document.querySelectorAll('.row-checkbox');
+            const checkboxes = document.querySelectorAll('.row-checkbox');
             checkboxes.forEach(cb => cb.checked = source.checked);
             hitungTotalTerpilih();
         }
@@ -2826,8 +2967,8 @@
                 showCancelButton: true,
                 confirmButtonText: 'Ya, Buat Nota!',
                 cancelButtonText: 'Batal',
-                confirmButtonColor: '#c1ff72',
-                cancelButtonColor: '#1e1e24'
+                confirmButtonColor: '#059669',
+                cancelButtonColor: '#475569'
             }).then((result) => {
                 if (result.isConfirmed) {
                     fetch('/laporan/simpan-setoran', {
@@ -2928,7 +3069,8 @@
             if (!noLaporan) return Swal.fire({
                 icon: 'warning',
                 title: 'Perhatian',
-                text: 'Silakan pilih nomor nota laporan terlebih dahulu!'
+                text: 'Silakan pilih nomor nota laporan terlebih dahulu!',
+                confirmButtonColor: '#4f46e5'
             });
             window.open(`/laporan/print-setoran/${noLaporan}`, '_blank');
         }

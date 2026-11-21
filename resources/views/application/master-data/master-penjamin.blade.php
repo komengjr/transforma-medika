@@ -6,176 +6,350 @@
 <link href="{{ asset('vendors/choices/choices.min.css') }}" rel="stylesheet" />
 <link href="{{ asset('vendors/flatpickr/flatpickr.min.css') }}" rel="stylesheet" />
 <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
+<link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@500;600;700;800&family=JetBrains+Mono:wght@500;700&display=swap" rel="stylesheet">
 
 <style>
-    /* =========================================
-       RETRO / NEUBRUTALISM THEME STYLES
-       ========================================= */
     :root {
-        --retro-dark: #1e1e24;
-        --retro-yellow: #ffde59;
-        --retro-pink: #ffa6c9;
-        --retro-cyan: #8bf0fa;
-        --retro-orange: #ff914d;
-        --retro-green: #c1ff72;
-        --retro-purple: #c8b6ff;
-        --retro-bg: #f4f0ea;
-        --retro-border: 3px solid var(--retro-dark);
-        --retro-shadow: 5px 5px 0px var(--retro-dark);
-        --retro-shadow-sm: 3px 3px 0px var(--retro-dark);
+        --ent-indigo: #4f46e5;
+        --ent-indigo-dark: #4338ca;
+        --ent-indigo-soft: #eef2ff;
+        --ent-emerald: #059669;
+        --ent-emerald-soft: #d1fae5;
+        --ent-sky: #0284c7;
+        --ent-amber: #d97706;
+        --ent-slate-900: #0f172a;
+        --ent-slate-700: #334155;
+        --ent-slate-500: #64748b;
+        --ent-border: #e2e8f0;
+        --ent-bg: #f8fafc;
     }
 
-    .retro-card {
-        border: var(--retro-border);
-        border-radius: 12px;
-        box-shadow: var(--retro-shadow);
+    .ent-font-display {
+        font-family: 'Plus Jakarta Sans', sans-serif !important;
+    }
+
+    /* Modern Hero Header */
+    .ent-hero-card {
+        background: linear-gradient(135deg, #0f172a 0%, #1e1b4b 55%, #312e81 100%);
+        border-radius: 16px;
+        border: 1px solid rgba(99, 102, 241, 0.25);
+        box-shadow: 0 12px 28px -6px rgba(15, 23, 42, 0.2);
+        position: relative;
         overflow: hidden;
-        background-color: #ffffff;
     }
 
-    .retro-header-banner {
-        background: linear-gradient(135deg, var(--retro-yellow) 0%, var(--retro-orange) 100%);
-        border: var(--retro-border);
-        border-radius: 12px;
-        box-shadow: var(--retro-shadow);
-        color: var(--retro-dark);
+    .ent-hero-card::before {
+        content: '';
+        position: absolute;
+        top: -50%;
+        right: -5%;
+        width: 320px;
+        height: 320px;
+        background: radial-gradient(circle, rgba(99, 102, 241, 0.28) 0%, transparent 70%);
+        pointer-events: none;
     }
 
-    .retro-btn {
-        font-weight: 800 !important;
-        border: 2px solid var(--retro-dark);
-        box-shadow: var(--retro-shadow-sm);
-        border-radius: 6px;
-        transition: all 0.1s ease-in-out;
-        text-transform: uppercase;
-        letter-spacing: 0.5px;
-        cursor: pointer;
+    .ent-icon-glass {
+        width: 52px;
+        height: 52px;
+        border-radius: 14px;
+        background: rgba(255, 255, 255, 0.1);
+        backdrop-filter: blur(8px);
+        border: 1px solid rgba(255, 255, 255, 0.18);
+        display: flex;
+        align-items: center;
+        justify-content: center;
     }
 
-    .retro-btn:active {
-        transform: translate(3px, 3px);
-        box-shadow: 0px 0px 0px var(--retro-dark);
+    /* Modern Cards */
+    .ent-card {
+        border: 1px solid var(--ent-border);
+        border-radius: 16px;
+        box-shadow: 0 4px 20px -2px rgba(15, 23, 42, 0.05);
+        /* background-color: #ffffff; */
+        overflow: hidden;
     }
 
-    .retro-btn-primary {
-        background-color: var(--retro-cyan);
-        color: var(--retro-dark);
+    .ent-card-header {
+        /* background: #f8fafc; */
+        border-bottom: 1px solid var(--ent-border);
+        padding: 0.9rem 1.25rem;
     }
 
-    .retro-btn-success {
-        background-color: var(--retro-green);
-        color: var(--retro-dark);
+    /* Buttons */
+    .btn-ent-primary {
+        background: linear-gradient(135deg, #4f46e5 0%, #4338ca 100%);
+        color: #ffffff !important;
+        border: none;
+        border-radius: 10px;
+        font-weight: 600;
+        box-shadow: 0 4px 12px rgba(79, 70, 229, 0.25);
+        transition: all 0.2s ease;
     }
 
-    .retro-btn-warning {
-        background-color: var(--retro-yellow);
-        color: var(--retro-dark);
+    .btn-ent-primary:hover {
+        transform: translateY(-1px);
+        box-shadow: 0 6px 16px rgba(79, 70, 229, 0.35);
     }
 
-    .retro-input,
+    .btn-ent-success {
+        background: linear-gradient(135deg, #10b981 0%, #059669 100%);
+        color: #ffffff !important;
+        border: none;
+        border-radius: 10px;
+        font-weight: 600;
+        box-shadow: 0 4px 12px rgba(5, 150, 105, 0.25);
+        transition: all 0.2s ease;
+    }
+
+    .btn-ent-success:hover:not(:disabled) {
+        transform: translateY(-1px);
+        box-shadow: 0 6px 16px rgba(5, 150, 105, 0.35);
+    }
+
+    .btn-ent-success:disabled {
+        opacity: 0.55;
+        box-shadow: none;
+    }
+
+    .btn-ent-soft-warning {
+        background-color: #fef3c7;
+        color: #b45309 !important;
+        border: 1px solid #fde68a;
+        border-radius: 8px;
+        font-weight: 600;
+        transition: all 0.15s ease;
+    }
+
+    .btn-ent-soft-warning:hover {
+        background-color: #f59e0b;
+        color: #ffffff !important;
+    }
+
+    .btn-ent-soft-primary {
+        background-color: #e0e7ff;
+        color: #4338ca !important;
+        border: 1px solid #c7d2fe;
+        border-radius: 8px;
+        font-weight: 600;
+        transition: all 0.15s ease;
+    }
+
+    .btn-ent-soft-primary:hover {
+        background-color: #4f46e5;
+        color: #ffffff !important;
+    }
+
+    .btn-ent-soft-info {
+        background-color: #e0f2fe;
+        color: #0369a1 !important;
+        border: 1px solid #bae6fd;
+        border-radius: 8px;
+        font-weight: 600;
+        transition: all 0.15s ease;
+    }
+
+    .btn-ent-soft-info:hover {
+        background-color: #0284c7;
+        color: #ffffff !important;
+    }
+
+    /* Form Controls */
+    .ent-input,
     .form-control,
     .form-select {
-        border: 2px solid var(--retro-dark) !important;
-        border-radius: 6px !important;
-        box-shadow: 2px 2px 0px var(--retro-dark) !important;
-        font-weight: 700 !important;
-        color: var(--retro-dark) !important;
-        background-color: #ffffff !important;
+        border: 1px solid #cbd5e1 !important;
+        border-radius: 10px !important;
+        font-size: 0.85rem;
+        color: var(--ent-slate-900);
+        background-color: #ffffff;
+        transition: all 0.2s ease;
     }
 
-    .retro-input:focus,
+    .ent-input:focus,
     .form-control:focus,
     .form-select:focus {
-        box-shadow: 4px 4px 0px var(--retro-dark) !important;
+        border-color: var(--ent-indigo) !important;
+        box-shadow: 0 0 0 3.5px rgba(79, 70, 229, 0.12) !important;
         outline: none;
     }
 
+    /* Penjamin Utama List Items */
+    .list-group-item-penjamin {
+        border: 1px solid var(--ent-border) !important;
+        margin-bottom: 8px;
+        border-radius: 12px !important;
+        cursor: pointer;
+        transition: all 0.18s ease;
+        background-color: #ffffff;
+        color: var(--ent-slate-700);
+    }
+
+    .list-group-item-penjamin:hover {
+        background-color: #f8fafc;
+        border-color: #c7d2fe !important;
+        transform: translateX(2px);
+    }
+
+    .list-group-item-penjamin.active {
+        background: linear-gradient(135deg, #eef2ff 0%, #e0e7ff 100%) !important;
+        color: var(--ent-indigo-dark) !important;
+        border: 1.5px solid var(--ent-indigo) !important;
+        box-shadow: 0 4px 12px -2px rgba(79, 70, 229, 0.15);
+    }
+
+    .list-group-item-penjamin.active .folder-icon-box {
+        background-color: var(--ent-indigo) !important;
+        color: #ffffff !important;
+    }
+
+    .folder-icon-box {
+        width: 34px;
+        height: 34px;
+        border-radius: 9px;
+        background-color: #f1f5f9;
+        color: var(--ent-indigo);
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        flex-shrink: 0;
+        transition: all 0.18s ease;
+    }
+
+    /* Modern DataTable */
     .table-custom {
-        font-size: 0.8rem;
-        border-collapse: collapse !important;
+        font-size: 0.82rem;
+        border-collapse: separate;
+        border-spacing: 0;
         width: 100%;
     }
 
     .table-custom thead th {
-        background-color: var(--retro-dark) !important;
-        color: var(--retro-green) !important;
-        font-size: 0.75rem;
-        font-weight: 800;
-        text-transform: uppercase;
-        border: 2px solid var(--retro-dark) !important;
-        padding: 12px 10px;
-        letter-spacing: 0.5px;
-        text-align: center;
-    }
-
-    .table-custom td {
-        border: 2px solid var(--retro-dark) !important;
+        background-color: #f1f5f9 !important;
+        color: var(--ent-slate-700) !important;
+        font-size: 0.72rem;
         font-weight: 700;
-        color: var(--retro-dark);
-        padding: 10px;
-        vertical-align: middle;
-        background-color: #ffffff;
-    }
-
-    .list-group-item-penjamin {
-        border: 2px solid var(--retro-dark) !important;
-        margin-bottom: 8px;
-        border-radius: 8px !important;
-        font-weight: 800;
-        cursor: pointer;
-        transition: all 0.15s ease;
-        box-shadow: 2px 2px 0px var(--retro-dark);
-        background-color: #ffffff;
-        color: var(--retro-dark);
-    }
-
-    .list-group-item-penjamin:hover {
-        background-color: var(--retro-yellow);
-        transform: translate(-1px, -1px);
-        box-shadow: 3px 3px 0px var(--retro-dark);
-    }
-
-    .list-group-item-penjamin.active {
-        background-color: var(--retro-cyan) !important;
-        color: var(--retro-dark) !important;
-        border-color: var(--retro-dark) !important;
-        box-shadow: 3px 3px 0px var(--retro-dark);
-    }
-
-    .retro-badge {
-        border: 2px solid var(--retro-dark);
-        border-radius: 6px;
-        padding: 4px 8px;
-        font-weight: 800;
-        box-shadow: 2px 2px 0px var(--retro-dark);
         text-transform: uppercase;
-        display: inline-block;
+        letter-spacing: 0.04em;
+        border-top: 1px solid var(--ent-border) !important;
+        border-bottom: 1.5px solid #cbd5e1 !important;
+        border-left: none !important;
+        border-right: none !important;
+        padding: 11px 12px;
+    }
+
+    .table-custom tbody td {
+        border-bottom: 1px solid #f1f5f9 !important;
+        border-left: none !important;
+        border-right: none !important;
+        color: var(--ent-slate-700);
+        padding: 11px 12px;
+        vertical-align: middle;
+    }
+
+    .table-custom tbody tr:hover td {
+        background-color: #f8fafc;
+    }
+
+    /* Soft Badges */
+    .ent-badge {
+        border-radius: 6px;
+        padding: 4px 9px;
+        font-weight: 600;
         font-size: 0.7rem;
+        display: inline-flex;
+        align-items: center;
+        gap: 4px;
+    }
+
+    .badge-soft-success {
+        background-color: #d1fae5;
+        color: #065f46;
+        border: 1px solid #a7f3d0;
+    }
+
+    .badge-soft-danger {
+        background-color: #fee2e2;
+        color: #991b1b;
+        border: 1px solid #fecaca;
+    }
+
+    .badge-soft-warning {
+        background-color: #fef3c7;
+        color: #92400e;
+        border: 1px solid #fde68a;
+    }
+
+    .badge-soft-info {
+        background-color: #e0f2fe;
+        color: #075985;
+        border: 1px solid #bae6fd;
+    }
+
+    .badge-soft-indigo {
+        background-color: #e0e7ff;
+        color: #3730a3;
+        border: 1px solid #c7d2fe;
+    }
+
+    /* Modal Styling */
+    .ent-modal-content {
+        border: 1px solid var(--ent-border) !important;
+        border-radius: 18px !important;
+        box-shadow: 0 25px 50px -12px rgba(15, 23, 42, 0.25) !important;
+        overflow: hidden;
+    }
+
+    .ent-modal-header {
+        background: linear-gradient(135deg, #0f172a 0%, #1e1b4b 100%);
+        color: #ffffff;
+        padding: 1rem 1.35rem;
+        border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+    }
+
+    .ent-section-title {
+        font-size: 0.78rem;
+        font-weight: 700;
+        text-transform: uppercase;
+        letter-spacing: 0.04em;
+        color: var(--ent-indigo);
+        border-bottom: 1px solid var(--ent-border);
+        padding-bottom: 0.45rem;
+        margin-bottom: 0.25rem;
     }
 </style>
 @endsection
 
 @section('content')
-<!-- HEADER BANNER -->
+<!-- HERO HEADER BANNER -->
 <div class="row mb-4">
     <div class="col-12">
-        <div class="card retro-header-banner p-1">
-            <div class="card-body p-4 text-dark position-relative z-1">
-                <div class="row align-items-center gy-3">
-                    <div class="col-lg-7 d-flex align-items-center">
-                        <div class="p-2 rounded-4 me-3 d-flex align-items-center justify-content-center"
-                            style="width: 65px; height: 65px; background: white; border: 2px solid var(--retro-dark); box-shadow: 3px 3px 0px var(--retro-dark);">
-                            <i class="fas fa-handshake text-dark fs-2"></i>
+        <div class="ent-hero-card p-3 p-md-4">
+            <div class="row align-items-center justify-content-between gy-3 position-relative" style="z-index: 2;">
+                <div class="col-lg-8 d-flex align-items-center gap-3">
+                    <div class="ent-icon-glass flex-shrink-0">
+                        <i class="fas fa-handshake text-info fs-3"></i>
+                    </div>
+                    <div>
+                        <div class="d-flex align-items-center gap-2 mb-1">
+                            <span class="badge rounded-pill" style="background: rgba(99, 102, 241, 0.3); border: 1px solid rgba(165, 180, 252, 0.4); color: #e0e7ff; font-size: 0.68rem; letter-spacing: 0.04em;">
+                                <i class="fas fa-database me-1"></i> MASTER DATA KEUANGAN & KLAIM
+                            </span>
                         </div>
+                        <h3 class="ent-font-display fw-bold mb-0 text-white" style="font-size: 1.35rem;">
+                            Manajemen <span style="color: #38bdf8;">Penjamin & Sub Penjamin</span>
+                        </h3>
+                        <p class="mb-0 fs--1" style="color: #cbd5e1;">
+                            Kelola kategori penjamin utama, rekanan perusahaan/asuransi, aturan tanggungan biaya, dan tarif khusus layanan.
+                        </p>
+                    </div>
+                </div>
+                <div class="col-lg-auto">
+                    <div class="px-3 py-2 rounded-3 d-flex align-items-center gap-2" style="background: rgba(255, 255, 255, 0.08); border: 1px solid rgba(255, 255, 255, 0.15);">
+                        <i class="fas fa-building text-success"></i>
                         <div>
-                            <div class="d-flex align-items-center gap-2 mb-1">
-                                <span class="retro-badge" style="background-color: var(--retro-cyan); color: var(--retro-dark);">
-                                    <i class="fas fa-database me-1"></i> Master Data
-                                </span>
-                            </div>
-                            <h3 class="fw-bolder mb-0 text-dark" style="font-size: 1.4rem; text-shadow: 1px 1px 0px white;">
-                                Manajemen <span class="fw-normal">Penjamin & Sub Penjamin</span>
-                            </h3>
+                            <span class="d-block text-uppercase" style="color: #94a3b8; font-size: 0.62rem;">Penjamin Utama</span>
+                            <span class="ent-font-display fw-bold text-white fs--1">{{ count($penjaminUtama) }} Kategori</span>
                         </div>
                     </div>
                 </div>
@@ -185,54 +359,61 @@
 </div>
 
 <!-- MAIN LAYOUT -->
-<div class="row g-4">
+<div class="row g-3">
     <!-- KOLOM KIRI: PENJAMIN UTAMA -->
     <div class="col-lg-4">
-        <div class="retro-card h-100">
-            <div class="card-header py-3 px-3 border-bottom border-dark d-flex justify-content-between align-items-center" style="background-color: var(--retro-yellow);">
-                <h5 class="mb-0 text-dark fw-bolder fs-0"><i class="fas fa-building me-1"></i> Penjamin Utama</h5>
-                <button class="btn btn-sm retro-btn retro-btn-success px-2 py-1 fs--1" data-bs-toggle="modal" data-bs-target="#modal-tambah-penjamin">
-                    <i class="fas fa-plus"></i> Tambah
+        <div class="ent-card h-100">
+            <div class="ent-card-header d-flex justify-content-between align-items-center">
+                <div class="d-flex align-items-center gap-2">
+                    <span class="rounded-2 d-flex align-items-center justify-content-center" style="width: 28px; height: 28px; background: var(--ent-indigo-soft); color: var(--ent-indigo);">
+                        <i class="fas fa-building fs--1"></i>
+                    </span>
+                    <h6 class="ent-font-display mb-0 text-dark fw-bold">Penjamin Utama</h6>
+                </div>
+                <button class="btn btn-sm btn-ent-success px-2 py-1 fs--1" data-bs-toggle="modal" data-bs-target="#modal-tambah-penjamin">
+                    <i class="fas fa-plus me-1"></i> Tambah
                 </button>
             </div>
             <div class="card-body p-3 bg-white">
                 <div class="mb-3">
-                    <div class="input-group input-group-sm">
-                        <span class="input-group-text bg-white text-dark" style="border: 2px solid var(--retro-dark); border-right: none;">
-                            <i class="fas fa-search"></i>
-                        </span>
-                        <input type="text" id="search-penjamin-utama" class="form-control retro-input form-control-sm" placeholder="Cari penjamin utama...">
+                    <div class="position-relative">
+                        <i class="fas fa-search text-muted position-absolute top-50 start-0 translate-middle-y ms-3 fs--1"></i>
+                        <input type="text" id="search-penjamin-utama" class="form-control ent-input form-control-sm ps-5" placeholder="Cari penjamin utama...">
                     </div>
                 </div>
 
-                <div class="list-group" id="list-penjamin-utama" style="max-height: 440px; overflow-y: auto;">
+                <div class="list-group" id="list-penjamin-utama" style="max-height: 460px; overflow-y: auto;">
                     @forelse ($penjaminUtama as $utama)
                     <div class="list-group-item list-group-item-penjamin p-2 px-3 d-flex justify-content-between align-items-center @if($loop->first) active @endif"
                         data-id="{{ $utama->id }}"
                         data-nama="{{ $utama->nama_penjamin }}">
-                        <div class="flex-grow-1 text-truncate pe-2 item-click-target">
-                            <i class="fas fa-folder-open me-2"></i>
-                            <span class="nama-penjamin-text fw-bold">{{ $utama->nama_penjamin }}</span>
-                            <br>
-                            <small>
-                                <span class="badge bg-dark text-warning" style="font-size: 0.6rem;">
+                        <div class="d-flex align-items-center gap-2 flex-grow-1 text-truncate pe-2 item-click-target">
+                            <div class="folder-icon-box">
+                                <i class="fas fa-folder-open fs--1"></i>
+                            </div>
+                            <div class="text-truncate">
+                                <div class="nama-penjamin-text ent-font-display fw-bold fs--1 text-truncate">{{ $utama->nama_penjamin }}</div>
+                                <span class="badge rounded-pill bg-light text-secondary border mt-0.5" style="font-size: 0.62rem;">
                                     {{ $utama->jenis_kategori ?? 'Umum / Lainnya' }}
                                 </span>
-                            </small>
+                            </div>
                         </div>
-                        <div class="d-flex align-items-center gap-1">
-                            <button type="button" class="btn btn-sm retro-btn retro-btn-warning px-2 py-1 btn-edit-utama"
+                        <div class="d-flex align-items-center gap-1.5 flex-shrink-0">
+                            <button type="button" class="btn btn-sm btn-ent-soft-warning px-2 py-1 btn-edit-utama"
                                 data-id="{{ $utama->id }}"
                                 data-nama="{{ $utama->nama_penjamin }}"
                                 data-kategori="{{ $utama->jenis_kategori }}"
-                                title="Edit Penjamin Utama" style="font-size: 0.65rem;">
+                                title="Edit Penjamin Utama" style="font-size: 0.68rem;">
                                 <i class="fas fa-edit"></i>
                             </button>
                             <i class="fas fa-chevron-right fs--2 text-muted ms-1"></i>
                         </div>
                     </div>
                     @empty
-                    <div class="text-center py-4 text-muted fw-bold fst-italic">Belum ada penjamin utama.</div>
+                    <div class="text-center py-5 text-muted fs--1">
+                        <i class="fas fa-folder-open d-block fs-2 mb-2 opacity-50"></i>
+                        Belum ada penjamin utama.
+                    </div>
                     @endforelse
                 </div>
             </div>
@@ -241,27 +422,32 @@
 
     <!-- KOLOM KANAN: TABEL SUB PENJAMIN -->
     <div class="col-lg-8">
-        <div class="retro-card h-100">
-            <div class="card-header py-3 px-3 border-bottom border-dark d-flex justify-content-between align-items-center" style="background-color: var(--retro-dark); color: white;">
-                <h5 class="mb-0 text-white fw-bolder fs-0">
-                    <i class="fas fa-list-alt text-info me-1"></i> Sub Penjamin untuk: <span id="selected-penjamin-title" class="text-warning text-decoration-underline">Pilih Penjamin</span>
-                </h5>
-                <button class="btn btn-sm retro-btn retro-btn-success px-3 py-1 fs--1" data-bs-toggle="modal" data-bs-target="#modal-tambah-sub-penjamin" id="btn-tambah-sub-trigger" disabled>
+        <div class="ent-card h-100">
+            <div class="ent-card-header d-flex flex-wrap justify-content-between align-items-center gap-2">
+                <div class="d-flex align-items-center gap-2">
+                    <span class="rounded-2 d-flex align-items-center justify-content-center" style="width: 28px; height: 28px; background: #e0f2fe; color: #0284c7;">
+                        <i class="fas fa-list-alt fs--1"></i>
+                    </span>
+                    <h6 class="ent-font-display mb-0 text-dark fw-bold">
+                        Sub Penjamin: <span id="selected-penjamin-title" class="text-primary">Pilih Penjamin</span>
+                    </h6>
+                </div>
+                <button class="btn btn-sm btn-ent-success px-3 py-1.5 fs--1" data-bs-toggle="modal" data-bs-target="#modal-tambah-sub-penjamin" id="btn-tambah-sub-trigger" disabled>
                     <i class="fas fa-plus-circle me-1"></i> Tambah Sub Penjamin
                 </button>
             </div>
             <div class="card-body p-3 bg-white">
                 <div class="table-responsive">
-                    <table id="table-sub-penjamin" class="table table-custom align-middle w-100 mb-0 fs--1 table-bordered" style="border: 2px solid var(--retro-dark);">
+                    <table id="table-sub-penjamin" class="table table-custom align-middle w-100 mb-0">
                         <thead>
                             <tr>
-                                <th class="py-2 px-3 text-center" style="width: 40px;">No</th>
-                                <th class="py-2 px-3">Nama Perusahaan / Asuransi</th>
-                                <th class="py-2 px-3 text-center">Status</th>
-                                <th class="py-2 px-3 text-center">Metode Bayar</th>
-                                <th class="py-2 px-3">Kontak PIC</th>
-                                <th class="py-2 px-3 text-center">Agreement / Ref</th>
-                                <th class="py-2 px-3 text-center" style="width: 85px;">Aksi</th>
+                                <th class="text-center" style="width: 40px;">No</th>
+                                <th>Nama Perusahaan / Asuransi</th>
+                                <th class="text-center">Status</th>
+                                <th class="text-center">Metode Bayar</th>
+                                <th>Kontak PIC</th>
+                                <th class="text-center">Agreement / Ref</th>
+                                <th class="text-center" style="width: 110px;">Aksi</th>
                             </tr>
                         </thead>
                         <tbody id="sub-penjamin-tbody"></tbody>
@@ -275,21 +461,21 @@
 <!-- MODAL TAMBAH PENJAMIN UTAMA -->
 <div class="modal fade" id="modal-tambah-penjamin" tabindex="-1" aria-hidden="true">
     <div class="modal-dialog modal-dialog-centered">
-        <div class="modal-content retro-card border-0">
-            <div class="card-header py-3 px-3 border-bottom border-dark d-flex justify-content-between align-items-center" style="background-color: var(--retro-yellow);">
-                <h5 class="mb-0 text-dark fw-bolder"><i class="fas fa-plus-circle me-1"></i> Tambah Penjamin Utama</h5>
-                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+        <div class="modal-content ent-modal-content">
+            <div class="ent-modal-header d-flex justify-content-between align-items-center">
+                <h6 class="ent-font-display mb-0 text-white fw-bold"><i class="fas fa-plus-circle text-info me-2"></i>Tambah Penjamin Utama</h6>
+                <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal" aria-label="Close"></button>
             </div>
             <div class="card-body p-4 bg-white">
                 <form action="{{ route('master_penjamin_utama_store') }}" method="POST">
                     @csrf
                     <div class="mb-3">
-                        <label class="form-label fw-bold text-dark fs--1">Nama Penjamin Utama</label>
-                        <input type="text" class="form-control retro-input" name="nama_penjamin" placeholder="Contoh: BPJS, Asuransi Swasta, Umum..." required>
+                        <label class="form-label fw-semibold text-dark fs--1">Nama Penjamin Utama</label>
+                        <input type="text" class="form-control ent-input" name="nama_penjamin" placeholder="Contoh: BPJS, Asuransi Swasta, Umum..." required>
                     </div>
-                    <div class="d-flex justify-content-end gap-2 pt-2 border-top border-dark">
-                        <button type="button" class="btn retro-btn btn-secondary btn-sm px-3" data-bs-dismiss="modal">Batal</button>
-                        <button type="submit" class="btn retro-btn retro-btn-success btn-sm px-4">Simpan</button>
+                    <div class="d-flex justify-content-end gap-2 pt-3 border-top">
+                        <button type="button" class="btn btn-light border btn-sm px-3 fw-semibold" data-bs-dismiss="modal">Batal</button>
+                        <button type="submit" class="btn btn-ent-success btn-sm px-4">Simpan</button>
                     </div>
                 </form>
             </div>
@@ -297,13 +483,13 @@
     </div>
 </div>
 
-<!-- MODAL TAMBAH SUB PENJAMIN (DISESUAIKAN DENGAN SKEMA TABEL TERBARU) -->
+<!-- MODAL TAMBAH SUB PENJAMIN -->
 <div class="modal fade" id="modal-tambah-sub-penjamin" tabindex="-1" aria-hidden="true">
     <div class="modal-dialog modal-dialog-centered modal-lg">
-        <div class="modal-content retro-card border-0">
-            <div class="card-header py-3 px-3 border-bottom border-dark d-flex justify-content-between align-items-center" style="background-color: var(--retro-yellow);">
-                <h5 class="mb-0 text-dark fw-bolder"><i class="fas fa-plus-circle me-1"></i> Form Sub Penjamin / Rekanan</h5>
-                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+        <div class="modal-content ent-modal-content">
+            <div class="ent-modal-header d-flex justify-content-between align-items-center">
+                <h6 class="ent-font-display mb-0 text-white fw-bold"><i class="fas fa-plus-circle text-info me-2"></i>Form Sub Penjamin / Rekanan</h6>
+                <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal" aria-label="Close"></button>
             </div>
             <div class="modal-body p-4 bg-white" style="max-height: 80vh; overflow-y: auto;">
                 <form action="{{ route('sub_penjamin_store') }}" method="POST">
@@ -313,59 +499,59 @@
                     <div class="row g-3">
                         <!-- SECTION 1: IDENTITAS & KONTRAK -->
                         <div class="col-md-12">
-                            <h6 class="fw-bold text-success border-bottom pb-1 mb-0"><i class="fas fa-info-circle me-1"></i> Identitas & Kontrak</h6>
+                            <div class="ent-section-title"><i class="fas fa-info-circle me-1"></i> Identitas & Kontrak</div>
                         </div>
                         <div class="col-md-6">
-                            <label class="form-label fw-bold text-dark fs--1">Nama Perusahaan / Asuransi*</label>
-                            <input type="text" class="form-control retro-input" name="nama_sub_penjamin" placeholder="Nama Perusahaan..." required>
+                            <label class="form-label fw-semibold text-dark fs--1">Nama Perusahaan / Asuransi <span class="text-danger">*</span></label>
+                            <input type="text" class="form-control ent-input" name="nama_sub_penjamin" placeholder="Nama Perusahaan..." required>
                         </div>
                         <div class="col-md-6">
-                            <label class="form-label fw-bold text-dark fs--1">No. Kontrak / SPK / MoU</label>
-                            <input type="text" class="form-control retro-input" name="no_ref" placeholder="No Referensi">
+                            <label class="form-label fw-semibold text-dark fs--1">No. Kontrak / SPK / MoU</label>
+                            <input type="text" class="form-control ent-input" name="no_ref" placeholder="No Referensi">
                         </div>
                         <div class="col-md-6">
-                            <label class="form-label fw-bold text-dark fs--1">Tgl. Mulai</label>
-                            <input type="date" class="form-control retro-input" name="tgl_mulai">
+                            <label class="form-label fw-semibold text-dark fs--1">Tgl. Mulai</label>
+                            <input type="date" class="form-control ent-input" name="tgl_mulai">
                         </div>
                         <div class="col-md-6">
-                            <label class="form-label fw-bold text-dark fs--1">Tgl. Selesai</label>
-                            <input type="date" class="form-control retro-input" name="tgl_selesai">
+                            <label class="form-label fw-semibold text-dark fs--1">Tgl. Selesai</label>
+                            <input type="date" class="form-control ent-input" name="tgl_selesai">
                         </div>
                         <div class="col-md-12">
-                            <label class="form-label fw-bold text-dark fs--1">Catatan Pelayanan</label>
-                            <textarea class="form-control retro-input" name="catatan_pelayanan" rows="2" placeholder="Catatan khusus pelayanan..."></textarea>
+                            <label class="form-label fw-semibold text-dark fs--1">Catatan Pelayanan</label>
+                            <textarea class="form-control ent-input" name="catatan_pelayanan" rows="2" placeholder="Catatan khusus pelayanan..."></textarea>
                         </div>
 
                         <!-- SECTION 2: PEMBAYARAN & KEUANGAN -->
-                        <div class="col-md-12 mt-3">
-                            <h6 class="fw-bold text-success border-bottom pb-1 mb-0"><i class="fas fa-calculator me-1"></i> Pengaturan Pembayaran & Keuangan</h6>
+                        <div class="col-md-12 mt-4">
+                            <div class="ent-section-title"><i class="fas fa-calculator me-1"></i> Pengaturan Pembayaran & Keuangan</div>
                         </div>
                         <div class="col-md-4">
-                            <label class="form-label fw-bold text-dark fs--1">Metode Pembayaran</label>
-                            <select class="form-select retro-input" name="tipe_pembayaran" required>
+                            <label class="form-label fw-semibold text-dark fs--1">Metode Pembayaran</label>
+                            <select class="form-select ent-input" name="tipe_pembayaran" required>
                                 <option value="CASH_DI_AWAL">Cash di Awal</option>
                                 <option value="CORPORATE_BILLING">Corporate Billing</option>
                                 <option value="INSURANCE_CLAIM">Insurance Claim</option>
                             </select>
                         </div>
                         <div class="col-md-4">
-                            <label class="form-label fw-bold text-dark fs--1">Jatuh Tempo (Hari)</label>
-                            <input type="number" class="form-control retro-input" name="jatuh_tempo_hari" value="30">
+                            <label class="form-label fw-semibold text-dark fs--1">Jatuh Tempo (Hari)</label>
+                            <input type="number" class="form-control ent-input" name="jatuh_tempo_hari" value="30">
                         </div>
                         <div class="col-md-4">
-                            <label class="form-label fw-bold text-dark fs--1">Min DP (%)</label>
-                            <input type="number" step="0.01" class="form-control retro-input" name="min_dp_persen" value="0.00">
+                            <label class="form-label fw-semibold text-dark fs--1">Min DP (%)</label>
+                            <input type="number" step="0.01" class="form-control ent-input" name="min_dp_persen" value="0.00">
                         </div>
 
                         <!-- SKEMA TANGGUNGAN (COVERAGE RULE) -->
                         <div class="col-md-12 pt-2">
-                            <div class="row g-2 p-3 border border-dark rounded" style="background-color: var(--retro-bg);">
-                                <div class="col-md-12 mb-1">
-                                    <label class="fw-bold text-dark fs--2 text-uppercase"><i class="fas fa-shield-alt me-1"></i> Skema Tanggungan Biaya (Coverage Rule)</label>
+                            <div class="row g-3 p-3 rounded-3 border" style="background-color: var(--ent-bg);">
+                                <div class="col-md-12 mb-0">
+                                    <label class="fw-bold text-primary fs--2 text-uppercase"><i class="fas fa-shield-alt me-1"></i> Skema Tanggungan Biaya (Coverage Rule)</label>
                                 </div>
                                 <div class="col-md-4">
-                                    <label class="form-label fw-bold text-dark fs--1">Pola Tanggungan</label>
-                                    <select class="form-select retro-input form-select-sm" name="pola_tanggungan" id="add-pola-tanggungan">
+                                    <label class="form-label fw-semibold text-dark fs--1">Pola Tanggungan</label>
+                                    <select class="form-select ent-input form-select-sm" name="pola_tanggungan" id="add-pola-tanggungan">
                                         <option value="FULL_PASIEN">Full Pasien (100% Tunai)</option>
                                         <option value="FULL_PERUSAHAAN">Full Perusahaan (100% Piutang)</option>
                                         <option value="SPLIT_PERSENTASE">Split (Persentase %)</option>
@@ -373,53 +559,53 @@
                                     </select>
                                 </div>
                                 <div class="col-md-4 add-wrapper-tanggungan d-none" id="add-wrapper-persen">
-                                    <label class="form-label fw-bold text-dark fs--1">Tanggungan Perusahaan (%)</label>
-                                    <input type="number" step="0.01" class="form-control retro-input form-select-sm" name="tanggungan_perusahaan_persen" value="0.00">
+                                    <label class="form-label fw-semibold text-dark fs--1">Tanggungan Perusahaan (%)</label>
+                                    <input type="number" step="0.01" class="form-control ent-input form-control-sm" name="tanggungan_perusahaan_persen" value="0.00">
                                 </div>
                                 <div class="col-md-4 add-wrapper-tanggungan d-none" id="add-wrapper-plafon">
-                                    <label class="form-label fw-bold text-dark fs--1">Maks. Plafon (Rp)</label>
-                                    <input type="number" step="0.01" class="form-control retro-input form-select-sm" name="tanggungan_perusahaan_maksimal_rp" value="0.00">
+                                    <label class="form-label fw-semibold text-dark fs--1">Maks. Plafon (Rp)</label>
+                                    <input type="number" step="0.01" class="form-control ent-input form-control-sm" name="tanggungan_perusahaan_maksimal_rp" value="0.00">
                                 </div>
                             </div>
                         </div>
 
                         <!-- SECTION 3: KONTAK & ALAMAT UTAMA -->
-                        <div class="col-md-12 mt-3">
-                            <h6 class="fw-bold text-success border-bottom pb-1 mb-0"><i class="fas id-card me-1"></i> Kontak & Alamat Utama</h6>
+                        <div class="col-md-12 mt-4">
+                            <div class="ent-section-title"><i class="fas fa-map-marker-alt me-1"></i> Kontak & Alamat Utama</div>
                         </div>
                         <div class="col-md-6">
-                            <label class="form-label fw-bold text-dark fs--1">No. Telp Perusahaan</label>
-                            <input type="text" class="form-control retro-input" name="telp_perusahaan" placeholder="No Telepon...">
+                            <label class="form-label fw-semibold text-dark fs--1">No. Telp Perusahaan</label>
+                            <input type="text" class="form-control ent-input" name="telp_perusahaan" placeholder="No Telepon...">
                         </div>
                         <div class="col-md-6">
-                            <label class="form-label fw-bold text-dark fs--1">Alamat</label>
-                            <textarea class="form-control retro-input" name="alamat" rows="2" placeholder="Alamat perusahaan..."></textarea>
+                            <label class="form-label fw-semibold text-dark fs--1">Alamat</label>
+                            <textarea class="form-control ent-input" name="alamat" rows="2" placeholder="Alamat perusahaan..."></textarea>
                         </div>
 
                         <!-- SECTION 4: MULTI-PIC KEUANGAN -->
-                        <div class="col-md-12 mt-3">
-                            <div class="d-flex justify-content-between align-items-center border-bottom pb-1">
-                                <h6 class="fw-bold text-success mb-0"><i class="fas fa-id-card me-1"></i> PIC Keuangan / Klaim</h6>
-                                <button type="button" class="btn btn-sm retro-btn retro-btn-primary py-0 px-2 fs--2" id="btn-tambah-pic-row">
-                                    <i class="fas fa-plus"></i> Tambah PIC
+                        <div class="col-md-12 mt-4">
+                            <div class="d-flex justify-content-between align-items-center border-bottom pb-2">
+                                <span class="ent-section-title border-0 pb-0 mb-0"><i class="fas fa-id-card me-1"></i> PIC Keuangan / Klaim</span>
+                                <button type="button" class="btn btn-sm btn-ent-soft-primary py-1 px-2 fs--2" id="btn-tambah-pic-row">
+                                    <i class="fas fa-plus me-1"></i> Tambah PIC
                                 </button>
                             </div>
                         </div>
                         <div class="col-md-12">
                             <div id="container-pic-rows" class="d-flex flex-column gap-2">
-                                <div class="card p-2 bg-light border border-dark pic-item-row">
+                                <div class="card p-2 bg-light border rounded-3 pic-item-row">
                                     <div class="row g-2 align-items-center">
                                         <div class="col-md-4">
-                                            <input type="text" class="form-control retro-input form-control-sm" name="pics[0][nama_pic]" placeholder="Nama PIC..." required>
+                                            <input type="text" class="form-control ent-input form-control-sm" name="pics[0][nama_pic]" placeholder="Nama PIC..." required>
                                         </div>
                                         <div class="col-md-3">
-                                            <input type="text" class="form-control retro-input form-control-sm" name="pics[0][telepon]" placeholder="No. HP...">
+                                            <input type="text" class="form-control ent-input form-control-sm" name="pics[0][telepon]" placeholder="No. HP...">
                                         </div>
                                         <div class="col-md-4">
-                                            <input type="email" class="form-control retro-input form-control-sm" name="pics[0][email]" placeholder="Email...">
+                                            <input type="email" class="form-control ent-input form-control-sm" name="pics[0][email]" placeholder="Email...">
                                         </div>
                                         <div class="col-md-1 text-center">
-                                            <button type="button" class="btn btn-sm btn-danger py-1 px-2 btn-hapus-pic" title="Hapus"><i class="fas fa-trash"></i></button>
+                                            <button type="button" class="btn btn-sm btn-outline-danger py-1 px-2 btn-hapus-pic" title="Hapus"><i class="fas fa-trash"></i></button>
                                         </div>
                                     </div>
                                 </div>
@@ -427,24 +613,24 @@
                         </div>
 
                         <!-- SECTION 5: KETENTUAN KHUSUS & STATUS -->
-                        <div class="col-md-12 mt-3">
-                            <h6 class="fw-bold text-success border-bottom pb-1 mb-0"><i class="fas fa-cog me-1"></i> Ketentuan & Status</h6>
+                        <div class="col-md-12 mt-4">
+                            <div class="ent-section-title"><i class="fas fa-cog me-1"></i> Ketentuan & Status</div>
                         </div>
                         <div class="col-md-12">
                             <div class="form-check">
-                                <input class="form-check-input border-dark" type="checkbox" name="wajib_surat_garansi" value="1" id="add_wajib_lo">
-                                <label class="form-check-label fw-bold text-dark fs--1" for="add_wajib_lo">Wajib melampirkan Surat Garansi / LoG (Letter of Guarantee)</label>
+                                <input class="form-check-input" type="checkbox" name="wajib_surat_garansi" value="1" id="add_wajib_lo">
+                                <label class="form-check-label fw-semibold text-dark fs--1" for="add_wajib_lo">Wajib melampirkan Surat Garansi / LoG (Letter of Guarantee)</label>
                             </div>
                             <div class="form-check form-switch mt-2">
-                                <input class="form-check-input border-dark" type="checkbox" value="1" name="status_aktif" id="add_status_aktif" checked>
-                                <label class="form-check-label fw-bold text-dark fs--1" for="add_status_aktif">Status Aktif</label>
+                                <input class="form-check-input" type="checkbox" value="1" name="status_aktif" id="add_status_aktif" checked>
+                                <label class="form-check-label fw-semibold text-dark fs--1" for="add_status_aktif">Status Aktif</label>
                             </div>
                         </div>
                     </div>
 
-                    <div class="d-flex justify-content-end gap-2 pt-3 mt-4 border-top border-dark">
-                        <button type="button" class="btn retro-btn btn-secondary btn-sm px-3" data-bs-dismiss="modal">Batal</button>
-                        <button type="submit" class="btn retro-btn retro-btn-success btn-sm px-4">Simpan</button>
+                    <div class="d-flex justify-content-end gap-2 pt-3 mt-4 border-top">
+                        <button type="button" class="btn btn-light border btn-sm px-3 fw-semibold" data-bs-dismiss="modal">Batal</button>
+                        <button type="submit" class="btn btn-ent-success btn-sm px-4">Simpan Data</button>
                     </div>
                 </form>
             </div>
@@ -452,13 +638,13 @@
     </div>
 </div>
 
-<!-- MODAL EDIT SUB PENJAMIN (DISESUAIKAN DENGAN SKEMA TABEL TERBARU) -->
+<!-- MODAL EDIT SUB PENJAMIN -->
 <div class="modal fade" id="modal-edit-sub-penjamin" tabindex="-1" aria-hidden="true">
     <div class="modal-dialog modal-dialog-centered modal-lg">
-        <div class="modal-content retro-card border-0">
-            <div class="card-header py-3 px-3 border-bottom border-dark d-flex justify-content-between align-items-center" style="background-color: var(--retro-yellow);">
-                <h5 class="mb-0 text-dark fw-bolder"><i class="fas fa-edit me-1"></i> Edit Sub Penjamin / Rekanan</h5>
-                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+        <div class="modal-content ent-modal-content">
+            <div class="ent-modal-header d-flex justify-content-between align-items-center">
+                <h6 class="ent-font-display mb-0 text-white fw-bold"><i class="fas fa-edit text-warning me-2"></i>Edit Sub Penjamin / Rekanan</h6>
+                <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal" aria-label="Close"></button>
             </div>
             <div class="modal-body p-4 bg-white" style="max-height: 80vh; overflow-y: auto;">
                 <form id="form-edit-sub-penjamin" method="POST">
@@ -467,59 +653,59 @@
                     <div class="row g-3">
                         <!-- SECTION 1: IDENTITAS & KONTRAK -->
                         <div class="col-md-12">
-                            <h6 class="fw-bold text-success border-bottom pb-1 mb-0"><i class="fas fa-info-circle me-1"></i> Identitas & Kontrak</h6>
+                            <div class="ent-section-title"><i class="fas fa-info-circle me-1"></i> Identitas & Kontrak</div>
                         </div>
                         <div class="col-md-6">
-                            <label class="form-label fw-bold text-dark fs--1">Nama Perusahaan / Asuransi*</label>
-                            <input type="text" class="form-control retro-input" id="edit-nama-sub-penjamin" name="nama_sub_penjamin" required>
+                            <label class="form-label fw-semibold text-dark fs--1">Nama Perusahaan / Asuransi <span class="text-danger">*</span></label>
+                            <input type="text" class="form-control ent-input" id="edit-nama-sub-penjamin" name="nama_sub_penjamin" required>
                         </div>
                         <div class="col-md-6">
-                            <label class="form-label fw-bold text-dark fs--1">No. Kontrak / SPK / MoU</label>
-                            <input type="text" class="form-control retro-input" id="edit-no-ref" name="no_ref" placeholder="No Referensi">
+                            <label class="form-label fw-semibold text-dark fs--1">No. Kontrak / SPK / MoU</label>
+                            <input type="text" class="form-control ent-input" id="edit-no-ref" name="no_ref" placeholder="No Referensi">
                         </div>
                         <div class="col-md-6">
-                            <label class="form-label fw-bold text-dark fs--1">Tgl. Mulai</label>
-                            <input type="date" class="form-control retro-input" id="edit-tgl-mulai" name="tgl_mulai">
+                            <label class="form-label fw-semibold text-dark fs--1">Tgl. Mulai</label>
+                            <input type="date" class="form-control ent-input" id="edit-tgl-mulai" name="tgl_mulai">
                         </div>
                         <div class="col-md-6">
-                            <label class="form-label fw-bold text-dark fs--1">Tgl. Selesai</label>
-                            <input type="date" class="form-control retro-input" id="edit-tgl-selesai" name="tgl_selesai">
+                            <label class="form-label fw-semibold text-dark fs--1">Tgl. Selesai</label>
+                            <input type="date" class="form-control ent-input" id="edit-tgl-selesai" name="tgl_selesai">
                         </div>
                         <div class="col-md-12">
-                            <label class="form-label fw-bold text-dark fs--1">Catatan Pelayanan</label>
-                            <textarea class="form-control retro-input" id="edit-catatan-pelayanan" name="catatan_pelayanan" rows="2" placeholder="Catatan khusus pelayanan..."></textarea>
+                            <label class="form-label fw-semibold text-dark fs--1">Catatan Pelayanan</label>
+                            <textarea class="form-control ent-input" id="edit-catatan-pelayanan" name="catatan_pelayanan" rows="2" placeholder="Catatan khusus pelayanan..."></textarea>
                         </div>
 
                         <!-- SECTION 2: PEMBAYARAN & KEUANGAN -->
-                        <div class="col-md-12 mt-3">
-                            <h6 class="fw-bold text-success border-bottom pb-1 mb-0"><i class="fas fa-calculator me-1"></i> Pengaturan Pembayaran & Keuangan</h6>
+                        <div class="col-md-12 mt-4">
+                            <div class="ent-section-title"><i class="fas fa-calculator me-1"></i> Pengaturan Pembayaran & Keuangan</div>
                         </div>
                         <div class="col-md-4">
-                            <label class="form-label fw-bold text-dark fs--1">Metode Pembayaran</label>
-                            <select class="form-select retro-input" id="edit-tipe-pembayaran" name="tipe_pembayaran" required>
+                            <label class="form-label fw-semibold text-dark fs--1">Metode Pembayaran</label>
+                            <select class="form-select ent-input" id="edit-tipe-pembayaran" name="tipe_pembayaran" required>
                                 <option value="CASH_DI_AWAL">Cash di Awal</option>
                                 <option value="CORPORATE_BILLING">Corporate Billing</option>
                                 <option value="INSURANCE_CLAIM">Insurance Claim</option>
                             </select>
                         </div>
                         <div class="col-md-4">
-                            <label class="form-label fw-bold text-dark fs--1">Jatuh Tempo (Hari)</label>
-                            <input type="number" class="form-control retro-input" id="edit-jatuh-tempo" name="jatuh_tempo_hari">
+                            <label class="form-label fw-semibold text-dark fs--1">Jatuh Tempo (Hari)</label>
+                            <input type="number" class="form-control ent-input" id="edit-jatuh-tempo" name="jatuh_tempo_hari">
                         </div>
                         <div class="col-md-4">
-                            <label class="form-label fw-bold text-dark fs--1">Min DP (%)</label>
-                            <input type="number" step="0.01" class="form-control retro-input" id="edit-min-dp" name="min_dp_persen">
+                            <label class="form-label fw-semibold text-dark fs--1">Min DP (%)</label>
+                            <input type="number" step="0.01" class="form-control ent-input" id="edit-min-dp" name="min_dp_persen">
                         </div>
 
                         <!-- SKEMA TANGGUNGAN (COVERAGE RULE) MODAL EDIT -->
                         <div class="col-md-12 pt-2">
-                            <div class="row g-2 p-3 border border-dark rounded" style="background-color: var(--retro-bg);">
-                                <div class="col-md-12 mb-1">
-                                    <label class="fw-bold text-dark fs--2 text-uppercase"><i class="fas fa-shield-alt me-1"></i> Skema Tanggungan Biaya (Coverage Rule)</label>
+                            <div class="row g-3 p-3 rounded-3 border" style="background-color: var(--ent-bg);">
+                                <div class="col-md-12 mb-0">
+                                    <label class="fw-bold text-primary fs--2 text-uppercase"><i class="fas fa-shield-alt me-1"></i> Skema Tanggungan Biaya (Coverage Rule)</label>
                                 </div>
                                 <div class="col-md-4">
-                                    <label class="form-label fw-bold text-dark fs--1">Pola Tanggungan</label>
-                                    <select class="form-select retro-input form-select-sm" name="pola_tanggungan" id="edit-pola-tanggungan">
+                                    <label class="form-label fw-semibold text-dark fs--1">Pola Tanggungan</label>
+                                    <select class="form-select ent-input form-select-sm" name="pola_tanggungan" id="edit-pola-tanggungan">
                                         <option value="FULL_PASIEN">Full Pasien (100% Tunai)</option>
                                         <option value="FULL_PERUSAHAAN">Full Perusahaan (100% Piutang)</option>
                                         <option value="SPLIT_PERSENTASE">Split (Persentase %)</option>
@@ -527,35 +713,35 @@
                                     </select>
                                 </div>
                                 <div class="col-md-4 edit-wrapper-tanggungan d-none" id="edit-wrapper-persen">
-                                    <label class="form-label fw-bold text-dark fs--1">Tanggungan Perusahaan (%)</label>
-                                    <input type="number" step="0.01" class="form-control retro-input form-select-sm" id="edit-tanggungan-persen" name="tanggungan_perusahaan_persen" value="0.00">
+                                    <label class="form-label fw-semibold text-dark fs--1">Tanggungan Perusahaan (%)</label>
+                                    <input type="number" step="0.01" class="form-control ent-input form-control-sm" id="edit-tanggungan-persen" name="tanggungan_perusahaan_persen" value="0.00">
                                 </div>
                                 <div class="col-md-4 edit-wrapper-tanggungan d-none" id="edit-wrapper-plafon">
-                                    <label class="form-label fw-bold text-dark fs--1">Maks. Plafon (Rp)</label>
-                                    <input type="number" step="0.01" class="form-control retro-input form-select-sm" id="edit-tanggungan-plafon" name="tanggungan_perusahaan_maksimal_rp" value="0.00">
+                                    <label class="form-label fw-semibold text-dark fs--1">Maks. Plafon (Rp)</label>
+                                    <input type="number" step="0.01" class="form-control ent-input form-control-sm" id="edit-tanggungan-plafon" name="tanggungan_perusahaan_maksimal_rp" value="0.00">
                                 </div>
                             </div>
                         </div>
 
                         <!-- SECTION 3: KONTAK & ALAMAT UTAMA -->
-                        <div class="col-md-12 mt-3">
-                            <h6 class="fw-bold text-success border-bottom pb-1 mb-0"><i class="fas fa-id-card me-1"></i> Kontak & Alamat Utama</h6>
+                        <div class="col-md-12 mt-4">
+                            <div class="ent-section-title"><i class="fas fa-id-card me-1"></i> Kontak & Alamat Utama</div>
                         </div>
                         <div class="col-md-6">
-                            <label class="form-label fw-bold text-dark fs--1">No. Telp Perusahaan</label>
-                            <input type="text" class="form-control retro-input" id="edit-telp-perusahaan" name="telp_perusahaan" placeholder="No Telepon...">
+                            <label class="form-label fw-semibold text-dark fs--1">No. Telp Perusahaan</label>
+                            <input type="text" class="form-control ent-input" id="edit-telp-perusahaan" name="telp_perusahaan" placeholder="No Telepon...">
                         </div>
                         <div class="col-md-6">
-                            <label class="form-label fw-bold text-dark fs--1">Alamat</label>
-                            <textarea class="form-control retro-input" id="edit-alamat" name="alamat" rows="2" placeholder="Alamat perusahaan..."></textarea>
+                            <label class="form-label fw-semibold text-dark fs--1">Alamat</label>
+                            <textarea class="form-control ent-input" id="edit-alamat" name="alamat" rows="2" placeholder="Alamat perusahaan..."></textarea>
                         </div>
 
                         <!-- SECTION 4: MULTI-PIC KEUANGAN -->
-                        <div class="col-md-12 mt-3">
-                            <div class="d-flex justify-content-between align-items-center border-bottom pb-1">
-                                <h6 class="fw-bold text-success mb-0"><i class="fas fa-id-card me-1"></i> PIC Keuangan / Klaim</h6>
-                                <button type="button" class="btn btn-sm retro-btn retro-btn-primary py-0 px-2 fs--2" id="btn-tambah-pic-row-edit">
-                                    <i class="fas fa-plus"></i> Tambah PIC
+                        <div class="col-md-12 mt-4">
+                            <div class="d-flex justify-content-between align-items-center border-bottom pb-2">
+                                <span class="ent-section-title border-0 pb-0 mb-0"><i class="fas fa-id-card me-1"></i> PIC Keuangan / Klaim</span>
+                                <button type="button" class="btn btn-sm btn-ent-soft-primary py-1 px-2 fs--2" id="btn-tambah-pic-row-edit">
+                                    <i class="fas fa-plus me-1"></i> Tambah PIC
                                 </button>
                             </div>
                         </div>
@@ -564,24 +750,24 @@
                         </div>
 
                         <!-- SECTION 5: KETENTUAN KHUSUS & STATUS -->
-                        <div class="col-md-12 mt-3">
-                            <h6 class="fw-bold text-success border-bottom pb-1 mb-0"><i class="fas fa-cog me-1"></i> Ketentuan & Status</h6>
+                        <div class="col-md-12 mt-4">
+                            <div class="ent-section-title"><i class="fas fa-cog me-1"></i> Ketentuan & Status</div>
                         </div>
                         <div class="col-md-12">
                             <div class="form-check">
-                                <input class="form-check-input border-dark" type="checkbox" name="wajib_surat_garansi" value="1" id="edit_wajib_lo">
-                                <label class="form-check-label fw-bold text-dark fs--1" for="edit_wajib_lo">Wajib melampirkan Surat Garansi / LoG (Letter of Guarantee)</label>
+                                <input class="form-check-input" type="checkbox" name="wajib_surat_garansi" value="1" id="edit_wajib_lo">
+                                <label class="form-check-label fw-semibold text-dark fs--1" for="edit_wajib_lo">Wajib melampirkan Surat Garansi / LoG (Letter of Guarantee)</label>
                             </div>
                             <div class="form-check form-switch mt-2">
-                                <input class="form-check-input border-dark" type="checkbox" value="1" name="status_aktif" id="edit_status_aktif">
-                                <label class="form-check-label fw-bold text-dark fs--1" for="edit_status_aktif">Status Aktif</label>
+                                <input class="form-check-input" type="checkbox" value="1" name="status_aktif" id="edit_status_aktif">
+                                <label class="form-check-label fw-semibold text-dark fs--1" for="edit_status_aktif">Status Aktif</label>
                             </div>
                         </div>
                     </div>
 
-                    <div class="d-flex justify-content-end gap-2 pt-3 mt-4 border-top border-dark">
-                        <button type="button" class="btn retro-btn btn-secondary btn-sm px-3" data-bs-dismiss="modal">Batal</button>
-                        <button type="submit" class="btn retro-btn retro-btn-success btn-sm px-4">Perbarui</button>
+                    <div class="d-flex justify-content-end gap-2 pt-3 mt-4 border-top">
+                        <button type="button" class="btn btn-light border btn-sm px-3 fw-semibold" data-bs-dismiss="modal">Batal</button>
+                        <button type="submit" class="btn btn-ent-success btn-sm px-4">Perbarui Data</button>
                     </div>
                 </form>
             </div>
@@ -592,36 +778,35 @@
 <!-- MODAL PENGATURAN TARIF (DINAMIS 3 TABEL) -->
 <div class="modal fade" id="modal-pengaturan-tarif" tabindex="-1" aria-hidden="true">
     <div class="modal-dialog modal-dialog-centered modal-xl">
-        <div class="modal-content retro-card border-0">
-            <div class="card-header py-3 px-3 border-bottom border-dark d-flex justify-content-between align-items-center" style="background-color: var(--retro-cyan);">
-                <h5 class="mb-0 text-dark fw-bolder"><i class="fas fa-tags me-1"></i> Pengaturan Tarif Khusus: <span id="title-tarif-nama" class="text-primary"></span></h5>
-                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+        <div class="modal-content ent-modal-content">
+            <div class="ent-modal-header d-flex justify-content-between align-items-center">
+                <h6 class="ent-font-display mb-0 text-white fw-bold"><i class="fas fa-tags text-info me-2"></i>Pengaturan Tarif Khusus: <span id="title-tarif-nama" style="color: #38bdf8;"></span></h6>
+                <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal" aria-label="Close"></button>
             </div>
             <div class="card-body p-0 bg-white">
                 <div class="row g-0 h-100">
                     <!-- KOLOM KIRI: FORM TAMBAH -->
-                    <div class="col-md-4 p-4 border-end border-dark bg-light" style="max-height: 500px; overflow-y: auto;">
-                        <h6 class="fw-bold text-dark border-bottom border-dark pb-2 mb-3"><i class="fas fa-plus-circle me-1"></i> Tambah Tarif</h6>
+                    <div class="col-md-4 p-4 border-end bg-light" style="max-height: 560px; overflow-y: auto;">
+                        <h6 class="ent-font-display fw-bold text-dark border-bottom pb-2 mb-3"><i class="fas fa-plus-circle text-primary me-1"></i> Tambah Tarif</h6>
                         <form id="form-pengaturan-tarif">
                             @csrf
                             <input type="hidden" name="sub_penjamin_id" id="tarif-sub-id">
-                            <div class="mb-3 p-3 border border-dark rounded bg-warning bg-opacity-10">
-                                <label class="form-label fw-bold text-dark fs--1 mb-1"><i class="fas fa-copy me-1"></i> Salin Data dari Sub Penjamin Lain</label>
+                            <div class="mb-3 p-3 border rounded-3 bg-white shadow-sm">
+                                <label class="form-label fw-bold text-dark fs--1 mb-1"><i class="fas fa-copy text-warning me-1"></i> Salin Data dari Sub Penjamin Lain</label>
                                 <div class="input-group input-group-sm">
-                                    <select class="form-select retro-input form-select-sm" id="select-sumber-sub-penjamin">
+                                    <select class="form-select ent-input form-select-sm" id="select-sumber-sub-penjamin">
                                         <option value="">-- Pilih Sub Penjamin Sumber --</option>
                                     </select>
-                                    <button type="button" class="btn retro-btn retro-btn-warning px-3" id="btn-proses-salin-tarif">
-                                        <i class="fas fa-file-import"></i> Salin
+                                    <button type="button" class="btn btn-ent-soft-warning px-3" id="btn-proses-salin-tarif">
+                                        <i class="fas fa-file-import me-1"></i> Salin
                                     </button>
                                 </div>
-                                <small class="text-muted d-block mt-1" style="font-size: 0.65rem;">Menyalin semua data tarif IGD, Poli, dan Ranap ke sub penjamin ini.</small>
+                                <small class="text-muted d-block mt-1" style="font-size: 0.68rem;">Menyalin semua data tarif IGD, Poli, dan Ranap ke sub penjamin ini.</small>
                             </div>
-                            <hr class="border-dark my-3">
 
                             <div class="mb-3">
-                                <label class="form-label fw-bold text-dark fs--1">Kategori Layanan</label>
-                                <select class="form-select retro-input" name="kategori_layanan" id="select-kategori-tarif" required>
+                                <label class="form-label fw-semibold text-dark fs--1">Kategori Layanan</label>
+                                <select class="form-select ent-input" name="kategori_layanan" id="select-kategori-tarif" required>
                                     <option value="">-- Pilih Layanan --</option>
                                     <option value="IGD">Tarif IGD</option>
                                     <option value="POLI">Tarif Poliklinik (Rajal)</option>
@@ -630,91 +815,91 @@
                             </div>
 
                             <!-- FORM KHUSUS IGD -->
-                            <div id="form-group-igd" class="d-none dynamic-tarif-form p-3 mb-3 border border-dark rounded bg-white">
-                                <h6 class="fw-bold text-danger border-bottom pb-1 fs--1"><i class="fas fa-ambulance"></i> Form Tarif IGD</h6>
+                            <div id="form-group-igd" class="d-none dynamic-tarif-form p-3 mb-3 border rounded-3 bg-white shadow-sm">
+                                <h6 class="fw-bold text-danger border-bottom pb-2 fs--1"><i class="fas fa-ambulance me-1"></i> Form Tarif IGD</h6>
                                 <div class="mb-2">
-                                    <label class="form-label fw-bold text-dark fs--2">Kategori Biaya</label>
-                                    <select class="form-select form-select-sm retro-input" name="igd_kategori_biaya">
+                                    <label class="form-label fw-semibold text-dark fs--2">Kategori Biaya</label>
+                                    <select class="form-select form-select-sm ent-input" name="igd_kategori_biaya">
                                         <option value="ADMINISTRASI">Administrasi</option>
                                         <option value="JASA_DOKTER_IGD">Jasa Dokter IGD</option>
                                         <option value="SARANA_IGD">Sarana IGD</option>
                                     </select>
                                 </div>
                                 <div class="mb-2">
-                                    <label class="form-label fw-bold text-dark fs--2">Nama Tarif</label>
-                                    <input type="text" class="form-control form-control-sm retro-input" name="igd_nama_tarif" placeholder="Cth: Konsultasi Dokter Jaga">
+                                    <label class="form-label fw-semibold text-dark fs--2">Nama Tarif</label>
+                                    <input type="text" class="form-control form-control-sm ent-input" name="igd_nama_tarif" placeholder="Cth: Konsultasi Dokter Jaga">
                                 </div>
                                 <div class="mb-2">
-                                    <label class="form-label fw-bold text-dark fs--2">Nominal Tarif (Rp)</label>
-                                    <input type="number" class="form-control form-control-sm retro-input" name="igd_tarif" placeholder="0">
+                                    <label class="form-label fw-semibold text-dark fs--2">Nominal Tarif (Rp)</label>
+                                    <input type="number" class="form-control form-control-sm ent-input" name="igd_tarif" placeholder="0">
                                 </div>
                             </div>
 
                             <!-- FORM KHUSUS POLI -->
-                            <div id="form-group-poli" class="d-none dynamic-tarif-form p-3 mb-3 border border-dark rounded bg-white">
-                                <h6 class="fw-bold text-success border-bottom pb-1 fs--1"><i class="fas fa-stethoscope"></i> Form Tarif Poliklinik</h6>
+                            <div id="form-group-poli" class="d-none dynamic-tarif-form p-3 mb-3 border rounded-3 bg-white shadow-sm">
+                                <h6 class="fw-bold text-success border-bottom pb-2 fs--1"><i class="fas fa-stethoscope me-1"></i> Form Tarif Poliklinik</h6>
                                 <div class="mb-2">
-                                    <label class="form-label fw-bold text-dark fs--2">Pilih Poliklinik</label>
-                                    <select class="form-select form-select-sm retro-input" name="poli_id" id="select-master-poli">
+                                    <label class="form-label fw-semibold text-dark fs--2">Pilih Poliklinik</label>
+                                    <select class="form-select form-select-sm ent-input" name="poli_id" id="select-master-poli">
                                         <option value="">-- Memuat data Poli... --</option>
                                     </select>
                                 </div>
                                 <div class="mb-2">
-                                    <label class="form-label fw-bold text-dark fs--2">Kategori Biaya</label>
-                                    <select class="form-select form-select-sm retro-input" name="poli_kategori_biaya">
+                                    <label class="form-label fw-semibold text-dark fs--2">Kategori Biaya</label>
+                                    <select class="form-select form-select-sm ent-input" name="poli_kategori_biaya">
                                         <option value="ADMINISTRASI">Administrasi</option>
                                         <option value="JASA_DOKTER">Jasa Dokter</option>
                                     </select>
                                 </div>
                                 <div class="mb-2">
-                                    <label class="form-label fw-bold text-dark fs--2">Nama Tarif</label>
-                                    <input type="text" class="form-control form-control-sm retro-input" name="poli_nama_tarif" placeholder="Cth: Jasa Konsultasi Spesialis">
+                                    <label class="form-label fw-semibold text-dark fs--2">Nama Tarif</label>
+                                    <input type="text" class="form-control form-control-sm ent-input" name="poli_nama_tarif" placeholder="Cth: Jasa Konsultasi Spesialis">
                                 </div>
                                 <div class="mb-2">
-                                    <label class="form-label fw-bold text-dark fs--2">Nominal Tarif (Rp)</label>
-                                    <input type="number" class="form-control form-control-sm retro-input" name="poli_tarif" placeholder="0">
+                                    <label class="form-label fw-semibold text-dark fs--2">Nominal Tarif (Rp)</label>
+                                    <input type="number" class="form-control form-control-sm ent-input" name="poli_tarif" placeholder="0">
                                 </div>
                             </div>
 
                             <!-- FORM KHUSUS RAWAT INAP (RANAP) -->
-                            <div id="form-group-ranap" class="d-none dynamic-tarif-form p-3 mb-3 border border-dark rounded bg-white">
-                                <h6 class="fw-bold text-primary border-bottom pb-1 fs--1"><i class="fas fa-procedures"></i> Form Tarif Rawat Inap</h6>
+                            <div id="form-group-ranap" class="d-none dynamic-tarif-form p-3 mb-3 border rounded-3 bg-white shadow-sm">
+                                <h6 class="fw-bold text-primary border-bottom pb-2 fs--1"><i class="fas fa-procedures me-1"></i> Form Tarif Rawat Inap</h6>
 
                                 <div class="mb-2">
-                                    <label class="form-label fw-bold text-dark fs--2">Pilih Ruangan</label>
-                                    <select class="form-select form-select-sm retro-input" name="ruangan_id" id="select-master-ruangan">
+                                    <label class="form-label fw-semibold text-dark fs--2">Pilih Ruangan</label>
+                                    <select class="form-select form-select-sm ent-input" name="ruangan_id" id="select-master-ruangan">
                                         <option value="">-- Memuat data Ruangan... --</option>
                                     </select>
                                 </div>
                                 <div class="mb-2">
-                                    <label class="form-label fw-bold text-dark fs--2">Pilih Bed (Opsional)</label>
-                                    <select class="form-select form-select-sm retro-input" name="bed_id" id="select-master-bed" disabled>
+                                    <label class="form-label fw-semibold text-dark fs--2">Pilih Bed (Opsional)</label>
+                                    <select class="form-select form-select-sm ent-input" name="bed_id" id="select-master-bed" disabled>
                                         <option value="">-- Pilih Ruangan Terlebih Dahulu --</option>
                                     </select>
                                 </div>
 
                                 <input type="hidden" name="ranap_kelas" id="hidden-ranap-kelas">
 
-                                <div class="mb-2 mt-3 border-top border-dark pt-2">
-                                    <label class="form-label fw-bold text-dark fs--2">Tarif Kamar / Hari (Rp)</label>
-                                    <input type="number" class="form-control form-control-sm retro-input" name="ranap_tarif_kamar" placeholder="0">
+                                <div class="mb-2 mt-3 border-top pt-2">
+                                    <label class="form-label fw-semibold text-dark fs--2">Tarif Kamar / Hari (Rp)</label>
+                                    <input type="number" class="form-control form-control-sm ent-input" name="ranap_tarif_kamar" placeholder="0">
                                 </div>
                                 <div class="mb-2">
-                                    <label class="form-label fw-bold text-dark fs--2">Tarif Visite Dokter / Hari (Rp)</label>
-                                    <input type="number" class="form-control form-control-sm retro-input" name="ranap_tarif_visite" placeholder="0">
+                                    <label class="form-label fw-semibold text-dark fs--2">Tarif Visite Dokter / Hari (Rp)</label>
+                                    <input type="number" class="form-control form-control-sm ent-input" name="ranap_tarif_visite" placeholder="0">
                                 </div>
                                 <div class="mb-2">
-                                    <label class="form-label fw-bold text-dark fs--2">Tarif Askep / Hari (Rp)</label>
-                                    <input type="number" class="form-control form-control-sm retro-input" name="ranap_tarif_askep" placeholder="0">
+                                    <label class="form-label fw-semibold text-dark fs--2">Tarif Askep / Hari (Rp)</label>
+                                    <input type="number" class="form-control form-control-sm ent-input" name="ranap_tarif_askep" placeholder="0">
                                 </div>
                             </div>
 
                             <!-- SKEMA TANGGUNGAN KHUSUS LAYANAN INI -->
-                            <div class="p-3 mb-3 border border-dark rounded bg-light" id="form-group-coverage" style="display: none;">
-                                <h6 class="fw-bold text-dark border-bottom border-dark pb-1 fs--2 text-uppercase"><i class="fas fa-shield-alt me-1"></i> Skema Tanggungan Tarif Ini</h6>
+                            <div class="p-3 mb-3 border rounded-3 bg-white shadow-sm" id="form-group-coverage" style="display: none;">
+                                <h6 class="fw-bold text-primary border-bottom pb-1 fs--2 text-uppercase"><i class="fas fa-shield-alt me-1"></i> Skema Tanggungan Tarif Ini</h6>
                                 <div class="mb-2">
-                                    <label class="form-label fw-bold text-dark fs--2">Aturan Tanggungan</label>
-                                    <select class="form-select form-select-sm retro-input" name="pola_tanggungan" id="tarif-pola-tanggungan">
+                                    <label class="form-label fw-semibold text-dark fs--2">Aturan Tanggungan</label>
+                                    <select class="form-select form-select-sm ent-input" name="pola_tanggungan" id="tarif-pola-tanggungan">
                                         <option value="IKUT_ATURAN_INDUK">Ikut Aturan Induk (Default)</option>
                                         <option value="FULL_PASIEN">Full Pasien (100% Tunai)</option>
                                         <option value="FULL_PERUSAHAAN">Full Perusahaan (100% Piutang)</option>
@@ -723,27 +908,29 @@
                                     </select>
                                 </div>
                                 <div class="mb-2 tarif-wrapper-tanggungan d-none" id="tarif-wrapper-persen">
-                                    <label class="form-label fw-bold text-dark fs--2">Tanggungan Perusahaan (%)</label>
-                                    <input type="number" step="0.01" class="form-control form-control-sm retro-input" name="tanggungan_perusahaan_persen" value="0">
+                                    <label class="form-label fw-semibold text-dark fs--2">Tanggungan Perusahaan (%)</label>
+                                    <input type="number" step="0.01" class="form-control form-control-sm ent-input" name="tanggungan_perusahaan_persen" value="0">
                                 </div>
                                 <div class="mb-2 tarif-wrapper-tanggungan d-none" id="tarif-wrapper-plafon">
-                                    <label class="form-label fw-bold text-dark fs--2">Maks. Tanggungan (Rp)</label>
-                                    <input type="number" step="0.01" class="form-control form-control-sm retro-input" name="tanggungan_perusahaan_maksimal_rp" value="0">
+                                    <label class="form-label fw-semibold text-dark fs--2">Maks. Tanggungan (Rp)</label>
+                                    <input type="number" step="0.01" class="form-control form-control-sm ent-input" name="tanggungan_perusahaan_maksimal_rp" value="0">
                                 </div>
                             </div>
 
-                            <button type="submit" class="btn retro-btn retro-btn-primary w-100 btn-sm mt-2" id="btn-save-tarif" disabled>Simpan Tarif</button>
+                            <button type="submit" class="btn btn-ent-primary w-100 btn-sm mt-2 py-2" id="btn-save-tarif" disabled>
+                                <i class="fas fa-save me-1"></i> Simpan Tarif
+                            </button>
                         </form>
                     </div>
 
                     <!-- KOLOM KANAN: TABEL LISTING -->
                     <div class="col-md-8 p-4">
-                        <h6 class="fw-bold text-dark border-bottom border-dark pb-2 mb-3"><i class="fas fa-list me-1"></i> Daftar Tarif Layanan</h6>
-                        <div class="table-responsive" style="max-height: 400px; overflow-y: auto;">
+                        <h6 class="ent-font-display fw-bold text-dark border-bottom pb-2 mb-3"><i class="fas fa-list text-primary me-1"></i> Daftar Tarif Layanan</h6>
+                        <div class="table-responsive" style="max-height: 460px; overflow-y: auto;">
                             <table class="table table-custom align-middle w-100 mb-0">
                                 <thead>
                                     <tr>
-                                        <th style="width: 40px;">No</th>
+                                        <th class="text-center" style="width: 40px;">No</th>
                                         <th>Layanan</th>
                                         <th>Detail Kategori / Nama Tarif</th>
                                         <th class="text-end">Rincian Harga (Rp)</th>
@@ -752,7 +939,7 @@
                                 </thead>
                                 <tbody id="tbody-list-tarif">
                                     <tr>
-                                        <td colspan="5" class="text-center py-4">Pilih Kategori Layanan</td>
+                                        <td colspan="5" class="text-center py-4 text-muted">Pilih Kategori Layanan</td>
                                     </tr>
                                 </tbody>
                             </table>
@@ -767,10 +954,10 @@
 <!-- MODAL PENGATURAN PEMERIKSAAN -->
 <div class="modal fade" id="modal-pengaturan-pemeriksaan" tabindex="-1" aria-hidden="true">
     <div class="modal-dialog modal-dialog-centered">
-        <div class="modal-content retro-card border-0">
-            <div class="card-header py-3 px-3 border-bottom border-dark d-flex justify-content-between align-items-center" style="background-color: var(--retro-pink);">
-                <h5 class="mb-0 text-dark fw-bolder"><i class="fas fa-stethoscope me-1"></i> Pengaturan Harga Pemeriksaan</h5>
-                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+        <div class="modal-content ent-modal-content">
+            <div class="ent-modal-header d-flex justify-content-between align-items-center">
+                <h6 class="ent-font-display mb-0 text-white fw-bold"><i class="fas fa-stethoscope text-info me-2"></i>Pengaturan Harga Pemeriksaan</h6>
+                <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal" aria-label="Close"></button>
             </div>
             <div class="card-body p-4 bg-white">
                 <form id="form-pengaturan-pemeriksaan" method="POST">
@@ -778,13 +965,13 @@
                     <input type="hidden" name="sub_penjamin_id" id="pemeriksaan-sub-id">
 
                     <div class="mb-3">
-                        <label class="form-label fw-bold text-dark fs--1">Sub Penjamin</label>
-                        <input type="text" class="form-control retro-input bg-light text-muted" id="pemeriksaan-sub-nama" readonly>
+                        <label class="form-label fw-semibold text-dark fs--1">Sub Penjamin</label>
+                        <input type="text" class="form-control ent-input bg-light text-muted" id="pemeriksaan-sub-nama" readonly>
                     </div>
 
                     <div class="mb-3">
-                        <label class="form-label fw-bold text-dark fs--1">Jenis Pemeriksaan</label>
-                        <select class="form-select retro-input" name="jenis_pemeriksaan" required>
+                        <label class="form-label fw-semibold text-dark fs--1">Jenis Pemeriksaan</label>
+                        <select class="form-select ent-input" name="jenis_pemeriksaan" required>
                             <option value="Laboratorium">Laboratorium</option>
                             <option value="Radiologi">Radiologi</option>
                             <option value="Fisioterapi">Fisioterapi</option>
@@ -793,13 +980,13 @@
                     </div>
 
                     <div class="mb-3">
-                        <label class="form-label fw-bold text-dark fs--1">Harga Acuan Khusus (Rp)</label>
-                        <input type="number" class="form-control retro-input" name="harga_khusus" placeholder="Contoh: 150000" required>
+                        <label class="form-label fw-semibold text-dark fs--1">Harga Acuan Khusus (Rp)</label>
+                        <input type="number" class="form-control ent-input" name="harga_khusus" placeholder="Contoh: 150000" required>
                     </div>
 
-                    <div class="d-flex justify-content-end gap-2 pt-3 border-top border-dark">
-                        <button type="button" class="btn retro-btn btn-secondary btn-sm px-3" data-bs-dismiss="modal">Batal</button>
-                        <button type="submit" class="btn retro-btn retro-btn-info btn-sm px-4">Simpan Pemeriksaan</button>
+                    <div class="d-flex justify-content-end gap-2 pt-3 border-top">
+                        <button type="button" class="btn btn-light border btn-sm px-3 fw-semibold" data-bs-dismiss="modal">Batal</button>
+                        <button type="submit" class="btn btn-ent-primary btn-sm px-4">Simpan Pemeriksaan</button>
                     </div>
                 </form>
             </div>
@@ -824,6 +1011,20 @@
     let picIndexEdit = 1;
 
     $(document).ready(function() {
+        // Live Search Penjamin Utama
+        $('#search-penjamin-utama').on('input', function() {
+            let keyword = $(this).val().toLowerCase().trim();
+            $('#list-penjamin-utama .list-group-item-penjamin').each(function() {
+                let nama = $(this).find('.nama-penjamin-text').text().toLowerCase();
+                let kategori = $(this).find('.badge').text().toLowerCase();
+                if (nama.includes(keyword) || kategori.includes(keyword)) {
+                    $(this).removeClass('d-none').addClass('d-flex');
+                } else {
+                    $(this).removeClass('d-flex').addClass('d-none');
+                }
+            });
+        });
+
         $('#add-pola-tanggungan').on('change', function() {
             let val = $(this).val();
             $('.add-wrapper-tanggungan').addClass('d-none');
@@ -856,19 +1057,19 @@
 
         $('#btn-tambah-pic-row').on('click', function() {
             let rowHtml = `
-            <div class="card p-2 bg-light border border-dark pic-item-row">
+            <div class="card p-2 bg-light border rounded-3 pic-item-row">
                 <div class="row g-2 align-items-center">
                     <div class="col-md-4">
-                        <input type="text" class="form-control retro-input form-control-sm" name="pics[${picIndexAdd}][nama_pic]" placeholder="Nama PIC..." required>
+                        <input type="text" class="form-control ent-input form-control-sm" name="pics[${picIndexAdd}][nama_pic]" placeholder="Nama PIC..." required>
                     </div>
                     <div class="col-md-3">
-                        <input type="text" class="form-control retro-input form-control-sm" name="pics[${picIndexAdd}][telepon]" placeholder="No. HP...">
+                        <input type="text" class="form-control ent-input form-control-sm" name="pics[${picIndexAdd}][telepon]" placeholder="No. HP...">
                     </div>
                     <div class="col-md-4">
-                        <input type="email" class="form-control retro-input form-control-sm" name="pics[${picIndexAdd}][email]" placeholder="Email...">
+                        <input type="email" class="form-control ent-input form-control-sm" name="pics[${picIndexAdd}][email]" placeholder="Email...">
                     </div>
                     <div class="col-md-1 text-center">
-                        <button type="button" class="btn btn-sm btn-danger py-1 px-2 btn-hapus-pic" title="Hapus"><i class="fas fa-trash"></i></button>
+                        <button type="button" class="btn btn-sm btn-outline-danger py-1 px-2 btn-hapus-pic" title="Hapus"><i class="fas fa-trash"></i></button>
                     </div>
                 </div>
             </div>`;
@@ -878,19 +1079,19 @@
 
         $('#btn-tambah-pic-row-edit').on('click', function() {
             let rowHtml = `
-            <div class="card p-2 bg-light border border-dark pic-item-row-edit">
+            <div class="card p-2 bg-light border rounded-3 pic-item-row-edit">
                 <div class="row g-2 align-items-center">
                     <div class="col-md-4">
-                        <input type="text" class="form-control retro-input form-control-sm" name="pics[${picIndexEdit}][nama_pic]" placeholder="Nama PIC..." required>
+                        <input type="text" class="form-control ent-input form-control-sm" name="pics[${picIndexEdit}][nama_pic]" placeholder="Nama PIC..." required>
                     </div>
                     <div class="col-md-3">
-                        <input type="text" class="form-control retro-input form-control-sm" name="pics[${picIndexEdit}][telepon]" placeholder="No. HP...">
+                        <input type="text" class="form-control ent-input form-control-sm" name="pics[${picIndexEdit}][telepon]" placeholder="No. HP...">
                     </div>
                     <div class="col-md-4">
-                        <input type="email" class="form-control retro-input form-control-sm" name="pics[${picIndexEdit}][email]" placeholder="Email...">
+                        <input type="email" class="form-control ent-input form-control-sm" name="pics[${picIndexEdit}][email]" placeholder="Email...">
                     </div>
                     <div class="col-md-1 text-center">
-                        <button type="button" class="btn btn-sm btn-danger py-1 px-2 btn-hapus-pic" title="Hapus"><i class="fas fa-trash"></i></button>
+                        <button type="button" class="btn btn-sm btn-outline-danger py-1 px-2 btn-hapus-pic" title="Hapus"><i class="fas fa-trash"></i></button>
                     </div>
                 </div>
             </div>`;
@@ -961,52 +1162,52 @@
         subTable.clear();
         if (dataArray && dataArray.length > 0) {
             dataArray.forEach((sub, index) => {
-                let badgeBilling = 'bg-secondary';
-                if (sub.tipe_pembayaran === 'CORPORATE_BILLING') badgeBilling = 'bg-warning text-dark';
-                else if (sub.tipe_pembayaran === 'INSURANCE_CLAIM') badgeBilling = 'bg-info text-dark';
-                else badgeBilling = 'bg-success text-white';
+                let badgeBilling = 'badge-soft-indigo';
+                if (sub.tipe_pembayaran === 'CORPORATE_BILLING') badgeBilling = 'badge-soft-warning';
+                else if (sub.tipe_pembayaran === 'INSURANCE_CLAIM') badgeBilling = 'badge-soft-info';
+                else badgeBilling = 'badge-soft-success';
 
                 let rawStatus = sub.status_aktif !== undefined ? sub.status_aktif : 1;
                 let statusVal = Number(rawStatus);
                 let statusBadge = (statusVal === 1) ?
-                    '<span class="retro-badge bg-success text-white">Aktif</span>' :
-                    '<span class="retro-badge bg-danger text-white">Non-Aktif</span>';
+                    '<span class="ent-badge badge-soft-success"><i class="fas fa-check-circle"></i> Aktif</span>' :
+                    '<span class="ent-badge badge-soft-danger"><i class="fas fa-times-circle"></i> Non-Aktif</span>';
 
-                let picListHtml = '<span class="text-muted fst-italic">Belum ada PIC</span>';
+                let picListHtml = '<span class="text-muted fst-italic fs--2">Belum ada PIC</span>';
                 if (sub.pics && sub.pics.length > 0) {
-                    picListHtml = sub.pics.map(p => `<span class="fw-bold">${p.nama_pic}</span> <small class="text-muted">(${p.telepon || '-'})</small>`).join('<br>');
+                    picListHtml = sub.pics.map(p => `<span class="fw-semibold text-dark">${p.nama_pic}</span> <small class="text-muted">(${p.telepon || '-'})</small>`).join('<br>');
                 }
 
-                let agreementInfo = `<span class="fw-bold">Kontrak / Ref</span><br><small class="text-muted">Ref: ${sub.no_ref || '-'}</small>`;
+                let agreementInfo = `<span class="fw-semibold text-dark">Kontrak / Ref</span><br><small class="text-muted">Ref: ${sub.no_ref || '-'}</small>`;
 
                 let actionBtn = `<div class="d-flex justify-content-center gap-1">`;
-                actionBtn += `<button class="btn btn-sm retro-btn retro-btn-warning px-2 py-1 btn-edit-sub"
+                actionBtn += `<button class="btn btn-sm btn-ent-soft-warning px-2 py-1 btn-edit-sub"
                                 data-id="${sub.sub_penjamin_id}"
                                 data-aktif="${statusVal}"
-                                title="Edit Sub Penjamin" style="font-size: 0.7rem;">
+                                title="Edit Sub Penjamin" style="font-size: 0.72rem;">
                                 <i class="fas fa-edit"></i>
                               </button>`;
 
                 if (statusVal === 0) {
-                    actionBtn += `<button class="btn btn-sm retro-btn retro-btn-primary px-2 py-1 btn-tarif"
+                    actionBtn += `<button class="btn btn-sm btn-ent-soft-primary px-2 py-1 btn-tarif"
                                     data-id="${sub.sub_penjamin_id}"
-                                    title="Pengaturan Tarif" style="font-size: 0.7rem;">
+                                    title="Pengaturan Tarif" style="font-size: 0.72rem;">
                                     <i class="fas fa-tags"></i>
                                   </button>`;
 
-                    actionBtn += `<button class="btn btn-sm retro-btn retro-btn-info px-2 py-1 btn-pemeriksaan"
+                    actionBtn += `<button class="btn btn-sm btn-ent-soft-info px-2 py-1 btn-pemeriksaan"
                                     data-id="${sub.sub_penjamin_id}"
-                                    title="Pengaturan Pemeriksaan" style="font-size: 0.7rem;">
+                                    title="Pengaturan Pemeriksaan" style="font-size: 0.72rem;">
                                     <i class="fas fa-stethoscope"></i>
                                   </button>`;
                 }
                 actionBtn += `</div>`;
 
                 subTable.row.add([
-                    `<div class="text-center">${index + 1}</div>`,
-                    `<div class="fw-bolder text-dark">${sub.nama_sub_penjamin}<br><small class="text-muted">Ref: ${sub.no_ref || '-'}</small></div>`,
+                    `<div class="text-center fw-semibold text-muted">${index + 1}</div>`,
+                    `<div class="fw-bold text-dark">${sub.nama_sub_penjamin}<br><small class="text-muted fw-normal">Ref: ${sub.no_ref || '-'}</small></div>`,
                     `<div class="text-center">${statusBadge}</div>`,
-                    `<div class="text-center"><span class="retro-badge ${badgeBilling}">${sub.tipe_pembayaran || 'CASH'}</span></div>`,
+                    `<div class="text-center"><span class="ent-badge ${badgeBilling}">${sub.tipe_pembayaran || 'CASH'}</span></div>`,
                     `<div>${picListHtml}</div>`,
                     `<div class="text-center">${agreementInfo}</div>`,
                     actionBtn
@@ -1030,8 +1231,8 @@
                 showCancelButton: true,
                 confirmButtonText: '<i class="fas fa-power-off"></i> Ya, Nonaktifkan',
                 cancelButtonText: 'Batal',
-                confirmButtonColor: '#e74c3c',
-                cancelButtonColor: '#1e1e24'
+                confirmButtonColor: '#e11d48',
+                cancelButtonColor: '#475569'
             }).then((result) => {
                 if (result.isConfirmed) {
                     let form = $('<form>', {
@@ -1212,37 +1413,37 @@
         let total = parseFloat(totalTarif) || 0;
 
         if (pola === 'IKUT_ATURAN_INDUK') {
-            return `<div class="mt-1"><span class="badge bg-secondary w-100" style="font-size:0.6rem;">Ikut Aturan Induk</span></div>`;
+            return `<div class="mt-1"><span class="badge bg-light text-secondary border w-100" style="font-size:0.62rem;">Ikut Aturan Induk</span></div>`;
         }
         if (pola === 'FULL_PASIEN') {
-            return `<div class="mt-1 text-danger fw-bolder" style="font-size:0.7rem;"><i class="fas fa-user me-1"></i>Pasien: Rp ${formatRp(total)}</div>`;
+            return `<div class="mt-1 text-danger fw-bold" style="font-size:0.7rem;"><i class="fas fa-user me-1"></i>Pasien: Rp ${formatRp(total)}</div>`;
         }
         if (pola === 'FULL_PERUSAHAAN') {
-            return `<div class="mt-1 text-success fw-bolder" style="font-size:0.7rem;"><i class="fas fa-building me-1"></i>Prsh: Rp ${formatRp(total)}</div>`;
+            return `<div class="mt-1 text-success fw-bold" style="font-size:0.7rem;"><i class="fas fa-building me-1"></i>Prsh: Rp ${formatRp(total)}</div>`;
         }
         if (pola === 'SPLIT_PERSENTASE') {
             let persen = parseFloat(row.tanggungan_perusahaan_persen) || 0;
             let prsh = total * (persen / 100);
             let psn = total - prsh;
-            return `<div class="mt-1 border-top border-dark pt-1" style="font-size:0.7rem;">
-                        <div class="text-success fw-bold"><i class="fas fa-building me-1"></i>Prsh (${persen}%): Rp ${formatRp(prsh)}</div>
-                        <div class="text-danger fw-bold"><i class="fas fa-user me-1"></i>Pasien: Rp ${formatRp(psn)}</div>
+            return `<div class="mt-1 border-top pt-1" style="font-size:0.7rem;">
+                        <div class="text-success fw-semibold"><i class="fas fa-building me-1"></i>Prsh (${persen}%): Rp ${formatRp(prsh)}</div>
+                        <div class="text-danger fw-semibold"><i class="fas fa-user me-1"></i>Pasien: Rp ${formatRp(psn)}</div>
                     </div>`;
         }
         if (pola === 'SPLIT_PLAFON') {
             let plafon = parseFloat(row.tanggungan_perusahaan_maksimal_rp) || 0;
             let prsh = Math.min(total, plafon);
             let psn = total - prsh;
-            return `<div class="mt-1 border-top border-dark pt-1" style="font-size:0.7rem;">
-                        <div class="text-success fw-bold"><i class="fas fa-building me-1"></i>Prsh (Maks): Rp ${formatRp(prsh)}</div>
-                        <div class="text-danger fw-bold"><i class="fas fa-user me-1"></i>Pasien: Rp ${formatRp(psn)}</div>
+            return `<div class="mt-1 border-top pt-1" style="font-size:0.7rem;">
+                        <div class="text-success fw-semibold"><i class="fas fa-building me-1"></i>Prsh (Maks): Rp ${formatRp(prsh)}</div>
+                        <div class="text-danger fw-semibold"><i class="fas fa-user me-1"></i>Pasien: Rp ${formatRp(psn)}</div>
                     </div>`;
         }
         return '';
     }
 
     function loadTableTarif(subPenjaminId) {
-        $('#tbody-list-tarif').html('<tr><td colspan="5" class="text-center py-4"><i class="fas fa-spinner fa-spin me-2"></i> Memuat data...</td></tr>');
+        $('#tbody-list-tarif').html('<tr><td colspan="5" class="text-center py-4 text-muted"><i class="fas fa-spinner fa-spin me-2"></i> Memuat data...</td></tr>');
 
         $.get(`/master-data/master-penjamin/get-tarif/${subPenjaminId}`, function(response) {
             let tbody = '';
@@ -1255,13 +1456,13 @@
                         let coverageHtml = renderCoverageInfo(row, row.tarif);
                         tbody += `<tr>
                             <td class="text-center">${no++}</td>
-                            <td class="fw-bold text-danger"><span class="badge bg-danger">IGD</span></td>
-                            <td><small class="text-muted fw-bold">${row.kategori_biaya}</small><br><span class="fw-bold">${row.nama_tarif}</span></td>
+                            <td><span class="ent-badge badge-soft-danger">IGD</span></td>
+                            <td><small class="text-muted fw-semibold d-block">${row.kategori_biaya}</small><span class="fw-bold text-dark">${row.nama_tarif}</span></td>
                             <td class="text-end">
-                                <div class="fw-bolder text-dark">Rp ${formatRp(row.tarif)}</div>
+                                <div class="fw-bold text-dark">Rp ${formatRp(row.tarif)}</div>
                                 ${coverageHtml}
                             </td>
-                            <td class="text-center"><button class="btn btn-sm btn-danger py-1 px-2 btn-hapus-tarif"><i class="fas fa-trash"></i></button></td>
+                            <td class="text-center"><button class="btn btn-sm btn-outline-danger py-1 px-2 btn-hapus-tarif"><i class="fas fa-trash"></i></button></td>
                         </tr>`;
                     });
                 }
@@ -1271,13 +1472,13 @@
                         let coverageHtml = renderCoverageInfo(row, row.tarif);
                         tbody += `<tr>
                             <td class="text-center">${no++}</td>
-                            <td class="fw-bold text-success"><span class="badge bg-success">POLIKLINIK</span></td>
-                            <td><small class="text-muted fw-bold">${row.kategori_biaya}</small><br><span class="fw-bold">${row.nama_tarif}</span></td>
+                            <td><span class="ent-badge badge-soft-success">POLIKLINIK</span></td>
+                            <td><small class="text-muted fw-semibold d-block">${row.kategori_biaya}</small><span class="fw-bold text-dark">${row.nama_tarif}</span></td>
                             <td class="text-end">
-                                <div class="fw-bolder text-dark">Rp ${formatRp(row.tarif)}</div>
+                                <div class="fw-bold text-dark">Rp ${formatRp(row.tarif)}</div>
                                 ${coverageHtml}
                             </td>
-                            <td class="text-center"><button class="btn btn-sm btn-danger py-1 px-2 btn-hapus-tarif"><i class="fas fa-trash"></i></button></td>
+                            <td class="text-center"><button class="btn btn-sm btn-outline-danger py-1 px-2 btn-hapus-tarif"><i class="fas fa-trash"></i></button></td>
                         </tr>`;
                     });
                 }
@@ -1289,21 +1490,21 @@
                         let rincian = `Kamar: Rp ${formatRp(row.tarif_kamar_per_hari)}<br>Visite: Rp ${formatRp(row.tarif_visite_dokter_per_hari)}<br>Askep: Rp ${formatRp(row.tarif_asuhan_keperawatan_per_hari)}`;
                         tbody += `<tr>
                             <td class="text-center">${no++}</td>
-                            <td class="fw-bold text-primary"><span class="badge bg-primary">RAWAT INAP</span></td>
-                            <td class="fw-bold">Kelas: ${row.kelas}</td>
+                            <td><span class="ent-badge badge-soft-indigo">RAWAT INAP</span></td>
+                            <td class="fw-bold text-dark">Kelas: ${row.kelas}</td>
                             <td class="text-end">
                                 <div style="font-size: 0.75rem;" class="mb-1 text-muted">${rincian}</div>
-                                <div class="fw-bolder text-dark border-top border-dark pt-1">Total: Rp ${formatRp(totalRanap)}</div>
+                                <div class="fw-bold text-dark border-top pt-1">Total: Rp ${formatRp(totalRanap)}</div>
                                 ${coverageHtml}
                             </td>
-                            <td class="text-center align-middle"><button class="btn btn-sm btn-danger py-1 px-2 btn-hapus-tarif"><i class="fas fa-trash"></i></button></td>
+                            <td class="text-center align-middle"><button class="btn btn-sm btn-outline-danger py-1 px-2 btn-hapus-tarif"><i class="fas fa-trash"></i></button></td>
                         </tr>`;
                     });
                 }
 
-                if (no === 1) tbody = `<tr><td colspan="5" class="text-center py-4 text-muted fst-italic fw-bold">Belum ada tarif terdaftar.</td></tr>`;
+                if (no === 1) tbody = `<tr><td colspan="5" class="text-center py-4 text-muted fst-italic">Belum ada tarif terdaftar.</td></tr>`;
             } else {
-                tbody = `<tr><td colspan="5" class="text-center py-4 text-danger fw-bold">Gagal memuat format data.</td></tr>`;
+                tbody = `<tr><td colspan="5" class="text-center py-4 text-danger fw-semibold">Gagal memuat format data.</td></tr>`;
             }
             $('#tbody-list-tarif').html(tbody);
         });
@@ -1344,19 +1545,19 @@
         if (sub.pics && sub.pics.length > 0) {
             sub.pics.forEach((p, idx) => {
                 let rowHtml = `
-                    <div class="card p-2 bg-light border border-dark pic-item-row-edit">
+                    <div class="card p-2 bg-light border rounded-3 pic-item-row-edit">
                         <div class="row g-2 align-items-center">
                             <div class="col-md-4">
-                                <input type="text" class="form-control retro-input form-control-sm" name="pics[${idx}][nama_pic]" value="${p.nama_pic || ''}" placeholder="Nama PIC..." required>
+                                <input type="text" class="form-control ent-input form-control-sm" name="pics[${idx}][nama_pic]" value="${p.nama_pic || ''}" placeholder="Nama PIC..." required>
                             </div>
                             <div class="col-md-3">
-                                <input type="text" class="form-control retro-input form-control-sm" name="pics[${idx}][telepon]" value="${p.telepon || ''}" placeholder="No. HP...">
+                                <input type="text" class="form-control ent-input form-control-sm" name="pics[${idx}][telepon]" value="${p.telepon || ''}" placeholder="No. HP...">
                             </div>
                             <div class="col-md-4">
-                                <input type="email" class="form-control retro-input form-control-sm" name="pics[${idx}][email]" value="${p.email || ''}" placeholder="Email...">
+                                <input type="email" class="form-control ent-input form-control-sm" name="pics[${idx}][email]" value="${p.email || ''}" placeholder="Email...">
                             </div>
                             <div class="col-md-1 text-center">
-                                <button type="button" class="btn btn-sm btn-danger py-1 px-2 btn-hapus-pic" title="Hapus"><i class="fas fa-trash"></i></button>
+                                <button type="button" class="btn btn-sm btn-outline-danger py-1 px-2 btn-hapus-pic" title="Hapus"><i class="fas fa-trash"></i></button>
                             </div>
                         </div>
                     </div>`;
@@ -1365,19 +1566,19 @@
             });
         } else {
             picContainerEdit.append(`
-                <div class="card p-2 bg-light border border-dark pic-item-row-edit">
+                <div class="card p-2 bg-light border rounded-3 pic-item-row-edit">
                     <div class="row g-2 align-items-center">
                         <div class="col-md-4">
-                            <input type="text" class="form-control retro-input form-control-sm" name="pics[0][nama_pic]" placeholder="Nama PIC..." required>
+                            <input type="text" class="form-control ent-input form-control-sm" name="pics[0][nama_pic]" placeholder="Nama PIC..." required>
                         </div>
                         <div class="col-md-3">
-                            <input type="text" class="form-control retro-input form-control-sm" name="pics[0][telepon]" placeholder="No. HP...">
+                            <input type="text" class="form-control ent-input form-control-sm" name="pics[0][telepon]" placeholder="No. HP...">
                         </div>
                         <div class="col-md-4">
-                            <input type="email" class="form-control retro-input form-control-sm" name="pics[0][email]" placeholder="Email...">
+                            <input type="email" class="form-control ent-input form-control-sm" name="pics[0][email]" placeholder="Email...">
                         </div>
                         <div class="col-md-1 text-center">
-                            <button type="button" class="btn btn-sm btn-danger py-1 px-2 btn-hapus-pic" title="Hapus"><i class="fas fa-trash"></i></button>
+                            <button type="button" class="btn btn-sm btn-outline-danger py-1 px-2 btn-hapus-pic" title="Hapus"><i class="fas fa-trash"></i></button>
                         </div>
                     </div>
                 </div>`);
@@ -1422,7 +1623,7 @@
             showCancelButton: true,
             confirmButtonText: 'Ya, Salin Sekarang',
             cancelButtonText: 'Batal',
-            confirmButtonColor: '#1e1e24'
+            confirmButtonColor: '#4f46e5'
         }).then((result) => {
             if (result.isConfirmed) {
                 let btn = $(this);
@@ -1437,7 +1638,7 @@
                         target_sub_id: targetSubId
                     },
                     success: function(response) {
-                        btn.prop('disabled', false).html('<i class="fas fa-file-import"></i> Salin');
+                        btn.prop('disabled', false).html('<i class="fas fa-file-import me-1"></i> Salin');
                         if (response.status === 'success') {
                             Swal.fire('Berhasil!', response.message, 'success');
                             loadTableTarif(targetSubId);
@@ -1446,7 +1647,7 @@
                         }
                     },
                     error: function() {
-                        btn.prop('disabled', false).html('<i class="fas fa-file-import"></i> Salin');
+                        btn.prop('disabled', false).html('<i class="fas fa-file-import me-1"></i> Salin');
                         Swal.fire('Error', 'Terjadi kesalahan pada server.', 'error');
                     }
                 });

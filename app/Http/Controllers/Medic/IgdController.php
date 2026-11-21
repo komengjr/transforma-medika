@@ -137,11 +137,11 @@ class IgdController extends Controller
         foreach ($rawQuery as $datas) {
             $noRegHtml = '<div class="d-flex flex-column">
                         <span class="code-block text-danger fw-bold">' . e($datas->no_registrasi) . '</span>
-                        <span class="text-muted fs--2 mt-1">IGD Unit</span>
+                        <span class="text-dark fs--2 mt-1">IGD Unit</span>
                       </div>';
 
             $pasienHtml = '<div class="fw-bold text-dark">' . e($datas->nama_pasien) . '</div>
-                       <span class="text-muted fs--2">PID: ' . e($datas->rm_pasien) . '</span>';
+                       <span class="text-dark fs--2">PID: ' . e($datas->rm_pasien) . '</span>';
 
             $tglHtml = '<div class="text-nowrap text-secondary">
                         <i class="far fa-clock me-1 opacity-50"></i>' . date('d/m/Y H:i', strtotime($datas->tanggal_registrasi)) . '

@@ -2081,10 +2081,10 @@ class PelayananController extends Controller
         // 1. Ambil daftar Dokter unik di rentang tanggal tersebut
         $dokterList = DB::table('medical_registrasi')
             ->whereBetween('tanggal_registrasi', [$tglAwal, $tglAkhir])
-            ->whereNotNull('dokter')
-            ->where('dokter', '!=', '')
+            ->whereNotNull('doctor_id')
+            ->where('doctor_id', '!=', '')
             ->distinct()
-            ->pluck('dokter');
+            ->pluck('doctor_id');
 
         // 2. Ambil daftar Penjamin / Sub Penjamin unik
         $penjaminList = DB::table('medical_registrasi as reg')
