@@ -806,28 +806,28 @@
                                 <div class="row g-2">
                                     <div class="col-3">
                                         <label class="delivery-tile p-2 d-flex flex-column align-items-center justify-content-center text-center h-100 mb-0">
-                                            <input class="form-check-input ms-0 mb-1.5 mt-0" type="checkbox" name="pengiriman[]" value="whatsapp" checked>
+                                            <input class="form-check-input ms-0 mb-1 mt-0" type="checkbox" name="pengiriman[]" value="whatsapp" checked>
                                             <i class="fab fa-whatsapp text-success mb-1 fs-5"></i>
                                             <span class="fw-semibold text-dark" style="font-size: 0.72rem;">WhatsApp</span>
                                         </label>
                                     </div>
                                     <div class="col-3">
                                         <label class="delivery-tile p-2 d-flex flex-column align-items-center justify-content-center text-center h-100 mb-0">
-                                            <input class="form-check-input ms-0 mb-1.5 mt-0" type="checkbox" name="pengiriman[]" value="email">
+                                            <input class="form-check-input ms-0 mb-1 mt-0" type="checkbox" name="pengiriman[]" value="email">
                                             <i class="fas fa-envelope text-danger mb-1 fs-5"></i>
                                             <span class="fw-semibold text-dark" style="font-size: 0.72rem;">Email</span>
                                         </label>
                                     </div>
                                     <div class="col-3">
                                         <label class="delivery-tile p-2 d-flex flex-column align-items-center justify-content-center text-center h-100 mb-0">
-                                            <input class="form-check-input ms-0 mb-1.5 mt-0" type="checkbox" name="pengiriman[]" value="satusehat" checked>
+                                            <input class="form-check-input ms-0 mb-1 mt-0" type="checkbox" name="pengiriman[]" value="satusehat" checked>
                                             <i class="fas fa-heartbeat text-info mb-1 fs-5"></i>
                                             <span class="fw-semibold text-dark" style="font-size: 0.72rem;">Satu Sehat</span>
                                         </label>
                                     </div>
                                     <div class="col-3">
                                         <label class="delivery-tile p-2 d-flex flex-column align-items-center justify-content-center text-center h-100 mb-0">
-                                            <input class="form-check-input ms-0 mb-1.5 mt-0" type="checkbox" name="pengiriman[]" value="cetak_fisik">
+                                            <input class="form-check-input ms-0 mb-1 mt-0" type="checkbox" name="pengiriman[]" value="cetak_fisik">
                                             <i class="fas fa-print text-secondary mb-1 fs-5"></i>
                                             <span class="fw-semibold text-dark" style="font-size: 0.72rem;">Cetak Kertas</span>
                                         </label>
@@ -1314,7 +1314,7 @@
                             </div>
 
                             <div class="mt-auto">
-                                <div class="p-3.5 rounded-4 d-flex justify-content-between align-items-center mb-4" style="background: linear-gradient(135deg, #eef2ff 0%, #e0e7ff 100%); border: 1px solid #c7d2fe;">
+                                <div class="p-3 rounded-4 d-flex justify-content-between align-items-center mb-4" style="background: linear-gradient(135deg, #eef2ff 0%, #e0e7ff 100%); border: 1px solid #c7d2fe;">
                                     <span class="fw-bold text-indigo-dark">Tagihan Akhir:</span>
                                     <span class="fw-bolder text-primary fs-3" id="tagihan-akhir-display">Rp 0</span>
                                 </div>

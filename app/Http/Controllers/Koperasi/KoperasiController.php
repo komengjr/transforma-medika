@@ -29,7 +29,10 @@ use Maatwebsite\Excel\Facades\Excel;
 use App\Services\AccountingService;
 use Exception;
 use Illuminate\Support\Facades\Log;
+use Illuminate\Support\Facades\Storage;
 use Illuminate\Support\Facades\Validator;
+use Pion\Laravel\ChunkUpload\Handler\HandlerFactory;
+use Pion\Laravel\ChunkUpload\Receiver\FileReceiver;
 
 class KoperasiController extends Controller
 {
@@ -5260,7 +5263,14 @@ class KoperasiController extends Controller
     {
         if ($this->url_akses($akses, $id) == true) {
             $data = DB::table('kop_master_peserta')->get();
-            return view('app-koperasi.master-koperasi.master-peserta', ['data' => $data, 'akses' => $akses, 'code' => $id]);
+            $cabangList = DB::table('kop_master_cabang')->get();
+
+            return view('app-koperasi.master-koperasi.master-peserta', [
+                'data'       => $data,
+                'cabangList' => $cabangList,
+                'akses'      => $akses,
+                'code'       => $id,
+            ]);
         } else {
             return Redirect::to('dashboard/home');
         }
@@ -5271,38 +5281,173 @@ class KoperasiController extends Controller
         $divisi = DB::table('kop_master_div_bag')->join('kop_master_divisi', 'kop_master_divisi.kop_master_divisi_code', '=', 'kop_master_div_bag.kop_master_divisi_code')->get();
         return view('app-koperasi.master-koperasi.master-peserta.form-add', compact('cabang', 'divisi'));
     }
+    public function master_koperasi_peserta_upload_profil(Request $request)
+    {
+        $receiver = new FileReceiver('file', $request, HandlerFactory::classFromRequest($request));
+
+        if (!$receiver->isUploaded()) {
+            // file not uploaded
+        }
+
+        $fileReceived = $receiver->receive(); // receive file
+        if ($fileReceived->isFinished()) { // file uploading is complete / all chunks are uploaded
+            $file = $fileReceived->getFile(); // get file
+            $extension = $file->getClientOriginalExtension();
+            $fileName = str_replace('.' . $extension, '', $file->getClientOriginalName()); //file name without extenstion
+            $fileName .= '_' . md5(time()) . '.' . $extension; // a unique file name
+
+            $disk = Storage::disk(config('filesystems.default'));
+            $path = $disk->putFileAs('public/koperasi/profile/' , $file, $fileName);
+            // $path1 = $disk('videos', $file, $fileName);
+
+            // delete chunked file
+            unlink($file->getPathname());
+            return [
+                'path' => Storage::url('koperasi/profile/'. $fileName),
+                'filename' => $fileName
+            ];
+        }
+
+        // otherwise return percentage informatoin
+        $handler = $fileReceived->handler();
+        return [
+            'done' => $handler->getPercentageDone(),
+            'status' => true
+        ];
+    }
     public function master_koperasi_peserta_save(Request $request)
     {
         try {
-            $code = str::uuid();
-            DB::table('kop_master_peserta')->insert([
-                'kop_master_peserta_code' => $code,
-                'kop_master_peserta_nik' => $request->nik,
-                'kop_master_peserta_nip' => $request->nip,
-                'kop_master_peserta_name' => $request->nama_lengkap,
-                'kop_master_peserta_tgl_lahir' => $request->tgl_lahir,
-                'kop_master_peserta_tempat_lahir' => $request->tempat_lahir,
-                'kop_master_peserta_jk' => $request->jenis_kelamin,
-                'kop_master_peserta_agama' => $request->agama,
-                'kop_master_peserta_alamat' => $request->alamat,
-                'kop_master_peserta_cabang' => $request->cabang,
-                'kop_master_peserta_email' => $request->email,
-                'kop_master_peserta_no_hp' => $request->no_hp,
-                'kop_master_peserta_tgl_kerja' => $request->tgl_masuk,
-                'kop_master_peserta_tgl_anggota' => $request->tgl_anggota,
-                'kop_master_peserta_photo' => "",
-                'kop_master_peserta_status' => 1,
-                'created_at' => now()
+            // Normalisasi input agar kompatibel baik dengan field form add maupun kolom kop_master_peserta
+            $nik           = $request->input('kop_master_peserta_nik', $request->input('nik'));
+            $nip           = $request->input('kop_master_peserta_nip', $request->input('nip'));
+            $nama          = $request->input('kop_master_peserta_name', $request->input('nama_lengkap'));
+            $tglLahir      = $request->input('kop_master_peserta_tgl_lahir', $request->input('tgl_lahir'));
+            $tempatLahir   = $request->input('kop_master_peserta_tempat_lahir', $request->input('tempat_lahir'));
+            $jk            = $request->input('kop_master_peserta_jk', $request->input('jenis_kelamin'));
+            $agama         = $request->input('kop_master_peserta_agama', $request->input('agama'));
+            $alamat        = $request->input('kop_master_peserta_alamat', $request->input('alamat'));
+            $cabang        = $request->input('kop_master_peserta_cabang', $request->input('cabang'));
+            $email         = $request->input('kop_master_peserta_email', $request->input('email'));
+            $noHp          = $request->input('kop_master_peserta_no_hp', $request->input('no_hp'));
+            $tglKerja      = $request->input('kop_master_peserta_tgl_kerja', $request->input('tgl_masuk'));
+            $tglAnggota    = $request->input('kop_master_peserta_tgl_anggota', $request->input('tgl_anggota'));
+            $divisi        = $request->input('divisi', $request->input('kop_master_div_bag_code'));
+            $status        = $request->input('kop_master_peserta_status', 1);
+            $securityCode  = $request->input('security_code', '123456');
+
+            // Merge ke request agar validasi required berjalan konsisten
+            $request->merge([
+                'nik'           => $nik,
+                'nip'           => $nip,
+                'nama_lengkap'  => $nama,
+                'tgl_lahir'     => $tglLahir,
+                'tempat_lahir'  => $tempatLahir,
+                'jenis_kelamin' => $jk,
+                'agama'         => $agama,
+                'alamat'        => $alamat,
+                'cabang'        => $cabang,
+                'email'         => $email,
+                'no_hp'         => $noHp,
+                'tgl_masuk'     => $tglKerja,
+                'tgl_anggota'   => $tglAnggota,
+                'divisi'        => $divisi,
             ]);
-            DB::table('kop_master_peserta_job')->insert([
-                'kop_master_peserta_job_code' => str::uuid(),
-                'kop_master_peserta_code' => $code,
-                'kop_master_div_bag_code' => $request->divisi,
-                'kop_master_peserta_job_status' => 1,
-                'created_at' => now()
+
+            $request->validate([
+                'nik'           => ['required', 'string', 'max:50'],
+                'nip'           => ['required', 'string', 'max:50'],
+                'nama_lengkap'  => ['required', 'string', 'max:255'],
+                'tgl_lahir'     => ['required', 'date'],
+                'tempat_lahir'  => ['required', 'string', 'max:255'],
+                'jenis_kelamin' => ['required', 'string', 'max:20'],
+                'agama'         => ['required', 'string', 'max:50'],
+                'alamat'        => ['required', 'string'],
+                'cabang'        => ['required', 'string', 'max:100'],
+                'email'         => ['required', 'email', 'max:255'],
+                'no_hp'         => ['required', 'string', 'max:30'],
+                'tgl_masuk'     => ['required', 'date'],
+                'tgl_anggota'   => ['required', 'date'],
+                'divisi'        => ['nullable', 'string', 'max:100'],
             ]);
+
+            $customCode = trim((string) $request->input('kop_master_peserta_code', ''));
+            $code = $customCode !== '' ? $customCode : (string) Str::uuid();
+
+            // Penanganan foto jika diunggah lewat file input atau hasil upload Resumable ($request->link)
+            $photoPath = '';
+            if ($request->hasFile('kop_master_peserta_photo')) {
+                $file = $request->file('kop_master_peserta_photo');
+                $filename = time() . '_' . Str::random(8) . '.' . $file->getClientOriginalExtension();
+                $file->move(public_path('uploads/koperasi/peserta'), $filename);
+                $photoPath = 'uploads/koperasi/peserta/' . $filename;
+            } elseif ($request->filled('link')) {
+                $photoPath = (string) $request->input('link');
+            }
+
+            DB::transaction(function () use (
+                $code,
+                $nik,
+                $nip,
+                $nama,
+                $tglLahir,
+                $tempatLahir,
+                $jk,
+                $agama,
+                $alamat,
+                $cabang,
+                $email,
+                $noHp,
+                $tglKerja,
+                $tglAnggota,
+                $photoPath,
+                $status,
+                $securityCode,
+                $divisi
+            ) {
+                DB::table('kop_master_peserta')->insert([
+                    'kop_master_peserta_code'         => $code,
+                    'kop_master_peserta_nik'          => $nik,
+                    'kop_master_peserta_nip'          => $nip,
+                    'kop_master_peserta_name'         => $nama,
+                    'kop_master_peserta_tgl_lahir'    => $tglLahir,
+                    'kop_master_peserta_tempat_lahir' => $tempatLahir,
+                    'kop_master_peserta_jk'           => $jk,
+                    'kop_master_peserta_agama'        => $agama,
+                    'kop_master_peserta_alamat'       => $alamat,
+                    'kop_master_peserta_cabang'       => $cabang,
+                    'kop_master_peserta_email'        => $email,
+                    'kop_master_peserta_no_hp'        => $noHp,
+                    'kop_master_peserta_tgl_kerja'    => $tglKerja,
+                    'kop_master_peserta_tgl_anggota'  => $tglAnggota,
+                    'kop_master_peserta_photo'        => $photoPath,
+                    'kop_master_peserta_status'       => $status,
+                    'security_code'                   => substr((string) $securityCode, 0, 6),
+                    'created_at'                      => now(),
+                    'updated_at'                      => now(),
+                ]);
+
+                if (!empty($divisi)) {
+                    DB::table('kop_master_peserta_job')->insert([
+                        'kop_master_peserta_job_code'   => (string) Str::uuid(),
+                        'kop_master_peserta_code'       => $code,
+                        'kop_master_div_bag_code'       => $divisi,
+                        'kop_master_peserta_job_status' => 1,
+                        'created_at'                    => now(),
+                        'updated_at'                    => now(),
+                    ]);
+                }
+            });
+
             return 1;
+        } catch (\Illuminate\Validation\ValidationException $e) {
+            return response()->json([
+                'status'  => 0,
+                'errors'  => $e->errors(),
+                'message' => 'Data wajib belum lengkap atau tidak valid.',
+            ], 422);
         } catch (\Throwable $e) {
+            Log::error('Gagal menyimpan peserta koperasi: ' . $e->getMessage());
             return 0;
         }
     }
@@ -5601,6 +5746,80 @@ class KoperasiController extends Controller
             return view('app-koperasi.master-koperasi.master-coa.table.data-table-coa', ['data' => $data]);
         } catch (\Throwable $e) {
             return 0;
+        }
+    }
+    public function master_koperasi_data_coa_update_level(Request $request)
+    {
+        $code = $request->input('code');
+
+        $coa = DB::table('kop_master_coa_data')
+            ->where('kop_coa_data_code', $code)
+            ->first();
+
+        if (!$coa) {
+            return '<div class="p-4 text-center text-danger fw-semibold">Data akun COA tidak ditemukan.</div>';
+        }
+
+        $masterCoa = DB::table('kop_master_coa')
+            ->where('kop_master_coa_code', $coa->kop_master_coa_code)
+            ->first();
+
+        // Sesuaikan path view partial sesuai struktur folder Anda
+        return view('app-koperasi.master-koperasi.master-coa.modal-update-level', compact('coa', 'masterCoa'));
+    }
+
+    public function master_koperasi_data_coa_update_save_level(Request $request)
+    {
+        $validator = Validator::make($request->all(), [
+            'kop_coa_data_code' => 'required|string',
+            'kop_coa_data_no'   => 'required|string|max:100',
+            'kop_coa_data_name' => 'required|string|max:255',
+            'kop_coa_data_opt'  => 'required|in:0,1',
+            'kop_coa_data_type' => 'nullable|string|max:100',
+            'kop_coa_data_status' => 'required|string|max:50',
+        ]);
+
+        if ($validator->fails()) {
+            return response()->json([
+                'status'  => 'error',
+                'message' => $validator->errors()->first(),
+            ], 422);
+        }
+
+        try {
+            $updated = DB::table('kop_master_coa_data')
+                ->where('kop_coa_data_code', $request->kop_coa_data_code)
+                ->update([
+                    'kop_coa_data_no'     => $request->kop_coa_data_no,
+                    'kop_coa_data_name'   => $request->kop_coa_data_name,
+                    'kop_coa_data_type'   => $request->kop_coa_data_type ?? '',
+                    'kop_coa_data_opt'    => $request->kop_coa_data_opt,
+                    'kop_coa_data_status' => $request->kop_coa_data_status,
+                    'updated_at'          => now(),
+                ]);
+
+            if ($updated === 0) {
+                $exists = DB::table('kop_master_coa_data')
+                    ->where('kop_coa_data_code', $request->kop_coa_data_code)
+                    ->exists();
+
+                if (!$exists) {
+                    return response()->json([
+                        'status'  => 'error',
+                        'message' => 'Data COA tidak ditemukan.',
+                    ], 404);
+                }
+            }
+
+            return response()->json([
+                'status'  => 'success',
+                'message' => 'Data akun COA berhasil diperbarui.',
+            ]);
+        } catch (\Throwable $e) {
+            return response()->json([
+                'status'  => 'error',
+                'message' => 'Gagal memperbarui data COA: ' . $e->getMessage(),
+            ], 500);
         }
     }
     public function master_koperasi_data_coa_sinskronisasi(Request $request)

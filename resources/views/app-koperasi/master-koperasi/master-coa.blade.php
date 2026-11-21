@@ -4,17 +4,36 @@
 <link rel="stylesheet" href="https://cdn.datatables.net/responsive/3.0.4/css/responsive.bootstrap5.css">
 <link href="{{ asset('vendors/flatpickr/flatpickr.min.css') }}" rel="stylesheet" />
 <link href="{{ asset('vendors/choices/choices.min.css') }}" rel="stylesheet" />
-<link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@600;700;800&family=JetBrains+Mono:wght@500;700&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
+<link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&family=JetBrains+Mono:wght@500;700&display=swap" rel="stylesheet">
 
 <style>
+    /* =========================================
+       MODERN ENTERPRISE UI STYLES (MASTER COA)
+       (ADAPTIVE LIGHT & DARK MODE BOOTSTRAP 5)
+       ========================================= */
     :root {
         --coa-indigo: #4f46e5;
-        --coa-indigo-soft: #eef2ff;
+        --coa-indigo-dark: #4338ca;
+        --coa-indigo-soft: rgba(79, 70, 229, 0.12);
         --coa-emerald: #059669;
-        --coa-slate-900: #0f172a;
-        --coa-slate-700: #334155;
-        --coa-slate-500: #64748b;
-        --coa-border: #e2e8f0;
+        --coa-grid-border: rgba(99, 102, 241, 0.28);
+        --coa-solid-bg: #ffffff;
+        --coa-solid-text: #0f172a;
+        --coa-subtle-surface: #f8fafc;
+        --coa-row-hover: #f1f5f9;
+    }
+
+    [data-bs-theme="dark"],
+    .dark {
+        --coa-solid-bg: #0f172a;
+        --coa-solid-text: #f8fafc;
+        --coa-subtle-surface: #1e293b;
+        --coa-row-hover: rgba(99, 102, 241, 0.14);
+    }
+
+    body {
+        font-family: 'Plus Jakarta Sans', sans-serif;
     }
 
     .coa-font-display {
@@ -24,17 +43,28 @@
     /* Compact Hero Header */
     .coa-hero-card {
         background: linear-gradient(135deg, #0f172a 0%, #1e1b4b 55%, #312e81 100%);
-        border-radius: 14px;
-        border: 1px solid rgba(99, 102, 241, 0.25);
-        box-shadow: 0 8px 20px -6px rgba(15, 23, 42, 0.2);
+        border-radius: 16px;
+        border: 1px solid rgba(99, 102, 241, 0.35);
+        box-shadow: 0 12px 28px -6px rgba(15, 23, 42, 0.22);
         position: relative;
         overflow: hidden;
     }
 
+    .coa-hero-card::before {
+        content: '';
+        position: absolute;
+        top: -50%;
+        right: -5%;
+        width: 340px;
+        height: 340px;
+        background: radial-gradient(circle, rgba(56, 189, 248, 0.22) 0%, transparent 70%);
+        pointer-events: none;
+    }
+
     .coa-icon-glass {
-        width: 40px;
-        height: 40px;
-        border-radius: 10px;
+        width: 42px;
+        height: 42px;
+        border-radius: 12px;
         background: rgba(255, 255, 255, 0.1);
         border: 1px solid rgba(255, 255, 255, 0.18);
         display: flex;
@@ -43,43 +73,48 @@
     }
 
     .coa-stat-pill {
-        background: rgba(255, 255, 255, 0.08);
-        border: 1px solid rgba(255, 255, 255, 0.15);
-        border-radius: 10px;
-        padding: 0.4rem 0.85rem;
+        background: rgba(255, 255, 255, 0.09);
+        backdrop-filter: blur(8px);
+        border: 1px solid rgba(255, 255, 255, 0.16);
+        border-radius: 12px;
+        padding: 0.42rem 0.9rem;
     }
 
     /* Main Card & Compact Toolbar */
     .coa-main-card {
-        border-radius: 14px;
-        border: 1px solid var(--coa-border);
-        box-shadow: 0 4px 16px -2px rgba(15, 23, 42, 0.05);
-        background: #ffffff;
+        border-radius: 16px;
+        border: 1px solid var(--coa-grid-border);
+        box-shadow: 0 4px 20px -2px rgba(15, 23, 42, 0.08);
+        background-color: var(--bs-body-bg, var(--coa-solid-bg));
+        color: var(--bs-body-color, var(--coa-solid-text));
         overflow: hidden;
     }
 
     .coa-toolbar {
-        background: #f8fafc;
-        border-bottom: 1px solid var(--coa-border);
-        padding: 0.6rem 1rem;
+        background-color: var(--coa-subtle-surface);
+        border-bottom: 1px solid var(--coa-grid-border);
+        padding: 0.65rem 1rem;
     }
 
     .coa-search-box {
-        background: #ffffff;
-        border: 1px solid #cbd5e1;
-        border-radius: 8px;
+        background-color: var(--coa-solid-bg);
+        border: 1px solid var(--coa-grid-border);
+        border-radius: 10px;
         transition: all 0.2s ease;
     }
 
     .coa-search-box:focus-within {
         border-color: var(--coa-indigo);
-        box-shadow: 0 0 0 3px rgba(79, 70, 229, 0.12);
+        box-shadow: 0 0 0 3.5px rgba(79, 70, 229, 0.15);
     }
 
     .coa-search-box input {
-        font-size: 0.76rem !important;
-        padding-top: 0.25rem;
-        padding-bottom: 0.25rem;
+        font-size: 0.78rem !important;
+        font-weight: 600;
+        color: var(--coa-solid-text) !important;
+        background-color: transparent !important;
+        padding-top: 0.28rem;
+        padding-bottom: 0.28rem;
     }
 
     .coa-search-box input:focus {
@@ -91,32 +126,33 @@
         background: linear-gradient(135deg, #4f46e5 0%, #4338ca 100%);
         color: #ffffff !important;
         border: none;
-        border-radius: 8px;
+        border-radius: 10px;
         font-weight: 600;
-        font-size: 0.74rem;
-        padding: 0.36rem 0.8rem;
-        box-shadow: 0 3px 8px rgba(79, 70, 229, 0.25);
-        transition: all 0.2s ease;
+        font-size: 0.76rem;
+        padding: 0.38rem 0.85rem;
+        box-shadow: 0 4px 12px rgba(79, 70, 229, 0.25);
+        transition: all 0.18s ease;
     }
 
     .btn-coa-sync:hover {
         transform: translateY(-1px);
+        box-shadow: 0 6px 16px rgba(79, 70, 229, 0.35);
     }
 
     .btn-coa-outline {
-        background: #ffffff;
-        border: 1px solid #cbd5e1;
-        color: var(--coa-slate-700);
-        border-radius: 8px;
+        background-color: var(--coa-solid-bg);
+        border: 1px solid var(--coa-grid-border);
+        color: var(--bs-body-color, var(--coa-solid-text));
+        border-radius: 10px;
         font-weight: 600;
-        font-size: 0.74rem;
-        padding: 0.34rem 0.7rem;
+        font-size: 0.76rem;
+        padding: 0.36rem 0.75rem;
         transition: all 0.15s ease;
     }
 
     .btn-coa-outline:hover {
-        background: var(--coa-indigo-soft);
-        border-color: #c7d2fe;
+        background-color: var(--coa-indigo-soft);
+        border-color: var(--coa-indigo);
         color: var(--coa-indigo);
     }
 
@@ -131,35 +167,36 @@
     }
 
     .coa-master-node {
-        border: 1px solid var(--coa-border);
-        border-radius: 10px;
-        margin-bottom: 0.55rem;
-        background: #ffffff;
+        border: 1px solid var(--coa-grid-border);
+        border-radius: 12px;
+        margin-bottom: 0.65rem;
+        background-color: var(--coa-solid-bg);
         overflow: hidden;
+        box-shadow: 0 2px 10px -4px rgba(15, 23, 42, 0.06);
     }
 
     .coa-master-trigger {
         display: flex;
         align-items: center;
         justify-content: space-between;
-        padding: 0.42rem 0.75rem;
-        background: linear-gradient(to right, #f1f5f9, #f8fafc);
+        padding: 0.48rem 0.8rem;
+        background-color: var(--coa-subtle-surface);
         text-decoration: none !important;
-        color: var(--coa-slate-900) !important;
+        color: var(--bs-body-color, var(--coa-solid-text)) !important;
         transition: background 0.15s ease;
     }
 
     .coa-master-trigger:hover {
-        background: #eef2ff;
+        background-color: var(--coa-row-hover);
     }
 
     .coa-master-trigger[aria-expanded="true"] {
-        border-bottom: 1px solid var(--coa-border);
-        background: #eef2ff;
+        border-bottom: 1px solid var(--coa-grid-border);
+        background-color: rgba(79, 70, 229, 0.08);
     }
 
     .coa-master-trigger .coa-chevron {
-        font-size: 0.65rem;
+        font-size: 0.66rem;
         transition: transform 0.2s ease;
         color: var(--coa-indigo);
     }
@@ -169,9 +206,17 @@
     }
 
     .coa-master-title {
-        font-size: 0.78rem;
+        font-size: 0.8rem;
         font-weight: 700;
         letter-spacing: 0.01em;
+    }
+
+    .coa-bab-pill {
+        background-color: var(--coa-solid-bg);
+        color: var(--bs-body-color, var(--coa-solid-text));
+        border: 1px solid var(--coa-grid-border);
+        font-size: 0.62rem;
+        font-weight: 700;
     }
 
     /* Compact Sub-levels List & Guide Lines */
@@ -180,10 +225,10 @@
         padding-left: 1.05rem;
         margin: 0;
         position: relative;
-        border-left: 1px dashed #cbd5e1;
+        border-left: 1px dashed rgba(99, 102, 241, 0.35);
         margin-left: 0.95rem;
-        padding-top: 0.12rem;
-        padding-bottom: 0.15rem;
+        padding-top: 0.14rem;
+        padding-bottom: 0.18rem;
     }
 
     .coa-branch-item {
@@ -198,32 +243,32 @@
         top: 0.72rem;
         width: 0.85rem;
         height: 1px;
-        background: #cbd5e1;
+        background: rgba(99, 102, 241, 0.35);
     }
 
     .coa-node-row {
         display: flex;
         align-items: center;
         justify-content: space-between;
-        padding: 0.2rem 0.5rem;
-        border-radius: 6px;
+        padding: 0.24rem 0.55rem;
+        border-radius: 8px;
         text-decoration: none !important;
-        color: var(--coa-slate-700) !important;
+        color: var(--bs-body-color, var(--coa-solid-text)) !important;
         background: transparent;
         border: 1px solid transparent;
-        line-height: 1.25;
+        line-height: 1.3;
         transition: all 0.12s ease;
     }
 
     .coa-node-row:hover {
-        background: #f1f5f9;
-        border-color: #e2e8f0;
+        background-color: var(--coa-row-hover);
+        border-color: var(--coa-grid-border);
         color: var(--coa-indigo) !important;
     }
 
     .coa-node-row.is-leaf:hover {
-        background: #eef2ff;
-        border-color: #c7d2fe;
+        background-color: var(--coa-indigo-soft);
+        border-color: rgba(79, 70, 229, 0.35);
     }
 
     .coa-node-row[aria-expanded="true"] .coa-chevron-sm {
@@ -240,7 +285,7 @@
     }
 
     .coa-label-text {
-        font-size: 0.73rem;
+        font-size: 0.74rem;
     }
 
     /* Compact Level Number Badges */
@@ -248,11 +293,11 @@
         font-family: 'JetBrains Mono', monospace;
         font-weight: 700;
         font-size: 0.67rem;
-        padding: 0.08rem 0.4rem;
-        border-radius: 4px;
+        padding: 0.08rem 0.42rem;
+        border-radius: 5px;
         display: inline-flex;
         align-items: center;
-        line-height: 1.2;
+        line-height: 1.25;
     }
 
     .lvl-0 {
@@ -261,33 +306,33 @@
     }
 
     .lvl-1 {
-        background: #e0f2fe;
-        color: #0369a1;
-        border: 1px solid #bae6fd;
+        background: rgba(2, 132, 199, 0.14);
+        color: #0284c7;
+        border: 1px solid rgba(2, 132, 199, 0.3);
     }
 
     .lvl-2 {
-        background: #d1fae5;
-        color: #047857;
-        border: 1px solid #a7f3d0;
+        background: rgba(5, 150, 105, 0.14);
+        color: #059669;
+        border: 1px solid rgba(5, 150, 105, 0.3);
     }
 
     .lvl-3 {
-        background: #ede9fe;
-        color: #6d28d9;
-        border: 1px solid #ddd6fe;
+        background: rgba(124, 58, 237, 0.14);
+        color: #7c3aed;
+        border: 1px solid rgba(124, 58, 237, 0.3);
     }
 
     .lvl-4 {
-        background: #fef3c7;
-        color: #b45309;
-        border: 1px solid #fde68a;
+        background: rgba(217, 119, 6, 0.14);
+        color: #d97706;
+        border: 1px solid rgba(217, 119, 6, 0.3);
     }
 
     .lvl-5 {
-        background: #f1f5f9;
-        color: #334155;
-        border: 1px solid #cbd5e1;
+        background: rgba(100, 116, 139, 0.14);
+        color: #64748b;
+        border: 1px solid rgba(100, 116, 139, 0.3);
     }
 
     /* Compact Add Button Row */
@@ -295,20 +340,20 @@
         display: inline-flex;
         align-items: center;
         gap: 0.35rem;
-        padding: 0.14rem 0.55rem;
+        padding: 0.16rem 0.55rem;
         margin: 2px 0;
-        border-radius: 5px;
+        border-radius: 6px;
         font-size: 0.68rem;
         font-weight: 600;
         color: var(--coa-emerald) !important;
-        background: #ecfdf5;
-        border: 1px dashed #6ee7b7;
+        background-color: rgba(5, 150, 105, 0.08);
+        border: 1px dashed rgba(5, 150, 105, 0.45);
         text-decoration: none !important;
         transition: all 0.12s ease;
     }
 
     .coa-add-trigger:hover {
-        background: #059669;
+        background-color: #059669;
         color: #ffffff !important;
         border-style: solid;
         border-color: #059669;
@@ -318,9 +363,9 @@
         opacity: 0;
         font-size: 0.64rem;
         padding: 0.08rem 0.45rem;
-        border-radius: 4px;
-        background: #eef2ff;
-        color: #4f46e5;
+        border-radius: 5px;
+        background-color: var(--coa-indigo-soft);
+        color: var(--coa-indigo);
         font-weight: 600;
         transition: opacity 0.12s ease;
     }
@@ -331,26 +376,57 @@
 
     /* Search Highlight */
     .coa-highlight {
-        background-color: #fef08a !important;
-        border-color: #eab308 !important;
+        background-color: rgba(245, 158, 11, 0.25) !important;
+        border-color: #f59e0b !important;
     }
 
     .coa-modal-content {
-        border-radius: 16px !important;
-        border: 1px solid #e2e8f0 !important;
-        box-shadow: 0 20px 40px -12px rgba(15, 23, 42, 0.25) !important;
+        border-radius: 18px !important;
+        border: 1px solid var(--coa-grid-border) !important;
+        background-color: var(--bs-body-bg, var(--coa-solid-bg)) !important;
+        color: var(--bs-body-color, var(--coa-solid-text)) !important;
+        box-shadow: 0 25px 50px -12px rgba(15, 23, 42, 0.35) !important;
         overflow: hidden;
+    }
+
+    /* =========================================
+   FORM CONTROL, ENT-INPUT & FORM-SELECT
+   ========================================= */
+    .form-control {
+        border: 1px solid var(--ent-grid-border, rgba(99, 102, 241, 0.28)) !important;
+        border-radius: 10px !important;
+        font-weight: 600 !important;
+        color: var(--bs-body-color, #0f172a) !important;
+        background-color: var(--bs-body-bg, #ffffff) !important;
+        font-size: 0.82rem !important;
+        min-height: 38px;
+        transition: all 0.2s ease;
+    }
+
+    .ent-input,
+    .form-select {
+        border: 1px solid var(--ent-grid-border, rgba(99, 102, 241, 0.28)) !important;
+        border-radius: 10px !important;
+        font-weight: 600 !important;
+        color: var(--bs-body-color, #0f172a) !important;
+        background-color: var(--bs-body-bg, #ffffff) !important;
+        padding-top: 18px !important;
+        padding-bottom: 5px !important;
+        padding-left: 11px !important;
+        font-size: 0.8rem !important;
+        height: 44px !important;
+        transition: all 0.2s ease;
     }
 </style>
 @endsection
 
 @section('content')
 <!-- COMPACT HERO HEADER BANNER -->
-<div class="row mb-2">
+<div class="row mb-3">
     <div class="col">
-        <div class="coa-hero-card px-3 py-2">
+        <div class="coa-hero-card px-3 py-3">
             <div class="row gx-2 gy-2 align-items-center justify-content-between position-relative" style="z-index: 2;">
-                <div class="col-lg-auto d-flex align-items-center gap-2">
+                <div class="col-lg-auto d-flex align-items-center gap-3">
                     <div class="coa-icon-glass shrink-0">
                         <img src="{{ asset('img/profit.png') }}" alt="Logo" width="24" />
                     </div>
@@ -369,7 +445,7 @@
                         <i class="fas fa-sitemap text-success" style="font-size: 0.85rem;"></i>
                         <div>
                             <span class="d-block text-uppercase" style="color: #94a3b8; font-size: 0.58rem; line-height: 1;">Total Akun</span>
-                            <span class="coa-font-display fw-bold text-white" style="font-size: 0.85rem;">{{ number_format($total) }} Accounts</span>
+                            <span class="coa-font-display fw-bold text-white" style="font-size: 0.85rem; font-family: 'JetBrains Mono', monospace !important;">{{ number_format($total) }} Accounts</span>
                         </div>
                     </div>
                 </div>
@@ -384,19 +460,19 @@
     <div class="coa-toolbar">
         <div class="row g-2 align-items-center justify-content-between">
             <div class="col-md-5 col-lg-4">
-                <div class="input-group coa-search-box px-2">
-                    <span class="input-group-text bg-transparent border-0 text-muted py-1">
+                <div class="input-group coa-search-box px-0">
+                    <span class="input-group-text bg-transparent border-0 opacity-75 py-1">
                         <i class="fas fa-search" style="font-size: 0.72rem;"></i>
                     </span>
                     <input type="text" id="searchCoaInput" class="form-control border-0 ps-1" placeholder="Cari nomor atau nama akun COA...">
-                    <button type="button" id="clearSearchCoa" class="btn btn-sm text-muted py-0 d-none" title="Reset pencarian">
+                    <button type="button" id="clearSearchCoa" class="btn btn-sm opacity-75 py-0 d-none" title="Reset pencarian">
                         <i class="fas fa-times" style="font-size: 0.7rem;"></i>
                     </button>
                 </div>
             </div>
 
-            <div class="col-md-auto d-flex flex-wrap align-items-center gap-1.5">
-                <span class="d-none d-xl-inline-block text-muted me-2" style="font-size: 0.68rem;">
+            <div class="col-md-auto d-flex flex-wrap align-items-center gap-2">
+                <span class="d-none d-xl-inline-block opacity-75 me-2" style="font-size: 0.68rem;">
                     <i class="fas fa-info-circle text-primary me-1"></i>Klik kanan / klik <strong>Edit</strong> untuk ubah akun
                 </span>
 
@@ -404,9 +480,9 @@
                     <i class="fas fa-folder-open me-1 text-primary"></i>Buka Semua
                 </button>
                 <button type="button" class="btn btn-coa-outline" id="btnCollapseAllCoa">
-                    <i class="fas fa-folder me-1 text-secondary"></i>Tutup Semua
+                    <i class="fas fa-folder me-1 opacity-75"></i>Tutup Semua
                 </button>
-                <button class="btn btn-coa-sync" data-bs-toggle="modal" data-bs-target="#modal-coa-xl" id="button-sinkronisasi-data-coa">
+                <button type="button" class="btn btn-coa-sync" data-bs-toggle="modal" data-bs-target="#modal-coa-xl" id="button-sinkronisasi-data-coa">
                     <i class="fas fa-sync-alt me-1"></i>Sinkronisasi COA
                 </button>
             </div>
@@ -423,9 +499,9 @@
                     <div class="d-flex align-items-center gap-2">
                         <i class="fas fa-chevron-right coa-chevron"></i>
                         <span class="coa-code-badge lvl-0">{{ $datas->kop_master_coa_no }}</span>
-                        <span class="coa-font-display coa-master-title text-dark coa-label-text">{{ $datas->kop_master_coa_name }}</span>
+                        <span class="coa-font-display coa-master-title coa-label-text">{{ $datas->kop_master_coa_name }}</span>
                     </div>
-                    <span class="badge bg-white text-secondary border" style="font-size: 0.62rem; font-weight: 600;">BAB {{ $datas->kop_master_coa_no }}</span>
+                    <span class="badge coa-bab-pill">BAB {{ $datas->kop_master_coa_no }}</span>
                 </a>
 
                 <ul class="collapse show coa-branch-list" id="treeviewStriped-1-{{ $datas->id_kop_master_coa }}">
@@ -442,7 +518,7 @@
                     @if ($subs->kop_coa_data_opt == 1)
                     <li class="coa-branch-item coa-searchable-node">
                         <a class="coa-node-row" data-bs-toggle="collapse" href="#treeviewStriped-2-{{ $subs->id_kop_master_coa_data }}" oncontextmenu="myFunction('{{ $subs->kop_coa_data_code }}'); return false;" role="button" aria-expanded="true">
-                            <div class="d-flex align-items-center gap-1.5">
+                            <div class="d-flex align-items-center gap-2">
                                 <i class="fas fa-chevron-right coa-chevron-sm"></i>
                                 <span class="coa-code-badge lvl-1">{{ $datas->kop_master_coa_no }}.{{ $no++ }}</span>
                                 <span class="fw-semibold coa-label-text">{{ $subs->kop_coa_data_name }}</span>
@@ -466,7 +542,7 @@
                             @if ($subs1->kop_coa_data_opt == 1)
                             <li class="coa-branch-item coa-searchable-node">
                                 <a class="coa-node-row" data-bs-toggle="collapse" href="#treeviewStriped-2-{{ $subs1->id_kop_master_coa_data }}" role="button" oncontextmenu="myFunction('{{ $subs1->kop_coa_data_code }}'); return false;" aria-expanded="true">
-                                    <div class="d-flex align-items-center gap-1.5">
+                                    <div class="d-flex align-items-center gap-2">
                                         <i class="fas fa-chevron-right coa-chevron-sm"></i>
                                         <span class="coa-code-badge lvl-2">{{ $datas->kop_master_coa_no }}.{{ $no-1 }}.{{ $no1++ }}</span>
                                         <span class="fw-semibold coa-label-text">{{ $subs1->kop_coa_data_name }}</span>
@@ -490,7 +566,7 @@
                                     @if ($subs2->kop_coa_data_opt == 1)
                                     <li class="coa-branch-item coa-searchable-node">
                                         <a class="coa-node-row" data-bs-toggle="collapse" href="#treeviewStriped-3-{{ $subs2->id_kop_master_coa_data }}" role="button" oncontextmenu="myFunction('{{ $subs2->kop_coa_data_code }}'); return false;" aria-expanded="true">
-                                            <div class="d-flex align-items-center gap-1.5">
+                                            <div class="d-flex align-items-center gap-2">
                                                 <i class="fas fa-chevron-right coa-chevron-sm"></i>
                                                 <span class="coa-code-badge lvl-3">{{ $datas->kop_master_coa_no }}.{{ $no-1 }}.{{ $no1-1 }}.{{ $no2++ }}</span>
                                                 <span class="fw-semibold coa-label-text">{{ $subs2->kop_coa_data_name }}</span>
@@ -514,7 +590,7 @@
                                             @if ($subs3->kop_coa_data_opt == 1)
                                             <li class="coa-branch-item coa-searchable-node">
                                                 <a class="coa-node-row" data-bs-toggle="collapse" href="#treeviewStriped-3-{{ $subs3->id_kop_master_coa_data }}" role="button" oncontextmenu="myFunction('{{ $subs3->kop_coa_data_code }}'); return false;" aria-expanded="true">
-                                                    <div class="d-flex align-items-center gap-1.5">
+                                                    <div class="d-flex align-items-center gap-2">
                                                         <i class="fas fa-chevron-right coa-chevron-sm"></i>
                                                         <span class="coa-code-badge lvl-4">{{ $datas->kop_master_coa_no }}.{{ $no-1 }}.{{ $no1-1 }}.{{ $no2-1 }}.{{ $no3++ }}</span>
                                                         <span class="fw-semibold coa-label-text">{{ $subs3->kop_coa_data_name }}</span>
@@ -537,12 +613,12 @@
                                                     @foreach ($sub4 as $subs4)
                                                     <li class="coa-branch-item coa-searchable-node">
                                                         <a class="coa-node-row is-leaf" href="#!" oncontextmenu="myFunction('{{ $subs4->kop_coa_data_code }}'); return false;">
-                                                            <div class="d-flex align-items-center gap-1.5">
+                                                            <div class="d-flex align-items-center gap-2">
                                                                 <i class="fas fa-file-alt text-primary" style="font-size: 0.65rem;"></i>
                                                                 <span class="coa-code-badge lvl-5">{{ $datas->kop_master_coa_no }}.{{ $no-1 }}.{{ $no1-1 }}.{{ $no2-1 }}.{{ $no3-1 }}.{{ $no4++ }}</span>
                                                                 <span class="coa-label-text">{{ $subs4->kop_coa_data_name }}</span>
                                                             </div>
-                                                            <div class="d-flex align-items-center gap-1.5">
+                                                            <div class="d-flex align-items-center gap-2">
                                                                 <span class="coa-edit-pill" onclick="event.preventDefault(); myFunction('{{ $subs4->kop_coa_data_code }}');">
                                                                     <i class="fas fa-pen me-1"></i>Edit
                                                                 </span>
@@ -563,12 +639,12 @@
                                             @else
                                             <li class="coa-branch-item coa-searchable-node">
                                                 <a class="coa-node-row is-leaf" href="#!" oncontextmenu="myFunction('{{ $subs3->kop_coa_data_code }}'); return false;">
-                                                    <div class="d-flex align-items-center gap-1.5">
+                                                    <div class="d-flex align-items-center gap-2">
                                                         <i class="fas fa-file-alt text-primary" style="font-size: 0.65rem;"></i>
                                                         <span class="coa-code-badge lvl-4">{{ $datas->kop_master_coa_no }}.{{ $no-1 }}.{{ $no1-1 }}.{{ $no2-1 }}.{{ $no3++ }}</span>
                                                         <span class="coa-label-text">{{ $subs3->kop_coa_data_name }}</span>
                                                     </div>
-                                                    <div class="d-flex align-items-center gap-1.5">
+                                                    <div class="d-flex align-items-center gap-2">
                                                         <span class="coa-edit-pill" onclick="event.preventDefault(); myFunction('{{ $subs3->kop_coa_data_code }}');">
                                                             <i class="fas fa-pen me-1"></i>Edit
                                                         </span>
@@ -590,12 +666,12 @@
                                     @else
                                     <li class="coa-branch-item coa-searchable-node">
                                         <a class="coa-node-row is-leaf" href="#!" oncontextmenu="myFunction('{{ $subs2->kop_coa_data_code }}'); return false;">
-                                            <div class="d-flex align-items-center gap-1.5">
+                                            <div class="d-flex align-items-center gap-2">
                                                 <i class="fas fa-file-alt text-primary" style="font-size: 0.65rem;"></i>
                                                 <span class="coa-code-badge lvl-3">{{ $datas->kop_master_coa_no }}.{{ $no-1 }}.{{ $no1-1 }}.{{ $no2++ }}</span>
                                                 <span class="coa-label-text">{{ $subs2->kop_coa_data_name }}</span>
                                             </div>
-                                            <div class="d-flex align-items-center gap-1.5">
+                                            <div class="d-flex align-items-center gap-2">
                                                 <span class="coa-edit-pill" onclick="event.preventDefault(); myFunction('{{ $subs2->kop_coa_data_code }}');">
                                                     <i class="fas fa-pen me-1"></i>Edit
                                                 </span>
@@ -617,12 +693,12 @@
                             @else
                             <li class="coa-branch-item coa-searchable-node">
                                 <a class="coa-node-row is-leaf" href="#!" oncontextmenu="myFunction('{{ $subs1->kop_coa_data_code }}'); return false;">
-                                    <div class="d-flex align-items-center gap-1.5">
+                                    <div class="d-flex align-items-center gap-2">
                                         <i class="fas fa-file-alt text-primary" style="font-size: 0.65rem;"></i>
                                         <span class="coa-code-badge lvl-2">{{ $datas->kop_master_coa_no }}.{{ $no-1 }}.{{ $no1++ }}</span>
                                         <span class="coa-label-text">{{ $subs1->kop_coa_data_name }}</span>
                                     </div>
-                                    <div class="d-flex align-items-center gap-1.5">
+                                    <div class="d-flex align-items-center gap-2">
                                         <span class="coa-edit-pill" onclick="event.preventDefault(); myFunction('{{ $subs1->kop_coa_data_code }}');">
                                             <i class="fas fa-pen me-1"></i>Edit
                                         </span>
@@ -644,12 +720,12 @@
                     @elseif($subs->kop_coa_data_opt == 0)
                     <li class="coa-branch-item coa-searchable-node">
                         <a class="coa-node-row is-leaf" href="#!" oncontextmenu="myFunction('{{ $subs->kop_coa_data_code }}'); return false;">
-                            <div class="d-flex align-items-center gap-1.5">
+                            <div class="d-flex align-items-center gap-2">
                                 <i class="fas fa-file-alt text-primary" style="font-size: 0.65rem;"></i>
                                 <span class="coa-code-badge lvl-1">{{ $datas->kop_master_coa_no }}.{{ $no++ }}</span>
                                 <span class="coa-label-text">{{ $subs->kop_coa_data_name }}</span>
                             </div>
-                            <div class="d-flex align-items-center gap-1.5">
+                            <div class="d-flex align-items-center gap-2">
                                 <span class="coa-edit-pill" onclick="event.preventDefault(); myFunction('{{ $subs->kop_coa_data_code }}');">
                                     <i class="fas fa-pen me-1"></i>Edit
                                 </span>
@@ -681,8 +757,8 @@
     <div class="modal-dialog modal-dialog-centered modal-lg" role="document">
         <div class="modal-content coa-modal-content">
             <div class="position-absolute top-0 end-0 mt-3 me-3 z-index-1">
-                <button class="btn-close btn btn-sm btn-circle d-flex flex-center transition-base" onclick="location.reload()"
-                    data-bs-dismiss="modal" aria-label="Close"></button>
+                <!-- <button class="btn-close btn btn-sm btn-circle d-flex flex-center transition-base" onclick="location.reload()"
+                    data-bs-dismiss="modal" aria-label="Close"></button> -->
             </div>
             <div id="menu-coa"></div>
         </div>
@@ -793,23 +869,7 @@
 </script>
 
 <script>
-    function myFunction(data) {
-        $('#modal-coa').modal('show');
-        $.ajax({
-            url: "{{ route('master_accounting_coa_update_level') }}",
-            type: "POST",
-            cache: false,
-            data: {
-                "_token": "{{ csrf_token() }}",
-                "code": data
-            },
-            dataType: 'html',
-        }).done(function(data) {
-            $('#menu-coa').html(data);
-        }).fail(function() {
-            $('#menu-coa').html('<div class="p-4 text-center text-danger">Gagal memuat data akun.</div>');
-        });
-    }
+
 </script>
 
 <script>
@@ -844,24 +904,7 @@
         });
     });
 
-    $(document).on("click", "#button-update-level", function(e) {
-        e.preventDefault();
-        let code = $(this).data("code");
-        $.ajax({
-            url: "{{ route('master_accounting_coa_update_level') }}",
-            type: "POST",
-            cache: false,
-            data: {
-                "_token": "{{ csrf_token() }}",
-                "code": code
-            },
-            dataType: 'html',
-        }).done(function(data) {
-            $('#menu-coa').html(data);
-        }).fail(function() {
-            $('#menu-coa').html('<div class="p-4 text-center text-danger">Gagal memuat data update COA.</div>');
-        });
-    });
+
 
     $(document).on("click", "#button-simpan-data-level-coa", function(e) {
         e.preventDefault();
@@ -899,37 +942,95 @@
         });
     });
 
-    $(document).on("click", "#button-simpan-data-update-level-coa", function(e) {
-        e.preventDefault();
-        var data = $("#form-update-coa").serialize();
-        $('#menu-add-data-coa').html(
-            '<div class="spinner-border text-primary my-3" style="display: block; margin-left: auto; margin-right: auto;" role="status"><span class="visually-hidden">Loading...</span></div>'
+    function myFunction(data) {
+        $('#modal-coa').modal('show');
+        $('#menu-coa').html(
+            '<div class="spinner-border text-primary my-4" style="display: block; margin-left: auto; margin-right: auto;" role="status"><span class="visually-hidden">Loading...</span></div>'
         );
+
+        $.ajax({
+            url: "{{ route('master_koperasi_data_coa_update_level') }}",
+            type: "POST",
+            cache: false,
+            data: {
+                "_token": "{{ csrf_token() }}",
+                "code": data
+            },
+            dataType: 'html',
+        }).done(function(resHtml) {
+            $('#menu-coa').html(resHtml);
+        }).fail(function() {
+            $('#menu-coa').html('<div class="p-4 text-center text-danger fw-semibold">Gagal memuat data akun.</div>');
+            Swal.fire({
+                icon: "error",
+                title: "Gagal Memuat",
+                text: "Tidak dapat mengambil detail akun COA.",
+                confirmButtonColor: "#4f46e5"
+            });
+        });
+    }
+
+    $(document).off("click", "#button-simpan-data-update-level-coa").on("click", "#button-simpan-data-update-level-coa", function(e) {
+        e.preventDefault();
+
+        const $form = $("#form-update-coa");
+        const $btn = $(this);
+        const originalHtml = $btn.html();
+
+        $btn.prop("disabled", true).html('<i class="fas fa-spinner fa-spin me-1"></i> Menyimpan...');
+
+        Swal.fire({
+            title: "Menyimpan Perubahan...",
+            text: "Mohon tunggu sebentar.",
+            allowOutsideClick: false,
+            allowEscapeKey: false,
+            didOpen: () => {
+                Swal.showLoading();
+            }
+        });
+
         $.ajax({
             url: "{{ route('master_accounting_coa_update_save_level') }}",
             type: "POST",
             cache: false,
-            data: data,
-            dataType: 'html',
-        }).done(function(data) {
-            if (data == 0) {
+            data: $form.serialize(),
+            dataType: "json"
+        }).done(function(res) {
+            $btn.prop("disabled", false).html(originalHtml);
+
+            if (res && res.status === "success") {
                 Swal.fire({
-                    icon: "error",
-                    title: "Gagal Memperbarui",
-                    text: "Terjadi kesalahan saat menyimpan perubahan."
+                    icon: "success",
+                    title: "Berhasil!",
+                    text: res.message || "Data akun COA berhasil diperbarui.",
+                    confirmButtonColor: "#059669",
+                    confirmButtonText: "OK"
+                }).then(() => {
+                    $('#modal-coa').modal('hide');
+                    location.reload();
                 });
-                $('#menu-add-data-coa').html('<button class="btn btn-success float-end" id="button-simpan-data-level-coa" data-code="">Simpan Data</button>');
             } else {
-                $('#menu-add-data-coa').html(data);
-                location.reload();
+                Swal.fire({
+                    icon: "warning",
+                    title: "Gagal Memperbarui",
+                    text: (res && res.message) ? res.message : "Data gagal disimpan.",
+                    confirmButtonColor: "#e11d48"
+                });
             }
-        }).fail(function() {
+        }).fail(function(xhr) {
+            $btn.prop("disabled", false).html(originalHtml);
+
+            let errMsg = "Terjadi kesalahan saat menyimpan perubahan data COA.";
+            if (xhr.responseJSON && xhr.responseJSON.message) {
+                errMsg = xhr.responseJSON.message;
+            }
+
             Swal.fire({
                 icon: "error",
                 title: "Terjadi Kesalahan",
-                text: "Gagal terhubung ke server."
+                text: errMsg,
+                confirmButtonColor: "#e11d48"
             });
-            $('#menu-add-data-coa').html('<button class="btn btn-success float-end" id="button-simpan-data-level-coa" data-code="">Simpan Data</button>');
         });
     });
 </script>

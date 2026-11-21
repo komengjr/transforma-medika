@@ -5,237 +5,327 @@
 <link rel="stylesheet" href="https://cdn.datatables.net/responsive/3.0.4/css/responsive.bootstrap5.css">
 <link href="{{ asset('vendors/choices/choices.min.css') }}" rel="stylesheet" />
 <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
+<link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&family=JetBrains+Mono:wght@500;700&display=swap" rel="stylesheet">
 
 <style>
     /* =========================================
-       RETRO / NEUBRUTALISM THEME STYLES
+       MODERN ENTERPRISE HEALTHCARE UI STYLES
+       (ADAPTIVE LIGHT & DARK MODE BOOTSTRAP 5)
        ========================================= */
     :root {
-        --retro-dark: #1e1e24;
-        --retro-yellow: #ffde59;
-        --retro-pink: #ffa6c9;
-        --retro-cyan: #8bf0fa;
-        --retro-orange: #ff914d;
-        --retro-green: #c1ff72;
-        --retro-purple: #c8b6ff;
-        --retro-bg: #f4f0ea;
-        --retro-border: 3px solid var(--retro-dark);
-        --retro-shadow: 5px 5px 0px var(--retro-dark);
-        --retro-shadow-sm: 3px 3px 0px var(--retro-dark);
+        --ent-indigo: #4f46e5;
+        --ent-indigo-dark: #4338ca;
+        --ent-indigo-soft: rgba(79, 70, 229, 0.12);
+        --ent-grid-border: rgba(99, 102, 241, 0.28);
+        --ent-emerald: #059669;
+        --ent-sky: #0284c7;
+        --ent-amber: #d97706;
+        --ent-rose: #e11d48;
+        --ent-solid-bg: #ffffff;
+        --ent-solid-text: #0f172a;
     }
 
-    /* Retro Cards */
-    .retro-card {
-        border: var(--retro-border);
-        border-radius: 12px;
-        box-shadow: var(--retro-shadow);
-        background-color: #ffffff;
+    [data-bs-theme="dark"],
+    .dark {
+        --ent-solid-bg: #0f172a;
+        --ent-solid-text: #f8fafc;
+    }
+
+    body {
+        font-family: 'Plus Jakarta Sans', sans-serif;
+    }
+
+    /* Adaptive Enterprise Card */
+    .ent-card {
+        border: 1px solid var(--ent-grid-border);
+        border-radius: 16px;
+        background-color: var(--bs-body-bg, var(--ent-solid-bg));
+        box-shadow: 0 4px 20px -2px rgba(15, 23, 42, 0.08);
         overflow: hidden;
     }
 
-    /* Retro Header Banner */
-    .retro-header-banner {
-        background: linear-gradient(135deg, var(--retro-yellow) 0%, var(--retro-orange) 100%);
-        border: var(--retro-border);
-        border-radius: 12px;
-        box-shadow: var(--retro-shadow);
-        color: var(--retro-dark);
+    .ent-card-header {
+        background-color: rgba(79, 70, 229, 0.06) !important;
+        border-bottom: 1px solid var(--ent-grid-border) !important;
+        padding: 12px 16px;
     }
 
-    /* Retro Buttons */
-    .retro-btn {
-        font-weight: 800 !important;
-        border: 2px solid var(--retro-dark);
-        box-shadow: var(--retro-shadow-sm);
-        border-radius: 6px;
-        transition: all 0.1s ease-in-out;
-        text-transform: uppercase;
-        letter-spacing: 0.5px;
+    /* Hero Banner */
+    .ent-header-banner {
+        background: linear-gradient(135deg, #0f172a 0%, #1e1b4b 55%, #312e81 100%);
+        border: 1px solid rgba(99, 102, 241, 0.35);
+        border-radius: 16px;
+        box-shadow: 0 12px 28px -6px rgba(15, 23, 42, 0.22);
+        color: #ffffff;
+        position: relative;
+        overflow: hidden;
+    }
+
+    .ent-header-banner::before {
+        content: '';
+        position: absolute;
+        top: -50%;
+        right: -5%;
+        width: 340px;
+        height: 340px;
+        background: radial-gradient(circle, rgba(16, 185, 129, 0.22) 0%, transparent 70%);
+        pointer-events: none;
+    }
+
+    .ent-glass-pill {
+        background: rgba(255, 255, 255, 0.09);
+        backdrop-filter: blur(8px);
+        border: 1px solid rgba(255, 255, 255, 0.16);
+        border-radius: 12px;
+        color: #ffffff;
+    }
+
+    /* Buttons */
+    .ent-btn {
+        font-weight: 600 !important;
+        border-radius: 10px;
+        transition: all 0.18s ease;
+        letter-spacing: 0.01em;
         cursor: pointer;
+        font-size: 0.8rem;
     }
 
-    .retro-btn:active {
-        transform: translate(3px, 3px);
-        box-shadow: 0px 0px 0px var(--retro-dark);
+    .ent-btn:hover {
+        transform: translateY(-1px);
     }
 
-    .retro-btn-primary {
-        background-color: var(--retro-cyan);
-        color: var(--retro-dark);
+    .ent-btn-primary {
+        background: linear-gradient(135deg, #4f46e5 0%, #4338ca 100%);
+        border: none;
+        color: #ffffff;
+        box-shadow: 0 4px 12px rgba(79, 70, 229, 0.25);
     }
 
-    .retro-btn-primary:hover {
-        background-color: #6ce0ed;
-        color: var(--retro-dark);
+    .ent-btn-primary:hover {
+        box-shadow: 0 6px 16px rgba(79, 70, 229, 0.35);
+        color: #ffffff;
     }
 
-    .retro-btn-warning {
-        background-color: var(--retro-yellow);
-        color: var(--retro-dark);
+    .ent-btn-warning {
+        background-color: rgba(245, 158, 11, 0.16);
+        border: 1px solid rgba(245, 158, 11, 0.45);
+        color: #d97706;
     }
 
-    .retro-btn-warning:hover {
-        background-color: #e6c84c;
-        color: var(--retro-dark);
+    .ent-btn-warning:hover {
+        background-color: #f59e0b;
+        border-color: #f59e0b;
+        color: #ffffff;
     }
 
-    .retro-btn-success {
-        background-color: var(--retro-green);
-        color: var(--retro-dark);
+    .ent-btn-success {
+        background: linear-gradient(135deg, #059669 0%, #047857 100%);
+        border: none;
+        color: #ffffff;
+        box-shadow: 0 4px 12px rgba(5, 150, 105, 0.25);
     }
 
-    .retro-btn-success:hover {
-        background-color: #b0f55b;
-        color: var(--retro-dark);
+    .ent-btn-success:hover {
+        box-shadow: 0 6px 16px rgba(5, 150, 105, 0.35);
+        color: #ffffff;
     }
 
-    .retro-btn-danger {
-        background-color: var(--retro-pink);
-        color: var(--retro-dark);
-    }
-
-    /* Inputs, Selects & Container Filter */
+    /* Filter Bar & Solid Inputs */
     .filter-bar-container {
-        background-color: #ffffff;
-        border: var(--retro-border);
-        border-radius: 12px;
-        padding: 15px 20px;
-        margin-bottom: 20px;
-        box-shadow: var(--retro-shadow-sm);
+        background-color: var(--bs-body-bg, var(--ent-solid-bg));
+        border: 1px solid var(--ent-grid-border);
+        border-radius: 16px;
+        padding: 16px 20px;
+        margin-bottom: 16px;
+        box-shadow: 0 4px 20px -2px rgba(15, 23, 42, 0.06);
     }
 
-    .retro-input,
-    .form-control,
+    .ent-field-label {
+        font-size: 0.68rem;
+        font-weight: 700;
+        text-transform: uppercase;
+        letter-spacing: 0.03em;
+        color: var(--bs-secondary-color, #64748b);
+        margin-bottom: 4px;
+    }
+
+    .form-control {
+        border: 1px solid var(--ent-grid-border) !important;
+        border-radius: 10px !important;
+        font-weight: 600 !important;
+        color: var(--bs-body-color) !important;
+        background-color: var(--bs-body-bg) !important;
+        font-size: 0.82rem !important;
+        min-height: 38px;
+        transition: all 0.2s ease;
+    }
+
+    .ent-input,
     .form-select {
-        border: 2px solid var(--retro-dark) !important;
-        border-radius: 6px !important;
-        box-shadow: 2px 2px 0px var(--retro-dark) !important;
-        font-weight: 700 !important;
-        color: var(--retro-dark) !important;
-        background-color: #ffffff !important;
+        border: 1px solid var(--ent-grid-border) !important;
+        border-radius: 10px !important;
+        font-weight: 600 !important;
+        color: var(--bs-body-color) !important;
+        background-color: var(--bs-body-bg) !important;
+        font-size: 0.82rem !important;
+        min-height: 38px;
+        transition: all 0.2s ease;
     }
 
-    .retro-input:focus,
+    .ent-input:focus,
     .form-control:focus,
     .form-select:focus {
-        border-color: var(--retro-dark) !important;
-        box-shadow: 4px 4px 0px var(--retro-dark) !important;
+        border-color: var(--ent-indigo) !important;
+        background-color: var(--ent-solid-bg) !important;
+        box-shadow: 0 0 0 3.5px rgba(79, 70, 229, 0.15) !important;
         outline: none;
     }
 
     /* Tabel Custom */
+    .table-custom-orange {
+        width: 100% !important;
+        border-collapse: collapse !important;
+        margin-bottom: 0 !important;
+        font-size: 0.8rem;
+    }
+
     .table-custom-orange thead th {
-        background-color: var(--retro-dark) !important;
-        color: var(--retro-green) !important;
-        font-size: 0.75rem;
-        font-weight: 800;
+        background-color: rgba(79, 70, 229, 0.12) !important;
+        color: var(--bs-body-color) !important;
+        font-size: 0.7rem;
+        font-weight: 700;
         text-transform: uppercase;
-        border-bottom: 3px solid var(--retro-dark);
-        padding: 12px 10px;
-        letter-spacing: 0.5px;
+        border: 1px solid var(--ent-grid-border) !important;
+        border-bottom: 2px solid rgba(79, 70, 229, 0.45) !important;
+        padding: 11px 10px;
+        letter-spacing: 0.04em;
+    }
+
+    .table-custom-orange td {
+        border: 1px solid var(--ent-grid-border) !important;
+        font-weight: 500;
+        color: var(--bs-body-color) !important;
+        padding: 9px 10px;
+        vertical-align: middle;
+        background-color: transparent;
     }
 
     .table-hover tbody tr {
-        border-bottom: 2px solid var(--retro-dark);
-        transition: background 0.2s;
+        transition: background-color 0.15s ease;
     }
 
-    .table-hover tbody tr:hover {
-        background-color: var(--retro-yellow) !important;
+    .table-hover tbody tr:hover,
+    .table-hover tbody tr:hover td {
+        background-color: rgba(79, 70, 229, 0.06) !important;
+    }
+
+    .row-selected,
+    .row-selected td {
+        background-color: rgba(79, 70, 229, 0.14) !important;
     }
 
     .card-panel {
-        background: #ffffff;
-        border: 2px solid var(--retro-dark);
-        border-radius: 10px;
-        padding: 15px;
-        margin-bottom: 15px;
-        box-shadow: 3px 3px 0px var(--retro-dark);
+        background-color: var(--bs-body-bg, var(--ent-solid-bg));
+        border: 1px solid var(--ent-grid-border);
+        border-radius: 12px;
+        padding: 12px 16px;
+        margin-bottom: 12px;
+        box-shadow: 0 4px 14px -4px rgba(15, 23, 42, 0.06);
     }
 
-    /* Kotak Total Tagihan Modern Retro */
+    /* Kotak Total Tagihan Modern Enterprise */
     .total-tagihan-box {
-        background: var(--retro-dark);
+        background: linear-gradient(135deg, #0f172a 0%, #1e1b4b 65%, #312e81 100%);
         color: #ffffff;
-        border: 3px solid var(--retro-dark);
-        border-radius: 12px;
+        border: 1px solid rgba(99, 102, 241, 0.4);
+        border-radius: 16px;
         padding: 18px 22px;
         display: flex;
         justify-content: space-between;
         align-items: center;
-        box-shadow: var(--retro-shadow-sm);
+        box-shadow: 0 10px 24px -6px rgba(15, 23, 42, 0.25);
     }
 
     .total-tagihan-number {
-        font-size: 2rem;
-        font-weight: 900;
-        color: var(--retro-green);
-        letter-spacing: 1px;
+        font-size: 1.95rem;
+        font-weight: 800;
+        font-family: 'JetBrains Mono', monospace;
+        color: #34d399;
+        letter-spacing: 0.5px;
     }
 
-    .row-selected {
-        background-color: var(--retro-yellow) !important;
-    }
-
-    /* Kartu Metode Pembayaran Modern Retro */
+    /* Kartu Metode Pembayaran */
     .payment-method-card {
-        background: #ffffff;
-        border: 2px solid var(--retro-dark);
-        border-radius: 10px;
+        background-color: var(--bs-body-bg, var(--ent-solid-bg));
+        border: 1px solid var(--ent-grid-border);
+        border-radius: 12px;
         padding: 14px 16px;
         margin-bottom: 12px;
-        box-shadow: 3px 3px 0px var(--retro-dark);
-        transition: all 0.1s ease;
+        box-shadow: 0 4px 14px -4px rgba(15, 23, 42, 0.05);
+        transition: all 0.18s ease;
+    }
+
+    .payment-method-card:focus-within {
+        border-color: var(--ent-indigo);
+        box-shadow: 0 6px 18px -4px rgba(79, 70, 229, 0.15);
     }
 
     .payment-method-card.disabled-method {
-        background-color: #e9ecef;
-        opacity: 0.65;
+        background-color: rgba(100, 116, 139, 0.08);
+        opacity: 0.62;
         pointer-events: none;
         box-shadow: none;
     }
 
-    .retro-badge {
-        border: 2px solid var(--retro-dark);
-        border-radius: 6px;
-        padding: 4px 8px;
-        font-weight: 800;
-        box-shadow: 2px 2px 0px var(--retro-dark);
+    .ent-badge {
+        border-radius: 9999px;
+        padding: 4px 10px;
+        font-weight: 700;
         text-transform: uppercase;
-        display: inline-block;
-        font-size: 0.7rem;
+        display: inline-flex;
+        align-items: center;
+        font-size: 0.68rem;
+        letter-spacing: 0.03em;
+    }
+
+    .ent-modal-popup {
+        border: 1px solid var(--ent-grid-border) !important;
+        border-radius: 18px !important;
+        background-color: var(--bs-body-bg, var(--ent-solid-bg)) !important;
+        color: var(--bs-body-color) !important;
     }
 </style>
 @endsection
 
 @section('content')
 <!-- HEADER BANNER UTAMA -->
-<div class="row mb-4">
+<div class="row mb-3">
     <div class="col-12">
-        <div class="card retro-header-banner p-1">
-            <div class="card-body p-4 text-dark position-relative z-1">
+        <div class="card ent-header-banner p-1">
+            <div class="card-body p-3 p-md-4 text-white position-relative" style="z-index: 2;">
                 <div class="row align-items-center gy-3">
                     <div class="col-lg-7 d-flex align-items-center">
-                        <div class="p-2 rounded-4 shadow-sm me-3 d-flex align-items-center justify-content-center"
-                            style="width: 65px; height: 65px; background: white; border: 2px solid var(--retro-dark); box-shadow: 3px 3px 0px var(--retro-dark);">
-                            <img src="{{ asset('img/keuangan.png') }}" alt="Logo" class="img-fluid" width="42" />
+                        <div class="ent-glass-pill p-2 me-3 d-flex align-items-center justify-content-center flex-shrink-0"
+                            style="width: 60px; height: 60px;">
+                            <img src="{{ asset('img/keuangan.png') }}" alt="Logo" class="img-fluid" width="40" />
                         </div>
                         <div>
                             <div class="d-flex align-items-center gap-2 mb-1">
-                                <span class="retro-badge" style="background-color: var(--retro-cyan); color: var(--retro-dark);">
+                                <span class="ent-badge" style="background: rgba(56, 189, 248, 0.2); border: 1px solid rgba(56, 189, 248, 0.45); color: #7dd3fc;">
                                     <i class="fas fa-shield-alt me-1"></i> v2.4 Medical Suite
                                 </span>
+                                <span style="color: #94a3b8; font-size: 0.75rem; font-weight: 600;">Keuangan &amp; Billing Kasir</span>
                             </div>
-                            <h3 class="fw-bolder mb-0 text-dark" style="font-size: 1.4rem; text-shadow: 1px 1px 0px white;">
-                                Welcome to {{ Env('APP_LABEL')}} <span class="fw-normal">Management System</span>
-                            </h3>
+                            <h4 class="fw-bold mb-0 text-white" style="letter-spacing: -0.02em;">
+                                Welcome to {{ Env('APP_LABEL')}} <span class="fw-normal" style="color: #cbd5e1;">Management System</span>
+                            </h4>
                         </div>
                     </div>
 
                     <div class="col-lg-5 text-lg-end">
-                        <div class="d-inline-flex align-items-center bg-white px-3 py-2 rounded-pill" style="border: 2px solid var(--retro-dark); box-shadow: 3px 3px 0px var(--retro-dark);">
-                            <h6 class="fw-bolder mb-0 text-dark" style="font-size: 0.95rem;">
-                                <i class="fas fa-money-check me-1 text-success"></i> Cashier Accounting
+                        <div class="ent-glass-pill d-inline-flex align-items-center px-3 py-2">
+                            <h6 class="fw-bold mb-0 text-white" style="font-size: 0.9rem;">
+                                <i class="fas fa-money-check me-2 text-success"></i> Cashier Accounting
                             </h6>
                         </div>
                     </div>
@@ -249,18 +339,18 @@
 <div class="filter-bar-container">
     <form id="form-filter-kasir" onsubmit="event.preventDefault(); loadAntreanKasir();" class="row g-2 align-items-end">
         <!-- Tanggal Awal -->
-        <div class="col-md-2">
-            <label class="form-label text-dark mb-1 fs--2 fw-bolder">TANGGAL AWAL</label>
+        <div class="col-sm-6 col-md-2">
+            <label class="form-label ent-field-label">Tanggal Awal</label>
             <input type="date" class="form-control form-control-sm retro-input" id="filter_tgl_awal" value="{{ date('Y-m-d') }}">
         </div>
         <!-- Tanggal Akhir -->
-        <div class="col-md-2">
-            <label class="form-label text-dark mb-1 fs--2 fw-bolder">TANGGAL AKHIR</label>
+        <div class="col-sm-6 col-md-2">
+            <label class="form-label ent-field-label">Tanggal Akhir</label>
             <input type="date" class="form-control form-control-sm retro-input" id="filter_tgl_akhir" value="{{ date('Y-m-d') }}">
         </div>
         <!-- Kel. Pelanggan -->
-        <div class="col-md-2">
-            <label class="form-label text-dark mb-1 fs--2 fw-bolder">KEL. PELANGGAN</label>
+        <div class="col-sm-6 col-md-2">
+            <label class="form-label ent-field-label">Kel. Pelanggan</label>
             <select class="form-select form-select-sm retro-input" id="filter_penjamin">
                 <option value="">Semua</option>
                 @foreach ($subPenjamins ?? [] as $sp)
@@ -269,13 +359,13 @@
             </select>
         </div>
         <!-- Cari Keyword -->
-        <div class="col-md-2">
-            <label class="form-label text-dark mb-1 fs--2 fw-bolder">CARI...</label>
+        <div class="col-sm-6 col-md-2">
+            <label class="form-label ent-field-label">Cari...</label>
             <input type="text" class="form-control form-control-sm retro-input" id="filter_keyword" placeholder="Nama / No Reg">
         </div>
         <!-- Status -->
-        <div class="col-md-2">
-            <label class="form-label text-dark mb-1 fs--2 fw-bolder">STATUS</label>
+        <div class="col-sm-6 col-md-2">
+            <label class="form-label ent-field-label">Status</label>
             <select class="form-select form-select-sm retro-input" id="filter_status">
                 <option value="Belum Lunas" selected>Belum Lunas</option>
                 <option value="Lunas">Lunas</option>
@@ -283,12 +373,12 @@
             </select>
         </div>
         <!-- Tombol Cari & Tombol Buat Laporan -->
-        <div class="col-md-2 d-flex gap-1">
-            <button type="submit" class="btn retro-btn retro-btn-warning flex-grow-1 fw-bold" style="height: 33px;" title="Cari Data">
+        <div class="col-sm-6 col-md-2 d-flex gap-1">
+            <button type="submit" class="btn ent-btn ent-btn-warning flex-grow-1 fw-semibold" style="height: 35px;" title="Cari Data">
                 <i class="fas fa-search"></i>
             </button>
-            <button type="button" class="btn retro-btn retro-btn-success flex-grow-1 fw-bold" style="height: 33px;" onclick="bukaModalBuatLaporanKeuangan()" title="Buat Laporan Keuangan">
-                <i class="fas fa-file-invoice-dollar"></i> Laporan
+            <button type="button" class="btn ent-btn ent-btn-success flex-grow-1 fw-semibold" style="height: 35px;" onclick="bukaModalBuatLaporanKeuangan()" title="Buat Laporan Keuangan">
+                <i class="fas fa-file-invoice-dollar me-1"></i> Laporan
             </button>
         </div>
     </form>
@@ -299,12 +389,14 @@
 
     <!-- KOLOM KIRI: TABEL DAFTAR PASIEN / ANTREAN -->
     <div class="col-lg-6">
-        <div class="retro-card h-100">
-            <div class="card-header bg-white border-bottom border-dark py-2">
-                <h6 class="mb-0 text-dark fw-bold">Daftar Kunjungan Pasien</h6>
+        <div class="ent-card h-100">
+            <div class="ent-card-header d-flex justify-content-between align-items-center">
+                <h6 class="mb-0 fw-bold d-flex align-items-center gap-2">
+                    <i class="fas fa-users text-primary"></i> Daftar Kunjungan Pasien
+                </h6>
             </div>
             <div class="table-responsive" style="max-height: 750px; overflow-y: auto;">
-                <table class="table table-hover table-custom-orange align-middle mb-0 fs--1" style="border: 2px solid var(--retro-dark); border-top: none;">
+                <table class="table table-hover table-custom-orange align-middle mb-0 fs--1">
                     <thead>
                         <tr>
                             <th style="width: 25%;">TGL. TRANSAKSI</th>
@@ -313,9 +405,9 @@
                             <th style="width: 25%;">KEL.PELANGGAN</th>
                         </tr>
                     </thead>
-                    <tbody id="tabel-antrean-body" style="font-weight: 700; color: var(--retro-dark);">
+                    <tbody id="tabel-antrean-body">
                         <tr>
-                            <td colspan="4" class="text-center py-4 text-muted">Memuat data antrean...</td>
+                            <td colspan="4" class="text-center py-4 opacity-75">Memuat data antrean...</td>
                         </tr>
                     </tbody>
                 </table>
@@ -327,16 +419,18 @@
     <div class="col-lg-6">
 
         <!-- Tabel Rincian Tagihan Layanan & Tanggungan (Dinamis via AJAX) -->
-        <div class="retro-card mb-3">
-            <div class="card-header bg-warning border-bottom border-dark py-2 d-flex justify-content-between align-items-center">
-                <h6 class="mb-0 text-dark fw-bold"><i class="fas fa-file-invoice-dollar me-2"></i> Rincian Tagihan & Tanggungan</h6>
-                <span class="retro-badge bg-white text-dark" id="lbl-nama-pasien-tagihan">-</span>
+        <div class="ent-card mb-3">
+            <div class="ent-card-header d-flex justify-content-between align-items-center">
+                <h6 class="mb-0 fw-bold d-flex align-items-center gap-2">
+                    <i class="fas fa-file-invoice-dollar text-primary"></i> Rincian Tagihan &amp; Tanggungan
+                </h6>
+                <span class="ent-badge" style="background: rgba(79, 70, 229, 0.14); color: #818cf8; border: 1px solid rgba(79, 70, 229, 0.32);" id="lbl-nama-pasien-tagihan">-</span>
             </div>
-            <div class="card-body p-0" style="max-height: 280px; overflow-y: auto; background-color: #f8f9fa;">
-                <table class="table table-sm table-bordered fs--1 align-middle mb-0 text-dark">
-                    <thead class="table-dark" style="position: sticky; top: 0; z-index: 1;">
-                        <tr>
-                            <th class="text-center" style="width: 45px;">Pilih</th>
+            <div class="card-body p-0" style="max-height: 280px; overflow-y: auto;">
+                <table class="table table-sm table-bordered fs--2 align-middle mb-0 table-custom-orange">
+                    <thead style="position: sticky; top: 0; z-index: 1;">
+                        <tr style="font-size: 7px;">
+                            <th class="text-center" style="width: 25px;">Pilih</th>
                             <th>Item / Layanan</th>
                             <th class="text-end">Subtotal</th>
                             <th class="text-end text-danger">Tgg. Pasien</th>
@@ -344,50 +438,50 @@
                             <th class="text-center" style="width: 80px;">Aksi Split</th>
                         </tr>
                     </thead>
-                    <tbody id="rincian-layanan-body" class="fw-bold">
+                    <tbody id="rincian-layanan-body" class="fw-semibold">
                         <tr>
-                            <td colspan="6" class="text-center py-3 text-muted">Pilih pasien di tabel kiri untuk melihat rincian tagihan.</td>
+                            <td colspan="6" class="text-center py-3 opacity-75">Pilih pasien di tabel kiri untuk melihat rincian tagihan.</td>
                         </tr>
                     </tbody>
                 </table>
             </div>
-            <div class="card-footer bg-light border-top border-dark d-flex justify-content-between py-2">
-                <span class="fs--1 fw-bold text-muted">Porsi Pasien: <span class="text-danger" id="lbl-total-tanggungan-pasien">Rp 0</span></span>
-                <span class="fs--1 fw-bold text-muted">Porsi Perusahaan: <span class="text-success" id="lbl-total-tanggungan-perusahaan">Rp 0</span></span>
+            <div class="card-footer d-flex justify-content-between py-2 px-3" style="background-color: rgba(79, 70, 229, 0.04); border-top: 1px solid var(--ent-grid-border);">
+                <span class="fs--1 fw-semibold opacity-75">Porsi Pasien: <span class="text-danger fw-bold" id="lbl-total-tanggungan-pasien">Rp 0</span></span>
+                <span class="fs--1 fw-semibold opacity-75">Porsi Perusahaan: <span class="text-success fw-bold" id="lbl-total-tanggungan-perusahaan">Rp 0</span></span>
             </div>
         </div>
 
         <!-- Box Total Tagihan Pasien -->
         <div class="total-tagihan-box mb-3">
             <div>
-                <h5 class="text-white fw-bold mb-0">Total Wajib Bayar Pasien</h5>
-                <small class="text-white-50 fs--2">Pola: <span id="lblPolaTanggungan" class="fw-bold text-warning">-</span></small>
+                <h6 class="text-white fw-bold mb-0">Total Wajib Bayar Pasien</h6>
+                <small style="color: #cbd5e1;" class="fs--2">Pola: <span id="lblPolaTanggungan" class="fw-bold text-warning">-</span></small>
             </div>
             <div class="total-tagihan-number" id="lblTotalTagihanPasien">0</div>
         </div>
 
         <!-- Bar Kontrol Cetak & Kartu Kontrol -->
-        <div class="card-panel d-flex align-items-center justify-content-between mb-3 py-2">
-            <div class="d-flex align-items-center gap-2 w-50">
+        <div class="card-panel d-flex flex-wrap align-items-center justify-content-between gap-2 mb-3 py-2">
+            <div class="d-flex align-items-center gap-2 flex-grow-1" style="max-width: 320px;">
                 <select class="form-select form-select-sm retro-input" id="tipePrint">
                     <option value="">Tipe Print</option>
                     <option value="thermal">Thermal Struk</option>
                     <option value="A4">Invoice Gabungan</option>
                 </select>
-                <button class="btn btn-sm retro-btn retro-btn-warning px-3" onclick="cetakNotaAktif()">
+                <button type="button" class="btn btn-sm ent-btn ent-btn-warning px-3" onclick="cetakNotaAktif()" title="Cetak Nota">
                     <i class="fas fa-print"></i>
                 </button>
             </div>
-            <button class="btn btn-sm retro-btn retro-btn-warning fw-bold px-4" onclick="bukaKartuKontrol()">
+            <button type="button" class="btn btn-sm ent-btn ent-btn-warning fw-semibold px-3" onclick="bukaKartuKontrol()">
                 KARTU KONTROL
             </button>
         </div>
 
         <!-- Form Metode Pembayaran (Mendukung Full Pasien, Full Perusahaan, atau Split Bill) -->
-        <div class="retro-card p-3 mb-3" id="panelMetodePembayaran">
+        <div class="ent-card p-3 mb-3" id="panelMetodePembayaran">
 
             <!-- Informasi Jika Full Perusahaan -->
-            <div id="alertFullPerusahaan" class="alert alert-success border border-dark fw-bold d-none text-center">
+            <div id="alertFullPerusahaan" class="alert alert-success fw-semibold d-none text-center rounded-3">
                 <i class="fas fa-building me-1"></i> Tagihan ini sepenuhnya ditanggung oleh Perusahaan/Asuransi (Masuk Piutang Perusahaan). Tidak ada pembayaran kasir dari pasien.
             </div>
 
@@ -395,21 +489,21 @@
             <div class="payment-method-card" id="cardCash">
                 <div class="d-flex align-items-center justify-content-between mb-2">
                     <div class="form-check form-switch">
-                        <input class="form-check-input" type="checkbox" id="toggleCash" onchange="toggleMetode('cash')" disabled style="border: 2px solid var(--retro-dark);">
-                        <label class="form-check-label fw-bold text-dark" for="toggleCash"><i class="fas fa-money-bill-wave text-success me-1"></i> Cash / Tunai (Porsi Pasien)</label>
+                        <input class="form-check-input" type="checkbox" id="toggleCash" onchange="toggleMetode('cash')" disabled>
+                        <label class="form-check-label fw-bold" for="toggleCash"><i class="fas fa-money-bill-wave text-success me-1"></i> Cash / Tunai (Porsi Pasien)</label>
                     </div>
                 </div>
                 <div class="row g-2">
                     <div class="col-6">
                         <div class="form-floating">
                             <input type="number" class="form-control form-control-sm retro-input fw-bold fs-1 text-primary" id="inputCashJumlah" placeholder="Jumlah" value="0" disabled>
-                            <label class="text-dark fw-bold">Nominal Bayar</label>
+                            <label class="fw-semibold">Nominal Bayar</label>
                         </div>
                     </div>
                     <div class="col-6">
                         <div class="form-floating">
-                            <input type="text" class="form-control form-control-sm retro-input fw-bold fs-1 text-danger bg-light" id="inputCashKembali" placeholder="Kembali" value="0" readonly>
-                            <label class="text-dark fw-bold">Kembalian</label>
+                            <input type="text" class="form-control form-control-sm retro-input fw-bold fs-1 text-danger" id="inputCashKembali" placeholder="Kembali" value="0" readonly>
+                            <label class="fw-semibold">Kembalian</label>
                         </div>
                     </div>
                 </div>
@@ -419,8 +513,8 @@
             <div class="payment-method-card" id="cardDebit">
                 <div class="d-flex align-items-center justify-content-between mb-2">
                     <div class="form-check form-switch">
-                        <input class="form-check-input" type="checkbox" id="toggleDebit" onchange="toggleMetode('debit')" disabled style="border: 2px solid var(--retro-dark);">
-                        <label class="form-check-label fw-bold text-dark" for="toggleDebit"><i class="fas fa-credit-card text-primary me-1"></i> Debit / QRIS / Transfer (Porsi Pasien)</label>
+                        <input class="form-check-input" type="checkbox" id="toggleDebit" onchange="toggleMetode('debit')" disabled>
+                        <label class="form-check-label fw-bold" for="toggleDebit"><i class="fas fa-credit-card text-primary me-1"></i> Debit / QRIS / Transfer (Porsi Pasien)</label>
                     </div>
                 </div>
                 <div class="row g-2">
@@ -442,8 +536,8 @@
             </div>
 
             <!-- TOMBOL PROSES PAYMENT OLEH KASIR -->
-            <button class="btn retro-btn retro-btn-success w-100 py-3 shadow-sm d-flex align-items-center justify-content-center gap-2 mt-3" id="btnProsesPayment" onclick="prosesPaymentKasir()" disabled>
-                <i class="fas fa-check-circle fs-5"></i> PROSES PEMBAYARAN & PIUTANG
+            <button type="button" class="btn ent-btn ent-btn-success w-100 py-3 shadow-sm d-flex align-items-center justify-content-center gap-2 mt-3" id="btnProsesPayment" onclick="prosesPaymentKasir()" disabled>
+                <i class="fas fa-check-circle fs-2"></i> PROSES PEMBAYARAN &amp; PIUTANG
             </button>
 
         </div>
@@ -457,12 +551,11 @@
 <script>
     let selectedOrderCode = null;
     let currentDataList = [];
-    let currentDetailItems = []; // Menyimpan item aktif untuk pengaturan split manual
+    let currentDetailItems = [];
 
     $(document).ready(function() {
         loadAntreanKasir();
 
-        // Hitung Kembalian Otomatis
         $('#inputCashJumlah').on('keyup change', function() {
             hitungKembalian();
         });
@@ -486,7 +579,7 @@
         const keyword = $('#filter_keyword').val();
         const status = $('#filter_status').val();
 
-        $('#tabel-antrean-body').html(`<tr><td colspan="4" class="text-center py-3 text-muted"><div class="spinner-border spinner-border-sm me-2"></div>Memuat data...</td></tr>`);
+        $('#tabel-antrean-body').html(`<tr><td colspan="4" class="text-center py-3 opacity-75"><div class="spinner-border spinner-border-sm me-2"></div>Memuat data...</td></tr>`);
 
         $.ajax({
             url: "{{ route('keuangan_menu_cashier_list_all_patient') }}",
@@ -509,19 +602,19 @@
                             <tr onclick="pilihPasienKasir('${regId}')" style="cursor: pointer;" id="row-${regId}">
                                 <td class="text-nowrap">${tglFormat}</td>
                                 <td>
-                                    <span class="text-danger fw-bold d-block">${item.d_reg_order_code || item.no_registrasi}</span>
-                                    <span class="text-dark fw-bold d-block" style="font-size: 0.75rem;">RM: ${item.rm_code || item.pid}</span>
+                                    <span class="text-danger fw-bold d-block" style="font-family: 'JetBrains Mono', monospace;">${item.d_reg_order_code || item.no_registrasi}</span>
+                                    <span class="opacity-75 fw-semibold d-block" style="font-size: 0.75rem; font-family: 'JetBrains Mono', monospace;">RM: ${item.rm_code || item.pid}</span>
                                 </td>
-                                <td class="fw-bold text-dark text-uppercase">${item.patient_name || item.nama_pasien}</td>
+                                <td class="fw-bold text-uppercase">${item.patient_name || item.nama_pasien}</td>
                                 <td>
-                                    <span class="text-dark fw-bold d-block">${item.t_layanan_cat_code || item.jenis_layanan}</span>
+                                    <span class="fw-semibold d-block">${item.t_layanan_cat_code || item.jenis_layanan}</span>
                                 </td>
                             </tr>
                         `;
                     });
                     $('#tabel-antrean-body').html(html);
                 } else {
-                    $('#tabel-antrean-body').html(`<tr><td colspan="4" class="text-center py-4 text-muted">Tidak ada data kunjungan.</td></tr>`);
+                    $('#tabel-antrean-body').html(`<tr><td colspan="4" class="text-center py-4 opacity-75">Tidak ada data kunjungan.</td></tr>`);
                 }
             },
             error: function() {
@@ -536,7 +629,7 @@
         $(`#row-${regId}`).addClass('row-selected');
 
         $('#lbl-nama-pasien-tagihan').text('Memuat...');
-        $('#rincian-layanan-body').html(`<tr><td colspan="5" class="text-center py-3 text-muted">Memuat rincian tanggungan...</td></tr>`);
+        $('#rincian-layanan-body').html(`<tr><td colspan="6" class="text-center py-3 opacity-75">Memuat rincian tanggungan...</td></tr>`);
 
         $.ajax({
             url: "/kasir/detail-tagihan/" + regId,
@@ -549,57 +642,9 @@
                 }
             },
             error: function() {
-                $('#rincian-layanan-body').html(`<tr><td colspan="5" class="text-center py-3 text-danger">Gagal menarik rincian tagihan.</td></tr>`);
+                $('#rincian-layanan-body').html(`<tr><td colspan="6" class="text-center py-3 text-danger">Gagal menarik rincian tagihan.</td></tr>`);
             }
         });
-    }
-
-    function renderRincianTabel(res) {
-        let htmlTagihan = '';
-        let totalPasienAcc = 0;
-        let totalPrshAcc = 0;
-
-        if (currentDetailItems && currentDetailItems.length > 0) {
-            currentDetailItems.forEach((item, index) => {
-                let tggPasien = parseFloat(item.tanggungan_pasien) || 0;
-                let tggPrsh = parseFloat(item.tanggungan_perusahaan) || 0;
-                let isLunas = item.status_pembayaran === 'LUNAS';
-
-                if (!isLunas) {
-                    totalPasienAcc += tggPasien;
-                    totalPrshAcc += tggPrsh;
-                }
-
-                let checkboxHtml = isLunas ?
-                    '<span class="badge bg-success text-white">LUNAS</span>' :
-                    `<input type="checkbox" class="form-check-input item-pilih-lunas" value="${item.id}" data-pasien="${tggPasien}" checked onchange="hitungTotalPilihanBayar()" style="border: 2px solid var(--retro-dark); width: 18px; height: 18px; cursor: pointer;">`;
-
-                let splitButtonHtml = isLunas ?
-                    '-' :
-                    `<button type="button" class="btn btn-sm retro-btn retro-btn-warning px-2 py-1 fs--2" onclick="bukaModalAturSplitItem(${index})" title="Ubah Porsi Tanggungan">
-                        <i class="fas fa-sliders-h"></i> Split
-                    </button>`;
-
-                htmlTagihan += `
-                    <tr class="${isLunas ? 'table-success bg-opacity-10' : ''}">
-                        <td class="text-center">${checkboxHtml}</td>
-                        <td>
-                            <span class="badge bg-secondary mb-1">${item.jenis_item}</span>
-                            <div class="fw-bold">${item.nama_item} (Qty: ${item.qty})</div>
-                        </td>
-                        <td class="text-end">Rp ${Number(item.harga_akhir).toLocaleString('id-ID')}</td>
-                        <td class="text-end text-danger">Rp ${tggPasien.toLocaleString('id-ID')}</td>
-                        <td class="text-end text-success">Rp ${tggPrsh.toLocaleString('id-ID')}</td>
-                        <td class="text-center">${splitButtonHtml}</td>
-                    </tr>
-                `;
-            });
-        } else {
-            htmlTagihan = `<tr><td colspan="6" class="text-center py-3 text-muted">Tidak ada rincian item.</td></tr>`;
-        }
-
-        $('#rincian-layanan-body').html(htmlTagihan);
-        hitungTotalPilihanBayar();
     }
 
     function renderRincianTabelokalUpdate() {
@@ -617,19 +662,18 @@
                 totalPrshAcc += tggPrsh;
             }
 
-            // KUNCI UTAMA: Checkbox pelunasan HANYA MUNCUL jika ada porsi tanggungan pasien (> 0)
             let checkboxHtml = '';
             if (isLunas) {
                 checkboxHtml = '<span class="badge bg-success text-white">LUNAS</span>';
             } else if (tggPasien > 0) {
-                checkboxHtml = `<input type="checkbox" class="form-check-input item-pilih-lunas" value="${item.id}" data-pasien="${tggPasien}" checked onchange="hitungTotalPilihanBayar()" style="border: 2px solid var(--retro-dark); width: 18px; height: 18px; cursor: pointer;">`;
+                checkboxHtml = `<input type="checkbox" class="form-check-input item-pilih-lunas" value="${item.id}" data-pasien="${tggPasien}" checked onchange="hitungTotalPilihanBayar()" style="width: 18px; height: 18px; cursor: pointer;">`;
             } else {
                 checkboxHtml = '<span class="badge bg-secondary text-white" style="font-size: 0.65rem;">Ditanggung Perusahaan</span>';
             }
 
             let splitButtonHtml = isLunas ?
                 '-' :
-                `<button type="button" class="btn btn-sm retro-btn retro-btn-warning px-2 py-1 fs--2" onclick="bukaModalAturSplitItem(${index})" title="Ubah Porsi Tanggungan">
+                `<button type="button" class="btn btn-sm ent-btn ent-btn-warning px-2 py-1 fs--2" onclick="bukaModalAturSplitItem(${index})" title="Ubah Porsi Tanggungan">
                     <i class="fas fa-sliders-h"></i> Split
                 </button>`;
 
@@ -638,7 +682,7 @@
                     <td class="text-center">${checkboxHtml}</td>
                     <td>
                         <span class="badge bg-secondary mb-1">${item.jenis_item}</span>
-                        <div class="fw-bold">${item.nama_item} (Qty: ${item.qty})</div>
+                        <div class="fw-semibold">${item.nama_item} (Qty: ${item.qty})</div>
                     </td>
                     <td class="text-end">Rp ${Number(item.harga_akhir).toLocaleString('id-ID')}</td>
                     <td class="text-end text-danger">Rp ${tggPasien.toLocaleString('id-ID')}</td>
@@ -662,18 +706,18 @@
             nonaktifkanMetodePembayaran(false);
         }
     }
-    // Fungsionalitas Memunculkan Modal Edit/Split Porsi per Item Layanan
+
     function bukaModalAturSplitItem(index) {
         let item = currentDetailItems[index];
         let subtotal = parseFloat(item.harga_akhir) || 0;
 
         Swal.fire({
-            title: `<div class="fs-5 fw-bold text-dark"><i class="fas fa-edit text-warning me-1"></i> Atur Porsi Item: ${item.nama_item}</div>`,
+            title: `<div class="fs-2 fw-bold"><i class="fas fa-sliders-h text-primary me-1"></i> Atur Porsi Item: ${item.nama_item}</div>`,
             html: `
                 <div class="text-start fs--1">
-                    <p class="mb-2 text-muted fw-bold">Subtotal Item: Rp ${subtotal.toLocaleString('id-ID')}</p>
+                    <p class="mb-2 opacity-75 fw-semibold">Subtotal Item: Rp ${subtotal.toLocaleString('id-ID')}</p>
                     <div class="mb-3">
-                        <label class="form-label fw-bold text-dark">Pilih Opsi Tanggungan Item Ini:</label>
+                        <label class="form-label fw-bold">Pilih Opsi Tanggungan Item Ini:</label>
                         <select id="swal-opsi-pola" class="form-select retro-input mb-2" onchange="gantiOpsiPolaSwal(${subtotal})">
                             <option value="FULL_PASIEN">Ditanggung Pasien 100%</option>
                             <option value="FULL_PERUSAHAAN">Ditanggung Perusahaan 100%</option>
@@ -687,7 +731,7 @@
                         </div>
                         <div class="mb-2">
                             <label class="form-label fw-bold text-success">Nominal Tanggungan Perusahaan (Rp)</label>
-                            <input type="number" id="swal-input-tgg-prsh" class="form-control retro-input bg-light" value="${item.tanggungan_perusahaan}" readonly>
+                            <input type="number" id="swal-input-tgg-prsh" class="form-control retro-input" value="${item.tanggungan_perusahaan}" readonly>
                         </div>
                     </div>
                 </div>
@@ -695,8 +739,8 @@
             showCancelButton: true,
             confirmButtonText: 'Simpan Porsi',
             cancelButtonText: 'Batal',
-            confirmButtonColor: '#598f72',
-            cancelButtonColor: '#6c757d',
+            confirmButtonColor: '#059669',
+            cancelButtonColor: '#64748b',
             preConfirm: () => {
                 let opsi = $('#swal-opsi-pola').val();
                 let tggPsn = 0;
@@ -726,7 +770,6 @@
                 let newTggPsn = result.value.tggPsn;
                 let newTggPrsh = result.value.tggPrsh;
 
-                // Kirim via AJAX ke database
                 $.ajax({
                     url: "{{ route('keuangan_menu_cashier_update_split') }}",
                     type: "POST",
@@ -738,11 +781,8 @@
                     },
                     success: function(res) {
                         if (res.success) {
-                            // Update lokal array item
                             currentDetailItems[index].tanggungan_pasien = newTggPsn;
                             currentDetailItems[index].tanggungan_perusahaan = newTggPrsh;
-
-                            // Render ulang tabel rincian
                             renderRincianTabelokalUpdate();
 
                             Swal.fire({
@@ -806,20 +846,18 @@
                     totalPrshAcc += tggPrsh;
                 }
 
-                // KUNCI UTAMA: Checkbox pelunasan HANYA MUNCUL jika ada porsi tanggungan pasien (> 0)
                 let checkboxHtml = '';
                 if (isLunas) {
                     checkboxHtml = '<span class="badge bg-success text-white">LUNAS</span>';
                 } else if (tggPasien > 0) {
-                    checkboxHtml = `<input type="checkbox" class="form-check-input item-pilih-lunas" value="${item.id}" data-pasien="${tggPasien}" checked onchange="hitungTotalPilihanBayar()" style="border: 2px solid var(--retro-dark); width: 18px; height: 18px; cursor: pointer;">`;
+                    checkboxHtml = `<input type="checkbox" class="form-check-input item-pilih-lunas" value="${item.id}" data-pasien="${tggPasien}" checked onchange="hitungTotalPilihanBayar()" style="width: 18px; height: 18px; cursor: pointer;">`;
                 } else {
-                    // Jika tgg_pasien == 0 (murni ditanggung perusahaan), jangan munculkan checkbox agar tidak bisa dicentang/dilunaskan di kasir
                     checkboxHtml = '<span class="badge bg-secondary text-white" style="font-size: 0.65rem;">Ditanggung Perusahaan</span>';
                 }
 
                 let splitButtonHtml = isLunas ?
                     '-' :
-                    `<button type="button" class="btn btn-sm retro-btn retro-btn-warning px-2 py-1 fs--2" onclick="bukaModalAturSplitItem(${index})" title="Ubah Porsi Tanggungan">
+                    `<button type="button" class="btn btn-sm ent-btn ent-btn-warning px-2 py-1 fs--2" onclick="bukaModalAturSplitItem(${index})" title="Ubah Porsi Tanggungan">
                         <i class="fas fa-sliders-h"></i> Split
                     </button>`;
 
@@ -828,7 +866,7 @@
                         <td class="text-center">${checkboxHtml}</td>
                         <td>
                             <span class="badge bg-secondary mb-1">${item.jenis_item}</span>
-                            <div class="fw-bold">${item.nama_item} (Qty: ${item.qty})</div>
+                            <div class="fw-semibold">${item.nama_item} (Qty: ${item.qty})</div>
                         </td>
                         <td class="text-end">Rp ${Number(item.harga_akhir).toLocaleString('id-ID')}</td>
                         <td class="text-end text-danger">Rp ${tggPasien.toLocaleString('id-ID')}</td>
@@ -838,7 +876,7 @@
                 `;
             });
         } else {
-            htmlTagihan = `<tr><td colspan="6" class="text-center py-3 text-muted">Tidak ada rincian item.</td></tr>`;
+            htmlTagihan = `<tr><td colspan="6" class="text-center py-3 opacity-75">Tidak ada rincian item.</td></tr>`;
         }
 
         $('#rincian-layanan-body').html(htmlTagihan);
@@ -885,7 +923,6 @@
         $('#btnProsesPayment').prop('disabled', !(adaYangDicentang || totalPasien === 0));
     }
 
-    // Hitung total tagihan berdasarkan checkbox item yang dicentang kasir
     function hitungTotalPilihanBayar() {
         let totalPilihan = 0;
         $('.item-pilih-lunas:checked').each(function() {
@@ -898,7 +935,6 @@
         if (bayarInput > 0) hitungKembalian();
     }
 
-    // Fungsi proses pembayaran parsial yang dikirim ke route baru
     function prosesPaymentKasir() {
         if (!selectedOrderCode) {
             return Swal.fire('Perhatian', 'Pilih pasien dari daftar kunjungan terlebih dahulu!', 'warning');
@@ -939,8 +975,8 @@
             text: `Proses pelunasan item terpilih dan terbitkan nota pembayaran baru?`,
             icon: 'question',
             showCancelButton: true,
-            confirmButtonColor: '#1e1e24',
-            cancelButtonColor: '#6c757d',
+            confirmButtonColor: '#4f46e5',
+            cancelButtonColor: '#64748b',
             confirmButtonText: 'Ya, Proses & Cetak Nota!',
             cancelButtonText: 'Batal'
         }).then((result) => {
@@ -967,7 +1003,6 @@
                                 timer: 1500,
                                 showConfirmButton: false
                             }).then(() => {
-                                // Buka nota transaksi pembayaran yang baru terbentuk di tab baru
                                 window.open(res.redirect_url, '_blank');
                                 loadAntreanKasir();
                                 pilihPasienKasir(selectedOrderCode);
@@ -1001,9 +1036,6 @@
     }
 </script>
 <script>
-    // ====================================================================
-    // FUNGSI LAPORAN KEUANGAN (KASIR KE ACCOUNTING)
-    // ====================================================================
     function bukaModalBuatLaporanKeuangan() {
         Swal.fire({
             title: 'Memuat Data...',
@@ -1022,42 +1054,42 @@
                                     rows += `
                                         <tr class="align-middle">
                                             <td class="text-center">
-                                                <input type="checkbox" class="form-check-input select-transaksi-keu" value="${item.transaksi_id}" data-tagihan="${item.total_tagihan}" checked onchange="hitungTotalSetoranKeu()" style="border: 2px solid var(--retro-dark); width: 18px; height: 18px; cursor: pointer;">
+                                                <input type="checkbox" class="form-check-input select-transaksi-keu" value="${item.transaksi_id}" data-tagihan="${item.total_tagihan}" checked onchange="hitungTotalSetoranKeu()" style="width: 18px; height: 18px; cursor: pointer;">
                                             </td>
-                                            <td class="text-nowrap fw-bold">
+                                            <td class="text-nowrap fw-semibold">
                                                 <i class="far fa-calendar-alt text-primary me-1"></i> ${item.tanggal_registrasi}
                                             </td>
                                             <td>
-                                                <span class="badge bg-white text-danger border border-dark fw-bold font-monospace fs--2 px-2 py-1">${item.no_registrasi}</span>
+                                                <span class="badge bg-light text-danger border fw-bold font-monospace fs--2 px-2 py-1">${item.no_registrasi}</span>
                                             </td>
                                             <td>
-                                                <span class="text-dark text-uppercase fw-bolder d-block">${item.nama_pasien}</span>
-                                                <span class="badge bg-light text-dark border border-dark fw-bold fs--2"><i class="fas fa-qrcode me-1"></i>${item.pid}</span>
+                                                <span class="text-uppercase fw-bold d-block">${item.nama_pasien}</span>
+                                                <span class="badge bg-light text-dark border fw-semibold fs--2"><i class="fas fa-qrcode me-1"></i>${item.pid}</span>
                                             </td>
                                             <td>
-                                                <span class="text-dark fw-bold d-block">${item.layanan}</span>
-                                                <small class="text-muted fw-bold" style="font-size: 0.65rem;">${item.poli}</small>
+                                                <span class="fw-semibold d-block">${item.layanan}</span>
+                                                <small class="opacity-75 fw-semibold" style="font-size: 0.65rem;">${item.poli}</small>
                                             </td>
                                             <td class="text-center">
-                                                <span class="badge bg-white text-dark border border-dark fw-bold px-2 py-1">${item.metode_bayar}</span>
+                                                <span class="badge bg-primary bg-opacity-10 text-primary border border-primary border-opacity-25 fw-bold px-2 py-1">${item.metode_bayar}</span>
                                             </td>
-                                            <td class="text-end fw-bolder text-success fs-0">
+                                            <td class="text-end fw-bold text-success fs-0" style="font-family: 'JetBrains Mono', monospace;">
                                                 Rp ${Number(item.total_tagihan).toLocaleString('id-ID')}
                                             </td>
                                         </tr>
                                     `;
                                 });
                             } else {
-                                rows = `<tr><td colspan="7" class="text-center py-4 text-muted fw-bold">Tidak ada transaksi lunas baru yang belum dilaporkan.</td></tr>`;
+                                rows = `<tr><td colspan="7" class="text-center py-4 opacity-75 fw-semibold">Tidak ada transaksi lunas baru yang belum dilaporkan.</td></tr>`;
                             }
 
                             let htmlModal = `
                                 <div class="text-start">
-                                    <div class="table-responsive border border-3 border-dark rounded-3 mb-3 shadow-sm" style="max-height: 400px; overflow-y: auto;">
-                                        <table class="table table-hover align-middle mb-0 fs--1" style="background-color: #fff;">
-                                            <thead class="text-dark" style="background-color: var(--retro-dark); color: var(--retro-green) !important; font-size: 0.7rem; border-bottom: 3px solid var(--retro-dark);">
+                                    <div class="table-responsive rounded-3 mb-3 shadow-sm" style="max-height: 400px; overflow-y: auto; border: 1px solid rgba(99, 102, 241, 0.28);">
+                                        <table class="table table-hover table-custom-orange align-middle mb-0 fs--1">
+                                            <thead>
                                                 <tr>
-                                                    <th class="text-center" width="5%"><input type="checkbox" class="form-check-input" id="checkAllKeu" checked onclick="toggleAllKeu(this)" style="border: 2px solid var(--retro-dark); width: 18px; height: 18px; cursor: pointer;"></th>
+                                                    <th class="text-center" width="5%"><input type="checkbox" class="form-check-input" id="checkAllKeu" checked onclick="toggleAllKeu(this)" style="width: 18px; height: 18px; cursor: pointer;"></th>
                                                     <th width="20%">TGL REGISTRASI</th>
                                                     <th width="18%">NO. REGISTRASI</th>
                                                     <th width="22%">NAMA PASIEN (PID)</th>
@@ -1066,28 +1098,28 @@
                                                     <th width="10%" class="text-end">TOTAL TAGIHAN</th>
                                                 </tr>
                                             </thead>
-                                            <tbody class="fw-bold text-dark">
+                                            <tbody>
                                                 ${rows}
                                             </tbody>
                                         </table>
                                     </div>
 
-                                    <div class="p-3 rounded-3 border border-3 border-dark bg-white d-flex flex-wrap justify-content-between align-items-center shadow-sm gap-2">
+                                    <div class="p-3 rounded-3 d-flex flex-wrap justify-content-between align-items-center shadow-sm gap-2" style="border: 1px solid rgba(99, 102, 241, 0.28);">
                                         <div class="d-flex gap-2">
-                                            <div class="p-2 border border-2 border-dark rounded-2 bg-light text-center px-3">
-                                                <small class="text-muted fw-bold d-block fs--2">TOTAL DIPILIH</small>
-                                                <h6 class="fw-bolder mb-0 text-dark" id="lblTotalDipilih">0 Transaksi</h6>
+                                            <div class="p-2 border rounded-3 text-center px-3">
+                                                <small class="opacity-75 fw-semibold d-block fs--2">TOTAL DIPILIH</small>
+                                                <h6 class="fw-bold mb-0" id="lblTotalDipilih">0 Transaksi</h6>
                                             </div>
-                                            <div class="p-2 border border-2 border-dark rounded-2 bg-light text-center px-3">
-                                                <small class="text-muted fw-bold d-block fs--2">TOTAL SETORAN</small>
-                                                <h6 class="fw-bolder mb-0 text-success" id="lblTotalSetoran">Rp 0</h6>
+                                            <div class="p-2 border rounded-3 text-center px-3">
+                                                <small class="opacity-75 fw-semibold d-block fs--2">TOTAL SETORAN</small>
+                                                <h6 class="fw-bold mb-0 text-success" id="lblTotalSetoran" style="font-family: 'JetBrains Mono', monospace;">Rp 0</h6>
                                             </div>
                                         </div>
                                         <div class="d-flex gap-2">
-                                            <button type="button" class="btn retro-btn btn-light border-dark px-4 fw-bold" onclick="Swal.close()" style="background-color: #fff; border: 2px solid var(--retro-dark);">
+                                            <button type="button" class="btn ent-btn btn-outline-secondary px-4 fw-semibold" onclick="Swal.close()">
                                                 BATAL
                                             </button>
-                                            <button type="button" class="btn retro-btn px-4 fw-bold text-white shadow-sm" id="btnBuatNotaLaporan" onclick="prosesSimpanLaporanKeuanganFinal()" style="background-color: #598f72; border: 2px solid var(--retro-dark);">
+                                            <button type="button" class="btn ent-btn ent-btn-success px-4 fw-semibold text-white shadow-sm" id="btnBuatNotaLaporan" onclick="prosesSimpanLaporanKeuanganFinal()">
                                                 <i class="fas fa-paper-plane me-1"></i> BUAT NOTA LAPORAN
                                             </button>
                                         </div>
@@ -1096,13 +1128,13 @@
                             `;
 
                             Swal.fire({
-                                title: '<div class="text-start fw-bolder fs-2 text-dark"><i class="fas fa-file-invoice-dollar me-2 text-warning"></i> Rekap Transaksi Belum Dilaporkan ke Accounting</div>',
+                                title: '<div class="text-start fw-bold fs-2"><i class="fas fa-file-invoice-dollar me-2 text-primary"></i> Rekap Transaksi Belum Dilaporkan ke Accounting</div>',
                                 html: htmlModal,
                                 width: '1050px',
                                 showConfirmButton: false,
                                 showCloseButton: true,
                                 customClass: {
-                                    popup: 'retro-card border-3 border-dark shadow-lg p-3'
+                                    popup: 'ent-modal-popup shadow-lg p-3'
                                 },
                                 didRender: () => {
                                     hitungTotalSetoranKeu();

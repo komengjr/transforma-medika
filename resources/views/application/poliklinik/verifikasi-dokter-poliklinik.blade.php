@@ -414,7 +414,7 @@
                                 </span>
                                 <span style="color: #94a3b8; font-size: 0.75rem; font-weight: 600;">Otorisasi Medis Poliklinik</span>
                             </div>
-                            <h4 class="fw-bold mb-0 text-white" style="letter-spacing: -0.02em;">
+                            <h4 class="fw-bold mb-0" style="letter-spacing: -0.02em; color: #cbd5e1;">
                                 Verifikasi Dokter <span class="fw-normal" style="color: #cbd5e1;">Poliklinik</span>
                             </h4>
                         </div>
@@ -422,7 +422,7 @@
 
                     <div class="col-lg-4 text-lg-end">
                         <div class="ent-glass-pill d-inline-flex align-items-center px-3 py-2">
-                            <h6 class="fw-bold mb-0 text-white" style="font-size: 0.9rem;">
+                            <h6 class="fw-bold mb-0" style="font-size: 0.9rem;color: #fdfeff;">
                                 <i class="fas fa-clipboard-check me-2 text-info"></i> Daftar Pasien Menunggu Verifikasi
                             </h6>
                         </div>
@@ -506,7 +506,7 @@
     <div class="card-body p-0 bg-white">
         <div class="table-responsive pb-3">
             <table id="example" class="table table-custom align-middle pb-3 w-100">
-                <thead>
+                <thead class="text-dark">
                     <tr>
                         <th width="5%" class="text-center">No</th>
                         <th width="15%">No Registrasi</th>

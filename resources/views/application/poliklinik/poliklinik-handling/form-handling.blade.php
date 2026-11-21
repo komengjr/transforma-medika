@@ -30,7 +30,7 @@
         border-radius: 14px;
         box-shadow: 0 4px 18px -2px rgba(15, 23, 42, 0.06);
         background-color: var(--bs-body-bg);
-        margin-bottom: 1.25rem;
+        /* margin-bottom: 1.25rem; */
         overflow: hidden;
     }
 
@@ -302,7 +302,7 @@
 <div class="modal-body p-0 ent-modal-wrap bg-white">
     <div class="ent-banner-top py-3 px-4 d-flex justify-content-between align-items-center flex-wrap gap-2 bg-white">
         <div class="position-relative" style="z-index: 2;">
-            <h5 class="mb-1 text-white fw-bold d-flex align-items-center">
+            <h5 class="mb-1 fw-bold d-flex align-items-center" style="color: white;">
                 <i class="fas fa-notes-medical text-info me-2"></i> Handling: {{ $data->m_poli_name ?? 'Poliklinik' }}
             </h5>
             <span class="ent-badge-pill" style="background: rgba(56, 189, 248, 0.18); border: 1px solid rgba(56, 189, 248, 0.35); color: #7dd3fc;">
@@ -316,7 +316,7 @@
         </div>
     </div>
 
-    <div class="p-3 p-md-4 bg-white">
+    <div class="p-3 p-md-3 bg-white">
         <div class="row g-3">
             <!-- IDENTITAS PASIEN -->
             <div class="col-12">
@@ -329,11 +329,11 @@
                                 <img src="{{ $data->master_patient_profile }}" class="rounded-circle shadow-sm" alt="Foto Pasien" style="width: 78px; height: 78px; object-fit: cover; border: 2px solid rgba(99, 102, 241, 0.45);">
                             @endif
                         </div>
-                        <div class="col-md-10 p-3 p-md-4">
+                        <div class="col-md-10 p-3 p-md-3">
                             <div class="row g-3 align-items-center">
-                                <div class="col-md-4">
+                                <div class="col-md-3">
                                     <label class="form-label text-uppercase fw-bold opacity-75 mb-1" style="font-size: 0.68rem;">Nama Pasien</label>
-                                    <div class="fw-bold fs-2">{{ $data->master_patient_name }}</div>
+                                    <div class="fw-bold fs--2">{{ $data->master_patient_name }}</div>
                                     <div class="fw-semibold opacity-75" style="font-size: 0.78rem; font-family: 'JetBrains Mono', monospace;">
                                         <i class="fas fa-qrcode text-primary me-1"></i>RM: {{ $data->master_patient_code }}
                                     </div>
@@ -343,11 +343,11 @@
                                     <div class="fw-semibold" style="font-size: 0.85rem;">{{ $data->master_patient_jk == 'L' ? 'Laki-Laki' : 'Perempuan' }}</div>
                                     <div class="fw-semibold opacity-75" style="font-size: 0.82rem;">{{ $data->master_patient_tgl_lahir }}</div>
                                 </div>
-                                <div class="col-md-5">
+                                <div class="col-md-6">
                                     <label class="form-label text-uppercase fw-bold opacity-75 mb-1" style="font-size: 0.68rem;">Dokter & Penjamin</label>
-                                    <div class="fw-bold" style="font-size: 0.88rem;"><i class="fas fa-user-md text-primary me-1"></i> {{ $data->master_doctor_name ?? 'Belum Ditentukan' }}</div>
+                                    <div class="fw-bold" style="font-size: 0.6rem;"><i class="fas fa-user-md text-primary me-1"></i> {{ $data->master_doctor_name ?? 'Belum Ditentukan' }}</div>
                                     <div class="mt-1">
-                                        <span class="ent-badge-pill" style="background: rgba(16, 185, 129, 0.14); color: #10b981; border: 1px solid rgba(16, 185, 129, 0.35);">
+                                        <span class="ent-badge-pill" style="background: rgba(16, 185, 129, 0.14); color: #10b981; border: 1px solid rgba(16, 185, 129, 0.35);font-size: 0.6rem;">
                                             <i class="fas fa-shield-alt me-1"></i> {{ $data->nama_penjamin ?? 'UMUM' }}
                                             {{ !empty($data->nama_sub_penjamin) ? ' - ' . $data->nama_sub_penjamin : '' }}
                                         </span>
@@ -367,7 +367,7 @@
                     <input type="hidden" name="jenis_template" value="{{ $template_type }}">
 
                     @if(!empty($data->instruksi_poli))
-                    <div class="alert d-flex align-items-center fw-semibold mb-4" style="background: rgba(245, 158, 11, 0.14); border: 1px solid rgba(245, 158, 11, 0.4); color: #f59e0b; border-radius: 12px;">
+                    <div class="alert d-flex align-items-center fw-semibold mb-3" style="background: rgba(245, 158, 11, 0.14); border: 1px solid rgba(245, 158, 11, 0.4); color: #f59e0b; border-radius: 12px;">
                         <i class="fas fa-info-circle me-2 fs-2"></i>
                         <div>Instruksi: {{ $data->instruksi_poli }}</div>
                     </div>
@@ -375,7 +375,7 @@
 
                     <!-- 1. ODONTOGRAM (MUNCUL JIKA DICENTANG DI TEMPLATE & TIPE GIGI) -->
                     @if($template_type === 'GIGI' && in_array('odontogram', $menu_aktif))
-                    <div class="ent-section-card">
+                    <div class="ent-section-card mb-3">
                         <div class="form-header-ent d-flex align-items-center gap-2">
                             <i class="fas fa-tooth text-warning"></i> Odontogram Interaktif & Asesmen Gigi
                         </div>
@@ -461,7 +461,7 @@
 
                     <!-- 2. ANAMNESA (MUNCUL JIKA DICENTANG DI MENU_AKTIF) -->
                     @if(in_array('anamnesa', $menu_aktif))
-                    <div class="ent-section-card">
+                    <div class="ent-section-card mb-3">
                         <div class="form-header-ent d-flex align-items-center gap-2">
                             <i class="fas fa-comment-medical text-info"></i> Anamnesa & Riwayat Medis Pasien
                         </div>
@@ -498,7 +498,7 @@
 
                     <!-- 3. VITAL SIGN (MUNCUL JIKA DICENTANG DI MENU_AKTIF) -->
                     @if(in_array('vital_sign', $menu_aktif))
-                    <div class="ent-section-card">
+                    <div class="ent-section-card mb-3">
                         <div class="form-header-ent d-flex align-items-center gap-2">
                             <i class="fas fa-heartbeat text-danger"></i> Fisik Umum & Tanda Vital (Vital Signs)
                         </div>
@@ -576,7 +576,7 @@
 
                     <!-- 4. ORDER TINDAKAN (MUNCUL JIKA DICENTANG DI MENU_AKTIF) -->
                     @if(in_array('tindakan', $menu_aktif))
-                    <div class="ent-section-card">
+                    <div class="ent-section-card mb-3">
                         <div class="form-header-ent d-flex justify-content-between align-items-center flex-wrap gap-2">
                             <span><i class="fas fa-vial text-primary me-2"></i> Order Pemeriksaan Lab / Rad / Tindakan Poli</span>
                             <span class="ent-badge-pill" style="background: rgba(79, 70, 229, 0.15); color: #818cf8; border: 1px solid rgba(79, 70, 229, 0.35);">
@@ -627,7 +627,7 @@
 
                     <!-- 5. E-RESEP OBAT (MUNCUL JIKA DICENTANG DI MENU_AKTIF) -->
                     @if(in_array('resep', $menu_aktif))
-                    <div class="ent-section-card">
+                    <div class="ent-section-card mb-3">
                         <div class="form-header-ent d-flex justify-content-between align-items-center flex-wrap gap-2">
                             <span><i class="fas fa-pills text-warning me-2"></i> E-Resep Dokter (Order Obat)</span>
                             <span class="ent-badge-pill" style="background: rgba(245, 158, 11, 0.15); color: #f59e0b; border: 1px solid rgba(245, 158, 11, 0.35);">
@@ -685,7 +685,7 @@
 
                     <!-- 6. DIAGNOSA AKHIR (MUNCUL JIKA DICENTANG DI MENU_AKTIF) -->
                     @if(in_array('diagnosa', $menu_aktif))
-                    <div class="ent-section-card">
+                    <div class="ent-section-card mb-3">
                         <div class="form-header-ent d-flex align-items-center gap-2">
                             <i class="fas fa-stethoscope text-success"></i> Diagnosa Utama Dokter
                         </div>

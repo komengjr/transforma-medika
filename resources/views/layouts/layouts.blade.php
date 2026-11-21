@@ -128,14 +128,14 @@
         }
 
         .mobile-search-flex .dropdown-menu {
-            width: 300px;
+            width: 320px;
             max-width: calc(100vw - 24px);
             min-width: unset !important;
         }
 
         /* Teks menu pada search-box menurun ke bawah agar tidak terpotong ke kanan */
         .navbar-menu-search-box .dropdown-menu {
-            min-width: 320px;
+            min-width: 480px;
         }
 
         .navbar-menu-search-box .scrollbar.list {
@@ -253,6 +253,7 @@
             justify-content: center;
             flex-shrink: 0;
         }
+
     </style>
 
     @yield('base.css')

@@ -574,7 +574,7 @@
     <div class="card-body p-0 bg-white">
         <div class="table-responsive pb-3">
             <table id="example" class="table table-custom  pb-3">
-                <thead>
+                <thead class="text-dark">
                     <tr>
                         <th width="2%" class="text-center">#</th>
                         <th width="5%" class="text-center">No</th>
