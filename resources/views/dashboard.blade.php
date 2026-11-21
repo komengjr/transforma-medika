@@ -1,5 +1,5 @@
 <!DOCTYPE html>
-<html lang="en-US" dir="ltr">
+<html lang="id" dir="ltr">
 
 <head>
     <meta charset="utf-8">
@@ -7,7 +7,7 @@
     <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no">
 
     <!-- Document Title -->
-    <title>{{ env('APP_NAME')}} | Management System</title>
+    <title>{{ env('APP_NAME') }} | Management System</title>
 
     <!-- Favicons -->
     <link rel="apple-touch-icon" sizes="180x180" href="{{ asset('img/favicon.png') }}">
@@ -16,11 +16,13 @@
     <link rel="shortcut icon" type="image/x-icon" href="{{ asset('img/favicon.png') }}">
     <link rel="manifest" href="../../../asset/img/favicons/manifest.json">
     <meta name="msapplication-TileImage" content="{{ asset('img/favicon.png') }}">
-    <meta name="theme-color" content="#1e1e24">
+    <meta name="theme-color" content="#4f46e5">
     <script src="{{ asset('asset/js/config.js') }}"></script>
 
     <!-- Stylesheets -->
-    <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@400;600;700;800;900&family=Plus+Jakarta+Sans:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@500;600;700;800&family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
     <link href="{{ asset('vendors/overlayscrollbars/OverlayScrollbars.min.css') }}" rel="stylesheet">
     <link href="{{ asset('asset/css/theme-rtl.min.css') }}" rel="stylesheet" id="style-rtl">
     <link href="{{ asset('asset/css/theme.min.css') }}" rel="stylesheet" id="style-default">
@@ -49,58 +51,34 @@
 
     <style>
         /* ========================================================= */
-        /* RETRO / NEUBRUTALISM GLOBAL THEME                         */
+        /* MODERN ENTERPRISE THEME (MATCHING LANDING INDEX)          */
         /* ========================================================= */
         :root {
-            --retro-dark: #1e1e24;
-            --retro-yellow: #ffde59;
-            --retro-pink: #ffa6c9;
-            --retro-cyan: #8bf0fa;
-            --retro-orange: #ff914d;
-            --retro-green: #c1ff72;
-            --retro-purple: #c8b6ff;
-            --retro-bg: #f4f0ea;
-            --retro-border: 3px solid var(--retro-dark);
-            --retro-shadow: 5px 5px 0px var(--retro-dark);
-            --retro-shadow-sm: 3px 3px 0px var(--retro-dark);
+            --brand-indigo: #4f46e5;
+            --brand-indigo-dark: #3730a3;
+            --brand-indigo-soft: #eef2ff;
+            --brand-slate-900: #0f172a;
+            --brand-slate-800: #1e293b;
+            --brand-slate-600: #475569;
+            --brand-slate-200: #e2e8f0;
+            --brand-bg: #f8fafc;
+            --card-shadow: 0 4px 20px -2px rgba(15, 23, 42, 0.05), 0 2px 6px -1px rgba(15, 23, 42, 0.03);
+            --card-shadow-hover: 0 14px 28px -5px rgba(79, 70, 229, 0.14), 0 6px 12px -4px rgba(15, 23, 42, 0.06);
         }
 
         body {
-            font-family: 'Plus Jakarta Sans', sans-serif !important;
+            font-family: 'Inter', sans-serif !important;
             margin: 0;
             padding: 0;
-            color: var(--retro-dark);
-            background-color: var(--retro-bg);
+            color: var(--brand-slate-900);
+            background-color: var(--brand-bg);
+            background-image:
+                radial-gradient(at 0% 0%, rgba(99, 102, 241, 0.08) 0px, transparent 50%),
+                radial-gradient(at 100% 100%, rgba(16, 185, 129, 0.07) 0px, transparent 50%),
+                radial-gradient(circle, rgba(99, 102, 241, 0.1) 1px, transparent 1px);
+            background-size: 100% 100%, 100% 100%, 32px 32px;
             position: relative;
             min-height: 100vh;
-        }
-
-        /* Latar Belakang Image Khusus Mobile dengan sentuhan retro overlay */
-        body::before {
-            content: "";
-            position: fixed;
-            top: 0;
-            left: 0;
-            width: 100vw;
-            height: 100vh;
-            background-image: url('https://images.unsplash.com/photo-1519501025264-65ba15a82390?auto=format&fit=crop&w=1920&q=80');
-            background-size: cover;
-            background-position: center;
-            background-repeat: no-repeat;
-            filter: blur(8px) brightness(0.65);
-            transform: scale(1.05);
-            z-index: -2;
-        }
-
-        body::after {
-            content: "";
-            position: fixed;
-            top: 0;
-            left: 0;
-            width: 100vw;
-            height: 100vh;
-            background: rgba(30, 30, 36, 0.75);
-            z-index: -1;
         }
 
         input,
@@ -112,8 +90,8 @@
         p,
         span,
         a,
-        badge {
-            font-family: 'Plus Jakarta Sans', sans-serif !important;
+        .badge {
+            font-family: 'Inter', sans-serif !important;
         }
 
         h1,
@@ -122,12 +100,12 @@
         h4,
         h5,
         h6 {
-            font-family: 'Outfit', sans-serif !important;
-            font-weight: 800 !important;
+            font-family: 'Plus Jakarta Sans', sans-serif !important;
+            font-weight: 700 !important;
         }
 
         /* ========================================================= */
-        /* MODE DESKTOP OPTIMIZED: RETRO NEUBRUTALISM                */
+        /* MODE DESKTOP: MODERN ENTERPRISE LAUNCHER                  */
         /* ========================================================= */
         @media (min-width: 992px) {
 
@@ -136,12 +114,6 @@
                 height: 100vh !important;
                 max-height: 100vh !important;
                 overflow: hidden !important;
-                background: var(--retro-bg) !important;
-            }
-
-            body::before,
-            body::after {
-                display: none !important;
             }
 
             .main-desktop-wrapper {
@@ -149,7 +121,7 @@
                 display: flex;
                 flex-direction: column;
                 justify-content: space-between;
-                padding: 1.5rem 3rem;
+                padding: 1.5rem 2.75rem;
                 box-sizing: border-box;
             }
 
@@ -163,48 +135,80 @@
                 min-height: 0;
             }
 
-            /* Header Desktop Card Retro */
+            /* Header Desktop Card Modern */
             .glass-header-card {
-                background: #ffffff;
-                border-radius: 12px;
-                border: var(--retro-border);
-                box-shadow: var(--retro-shadow);
-                padding: 0.8rem 1.4rem;
+                background: rgba(255, 255, 255, 0.92);
+                backdrop-filter: blur(12px);
+                border-radius: 18px;
+                border: 1px solid var(--brand-slate-200);
+                box-shadow: var(--card-shadow);
+                padding: 0.85rem 1.5rem;
                 margin-bottom: 1rem;
                 position: relative;
                 z-index: 1050 !important;
                 flex-shrink: 0;
             }
 
+            .brand-logo-box {
+                background: #ffffff;
+                border: 1px solid var(--brand-slate-200);
+                border-radius: 12px;
+                padding: 0.45rem 0.75rem;
+                box-shadow: 0 2px 6px rgba(15, 23, 42, 0.04);
+            }
+
             .desktop-search-wrapper {
-                max-width: 450px;
+                max-width: 440px;
             }
 
-            .desktop-search-wrapper input:focus {
+            .modern-search-group {
+                background: #f1f5f9;
+                border: 1px solid transparent;
+                border-radius: 12px;
+                transition: all 0.2s ease;
+            }
+
+            .modern-search-group:focus-within {
+                background: #ffffff;
+                border-color: var(--brand-indigo);
+                box-shadow: 0 0 0 4px rgba(79, 70, 229, 0.12);
+            }
+
+            .modern-search-group input {
+                background: transparent !important;
+                font-size: 0.875rem;
+                color: var(--brand-slate-900);
+            }
+
+            .modern-search-group input:focus {
                 outline: none;
-                background: #fff;
+                box-shadow: none;
             }
 
-            .dropdown-menu-custom {
-                z-index: 999999 !important;
-                position: absolute !important;
-                border-radius: 12px !important;
-                padding: 0.5rem !important;
-                background-color: #ffffff !important;
-                border: var(--retro-border) !important;
-                box-shadow: var(--retro-shadow) !important;
-            }
-
+            /* Announcement Banner Modern */
             .marquee-box {
-                background: var(--retro-yellow);
-                border-radius: 8px;
-                padding: 8px 16px;
-                color: var(--retro-dark);
-                margin-bottom: 1rem;
-                box-shadow: var(--retro-shadow-sm);
-                border: 2px solid var(--retro-dark);
+                background: linear-gradient(135deg, #0f172a 0%, #1e1b4b 60%, #312e81 100%);
+                border-radius: 14px;
+                padding: 10px 18px;
+                color: #f8fafc;
+                margin-bottom: 1.25rem;
+                box-shadow: 0 6px 16px -4px rgba(30, 27, 75, 0.25);
+                border: 1px solid rgba(99, 102, 241, 0.25);
                 flex-shrink: 0;
-                font-weight: 800;
+                font-weight: 500;
+            }
+
+            .marquee-pill {
+                background: rgba(99, 102, 241, 0.25);
+                border: 1px solid rgba(129, 140, 248, 0.4);
+                color: #c7d2fe;
+                font-size: 0.7rem;
+                font-weight: 700;
+                padding: 3px 10px;
+                border-radius: 99px;
+                letter-spacing: 0.4px;
+                text-transform: uppercase;
+                white-space: nowrap;
             }
 
             /* Container Grid App Desktop */
@@ -213,144 +217,176 @@
                 display: grid;
                 grid-template-columns: repeat(5, 1fr);
                 grid-auto-rows: min-content;
-                gap: 1.2rem;
+                gap: 1.15rem;
                 align-items: stretch;
                 align-content: start;
                 min-height: 0;
                 overflow-y: auto;
-                padding-bottom: 1rem;
-                padding-right: 0.5rem;
+                padding: 0.25rem 0.5rem 1rem 0.1rem;
             }
 
             .menu-grid-desktop::-webkit-scrollbar {
-                width: 8px;
+                width: 6px;
             }
 
             .menu-grid-desktop::-webkit-scrollbar-track {
-                background: var(--retro-bg);
-                border-left: 2px solid var(--retro-dark);
+                background: transparent;
             }
 
             .menu-grid-desktop::-webkit-scrollbar-thumb {
-                background-color: var(--retro-dark);
-                border-radius: 4px;
+                background-color: #cbd5e1;
+                border-radius: 99px;
+            }
+
+            .menu-grid-desktop::-webkit-scrollbar-thumb:hover {
+                background-color: var(--brand-indigo);
             }
 
             /* ----------------------------------------------------- */
-            /* RETRO CARD STYLING                                    */
+            /* MODERN ENTERPRISE CARD STYLING                        */
             /* ----------------------------------------------------- */
             .menu-card-desktop {
                 background: #ffffff;
-                border-radius: 12px;
-                border: 2px solid var(--retro-dark);
+                border-radius: 18px;
+                border: 1px solid var(--brand-slate-200);
                 position: relative;
-                min-height: 140px;
+                min-height: 150px;
                 cursor: pointer;
-                transition: all 0.15s ease-in-out;
-                box-shadow: 3px 3px 0px var(--retro-dark);
+                transition: all 0.25s cubic-bezier(0.4, 0, 0.2, 1);
+                box-shadow: var(--card-shadow);
                 overflow: hidden;
                 display: flex;
                 flex-direction: column;
-                justify-content: center;
-                padding: 1.2rem;
+                justify-content: space-between;
+                padding: 1.35rem;
                 z-index: 1;
             }
 
-            .card-gradient-bg {
+            .menu-card-desktop::before {
+                content: '';
                 position: absolute;
                 top: 0;
                 left: 0;
-                width: 100%;
-                height: 100%;
-                opacity: 0.12;
-                transition: opacity 0.2s ease;
-                z-index: -1;
+                right: 0;
+                height: 3px;
+                background: var(--card-accent, var(--brand-indigo));
+                opacity: 0;
+                transition: opacity 0.25s ease;
             }
 
             .menu-card-desktop:hover {
-                transform: translate(-3px, -3px);
-                box-shadow: 6px 6px 0px var(--retro-dark);
-                background-color: var(--retro-yellow);
+                transform: translateY(-4px);
+                box-shadow: var(--card-shadow-hover);
+                border-color: rgba(79, 70, 229, 0.35);
+            }
+
+            .menu-card-desktop:hover::before {
+                opacity: 1;
             }
 
             .card-content-wrapper {
                 display: flex;
                 flex-direction: column;
                 height: 100%;
+                justify-content: space-between;
             }
 
             .menu-icon-wrapper {
                 width: 48px;
                 height: 48px;
-                border-radius: 10px;
-                border: 2px solid var(--retro-dark);
+                border-radius: 14px;
                 display: flex;
                 align-items: center;
                 justify-content: center;
-                font-size: 1.4rem;
-                color: var(--retro-dark);
-                margin-bottom: 0.8rem;
-                box-shadow: 2px 2px 0px var(--retro-dark);
-                transition: transform 0.2s ease;
+                font-size: 1.25rem;
+                margin-bottom: 1rem;
+                transition: transform 0.25s ease, box-shadow 0.25s ease;
             }
 
             .menu-card-desktop:hover .menu-icon-wrapper {
-                transform: scale(1.08);
+                transform: scale(1.07);
+            }
+
+            .card-arrow-hint {
+                width: 28px;
+                height: 28px;
+                border-radius: 8px;
+                background: #f8fafc;
+                color: #94a3b8;
+                display: flex;
+                align-items: center;
+                justify-content: center;
+                font-size: 0.75rem;
+                transition: all 0.2s ease;
+            }
+
+            .menu-card-desktop:hover .card-arrow-hint {
+                background: var(--brand-indigo-soft);
+                color: var(--brand-indigo);
+                transform: translateX(2px);
             }
 
             .card-text h6 {
-                color: var(--retro-dark);
-                font-size: 0.9rem;
+                color: var(--brand-slate-900);
+                font-size: 0.92rem;
+                letter-spacing: -0.01em;
+                transition: color 0.2s ease;
+            }
+
+            .menu-card-desktop:hover .card-text h6 {
+                color: var(--brand-indigo);
             }
 
             .card-text p {
-                color: #555;
-                line-height: 1.3;
-                font-weight: 600;
+                color: var(--brand-slate-600);
+                line-height: 1.4;
+                font-weight: 400;
+                font-size: 0.76rem;
             }
 
             .desktop-footer {
-                padding: 0.8rem 0 0 0;
+                padding: 0.75rem 0 0 0;
                 text-align: center;
-                color: var(--retro-dark) !important;
+                color: var(--brand-slate-600) !important;
                 flex-shrink: 0;
-                font-weight: 800;
+                font-weight: 500;
             }
         }
 
         /* ========================================================= */
-        /* MODE MOBILE: RETRO NEUBRUTALISM ANDROID LAUNCHER          */
+        /* MODE MOBILE: MODERN CLEAN APP LAUNCHER                    */
         /* ========================================================= */
         @media (max-width: 991.98px) {
             body {
-                padding-bottom: 90px;
+                padding-bottom: 95px;
             }
 
             .mobile-header-bar {
-                background: #ffffff;
-                border-bottom: var(--retro-border);
-                box-shadow: 0px 4px 0px var(--retro-dark);
-                padding: 0.8rem 1rem;
+                background: rgba(255, 255, 255, 0.92);
+                backdrop-filter: blur(12px);
+                border-bottom: 1px solid var(--brand-slate-200);
+                box-shadow: 0 2px 10px rgba(15, 23, 42, 0.04);
+                padding: 0.85rem 1.1rem;
                 position: sticky;
                 top: 0;
                 z-index: 10000;
             }
 
             .android-widget-card {
-                background: var(--retro-yellow);
-                border: var(--retro-border);
-                color: var(--retro-dark);
-                border-radius: 14px;
-                padding: 1.1rem;
+                background: linear-gradient(135deg, #0f172a 0%, #1e1b4b 55%, #312e81 100%);
+                border: 1px solid rgba(99, 102, 241, 0.3);
+                color: #ffffff;
+                border-radius: 20px;
+                padding: 1.25rem;
                 margin: 1rem;
-                box-shadow: var(--retro-shadow);
+                box-shadow: 0 12px 24px -6px rgba(30, 27, 75, 0.35);
             }
 
             .android-app-grid {
                 display: grid;
                 grid-template-columns: repeat(4, 1fr);
-                gap: 1.2rem 0.5rem;
-                padding: 0.5rem 0.8rem;
+                gap: 1.1rem 0.5rem;
+                padding: 0.5rem 0.9rem;
             }
 
             .app-item-mobile {
@@ -362,33 +398,30 @@
             }
 
             .app-icon-wrapper {
-                width: 56px;
-                height: 56px;
-                border-radius: 14px;
-                border: 2px solid var(--retro-dark);
+                width: 58px;
+                height: 58px;
+                border-radius: 18px;
                 display: flex;
                 align-items: center;
                 justify-content: center;
                 font-size: 1.35rem;
-                color: var(--retro-dark);
-                box-shadow: var(--retro-shadow-sm);
-                margin-bottom: 6px;
-                transition: transform 0.1s ease;
+                box-shadow: 0 6px 14px -3px rgba(15, 23, 42, 0.1);
+                border: 1px solid rgba(255, 255, 255, 0.8);
+                margin-bottom: 7px;
+                transition: transform 0.15s ease, box-shadow 0.15s ease;
             }
 
             .app-item-mobile:active .app-icon-wrapper {
-                transform: translate(2px, 2px);
-                box-shadow: 0px 0px 0px var(--retro-dark);
+                transform: scale(0.93);
             }
 
             .app-label-mobile {
-                font-size: 0.68rem;
-                font-weight: 800;
-                color: #ffffff;
-                text-shadow: 2px 2px 0px var(--retro-dark), -1px -1px 0px var(--retro-dark), 1px -1px 0px var(--retro-dark), -1px 1px 0px var(--retro-dark);
+                font-size: 0.7rem;
+                font-weight: 600;
+                color: var(--brand-slate-800);
                 text-align: center;
-                line-height: 1.2;
-                max-width: 72px;
+                line-height: 1.25;
+                max-width: 76px;
                 display: -webkit-box;
                 -webkit-line-clamp: 2;
                 -webkit-box-orient: vertical;
@@ -401,16 +434,17 @@
                 left: 50%;
                 transform: translateX(-50%);
                 width: 92%;
-                max-width: 400px;
-                height: 70px;
-                background: #ffffff;
-                border-radius: 20px;
+                max-width: 410px;
+                height: 68px;
+                background: rgba(255, 255, 255, 0.95);
+                backdrop-filter: blur(14px);
+                border-radius: 22px;
                 display: flex;
                 align-items: center;
                 justify-content: space-around;
                 padding: 0 10px;
-                box-shadow: var(--retro-shadow);
-                border: var(--retro-border);
+                box-shadow: 0 10px 30px -5px rgba(15, 23, 42, 0.15);
+                border: 1px solid var(--brand-slate-200);
                 z-index: 10000;
             }
 
@@ -421,107 +455,135 @@
                 justify-content: center;
                 text-decoration: none;
                 font-size: 0.68rem;
-                font-weight: 800;
-                color: var(--retro-dark);
-                transition: all 0.15s ease-in-out;
-                position: relative;
-                padding: 4px 8px;
-                border-radius: 10px;
+                font-weight: 600;
+                color: var(--brand-slate-600);
+                transition: all 0.2s ease;
+                padding: 4px 10px;
+                border-radius: 12px;
             }
 
             .nav-icon-wrapper {
-                width: 36px;
-                height: 36px;
+                width: 34px;
+                height: 34px;
                 border-radius: 10px;
-                border: 2px solid var(--retro-dark);
                 display: flex;
                 align-items: center;
                 justify-content: center;
-                font-size: 1.1rem;
+                font-size: 1rem;
                 margin-bottom: 2px;
-                box-shadow: 2px 2px 0px var(--retro-dark);
+                transition: all 0.2s ease;
             }
 
             .nav-icon-home {
-                background: var(--retro-cyan);
+                background: #eef2ff;
+                color: #4f46e5;
             }
 
             .nav-icon-reset {
-                background: var(--retro-yellow);
+                background: #fef3c7;
+                color: #d97706;
             }
 
             .nav-icon-info {
-                background: var(--retro-purple);
+                background: #e0f2fe;
+                color: #0284c7;
             }
 
             .nav-icon-logout {
-                background: var(--retro-pink);
+                background: #ffe4e6;
+                color: #e11d48;
             }
 
-            .android-nav-btn.active .nav-icon-wrapper {
-                transform: translateY(-4px);
-                box-shadow: 3px 5px 0px var(--retro-dark);
+            .android-nav-btn.active {
+                color: var(--brand-indigo);
+                font-weight: 700;
             }
 
-            .android-nav-btn:active .nav-icon-wrapper {
-                transform: translate(2px, 2px);
-                box-shadow: 0px 0px 0px var(--retro-dark);
+            .android-nav-btn.active .nav-icon-home {
+                background: var(--brand-indigo);
+                color: #ffffff;
+                box-shadow: 0 4px 10px rgba(79, 70, 229, 0.35);
             }
         }
 
-        /* Custom Stylish Dropdown & Modals Retro */
-        .glass-dropdown-menu {
+        /* ========================================================= */
+        /* MODERN DROPDOWN, BADGES & MODALS                          */
+        /* ========================================================= */
+        .modern-badge {
+            border-radius: 8px;
+            padding: 4px 10px;
+            font-weight: 600;
+            font-size: 0.7rem;
+            letter-spacing: 0.02em;
+            display: inline-flex;
+            align-items: center;
+            gap: 5px;
+        }
+
+        .badge-indigo {
+            background-color: #eef2ff;
+            color: #4338ca;
+            border: 1px solid #c7d2fe;
+        }
+
+        .badge-emerald {
+            background-color: #ecfdf5;
+            color: #047857;
+            border: 1px solid #a7f3d0;
+        }
+
+        .glass-dropdown-menu,
+        .glass-dropdown-mobile {
             background: #ffffff !important;
-            border: var(--retro-border) !important;
-            box-shadow: var(--retro-shadow) !important;
-            border-radius: 12px !important;
-            padding: 0.5rem !important;
-            min-width: 230px !important;
+            border: 1px solid var(--brand-slate-200) !important;
+            box-shadow: 0 20px 35px -10px rgba(15, 23, 42, 0.14), 0 4px 12px -2px rgba(15, 23, 42, 0.05) !important;
+            border-radius: 16px !important;
+            padding: 0.6rem !important;
+            min-width: 245px !important;
+            z-index: 999999 !important;
         }
 
         .dropdown-profile-header {
-            background: var(--retro-bg);
-            border: 2px solid var(--retro-dark);
-            border-radius: 8px;
-            padding: 0.65rem 0.8rem;
-            margin-bottom: 0.4rem;
+            background: #f8fafc;
+            border: 1px solid var(--brand-slate-200);
+            border-radius: 12px;
+            padding: 0.75rem 0.85rem;
+            margin-bottom: 0.45rem;
         }
 
-        .glass-dropdown-item {
-            border-radius: 6px !important;
+        .glass-dropdown-item,
+        .mobile-dropdown-item {
+            border-radius: 10px !important;
             padding: 0.55rem 0.75rem !important;
-            font-size: 0.85rem !important;
-            font-weight: 800 !important;
-            color: var(--retro-dark) !important;
-            transition: all 0.1s ease !important;
+            font-size: 0.83rem !important;
+            font-weight: 600 !important;
+            color: var(--brand-slate-800) !important;
+            transition: all 0.15s ease !important;
             display: flex !important;
             align-items: center !important;
             justify-content: space-between !important;
-            border: 2px solid transparent !important;
         }
 
-        .glass-dropdown-item:hover {
-            background-color: var(--retro-yellow) !important;
-            border: 2px solid var(--retro-dark) !important;
-            box-shadow: 2px 2px 0px var(--retro-dark);
-            transform: translateX(2px);
+        .glass-dropdown-item:hover,
+        .mobile-dropdown-item:active {
+            background-color: #eef2ff !important;
+            color: var(--brand-indigo) !important;
         }
 
         .glass-dropdown-item.text-danger:hover {
-            background-color: var(--retro-pink) !important;
+            background-color: #fff1f2 !important;
+            color: #e11d48 !important;
         }
 
         .item-icon-box {
-            width: 30px;
-            height: 30px;
-            border-radius: 6px;
-            border: 2px solid var(--retro-dark);
+            width: 32px;
+            height: 32px;
+            border-radius: 9px;
             display: inline-flex;
             align-items: center;
             justify-content: center;
             font-size: 0.85rem;
             margin-right: 10px;
-            box-shadow: 2px 2px 0px var(--retro-dark);
         }
 
         .btn-dropdown-trigger,
@@ -531,179 +593,164 @@
             display: inline-flex;
             align-items: center;
             justify-content: center;
-            border-radius: 8px !important;
+            border-radius: 12px !important;
             background: #ffffff !important;
-            border: 2px solid var(--retro-dark) !important;
-            color: var(--retro-dark) !important;
-            box-shadow: var(--retro-shadow-sm) !important;
-            transition: all 0.1s ease !important;
+            border: 1px solid var(--brand-slate-200) !important;
+            color: var(--brand-slate-600) !important;
+            box-shadow: 0 2px 6px rgba(15, 23, 42, 0.04) !important;
+            transition: all 0.15s ease !important;
         }
 
         .btn-dropdown-trigger:hover,
         .btn-dropdown-trigger[aria-expanded="true"],
         .btn-mobile-trigger:active,
         .btn-mobile-trigger[aria-expanded="true"] {
-            background: var(--retro-cyan) !important;
-            transform: translate(2px, 2px);
-            box-shadow: 0px 0px 0px var(--retro-dark) !important;
+            background: #eef2ff !important;
+            border-color: #c7d2fe !important;
+            color: var(--brand-indigo) !important;
         }
 
-        .glass-dropdown-mobile {
-            background: #ffffff !important;
-            border: var(--retro-border) !important;
-            box-shadow: var(--retro-shadow) !important;
-            border-radius: 12px !important;
-            padding: 0.5rem !important;
-            min-width: 210px !important;
-            margin-top: 8px !important;
-        }
-
-        .mobile-dropdown-item {
-            border-radius: 6px !important;
-            padding: 0.6rem 0.75rem !important;
-            font-size: 0.82rem !important;
-            font-weight: 800 !important;
-            color: var(--retro-dark) !important;
-            display: flex !important;
-            align-items: center !important;
-            justify-content: space-between !important;
-            border: 2px solid transparent !important;
-        }
-
-        .mobile-dropdown-item:active {
-            background-color: var(--retro-yellow) !important;
-            border: 2px solid var(--retro-dark) !important;
-        }
-
+        /* Modal Styling Modern */
         .modal-sm-custom {
-            max-width: 380px;
+            max-width: 400px;
+        }
+
+        .modern-modal-content {
+            background: #ffffff !important;
+            border: 1px solid var(--brand-slate-200) !important;
+            border-radius: 22px !important;
+            box-shadow: 0 25px 50px -12px rgba(15, 23, 42, 0.25) !important;
+            overflow: hidden;
         }
 
         .glass-reset-modal {
-            background: #ffffff !important;
-            border: var(--retro-border) !important;
-            border-radius: 16px !important;
-            padding: 1.8rem;
+            padding: 2rem 1.75rem;
             position: relative;
-            box-shadow: 8px 8px 0px var(--retro-dark) !important;
         }
 
         .btn-close-custom {
             position: absolute;
-            top: 15px;
-            right: 15px;
-            font-size: 0.8rem;
+            top: 16px;
+            right: 16px;
+            font-size: 0.75rem;
             z-index: 10;
-            border: 2px solid var(--retro-dark);
+            background-color: #f1f5f9;
             border-radius: 50%;
-            padding: 5px;
-            box-shadow: 2px 2px 0px var(--retro-dark);
+            padding: 8px;
+            transition: background-color 0.2s;
+        }
+
+        .btn-close-custom:hover {
+            background-color: #e2e8f0;
         }
 
         .reset-icon-badge {
-            width: 60px;
-            height: 60px;
-            border-radius: 12px;
-            border: 2px solid var(--retro-dark);
+            width: 58px;
+            height: 58px;
+            border-radius: 16px;
             display: flex;
             align-items: center;
             justify-content: center;
-            box-shadow: 3px 3px 0px var(--retro-dark);
         }
 
         .custom-input {
-            border: 2px solid var(--retro-dark) !important;
-            border-radius: 6px !important;
-            font-size: 0.85rem;
-            font-weight: 700;
-            padding: 0.6rem 0.75rem;
+            border: 1px solid #cbd5e1 !important;
+            border-radius: 10px !important;
+            font-size: 0.875rem;
+            font-weight: 500;
+            padding: 0.65rem 0.85rem;
             background: #ffffff !important;
-            box-shadow: 2px 2px 0px var(--retro-dark) !important;
+            transition: all 0.2s ease;
         }
 
         .custom-input:focus {
-            box-shadow: 4px 4px 0px var(--retro-dark) !important;
+            border-color: var(--brand-indigo) !important;
+            box-shadow: 0 0 0 4px rgba(79, 70, 229, 0.12) !important;
             outline: none;
+        }
+
+        .input-group .custom-input {
+            border-top-left-radius: 0 !important;
+            border-bottom-left-radius: 0 !important;
         }
 
         .input-group-text {
-            border: 2px solid var(--retro-dark) !important;
-            border-radius: 6px 0 0 6px !important;
-            background: var(--retro-yellow) !important;
-            color: var(--retro-dark) !important;
-            font-weight: 800;
+            border: 1px solid #cbd5e1 !important;
+            border-right: 0 !important;
+            border-radius: 10px 0 0 10px !important;
+            background: #f8fafc !important;
+            color: var(--brand-slate-600) !important;
         }
 
         .otp-input {
-            width: 48px;
+            width: 46px;
             height: 52px;
-            font-size: 1.4rem;
-            font-weight: 900;
-            border-radius: 8px;
-            background: #ffffff;
-            border: 2px solid var(--retro-dark);
-            color: var(--retro-dark);
-            box-shadow: 2px 2px 0px var(--retro-dark);
-            transition: all 0.1s ease;
+            font-size: 1.35rem;
+            font-weight: 700;
+            border-radius: 12px;
+            background: #f8fafc;
+            border: 1.5px solid #cbd5e1;
+            color: var(--brand-slate-900);
+            transition: all 0.15s ease;
         }
 
         .otp-input:focus {
-            background: var(--retro-yellow);
-            box-shadow: 4px 4px 0px var(--retro-dark);
+            background: #ffffff;
+            border-color: var(--brand-indigo);
+            box-shadow: 0 0 0 4px rgba(79, 70, 229, 0.15);
             outline: none;
         }
 
-        .retro-btn {
-            font-weight: 950 !important;
-            border: 2px solid var(--retro-dark) !important;
-            box-shadow: var(--retro-shadow-sm) !important;
-            border-radius: 8px !important;
-            text-transform: uppercase;
-            letter-spacing: 0.5px;
-            transition: all 0.1s ease-in-out;
+        .modern-btn {
+            font-weight: 600 !important;
+            border-radius: 12px !important;
+            font-size: 0.875rem;
+            transition: all 0.2s ease;
             cursor: pointer;
-        }
-
-        .retro-btn:active {
-            transform: translate(3px, 3px);
-            box-shadow: 0px 0px 0px var(--retro-dark) !important;
+            border: none !important;
         }
 
         .btn-primary-gradient {
-            background-color: var(--retro-cyan) !important;
-            color: var(--retro-dark) !important;
+            background: linear-gradient(135deg, #4f46e5 0%, #4338ca 100%) !important;
+            color: #ffffff !important;
+            box-shadow: 0 6px 15px -3px rgba(79, 70, 229, 0.35) !important;
         }
 
         .btn-primary-gradient:hover {
-            background-color: #6ce0ed !important;
-            color: var(--retro-dark) !important;
+            background: linear-gradient(135deg, #4338ca 0%, #3730a3 100%) !important;
+            transform: translateY(-1px);
+            color: #ffffff !important;
         }
 
         .btn-success-gradient {
-            background-color: var(--retro-green) !important;
-            color: var(--retro-dark) !important;
+            background: linear-gradient(135deg, #10b981 0%, #059669 100%) !important;
+            color: #ffffff !important;
+            box-shadow: 0 6px 15px -3px rgba(16, 185, 129, 0.35) !important;
         }
 
         .btn-success-gradient:hover {
-            background-color: #b0f55b !important;
-            color: var(--retro-dark) !important;
-        }
-
-        .retro-badge {
-            border: 2px solid var(--retro-dark);
-            border-radius: 6px;
-            padding: 4px 8px;
-            font-weight: 800;
-            box-shadow: 2px 2px 0px var(--retro-dark);
-            text-transform: uppercase;
-            display: inline-block;
-            font-size: 0.7rem;
+            background: linear-gradient(135deg, #059669 0%, #047857 100%) !important;
+            transform: translateY(-1px);
+            color: #ffffff !important;
         }
     </style>
 </head>
 
 <body>
-    <!-- DESKTOP MODE CONTAINER -->
+    @php
+    if (Auth::user()->access_code == 'master') {
+    $menu = DB::table('z_menu_super')->get();
+    } else {
+    $menu = DB::table('z_menu_super')
+    ->join('z_menu_user_super', 'z_menu_user_super.menu_super_code', '=', 'z_menu_super.menu_super_code')
+    ->where('z_menu_user_super.access_code', Auth::user()->access_code)
+    ->get();
+    }
+    @endphp
+
+    <!-- ========================================================= -->
+    <!-- DESKTOP MODE CONTAINER                                    -->
+    <!-- ========================================================= -->
     <div class="main-desktop-wrapper d-none d-lg-flex">
         <div class="desktop-content-container">
 
@@ -711,82 +758,91 @@
             <div class="glass-header-card">
                 <div class="d-flex align-items-center justify-content-between">
 
-                    <!-- Kiri: Logo -->
+                    <!-- Kiri: Brand & Logo -->
                     <div class="d-flex align-items-center gap-3">
-                        <div class="p-2 bg-white rounded-3 border border-dark shadow-sm" style="box-shadow: 2px 2px 0px var(--retro-dark);">
-                            <img src="{{asset('img/logo-pt.png')}}" alt="Logo" width="85" height="36">
+                        <div class="brand-logo-box">
+                            <img src="{{ asset('img/logo-pt.png') }}" alt="Logo" width="85" height="36" style="object-fit: contain;">
                         </div>
                         <div>
-                            <span class="retro-badge" style="background-color: var(--retro-yellow);">Innoventra System</span>
-                            <h5 class="fw-bolder mb-0 text-dark mt-1">
-                                Ver.3 <span class="fw-normal">Dashboard</span>
+                            <div class="d-flex align-items-center gap-2">
+                                <span class="modern-badge badge-indigo">
+                                    <span style="width: 6px; height: 6px; border-radius: 50%; background: #4f46e5;"></span>
+                                    INNOVENTRA SUITE
+                                </span>
+                                <span class="text-muted fs--2 fw-semibold">v3.4</span>
+                            </div>
+                            <h5 class="fw-bolder mb-0 text-dark mt-1" style="font-size: 1.05rem;">
+                                Enterprise <span class="text-primary">Management Portal</span>
                             </h5>
                         </div>
                     </div>
 
                     <!-- Tengah: Search Filter Aplikasi -->
                     <div class="flex-grow-1 px-4 mx-3 desktop-search-wrapper">
-                        <div class="input-group shadow-sm bg-white rounded-pill overflow-hidden" style="border: 2px solid var(--retro-dark); box-shadow: 2px 2px 0px var(--retro-dark);">
-                            <span class="input-group-text bg-transparent border-0 text-dark ps-3">
-                                <i class="fas fa-search"></i>
+                        <div class="input-group modern-search-group px-2 py-1">
+                            <span class="input-group-text bg-transparent border-0 text-muted ps-2">
+                                <i class="fas fa-search fs--1"></i>
                             </span>
-                            <input type="text" id="desktopSearchApp" class="form-control border-0 ps-2 fw-bold" placeholder="Cari modul atau aplikasi..." style="box-shadow: none;">
+                            <input type="text" id="desktopSearchApp" class="form-control border-0 ps-2" placeholder="Cari aplikasi (SIMRS, Koperasi, HRIS, Keuangan)...">
                         </div>
                     </div>
 
                     <!-- Kanan: Profil & Setting -->
                     <div class="d-flex align-items-center gap-3">
                         <div class="text-end">
-                            <h6 class="mb-0 fw-bolder text-dark fs--1">{{Auth::user()->fullname}}</h6>
-                            <span class="retro-badge" style="background-color: var(--retro-cyan); font-size: 0.65rem;">{{ strtoupper(Auth::user()->access_code) }}</span>
+                            <h6 class="mb-0 fw-bold text-dark fs--1">{{ Auth::user()->fullname }}</h6>
+                            <span class="modern-badge badge-emerald mt-1" style="font-size: 0.65rem; padding: 2px 8px;">
+                                {{ strtoupper(Auth::user()->access_code) }}
+                            </span>
                         </div>
 
                         <div class="position-relative">
-                            <img class="rounded-circle" src="{{asset('img/pp.png')}}" width="38" height="38" alt="Profile" style="border: 2px solid var(--retro-dark); box-shadow: 2px 2px 0px var(--retro-dark);" />
+                            <img class="rounded-circle" src="{{ asset('img/pp.png') }}" width="40" height="40" alt="Profile" style="border: 2px solid #e0e7ff; box-shadow: 0 2px 8px rgba(79,70,229,0.15);" />
+                            <span style="position: absolute; bottom: 0; right: 0; width: 10px; height: 10px; background: #10b981; border: 2px solid #fff; border-radius: 50%;"></span>
                         </div>
 
                         <!-- Dropdown Action Button -->
                         <div class="dropdown" style="z-index: 999999 !important; position: relative;">
-                            <button class="btn btn-dropdown-trigger shadow-sm" type="button" id="dropdownDesktop" data-bs-toggle="dropdown" aria-expanded="false">
+                            <button class="btn btn-dropdown-trigger" type="button" id="dropdownDesktop" data-bs-toggle="dropdown" aria-expanded="false">
                                 <i class="fas fa-ellipsis-v"></i>
                             </button>
 
-                            <ul class="dropdown-menu dropdown-menu-end glass-dropdown-menu shadow-lg" aria-labelledby="dropdownDesktop">
+                            <ul class="dropdown-menu dropdown-menu-end glass-dropdown-menu" aria-labelledby="dropdownDesktop">
                                 <li class="dropdown-profile-header">
                                     <div class="d-flex align-items-center justify-content-between">
                                         <div>
                                             <div class="fw-bold text-dark fs--1">{{ Auth::user()->fullname }}</div>
-                                            <small class="text-muted fs--2" style="font-size: 0.7rem;">
-                                                <span class="retro-badge" style="background-color: var(--retro-yellow); padding: 2px 6px;">
-                                                    {{ strtoupper(Auth::user()->access_code) }}
-                                                </span>
-                                            </small>
+                                            <span class="modern-badge badge-indigo mt-1" style="font-size: 0.62rem; padding: 2px 7px;">
+                                                {{ strtoupper(Auth::user()->access_code) }}
+                                            </span>
                                         </div>
-                                        <i class="fas fa-user-shield text-dark fs-5"></i>
+                                        <div class="item-icon-box m-0" style="background: #eef2ff; color: #4f46e5;">
+                                            <i class="fas fa-user-shield"></i>
+                                        </div>
                                     </div>
                                 </li>
 
                                 <li>
                                     <button class="dropdown-item glass-dropdown-item" id="button-menu-utama">
                                         <div class="d-flex align-items-center">
-                                            <span class="item-icon-box" style="background-color: var(--retro-cyan);">
-                                                <i class="fab fa-dashcube"></i>
+                                            <span class="item-icon-box" style="background: #eef2ff; color: #4f46e5;">
+                                                <i class="fas fa-home"></i>
                                             </span>
-                                            <span>Menu Utama</span>
+                                            <span>Halaman Utama</span>
                                         </div>
-                                        <i class="fas fa-chevron-right item-arrow"></i>
+                                        <i class="fas fa-chevron-right fs--2 opacity-50"></i>
                                     </button>
                                 </li>
 
                                 <li>
                                     <button class="dropdown-item glass-dropdown-item" data-bs-toggle="modal" data-bs-target="#modal-keuangan" id="button-proses-transaksi">
                                         <div class="d-flex align-items-center">
-                                            <span class="item-icon-box" style="background-color: var(--retro-yellow);">
+                                            <span class="item-icon-box" style="background: #fef3c7; color: #d97706;">
                                                 <i class="fas fa-key"></i>
                                             </span>
                                             <span>Ubah Kata Sandi</span>
                                         </div>
-                                        <i class="fas fa-chevron-right item-arrow"></i>
+                                        <i class="fas fa-chevron-right fs--2 opacity-50"></i>
                                     </button>
                                 </li>
 
@@ -794,29 +850,29 @@
                                 <li>
                                     <button class="dropdown-item glass-dropdown-item" id="button-master-dashboard">
                                         <div class="d-flex align-items-center">
-                                            <span class="item-icon-box" style="background-color: var(--retro-purple);">
-                                                <i class="fas fa-cog"></i>
+                                            <span class="item-icon-box" style="background: #f3e8ff; color: #7c3aed;">
+                                                <i class="fas fa-sliders-h"></i>
                                             </span>
                                             <span>Master Page</span>
                                         </div>
-                                        <i class="fas fa-chevron-right item-arrow"></i>
+                                        <i class="fas fa-chevron-right fs--2 opacity-50"></i>
                                     </button>
                                 </li>
                                 @endif
 
                                 <li>
-                                    <hr class="dropdown-divider my-2 border-dark">
+                                    <hr class="dropdown-divider my-2" style="border-color: #e2e8f0;">
                                 </li>
 
                                 <li>
                                     <button class="dropdown-item glass-dropdown-item text-danger" id="button-logout">
                                         <div class="d-flex align-items-center">
-                                            <span class="item-icon-box" style="background-color: var(--retro-pink);">
+                                            <span class="item-icon-box" style="background: #ffe4e6; color: #e11d48;">
                                                 <i class="fas fa-sign-out-alt"></i>
                                             </span>
                                             <span>Log Out</span>
                                         </div>
-                                        <i class="fas fa-chevron-right item-arrow"></i>
+                                        <i class="fas fa-chevron-right fs--2 opacity-50"></i>
                                     </button>
                                 </li>
                             </ul>
@@ -826,60 +882,75 @@
                 </div>
             </div>
 
-            <!-- Running Text Marquee -->
-            <div class="marquee-box d-flex align-items-center">
-                <i class="fas fa-bullhorn me-2 fs--1"></i>
-                <marquee class="m-0 fw-bolder fs--1" behavior="scroll" direction="left">
-                    Selamat Datang di Innoventra System Management — Solusi Integrasi Sistem Terlengkap untuk Bisnis Anda.
+            <!-- Running Text Marquee Banner -->
+            <div class="marquee-box d-flex align-items-center gap-3">
+                <span class="marquee-pill">
+                    <i class="fas fa-bolt me-1 text-warning"></i> Info Sistem
+                </span>
+                <marquee class="m-0 fs--1 text-light" behavior="scroll" direction="left">
+                    Selamat Datang di PT Innoventra Solusi Digital — Ekosistem Aplikasi Terpadu untuk Rumah Sakit (SIMRS &amp; Medis), Koperasi Digital, Human Resource (HRIS), serta Akuntansi &amp; Keuangan.
                 </marquee>
             </div>
 
             <!-- Grid Card Features Desktop -->
             <div class="menu-grid-desktop" id="desktopAppGrid">
-                @if (Auth::user()->access_code == 'master')
-                @php $menu = DB::table('z_menu_super')->get(); @endphp
-                @else
-                @php
-                $menu = DB::table('z_menu_super')
-                ->join('z_menu_user_super', 'z_menu_user_super.menu_super_code', '=', 'z_menu_super.menu_super_code')
-                ->where('z_menu_user_super.access_code', Auth::user()->access_code)
-                ->get();
-                @endphp
-                @endif
-
                 @foreach ($menu as $menus)
                 @php
-                $code = strtolower($menus->menu_super_code);
+                $code = strtolower($menus->menu_super_code . ' ' . $menus->menu_super_name);
 
-                $iconClass = 'fa-cubes';
-                $accentColor = 'var(--retro-cyan)';
+                // Default: Enterprise Indigo
+                $iconClass = 'fa-layer-group';
+                $iconBg = '#eef2ff';
+                $iconColor = '#4f46e5';
+                $accentHex = '#4f46e5';
 
-                if(str_contains($code, 'account') || str_contains($code, 'keuangan')) {
-                $iconClass = 'fa-chart-pie';
-                $accentColor = 'var(--retro-green)';
-                } elseif(str_contains($code, 'inventar') || str_contains($code, 'stok')) {
-                $iconClass = 'fa-box-open';
-                $accentColor = 'var(--retro-yellow)';
-                } elseif(str_contains($code, 'medic') || str_contains($code, 'health')) {
-                $iconClass = 'fa-notes-medical';
-                $accentColor = 'var(--retro-pink)';
-                } elseif(str_contains($code, 'logis') || str_contains($code, 'kurir')) {
-                $iconClass = 'fa-truck-fast';
-                $accentColor = 'var(--retro-purple)';
+                if(str_contains($code, 'medic') || str_contains($code, 'health') || str_contains($code, 'rs') || str_contains($code, 'klinik')) {
+                // Rumah Sakit / Medis (Sky Blue)
+                $iconClass = 'fa-hospital-user';
+                $iconBg = '#e0f2fe';
+                $iconColor = '#0284c7';
+                $accentHex = '#0284c7';
+                } elseif(str_contains($code, 'koper') || str_contains($code, 'coop') || str_contains($code, 'simpan')) {
+                // Koperasi Digital (Emerald)
+                $iconClass = 'fa-hand-holding-usd';
+                $iconBg = '#d1fae5';
+                $iconColor = '#059669';
+                $accentHex = '#059669';
+                } elseif(str_contains($code, 'hr') || str_contains($code, 'sdm') || str_contains($code, 'pegawai') || str_contains($code, 'karyawan') || str_contains($code, 'payroll')) {
+                // Human Resource (Violet)
+                $iconClass = 'fa-users-cog';
+                $iconBg = '#ede9fe';
+                $iconColor = '#7c3aed';
+                $accentHex = '#7c3aed';
+                } elseif(str_contains($code, 'account') || str_contains($code, 'keuangan') || str_contains($code, 'akuntan') || str_contains($code, 'finance')) {
+                // Akuntansi & Keuangan (Amber)
+                $iconClass = 'fa-chart-line';
+                $iconBg = '#fef3c7';
+                $iconColor = '#d97706';
+                $accentHex = '#d97706';
+                } elseif(str_contains($code, 'inventar') || str_contains($code, 'stok') || str_contains($code, 'logis') || str_contains($code, 'gudang')) {
+                // Inventaris & Logistik (Teal)
+                $iconClass = 'fa-boxes';
+                $iconBg = '#ccfbf1';
+                $iconColor = '#0d9488';
+                $accentHex = '#0d9488';
                 }
                 @endphp
 
-                <div class="menu-card-desktop item-card-filter" id="menu" data-code="{{$menus->menu_super_code}}">
-                    <div class="card-gradient-bg" style="background-color: {{$accentColor}};"></div>
-
+                <div class="menu-card-desktop item-card-filter" id="menu" data-code="{{ $menus->menu_super_code }}" style="--card-accent: {{ $accentHex }};">
                     <div class="card-content-wrapper">
-                        <div class="menu-icon-wrapper" style="background-color: {{$accentColor}};">
-                            <i class="fas {{$iconClass}}"></i>
+                        <div class="d-flex align-items-start justify-content-between">
+                            <div class="menu-icon-wrapper" style="background-color: {{ $iconBg }}; color: {{ $iconColor }};">
+                                <i class="fas {{ $iconClass }}"></i>
+                            </div>
+                            <span class="card-arrow-hint">
+                                <i class="fas fa-arrow-right"></i>
+                            </span>
                         </div>
 
                         <div class="card-text">
-                            <h6 class="fw-bolder text-uppercase mb-1 filter-title">{{$menus->menu_super_name}}</h6>
-                            <p class="fs--2 mb-0 text-truncate filter-desc">{{$menus->menu_super_desc}}</p>
+                            <h6 class="fw-bold mb-1 filter-title">{{ $menus->menu_super_name }}</h6>
+                            <p class="mb-0 text-truncate filter-desc" title="{{ $menus->menu_super_desc }}">{{ $menus->menu_super_desc }}</p>
                         </div>
                     </div>
                 </div>
@@ -889,33 +960,38 @@
         </div>
 
         <footer class="desktop-footer text-center fs--2">
-            <p class="mb-0 fw-bold">Innoventra System &copy; 2026 | v3.4.0</p>
+            <p class="mb-0">© <span id="yr-desktop">2026</span> <strong>PT Innoventra Solusi Digital</strong> — Enterprise Management Suite v3.4.0</p>
         </footer>
     </div>
 
 
-    <!-- MOBILE MODE CONTAINER -->
+    <!-- ========================================================= -->
+    <!-- MOBILE MODE CONTAINER                                     -->
+    <!-- ========================================================= -->
     <div class="d-lg-none">
         <div class="mobile-header-bar d-flex align-items-center justify-content-between">
-            <div class="d-flex align-items-center gap-2">
-                <img src="{{asset('img/pp.png')}}" width="36" height="36" class="rounded-circle p-1 bg-white" style="border: 2px solid var(--retro-dark);" />
+            <div class="d-flex align-items-center gap-2.5">
+                <div class="position-relative">
+                    <img src="{{ asset('img/pp.png') }}" width="38" height="38" class="rounded-circle bg-white" style="border: 2px solid #e0e7ff;" />
+                    <span style="position: absolute; bottom: 0; right: 0; width: 9px; height: 9px; background: #10b981; border: 1.5px solid #fff; border-radius: 50%;"></span>
+                </div>
                 <div>
-                    <h6 class="mb-0 fw-bolder text-dark fs--1">{{Auth::user()->fullname}}</h6>
-                    <small class="text-muted fw-bold fs--2">{{ strtoupper(Auth::user()->access_code) }}</small>
+                    <h6 class="mb-0 fw-bold text-dark fs--1">{{ Auth::user()->fullname }}</h6>
+                    <span class="modern-badge badge-indigo" style="font-size: 0.6rem; padding: 1px 6px;">{{ strtoupper(Auth::user()->access_code) }}</span>
                 </div>
             </div>
 
             <!-- Dropdown Action Button Mobile -->
             <div class="dropdown">
-                <button class="btn btn-mobile-trigger shadow-sm" type="button" id="dropdownMobile" data-bs-toggle="dropdown" aria-expanded="false">
+                <button class="btn btn-mobile-trigger" type="button" id="dropdownMobile" data-bs-toggle="dropdown" aria-expanded="false">
                     <i class="fas fa-ellipsis-v"></i>
                 </button>
-                <ul class="dropdown-menu dropdown-menu-end glass-dropdown-mobile border-0" aria-labelledby="dropdownMobile">
+                <ul class="dropdown-menu dropdown-menu-end glass-dropdown-mobile" aria-labelledby="dropdownMobile">
                     <li>
                         <button class="dropdown-item mobile-dropdown-item" id="button-menu-utama">
                             <div class="d-flex align-items-center">
-                                <span class="mobile-icon-box item-icon-box" style="background-color: var(--retro-cyan);"><i class="fab fa-dashcube"></i></span>
-                                <span>Menu Utama</span>
+                                <span class="item-icon-box" style="background: #eef2ff; color: #4f46e5;"><i class="fas fa-home"></i></span>
+                                <span>Halaman Utama</span>
                             </div>
                             <i class="fas fa-chevron-right fs--2 opacity-50"></i>
                         </button>
@@ -923,7 +999,7 @@
                     <li>
                         <button class="dropdown-item mobile-dropdown-item" data-bs-toggle="modal" data-bs-target="#modal-keuangan" id="button-proses-transaksi">
                             <div class="d-flex align-items-center">
-                                <span class="mobile-icon-box item-icon-box" style="background-color: var(--retro-yellow);"><i class="fas fa-key"></i></span>
+                                <span class="item-icon-box" style="background: #fef3c7; color: #d97706;"><i class="fas fa-key"></i></span>
                                 <span>Ubah Password</span>
                             </div>
                             <i class="fas fa-chevron-right fs--2 opacity-50"></i>
@@ -933,7 +1009,7 @@
                     <li>
                         <button class="dropdown-item mobile-dropdown-item" id="button-master-dashboard">
                             <div class="d-flex align-items-center">
-                                <span class="mobile-icon-box item-icon-box" style="background-color: var(--retro-purple);"><i class="fas fa-cog"></i></span>
+                                <span class="item-icon-box" style="background: #f3e8ff; color: #7c3aed;"><i class="fas fa-sliders-h"></i></span>
                                 <span>Master Page</span>
                             </div>
                             <i class="fas fa-chevron-right fs--2 opacity-50"></i>
@@ -941,12 +1017,12 @@
                     </li>
                     @endif
                     <li>
-                        <hr class="dropdown-divider my-1 border-dark">
+                        <hr class="dropdown-divider my-1" style="border-color: #e2e8f0;">
                     </li>
                     <li>
                         <button class="dropdown-item mobile-dropdown-item text-danger" id="button-logout">
                             <div class="d-flex align-items-center">
-                                <span class="mobile-icon-box item-icon-box" style="background-color: var(--retro-pink);"><i class="fas fa-sign-out-alt"></i></span>
+                                <span class="item-icon-box" style="background: #ffe4e6; color: #e11d48;"><i class="fas fa-sign-out-alt"></i></span>
                                 <span>Log Out</span>
                             </div>
                             <i class="fas fa-chevron-right fs--2 opacity-50"></i>
@@ -956,115 +1032,147 @@
             </div>
         </div>
 
+        <!-- Mobile Hero Banner -->
         <div class="android-widget-card">
-            <div class="d-flex align-items-center justify-content-between mb-1">
-                <span class="retro-badge" style="background-color: #ffffff;">Ver.3 Active</span>
-                <i class="fas fa-microchip fs-4"></i>
+            <div class="d-flex align-items-center justify-content-between mb-2">
+                <span style="background: rgba(99, 102, 241, 0.3); border: 1px solid rgba(165, 180, 252, 0.4); color: #e0e7ff; font-size: 0.65rem; font-weight: 700; padding: 3px 10px; border-radius: 99px;">
+                    ● INNOVENTRA SUITE v3.4
+                </span>
+                <i class="fas fa-layer-group text-indigo-200 fs-5" style="color: #a5b4fc;"></i>
             </div>
-            <h6 class="fw-bolder mb-1 text-dark">Innoventra Dashboard</h6>
-            <p class="fs--2 mb-0 fw-bold opacity-75">Silakan pilih aplikasi/modul di bawah untuk pengelolaan data.</p>
+            <h6 class="fw-bold mb-1 text-white" style="font-size: 1.05rem;">Portal Aplikasi Terpadu</h6>
+            <p class="fs--2 mb-0" style="color: #cbd5e1;">Pilih modul Rumah Sakit, Koperasi, HRIS, atau Akuntansi di bawah untuk mulai bekerja.</p>
         </div>
 
+        <!-- Mobile App Grid -->
         <div class="android-app-grid">
             @foreach ($menu as $menus)
             @php
-            $code = strtolower($menus->menu_super_code);
-            $bgColor = 'background-color: var(--retro-cyan);';
-            $iconClass = 'fa-th-large';
+            $code = strtolower($menus->menu_super_code . ' ' . $menus->menu_super_name);
+            $iconClass = 'fa-layer-group';
+            $iconBg = '#eef2ff';
+            $iconColor = '#4f46e5';
 
-            if(str_contains($code, 'account') || str_contains($code, 'keuangan')) {
-            $bgColor = 'background-color: var(--retro-green);';
-            $iconClass = 'fa-calculator';
-            } elseif(str_contains($code, 'inventar') || str_contains($code, 'stok')) {
-            $bgColor = 'background-color: var(--retro-yellow);';
+            if(str_contains($code, 'medic') || str_contains($code, 'health') || str_contains($code, 'rs') || str_contains($code, 'klinik')) {
+            $iconClass = 'fa-hospital-user';
+            $iconBg = '#e0f2fe';
+            $iconColor = '#0284c7';
+            } elseif(str_contains($code, 'koper') || str_contains($code, 'coop') || str_contains($code, 'simpan')) {
+            $iconClass = 'fa-hand-holding-usd';
+            $iconBg = '#d1fae5';
+            $iconColor = '#059669';
+            } elseif(str_contains($code, 'hr') || str_contains($code, 'sdm') || str_contains($code, 'pegawai') || str_contains($code, 'karyawan') || str_contains($code, 'payroll')) {
+            $iconClass = 'fa-users-cog';
+            $iconBg = '#ede9fe';
+            $iconColor = '#7c3aed';
+            } elseif(str_contains($code, 'account') || str_contains($code, 'keuangan') || str_contains($code, 'akuntan') || str_contains($code, 'finance')) {
+            $iconClass = 'fa-chart-line';
+            $iconBg = '#fef3c7';
+            $iconColor = '#d97706';
+            } elseif(str_contains($code, 'inventar') || str_contains($code, 'stok') || str_contains($code, 'logis') || str_contains($code, 'gudang')) {
             $iconClass = 'fa-boxes';
-            } elseif(str_contains($code, 'medic') || str_contains($code, 'health')) {
-            $bgColor = 'background-color: var(--retro-pink);';
-            $iconClass = 'fa-user-md';
-            } elseif(str_contains($code, 'logis') || str_contains($code, 'kurir')) {
-            $bgColor = 'background-color: var(--retro-purple);';
-            $iconClass = 'fa-truck';
+            $iconBg = '#ccfbf1';
+            $iconColor = '#0d9488';
             }
             @endphp
 
-            <div class="app-item-mobile" id="menu" data-code="{{$menus->menu_super_code}}">
-                <div class="app-icon-wrapper" style="{{$bgColor}}">
-                    <i class="fas {{$iconClass}}"></i>
+            <div class="app-item-mobile" id="menu" data-code="{{ $menus->menu_super_code }}">
+                <div class="app-icon-wrapper" style="background-color: {{ $iconBg }}; color: {{ $iconColor }};">
+                    <i class="fas {{ $iconClass }}"></i>
                 </div>
-                <span class="app-label-mobile">{{$menus->menu_super_name}}</span>
+                <span class="app-label-mobile">{{ $menus->menu_super_name }}</span>
             </div>
             @endforeach
         </div>
 
+        <!-- Mobile Bottom Floating Navigation -->
         <div class="android-bottom-nav">
             <a class="android-nav-btn active" href="#">
-                <div class="nav-icon-wrapper nav-icon-home"><i class="fas fa-home"></i></div>
-                <span>Home</span>
+                <div class="nav-icon-wrapper nav-icon-home"><i class="fas fa-th-large"></i></div>
+                <span>Aplikasi</span>
             </a>
             <a class="android-nav-btn" href="#" data-bs-toggle="modal" data-bs-target="#modal-keuangan">
                 <div class="nav-icon-wrapper nav-icon-reset"><i class="fas fa-key"></i></div>
-                <span>Reset</span>
+                <span>Sandi</span>
             </a>
             <a class="android-nav-btn" href="#" data-bs-toggle="modal" data-bs-target="#staticBackdrop">
-                <div class="nav-icon-wrapper nav-icon-info"><i class="fas fa-comment-alt"></i></div>
+                <div class="nav-icon-wrapper nav-icon-info"><i class="fas fa-info-circle"></i></div>
                 <span>Info</span>
             </a>
             <a class="android-nav-btn" id="button-logout" href="#">
                 <div class="nav-icon-wrapper nav-icon-logout"><i class="fas fa-power-off"></i></div>
-                <span class="text-danger fw-bold">Keluar</span>
+                <span class="text-danger">Keluar</span>
             </a>
         </div>
     </div>
 
-    <!-- Modals -->
+    <!-- ========================================================= -->
+    <!-- MODALS                                                    -->
+    <!-- ========================================================= -->
+    <!-- Info Modal -->
     <div class="modal fade" id="staticBackdrop" data-bs-keyboard="false" tabindex="-1" aria-hidden="true">
         <div class="modal-dialog modal-dialog-centered" role="document">
-            <div class="modal-content border-0 shadow-lg rounded-4 overflow-hidden" style="border: var(--retro-border) !important; box-shadow: 8px 8px 0px var(--retro-dark) !important;">
-                <div class="modal-header bg-white border-bottom border-dark">
-                    <h6 class="modal-title fw-bolder text-dark" id="staticBackdropLabel">Informasi System</h6>
-                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close" style="border: 2px solid var(--retro-dark); border-radius: 50%; padding: 5px; box-shadow: 2px 2px 0px var(--retro-dark);"></button>
+            <div class="modal-content modern-modal-content">
+                <div class="modal-header bg-white border-bottom" style="border-color: #e2e8f0 !important;">
+                    <div class="d-flex align-items-center gap-2">
+                        <span class="item-icon-box m-0" style="background: #eef2ff; color: #4f46e5;">
+                            <i class="fas fa-info-circle"></i>
+                        </span>
+                        <h6 class="modal-title fw-bold text-dark mb-0" id="staticBackdropLabel">Informasi Sistem</h6>
+                    </div>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
                 </div>
                 <div class="modal-body p-4 bg-white">
-                    <p class="text-dark fs--1 mb-0 fw-bold">Layanan integrasi dashboard manajemen terlengkap untuk membantu pengelolaan data perusahaan Anda.</p>
+                    <p class="text-slate-600 fs--1 mb-0" style="line-height: 1.6;">
+                        <strong>PT Innoventra Solusi Digital</strong> — Platform manajemen terpadu untuk pengelolaan operasional Rumah Sakit (SIMRS &amp; PACS), Koperasi Digital, Human Resource (HRIS), serta Akuntansi &amp; Keuangan.
+                    </p>
                 </div>
             </div>
         </div>
     </div>
 
+    <!-- Reset Password OTP Modal -->
     <div class="modal fade" id="modal-keuangan" tabindex="-1" aria-hidden="true" data-bs-backdrop="static">
         <div class="modal-dialog modal-dialog-centered modal-sm-custom">
-            <div class="modal-content glass-reset-modal border-0 shadow-lg">
+            <div class="modal-content modern-modal-content glass-reset-modal">
                 <button type="button" class="btn-close btn-close-custom" data-bs-dismiss="modal" aria-label="Close"></button>
+
+                <!-- Step 1 -->
                 <div id="reset-step-1" class="reset-step-container">
                     <div class="text-center mb-4">
-                        <div class="reset-icon-badge bg-white text-dark mx-auto mb-3" style="background-color: var(--retro-yellow) !important;"><i class="fas fa-envelope fs-3"></i></div>
-                        <h5 class="fw-bolder text-dark mb-1">Reset Password</h5>
-                        <p class="text-muted fs--2 mb-0 fw-bold">Masukkan email terdaftar untuk menerima kode verifikasi OTP.</p>
+                        <div class="reset-icon-badge mx-auto mb-3" style="background: #eef2ff; color: #4f46e5;">
+                            <i class="fas fa-envelope-open-text fs-3"></i>
+                        </div>
+                        <h5 class="fw-bold text-dark mb-1">Ubah Kata Sandi</h5>
+                        <p class="text-muted fs--2 mb-0">Masukkan email terdaftar untuk menerima kode verifikasi OTP.</p>
                     </div>
                     <form id="form-request-otp">
                         <div class="mb-3">
-                            <label class="form-label text-dark fw-bolder fs--2">EMAIL TERDAFTAR</label>
+                            <label class="form-label text-dark fw-semibold fs--2">Email Terdaftar</label>
                             <div class="input-group">
                                 <span class="input-group-text"><i class="fas fa-at"></i></span>
-                                <input type="email" class="form-control custom-input" id="reset-email" placeholder="nama@email.com" required>
+                                <input type="email" class="form-control custom-input" id="reset-email" placeholder="nama@perusahaan.com" required>
                             </div>
                         </div>
-                        <button type="submit" class="btn retro-btn btn-primary-gradient w-100 py-2 text-dark" id="btn-send-otp">
+                        <button type="submit" class="btn modern-btn btn-primary-gradient w-100 py-2.5" id="btn-send-otp">
                             <span>Kirim Kode Verifikasi</span> <i class="fas fa-arrow-right ms-2 fs--2"></i>
                         </button>
                     </form>
                 </div>
 
+                <!-- Step 2 -->
                 <div id="reset-step-2" class="reset-step-container d-none">
                     <div class="text-center mb-3">
-                        <div class="reset-icon-badge mx-auto mb-2" style="background-color: var(--retro-cyan) !important;"><i class="fas fa-shield-alt fs-4"></i></div>
-                        <h5 class="fw-bolder text-dark mb-1">Verifikasi OTP</h5>
-                        <p class="text-muted fs--2 mb-0 fw-bold">Masukkan 6 digit kode OTP yang dikirim ke email Anda.</p>
+                        <div class="reset-icon-badge mx-auto mb-2" style="background: #e0f2fe; color: #0284c7;">
+                            <i class="fas fa-shield-alt fs-4"></i>
+                        </div>
+                        <h5 class="fw-bold text-dark mb-1">Verifikasi OTP</h5>
+                        <p class="text-muted fs--2 mb-0">Masukkan 6 digit kode OTP yang dikirim ke email Anda.</p>
                     </div>
                     <form id="form-verify-otp">
                         <div class="mb-3">
-                            <label class="form-label text-dark fw-bolder fs--2 text-center d-block">KODE VERIFIKASI (OTP)</label>
-                            <div class="d-flex justify-content-center gap-1 otp-group mb-2">
+                            <label class="form-label text-dark fw-semibold fs--2 text-center d-block">Kode Verifikasi (OTP)</label>
+                            <div class="d-flex justify-content-center gap-1.5 otp-group mb-2">
                                 <input type="text" maxlength="1" class="form-control otp-input text-center px-1" required>
                                 <input type="text" maxlength="1" class="form-control otp-input text-center px-1" required>
                                 <input type="text" maxlength="1" class="form-control otp-input text-center px-1" required>
@@ -1072,35 +1180,46 @@
                                 <input type="text" maxlength="1" class="form-control otp-input text-center px-1" required>
                                 <input type="text" maxlength="1" class="form-control otp-input text-center px-1" required>
                             </div>
-                            <div class="text-center"><small class="text-dark fw-bold fs--2">Belum terima kode? <a href="#" id="btn-resend-otp" class="text-primary fw-bolder text-decoration-underline">Kirim Ulang</a></small></div>
+                            <div class="text-center">
+                                <small class="text-muted fs--2">Belum terima kode? <a href="#" id="btn-resend-otp" class="text-primary fw-semibold text-decoration-none">Kirim Ulang</a></small>
+                            </div>
                         </div>
-                        <button type="submit" class="btn retro-btn btn-primary-gradient w-100 py-2 text-dark mt-2" id="btn-check-otp"><i class="fas fa-check-circle me-1"></i> Verifikasi Kode OTP</button>
+                        <button type="submit" class="btn modern-btn btn-primary-gradient w-100 py-2.5 mt-2" id="btn-check-otp">
+                            <i class="fas fa-check-circle me-1"></i> Verifikasi Kode OTP
+                        </button>
                     </form>
                 </div>
 
+                <!-- Step 3 -->
                 <div id="reset-step-3" class="reset-step-container d-none">
                     <div class="text-center mb-3">
-                        <div class="reset-icon-badge mx-auto mb-2" style="background-color: var(--retro-green) !important;"><i class="fas fa-lock fs-4"></i></div>
-                        <h5 class="fw-bolder text-dark mb-1">Password Baru</h5>
-                        <p class="text-muted fs--2 mb-0 fw-bold">Buat kata sandi baru untuk akun Anda.</p>
+                        <div class="reset-icon-badge mx-auto mb-2" style="background: #d1fae5; color: #059669;">
+                            <i class="fas fa-lock fs-4"></i>
+                        </div>
+                        <h5 class="fw-bold text-dark mb-1">Kata Sandi Baru</h5>
+                        <p class="text-muted fs--2 mb-0">Buat kata sandi baru yang aman untuk akun Anda.</p>
                     </div>
                     <form id="form-reset-password">
                         <div class="mb-3">
-                            <label class="form-label text-dark fw-bolder fs--2">KATA SANDI BARU</label>
+                            <label class="form-label text-dark fw-semibold fs--2">Kata Sandi Baru</label>
                             <div class="input-group">
                                 <span class="input-group-text"><i class="fas fa-key"></i></span>
-                                <input type="password" class="form-control custom-input" id="new-password" placeholder="••••••••" minlength="6" required>
-                                <button class="btn retro-btn bg-white text-dark btn-toggle-pass" type="button" style="border: 2px solid var(--retro-dark) !important; border-radius: 0 6px 6px 0 !important;"><i class="fas fa-eye"></i></button>
+                                <input type="password" class="form-control custom-input" id="new-password" placeholder="Minimal 6 karakter" minlength="6" required>
+                                <button class="btn bg-light border text-muted btn-toggle-pass" type="button" style="border-color: #cbd5e1 !important; border-radius: 0 10px 10px 0 !important;">
+                                    <i class="fas fa-eye"></i>
+                                </button>
                             </div>
                         </div>
                         <div class="mb-3">
-                            <label class="form-label text-dark fw-bolder fs--2">KONFIRMASI KATA SANDI</label>
+                            <label class="form-label text-dark fw-semibold fs--2">Konfirmasi Kata Sandi</label>
                             <div class="input-group">
                                 <span class="input-group-text"><i class="fas fa-key"></i></span>
-                                <input type="password" class="form-control custom-input" id="confirm-password" placeholder="••••••••" minlength="6" required>
+                                <input type="password" class="form-control custom-input" id="confirm-password" placeholder="Ulangi kata sandi baru" minlength="6" required>
                             </div>
                         </div>
-                        <button type="submit" class="btn retro-btn btn-success-gradient w-100 py-2 text-dark mt-2" id="btn-save-password"><i class="fas fa-save me-1"></i> Simpan Password Baru</button>
+                        <button type="submit" class="btn modern-btn btn-success-gradient w-100 py-2.5 mt-2" id="btn-save-password">
+                            <i class="fas fa-save me-1"></i> Simpan Kata Sandi Baru
+                        </button>
                     </form>
                 </div>
             </div>
@@ -1116,6 +1235,9 @@
 
     <script>
         document.addEventListener("DOMContentLoaded", function() {
+            const yrEl = document.getElementById('yr-desktop');
+            if (yrEl) yrEl.textContent = new Date().getFullYear();
+
             const searchInput = document.getElementById('desktopSearchApp');
             if (searchInput) {
                 searchInput.addEventListener('input', function() {
@@ -1174,7 +1296,7 @@
                 const emailInput = document.getElementById("reset-email");
                 userEmail = emailInput.value;
                 const btn = $("#btn-send-otp");
-                btn.prop("disabled", true).html('<i class="fas fa-spinner fa-spin"></i> Memeriksa Email...');
+                btn.prop("disabled", true).html('<i class="fas fa-spinner fa-spin me-1"></i> Memeriksa Email...');
                 $.ajax({
                     url: "{{ route('verifikasi_send_email') }}",
                     type: "POST",
@@ -1204,7 +1326,8 @@
                         Swal.fire({
                             icon: 'error',
                             title: 'Email Tidak Ditemukan!',
-                            text: res.message || 'Silakan periksa kembali email yang Anda masukkan.'
+                            text: res.message || 'Silakan periksa kembali email yang Anda masukkan.',
+                            confirmButtonColor: '#4f46e5'
                         }).then(() => {
                             emailInput.focus();
                             emailInput.select();
@@ -1220,7 +1343,8 @@
                     Swal.fire({
                         icon: 'error',
                         title: 'Gagal Memeriksa Email',
-                        text: errorMsg
+                        text: errorMsg,
+                        confirmButtonColor: '#4f46e5'
                     }).then(() => {
                         emailInput.focus();
                         emailInput.select();
@@ -1239,10 +1363,15 @@
                 otpInputs.forEach(input => otpCode += input.value);
                 const btn = $("#btn-check-otp");
                 if (otpCode.length < 6) {
-                    Swal.fire("Peringatan", "Harap masukkan 6 digit kode OTP secara lengkap!", "warning");
+                    Swal.fire({
+                        icon: "warning",
+                        title: "Peringatan",
+                        text: "Harap masukkan 6 digit kode OTP secara lengkap!",
+                        confirmButtonColor: '#4f46e5'
+                    });
                     return;
                 }
-                btn.prop("disabled", true).html('<i class="fas fa-spinner fa-spin"></i> Memverifikasi...');
+                btn.prop("disabled", true).html('<i class="fas fa-spinner fa-spin me-1"></i> Memverifikasi...');
                 $.ajax({
                     url: "{{ route('verifikasi_otp_check') }}",
                     type: "POST",
@@ -1259,7 +1388,7 @@
                         Swal.fire({
                             icon: 'success',
                             title: 'OTP Valid!',
-                            text: 'Silakan masukkan password baru Anda.',
+                            text: 'Silakan masukkan kata sandi baru Anda.',
                             timer: 1500,
                             showConfirmButton: false
                         });
@@ -1267,12 +1396,22 @@
                         step3.classList.remove("d-none");
                         document.getElementById("new-password").focus();
                     } else {
-                        Swal.fire("OTP Salah", res.message, "error");
+                        Swal.fire({
+                            icon: "error",
+                            title: "OTP Salah",
+                            text: res.message,
+                            confirmButtonColor: '#4f46e5'
+                        });
                     }
                 }).fail(function(xhr) {
                     btn.prop("disabled", false).html('<i class="fas fa-check-circle me-1"></i> Verifikasi Kode OTP');
                     const res = xhr.responseJSON;
-                    Swal.fire("Error", res && res.message ? res.message : "Gagal memverifikasi OTP.", "error");
+                    Swal.fire({
+                        icon: "error",
+                        title: "Error",
+                        text: res && res.message ? res.message : "Gagal memverifikasi OTP.",
+                        confirmButtonColor: '#4f46e5'
+                    });
                 });
             });
 
@@ -1282,10 +1421,15 @@
                 const confirmPassword = document.getElementById("confirm-password").value;
                 const btn = $("#btn-save-password");
                 if (password !== confirmPassword) {
-                    Swal.fire("Perhatian", "Konfirmasi kata sandi tidak cocok!", "warning");
+                    Swal.fire({
+                        icon: "warning",
+                        title: "Perhatian",
+                        text: "Konfirmasi kata sandi tidak cocok!",
+                        confirmButtonColor: '#4f46e5'
+                    });
                     return;
                 }
-                btn.prop("disabled", true).html('<i class="fas fa-spinner fa-spin"></i> Menyimpan...');
+                btn.prop("disabled", true).html('<i class="fas fa-spinner fa-spin me-1"></i> Menyimpan...');
                 $.ajax({
                     url: "{{ route('verifikasi_reset_pass') }}",
                     type: "POST",
@@ -1298,22 +1442,33 @@
                     },
                     dataType: "json"
                 }).done(function(res) {
-                    btn.prop("disabled", false).html('<i class="fas fa-save me-1"></i> Simpan Password Baru');
+                    btn.prop("disabled", false).html('<i class="fas fa-save me-1"></i> Simpan Kata Sandi Baru');
                     if (res.status === 'success') {
                         Swal.fire({
                             icon: 'success',
                             title: 'Berhasil!',
-                            text: res.message
+                            text: res.message,
+                            confirmButtonColor: '#4f46e5'
                         }).then(() => {
                             location.reload();
                         });
                     } else {
-                        Swal.fire("Gagal", res.message, "error");
+                        Swal.fire({
+                            icon: "error",
+                            title: "Gagal",
+                            text: res.message,
+                            confirmButtonColor: '#4f46e5'
+                        });
                     }
                 }).fail(function(xhr) {
-                    btn.prop("disabled", false).html('<i class="fas fa-save me-1"></i> Simpan Password Baru');
+                    btn.prop("disabled", false).html('<i class="fas fa-save me-1"></i> Simpan Kata Sandi Baru');
                     const res = xhr.responseJSON;
-                    Swal.fire("Error", res && res.message ? res.message : "Gagal mengubah password.", "error");
+                    Swal.fire({
+                        icon: "error",
+                        title: "Error",
+                        text: res && res.message ? res.message : "Gagal mengubah password.",
+                        confirmButtonColor: '#4f46e5'
+                    });
                 });
             });
         });
@@ -1322,8 +1477,8 @@
             e.preventDefault();
             var code = $(this).data("code");
             Swal.fire({
-                title: "Mohon Menunggu",
-                html: "Membuka modul...",
+                title: "Memuat Aplikasi",
+                html: "Menyiapkan ruang kerja Anda...",
                 timer: 400,
                 timerProgressBar: true,
                 allowOutsideClick: false,
@@ -1344,7 +1499,12 @@
                     }).done(function(data) {
                         window.location.replace(data);
                     }).fail(function() {
-                        Swal.fire("Error", "Gagal memuat menu.", "error");
+                        Swal.fire({
+                            icon: "error",
+                            title: "Error",
+                            text: "Gagal memuat modul aplikasi.",
+                            confirmButtonColor: '#4f46e5'
+                        });
                     });
                 }
             });
@@ -1354,11 +1514,11 @@
             e.preventDefault();
             Swal.fire({
                 title: "Konfirmasi Keluar",
-                text: "Apakah Anda yakin ingin keluar?",
+                text: "Apakah Anda yakin ingin mengakhiri sesi ini?",
                 icon: "warning",
                 showCancelButton: true,
-                confirmButtonColor: "#1e1e24",
-                cancelButtonColor: "#6c757d",
+                confirmButtonColor: "#4f46e5",
+                cancelButtonColor: "#64748b",
                 confirmButtonText: "Ya, Log Out",
                 cancelButtonText: "Batal"
             }).then((result) => {
@@ -1370,11 +1530,11 @@
 
         $(document).on("click", "#button-master-dashboard", function(e) {
             e.preventDefault();
-            window.location.href = "{{route('master_dashboard')}}";
+            window.location.href = "{{ route('master_dashboard') }}";
         });
         $(document).on("click", "#button-menu-utama", function(e) {
             e.preventDefault();
-            window.location.href = "{{route('/')}}";
+            window.location.href = "{{ route('/') }}";
         });
     </script>
 </body>
