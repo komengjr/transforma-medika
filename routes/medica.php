@@ -406,7 +406,7 @@ Route::prefix('application')->group(function () {
     // Route untuk memproses pembayaran kasir secara parsial (sebagian item)
     Route::post('/kasir/update-split-item', [KeuanganController::class, 'updateSplitItem'])->name('keuangan_menu_cashier_update_split');
     Route::post('/kasir/proses-payment-parsial', [KeuanganController::class, 'prosesPaymentParsial'])->name('keuangan_menu_cashier_proses_payment_parsial');
-    Route::get('/cashier/download-receipt-pdf/{transaksiId}', [KeuanganController::class, 'downloadReceiptPdf'])->name('pembayaran.nota');
+    Route::get('/cashier/download-receipt-pdf/{transaksiId}', [KeuanganController::class, 'downloadReceiptPdf'])->name('pembayaran.notas');
 
     Route::get('/api/penagihan/perusahaan', [KeuanganController::class, 'apiGetDaftarPenagihanPerusahaan'])->name('api.daftar.penagihan.perusahaan');
     Route::post('/api/pelunasan/piutang-perusahaan', [KeuanganController::class, 'prosesPelunasanPiutangPerusahaan'])->name('api.pelunasan.piutang.perusahaan');
