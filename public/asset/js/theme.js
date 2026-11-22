@@ -1002,11 +1002,7 @@ var chatInit = function chatInit() {
                 selection.emoji;
         });
 };
-/* -------------------------------------------------------------------------- */
 
-/*                                   choices                                   */
-
-/* -------------------------------------------------------------------------- */
 
 var choicesInit = function choicesInit() {
     if (window.Choices) {

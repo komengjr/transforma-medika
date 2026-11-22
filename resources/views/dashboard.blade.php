@@ -135,48 +135,72 @@
                 min-height: 0;
             }
 
-            /* Header Desktop Card Modern */
+            /* Header Desktop Card Senada Tema (Indigo-Slate Gradient) */
             .glass-header-card {
-                background: rgba(255, 255, 255, 0.92);
+                background: linear-gradient(135deg, #1e1b4b 0%, #312e81 55%, #4338ca 100%);
                 backdrop-filter: blur(12px);
                 border-radius: 18px;
-                border: 1px solid var(--brand-slate-200);
-                box-shadow: var(--card-shadow);
+                border: 1px solid rgba(165, 180, 252, 0.35);
+                box-shadow: 0 10px 24px -6px rgba(49, 46, 129, 0.28);
                 padding: 0.85rem 1.5rem;
                 margin-bottom: 1rem;
+                color: #ffffff;
                 position: relative;
                 z-index: 1050 !important;
                 flex-shrink: 0;
             }
 
             .brand-logo-box {
-                background: #ffffff;
-                border: 1px solid var(--brand-slate-200);
+                background: rgba(237, 239, 238, 0.98);
+                border: 1px solid rgba(199, 210, 254, 0.35);
                 border-radius: 12px;
                 padding: 0.45rem 0.75rem;
-                box-shadow: 0 2px 6px rgba(15, 23, 42, 0.04);
+                box-shadow: 0 2px 8px rgba(15, 23, 42, 0.15);
+            }
+
+            .header-title-text {
+                color: #ffffff !important;
+            }
+
+            .header-subtitle-accent {
+                color: #a5b4fc !important;
+            }
+
+            .header-version-text {
+                color: #c7d2fe !important;
+            }
+
+            /* Baris Flex Pencarian + Marquee */
+            .search-marquee-flex {
+                display: flex;
+                align-items: center;
+                gap: 0.85rem;
+                margin-bottom: 1.25rem;
+                flex-shrink: 0;
             }
 
             .desktop-search-wrapper {
-                max-width: 440px;
+                flex: 0 0 360px;
+                max-width: 360px;
             }
 
             .modern-search-group {
-                background: #f1f5f9;
-                border: 1px solid transparent;
-                border-radius: 12px;
+                background: #eef2ff;
+                border: 1.5px solid #c7d2fe;
+                border-radius: 14px;
                 transition: all 0.2s ease;
+                box-shadow: 0 4px 12px -4px rgba(79, 70, 229, 0.12);
             }
 
             .modern-search-group:focus-within {
                 background: #ffffff;
                 border-color: var(--brand-indigo);
-                box-shadow: 0 0 0 4px rgba(79, 70, 229, 0.12);
+                box-shadow: 0 0 0 4px rgba(79, 70, 229, 0.14);
             }
 
             .modern-search-group input {
                 background: transparent !important;
-                font-size: 0.875rem;
+                font-size: 0.85rem;
                 color: var(--brand-slate-900);
             }
 
@@ -187,21 +211,22 @@
 
             /* Announcement Banner Modern */
             .marquee-box {
-                background: linear-gradient(135deg, #0f172a 0%, #1e1b4b 60%, #312e81 100%);
+                flex: 1;
+                min-width: 0;
+                background: linear-gradient(135deg, #312e81 0%, #4338ca 55%, #4f46e5 100%);
                 border-radius: 14px;
                 padding: 10px 18px;
                 color: #f8fafc;
-                margin-bottom: 1.25rem;
-                box-shadow: 0 6px 16px -4px rgba(30, 27, 75, 0.25);
-                border: 1px solid rgba(99, 102, 241, 0.25);
-                flex-shrink: 0;
+                margin-bottom: 0;
+                box-shadow: 0 6px 16px -4px rgba(67, 56, 202, 0.28);
+                border: 1px solid rgba(165, 180, 252, 0.35);
                 font-weight: 500;
             }
 
             .marquee-pill {
-                background: rgba(99, 102, 241, 0.25);
-                border: 1px solid rgba(129, 140, 248, 0.4);
-                color: #c7d2fe;
+                background: rgba(255, 255, 255, 0.16);
+                border: 1px solid rgba(224, 231, 255, 0.4);
+                color: #ffffff;
                 font-size: 0.7rem;
                 font-weight: 700;
                 padding: 3px 10px;
@@ -373,13 +398,13 @@
             }
 
             .android-widget-card {
-                background: linear-gradient(135deg, #0f172a 0%, #1e1b4b 55%, #312e81 100%);
-                border: 1px solid rgba(99, 102, 241, 0.3);
+                background: linear-gradient(135deg, #1e1b4b 0%, #312e81 55%, #4338ca 100%);
+                border: 1px solid rgba(165, 180, 252, 0.35);
                 color: #ffffff;
                 border-radius: 20px;
                 padding: 1.25rem;
                 margin: 1rem;
-                box-shadow: 0 12px 24px -6px rgba(30, 27, 75, 0.35);
+                box-shadow: 0 12px 24px -6px rgba(49, 46, 129, 0.32);
             }
 
             .android-app-grid {
@@ -594,15 +619,27 @@
             align-items: center;
             justify-content: center;
             border-radius: 12px !important;
+            background: rgba(255, 255, 255, 0.14) !important;
+            border: 1px solid rgba(199, 210, 254, 0.35) !important;
+            color: #ffffff !important;
+            box-shadow: 0 2px 6px rgba(15, 23, 42, 0.15) !important;
+            transition: all 0.15s ease !important;
+        }
+
+        .btn-mobile-trigger {
             background: #ffffff !important;
             border: 1px solid var(--brand-slate-200) !important;
             color: var(--brand-slate-600) !important;
             box-shadow: 0 2px 6px rgba(15, 23, 42, 0.04) !important;
-            transition: all 0.15s ease !important;
         }
 
         .btn-dropdown-trigger:hover,
-        .btn-dropdown-trigger[aria-expanded="true"],
+        .btn-dropdown-trigger[aria-expanded="true"] {
+            background: rgba(255, 255, 255, 0.24) !important;
+            border-color: #c7d2fe !important;
+            color: #ffffff !important;
+        }
+
         .btn-mobile-trigger:active,
         .btn-mobile-trigger[aria-expanded="true"] {
             background: #eef2ff !important;
@@ -767,38 +804,28 @@
                             <div class="d-flex align-items-center gap-2">
                                 <span class="modern-badge badge-indigo">
                                     <span style="width: 6px; height: 6px; border-radius: 50%; background: #4f46e5;"></span>
-                                    INNOVENTRA SUITE
+                                    {{ strtoupper(env('APP_NAME')) }}
                                 </span>
-                                <span class="text-muted fs--2 fw-semibold">v3.4</span>
+                                <span class="header-version-text fs--2 fw-semibold">v3.4</span>
                             </div>
-                            <h5 class="fw-bolder mb-0 text-dark mt-1" style="font-size: 1.05rem;">
-                                Enterprise <span class="text-primary">Management Portal</span>
+                            <h5 class="fw-bolder mb-0 header-title-text mt-1" style="font-size: 1.05rem;">
+                                Enterprise <span class="header-subtitle-accent">Management Portal</span>
                             </h5>
-                        </div>
-                    </div>
-
-                    <!-- Tengah: Search Filter Aplikasi -->
-                    <div class="flex-grow-1 px-4 mx-3 desktop-search-wrapper">
-                        <div class="input-group modern-search-group px-2 py-1">
-                            <span class="input-group-text bg-transparent border-0 text-muted ps-2">
-                                <i class="fas fa-search fs--1"></i>
-                            </span>
-                            <input type="text" id="desktopSearchApp" class="form-control border-0 ps-2" placeholder="Cari aplikasi (SIMRS, Koperasi, HRIS, Keuangan)...">
                         </div>
                     </div>
 
                     <!-- Kanan: Profil & Setting -->
                     <div class="d-flex align-items-center gap-3">
                         <div class="text-end">
-                            <h6 class="mb-0 fw-bold text-dark fs--1">{{ Auth::user()->fullname }}</h6>
+                            <h6 class="mb-0 fw-bold header-title-text fs--1">{{ Auth::user()->fullname }}</h6>
                             <span class="modern-badge badge-emerald mt-1" style="font-size: 0.65rem; padding: 2px 8px;">
                                 {{ strtoupper(Auth::user()->access_code) }}
                             </span>
                         </div>
 
                         <div class="position-relative">
-                            <img class="rounded-circle" src="{{ asset('img/pp.png') }}" width="40" height="40" alt="Profile" style="border: 2px solid #e0e7ff; box-shadow: 0 2px 8px rgba(79,70,229,0.15);" />
-                            <span style="position: absolute; bottom: 0; right: 0; width: 10px; height: 10px; background: #10b981; border: 2px solid #fff; border-radius: 50%;"></span>
+                            <img class="rounded-circle" src="{{ asset('img/pp.png') }}" width="40" height="40" alt="Profile" style="border: 2px solid #c7d2fe; box-shadow: 0 2px 8px rgba(15,23,42,0.22);" />
+                            <span style="position: absolute; bottom: 0; right: 0; width: 10px; height: 10px; background: #10b981; border: 2px solid #312e81; border-radius: 50%;"></span>
                         </div>
 
                         <!-- Dropdown Action Button -->
@@ -811,7 +838,7 @@
                                 <li class="dropdown-profile-header">
                                     <div class="d-flex align-items-center justify-content-between">
                                         <div>
-                                            <div class="fw-bold text-dark fs--1">{{ Auth::user()->fullname }}</div>
+                                            <div class="fw-bold fs--1" style="color: darkblue;">{{ Auth::user()->fullname }}</div>
                                             <span class="modern-badge badge-indigo mt-1" style="font-size: 0.62rem; padding: 2px 7px;">
                                                 {{ strtoupper(Auth::user()->access_code) }}
                                             </span>
@@ -882,14 +909,25 @@
                 </div>
             </div>
 
-            <!-- Running Text Marquee Banner -->
-            <div class="marquee-box d-flex align-items-center gap-3">
-                <span class="marquee-pill">
-                    <i class="fas fa-bolt me-1 text-warning"></i> Info Sistem
-                </span>
-                <marquee class="m-0 fs--1 text-light" behavior="scroll" direction="left">
-                    Selamat Datang di PT Innoventra Solusi Digital — Ekosistem Aplikasi Terpadu untuk Rumah Sakit (SIMRS &amp; Medis), Koperasi Digital, Human Resource (HRIS), serta Akuntansi &amp; Keuangan.
-                </marquee>
+            <!-- Flex Bar: Pencarian Menu (Kiri) + Running Text Marquee Banner (Kanan) -->
+            <div class="search-marquee-flex">
+                <div class="desktop-search-wrapper">
+                    <div class="input-group modern-search-group px-2 py-1">
+                        <span class="input-group-text bg-transparent border-0 text-primary ps-2">
+                            <i class="fas fa-search fs--1"></i>
+                        </span>
+                        <input type="text" id="desktopSearchApp" class="form-control border-0 ps-2" placeholder="Cari aplikasi (SIMRS, Koperasi, HRIS, Keuangan)...">
+                    </div>
+                </div>
+
+                <div class="marquee-box d-flex align-items-center gap-3">
+                    <span class="marquee-pill">
+                        <i class="fas fa-bolt me-1 text-warning"></i> Info Sistem
+                    </span>
+                    <marquee class="m-0 fs--1" style="color: white;" behavior="scroll" direction="left">
+                        Selamat Datang di {{ env('APP_NAME') }} — Ekosistem Aplikasi Terpadu untuk Rumah Sakit (SIMRS &amp; Medis), Koperasi Digital, Human Resource (HRIS), serta Akuntansi &amp; Keuangan.
+                    </marquee>
+                </div>
             </div>
 
             <!-- Grid Card Features Desktop -->
@@ -960,7 +998,7 @@
         </div>
 
         <footer class="desktop-footer text-center fs--2">
-            <p class="mb-0">© <span id="yr-desktop">2026</span> <strong>PT Innoventra Solusi Digital</strong> — Enterprise Management Suite v3.4.0</p>
+            <p class="mb-0">© <span id="yr-desktop">2026</span> <strong>{{ env('APP_NAME') }}</strong> — Enterprise Management Suite v3.4.0</p>
         </footer>
     </div>
 
@@ -970,16 +1008,72 @@
     <!-- ========================================================= -->
     <div class="d-lg-none">
         <div class="mobile-header-bar d-flex align-items-center justify-content-between">
-            <div class="d-flex align-items-center gap-2.5">
-                <div class="position-relative">
-                    <img src="{{ asset('img/pp.png') }}" width="38" height="38" class="rounded-circle bg-white" style="border: 2px solid #e0e7ff;" />
-                    <span style="position: absolute; bottom: 0; right: 0; width: 9px; height: 9px; background: #10b981; border: 1.5px solid #fff; border-radius: 50%;"></span>
+            <div class="d-flex align-items-center gap-2 mobile-profile-box">
+                <div class="position-relative flex-shrink-0">
+                    <img src="{{ asset('img/pp.png') }}" width="38" height="38" class="rounded-circle bg-white mobile-profile-avatar" alt="Profile" />
+                    <span class="mobile-online-dot"></span>
                 </div>
-                <div>
-                    <h6 class="mb-0 fw-bold text-dark fs--1">{{ Auth::user()->fullname }}</h6>
-                    <span class="modern-badge badge-indigo" style="font-size: 0.6rem; padding: 1px 6px;">{{ strtoupper(Auth::user()->access_code) }}</span>
+                <div class="text-start min-w-0">
+                    <h6 class="mb-0 fw-bold fs--1 text-truncate" style="color: #1e1b4b; letter-spacing: -0.01em;">{{ Auth::user()->fullname }}</h6>
+                    <span class="modern-badge badge-indigo mt-1" style="font-size: 0.6rem; padding: 1.5px 7px;">
+                        <i class="fas fa-shield-alt" style="font-size: 0.55rem;"></i> {{ strtoupper(Auth::user()->access_code) }}
+                    </span>
                 </div>
             </div>
+
+            <style>
+                .mobile-profile-box {
+                    position: relative;
+                    padding: 6px 12px 6px 8px;
+                    border-radius: 16px;
+                    background: linear-gradient(135deg, rgba(255, 255, 255, 0.96) 0%, rgba(238, 242, 255, 0.92) 100%);
+                    border: 1.5px solid transparent;
+                    background-clip: padding-box;
+                    box-shadow:
+                        0 6px 16px -4px rgba(79, 70, 229, 0.14),
+                        inset 0 1px 0 0 rgba(255, 255, 255, 0.9);
+                    width: fit-content;
+                    max-width: 100%;
+                    transition: transform 0.2s cubic-bezier(0.34, 1.56, 0.64, 1), box-shadow 0.2s ease;
+                }
+
+                /* Border gradasi modern indigo ke sky/emerald */
+                .mobile-profile-box::before {
+                    content: "";
+                    position: absolute;
+                    inset: -1.5px;
+                    border-radius: 17.5px;
+                    padding: 1.5px;
+                    background: linear-gradient(135deg, rgba(79, 70, 229, 0.65), rgba(99, 102, 241, 0.25) 50%, rgba(16, 185, 129, 0.55));
+                    -webkit-mask: linear-gradient(#fff 0 0) content-box, linear-gradient(#fff 0 0);
+                    -webkit-mask-composite: xor;
+                    mask-composite: exclude;
+                    pointer-events: none;
+                }
+
+                .mobile-profile-box:active {
+                    transform: scale(0.98);
+                    box-shadow: 0 3px 10px -2px rgba(79, 70, 229, 0.22);
+                }
+
+                .mobile-profile-avatar {
+                    border: 2px solid #ffffff;
+                    box-shadow: 0 0 0 2px rgba(79, 70, 229, 0.35), 0 4px 10px rgba(79, 70, 229, 0.18);
+                    object-fit: cover;
+                }
+
+                .mobile-online-dot {
+                    position: absolute;
+                    bottom: 0;
+                    right: 0;
+                    width: 10px;
+                    height: 10px;
+                    background: #10b981;
+                    border: 2px solid #ffffff;
+                    border-radius: 50%;
+                    box-shadow: 0 0 0 2px rgba(16, 185, 129, 0.25);
+                }
+            </style>
 
             <!-- Dropdown Action Button Mobile -->
             <div class="dropdown">
@@ -1035,13 +1129,13 @@
         <!-- Mobile Hero Banner -->
         <div class="android-widget-card">
             <div class="d-flex align-items-center justify-content-between mb-2">
-                <span style="background: rgba(99, 102, 241, 0.3); border: 1px solid rgba(165, 180, 252, 0.4); color: #e0e7ff; font-size: 0.65rem; font-weight: 700; padding: 3px 10px; border-radius: 99px;">
-                    ● INNOVENTRA SUITE v3.4
+                <span style="background: rgba(255, 255, 255, 0.16); border: 1px solid rgba(224, 231, 255, 0.4); color: #ffffff; font-size: 0.65rem; font-weight: 700; padding: 3px 10px; border-radius: 99px;">
+                    ● {{ strtoupper(env('APP_NAME')) }} v3.4
                 </span>
-                <i class="fas fa-layer-group text-indigo-200 fs-5" style="color: #a5b4fc;"></i>
+                <i class="fas fa-layer-group fs-5" style="color: #c7d2fe;"></i>
             </div>
-            <h6 class="fw-bold mb-1 text-white" style="font-size: 1.05rem;">Portal Aplikasi Terpadu</h6>
-            <p class="fs--2 mb-0" style="color: #cbd5e1;">Pilih modul Rumah Sakit, Koperasi, HRIS, atau Akuntansi di bawah untuk mulai bekerja.</p>
+            <h6 class="fw-bold mb-1" style="font-size: 1.05rem; color: white;">{{ env('APP_NAME') }}</h6>
+            <p class="fs--2 mb-0" style="color: #e0e7ff;">Pilih modul Rumah Sakit, Koperasi, HRIS, atau Akuntansi di bawah untuk mulai bekerja.</p>
         </div>
 
         <!-- Mobile App Grid -->
@@ -1123,8 +1217,8 @@
                     <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
                 </div>
                 <div class="modal-body p-4 bg-white">
-                    <p class="text-slate-600 fs--1 mb-0" style="line-height: 1.6;">
-                        <strong>PT Innoventra Solusi Digital</strong> — Platform manajemen terpadu untuk pengelolaan operasional Rumah Sakit (SIMRS &amp; PACS), Koperasi Digital, Human Resource (HRIS), serta Akuntansi &amp; Keuangan.
+                    <p class="text-slate-600 fs--1 mb-0" style="line-height: 1.6; color: darkblue;">
+                        <strong>{{ env('APP_NAME') }}</strong> — Platform manajemen terpadu untuk pengelolaan operasional Rumah Sakit (SIMRS &amp; PACS), Koperasi Digital, Human Resource (HRIS), serta Akuntansi &amp; Keuangan.
                     </p>
                 </div>
             </div>
@@ -1143,7 +1237,7 @@
                         <div class="reset-icon-badge mx-auto mb-3" style="background: #eef2ff; color: #4f46e5;">
                             <i class="fas fa-envelope-open-text fs-3"></i>
                         </div>
-                        <h5 class="fw-bold text-dark mb-1">Ubah Kata Sandi</h5>
+                        <h5 class="fw-bold text-muted mb-1">Ubah Kata Sandi</h5>
                         <p class="text-muted fs--2 mb-0">Masukkan email terdaftar untuk menerima kode verifikasi OTP.</p>
                     </div>
                     <form id="form-request-otp">
