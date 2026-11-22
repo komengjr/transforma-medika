@@ -761,7 +761,7 @@
                     <!-- Kiri: Brand & Logo -->
                     <div class="d-flex align-items-center gap-3">
                         <div class="brand-logo-box">
-                            <img src="{{ asset('img/logo-pt.png') }}" alt="Logo" width="85" height="36" style="object-fit: contain;">
+                            <img src="{{ asset('img/system-panel.png') }}" alt="Logo" width="85" height="36" style="object-fit: contain;">
                         </div>
                         <div>
                             <div class="d-flex align-items-center gap-2">

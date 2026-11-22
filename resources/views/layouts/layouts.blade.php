@@ -253,7 +253,6 @@
             justify-content: center;
             flex-shrink: 0;
         }
-
     </style>
 
     @yield('base.css')
@@ -415,47 +414,47 @@
             <div class="content">
                 @php
                 $searchableMenus = collect([
-                    [
-                        'path' => 'Dashboard',
-                        'name' => 'Back to Home',
-                        'url' => route('dashboard.home'),
-                        'icon' => 'fab fa-dashcube'
-                    ]
+                [
+                'path' => 'Dashboard',
+                'name' => 'Back to Home',
+                'url' => route('dashboard.home'),
+                'icon' => 'fab fa-dashcube'
+                ]
                 ]);
 
                 foreach ($menu as $menus) {
-                    $subMenuSearch = DB::table('z_menu_user')
-                        ->join('z_menu_sub', 'z_menu_sub.menu_sub_code', '=', 'z_menu_user.menu_sub_code')
-                        ->where('z_menu_user.access_code', Auth::user()->access_code)
-                        ->where('z_menu_sub.menu_code', $menus->menu_code)
-                        ->orderBy('z_menu_sub.id_menu_sub', 'ASC')
-                        ->get();
+                $subMenuSearch = DB::table('z_menu_user')
+                ->join('z_menu_sub', 'z_menu_sub.menu_sub_code', '=', 'z_menu_user.menu_sub_code')
+                ->where('z_menu_user.access_code', Auth::user()->access_code)
+                ->where('z_menu_sub.menu_code', $menus->menu_code)
+                ->orderBy('z_menu_sub.id_menu_sub', 'ASC')
+                ->get();
 
-                    foreach ($subMenuSearch as $sub_menus) {
-                        if ($sub_menus->menu_sub_option == 'dropdown') {
-                            $mainSubs = DB::table('z_menu_sub_main')
-                                ->join('z_menu_user_sub', 'z_menu_user_sub.menu_main_sub_code', '=', 'z_menu_sub_main.menu_main_sub_code')
-                                ->where('z_menu_sub_main.menu_sub_code', $sub_menus->menu_sub_code)
-                                ->where('z_menu_user_sub.access_code', Auth::user()->access_code)
-                                ->get();
+                foreach ($subMenuSearch as $sub_menus) {
+                if ($sub_menus->menu_sub_option == 'dropdown') {
+                $mainSubs = DB::table('z_menu_sub_main')
+                ->join('z_menu_user_sub', 'z_menu_user_sub.menu_main_sub_code', '=', 'z_menu_sub_main.menu_main_sub_code')
+                ->where('z_menu_sub_main.menu_sub_code', $sub_menus->menu_sub_code)
+                ->where('z_menu_user_sub.access_code', Auth::user()->access_code)
+                ->get();
 
-                            foreach ($mainSubs as $item) {
-                                $searchableMenus->push([
-                                    'path' => $menus->menu_name . ' • ' . $sub_menus->menu_sub_name,
-                                    'name' => $item->menu_main_sub_name,
-                                    'url' => url($item->menu_main_sub_code . '/' . $item->menu_main_sub_link),
-                                    'icon' => $item->menu_main_sub_icon ?: $sub_menus->menu_sub_icon
-                                ]);
-                            }
-                        } else {
-                            $searchableMenus->push([
-                                'path' => $menus->menu_name,
-                                'name' => $sub_menus->menu_sub_name,
-                                'url' => url($sub_menus->menu_sub_code . '/' . $sub_menus->menu_sub_link),
-                                'icon' => $sub_menus->menu_sub_icon
-                            ]);
-                        }
-                    }
+                foreach ($mainSubs as $item) {
+                $searchableMenus->push([
+                'path' => $menus->menu_name . ' • ' . $sub_menus->menu_sub_name,
+                'name' => $item->menu_main_sub_name,
+                'url' => url($item->menu_main_sub_code . '/' . $item->menu_main_sub_link),
+                'icon' => $item->menu_main_sub_icon ?: $sub_menus->menu_sub_icon
+                ]);
+                }
+                } else {
+                $searchableMenus->push([
+                'path' => $menus->menu_name,
+                'name' => $sub_menus->menu_sub_name,
+                'url' => url($sub_menus->menu_sub_code . '/' . $sub_menus->menu_sub_link),
+                'icon' => $sub_menus->menu_sub_icon
+                ]);
+                }
+                }
                 }
                 @endphp
 
@@ -568,32 +567,272 @@
                                     </div>
                                 </div>
                             </li>
-                            <li class="nav-item dropdown">
-                                <a class="nav-link pe-0" id="navbarDropdownUser" href="#" role="button" data-bs-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
-                                    <div class="avatar avatar-xl">
-                                        <img class="rounded-circle" src="{{ asset('img/pp.png') }}" alt="" />
+                            <li class="nav-item dropdown ms-3">
+                                <a class="nav-link p-0 position-relative d-inline-flex align-items-center gap-2 ent-navbar-profile-box" id="navbarDropdownUser" href="#" role="button" data-bs-toggle="dropdown" aria-haspopup="true" aria-expanded="false" style="outline: none;">
+                                    <!-- Avatar Wrapper dengan Ring Animasi Glowing & Status Indicator -->
+                                    <div class="avatar-wrapper position-relative flex-shrink-0">
+                                        <div class="avatar avatar-xl position-relative d-flex align-items-center justify-content-center" style="width: 40px; height: 40px;">
+                                            <!-- Glowing Ripple Ring Animasi -->
+                                            <span class="avatar-pulse-ring position-absolute rounded-circle"></span>
+                                            <img class="rounded-circle border border-2 border-primary position-relative" src="{{ asset('img/pp.png') }}" alt="User Profile" style="width: 36px; height: 36px; object-fit: cover; z-index: 2; transition: transform 0.3s cubic-bezier(0.34, 1.56, 0.64, 1);" />
+                                        </div>
+                                        <!-- Indicator Online Dot dengan Animasi Pulse -->
+                                        <span class="position-absolute bottom-0 end-0 bg-success border border-2 border-white dark__border-1000 rounded-circle" style="width: 11px; height: 11px; z-index: 3;">
+                                            <span class="position-absolute top-0 start-0 w-100 h-100 bg-success rounded-circle animate-ping opacity-75" style="animation: ping 1.8s cubic-bezier(0, 0, 0.2, 1) infinite;"></span>
+                                        </span>
+                                    </div>
+
+                                    <!-- Nama & Role di Sebelah Avatar (Memanjang Sesuai Panjang Nama) -->
+                                    <div class="d-none d-md-block text-start pe-1">
+                                        <div class="fw-bold text-dark dark__text-white lh-1 text-nowrap" style="font-size: 0.78rem;">{{ Auth::user()->fullname }}</div>
+                                        <span class="text-muted text-uppercase d-block mt-1" style="font-size: 0.62rem; font-weight: 700; letter-spacing: 0.03em; line-height: 1;">{{ Auth::user()->access_code }}</span>
                                     </div>
                                 </a>
-                                <div class="dropdown-menu dropdown-menu-end py-0" aria-labelledby="navbarDropdownUser">
-                                    <div class="bg-white dark__bg-1000 rounded-2 py-2">
-                                        <a class="dropdown-item text-primary text-center">{{ Auth::user()->fullname }}</a>
-                                        <div class="dropdown-divider"></div>
-                                        <a class="dropdown-item" href="#!" id="button-setup-notification" data-bs-toggle="modal" data-bs-target="#modal-template-sm">
-                                            <span class="fas fa-cogs me-1 text-warning"></span> Set Notification
-                                        </a>
-                                        <a class="dropdown-item" href="#" id="button-setup-profil" data-bs-toggle="modal" data-bs-target="#modal-template-xl">
-                                            <span class="fas fa-user-cog me-1 text-info"></span> Profile & account
-                                        </a>
-                                        @if (Auth::user()->access_code == 'master')
-                                        <a class="dropdown-item" href="{{route('master_dashboard')}}">
-                                            <span class="fas fa-th-large me-2 text-danger"></span> Master Page
-                                        </a>
-                                        @endif
-                                        <div class="dropdown-divider"></div>
-                                        <a class="dropdown-item" href="{{ route('logout') }}"><span class="fab fa-keycdn"></span> Logout</a>
+
+                                <!-- Dropdown Menu dengan Efek Glassmorphism & Enterprise Styling -->
+                                <div class="dropdown-menu dropdown-menu-end py-0 shadow-lg border border-1 border-light-subtle rounded-3 overflow-hidden ent-dropdown-anim" aria-labelledby="navbarDropdownUser" style="min-width: 260px; max-width: 420px; z-index: 1050; border-color: rgba(99, 102, 241, 0.2) !important;">
+                                    <div class="bg-white dark__bg-1000">
+                                        <!-- Header Profil -->
+                                        <div class="p-3 text-center border-bottom border-light-subtle position-relative overflow-hidden" style="background: linear-gradient(135deg, rgba(79, 70, 229, 0.08) 0%, rgba(67, 56, 202, 0.03) 100%);">
+                                            <div class="position-absolute top-0 start-0 w-100 h-100 opacity-25" style="background-image: radial-gradient(circle at 80% 20%, rgba(79, 70, 229, 0.15) 0%, transparent 50%); z-index: 1;"></div>
+
+                                            <div class="position-relative" style="z-index: 2;">
+                                                <div class="avatar avatar-2xl mx-auto mb-2" style="width: 50px; height: 50px;">
+                                                    <img class="rounded-circle border border-2 border-primary shadow-sm" src="{{ asset('img/pp.png') }}" alt="" style="width: 50px; height: 50px; object-fit: cover;" />
+                                                </div>
+                                                <h6 class="fw-extrabold text-dark dark__text-white mb-0" style="font-size: 0.88rem; letter-spacing: -0.01em;">{{ Auth::user()->fullname }}</h6>
+                                                <span class="badge bg-primary-subtle text-primary border border-primary-subtle rounded-pill px-2 py-1 mt-1 text-uppercase fw-bold" style="font-size: 0.62rem; letter-spacing: 0.04em;">
+                                                    <i class="fas fa-shield-alt me-1 text-primary"></i> {{ Auth::user()->access_code }}
+                                                </span>
+                                            </div>
+                                        </div>
+
+                                        <!-- Item Menu dengan Animasi Hover & Micro-Animations -->
+                                        <div class="p-2 d-flex flex-column gap-1">
+                                            <a class="dropdown-item rounded-2 py-2 px-3 d-flex align-items-center justify-content-between ent-menu-item" href="#!" id="button-setup-notification" data-bs-toggle="modal" data-bs-target="#modal-template-sm">
+                                                <span class="d-flex align-items-center gap-2">
+                                                    <span class="icon-box bg-warning-subtle text-warning d-flex align-items-center justify-content-center rounded-2" style="width: 28px; height: 28px;">
+                                                        <i class="fas fa-bell anim-shake" style="font-size: 0.82rem;"></i>
+                                                    </span>
+                                                    <span class="fw-semibold text-dark dark__text-light" style="font-size: 0.78rem;">Set Notification</span>
+                                                </span>
+                                                <i class="fas fa-chevron-right text-muted opacity-50" style="font-size: 0.65rem;"></i>
+                                            </a>
+
+                                            <a class="dropdown-item rounded-2 py-2 px-3 d-flex align-items-center justify-content-between ent-menu-item" href="#" id="button-setup-profil" data-bs-toggle="modal" data-bs-target="#modal-template-xl">
+                                                <span class="d-flex align-items-center gap-2">
+                                                    <span class="icon-box bg-info-subtle text-info d-flex align-items-center justify-content-center rounded-2" style="width: 28px; height: 28px;">
+                                                        <i class="fas fa-user-cog anim-spin-hover" style="font-size: 0.82rem;"></i>
+                                                    </span>
+                                                    <span class="fw-semibold text-dark dark__text-light" style="font-size: 0.78rem;">Profile &amp; Account</span>
+                                                </span>
+                                                <i class="fas fa-chevron-right text-muted opacity-50" style="font-size: 0.65rem;"></i>
+                                            </a>
+
+                                            @if (Auth::user()->access_code == 'master')
+                                            <a class="dropdown-item rounded-2 py-2 px-3 d-flex align-items-center justify-content-between ent-menu-item" href="{{ route('master_dashboard') }}">
+                                                <span class="d-flex align-items-center gap-2">
+                                                    <span class="icon-box bg-danger-subtle text-danger d-flex align-items-center justify-content-center rounded-2" style="width: 28px; height: 28px;">
+                                                        <i class="fas fa-th-large anim-pulse-slow" style="font-size: 0.82rem;"></i>
+                                                    </span>
+                                                    <span class="fw-semibold text-dark dark__text-light" style="font-size: 0.78rem;">Master Page</span>
+                                                </span>
+                                                <span class="badge bg-danger text-white rounded-pill" style="font-size: 0.58rem; font-weight: 800;">ROOT</span>
+                                            </a>
+                                            @endif
+
+                                            <div class="dropdown-divider my-1 border-light-subtle"></div>
+
+                                            <a class="dropdown-item rounded-2 py-2 px-3 d-flex align-items-center justify-content-between ent-menu-item text-danger" href="{{ route('logout') }}">
+                                                <span class="d-flex align-items-center gap-2">
+                                                    <span class="icon-box bg-danger-subtle text-danger d-flex align-items-center justify-content-center rounded-2" style="width: 28px; height: 28px;">
+                                                        <i class="fas fa-sign-out-alt anim-slide-right" style="font-size: 0.82rem;"></i>
+                                                    </span>
+                                                    <span class="fw-bold" style="font-size: 0.78rem;">Logout</span>
+                                                </span>
+                                                <span class="small opacity-50 font-monospace" style="font-size: 0.62rem;"><i class="fas fa-power-off"></i></span>
+                                            </a>
+                                        </div>
                                     </div>
                                 </div>
                             </li>
+
+                            <style>
+                                /* Kotak Border Tombol Profil di Navbar (Memanjang Horizontal Sesuai Nama) */
+                                .ent-navbar-profile-box {
+                                    padding: 4px 10px 4px 5px !important;
+                                    border: 1.5px solid rgba(79, 70, 229, 0.35);
+                                    border-radius: 12px;
+                                    background-color: rgba(79, 70, 229, 0.04);
+                                    width: fit-content;
+                                    transition: all 0.2s ease;
+                                }
+
+                                .ent-navbar-profile-box::after {
+                                    display: none !important;
+                                }
+
+                                .ent-navbar-profile-box:hover,
+                                .dropdown.show .ent-navbar-profile-box {
+                                    border-color: rgba(79, 70, 229, 0.75);
+                                    background-color: rgba(79, 70, 229, 0.09);
+                                    box-shadow: 0 4px 12px rgba(79, 70, 229, 0.14);
+                                }
+
+                                [data-bs-theme="dark"] .ent-navbar-profile-box,
+                                .dark .ent-navbar-profile-box {
+                                    background-color: rgba(99, 102, 241, 0.08);
+                                    border-color: rgba(129, 140, 248, 0.4);
+                                }
+
+                                /* CSS Styles khusus untuk Micro-Animations & Dropdown */
+                                .avatar-pulse-ring {
+                                    top: -1px;
+                                    left: -1px;
+                                    right: -1px;
+                                    bottom: -1px;
+                                    border: 2px solid rgba(79, 70, 229, 0.4);
+                                    animation: avatarPulse 2.2s cubic-bezier(0.24, 0, 0.38, 1) infinite;
+                                }
+
+                                @keyframes avatarPulse {
+                                    0% {
+                                        transform: scale(0.96);
+                                        opacity: 0.8;
+                                    }
+
+                                    50% {
+                                        transform: scale(1.06);
+                                        opacity: 0.2;
+                                    }
+
+                                    100% {
+                                        transform: scale(0.96);
+                                        opacity: 0.8;
+                                    }
+                                }
+
+                                @keyframes ping {
+
+                                    75%,
+                                    100% {
+                                        transform: scale(2.2);
+                                        opacity: 0;
+                                    }
+                                }
+
+                                /* Animasi dropdown meluncur halus */
+                                .ent-dropdown-anim {
+                                    display: block !important;
+                                    visibility: hidden;
+                                    opacity: 0;
+                                    transform: translateY(12px) scale(0.96);
+                                    transition: all 0.22s cubic-bezier(0.34, 1.56, 0.64, 1);
+                                    transform-origin: top right;
+                                }
+
+                                .dropdown:hover .ent-dropdown-anim,
+                                .dropdown.show .ent-dropdown-anim {
+                                    visibility: visible;
+                                    opacity: 1;
+                                    transform: translateY(4px) scale(1);
+                                }
+
+                                /* Hover effect item menu */
+                                .ent-menu-item {
+                                    transition: all 0.2s ease;
+                                }
+
+                                .ent-menu-item:hover {
+                                    background-color: rgba(79, 70, 229, 0.06) !important;
+                                    transform: translateX(2px);
+                                }
+
+                                .ent-menu-item.text-danger:hover {
+                                    background-color: rgba(225, 29, 72, 0.08) !important;
+                                }
+
+                                /* Micro-Animations on Icons */
+                                .ent-menu-item:hover .anim-shake {
+                                    animation: bellShake 0.65s ease-in-out;
+                                }
+
+                                @keyframes bellShake {
+
+                                    0%,
+                                    100% {
+                                        transform: rotate(0);
+                                    }
+
+                                    15% {
+                                        transform: rotate(15deg);
+                                    }
+
+                                    30% {
+                                        transform: rotate(-12deg);
+                                    }
+
+                                    45% {
+                                        transform: rotate(10deg);
+                                    }
+
+                                    60% {
+                                        transform: rotate(-8deg);
+                                    }
+
+                                    75% {
+                                        transform: rotate(4deg);
+                                    }
+                                }
+
+                                .ent-menu-item:hover .anim-spin-hover {
+                                    animation: gearSpin 0.9s linear;
+                                }
+
+                                @keyframes gearSpin {
+                                    0% {
+                                        transform: rotate(0);
+                                    }
+
+                                    100% {
+                                        transform: rotate(180deg);
+                                    }
+                                }
+
+                                .anim-pulse-slow {
+                                    animation: iconPulse 2s infinite ease-in-out;
+                                }
+
+                                @keyframes iconPulse {
+
+                                    0%,
+                                    100% {
+                                        transform: scale(1);
+                                        opacity: 1;
+                                    }
+
+                                    50% {
+                                        transform: scale(1.12);
+                                        opacity: 0.85;
+                                    }
+                                }
+
+                                .ent-menu-item:hover .anim-slide-right {
+                                    animation: slideRight 0.5s ease;
+                                }
+
+                                @keyframes slideRight {
+
+                                    0%,
+                                    100% {
+                                        transform: translateX(0);
+                                    }
+
+                                    50% {
+                                        transform: translateX(3px);
+                                    }
+                                }
+                            </style>
                         </ul>
                     </div>
                 </nav>
@@ -707,7 +946,7 @@
                             </p>
                         </div>
                         <div class="col-12 col-sm-auto text-center">
-                            <img src="{{ asset('img/logo-pt.png') }}" alt="" width="90">
+                            <img src="{{ asset('img/system-panel.png') }}" alt="" width="90">
                         </div>
                     </div>
                 </footer>
