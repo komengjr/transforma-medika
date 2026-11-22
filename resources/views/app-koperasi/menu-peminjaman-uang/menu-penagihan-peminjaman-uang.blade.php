@@ -1,16 +1,325 @@
 @extends('layouts.layouts')
 
+@section('base.css')
+<!-- Select2 CSS & Theme -->
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/select2@4.1.0-rc.0/dist/css/select2.min.css" />
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/select2-bootstrap-5-theme@1.3.0/dist/select2-bootstrap-5-theme.min.css" />
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
+<link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&family=JetBrains+Mono:wght@500;700&display=swap" rel="stylesheet">
+
+<style>
+    /* =========================================
+       MODERN ENTERPRISE UI STYLES (PENAGIHAN PINJAMAN)
+       (ADAPTIVE LIGHT & DARK MODE BOOTSTRAP 5)
+       ========================================= */
+    :root {
+        --ent-indigo: #4f46e5;
+        --ent-indigo-dark: #4338ca;
+        --ent-indigo-soft: rgba(79, 70, 229, 0.12);
+        --ent-grid-border: rgba(99, 102, 241, 0.28);
+        --ent-emerald: #059669;
+        --ent-sky: #0284c7;
+        --ent-amber: #d97706;
+        --ent-rose: #e11d48;
+        --ent-surface: #ffffff;
+    }
+
+    [data-bs-theme="dark"],
+    .dark {
+        --ent-surface: #0f172a;
+    }
+
+    body {
+        font-family: 'Plus Jakarta Sans', sans-serif;
+    }
+
+    /* Adaptive Enterprise Card */
+    .ent-card {
+        border: 1px solid var(--ent-grid-border);
+        border-radius: 16px;
+        box-shadow: 0 4px 20px -2px rgba(15, 23, 42, 0.08);
+        overflow: hidden;
+    }
+
+    .ent-card>.card-header {
+        border-bottom: 1px solid var(--ent-grid-border) !important;
+    }
+
+    .ent-table-surface {
+        background-color: var(--bs-body-bg, var(--ent-surface));
+    }
+
+    /* Hero Banner */
+    .ent-header-banner {
+        background: linear-gradient(135deg, #0f172a 0%, #1e1b4b 55%, #312e81 100%);
+        border: 1px solid rgba(99, 102, 241, 0.35);
+        border-radius: 16px;
+        box-shadow: 0 12px 28px -6px rgba(15, 23, 42, 0.22);
+        color: #ffffff;
+        position: relative;
+        overflow: hidden;
+    }
+
+    .ent-glass-pill {
+        background: rgba(255, 255, 255, 0.09);
+        backdrop-filter: blur(8px);
+        border: 1px solid rgba(255, 255, 255, 0.16);
+        border-radius: 12px;
+        color: #ffffff;
+    }
+
+    /* Modern Buttons */
+    .ent-btn {
+        font-weight: 600 !important;
+        border-radius: 10px;
+        transition: all 0.18s ease;
+        letter-spacing: 0.01em;
+        cursor: pointer;
+        font-size: 0.82rem;
+    }
+
+    .ent-btn:hover:not(:disabled) {
+        transform: translateY(-1px);
+    }
+
+    .ent-btn-success {
+        background: linear-gradient(135deg, #059669 0%, #047857 100%);
+        border: none;
+        color: #ffffff;
+        box-shadow: 0 4px 12px rgba(5, 150, 105, 0.25);
+    }
+
+    .ent-btn-success:hover:not(:disabled) {
+        box-shadow: 0 6px 16px rgba(5, 150, 105, 0.35);
+        color: #ffffff;
+    }
+
+    .ent-btn-secondary {
+        background-color: rgba(100, 116, 139, 0.14);
+        border: 1px solid var(--ent-grid-border);
+        color: var(--bs-body-color);
+    }
+
+    .ent-btn-secondary:hover {
+        background-color: rgba(79, 70, 229, 0.12);
+        border-color: var(--ent-indigo);
+        color: var(--bs-body-color);
+    }
+
+    /* Form & Select2 Adaptive */
+    .ent-label {
+        font-size: 0.7rem;
+        font-weight: 700;
+        text-transform: uppercase;
+        letter-spacing: 0.03em;
+        color: var(--bs-secondary-color, #64748b);
+        margin-bottom: 6px;
+    }
+
+    .form-control {
+        border: 1px solid var(--ent-grid-border) !important;
+        border-radius: 10px !important;
+        font-weight: 600 !important;
+        color: var(--bs-body-color) !important;
+        background-color: var(--bs-body-bg) !important;
+        font-size: 0.82rem !important;
+        min-height: 38px;
+        transition: all 0.2s ease;
+    }
+
+    .ent-form .form-select {
+        border: 1px solid var(--ent-grid-border) !important;
+        border-radius: 10px !important;
+        font-weight: 600 !important;
+        color: var(--bs-body-color) !important;
+        background-color: var(--bs-body-bg) !important;
+        font-size: 0.82rem !important;
+        min-height: 40px;
+        transition: all 0.2s ease;
+    }
+
+    .ent-form .form-select:focus {
+        border-color: var(--ent-indigo) !important;
+        box-shadow: 0 0 0 3.5px rgba(79, 70, 229, 0.15) !important;
+        outline: none;
+    }
+
+    .select2-container--bootstrap-5 .select2-selection {
+        border: 1px solid var(--ent-grid-border) !important;
+        border-radius: 10px !important;
+        font-weight: 600 !important;
+        color: var(--bs-body-color) !important;
+        background-color: var(--bs-body-bg) !important;
+        font-size: 0.82rem !important;
+        min-height: 40px !important;
+        display: flex;
+        align-items: center;
+    }
+
+    .select2-container--bootstrap-5.select2-container--focus .select2-selection,
+    .select2-container--bootstrap-5.select2-container--open .select2-selection {
+        border-color: var(--ent-indigo) !important;
+        box-shadow: 0 0 0 3.5px rgba(79, 70, 229, 0.15) !important;
+    }
+
+    /* Soft Badges */
+    .ent-badge {
+        border-radius: 9999px;
+        padding: 4px 10px;
+        font-weight: 700;
+        text-transform: uppercase;
+        display: inline-flex;
+        align-items: center;
+        font-size: 0.68rem;
+        letter-spacing: 0.03em;
+    }
+
+    .badge-lunas {
+        background-color: rgba(16, 185, 129, 0.15) !important;
+        color: #10b981 !important;
+        border: 1px solid rgba(16, 185, 129, 0.35);
+    }
+
+    .badge-belum {
+        background-color: rgba(245, 158, 11, 0.16) !important;
+        color: #d97706 !important;
+        border: 1px solid rgba(245, 158, 11, 0.38);
+    }
+
+    /* Nota Highlight Pill */
+    .ent-nota-box {
+        background: linear-gradient(135deg, rgba(79, 70, 229, 0.08), rgba(5, 150, 105, 0.08));
+        border: 1px solid var(--ent-grid-border);
+        border-radius: 12px;
+        padding: 12px;
+        text-align: center;
+    }
+
+    /* Summary Box */
+    .ent-summary-box {
+        background-color: rgba(79, 70, 229, 0.05);
+        border: 1px solid var(--ent-grid-border);
+        border-radius: 12px;
+        padding: 14px;
+    }
+
+    /* =========================================================
+       TABLE WITH COLORED GRID BORDERS
+       ========================================================= */
+    .table-custom {
+        width: 100% !important;
+        border-collapse: collapse !important;
+        margin-bottom: 0 !important;
+    }
+
+    .table-custom thead th {
+        background-color: rgba(79, 70, 229, 0.12) !important;
+        color: var(--bs-body-color) !important;
+        font-size: 0.72rem;
+        font-weight: 700;
+        text-transform: uppercase;
+        border: 1px solid var(--ent-grid-border) !important;
+        border-bottom: 2px solid rgba(79, 70, 229, 0.45) !important;
+        padding: 13px 12px;
+        letter-spacing: 0.04em;
+    }
+
+    .table-custom thead th:first-child {
+        border-left: none !important;
+    }
+
+    .table-custom thead th:last-child {
+        border-right: none !important;
+        padding-right: 16px !important;
+    }
+
+    .table-custom tbody tr {
+        transition: background-color 0.15s ease;
+    }
+
+    .table-custom tbody tr:hover td {
+        background-color: rgba(79, 70, 229, 0.07) !important;
+    }
+
+    .table-custom tbody tr.row-lunas td {
+        background-color: rgba(16, 185, 129, 0.06) !important;
+    }
+
+    .table-custom td {
+        border: 1px solid var(--ent-grid-border) !important;
+        font-weight: 500;
+        color: var(--bs-body-color) !important;
+        padding: 11px 12px;
+        vertical-align: middle;
+        font-size: 0.82rem;
+    }
+
+    .table-custom tbody td:first-child {
+        border-left: none !important;
+    }
+
+    .table-custom tbody td:last-child {
+        border-right: none !important;
+        padding-right: 16px !important;
+    }
+
+    .ent-card-body-flush {
+        padding: 0 !important;
+        margin: 0 !important;
+    }
+
+    /* Custom Checkbox */
+    .ent-checkbox {
+        width: 1.15em;
+        height: 1.15em;
+        border: 1.5px solid rgba(99, 102, 241, 0.55) !important;
+        border-radius: 5px;
+        cursor: pointer;
+    }
+
+    .ent-checkbox:checked {
+        background-color: var(--ent-indigo) !important;
+        border-color: var(--ent-indigo) !important;
+    }
+
+    /* Empty Placeholder Icon */
+    .ent-empty-icon {
+        width: 72px;
+        height: 72px;
+        border-radius: 18px;
+        background: rgba(79, 70, 229, 0.1);
+        border: 1px solid var(--ent-grid-border);
+        color: var(--ent-indigo);
+        display: inline-flex;
+        align-items: center;
+        justify-content: center;
+    }
+</style>
+@endsection
+
 @section('content')
+<!-- HERO BANNER HEADER -->
 <div class="row mb-3">
-    <div class="col">
-        <div class="d-flex align-items-center justify-content-between bg-white p-3 rounded shadow-sm border-start border-success border-4">
-            <div class="d-flex align-items-center">
-                <div class="bg-success text-white p-3 rounded-3 me-3 shadow-sm">
-                    <i class="fas fa-hand-holding-usd fa-2x"></i>
-                </div>
-                <div>
-                    <h4 class="mb-1 fw-bold text-dark">Penagihan & Pelunasan Cicilan Peminjaman Uang</h4>
-                    <p class="text-muted mb-0">Penerimaan setoran angsuran pinjaman tunai dari peserta koperasi (Multi-Pembayaran)</p>
+    <div class="col-12">
+        <div class="card ent-header-banner p-1">
+            <div class="card-body p-3 p-md-4 text-white position-relative" style="z-index: 2;">
+                <div class="row align-items-center gy-3">
+                    <div class="col-lg-8 d-flex align-items-center">
+                        <div class="ent-glass-pill me-3 d-flex align-items-center justify-content-center flex-shrink-0"
+                            style="width: 60px; height: 60px;">
+                            <i class="fas fa-hand-holding-usd fa-2x text-info"></i>
+                        </div>
+                        <div>
+                            <div class="d-flex align-items-center gap-2 mb-1">
+                                <span class="ent-badge" style="background: rgba(56, 189, 248, 0.2); border: 1px solid rgba(56, 189, 248, 0.4); color: #7dd3fc;">
+                                    <i class="fas fa-receipt me-1"></i> {{ env('APP_LABEL', 'KOPERASI') }} INSTALLMENT
+                                </span>
+                                <span style="color: #94a3b8; font-size: 0.75rem; font-weight: 600;">Penagihan &amp; Pelunasan Cicilan</span>
+                            </div>
+                            <h4 class="mb-0 fw-bold text-white" style="letter-spacing: -0.02em;">Penagihan &amp; Pelunasan Cicilan Peminjaman Uang</h4>
+                            <p class="mb-0 small" style="color: #cbd5e1;">Penerimaan setoran angsuran pinjaman tunai dari peserta koperasi (Multi-Pembayaran).</p>
+                        </div>
+                    </div>
                 </div>
             </div>
         </div>
@@ -20,10 +329,12 @@
 <div class="row g-3">
     <!-- DROP DOWN FILTER NOTA PINJAMAN -->
     <div class="col-12">
-        <div class="card border border-success shadow-sm bg-light p-3">
+        <div class="ent-card ent-table-surface p-3 p-md-4 ent-form">
             <div class="row g-3 align-items-end">
                 <div class="col-md-9">
-                    <label class="form-label fw-bold text-secondary">Pilih Kontrak Nota Pinjaman Anggota Aktif</label>
+                    <label class="form-label ent-label">
+                        <i class="fas fa-search text-primary me-1"></i> Pilih Kontrak Nota Pinjaman Anggota Aktif
+                    </label>
                     <select class="form-select select2-nota" name="peminjaman_id" id="filter_peminjaman_id" data-placeholder="-- Pilih Nota Pinjaman / Nama Anggota --">
                         <option value=""></option>
                         @foreach($listNota as $n)
@@ -32,7 +343,7 @@
                     </select>
                 </div>
                 <div class="col-md-3 d-grid">
-                    <button type="button" class="btn btn-secondary fw-bold py-2" id="btn-reset-filter">
+                    <button type="button" class="btn ent-btn ent-btn-secondary py-2" id="btn-reset-filter" style="min-height: 40px;">
                         <i class="fas fa-undo me-1"></i> Reset Pencarian
                     </button>
                 </div>
@@ -44,58 +355,65 @@
     <div class="col-12 d-none" id="section-detail-penagihan">
         <div class="row g-3">
             <!-- PANEL RESUME KONTRAK & RINGKASAN PEMBAYARAN MULTI -->
-            <div class="col-md-4">
-                <div class="card border-0 shadow-sm mb-3">
-                    <div class="card-header bg-dark text-white fw-bold py-3">
-                        <i class="fas fa-file-contract me-2"></i>Detail Kontrak Pinjaman
+            <div class="col-lg-4">
+                <!-- Detail Kontrak Pinjaman -->
+                <div class="ent-card ent-table-surface mb-3">
+                    <div class="card-header py-3 px-4">
+                        <h6 class="card-title mb-0 fw-bold">
+                            <i class="fas fa-file-contract text-primary me-2"></i>Detail Kontrak Pinjaman
+                        </h6>
                     </div>
-                    <div class="card-body px-0">
-                        <div class="mb-3 text-center border-bottom pb-2">
-                            <small class="text-muted d-block font-monospace">NOMOR NOTA</small>
-                            <span class="fs-2 fw-bold text-success font-monospace" id="res-nota">-</span>
+                    <div class="card-body p-4">
+                        <div class="ent-nota-box mb-3">
+                            <small class="ent-label d-block mb-1">Nomor Nota</small>
+                            <span class="fs-2 fw-bold text-success" id="res-nota" style="font-family: 'JetBrains Mono', monospace;">-</span>
                         </div>
-                        <table class="table table-sm table-borderless mb-0">
+
+                        <table class="table table-sm table-borderless mb-0 small">
                             <tr>
-                                <td width="42%" class="text-muted">Nama Peserta</td>
-                                <td width="3%">:</td>
-                                <td class="fw-bold" id="res-nama">-</td>
+                                <td width="42%" class="opacity-75">Nama Peserta</td>
+                                <td width="4%" class="opacity-75">:</td>
+                                <td class="fw-bold text-uppercase" id="res-nama">-</td>
                             </tr>
                             <tr>
-                                <td class="text-muted">Kode Peserta</td>
-                                <td>:</td>
-                                <td class="font-monospace" id="res-kode">-</td>
+                                <td class="opacity-75">Kode Peserta</td>
+                                <td class="opacity-75">:</td>
+                                <td id="res-kode" style="font-family: 'JetBrains Mono', monospace;">-</td>
                             </tr>
                             <tr>
-                                <td class="text-muted">Plafon Pinjaman</td>
-                                <td>:</td>
-                                <td class="font-monospace fw-bold text-primary" id="res-plafon">-</td>
+                                <td class="opacity-75">Plafon Pinjaman</td>
+                                <td class="opacity-75">:</td>
+                                <td class="fw-bold text-primary" id="res-plafon" style="font-family: 'JetBrains Mono', monospace;">-</td>
                             </tr>
                             <tr>
-                                <td class="text-muted">Jasa / Bunga</td>
-                                <td>:</td>
-                                <td class="font-monospace text-warning fw-bold" id="res-bunga">-</td>
+                                <td class="opacity-75">Jasa / Bunga</td>
+                                <td class="opacity-75">:</td>
+                                <td class="fw-bold" style="color: var(--ent-amber); font-family: 'JetBrains Mono', monospace;" id="res-bunga">-</td>
                             </tr>
-                            <tr class="border-top">
-                                <td class="text-muted fw-bold">Total Piutang</td>
-                                <td>:</td>
-                                <td class="font-monospace text-success fw-bold fs-2" id="res-total">-</td>
+                            <tr style="border-top: 1px solid var(--ent-grid-border);">
+                                <td class="opacity-75 fw-bold pt-2">Total Piutang</td>
+                                <td class="opacity-75 pt-2">:</td>
+                                <td class="text-success fw-bold pt-2" id="res-total" style="font-family: 'JetBrains Mono', monospace; font-size: 0.95rem;">-</td>
                             </tr>
                             <tr>
-                                <td class="text-muted">Cicilan / Bln</td>
-                                <td>:</td>
-                                <td class="font-monospace text-dark fw-bold fs-2" id="res-cicilan">-</td>
+                                <td class="opacity-75">Cicilan / Bln</td>
+                                <td class="opacity-75">:</td>
+                                <td class="fw-bold" id="res-cicilan" style="font-family: 'JetBrains Mono', monospace; font-size: 0.92rem;">-</td>
                             </tr>
                         </table>
                     </div>
                 </div>
 
-                <div class="card border-0 shadow-sm">
-                    <div class="card-header bg-white py-3 border-bottom fw-bold">
-                        <i class="fas fa-calculator text-success me-2"></i>Ringkasan & Pembayaran
+                <!-- Ringkasan & Pembayaran -->
+                <div class="ent-card ent-table-surface ent-form">
+                    <div class="card-header py-3 px-4">
+                        <h6 class="card-title mb-0 fw-bold">
+                            <i class="fas fa-calculator text-success me-2"></i>Ringkasan &amp; Pembayaran
+                        </h6>
                     </div>
-                    <div class="card-body">
+                    <div class="card-body p-4">
                         <div class="mb-3">
-                            <label class="form-label fw-bold text-secondary">Simpan Uang Masuk Ke <span class="text-danger">*</span></label>
+                            <label class="form-label ent-label">Simpan Uang Masuk Ke <span class="text-danger">*</span></label>
                             <select class="form-select" id="sumber_dana_coa_pembayaran">
                                 <option value="">-- Pilih Akun Kas / Bank --</option>
                                 @foreach($bankCoa as $coa)
@@ -104,31 +422,31 @@
                             </select>
                         </div>
 
-                        <div class="bg-light p-3 rounded mb-3 border">
+                        <div class="ent-summary-box mb-3 small">
                             <div class="d-flex justify-content-between mb-2">
-                                <span class="text-muted">Bulan Dipilih:</span>
-                                <span class="fw-bold font-monospace text-dark" id="label-total-bulan">0 Bulan</span>
+                                <span class="opacity-75">Bulan Dipilih:</span>
+                                <span class="fw-bold" id="label-total-bulan" style="font-family: 'JetBrains Mono', monospace;">0 Bulan</span>
                             </div>
                             <div class="d-flex justify-content-between mb-1">
-                                <span class="text-muted">Total Pokok:</span>
-                                <span class="fw-bold font-monospace text-secondary" id="label-total-pokok">Rp 0</span>
+                                <span class="opacity-75">Total Pokok:</span>
+                                <span class="fw-bold opacity-75" id="label-total-pokok" style="font-family: 'JetBrains Mono', monospace;">Rp 0</span>
                             </div>
                             <div class="d-flex justify-content-between mb-1">
-                                <span class="text-muted">Total Bunga:</span>
-                                <span class="fw-bold font-monospace text-warning" id="label-total-bunga">Rp 0</span>
+                                <span class="opacity-75">Total Bunga:</span>
+                                <span class="fw-bold" style="color: var(--ent-amber); font-family: 'JetBrains Mono', monospace;" id="label-total-bunga">Rp 0</span>
                             </div>
-                            <div class="d-flex justify-content-between mb-1 small text-muted fst-italic d-none" id="info-penambahan-bunga">
-                                <span colspan="2">* Kalkulasi bunga 10% x jumlah bulan</span>
+                            <div class="d-flex justify-content-between mb-1 extra-small opacity-75 fst-italic d-none" id="info-penambahan-bunga">
+                                <span>* Kalkulasi bunga 10% x jumlah bulan</span>
                             </div>
-                            <hr class="my-2">
+                            <hr class="my-2" style="border-color: var(--ent-grid-border);">
                             <div class="d-flex justify-content-between align-items-center">
-                                <span class="text-muted fw-bold">Total Tagihan:</span>
-                                <span class="fs-2 fw-bold text-success font-monospace" id="label-total-nominal">Rp 0</span>
+                                <span class="opacity-75 fw-bold">Total Tagihan:</span>
+                                <span class="fs-3 fw-bold text-success" id="label-total-nominal" style="font-family: 'JetBrains Mono', monospace;">Rp 0</span>
                             </div>
                         </div>
 
                         <div class="d-grid">
-                            <button type="button" class="btn btn-success fw-bold py-2 shadow-sm" id="btn-proses-multi-bayar" disabled>
+                            <button type="button" class="btn ent-btn ent-btn-success py-2" id="btn-proses-multi-bayar" disabled>
                                 <i class="fas fa-check-double me-1"></i> Proses Pembayaran Multi
                             </button>
                         </div>
@@ -137,27 +455,32 @@
             </div>
 
             <!-- PANEL TABEL TENOR JADWAL -->
-            <div class="col-md-8">
-                <div class="card border-0 shadow-sm h-100">
-                    <div class="card-header bg-white fw-bold py-3 border-bottom d-flex align-items-center justify-content-between">
-                        <span><i class="fas fa-list-ol text-warning me-2"></i>Daftar Angsuran Pinjaman</span>
-                        <div class="form-check">
-                            <input class="form-check-input" type="checkbox" id="select-all-checkbox">
-                            <label class="form-check-label fw-semibold text-secondary small" for="select-all-checkbox">Pilih Semua Belum Lunas</label>
+            <div class="col-lg-8">
+                <div class="ent-card ent-table-surface h-100">
+                    <div class="card-header py-3 px-4 d-flex align-items-center justify-content-between flex-wrap gap-2">
+                        <h6 class="card-title mb-0 fw-bold">
+                            <i class="fas fa-list-ol text-warning me-2"></i>Daftar Angsuran Pinjaman
+                        </h6>
+                        <div class="form-check d-flex align-items-center gap-2 mb-0">
+                            <input class="form-check-input ent-checkbox mt-0" type="checkbox" id="select-all-checkbox">
+                            <label class="form-check-label fw-semibold opacity-75 small mb-0" for="select-all-checkbox" style="cursor: pointer;">
+                                Pilih Semua Belum Lunas
+                            </label>
                         </div>
                     </div>
-                    <div class="card-body p-0">
+
+                    <div class="card-body ent-card-body-flush">
                         <div class="table-responsive">
-                            <table class="table table-hover align-middle mb-0" id="table-jadwal-cicilan">
-                                <thead class="table-light">
+                            <table class="table table-custom align-middle mb-0 w-100" id="table-jadwal-cicilan">
+                                <thead>
                                     <tr>
-                                        <th class="ps-3 text-center" width="5%">Pilih</th>
+                                        <th class="text-center" style="width: 6%;">Pilih</th>
                                         <th>Angsuran</th>
                                         <th>Jatuh Tempo</th>
                                         <th class="text-end">Pokok</th>
                                         <th class="text-end">Bunga</th>
                                         <th class="text-end">Total Tagihan</th>
-                                        <th class="text-center pe-3">Status</th>
+                                        <th class="text-center">Status</th>
                                     </tr>
                                 </thead>
                                 <tbody>
@@ -173,11 +496,13 @@
 
     <!-- PLACEHOLDER STATE KOSONG -->
     <div class="col-12" id="section-placeholder-kosong">
-        <div class="card border-0 shadow-sm py-5 text-center text-muted">
+        <div class="ent-card ent-table-surface py-5 px-3 text-center">
             <div class="card-body">
-                <i class="fas fa-search-dollar fa-4x mb-3 text-black-50"></i>
-                <h5>Silahkan pilih nomor nota pembiayaan pinjaman peserta terlebih dahulu.</h5>
-                <p class="mb-0 text-sm">Sistem akan memuat rincian data cicilan peminjaman uang melalui API backend secara terpisah.</p>
+                <div class="ent-empty-icon mb-3">
+                    <i class="fas fa-search-dollar fa-2x"></i>
+                </div>
+                <h5 class="fw-bold mb-1">Silahkan pilih nomor nota pembiayaan pinjaman peserta terlebih dahulu.</h5>
+                <p class="mb-0 opacity-75 small">Sistem akan memuat rincian data cicilan peminjaman uang secara otomatis setelah nota dipilih.</p>
             </div>
         </div>
     </div>
@@ -185,9 +510,7 @@
 @endsection
 
 @section('base.js')
-<link href="https://cdn.jsdelivr.net/npm/select2@4.1.0-rc.0/dist/css/select2.min.css" rel="stylesheet" />
 <script src="https://cdn.jsdelivr.net/npm/select2@4.1.0-rc.0/dist/js/select2.min.js"></script>
-<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/select2-bootstrap-5-theme@1.3.0/dist/select2-bootstrap-5-theme.min.css" />
 <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
 
 <script>
@@ -220,7 +543,7 @@
         function hitungTotalPilihan() {
             let totalBulan = 0;
             let sumPokok = 0;
-            let sampleBunga = 0; // Ambil referensi nilai bunga dari baris pertama yang dicentang
+            let sampleBunga = 0;
 
             $('.checkbox-tenor:checked').each(function(index) {
                 let p = parseFloat($(this).data('pokok') || 0);
@@ -228,7 +551,7 @@
 
                 sumPokok += p;
                 if (index === 0) {
-                    sampleBunga = b; // Simpan nilai bunga acuan 1 bulan
+                    sampleBunga = b;
                 }
                 totalBulan++;
             });
@@ -238,7 +561,6 @@
             let totalNominal = 0;
 
             if (totalBulan === 1) {
-                // Jika checklist hanya 1 bulan: Pokok + Bunga normal
                 let checkedEl = $('.checkbox-tenor:checked').first();
                 finalPokok = parseFloat(checkedEl.data('pokok') || 0);
                 finalBunga = parseFloat(checkedEl.data('bunga') || 0);
@@ -246,7 +568,6 @@
 
                 $('#info-penambahan-bunga').addClass('d-none');
             } else if (totalBulan > 1) {
-                // Jika checklist > 1 bulan: (pokok * jumlah bulan) + (bunga * 10% * jumlah bulan)
                 finalPokok = sumPokok;
                 finalBunga = sampleBunga * 0.10 * totalBulan;
                 totalNominal = finalPokok + finalBunga;
@@ -256,7 +577,6 @@
                 $('#info-penambahan-bunga').addClass('d-none');
             }
 
-            // Tampilkan pada label ringkasan
             $('#label-total-bulan').text(totalBulan + ' Bulan');
             $('#label-total-pokok').text(formatRupiah(finalPokok));
             $('#label-total-bunga').text(formatRupiah(finalBunga));
@@ -286,7 +606,6 @@
                 }
             });
 
-            // AJAX Call ke Controller Method Get Data Pinjaman
             $.ajax({
                 url: `{{ url('koperasi/menu-koperasi/penagihan-peminjaman/get-data') }}/${id}`,
                 type: "GET",
@@ -311,8 +630,8 @@
                         if (jadwal && jadwal.length > 0) {
                             jadwal.forEach(function(row) {
                                 let isLunas = (row.status_bayar === 'LUNAS');
-                                let rowClass = isLunas ? 'table-success bg-opacity-25' : '';
-                                let badgeClass = isLunas ? 'bg-success' : 'bg-warning text-dark';
+                                let rowClass = isLunas ? 'row-lunas' : '';
+                                let badgeClass = isLunas ? 'badge-lunas' : 'badge-belum';
 
                                 let bunga = parseFloat(row.bunga_tagihan ?? 0);
                                 let totalTagihan = parseFloat(row.jumlah_tagihan ?? 0);
@@ -320,22 +639,24 @@
 
                                 let checkboxInput = isLunas ?
                                     `<span class="text-success"><i class="fas fa-check-double"></i></span>` :
-                                    `<input class="form-check-input checkbox-tenor shadow-sm" type="checkbox" value="${row.id}" data-nominal="${totalTagihan}" data-pokok="${pokokTagihan}" data-bunga="${bunga}">`;
+                                    `<input class="form-check-input ent-checkbox checkbox-tenor" type="checkbox" value="${row.id}" data-nominal="${totalTagihan}" data-pokok="${pokokTagihan}" data-bunga="${bunga}">`;
 
                                 html += `
                                     <tr class="${rowClass}">
-                                        <td class="ps-3 text-center">${checkboxInput}</td>
-                                        <td class="fw-bold text-secondary">Bulan Ke-${row.angsuran_ke}</td>
-                                        <td><i class="far fa-calendar-alt text-muted me-1"></i> ${formatTanggal(row.jatuh_tempo)}</td>
-                                        <td class="text-end font-monospace text-muted">${formatRupiah(pokokTagihan)}</td>
-                                        <td class="text-end font-monospace text-warning fw-bold">${formatRupiah(bunga)}</td>
-                                        <td class="text-end font-monospace fw-bold text-success">${formatRupiah(totalTagihan)}</td>
-                                        <td class="text-center pe-3"><span class="badge ${badgeClass}">${row.status_bayar}</span></td>
+                                        <td class="text-center">${checkboxInput}</td>
+                                        <td class="fw-bold opacity-75">Bulan Ke-${row.angsuran_ke}</td>
+                                        <td style="font-family: 'JetBrains Mono', monospace; font-size: 0.78rem;">
+                                            <i class="far fa-calendar-alt text-primary me-1"></i> ${formatTanggal(row.jatuh_tempo)}
+                                        </td>
+                                        <td class="text-end opacity-75" style="font-family: 'JetBrains Mono', monospace;">${formatRupiah(pokokTagihan)}</td>
+                                        <td class="text-end fw-bold" style="color: var(--ent-amber); font-family: 'JetBrains Mono', monospace;">${formatRupiah(bunga)}</td>
+                                        <td class="text-end fw-bold text-success" style="font-family: 'JetBrains Mono', monospace;">${formatRupiah(totalTagihan)}</td>
+                                        <td class="text-center"><span class="ent-badge ${badgeClass}">${row.status_bayar}</span></td>
                                     </tr>
                                 `;
                             });
                         } else {
-                            html = `<tr><td colspan="7" class="text-center py-4 text-muted">Belum ada rincian jadwal tenor untuk kontrak pinjaman ini.</td></tr>`;
+                            html = `<tr><td colspan="7" class="text-center py-4 opacity-75">Belum ada rincian jadwal tenor untuk kontrak pinjaman ini.</td></tr>`;
                         }
 
                         $('#table-jadwal-cicilan tbody').html(html);
@@ -396,7 +717,7 @@
                 text: `Proses pelunasan sebanyak ${totalBulanStr} dengan total sebesar ${totalNominalStr}? Jurnal penerimaan kas akan diterbitkan otomatis.`,
                 icon: 'question',
                 showCancelButton: true,
-                confirmButtonColor: '#198754',
+                confirmButtonColor: '#059669',
                 cancelButtonColor: '#6c757d',
                 confirmButtonText: 'Ya, Proses Bayar',
                 cancelButtonText: 'Batal'

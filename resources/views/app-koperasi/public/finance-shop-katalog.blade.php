@@ -4,7 +4,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Koperasi E-Shop & Katalog Anggota</title>
+    <title>Koperasi E-Shop &amp; Katalog Anggota</title>
 
     <!-- Bootstrap 5 CSS -->
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" rel="stylesheet">
@@ -12,32 +12,89 @@
     <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.2/css/all.min.css" rel="stylesheet">
     <!-- SweetAlert2 CSS -->
     <link href="https://cdn.jsdelivr.net/npm/sweetalert2@11/dist/sweetalert2.min.css" rel="stylesheet">
+    <!-- Fonts -->
+    <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&family=JetBrains+Mono:wght@500;700&display=swap" rel="stylesheet">
 
     <style>
-        body {
-            background-color: #f6f9fc;
-            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+        /* =========================================
+           MODERN ENTERPRISE UI STYLES (KOP-MART E-SHOP)
+           (ADAPTIVE LIGHT & DARK MODE BOOTSTRAP 5)
+           ========================================= */
+        :root {
+            --ent-indigo: #4f46e5;
+            --ent-indigo-dark: #4338ca;
+            --ent-indigo-soft: rgba(79, 70, 229, 0.12);
+            --ent-grid-border: rgba(99, 102, 241, 0.28);
+            --ent-emerald: #059669;
+            --ent-sky: #0284c7;
+            --ent-amber: #d97706;
+            --ent-rose: #e11d48;
+            --ent-surface: #ffffff;
+            --ent-text: #0f172a;
+            --ent-bg: #f1f5f9;
         }
 
-        .product-card {
-            border: none;
+        [data-bs-theme="dark"],
+        .dark {
+            --ent-surface: #0f172a;
+            --ent-text: #f8fafc;
+            --ent-bg: #020617;
+        }
+
+        body {
+            background-color: var(--ent-bg);
+            color: var(--ent-text);
+            font-family: 'Plus Jakarta Sans', sans-serif;
+        }
+
+        /* Hero Navbar Banner */
+        .ent-navbar-banner {
+            background: linear-gradient(135deg, #0f172a 0%, #1e1b4b 55%, #312e81 100%);
+            border-bottom: 1px solid rgba(99, 102, 241, 0.35);
+            box-shadow: 0 10px 25px -5px rgba(15, 23, 42, 0.25);
+        }
+
+        .ent-glass-pill {
+            background: rgba(255, 255, 255, 0.09);
+            backdrop-filter: blur(8px);
+            border: 1px solid rgba(255, 255, 255, 0.16);
             border-radius: 12px;
-            transition: transform 0.2s, box-shadow 0.2s;
+            color: #ffffff;
+        }
+
+        /* Adaptive Enterprise Card */
+        .ent-card {
+            border: 1px solid var(--ent-grid-border);
+            border-radius: 16px;
+            background-color: var(--ent-surface);
+            color: var(--ent-text);
+            box-shadow: 0 4px 20px -2px rgba(15, 23, 42, 0.08);
             overflow: hidden;
-            background: #fff;
-            box-shadow: 0 4px 10px rgba(0, 0, 0, 0.03);
+        }
+
+        /* Product Card */
+        .product-card {
+            border: 1px solid var(--ent-grid-border);
+            border-radius: 16px;
+            transition: transform 0.2s ease, box-shadow 0.2s ease, border-color 0.2s ease;
+            overflow: hidden;
+            background: var(--ent-surface);
+            color: var(--ent-text);
+            box-shadow: 0 4px 16px -2px rgba(15, 23, 42, 0.06);
         }
 
         .product-card:hover {
-            transform: translateY(-5px);
-            box-shadow: 0 8px 20px rgba(0, 0, 0, 0.08);
+            transform: translateY(-4px);
+            border-color: rgba(79, 70, 229, 0.55);
+            box-shadow: 0 12px 24px -6px rgba(79, 70, 229, 0.15);
         }
 
         .product-img-wrapper {
             position: relative;
-            height: 200px;
+            height: 195px;
             width: 100%;
-            background-color: #eaeaea;
+            background-color: rgba(79, 70, 229, 0.06);
+            border-bottom: 1px solid var(--ent-grid-border);
         }
 
         .product-img {
@@ -51,6 +108,15 @@
             top: 10px;
             left: 10px;
             z-index: 2;
+            background: rgba(15, 23, 42, 0.82) !important;
+            backdrop-filter: blur(4px);
+            border: 1px solid rgba(255, 255, 255, 0.2);
+            border-radius: 9999px;
+            padding: 4px 10px;
+            font-size: 0.68rem;
+            font-weight: 700;
+            text-transform: uppercase;
+            letter-spacing: 0.03em;
         }
 
         .cart-sticky {
@@ -62,46 +128,161 @@
             font-size: 0.75rem;
         }
 
-        /* Style Tambahan untuk Pencarian & Kategori */
-        .search-box {
-            border-radius: 30px;
-            padding-left: 20px;
-            border: 2px solid #e2e8f0;
-            transition: all 0.3s;
+        /* Form Label & Input */
+        .ent-form-label {
+            font-size: 0.68rem;
+            font-weight: 700;
+            text-transform: uppercase;
+            letter-spacing: 0.03em;
+            color: var(--bs-secondary-color, #64748b);
+            margin-bottom: 6px;
         }
 
-        .search-box:focus {
-            border-color: #0d6efd;
-            box-shadow: 0 0 0 0.25rem rgba(13, 110, 253, 0.15);
+        .search-box,
+        .ent-select {
+            border: 1px solid var(--ent-grid-border) !important;
+            border-radius: 10px !important;
+            background-color: var(--ent-surface) !important;
+            color: var(--ent-text) !important;
+            font-weight: 600;
+            font-size: 0.82rem;
+            transition: all 0.2s ease;
         }
 
+        .search-box:focus,
+        .ent-select:focus {
+            border-color: var(--ent-indigo) !important;
+            box-shadow: 0 0 0 3.5px rgba(79, 70, 229, 0.15) !important;
+            outline: none;
+        }
+
+        .search-input-group .input-group-text {
+            border: 1px solid var(--ent-grid-border) !important;
+            border-right: none !important;
+            border-radius: 10px 0 0 10px !important;
+            background-color: rgba(79, 70, 229, 0.06) !important;
+            color: var(--ent-indigo) !important;
+        }
+
+        .search-input-group .search-box {
+            border-top-left-radius: 0 !important;
+            border-bottom-left-radius: 0 !important;
+        }
+
+        /* Category Pills */
         .category-pill {
             cursor: pointer;
-            transition: all 0.2s;
+            transition: all 0.2s ease;
             user-select: none;
-            border: 1px solid #0d6efd;
+            border: 1px solid var(--ent-grid-border);
+            background-color: rgba(79, 70, 229, 0.06);
+            color: var(--ent-text);
+            font-weight: 600;
+            font-size: 0.74rem;
         }
 
         .category-pill:hover {
-            background-color: #0d6efd;
-            color: #fff !important;
+            background-color: rgba(79, 70, 229, 0.16);
+            border-color: var(--ent-indigo);
         }
 
         .category-pill.active {
-            background-color: #0d6efd;
-            color: #fff !important;
-            font-weight: bold;
+            background: linear-gradient(135deg, #4f46e5 0%, #4338ca 100%);
+            border-color: #4f46e5;
+            color: #ffffff !important;
+            font-weight: 700;
+            box-shadow: 0 4px 10px rgba(79, 70, 229, 0.25);
+        }
+
+        /* Modern Buttons */
+        .ent-btn {
+            font-weight: 600 !important;
+            border-radius: 10px;
+            transition: all 0.18s ease;
+            letter-spacing: 0.01em;
+            cursor: pointer;
+            font-size: 0.82rem;
+        }
+
+        .ent-btn:hover:not(:disabled) {
+            transform: translateY(-1px);
+        }
+
+        .ent-btn-primary {
+            background: linear-gradient(135deg, #4f46e5 0%, #4338ca 100%);
+            border: none;
+            color: #ffffff;
+            box-shadow: 0 4px 12px rgba(79, 70, 229, 0.25);
+        }
+
+        .ent-btn-primary:hover:not(:disabled) {
+            box-shadow: 0 6px 16px rgba(79, 70, 229, 0.35);
+            color: #ffffff;
+        }
+
+        /* Soft Badges */
+        .ent-badge {
+            border-radius: 9999px;
+            padding: 4px 10px;
+            font-weight: 700;
+            text-transform: uppercase;
+            display: inline-flex;
+            align-items: center;
+            font-size: 0.68rem;
+            letter-spacing: 0.03em;
+        }
+
+        .badge-stock-ok {
+            background-color: rgba(16, 185, 129, 0.16) !important;
+            color: #10b981 !important;
+            border: 1px solid rgba(16, 185, 129, 0.38);
+        }
+
+        .badge-stock-empty {
+            background-color: rgba(225, 29, 72, 0.16) !important;
+            color: #e11d48 !important;
+            border: 1px solid rgba(225, 29, 72, 0.38);
+        }
+
+        /* Cart Item Row */
+        .cart-item-row {
+            background-color: rgba(79, 70, 229, 0.05);
+            border: 1px solid var(--ent-grid-border) !important;
+        }
+
+        /* Payment Radio Box */
+        .ent-pay-option {
+            border: 1px solid var(--ent-grid-border);
+            border-radius: 10px;
+            padding: 8px 10px;
+            background-color: rgba(79, 70, 229, 0.03);
+            transition: border-color 0.15s ease, background-color 0.15s ease;
+        }
+
+        .ent-pay-option:hover {
+            border-color: rgba(79, 70, 229, 0.5);
+            background-color: rgba(79, 70, 229, 0.07);
         }
     </style>
 </head>
 
 <body>
 
-    <!-- TOP NAVBAR -->
-    <nav class="navbar navbar-expand-lg navbar-dark bg-primary shadow-sm py-3 mb-4">
+    <!-- TOP HERO NAVBAR -->
+    <nav class="navbar navbar-expand-lg ent-navbar-banner navbar-dark py-3 mb-4">
         <div class="container">
-            <a class="navbar-brand fw-bold" href="#"><i class="fas fa-shopping-bag me-2 text-warning"></i>KOP-MART ONLINE</a>
-            <span class="navbar-text text-white-50 d-none d-sm-inline">Katalog Belanja Khusus Anggota Koperasi</span>
+            <a class="navbar-brand fw-bold d-flex align-items-center" href="#">
+                <span class="ent-glass-pill d-inline-flex align-items-center justify-content-center me-2" style="width: 38px; height: 38px;">
+                    <i class="fas fa-shopping-bag text-info"></i>
+                </span>
+                <span>KOP-MART <span class="text-info">ONLINE</span></span>
+            </a>
+            <div class="d-flex align-items-center gap-2">
+                <span class="ent-badge" style="background: rgba(56, 189, 248, 0.18); border: 1px solid rgba(56, 189, 248, 0.35); color: #7dd3fc;">
+                    <i class="fas fa-store me-1"></i> E-Shop Anggota
+                </span>
+                <span class="navbar-text small d-none d-md-inline" style="color: #cbd5e1;">Katalog Belanja Khusus Anggota Koperasi</span>
+            </div>
         </div>
     </nav>
 
@@ -110,27 +291,27 @@
         <!-- FITUR FILTER & PENCARIAN -->
         <div class="row mb-4">
             <div class="col-12">
-                <div class="card border-0 shadow-sm p-4 rounded-3 bg-white">
+                <div class="ent-card p-3 p-md-4">
                     <div class="row align-items-center g-3">
                         <!-- Input Cari Nama -->
                         <div class="col-md-5">
-                            <label class="form-label small fw-bold text-secondary mb-2"><i class="fas fa-search me-1"></i> Cari Produk</label>
-                            <div class="input-group">
-                                <span class="input-group-text bg-transparent border-end-0 rounded-start-pill text-muted"><i class="fas fa-search"></i></span>
-                                <input type="text" id="search-product" class="form-control search-box border-start-0 rounded-end-pill py-2" placeholder="Ketik nama produk yang dicari...">
+                            <label class="form-label ent-form-label"><i class="fas fa-search me-1 text-primary"></i> Cari Produk</label>
+                            <div class="input-group search-input-group">
+                                <span class="input-group-text"><i class="fas fa-search"></i></span>
+                                <input type="text" id="search-product" class="form-control search-box py-2" placeholder="Ketik nama produk yang dicari...">
                             </div>
                         </div>
                         <!-- Filter Kategori Buttons -->
                         <div class="col-md-7">
-                            <label class="form-label small fw-bold text-secondary mb-2"><i class="fas fa-tags me-1"></i> Filter Kategori</label>
+                            <label class="form-label ent-form-label"><i class="fas fa-tags me-1 text-primary"></i> Filter Kategori</label>
                             <div class="d-flex flex-wrap gap-2" id="category-filter-container">
-                                <span class="badge bg-outline-primary text-primary category-pill rounded-pill px-3 py-2 active" data-category="all">Semua</span>
+                                <span class="badge category-pill rounded-pill px-3 py-2 active" data-category="all">Semua</span>
 
                                 @php
                                 $categories = $produk->pluck('kategori')->unique();
                                 @endphp
                                 @foreach($categories as $cat)
-                                <span class="badge bg-outline-primary text-primary category-pill rounded-pill px-3 py-2" data-category="{{ $cat }}">{{ $cat }}</span>
+                                <span class="badge category-pill rounded-pill px-3 py-2" data-category="{{ $cat }}">{{ $cat }}</span>
                                 @endforeach
                             </div>
                         </div>
@@ -143,9 +324,9 @@
 
             <!-- BAGIAN KIRI: ETALASE DAFTAR PRODUK (8 COLUMNS) -->
             <div class="col-lg-8">
-                <div class="d-flex justify-content-between align-items-center mb-4">
-                    <h4 class="fw-bold mb-0 text-dark"><i class="fas fa-boxes me-2 text-primary"></i>Pilih Produk</h4>
-                    <span class="text-muted small" id="search-status"></span>
+                <div class="d-flex justify-content-between align-items-center mb-3">
+                    <h5 class="fw-bold mb-0"><i class="fas fa-boxes me-2 text-primary"></i>Pilih Produk</h5>
+                    <span class="opacity-75 small fw-semibold" id="search-status"></span>
                 </div>
 
                 <div class="row row-cols-1 row-cols-md-3 g-4" id="product-list-container">
@@ -153,25 +334,25 @@
                     <div class="col product-item" data-nama="{{ strtolower($p->nama_produk) }}" data-kategori="{{ $p->kategori }}">
                         <div class="card h-100 product-card">
                             <div class="product-img-wrapper">
-                                <span class="badge bg-dark badge-category shadow-sm">{{ $p->kategori }}</span>
+                                <span class="badge text-white badge-category shadow-sm">{{ $p->kategori }}</span>
                                 <img src="{{ $p->url_gambar }}" class="product-img" alt="{{ $p->nama_produk }}">
                             </div>
                             <div class="card-body d-flex flex-column p-3">
-                                <small class="text-muted text-uppercase tracking-wider font-monospace fs-7">{{ $p->kode_produk }}</small>
-                                <h6 class="fw-bold text-dark mt-1 text-truncate product-name" title="{{ $p->nama_produk }}">{{ $p->nama_produk }}</h6>
-                                <h5 class="text-danger fw-bold my-2">Rp {{ number_format($p->harga_jual_default, 0, ',', '.') }}</h5>
+                                <small class="opacity-75 text-uppercase fs-7" style="font-family: 'JetBrains Mono', monospace;">{{ $p->kode_produk }}</small>
+                                <h6 class="fw-bold mt-1 text-truncate product-name" title="{{ $p->nama_produk }}">{{ $p->nama_produk }}</h6>
+                                <h6 class="text-danger fw-bold my-2" style="font-family: 'JetBrains Mono', monospace; font-size: 1rem;">Rp {{ number_format($p->harga_jual_default, 0, ',', '.') }}</h6>
 
                                 <div class="mt-auto pt-2">
                                     <div class="d-flex justify-content-between align-items-center mb-3">
-                                        <span class="small text-muted">Stok Tersedia:</span>
+                                        <span class="small opacity-75">Stok Tersedia:</span>
                                         @if($p->stok_aktual <= 0)
-                                            <span class="badge bg-danger-subtle text-danger fw-bold">Habis</span>
+                                            <span class="ent-badge badge-stock-empty">Habis</span>
                                             @else
-                                            <span class="badge bg-success-subtle text-success fw-bold">{{ $p->stok_aktual }} {{ $p->satuan }}</span>
+                                            <span class="ent-badge badge-stock-ok" style="font-family: 'JetBrains Mono', monospace;">{{ $p->stok_aktual }} {{ $p->satuan }}</span>
                                             @endif
                                     </div>
 
-                                    <button class="btn btn-outline-primary w-100 fw-bold btn-add-to-cart btn-sm rounded-pill"
+                                    <button type="button" class="btn ent-btn ent-btn-primary w-100 py-2 btn-add-to-cart"
                                         data-id="{{ $p->id_produk }}"
                                         data-nama="{{ $p->nama_produk }}"
                                         data-harga="{{ $p->harga_jual_default }}"
@@ -185,12 +366,12 @@
                     </div>
                     @empty
                     <div class="col-12 text-center py-5" id="original-empty-message">
-                        <div class="text-muted"><i class="fas fa-folder-open fa-3x mb-3 text-secondary"></i><br>Belum ada produk aktif yang dijual oleh koperasi.</div>
+                        <div class="opacity-75"><i class="fas fa-folder-open fa-3x mb-3 text-primary"></i><br>Belum ada produk aktif yang dijual oleh koperasi.</div>
                     </div>
                     @endforelse
 
                     <div class="col-12 text-center py-5 d-none" id="search-empty-message">
-                        <div class="text-muted"><i class="fas fa-search fa-3x mb-3 text-secondary"></i><br>Produk yang kamu cari tidak ditemukan. coba kata kunci lain!</div>
+                        <div class="opacity-75"><i class="fas fa-search fa-3x mb-3 text-primary"></i><br>Produk yang kamu cari tidak ditemukan. Coba kata kunci lain!</div>
                     </div>
                 </div>
             </div>
@@ -200,15 +381,14 @@
                 <div class="cart-sticky">
 
                     <!-- BOX PILIH IDENTITAS ANGGOTA -->
-                    <div class="card border-0 shadow-sm p-3 bg-white rounded-3 mb-3">
-                        <!-- UPDATE: Ditambahkan tombol lihat list belanja -->
+                    <div class="ent-card p-3 p-md-4 mb-3">
                         <div class="d-flex justify-content-between align-items-center mb-2">
-                            <label class="form-label small fw-bold text-secondary mb-0"><i class="fas fa-user-check me-1"></i> Pilih Anggota Pembeli:</label>
-                            <button class="btn btn-outline-secondary btn-sm fw-bold px-2 py-0 rounded-pill" id="btn-view-history" style="font-size: 0.7rem;">
+                            <label class="form-label ent-form-label mb-0"><i class="fas fa-user-check me-1 text-primary"></i> Pilih Anggota Pembeli:</label>
+                            <button type="button" class="btn btn-sm ent-btn btn-outline-primary px-2 py-1" id="btn-view-history" style="font-size: 0.7rem;">
                                 <i class="fas fa-history me-1"></i> List Belanja
                             </button>
                         </div>
-                        <select class="form-select font-monospace text-dark btn-sm fs-7" id="select-peserta">
+                        <select class="form-select ent-select py-2 fs-7" id="select-peserta" style="font-family: 'JetBrains Mono', monospace;">
                             <option value="" selected disabled>-- Pilih Anggota Koperasi --</option>
                             @foreach($peserta as $item)
                             <option value="{{ $item->id_kop_master_peserta }}">
@@ -219,68 +399,65 @@
                     </div>
 
                     <!-- RINGKASAN KERANJANG BELANJA -->
-                    <div class="card border-0 shadow-sm p-4 bg-white rounded-3">
-                        <div class="d-flex justify-content-between align-items-center border-bottom pb-3 mb-3">
-                            <h5 class="fw-bold text-dark mb-0"><i class="fas fa-shopping-cart me-2 text-primary"></i>Keranjang Saya</h5>
-                            <span class="badge bg-danger rounded-circle px-2 py-1" id="cart-count-badge">0</span>
+                    <div class="ent-card p-3 p-md-4">
+                        <div class="d-flex justify-content-between align-items-center pb-3 mb-3" style="border-bottom: 1px solid var(--ent-grid-border);">
+                            <h6 class="fw-bold mb-0"><i class="fas fa-shopping-cart me-2 text-primary"></i>Keranjang Saya</h6>
+                            <span class="ent-badge" style="background: rgba(225, 29, 72, 0.16); color: #e11d48; border: 1px solid rgba(225, 29, 72, 0.35); font-family: 'JetBrains Mono', monospace;" id="cart-count-badge">0</span>
                         </div>
 
                         <!-- Kontainer Daftar Rincian Barang di Keranjang -->
-                        <div id="cart-items-container" style="max-height: 200px; overflow-y: auto;" class="mb-3">
-                            <p class="text-muted text-center py-4 small mb-0" id="cart-empty-text">Keranjang masih kosong. Silakan pilih produk di sebelah kiri.</p>
+                        <div id="cart-items-container" style="max-height: 210px; overflow-y: auto;" class="mb-3">
+                            <p class="opacity-75 text-center py-4 small mb-0" id="cart-empty-text">Keranjang masih kosong. Silakan pilih produk di sebelah kiri.</p>
                         </div>
 
                         <!-- PILIHAN METODE PEMBAYARAN -->
-                        <div class="border-top pt-3 mb-3" id="payment-method-wrapper">
-                            <label class="form-label small fw-bold text-secondary mb-2"><i class="fas fa-credit-card me-1"></i> Pilih Metode Pembayaran:</label>
+                        <div class="pt-3 mb-3" id="payment-method-wrapper" style="border-top: 1px solid var(--ent-grid-border);">
+                            <label class="form-label ent-form-label mb-2"><i class="fas fa-credit-card me-1 text-primary"></i> Pilih Metode Pembayaran:</label>
 
-                            <!-- Opsi 1: Masuk Tagihan -->
-                            <div class="form-check mb-2">
-                                <input class="form-check-input" type="radio" name="select_metode_bayar" id="pay-cash" value="CASH" checked>
-                                <label class="form-check-label small" for="pay-cash">
+                            <div class="ent-pay-option form-check mb-2">
+                                <input class="form-check-input ms-0 me-2" type="radio" name="select_metode_bayar" id="pay-cash" value="CASH" checked>
+                                <label class="form-check-label small d-block" for="pay-cash">
                                     <strong>CASH</strong>
-                                    <div class="text-muted fs-7">Silahkan Langsung Bayar ke Bagian Bendahara.</div>
+                                    <div class="opacity-75 fs-7">Silahkan Langsung Bayar ke Bagian Bendahara.</div>
                                 </label>
                             </div>
-                            <!-- Opsi 1: Masuk Tagihan -->
-                            <div class="form-check mb-2">
-                                <input class="form-check-input" type="radio" name="select_metode_bayar" id="pay-tagihan" value="MASUK_TAGIHAN" checked>
-                                <label class="form-check-label small" for="pay-tagihan">
+
+                            <div class="ent-pay-option form-check mb-2">
+                                <input class="form-check-input ms-0 me-2" type="radio" name="select_metode_bayar" id="pay-tagihan" value="MASUK_TAGIHAN" checked>
+                                <label class="form-check-label small d-block" for="pay-tagihan">
                                     <strong>Masuk Tagihan Anggota</strong>
-                                    <div class="text-muted fs-7">Akumulasi otomatis ke dalam lembar tagihan rutin koperasi bulanan Anda.</div>
+                                    <div class="opacity-75 fs-7">Akumulasi otomatis ke dalam lembar tagihan rutin koperasi bulanan Anda.</div>
                                 </label>
                             </div>
 
-                            <!-- Opsi 2: Transfer Bank -->
-                            <div class="form-check mb-2">
-                                <input class="form-check-input" type="radio" name="select_metode_bayar" id="pay-tf" value="TRANSFER_BANK" disabled>
-                                <label class="form-check-label small" for="pay-tf">
+                            <div class="ent-pay-option form-check mb-2 opacity-50">
+                                <input class="form-check-input ms-0 me-2" type="radio" name="select_metode_bayar" id="pay-tf" value="TRANSFER_BANK" disabled>
+                                <label class="form-check-label small d-block" for="pay-tf">
                                     <strong>Transfer Bank Manual</strong>
-                                    <div class="text-muted fs-7">Transfer langsung ke rekening bank resmi Koperasi (Verifikasi manual).</div>
+                                    <div class="opacity-75 fs-7">Transfer langsung ke rekening bank resmi Koperasi (Verifikasi manual).</div>
                                 </label>
                             </div>
 
-                            <!-- Opsi 3: Virtual Account -->
-                            <div class="form-check">
-                                <input class="form-check-input" type="radio" name="select_metode_bayar" id="pay-va" value="VIRTUAL_ACCOUNT" disabled>
-                                <label class="form-check-label small" for="pay-va">
+                            <div class="ent-pay-option form-check opacity-50">
+                                <input class="form-check-input ms-0 me-2" type="radio" name="select_metode_bayar" id="pay-va" value="VIRTUAL_ACCOUNT" disabled>
+                                <label class="form-check-label small d-block" for="pay-va">
                                     <strong>Virtual Account (Otomatis)</strong>
-                                    <div class="text-muted fs-7">Konfirmasi instan menggunakan kode VA unik (Mandiri, BRI, BCA, BNI).</div>
+                                    <div class="opacity-75 fs-7">Konfirmasi instan menggunakan kode VA unik (Mandiri, BRI, BCA, BNI).</div>
                                 </label>
                             </div>
                         </div>
 
                         <!-- Total Harga Gabungan -->
-                        <div class="border-top pt-3">
+                        <div class="pt-3" style="border-top: 1px solid var(--ent-grid-border);">
                             <div class="d-flex justify-content-between align-items-center mb-3">
-                                <span class="fw-bold text-secondary">Total Tagihan:</span>
-                                <h4 class="fw-bold text-primary mb-0" id="cart-total-price">Rp 0</h4>
+                                <span class="fw-bold opacity-75 small text-uppercase">Total Tagihan:</span>
+                                <h5 class="fw-bold text-primary mb-0" id="cart-total-price" style="font-family: 'JetBrains Mono', monospace;">Rp 0</h5>
                             </div>
-                            <div class="alert alert-info py-2 px-3 small rounded-3 border-0 mb-3" id="tenor-info-alert">
-                                <i class="fas fa-info-circle me-1"></i> Transaksi menggunakan metode: <strong id="text-tenor-info">Masuk Tagihan Anggota</strong>.
+                            <div class="alert py-2 px-3 small rounded-3 mb-3" id="tenor-info-alert" style="background: rgba(79, 70, 229, 0.08); border: 1px solid var(--ent-grid-border); color: var(--ent-text);">
+                                <i class="fas fa-info-circle me-1 text-primary"></i> Transaksi menggunakan metode: <strong id="text-tenor-info">Masuk Tagihan Anggota</strong>.
                             </div>
-                            <button class="btn btn-primary w-100 fw-bold py-2 rounded-3 shadow-sm" id="btn-checkout" disabled>
-                                <i class="fas fa-lock me-1"></i> Verifikasi Keamanan & Ajukan
+                            <button type="button" class="btn ent-btn ent-btn-primary w-100 py-2" id="btn-checkout" disabled>
+                                <i class="fas fa-lock me-1"></i> Verifikasi Keamanan &amp; Ajukan
                             </button>
                         </div>
                     </div>
@@ -351,7 +528,9 @@
             // Listener metode pembayaran baru
             $('input[name="select_metode_bayar"]').on('change', function() {
                 let currentMethod = $(this).val();
-                if (currentMethod === 'MASUK_TAGIHAN') {
+                if (currentMethod === 'CASH') {
+                    $('#text-tenor-info').text('CASH');
+                } else if (currentMethod === 'MASUK_TAGIHAN') {
                     $('#text-tenor-info').text('Masuk Tagihan Anggota');
                 } else if (currentMethod === 'TRANSFER_BANK') {
                     $('#text-tenor-info').text('Transfer Bank Manual');
@@ -410,15 +589,15 @@
                     totalQtyItem += item.qty;
 
                     let rowHtml = `
-                    <div class="d-flex justify-content-between align-items-center bg-light p-2 rounded-3 mb-2 border cart-item-row">
-                        <div style="max-width: 65%;">
+                    <div class="d-flex justify-content-between align-items-center p-2 rounded-3 mb-2 cart-item-row">
+                        <div style="max-width: 62%;">
                             <span class="fw-bold d-block text-truncate small">${item.nama}</span>
-                            <small class="text-danger font-monospace text-muted">${formatRupiah(item.harga)}</small>
+                            <small class="text-danger fw-bold" style="font-family: 'JetBrains Mono', monospace;">${formatRupiah(item.harga)}</small>
                         </div>
                         <div class="d-flex align-items-center">
-                            <button class="btn btn-sm btn-light border py-0 px-2 btn-change-qty" data-index="${index}" data-action="minus">-</button>
-                            <span class="mx-2 fw-bold small">${item.qty}</span>
-                            <button class="btn btn-sm btn-light border py-0 px-2 btn-change-qty" data-index="${index}" data-action="plus">+</button>
+                            <button type="button" class="btn btn-sm btn-outline-secondary py-0 px-2 btn-change-qty" data-index="${index}" data-action="minus">-</button>
+                            <span class="mx-2 fw-bold small" style="font-family: 'JetBrains Mono', monospace;">${item.qty}</span>
+                            <button type="button" class="btn btn-sm btn-outline-secondary py-0 px-2 btn-change-qty" data-index="${index}" data-action="plus">+</button>
                         </div>
                     </div>
                 `;
@@ -474,7 +653,7 @@
                         style: 'text-align: center; font-size: 24px; letter-spacing: 8px;'
                     },
                     showCancelButton: true,
-                    confirmButtonColor: '#0d6efd',
+                    confirmButtonColor: '#4f46e5',
                     confirmButtonText: 'Konfirmasi Pembelian',
                     cancelButtonText: 'Batal',
                     inputValidator: (value) => {
@@ -500,7 +679,7 @@
                                 if (res.status === 'success') {
                                     Swal.fire({
                                         title: 'Transaksi Berhasil!',
-                                        html: `${res.message}<br><br><b class="fs-4 font-monospace text-primary bg-light p-2 rounded border d-inline-block mt-2">${res.nota}</b>`,
+                                        html: `${res.message}<br><br><b class="fs-4 text-primary p-2 rounded d-inline-block mt-2" style="font-family: 'JetBrains Mono', monospace; background: rgba(79,70,229,0.08); border: 1px solid rgba(79,70,229,0.28);">${res.nota}</b>`,
                                         icon: 'success'
                                     }).then(() => {
                                         internalCart = [];
@@ -516,7 +695,7 @@
                 });
             });
 
-            // UPDATE: Action Lihat List Belanja (History) Anggota
+            // Action Lihat List Belanja (History) Anggota
             $('#btn-view-history').on('click', function() {
                 let idPeserta = $('#select-peserta').val();
                 let namaPeserta = $("#select-peserta option:selected").text().trim();
@@ -538,7 +717,7 @@
                         style: 'text-align: center; font-size: 24px; letter-spacing: 8px;'
                     },
                     showCancelButton: true,
-                    confirmButtonColor: '#0d6efd',
+                    confirmButtonColor: '#4f46e5',
                     confirmButtonText: 'Lihat List Belanja',
                     cancelButtonText: 'Batal',
                     inputValidator: (value) => {
@@ -550,7 +729,6 @@
                     if (result.isConfirmed) {
                         let secureCodeValue = result.value;
 
-                        // Loading State
                         Swal.fire({
                             title: 'Mengambil Data...',
                             allowOutsideClick: false,
@@ -558,7 +736,7 @@
                         });
 
                         $.ajax({
-                            url: "{{ route('shop.history') }}", // Sesuaikan dengan nama route history Anda di Laravel
+                            url: "{{ route('shop.history') }}",
                             type: "POST",
                             data: {
                                 _token: "{{ csrf_token() }}",
@@ -567,10 +745,9 @@
                             },
                             success: function(res) {
                                 if (res.status === 'success') {
-                                    // Membuat tampilan list belanja dalam modal
                                     let listHtml = `<div class="text-start" style="max-height: 350px; overflow-y: auto;">`;
 
-                                    if(res.data && res.data.length > 0) {
+                                    if (res.data && res.data.length > 0) {
                                         listHtml += `<table class="table table-sm small table-bordered">
                                             <thead class="table-light">
                                                 <tr>
