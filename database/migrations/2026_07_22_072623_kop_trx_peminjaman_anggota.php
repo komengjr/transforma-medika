@@ -13,7 +13,6 @@ class KopTrxPeminjamanAnggota extends Migration
      */
     public function up()
     {
-        // 1. Tabel Utama Transaksi Peminjaman Uang
         Schema::create('kop_trx_pinjaman_anggota', function (Blueprint $table) {
             $table->id();
 
@@ -64,8 +63,6 @@ class KopTrxPeminjamanAnggota extends Migration
                 ->on('kop_master_peserta')
                 ->onDelete('restrict');
         });
-
-        // 2. Tabel Jadwal Angsuran / Tenor Pinjaman Uang
         Schema::create('kop_trx_pinjaman_tenor', function (Blueprint $table) {
             $table->id();
 

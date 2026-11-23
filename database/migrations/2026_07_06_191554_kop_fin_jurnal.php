@@ -28,6 +28,14 @@ class KopFinJurnal extends Migration
             $table->string('jurnal_created');
             $table->timestamps();
         });
+        Schema::create('kop_fin_jurnal_detail', function (Blueprint $table) {
+            $table->id('id_jurnal_detail');
+            $table->foreignId('jurnal_id')->constrained('kop_fin_jurnal', 'id_jurnal')->onDelete('cascade');
+            $table->string('coa_code'); // Menghubungkan ke kode COA Anda (misal: '1111', '4101')
+            $table->integer('jurnal_debit')->default(0);
+            $table->integer('jurnal_kredit')->default(0);
+            $table->timestamps();
+        });
     }
 
     /**
@@ -38,5 +46,6 @@ class KopFinJurnal extends Migration
     public function down()
     {
         Schema::dropIfExists('kop_fin_jurnal');
+        Schema::dropIfExists('kop_fin_jurnal_detail');
     }
 }

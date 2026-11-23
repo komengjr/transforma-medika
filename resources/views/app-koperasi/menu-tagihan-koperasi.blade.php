@@ -94,6 +94,18 @@
         color: #ffffff;
     }
 
+    .ent-btn-success {
+        background: linear-gradient(135deg, #059669 0%, #047857 100%);
+        border: none;
+        color: #ffffff;
+        box-shadow: 0 4px 12px rgba(5, 150, 105, 0.25);
+    }
+
+    .ent-btn-success:hover:not(:disabled) {
+        box-shadow: 0 6px 16px rgba(5, 150, 105, 0.35);
+        color: #ffffff;
+    }
+
     /* Form Controls */
     .ent-form-label {
         font-size: 0.68rem;
@@ -135,6 +147,10 @@
         outline: none;
     }
 
+    .ent-form .form-control[readonly] {
+        background-color: rgba(79, 70, 229, 0.06) !important;
+    }
+
     /* Navigation Pills */
     .ent-nav-pills {
         background-color: var(--ent-surface);
@@ -159,13 +175,6 @@
         background-color: rgba(79, 70, 229, 0.08);
     }
 
-    #tab-bulanan .nav-link.active {
-        background: linear-gradient(135deg, #0284c7 0%, #0369a1 100%);
-        color: #ffffff;
-        opacity: 1;
-        box-shadow: 0 4px 12px rgba(2, 132, 199, 0.28);
-    }
-
     #tab-voucher .nav-link.active {
         background: linear-gradient(135deg, #f59e0b 0%, #d97706 100%);
         color: #ffffff;
@@ -185,13 +194,6 @@
         color: #ffffff;
         opacity: 1;
         box-shadow: 0 4px 12px rgba(79, 70, 229, 0.28);
-    }
-
-    #tab-lain .nav-link.active {
-        background: linear-gradient(135deg, #475569 0%, #334155 100%);
-        color: #ffffff;
-        opacity: 1;
-        box-shadow: 0 4px 12px rgba(71, 85, 105, 0.28);
     }
 
     /* Soft Badges */
@@ -351,21 +353,17 @@
 
 <!-- TAB KATEGORI PENAGIHAN -->
 <ul class="nav nav-pills gap-2 mb-3 ent-nav-pills" id="pills-tab" role="tablist">
-    <li class="nav-item" id="tab-bulanan"><button class="nav-link active" data-bs-toggle="pill" data-bs-target="#pills-bulanan" type="button" role="tab">Bulanan</button></li>
-    <li class="nav-item" id="tab-voucher"><button class="nav-link" data-bs-toggle="pill" data-bs-target="#pills-voucher" type="button" role="tab">Voucher</button></li>
+    <li class="nav-item" id="tab-voucher"><button class="nav-link active" data-bs-toggle="pill" data-bs-target="#pills-voucher" type="button" role="tab">Voucher Layanan</button></li>
     <li class="nav-item" id="tab-peminjaman-uang"><button class="nav-link" data-bs-toggle="pill" data-bs-target="#pills-peminjaman-uang" type="button" role="tab">Peminjaman Uang</button></li>
-    <li class="nav-item" id="tab-peminjaman-barang"><button class="nav-link" data-bs-toggle="pill" data-bs-target="#pills-peminjaman-barang" type="button" role="tab">Peminjaman Barang</button></li>
-    <li class="nav-item" id="tab-lain"><button class="nav-link" data-bs-toggle="pill" data-bs-target="#pills-lain" type="button" role="tab">Lain-Lain</button></li>
+    <li class="nav-item" id="tab-peminjaman-barang"><button class="nav-link" data-bs-toggle="pill" data-bs-target="#pills-peminjaman-barang" type="button" role="tab">Pembelian Barang</button></li>
 </ul>
 
 <!-- KONTEN TABEL PENAGIHAN -->
 <div class="tab-content ent-card ent-table-surface" id="pills-tabContent">
     @foreach([
-    'bulanan' => ['id' => 'pills-bulanan', 'class' => 'show active', 'text' => 'Simpanan Wajib & Pokok', 'color' => 'info'],
-    'voucher' => ['id' => 'pills-voucher', 'class' => '', 'text' => 'Belanja Toko / Kantin', 'color' => 'warning'],
-    'peminjaman_uang' => ['id' => 'pills-peminjaman-uang', 'class' => '', 'text' => 'Angsuran & Pinjaman', 'color' => 'danger'],
-    'peminjaman_barang' => ['id' => 'pills-peminjaman-barang', 'class' => '', 'text' => 'Angsuran & Pinjaman', 'color' => 'primary'],
-    'lain' => ['id' => 'pills-lain', 'class' => '', 'text' => 'Biaya Administrasi & Sanksi', 'color' => 'secondary']
+    'voucher' => ['id' => 'pills-voucher', 'class' => 'show active', 'text' => 'Tagihan Voucher Layanan Anggota', 'color' => 'warning'],
+    'peminjaman_uang' => ['id' => 'pills-peminjaman-uang', 'class' => '', 'text' => 'Angsuran Peminjaman Uang Anggota', 'color' => 'danger'],
+    'peminjaman_barang' => ['id' => 'pills-peminjaman-barang', 'class' => '', 'text' => 'Angsuran Pembelian Barang Anggota', 'color' => 'primary'],
     ] as $key => $meta)
     <div class="tab-pane fade {{ $meta['class'] }}" id="{{ $meta['id'] }}" role="tabpanel">
         <div class="p-3 d-flex justify-content-between align-items-center flex-wrap gap-2" style="background-color: rgba(79, 70, 229, 0.06); border-bottom: 1px solid var(--ent-grid-border);">
@@ -384,17 +382,89 @@
                         <th>Nama Peserta</th>
                         <th>Status</th>
                         <th class="text-end">Nominal</th>
+                        <th class="text-center">Aksi</th>
                     </tr>
                 </thead>
                 <tbody id="data-{{ $key }}">
                     <tr>
-                        <td colspan="8" class="text-center py-4 opacity-75">Silakan tentukan filter lalu klik Cari Data.</td>
+                        <td colspan="9" class="text-center py-4 opacity-75">Silakan tentukan filter lalu klik Cari Data.</td>
                     </tr>
                 </tbody>
             </table>
         </div>
     </div>
     @endforeach
+</div>
+
+<!-- MODAL FORM PELUNASAN TAGIHAN -->
+<div class="modal fade" id="modalPelunasanTagihan" tabindex="-1" aria-hidden="true">
+    <div class="modal-dialog modal-dialog-centered">
+        <div class="modal-content ent-table-surface" style="border: 1px solid var(--ent-grid-border); border-radius: 16px; overflow: hidden;">
+            <div class="modal-header text-white py-3 px-4" style="background: linear-gradient(135deg, #059669 0%, #047857 100%);">
+                <h6 class="modal-title fw-bold mb-0">
+                    <i class="fas fa-money-check-dollar me-2"></i>Form Pelunasan Tagihan
+                </h6>
+                <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <form id="formPelunasanTagihan" class="ent-form">
+                @csrf
+                <div class="modal-body p-4">
+                    <input type="hidden" id="lunas_id" name="id_transaksi">
+                    <input type="hidden" id="lunas_kategori" name="kategori">
+                    <input type="hidden" id="lunas_kode_lama" name="kode_transaksi">
+
+                    <div class="row g-3">
+                        <div class="col-md-6">
+                            <label class="form-label ent-form-label">No. Tagihan</label>
+                            <input type="text" class="form-control fw-bold text-primary" id="lunas_no_tagihan" style="font-family: 'JetBrains Mono', monospace;" readonly>
+                        </div>
+                        <div class="col-md-6">
+                            <label class="form-label ent-form-label">Tanggal Bayar <span class="text-danger">*</span></label>
+                            <input type="date" class="form-control" id="lunas_tanggal_bayar" name="tanggal_bayar" value="{{ date('Y-m-d') }}" style="font-family: 'JetBrains Mono', monospace;" required>
+                        </div>
+
+                        <div class="col-12">
+                            <label class="form-label ent-form-label">Peserta / Anggota</label>
+                            <input type="text" class="form-control" id="lunas_peserta" readonly>
+                        </div>
+
+                        <div class="col-md-6">
+                            <label class="form-label ent-form-label">Total Tagihan (Rp)</label>
+                            <input type="text" class="form-control fw-bold text-danger" id="lunas_total_tagihan" style="font-family: 'JetBrains Mono', monospace;" readonly>
+                        </div>
+
+                        <div class="col-md-6">
+                            <label class="form-label ent-form-label">Nominal Pelunasan (Rp) <span class="text-danger">*</span></label>
+                            <input type="text" inputmode="decimal" class="form-control fw-bold text-success" id="lunas_nominal_bayar" name="nominal_bayar" style="font-family: 'JetBrains Mono', monospace;" required>
+                        </div>
+
+                        <div class="col-12">
+                            <label class="form-label ent-form-label">Akun Kas / Bank Penerima (Debit) <span class="text-danger">*</span></label>
+                            <select class="form-select" id="lunas_coa_kas" name="coa_kas" required>
+                                <option value="" disabled selected>-- Pilih COA Kas / Bank --</option>
+                                @foreach(($list_coa ?? collect()) as $coa)
+                                <option value="{{ $coa->coa_code }}">
+                                    {{ $coa->coa_code }} - {{ $coa->coa_name }} ({{ strtoupper($coa->coa_type) }})
+                                </option>
+                                @endforeach
+                            </select>
+                        </div>
+
+                        <div class="col-12">
+                            <label class="form-label ent-form-label">Catatan Pelunasan</label>
+                            <input type="text" class="form-control" id="lunas_keterangan" name="keterangan" placeholder="Contoh: Pelunasan tagihan anggota...">
+                        </div>
+                    </div>
+                </div>
+                <div class="modal-footer px-4 py-3" style="background-color: rgba(79, 70, 229, 0.04); border-top: 1px solid var(--ent-grid-border);">
+                    <button type="button" class="btn ent-btn btn-secondary px-3 py-2" data-bs-dismiss="modal">Batal</button>
+                    <button type="submit" class="btn ent-btn ent-btn-success px-4 py-2">
+                        <i class="fas fa-check-circle me-1"></i> Proses Pelunasan
+                    </button>
+                </div>
+            </form>
+        </div>
+    </div>
 </div>
 @endsection
 
@@ -415,36 +485,60 @@
 <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
 
 <script>
+    let modalPelunasanTagihanInstance = null;
+    let cachedTagihanResponse = {};
+
+    function formatSeparatorRupiah(val) {
+        const clean = String(val ?? '').replace(/[^\d]/g, '').replace(/^0+(?=\d)/, '');
+        if (!clean) return '0';
+        return Number(clean).toLocaleString('id-ID');
+    }
+
+    function parseSeparatorRupiah(val) {
+        const clean = String(val ?? '').replace(/[^\d]/g, '');
+        return clean ? parseInt(clean, 10) : 0;
+    }
+
     // Fungsi AJAX Fetch API untuk mengambil data dari Route ke-2 tanpa reload halaman
     function loadDataTagihan() {
         const cabang = document.getElementById('cabang_id').value;
         const start = document.getElementById('start_date').value;
         const end = document.getElementById('end_date').value;
 
-        // Berikan indikator loading pada semua tabel
-        const categories = ['bulanan', 'voucher', 'peminjaman_uang', 'peminjaman_barang', 'lain'];
+        // Berikan indikator loading pada tabel kategori aktif
+        const categories = ['voucher', 'peminjaman_uang', 'peminjaman_barang'];
         categories.forEach(key => {
-            document.getElementById(`data-${key}`).innerHTML = `<tr><td colspan="8" class="text-center py-4 text-primary"><div class="spinner-border spinner-border-sm me-2"></div>Memuat data...</td></tr>`;
+            document.getElementById(`data-${key}`).innerHTML = `<tr><td colspan="9" class="text-center py-4 text-primary"><div class="spinner-border spinner-border-sm me-2"></div>Memuat data...</td></tr>`;
         });
 
         // Tembak URL Route ke-2 dengan query string parameter
-        fetch(`{{ route('menu_koperasi_tagihan_koperasi_load') }}?cabang_id=${cabang}&start_date=${start}&end_date=${end}`)
+        fetch(`{{ route('menu_koperasi_tagihan_koperasi_load') }}?cabang_id=${encodeURIComponent(cabang)}&start_date=${encodeURIComponent(start)}&end_date=${encodeURIComponent(end)}`)
             .then(response => response.json())
             .then(res => {
+                cachedTagihanResponse = res;
+
                 categories.forEach(key => {
+                    const catData = res[key] || { total: 0, data: [] };
+
                     // 1. Update Badge Total Uang Nominal
-                    document.getElementById(`total-${key}`).innerText = 'Total: ' + formatRupiah(res[key].total);
+                    document.getElementById(`total-${key}`).innerText = 'Total: ' + formatRupiah(catData.total || 0);
 
                     // 2. Render isi baris tabel body
                     let htmlRows = '';
-                    if (res[key].data.length === 0) {
-                        htmlRows = `<tr><td colspan="8" class="text-center py-4 opacity-75">Tidak ditemukan data penagihan.</td></tr>`;
+                    if (!catData.data || catData.data.length === 0) {
+                        htmlRows = `<tr><td colspan="9" class="text-center py-4 opacity-75">Tidak ditemukan data penagihan.</td></tr>`;
                     } else {
-                        res[key].data.forEach((item, index) => {
+                        catData.data.forEach((item, index) => {
                             let namaCabang = item.peserta && item.peserta.cabang ? item.peserta.cabang.kop_master_cabang_name : (item.peserta ? item.peserta.kop_master_peserta_cabang : 'N/A');
                             let idPeserta = item.peserta ? item.peserta.kop_master_peserta_code : item.kop_req_tagihan_id;
                             let namaPeserta = item.peserta ? item.peserta.kop_master_peserta_name : 'Data Peserta Hilang';
-                            let badgeStatus = item.kop_req_tagihan_status === 'paid' ? 'badge-status-paid' : 'badge-status-unpaid';
+                            let isPaid = String(item.kop_req_tagihan_status || '').toLowerCase() === 'paid';
+                            let badgeStatus = isPaid ? 'badge-status-paid' : 'badge-status-unpaid';
+                            let labelStatus = isPaid ? 'LUNAS' : String(item.kop_req_tagihan_status || 'UNPAID').toUpperCase();
+
+                            let aksiHtml = isPaid
+                                ? `<span class="ent-badge badge-status-paid"><i class="fas fa-check me-1"></i> Lunas</span>`
+                                : `<button type="button" class="btn btn-sm ent-btn ent-btn-success py-1 px-2" onclick="openModalPelunasan('${key}', ${index})"><i class="fas fa-money-check-dollar me-1"></i> Lunasi</button>`;
 
                             htmlRows += `
                                 <tr>
@@ -454,8 +548,9 @@
                                     <td style="font-family: 'JetBrains Mono', monospace; font-size: 0.78rem;">${formatTanggal(item.kop_req_tagihan_date)}</td>
                                     <td><span class="badge badge-meta-pill" style="font-family: 'JetBrains Mono', monospace;">${idPeserta}</span></td>
                                     <td class="fw-semibold">${namaPeserta}</td>
-                                    <td><span class="ent-badge ${badgeStatus}">${item.kop_req_tagihan_status.toUpperCase()}</span></td>
+                                    <td><span class="ent-badge ${badgeStatus}">${labelStatus}</span></td>
                                     <td class="text-end fw-bold" style="font-family: 'JetBrains Mono', monospace;">${formatRupiah(item.kop_req_tagihan_nominal)}</td>
+                                    <td class="text-center">${aksiHtml}</td>
                                 </tr>`;
                         });
                     }
@@ -468,9 +563,111 @@
             });
     }
 
+    function openModalPelunasan(kategori, index) {
+        const catList = cachedTagihanResponse[kategori]?.data || [];
+        const item = catList[index];
+        if (!item) return;
+
+        const pesertaLabel = item.peserta
+            ? `${item.peserta.kop_master_peserta_code} - ${item.peserta.kop_master_peserta_name}`
+            : (item.kop_req_tagihan_id || '-');
+        const nominalAngka = parseInt(parseFloat(item.kop_req_tagihan_nominal || 0), 10);
+
+        document.getElementById('lunas_id').value = item.id ?? '';
+        document.getElementById('lunas_kategori').value = kategori;
+        document.getElementById('lunas_kode_lama').value = item.kop_req_tagihan_code;
+        document.getElementById('lunas_no_tagihan').value = item.kop_req_tagihan_code;
+        document.getElementById('lunas_tanggal_bayar').value = '{{ date("Y-m-d") }}';
+        document.getElementById('lunas_peserta').value = pesertaLabel;
+        document.getElementById('lunas_total_tagihan').value = formatRupiah(nominalAngka);
+        document.getElementById('lunas_nominal_bayar').value = formatSeparatorRupiah(nominalAngka);
+        document.getElementById('lunas_keterangan').value = `Pelunasan tagihan ${item.kop_req_tagihan_code} (${pesertaLabel})`;
+
+        if (!modalPelunasanTagihanInstance) {
+            modalPelunasanTagihanInstance = new bootstrap.Modal(document.getElementById('modalPelunasanTagihan'));
+        }
+        modalPelunasanTagihanInstance.show();
+    }
+
+    document.addEventListener('DOMContentLoaded', function() {
+        const inputBayar = document.getElementById('lunas_nominal_bayar');
+        if (inputBayar) {
+            inputBayar.addEventListener('input', function() {
+                this.value = formatSeparatorRupiah(this.value);
+            });
+        }
+
+        const formPelunasan = document.getElementById('formPelunasanTagihan');
+        if (formPelunasan) {
+            formPelunasan.addEventListener('submit', function(e) {
+                e.preventDefault();
+
+                const payload = {
+                    id_transaksi: document.getElementById('lunas_id').value,
+                    kategori: document.getElementById('lunas_kategori').value,
+                    kode_transaksi: document.getElementById('lunas_kode_lama').value,
+                    tanggal_bayar: document.getElementById('lunas_tanggal_bayar').value,
+                    nominal_bayar: parseSeparatorRupiah(document.getElementById('lunas_nominal_bayar').value),
+                    coa_kas: document.getElementById('lunas_coa_kas').value,
+                    keterangan: document.getElementById('lunas_keterangan').value
+                };
+
+                if (!payload.coa_kas || payload.nominal_bayar <= 0) {
+                    Swal.fire('Form Belum Lengkap', 'Pilih COA Kas/Bank dan pastikan nominal pelunasan lebih dari 0.', 'warning');
+                    return;
+                }
+
+                Swal.fire({
+                    title: 'Konfirmasi Pelunasan?',
+                    text: `Tagihan ${payload.kode_transaksi} sebesar Rp ${formatSeparatorRupiah(payload.nominal_bayar)} akan dilunasi dan dijurnal.`,
+                    icon: 'question',
+                    showCancelButton: true,
+                    confirmButtonColor: '#059669',
+                    cancelButtonColor: '#6c757d',
+                    confirmButtonText: 'Ya, Lunasi Sekarang',
+                    cancelButtonText: 'Batal'
+                }).then((result) => {
+                    if (!result.isConfirmed) return;
+
+                    Swal.fire({
+                        title: 'Memproses Pelunasan...',
+                        allowOutsideClick: false,
+                        didOpen: () => Swal.showLoading()
+                    });
+
+                    fetch(`{{ route('menu_koperasi_tagihan_koperasi_pelunasan') }}`, {
+                        method: 'POST',
+                        headers: {
+                            'Content-Type': 'application/json',
+                            'X-CSRF-TOKEN': '{{ csrf_token() }}',
+                            'Accept': 'application/json'
+                        },
+                        body: JSON.stringify(payload)
+                    })
+                    .then(async res => {
+                        const data = await res.json();
+                        if (!res.ok) throw new Error(data.message || 'Gagal memproses pelunasan.');
+                        return data;
+                    })
+                    .then(res => {
+                        Swal.fire('Berhasil!', res.message || 'Tagihan berhasil dilunasi.', 'success').then(() => {
+                            if (modalPelunasanTagihanInstance) {
+                                modalPelunasanTagihanInstance.hide();
+                            }
+                            loadDataTagihan();
+                        });
+                    })
+                    .catch(err => {
+                        Swal.fire('Gagal', err.message || 'Terjadi kesalahan saat memproses pelunasan.', 'error');
+                    });
+                });
+            });
+        }
+    });
+
     // Fungsi Pembantu: Format Angka ke Rupiah Akuntansi
     function formatRupiah(angka) {
-        return 'Rp ' + parseFloat(angka).toLocaleString('id-ID', {
+        return 'Rp ' + parseFloat(angka || 0).toLocaleString('id-ID', {
             minimumFractionDigits: 0
         });
     }

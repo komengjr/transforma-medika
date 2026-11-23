@@ -139,7 +139,6 @@
         transition: all 0.2s ease;
     }
 
-
     .ent-form .form-control,
     .ent-form .form-select {
         border: 1px solid var(--ent-grid-border) !important;
@@ -314,14 +313,14 @@
                                 </span>
                                 <span style="color: #94a3b8; font-size: 0.75rem; font-weight: 600;">Jurnal Otomatis &amp; Laporan</span>
                             </div>
-                            <h4 class="mb-0 fw-bold text-white" style="letter-spacing: -0.02em;">Pusat Laporan Keuangan Koperasi</h4>
+                            <h4 class="mb-0 fw-bold" style="letter-spacing: -0.02em; color: white;">Pusat Laporan Keuangan Koperasi</h4>
                             <p class="mb-0 small" style="color: #cbd5e1;">Jurnal Umum, Buku Besar, Laba Rugi, Perubahan Modal, Neraca, dan Arus Kas.</p>
                         </div>
                     </div>
 
                     <div class="col-lg-4 d-flex align-items-center justify-content-lg-end gap-2">
-                        <button type="button" onclick="window.print()" class="btn ent-btn ent-glass-pill px-3 py-2">
-                            <i class="fas fa-print me-1 text-info"></i> Cetak Laporan
+                        <button type="button" onclick="openSaldoAwalModal()" class="btn ent-btn ent-btn-success px-3 py-2">
+                            <i class="fas fa-plus-circle me-1"></i> Masukan Saldo Awal
                         </button>
                     </div>
                 </div>
@@ -370,6 +369,85 @@
 <!-- AREA KONTEN LAPORAN DINAMIS -->
 <div class="ent-card ent-table-surface mb-3 p-3 p-md-4 print-card" id="area-print-laporan">
     <div id="konten-laporan-dinamis">
+    </div>
+</div>
+
+<!-- MODAL INPUT SALDO AWAL KOPERASI -->
+<div class="modal fade no-print" id="modalSaldoAwal" tabindex="-1" aria-hidden="true">
+    <div class="modal-dialog modal-xl modal-dialog-centered modal-dialog-scrollable">
+        <div class="modal-content modal-ent-content">
+            <div class="ent-modal-banner py-3 px-4 d-flex align-items-center justify-content-between">
+                <div>
+                    <span class="ent-badge mb-1" style="background: rgba(16, 185, 129, 0.22); border: 1px solid rgba(16, 185, 129, 0.45); color: #6ee7b7; font-size: 0.62rem;">
+                        <i class="fas fa-scale-balanced me-1"></i> OPENING BALANCE (DOUBLE-ENTRY)
+                    </span>
+                    <h5 class="modal-title fw-bold text-white mb-0">Input Saldo Awal Neraca &amp; Akun Koperasi</h5>
+                </div>
+                <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <div class="modal-body p-4 ent-form">
+                <div class="alert alert-info py-2 px-3 small mb-3 rounded-3 d-flex align-items-center gap-2">
+                    <i class="fas fa-info-circle fa-lg"></i>
+                    <div>
+                        Masukkan saldo akhir sebelum aplikasi digunakan (Kas, Bank, Piutang, Persediaan di <strong>Debit</strong>; Utang, Simpanan Anggota, Modal/Ekuitas Awal di <strong>Kredit</strong>) hingga total <strong>Debit = Kredit</strong>.
+                    </div>
+                </div>
+
+                <div class="row g-3 mb-4">
+                    <div class="col-md-3">
+                        <label class="form-label ent-form-label">Tanggal Cut-Off Saldo Awal <span class="text-danger">*</span></label>
+                        <input type="date" class="form-control" id="sa_jurnal_tgl" value="{{ date('Y-m-01') }}" style="font-family: 'JetBrains Mono', monospace;" required>
+                    </div>
+                    <div class="col-md-9">
+                        <label class="form-label ent-form-label">Keterangan / Uraian Saldo Awal <span class="text-danger">*</span></label>
+                        <input type="text" class="form-control" id="sa_jurnal_keterangan" value="Saldo Awal Pembukuan Koperasi" placeholder="Contoh: Saldo Awal Migrasi Data Koperasi..." required>
+                    </div>
+                </div>
+
+                <div class="d-flex justify-content-between align-items-center mb-2 flex-wrap gap-2">
+                    <h6 class="fw-bold mb-0 small text-uppercase">
+                        <i class="fas fa-list-check me-2 text-success"></i>Daftar Akun Saldo Awal (Debit &amp; Kredit)
+                    </h6>
+                    <button type="button" class="btn btn-sm ent-btn ent-btn-primary px-3 py-1" onclick="tambahBarisSaldoAwal()">
+                        <i class="fas fa-plus me-1"></i> Tambah Baris Akun
+                    </button>
+                </div>
+
+                <div class="table-responsive rounded-3 mb-3" style="border: 1px solid var(--ent-grid-border);">
+                    <table class="table table-custom align-middle mb-0 w-100" id="table-saldo-awal-rows">
+                        <thead>
+                            <tr>
+                                <th style="width: 44%;">Akun Rekening (COA)</th>
+                                <th style="width: 24%;" class="text-end">Saldo Debit (Rp)</th>
+                                <th style="width: 24%;" class="text-end">Saldo Kredit (Rp)</th>
+                                <th style="width: 8%;" class="text-center">Hapus</th>
+                            </tr>
+                        </thead>
+                        <tbody id="tbody-saldo-awal">
+                            <!-- Baris saldo awal diisi via JS -->
+                        </tbody>
+                        <tfoot>
+                            <tr style="background-color: rgba(79, 70, 229, 0.08);">
+                                <td class="fw-bold text-uppercase text-end">Total Saldo Awal :</td>
+                                <td class="text-end fw-bold text-success" id="sa-total-debit" style="font-family: 'JetBrains Mono', monospace;">Rp 0</td>
+                                <td class="text-end fw-bold text-danger" id="sa-total-kredit" style="font-family: 'JetBrains Mono', monospace;">Rp 0</td>
+                                <td></td>
+                            </tr>
+                        </tfoot>
+                    </table>
+                </div>
+
+                <div id="sa-balance-indicator" class="alert py-2 px-3 small fw-bold mb-0 text-center rounded-3">
+                    Menghitung keseimbangan saldo awal...
+                </div>
+            </div>
+            <div class="modal-footer px-4 py-3" style="background-color: rgba(79, 70, 229, 0.05); border-top: 1px solid var(--ent-grid-border);">
+                <button type="button" class="btn ent-btn btn-secondary px-3 py-2" data-bs-dismiss="modal">Batal</button>
+                <button type="button" class="btn ent-btn ent-btn-success px-4 py-2" id="btn-simpan-saldo-awal" onclick="simpanSaldoAwal()" disabled>
+                    <i class="fas fa-save me-1"></i> Simpan Saldo Awal
+                </button>
+            </div>
+        </div>
     </div>
 </div>
 
@@ -489,8 +567,9 @@
     let laporanAktif = 'jurnal';
     let cachedGroupedJurnal = {};
     let modalEditJurnalInstance = null;
+    let modalSaldoAwalInstance = null;
 
-    // Daftar COA dari Blade untuk opsi dropdown di modal koreksi jurnal
+    // Daftar COA dari Blade untuk opsi dropdown di modal saldo awal & koreksi jurnal
     const daftarCoaMaster = @json($coa);
 
     function buildCoaOptionsHtml(selectedCode = '') {
@@ -517,6 +596,279 @@
         loadLaporanAktif();
     }
 
+    // =========================================================
+    // HELPER FORMAT & PARSE SEPARATOR RUPIAH
+    // =========================================================
+    function formatRupiahInput(rawValue) {
+        if (rawValue === null || rawValue === undefined) return '0';
+        let str = String(rawValue).trim();
+        if (str === '') return '0';
+
+        // Hilangkan spasi dan karakter selain angka, titik, atau koma
+        str = str.replace(/[^\d.,]/g, '');
+        if (str === '') return '0';
+
+        // Pisahkan bagian bulat dan desimal (jika ada koma)
+        let parts = str.split(',');
+        let intPart = parts[0].replace(/\./g, '');
+        let decPart = parts.length > 1 ? parts.slice(1).join('').replace(/\./g, '') : '';
+
+        // Jika tidak ada koma tapi ada titik, cek apakah titik adalah pemisah ribuan atau desimal
+        if (parts.length === 1 && str.includes('.')) {
+            const dotParts = str.split('.');
+            const lastSeg = dotParts[dotParts.length - 1];
+            // Jika bagian setelah titik 1-2 digit, anggap sebagai desimal; selain itu pemisah ribuan
+            if (dotParts.length === 2 && lastSeg.length > 0 && lastSeg.length <= 2) {
+                intPart = dotParts[0].replace(/\./g, '');
+                decPart = lastSeg;
+            } else {
+                intPart = str.replace(/\./g, '');
+                decPart = '';
+            }
+        }
+
+        intPart = intPart.replace(/^0+(?=\d)/, '');
+        if (intPart === '') intPart = '0';
+
+        const formattedInt = Number(intPart).toLocaleString('id-ID');
+        return decPart !== '' ? `${formattedInt},${decPart}` : formattedInt;
+    }
+
+    function parseRupiahNumber(formattedValue) {
+        if (formattedValue === null || formattedValue === undefined) return 0;
+        let str = String(formattedValue).trim();
+        if (str === '') return 0;
+
+        // Hapus karakter selain angka, titik, dan koma
+        str = str.replace(/[^\d.,]/g, '');
+        if (str === '') return 0;
+
+        if (str.includes(',')) {
+            const parts = str.split(',');
+            const intPart = parts[0].replace(/\./g, '') || '0';
+            const decPart = parts.slice(1).join('').replace(/\./g, '');
+            const num = parseFloat(`${intPart}.${decPart}`);
+            return Number.isNaN(num) ? 0 : num;
+        }
+
+        if (str.includes('.')) {
+            const dotParts = str.split('.');
+            const lastSeg = dotParts[dotParts.length - 1];
+            if (dotParts.length === 2 && lastSeg.length > 0 && lastSeg.length <= 2) {
+                const intPart = dotParts[0].replace(/\./g, '') || '0';
+                const num = parseFloat(`${intPart}.${lastSeg}`);
+                return Number.isNaN(num) ? 0 : num;
+            }
+            const cleanInt = str.replace(/\./g, '');
+            const num = parseFloat(cleanInt);
+            return Number.isNaN(num) ? 0 : num;
+        }
+
+        const num = parseFloat(str);
+        return Number.isNaN(num) ? 0 : num;
+    }
+
+    function formatNominalDisplay(num) {
+        const val = Number(num || 0);
+        return val.toLocaleString('id-ID', {
+            minimumFractionDigits: 0,
+            maximumFractionDigits: 2
+        });
+    }
+
+    // =========================================================
+    // FUNGSI INPUT SALDO AWAL KOPERASI
+    // =========================================================
+    function openSaldoAwalModal() {
+        const tbody = document.getElementById('tbody-saldo-awal');
+        tbody.innerHTML = '';
+
+        tambahBarisSaldoAwal();
+        tambahBarisSaldoAwal();
+        hitungTotalSaldoAwal();
+
+        if (!modalSaldoAwalInstance) {
+            modalSaldoAwalInstance = new bootstrap.Modal(document.getElementById('modalSaldoAwal'));
+        }
+        modalSaldoAwalInstance.show();
+    }
+
+    function tambahBarisSaldoAwal(selectedCode = '', debitVal = 0, kreditVal = 0) {
+        const tbody = document.getElementById('tbody-saldo-awal');
+        const tr = document.createElement('tr');
+
+        tr.innerHTML = `
+            <td>
+                <select class="form-select sa-row-coa" required>
+                    ${buildCoaOptionsHtml(selectedCode)}
+                </select>
+            </td>
+            <td>
+                <input type="text" inputmode="decimal" class="form-control text-end sa-row-debit" value="${formatNominalDisplay(debitVal)}" style="font-family: 'JetBrains Mono', monospace;" oninput="onInputSaldoAwalNominal(this, 'debit')">
+            </td>
+            <td>
+                <input type="text" inputmode="decimal" class="form-control text-end sa-row-kredit" value="${formatNominalDisplay(kreditVal)}" style="font-family: 'JetBrains Mono', monospace;" oninput="onInputSaldoAwalNominal(this, 'kredit')">
+            </td>
+            <td class="text-center">
+                <button type="button" class="btn btn-sm ent-btn btn-outline-danger py-1 px-2" onclick="hapusBarisSaldoAwal(this)" title="Hapus Baris">
+                    <i class="fas fa-trash"></i>
+                </button>
+            </td>
+        `;
+        tbody.appendChild(tr);
+        hitungTotalSaldoAwal();
+    }
+
+    function onInputSaldoAwalNominal(inputEl, tipe) {
+        const formatted = formatRupiahInput(inputEl.value);
+        inputEl.value = formatted;
+
+        const row = inputEl.closest('tr');
+        const val = parseRupiahNumber(formatted);
+        if (val > 0) {
+            if (tipe === 'debit') {
+                row.querySelector('.sa-row-kredit').value = '0';
+            } else {
+                row.querySelector('.sa-row-debit').value = '0';
+            }
+        }
+        hitungTotalSaldoAwal();
+    }
+
+    function hapusBarisSaldoAwal(btn) {
+        const tbody = document.getElementById('tbody-saldo-awal');
+        if (tbody.querySelectorAll('tr').length <= 2) {
+            Swal.fire('Minimal 2 Baris', 'Saldo awal double-entry minimal memiliki 2 baris akun (Debit dan Kredit).', 'warning');
+            return;
+        }
+        btn.closest('tr').remove();
+        hitungTotalSaldoAwal();
+    }
+
+    function hitungTotalSaldoAwal() {
+        let totalDebit = 0;
+        let totalKredit = 0;
+
+        document.querySelectorAll('#tbody-saldo-awal tr').forEach(row => {
+            totalDebit += parseRupiahNumber(row.querySelector('.sa-row-debit').value);
+            totalKredit += parseRupiahNumber(row.querySelector('.sa-row-kredit').value);
+        });
+
+        document.getElementById('sa-total-debit').textContent = 'Rp ' + formatNominalDisplay(totalDebit);
+        document.getElementById('sa-total-kredit').textContent = 'Rp ' + formatNominalDisplay(totalKredit);
+
+        const indicator = document.getElementById('sa-balance-indicator');
+        const btnSave = document.getElementById('btn-simpan-saldo-awal');
+        const isBalanced = totalDebit > 0 && Math.abs(totalDebit - totalKredit) < 0.01;
+
+        if (isBalanced) {
+            indicator.className = 'alert alert-success py-2 px-3 small fw-bold mb-0 text-center rounded-3';
+            indicator.innerHTML = `<i class="fas fa-check-circle me-1"></i> SALDO AWAL SEIMBANG (BALANCE) — Rp ${formatNominalDisplay(totalDebit)}`;
+            btnSave.disabled = false;
+        } else if (totalDebit === 0 && totalKredit === 0) {
+            indicator.className = 'alert alert-secondary py-2 px-3 small fw-bold mb-0 text-center rounded-3';
+            indicator.innerHTML = `<i class="fas fa-info-circle me-1"></i> Silakan masukkan nominal Debit dan Kredit saldo awal.`;
+            btnSave.disabled = true;
+        } else {
+            const selisih = Math.abs(totalDebit - totalKredit);
+            indicator.className = 'alert alert-danger py-2 px-3 small fw-bold mb-0 text-center rounded-3';
+            indicator.innerHTML = `<i class="fas fa-exclamation-triangle me-1"></i> BELUM SEIMBANG (UNBALANCED) — Selisih: Rp ${formatNominalDisplay(selisih)}`;
+            btnSave.disabled = true;
+        }
+    }
+
+    function simpanSaldoAwal() {
+        const tanggal = document.getElementById('sa_jurnal_tgl').value;
+        const keterangan = document.getElementById('sa_jurnal_keterangan').value.trim();
+
+        if (!tanggal || !keterangan) {
+            Swal.fire('Form Belum Lengkap', 'Tanggal cut-off dan keterangan saldo awal wajib diisi.', 'warning');
+            return;
+        }
+
+        const details = [];
+        let validRows = true;
+
+        document.querySelectorAll('#tbody-saldo-awal tr').forEach(row => {
+            const coaCode = row.querySelector('.sa-row-coa').value;
+            const debit = parseRupiahNumber(row.querySelector('.sa-row-debit').value);
+            const kredit = parseRupiahNumber(row.querySelector('.sa-row-kredit').value);
+
+            if (!coaCode || (debit === 0 && kredit === 0)) {
+                validRows = false;
+            }
+
+            details.push({
+                coa_code: coaCode,
+                jurnal_debit: debit,
+                jurnal_kredit: kredit
+            });
+        });
+
+        if (!validRows) {
+            Swal.fire('Baris Tidak Valid', 'Pastikan setiap baris memiliki Akun COA dan nominal Debit atau Kredit lebih dari 0.', 'warning');
+            return;
+        }
+
+        Swal.fire({
+            title: 'Simpan Saldo Awal?',
+            text: `Data saldo awal per tanggal ${tanggal} akan dicatat ke Jurnal Umum, Buku Besar, dan Neraca.`,
+            icon: 'question',
+            showCancelButton: true,
+            confirmButtonColor: '#059669',
+            cancelButtonColor: '#6c757d',
+            confirmButtonText: 'Ya, Simpan Saldo Awal',
+            cancelButtonText: 'Batal'
+        }).then((result) => {
+            if (result.isConfirmed) {
+                Swal.fire({
+                    title: 'Menyimpan Saldo Awal...',
+                    allowOutsideClick: false,
+                    didOpen: () => {
+                        Swal.showLoading();
+                    }
+                });
+
+                fetch(`{{ route('akutansi_koperasi_saldo_awal_store') }}`, {
+                        method: 'POST',
+                        headers: {
+                            'Content-Type': 'application/json',
+                            'X-CSRF-TOKEN': '{{ csrf_token() }}',
+                            'Accept': 'application/json'
+                        },
+                        body: JSON.stringify({
+                            jurnal_tgl: tanggal,
+                            jurnal_keterangan: keterangan,
+                            details: details
+                        })
+                    })
+                    .then(async res => {
+                        const data = await res.json();
+                        if (!res.ok) throw new Error(data.message || 'Gagal menyimpan saldo awal.');
+                        return data;
+                    })
+                    .then(res => {
+                        Swal.fire('Berhasil!', res.message || 'Saldo awal berhasil disimpan.', 'success').then(() => {
+                            if (modalSaldoAwalInstance) {
+                                modalSaldoAwalInstance.hide();
+                            }
+                            const filterMulai = document.getElementById('global-tgl-mulai');
+                            if (tanggal < filterMulai.value) {
+                                filterMulai.value = tanggal;
+                            }
+                            loadLaporanAktif();
+                        });
+                    })
+                    .catch(err => {
+                        Swal.fire('Gagal Menyimpan', err.message || 'Terjadi kesalahan saat menyimpan saldo awal.', 'error');
+                    });
+            }
+        });
+    }
+
+    // =========================================================
+    // FUNGSI EDIT / KOREKSI JURNAL UMUM
+    // =========================================================
     function openEditJurnalModal(noBukti) {
         const jurnal = cachedGroupedJurnal[noBukti];
         if (!jurnal) {
@@ -561,10 +913,10 @@
                 </select>
             </td>
             <td>
-                <input type="number" step="any" min="0" class="form-control text-end edit-row-debit" value="${debitVal}" style="font-family: 'JetBrains Mono', monospace;" oninput="hitungTotalEditJurnal()">
+                <input type="text" inputmode="decimal" class="form-control text-end edit-row-debit" value="${formatNominalDisplay(debitVal)}" style="font-family: 'JetBrains Mono', monospace;" oninput="onInputEditJurnalNominal(this, 'debit')">
             </td>
             <td>
-                <input type="number" step="any" min="0" class="form-control text-end edit-row-kredit" value="${kreditVal}" style="font-family: 'JetBrains Mono', monospace;" oninput="hitungTotalEditJurnal()">
+                <input type="text" inputmode="decimal" class="form-control text-end edit-row-kredit" value="${formatNominalDisplay(kreditVal)}" style="font-family: 'JetBrains Mono', monospace;" oninput="onInputEditJurnalNominal(this, 'kredit')">
             </td>
             <td class="text-center">
                 <button type="button" class="btn btn-sm ent-btn btn-outline-danger py-1 px-2" onclick="hapusBarisEditJurnal(this)" title="Hapus Baris">
@@ -573,6 +925,22 @@
             </td>
         `;
         tbody.appendChild(tr);
+        hitungTotalEditJurnal();
+    }
+
+    function onInputEditJurnalNominal(inputEl, tipe) {
+        const formatted = formatRupiahInput(inputEl.value);
+        inputEl.value = formatted;
+
+        const row = inputEl.closest('tr');
+        const val = parseRupiahNumber(formatted);
+        if (val > 0) {
+            if (tipe === 'debit') {
+                row.querySelector('.edit-row-kredit').value = '0';
+            } else {
+                row.querySelector('.edit-row-debit').value = '0';
+            }
+        }
         hitungTotalEditJurnal();
     }
 
@@ -591,12 +959,12 @@
         let totalKredit = 0;
 
         document.querySelectorAll('#tbody-edit-jurnal tr').forEach(row => {
-            totalDebit += parseFloat(row.querySelector('.edit-row-debit').value) || 0;
-            totalKredit += parseFloat(row.querySelector('.edit-row-kredit').value) || 0;
+            totalDebit += parseRupiahNumber(row.querySelector('.edit-row-debit').value);
+            totalKredit += parseRupiahNumber(row.querySelector('.edit-row-kredit').value);
         });
 
-        document.getElementById('edit-total-debit').textContent = 'Rp ' + totalDebit.toLocaleString('id-ID');
-        document.getElementById('edit-total-kredit').textContent = 'Rp ' + totalKredit.toLocaleString('id-ID');
+        document.getElementById('edit-total-debit').textContent = 'Rp ' + formatNominalDisplay(totalDebit);
+        document.getElementById('edit-total-kredit').textContent = 'Rp ' + formatNominalDisplay(totalKredit);
 
         const indicator = document.getElementById('edit-balance-indicator');
         const btnSave = document.getElementById('btn-simpan-koreksi-jurnal');
@@ -604,12 +972,12 @@
 
         if (isBalanced) {
             indicator.className = 'alert alert-success py-2 px-3 small fw-bold mb-0 text-center rounded-3';
-            indicator.innerHTML = `<i class="fas fa-check-circle me-1"></i> JURNAL SEIMBANG (BALANCE) — Rp ${totalDebit.toLocaleString('id-ID')}`;
+            indicator.innerHTML = `<i class="fas fa-check-circle me-1"></i> JURNAL SEIMBANG (BALANCE) — Rp ${formatNominalDisplay(totalDebit)}`;
             btnSave.disabled = false;
         } else {
             const selisih = Math.abs(totalDebit - totalKredit);
             indicator.className = 'alert alert-danger py-2 px-3 small fw-bold mb-0 text-center rounded-3';
-            indicator.innerHTML = `<i class="fas fa-exclamation-triangle me-1"></i> TIDAK SEIMBANG (UNBALANCED) — Selisih: Rp ${selisih.toLocaleString('id-ID')}`;
+            indicator.innerHTML = `<i class="fas fa-exclamation-triangle me-1"></i> TIDAK SEIMBANG (UNBALANCED) — Selisih: Rp ${formatNominalDisplay(selisih)}`;
             btnSave.disabled = true;
         }
     }
@@ -630,8 +998,8 @@
         document.querySelectorAll('#tbody-edit-jurnal tr').forEach(row => {
             const id = row.querySelector('.edit-row-id').value;
             const coaCode = row.querySelector('.edit-row-coa').value;
-            const debit = parseFloat(row.querySelector('.edit-row-debit').value) || 0;
-            const kredit = parseFloat(row.querySelector('.edit-row-kredit').value) || 0;
+            const debit = parseRupiahNumber(row.querySelector('.edit-row-debit').value);
+            const kredit = parseRupiahNumber(row.querySelector('.edit-row-kredit').value);
 
             if (!coaCode || (debit === 0 && kredit === 0)) {
                 validRows = false;
@@ -714,7 +1082,6 @@
             fetch(`{{ route('akutansi_koperasi_report_jurnal') }}${params}`)
                 .then(res => res.json())
                 .then(data => {
-                    // 1. Kelompokkan data berdasarkan jurnal_no_bukti
                     const groupedJurnal = {};
 
                     data.forEach(item => {
@@ -736,7 +1103,6 @@
 
                     cachedGroupedJurnal = groupedJurnal;
 
-                    // 2. Susun HTML Tabel dengan Grouping per No Bukti
                     let html = `
                     <div class="d-flex justify-content-between align-items-center mb-3 flex-wrap gap-2">
                         <h5 class="fw-bold m-0"><i class="fas fa-book me-2 text-primary"></i>Jurnal Umum Koperasi</h5>
@@ -763,12 +1129,10 @@
                         html += `<tr><td colspan="6" class="text-center py-4 opacity-75">Tidak ada data transaksi jurnal pada periode ini.</td></tr>`;
                     }
 
-                    // 3. Looping kelompok jurnal
                     keys.forEach(noBukti => {
                         const jurnal = groupedJurnal[noBukti];
                         const safeNoBukti = String(noBukti).replace(/'/g, "\\'");
 
-                        // Baris Header untuk nomor bukti, tanggal, dan tombol edit transaksi
                         html += `
                         <tr class="jurnal-group-header fw-bold">
                             <td style="font-family: 'JetBrains Mono', monospace; font-size: 0.78rem;">
@@ -785,7 +1149,6 @@
                         </tr>
                     `;
 
-                        // Looping detail akun di dalam nomor bukti tersebut
                         jurnal.details.forEach((detail, index) => {
                             const indentStyle = detail.kredit > 0 ? 'ps-4 opacity-75 fst-italic' : 'fw-semibold';
                             const displayDebit = detail.debit > 0 ? `Rp ${detail.debit.toLocaleString('id-ID')}` : '-';
@@ -809,7 +1172,6 @@
                         `;
                         });
 
-                        // Pembatas antar nomor bukti
                         html += `<tr class="jurnal-spacer"><td colspan="6"></td></tr>`;
                     });
 

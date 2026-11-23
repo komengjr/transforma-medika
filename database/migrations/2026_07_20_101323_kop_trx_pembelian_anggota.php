@@ -13,7 +13,6 @@ class KopTrxPembelianAnggota extends Migration
      */
     public function up()
     {
-        // 1. Tabel Utama Pembelian Barang
         Schema::create('kop_trx_pembelian_anggota', function (Blueprint $table) {
             $table->id();
 
@@ -63,8 +62,6 @@ class KopTrxPembelianAnggota extends Migration
                 ->on('kop_master_peserta')
                 ->onDelete('restrict');
         });
-
-        // 2. Tabel Jadwal Angsuran / Tenor Detail
         Schema::create('kop_trx_pembelian_tenor', function (Blueprint $table) {
             $table->id();
 

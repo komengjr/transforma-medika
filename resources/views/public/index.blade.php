@@ -257,6 +257,7 @@
                 <li><a href="#about" @click="mm=false" class="block text-slate-700 dark:text-slate-300 hover:text-indigo-600">Tentang Kami</a></li>
                 <li><a href="#process" @click="mm=false" class="block text-slate-700 dark:text-slate-300 hover:text-indigo-600">Alur Kerja</a></li>
                 <li><a href="{{ route('blog.index') }}" @click="mm=false" class="block text-slate-700 dark:text-slate-300 hover:text-indigo-600">Blog &amp; Info</a></li>
+                <li><a href="{{ route('public.brain-test.index') }}" @click="mm=false" class="block text-slate-700 dark:text-slate-300 hover:text-indigo-600">Bank Soal &amp; Tryout</a></li>
                 <li><a href="#contact" @click="mm=false" class="block text-slate-700 dark:text-slate-300 hover:text-indigo-600">Kontak</a></li>
                 <li class="pt-3 border-t border-slate-100 dark:border-slate-800 flex flex-col gap-2.5">
                     <a href="/login" class="inline-flex items-center justify-center border border-slate-300 dark:border-slate-700 text-slate-700 dark:text-slate-200 font-medium text-sm px-5 py-2.5 rounded-xl">Portal Klien</a>

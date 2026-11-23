@@ -500,9 +500,8 @@
                                 <div class="col-4">
                                     <input type="radio" class="btn-check" name="metode_pembayaran_pilihan" id="metodeSaldo" value="SALDO" autocomplete="off" checked>
                                     <label class="btn w-100 p-2 text-start d-flex flex-column align-items-center justify-content-center payment-card rounded-3 h-100" for="metodeSaldo">
-                                        <div class="rounded-circle bg-success bg-opacity-10 p-2 mb-1 text-success">
-                                            <i class="fas fa-wallet"></i>
-                                        </div>
+
+                                        <i class="fas fa-wallet text-success"></i>
                                         <span class="fw-bold text-center" style="font-size: 0.72rem;">Saldo Anggota</span>
                                         <span class="ent-badge badge-status-lunas mt-1" style="font-size: 0.6rem; padding: 2px 7px;">LUNAS</span>
                                     </label>
@@ -511,9 +510,8 @@
                                 <div class="col-4">
                                     <input type="radio" class="btn-check" name="metode_pembayaran_pilihan" id="metodePotongGaji" value="POTONG_GAJI" autocomplete="off">
                                     <label class="btn w-100 p-2 text-start d-flex flex-column align-items-center justify-content-center payment-card rounded-3 h-100" for="metodePotongGaji">
-                                        <div class="rounded-circle bg-info bg-opacity-10 p-2 mb-1 text-info">
-                                            <i class="fas fa-file-invoice-dollar"></i>
-                                        </div>
+
+                                        <i class="fas fa-file-invoice-dollar text-info"></i>
                                         <span class="fw-bold text-center" style="font-size: 0.72rem;">Potong Gaji</span>
                                         <span class="ent-badge badge-status-piutang mt-1" style="font-size: 0.6rem; padding: 2px 7px;">PIUTANG</span>
                                     </label>
@@ -522,9 +520,7 @@
                                 <div class="col-4">
                                     <input type="radio" class="btn-check" name="metode_pembayaran_pilihan" id="metodeTagihanBulan" value="TAGIHAN_BULAN" autocomplete="off">
                                     <label class="btn w-100 p-2 text-start d-flex flex-column align-items-center justify-content-center payment-card rounded-3 h-100" for="metodeTagihanBulan">
-                                        <div class="rounded-circle bg-warning bg-opacity-10 p-2 mb-1 text-warning">
-                                            <i class="fas fa-clock"></i>
-                                        </div>
+                                        <i class="fas fa-clock warning"></i>
                                         <span class="fw-bold text-center" style="font-size: 0.72rem;">Tagihan Bulan</span>
                                         <span class="ent-badge badge-status-pending mt-1" style="font-size: 0.6rem; padding: 2px 7px;">PENDING</span>
                                     </label>

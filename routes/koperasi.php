@@ -144,7 +144,8 @@ Route::prefix('koperasi/')->group(function (): void {
     Route::post('menu-koperasi/simpanan-sukarela/proses-save-data', [KoperasiController::class, 'menu_koperasi_sukarela_proses_save'])->name('menu_koperasi_sukarela_proses_save');
 
     Route::get('menu-koperasi/tagihan-koperasi/load', [KoperasiController::class, 'menu_koperasi_tagihan_koperasi_load'])->name('menu_koperasi_tagihan_koperasi_load');
-
+    Route::post('menu-koperasi/tagihan-koperasi/pelunasan', [KoperasiController::class, 'prosesPelunasanTagihan'])->name('menu_koperasi_tagihan_koperasi_pelunasan');
+    Route::post('menu-koperasi/tagihan-koperasi/pembelian-barang/store', [KoperasiController::class, 'simpanPembelianBarang'])->name('menu_koperasi_pembelian_barang_store');
     Route::get('menu-koperasi/pembelian-barang-koperasi/get-data', [KoperasiController::class, 'menu_koperasi_pembelian_barang_get_data'])->name('menu_koperasi_pembelian_barang_get_data');
     Route::post('menu-koperasi/pembelian-barang-koperasi/save-data', [KoperasiController::class, 'menu_koperasi_pembelian_barang_save'])->name('menu_koperasi_pembelian_barang_save');
 
@@ -255,3 +256,9 @@ Route::prefix('koperasi/')->group(function (): void {
     Route::get('laporan-koperasi/laporan-pembagian-shu/get-data', [KoperasiController::class, 'laporan_koperasi_pembagian_shu_get_data'])->name('laporan_koperasi_pembagian_shu_get_data');
     Route::post('laporan-koperasi/laporan-pembagian-shu/cairkan-shu', [KoperasiController::class, 'laporan_koperasi_pembagian_shu_cairkan_shu'])->name('laporan_koperasi_pembagian_shu_cairkan_shu');
 });
+
+
+Route::post('/koperasi/akutansi-koperasi/report/jurnal/update', [KoperasiController::class, 'simpanKoreksiJurnal'])
+    ->name('akutansi_koperasi_report_jurnal_update');
+Route::post('/koperasi/akutansi-koperasi/saldo-awal/store', [KoperasiController::class, 'simpanSaldoAwal'])
+    ->name('akutansi_koperasi_saldo_awal_store');
