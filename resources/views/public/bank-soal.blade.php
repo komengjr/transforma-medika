@@ -80,13 +80,13 @@
             height: 100%;
             pointer-events: none;
             z-index: 1;
-            opacity: 0.78;
+            opacity: 0.72;
             transition: transform 0.35s ease, opacity 0.35s ease;
         }
 
         .group:hover .card-atk-bg {
-            transform: scale(1.05);
-            opacity: 0.95;
+            transform: scale(1.04);
+            opacity: 0.9;
         }
 
         /* Animasi perpindahan halaman saat konfirmasi Yes */
@@ -145,7 +145,7 @@
     <!-- ANIMASI PERPINDAHAN HALAMAN -->
     <div id="pageTransitionOverlay" class="page-transition-overlay" aria-hidden="true">
         <div class="transition-card text-center text-white px-6">
-            <div class="w-16 h-16 mx-auto mb-4 rounded-2xl bg-indigo-600/25 border border-indigo-400/40 flex items-center justify-center relative">
+            <div class="w-16 h-16 mx-auto mb-4 rounded-2xl bg-indigo-600/25 border border-indigo-400/40 flex items-center justify-content-center relative">
                 <div class="w-10 h-10 border-4 border-indigo-400 border-t-transparent rounded-full animate-spin"></div>
             </div>
             <p class="text-xs uppercase tracking-widest text-indigo-300 font-bold mb-1">Menyiapkan Lembar Ujian</p>
@@ -242,33 +242,12 @@
         </div>
     </section>
 
-    <!-- DAFTAR CARD ALA NETFLIX PER KLASIFIKASI (HANYA NAMA TES, KATEGORI, PASSING GRADE, URUTAN) -->
+    <!-- DAFTAR CARD ALA NETFLIX PER KLASIFIKASI (1 NAMA TES = 1 CARD + SEMUA KATEGORINYA) -->
     <main class="max-w-7xl mx-auto px-6 py-10 w-full flex-grow space-y-12">
-        @forelse($klasifikasis as $kIdx => $klas)
+        @forelse($klasifikasis as $klas)
         @php
-        $cardsInKlas = collect();
-        foreach ($klas->pakets as $pIdx => $paket) {
-        if ($paket->kategoris->count() > 0) {
-        foreach ($paket->kategoris as $kategori) {
-        $cardsInKlas->push([
-        'urutan' => $kategori->urutan ?? ($pIdx + 1),
-        'nama_test' => $paket->nama_test,
-        'kategori' => $kategori->nama_kategori,
-        'passing_grade' => $paket->passing_grade ?? 0,
-        'tes_url' => route('brain-test.tes.halaman', $paket->id),
-        ]);
-        }
-        } else {
-        $cardsInKlas->push([
-        'urutan' => $paket->urutan ?? ($pIdx + 1),
-        'nama_test' => $paket->nama_test,
-        'kategori' => '-',
-        'passing_grade' => $paket->passing_grade ?? 0,
-        'tes_url' => route('brain-test.tes.halaman', $paket->id),
-        ]);
-        }
-        }
-        $rowRef = 'netflixRow_' . $klas->id;
+            $paketsInKlas = $klas->pakets ?? collect();
+            $rowRef = 'netflixRow_' . $klas->id;
         @endphp
 
         <section x-show="selectedKlasifikasi === 'all' || selectedKlasifikasi === '{{ $klas->id }}'" x-transition
@@ -289,9 +268,9 @@
 
                 <div class="flex items-center gap-2">
                     <span class="text-xs font-semibold px-3 py-1.5 rounded-xl bg-slate-200/70 dark:bg-slate-800 text-slate-700 dark:text-slate-300">
-                        {{ $cardsInKlas->count() }} Data Tes
+                        {{ $paketsInKlas->count() }} Paket Tes
                     </span>
-                    @if($cardsInKlas->count() > 0)
+                    @if($paketsInKlas->count() > 0)
                     <button type="button" @click="scrollRow('{{ $rowRef }}', -420)"
                         class="w-8 h-8 rounded-full bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-700 flex items-center justify-center hover:border-indigo-500 transition-colors"
                         title="Geser Kiri">
@@ -306,105 +285,101 @@
                 </div>
             </div>
 
-            @if($cardsInKlas->count() > 0)
+            @if($paketsInKlas->count() > 0)
             <div id="{{ $rowRef }}" class="netflix-row flex gap-4 overflow-x-auto pb-4 pt-1 scroll-smooth">
-                @foreach($cardsInKlas as $itemIdx => $card)
+                @foreach($paketsInKlas as $pIdx => $paket)
                 @php
-                $searchBlob = strtolower($card['nama_test'] . ' ' . $card['kategori'] . ' ' . $klas->nama_klasifikasi);
+                    $kategoris = $paket->kategoris ?? collect();
+                    $kategoriLabels = $kategoris->pluck('nama_kategori')->filter()->values();
+                    $kategoriSummaryText = $kategoriLabels->isNotEmpty() ? $kategoriLabels->implode(', ') : '-';
+                    $urutanCard = $kategoris->min('urutan') ?? ($paket->urutan ?? ($pIdx + 1));
+                    $tesUrl = route('brain-test.tes.halaman', $paket->id);
+                    $searchBlob = strtolower($paket->nama_test . ' ' . $kategoriSummaryText . ' ' . $klas->nama_klasifikasi);
                 @endphp
 
-                <a href="{{ $card['tes_url'] }}"
-                    @click.prevent="confirmMulaiUjian({{ json_encode($card['nama_test']) }}, {{ json_encode($card['kategori']) }}, {{ json_encode($card['tes_url']) }})"
+                <a href="{{ $tesUrl }}"
+                    @click.prevent="confirmMulaiUjian({{ json_encode($paket->nama_test) }}, {{ json_encode($kategoriSummaryText) }}, {{ json_encode($tesUrl) }})"
                     x-show="searchQuery.trim() === '' || {{ json_encode($searchBlob) }}.includes(searchQuery.toLowerCase().trim())"
-                    class="group relative shrink-0 w-56 sm:w-64 aspect-[3/4] rounded-2xl overflow-hidden bg-white dark:bg-slate-900 border-2 border-slate-200 dark:border-slate-700 shadow-md hover:shadow-xl hover:border-indigo-500 hover:scale-[1.03] hover:z-10 transition-all duration-300 flex flex-col justify-between p-5 text-slate-900 dark:text-white cursor-pointer">
+                    class="group relative shrink-0 w-64 sm:w-72 min-h-[340px] rounded-2xl overflow-hidden bg-white dark:bg-slate-900 border-2 border-slate-200 dark:border-slate-700 shadow-md hover:shadow-xl hover:border-indigo-500 hover:scale-[1.02] hover:z-10 transition-all duration-300 flex flex-col justify-between p-5 text-slate-900 dark:text-white cursor-pointer">
 
-                    <!-- Gambar Buku di Tengah/Kiri, Papan Ujian & Alat Tulis di Sampingnya -->
+                    <!-- Background Buku, Papan Ujian & Alat Tulis -->
                     <svg class="card-atk-bg" viewBox="0 0 280 380" fill="none" xmlns="http://www.w3.org/2000/svg" aria-hidden="true">
-                        <!-- BUKU (Tengah - Kiri) -->
                         <g transform="translate(24, 62) rotate(-5)">
-                            <!-- Cover & Halaman Buku -->
                             <rect x="0" y="0" width="128" height="156" rx="10" fill="#e0e7ff" stroke="#4f46e5" stroke-width="3.5" />
                             <rect x="12" y="6" width="110" height="144" rx="6" fill="#ffffff" stroke="#94a3b8" stroke-width="2.5" />
-                            <!-- Punggung Buku -->
                             <rect x="0" y="0" width="14" height="156" rx="5" fill="#6366f1" stroke="#4338ca" stroke-width="3" />
-                            <!-- Garis Teks Halaman Buku -->
                             <rect x="26" y="24" width="76" height="8" rx="4" fill="#4f46e5" />
                             <rect x="26" y="42" width="68" height="6" rx="3" fill="#cbd5e1" />
                             <rect x="26" y="56" width="74" height="6" rx="3" fill="#cbd5e1" />
                             <rect x="26" y="70" width="56" height="6" rx="3" fill="#cbd5e1" />
-                            <rect x="26" y="92" width="72" height="6" rx="3" fill="#cbd5e1" />
-                            <rect x="26" y="106" width="62" height="6" rx="3" fill="#cbd5e1" />
-                            <rect x="26" y="120" width="70" height="6" rx="3" fill="#cbd5e1" />
                         </g>
 
-                        <!-- PAPAN UJIAN / CLIPBOARD (Di Samping Kanan Buku) -->
                         <g transform="translate(166, 56) rotate(7)">
                             <rect x="0" y="10" width="90" height="122" rx="9" fill="#f59e0b" stroke="#b45309" stroke-width="3" />
                             <rect x="8" y="20" width="74" height="104" rx="5" fill="#ffffff" stroke="#d97706" stroke-width="2" />
-                            <!-- Klip Papan Ujian di Atas -->
                             <rect x="24" y="0" width="42" height="18" rx="5" fill="#94a3b8" stroke="#475569" stroke-width="2.5" />
                             <circle cx="45" cy="8" r="4" fill="#f8fafc" />
-                            <!-- Garis Lembar Jawaban pada Papan Ujian -->
                             <line x1="18" y1="38" x2="70" y2="38" stroke="#64748b" stroke-width="2.5" stroke-linecap="round" />
                             <line x1="18" y1="54" x2="64" y2="54" stroke="#94a3b8" stroke-width="2" stroke-linecap="round" />
-                            <line x1="18" y1="68" x2="68" y2="68" stroke="#94a3b8" stroke-width="2" stroke-linecap="round" />
                             <circle cx="22" cy="88" r="4" fill="#10b981" />
                             <line x1="32" y1="88" x2="66" y2="88" stroke="#94a3b8" stroke-width="2" stroke-linecap="round" />
-                            <circle cx="22" cy="104" r="4" stroke="#94a3b8" stroke-width="2" fill="none" />
-                            <line x1="32" y1="104" x2="60" y2="104" stroke="#94a3b8" stroke-width="2" stroke-linecap="round" />
                         </g>
 
-                        <!-- ALAT TULIS DI SAMPING BAWAH: PENSIL, PENGGARIS, PENGHAPUS & STABILO -->
-                        <!-- Pensil -->
                         <g transform="translate(34, 232) rotate(-22)">
                             <rect x="0" y="14" width="18" height="78" rx="3" fill="#fde047" stroke="#ca8a04" stroke-width="2.5" />
                             <rect x="0" y="0" width="18" height="14" rx="4" fill="#fda4af" stroke="#e11d48" stroke-width="2.5" />
                             <polygon points="0,92 18,92 9,112" fill="#fef3c7" stroke="#ca8a04" stroke-width="2.5" stroke-linejoin="round" />
-                            <polygon points="6.5,107 11.5,107 9,112" fill="#1e293b" />
                         </g>
 
-                        <!-- Penggaris -->
                         <g transform="translate(82, 238) rotate(12)">
                             <rect x="0" y="0" width="88" height="20" rx="4" fill="#bae6fd" stroke="#0284c7" stroke-width="2.5" />
                             <line x1="12" y1="0" x2="12" y2="8" stroke="#0369a1" stroke-width="1.8" />
                             <line x1="24" y1="0" x2="24" y2="6" stroke="#0369a1" stroke-width="1.8" />
                             <line x1="36" y1="0" x2="36" y2="8" stroke="#0369a1" stroke-width="1.8" />
                             <line x1="48" y1="0" x2="48" y2="6" stroke="#0369a1" stroke-width="1.8" />
-                            <line x1="60" y1="0" x2="60" y2="8" stroke="#0369a1" stroke-width="1.8" />
-                            <line x1="72" y1="0" x2="72" y2="6" stroke="#0369a1" stroke-width="1.8" />
-                        </g>
-
-                        <!-- Penghapus -->
-                        <g transform="translate(182, 212) rotate(16)">
-                            <rect x="0" y="0" width="44" height="24" rx="5" fill="#fbcfe8" stroke="#db2777" stroke-width="2.5" />
-                            <rect x="13" y="0" width="18" height="24" fill="#f472b6" opacity="0.55" />
-                        </g>
-
-                        <!-- Stabilo / Pulpen -->
-                        <g transform="translate(232, 206) rotate(32)">
-                            <rect x="0" y="12" width="16" height="54" rx="3.5" fill="#bef264" stroke="#65a30d" stroke-width="2.5" />
-                            <polygon points="2,12 14,12 10.5,2 5.5,2" fill="#d9f99d" stroke="#65a30d" stroke-width="2.2" stroke-linejoin="round" />
                         </g>
                     </svg>
 
                     <div class="relative z-10 flex items-center justify-between gap-2">
                         <span class="px-2.5 py-1 rounded-md bg-rose-600 text-white text-[11px] font-extrabold tracking-wide shadow">
-                            URUTAN #{{ $card['urutan'] }}
+                            URUTAN #{{ $urutanCard }}
                         </span>
+                        @if(!empty($paket->durasi_menit))
+                        <span class="px-2.5 py-1 rounded-md bg-slate-900/80 text-white text-[11px] font-semibold">
+                            {{ $paket->durasi_menit }} Menit
+                        </span>
+                        @endif
                     </div>
 
-                    <div class="relative z-10 mt-auto space-y-2.5 bg-white/85 dark:bg-slate-900/85 backdrop-blur-[2px] p-3 rounded-xl border border-slate-200/80 dark:border-slate-700/80">
-                        <div class="text-[11px] font-bold uppercase tracking-wider text-indigo-600 dark:text-indigo-300">
-                            Kategori: <span class="text-slate-800 dark:text-white">{{ $card['kategori'] }}</span>
-                        </div>
-
+                    <div class="relative z-10 mt-auto space-y-3 bg-white/90 dark:bg-slate-900/90 backdrop-blur-[2px] p-3.5 rounded-xl border border-slate-200/90 dark:border-slate-700/90">
                         <h3 class="font-display font-extrabold text-lg leading-snug text-slate-900 dark:text-white">
-                            {{ $card['nama_test'] }}
+                            {{ $paket->nama_test }}
                         </h3>
+
+                        <!-- Daftar Seluruh Kategori pada Paket Tes Ini -->
+                        <div>
+                            <div class="text-[10px] font-bold uppercase tracking-wider text-indigo-600 dark:text-indigo-300 mb-1.5">
+                                Kategori ({{ $kategoris->count() }})
+                            </div>
+                            @if($kategoris->count() > 0)
+                            <div class="flex flex-wrap gap-1.5">
+                                @foreach($kategoris as $kat)
+                                <span class="inline-flex items-center gap-1 px-2 py-0.5 rounded-md text-[11px] font-bold bg-indigo-50 dark:bg-indigo-950/80 text-indigo-700 dark:text-indigo-300 border border-indigo-200/80 dark:border-indigo-700/60">
+                                    {{ $kat->nama_kategori }}
+                                    @if(isset($kat->soals_count))
+                                    <span class="text-[10px] opacity-75">({{ $kat->soals_count }})</span>
+                                    @endif
+                                </span>
+                                @endforeach
+                            </div>
+                            @else
+                            <span class="text-xs text-slate-400 italic">Belum ada kategori</span>
+                            @endif
+                        </div>
 
                         <div class="flex items-center justify-between pt-2.5 border-t border-slate-200 dark:border-slate-700 text-xs">
                             <span class="text-emerald-700 dark:text-emerald-300 font-bold">
-                                PG: {{ $card['passing_grade'] }}
+                                PG: {{ $paket->passing_grade ?? 0 }}
                             </span>
                             <span class="font-bold text-indigo-600 dark:text-indigo-300 group-hover:text-indigo-800 dark:group-hover:text-indigo-200 transition-colors">
                                 Mulai Tes →
@@ -459,10 +434,10 @@
                         });
                     }
                 },
-                confirmMulaiUjian(namaTest, kategori, targetUrl) {
+                confirmMulaiUjian(namaTest, kategoriSummary, targetUrl) {
                     Swal.fire({
                         title: 'Mulai Ujian?',
-                        html: '<div class="text-sm text-slate-600">Apakah Anda ingin memulai ujian <strong>' + namaTest + '</strong>' + (kategori && kategori !== '-' ? ' (Kategori: <strong>' + kategori + '</strong>)' : '') + '?</div>',
+                        html: '<div class="text-sm text-slate-600">Apakah Anda ingin memulai ujian <strong>' + namaTest + '</strong>' + (kategoriSummary && kategoriSummary !== '-' ? '<br><span class="text-xs text-slate-500">Kategori: <strong>' + kategoriSummary + '</strong></span>' : '') + '?</div>',
                         icon: 'question',
                         showCancelButton: true,
                         confirmButtonText: 'Yes, Mulai Ujian',

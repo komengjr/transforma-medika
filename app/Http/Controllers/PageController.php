@@ -97,7 +97,7 @@ class PageController extends Controller
                 $q->orderBy('id', 'asc');
             },
             'pakets.kategoris' => function ($q) {
-                $q->orderBy('urutan', 'asc')->withCount('soals');
+                $q->orderBy('urutan', 'asc')->orderBy('id', 'asc')->withCount('soals');
             },
         ])->orderBy('id', 'asc')->get();
 
