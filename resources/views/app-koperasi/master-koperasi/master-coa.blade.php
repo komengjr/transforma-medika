@@ -397,7 +397,7 @@
         border-radius: 10px !important;
         font-weight: 600 !important;
         color: var(--bs-body-color, #0f172a) !important;
-        background-color: var(--bs-body-bg, #ffffff) !important;
+        /* background-color: var(--bs-body-bg, #ffffff) !important; */
         font-size: 0.82rem !important;
         min-height: 38px;
         transition: all 0.2s ease;
@@ -409,7 +409,7 @@
         border-radius: 10px !important;
         font-weight: 600 !important;
         color: var(--bs-body-color, #0f172a) !important;
-        background-color: var(--bs-body-bg, #ffffff) !important;
+        /* background-color: var(--bs-body-bg, #ffffff) !important; */
         padding-top: 18px !important;
         padding-bottom: 5px !important;
         padding-left: 11px !important;
@@ -434,7 +434,7 @@
                         <span class="d-block text-uppercase fw-semibold" style="color: #a5b4fc; font-size: 0.62rem; letter-spacing: 0.05em;">
                             {{ Env('APP_LABEL') }} Management System
                         </span>
-                        <h5 class="coa-font-display text-white fw-bold mb-0" style="font-size: 1.05rem;">
+                        <h5 class="coa-font-display fw-bold mb-0" style="font-size: 1.05rem; color: white;">
                             Master <span style="color: #38bdf8;">Chart of Accounts (COA)</span> Koperasi
                         </h5>
                     </div>

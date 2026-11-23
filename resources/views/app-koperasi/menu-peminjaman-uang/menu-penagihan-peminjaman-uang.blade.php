@@ -316,7 +316,7 @@
                                 </span>
                                 <span style="color: #94a3b8; font-size: 0.75rem; font-weight: 600;">Penagihan &amp; Pelunasan Cicilan</span>
                             </div>
-                            <h4 class="mb-0 fw-bold text-white" style="letter-spacing: -0.02em;">Penagihan &amp; Pelunasan Cicilan Peminjaman Uang</h4>
+                            <h4 class="mb-0 fw-bold" style="letter-spacing: -0.02em;color: white;">Penagihan &amp; Pelunasan Cicilan Peminjaman Uang</h4>
                             <p class="mb-0 small" style="color: #cbd5e1;">Penerimaan setoran angsuran pinjaman tunai dari peserta koperasi (Multi-Pembayaran).</p>
                         </div>
                     </div>
@@ -332,7 +332,7 @@
         <div class="ent-card ent-table-surface p-3 p-md-4 ent-form">
             <div class="row g-3 align-items-end">
                 <div class="col-md-9">
-                    <label class="form-label ent-label">
+                    <label class="form-label ent-label text-dark">
                         <i class="fas fa-search text-primary me-1"></i> Pilih Kontrak Nota Pinjaman Anggota Aktif
                     </label>
                     <select class="form-select select2-nota" name="peminjaman_id" id="filter_peminjaman_id" data-placeholder="-- Pilih Nota Pinjaman / Nama Anggota --">

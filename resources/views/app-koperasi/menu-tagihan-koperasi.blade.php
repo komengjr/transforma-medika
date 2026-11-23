@@ -4,6 +4,8 @@
 <link rel="stylesheet" href="https://cdn.datatables.net/2.2.2/css/dataTables.bootstrap5.css">
 <link rel="stylesheet" href="https://cdn.datatables.net/responsive/3.0.4/css/responsive.bootstrap5.css">
 <link rel="stylesheet" href="https://cdn.datatables.net/buttons/3.2.4/css/buttons.dataTables.css">
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/select2@4.1.0-rc.0/dist/css/select2.min.css" />
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/select2-bootstrap-5-theme@1.3.0/dist/select2-bootstrap-5-theme.min.css" />
 <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.1/font/bootstrap-icons.css">
 <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
 <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&family=JetBrains+Mono:wght@500;700&display=swap" rel="stylesheet">
@@ -149,6 +151,83 @@
 
     .ent-form .form-control[readonly] {
         background-color: rgba(79, 70, 229, 0.06) !important;
+    }
+
+    /* Select2 Custom Enterprise Integration */
+    .select2-container--bootstrap-5 {
+        width: 100% !important;
+    }
+
+    .ent-form .select2-container--bootstrap-5 .select2-selection--single {
+        border: 1px solid var(--ent-grid-border) !important;
+        border-radius: 10px !important;
+        font-weight: 600 !important;
+        color: var(--ent-text) !important;
+        background-color: var(--ent-surface) !important;
+        padding: 6px 34px 6px 12px !important;
+        font-size: 0.82rem !important;
+        height: 40px !important;
+        min-height: 40px !important;
+        display: flex !important;
+        align-items: center !important;
+        box-shadow: none !important;
+        transition: all 0.2s ease;
+    }
+
+    .select2-container--bootstrap-5.select2-container--focus .select2-selection--single,
+    .select2-container--bootstrap-5.select2-container--open .select2-selection--single {
+        border-color: var(--ent-indigo) !important;
+        box-shadow: 0 0 0 3.5px rgba(79, 70, 229, 0.15) !important;
+    }
+
+    .select2-container--bootstrap-5 .select2-selection--single .select2-selection__rendered {
+        padding: 0 !important;
+        line-height: 1.25 !important;
+        color: var(--ent-text) !important;
+        font-weight: 600 !important;
+    }
+
+    .select2-container--bootstrap-5 .select2-dropdown {
+        border: 1px solid var(--ent-grid-border) !important;
+        border-radius: 12px !important;
+        background-color: var(--ent-surface) !important;
+        color: var(--ent-text) !important;
+        box-shadow: 0 12px 24px -6px rgba(15, 23, 42, 0.18) !important;
+        overflow: hidden;
+        z-index: 1075;
+    }
+
+    .select2-container--bootstrap-5 .select2-search--dropdown .select2-search__field {
+        border: 1px solid var(--ent-grid-border) !important;
+        border-radius: 8px !important;
+        background-color: var(--ent-surface) !important;
+        color: var(--ent-text) !important;
+        font-size: 0.8rem !important;
+        font-weight: 600 !important;
+        padding: 6px 10px !important;
+    }
+
+    .select2-container--bootstrap-5 .select2-search--dropdown .select2-search__field:focus {
+        border-color: var(--ent-indigo) !important;
+        outline: none;
+        box-shadow: 0 0 0 2.5px rgba(79, 70, 229, 0.15) !important;
+    }
+
+    .select2-container--bootstrap-5 .select2-results__option {
+        font-size: 0.8rem !important;
+        font-weight: 600 !important;
+        padding: 8px 12px !important;
+        color: var(--ent-text) !important;
+    }
+
+    .select2-container--bootstrap-5 .select2-results__option--highlighted[aria-selected] {
+        background-color: var(--ent-indigo) !important;
+        color: #ffffff !important;
+    }
+
+    .select2-container--bootstrap-5 .select2-results__option[aria-selected="true"] {
+        background-color: rgba(79, 70, 229, 0.14) !important;
+        color: var(--ent-indigo) !important;
     }
 
     /* Navigation Pills */
@@ -312,7 +391,7 @@
                                 </span>
                                 <span style="color: #94a3b8; font-size: 0.75rem; font-weight: 600;">Rekapitulasi Tagihan</span>
                             </div>
-                            <h4 class="mb-0 fw-bold text-white" style="letter-spacing: -0.02em;">Daftar Penagihan Koperasi</h4>
+                            <h4 class="mb-0 fw-bold" style="letter-spacing: -0.02em;color: white;">Daftar Penagihan Koperasi</h4>
                             <p class="mb-0 small" style="color: #cbd5e1;">Pantau dan saring tagihan anggota per cabang, rentang tanggal, serta kategori transaksi.</p>
                         </div>
                     </div>
@@ -328,7 +407,7 @@
     <form id="filterForm" class="row g-3 align-items-end ent-form">
         <div class="col-md-3">
             <label class="form-label ent-form-label">Cabang Koperasi</label>
-            <select class="form-select" id="cabang_id" name="cabang_id">
+            <select class="form-select select2-penagihan-kop" id="cabang_id" name="cabang_id">
                 <option value="semua">Semua Cabang</option>
                 @foreach($list_cabang as $cabang)
                 <option value="{{ $cabang->kop_master_cabang_code }}">[ {{$cabang->kop_master_cabang_code}} ] {{ $cabang->kop_master_cabang_name }}</option>
@@ -440,8 +519,8 @@
 
                         <div class="col-12">
                             <label class="form-label ent-form-label">Akun Kas / Bank Penerima (Debit) <span class="text-danger">*</span></label>
-                            <select class="form-select" id="lunas_coa_kas" name="coa_kas" required>
-                                <option value="" disabled selected>-- Pilih COA Kas / Bank --</option>
+                            <select class="form-select select2-penagihan-kop-modal" id="lunas_coa_kas" name="coa_kas" required>
+                                <option value="" selected>-- Pilih COA Kas / Bank --</option>
                                 @foreach(($list_coa ?? collect()) as $coa)
                                 <option value="{{ $coa->coa_code }}">
                                     {{ $coa->coa_code }} - {{ $coa->coa_name }} ({{ strtoupper($coa->coa_type) }})
@@ -487,6 +566,75 @@
 <script>
     let modalPelunasanTagihanInstance = null;
     let cachedTagihanResponse = {};
+
+    function runWhenSelect2Ready(callback) {
+        if (window.jQuery && $.fn.select2) {
+            callback();
+            return;
+        }
+        const loadSelect2 = () => {
+            const s = document.createElement('script');
+            s.src = 'https://cdn.jsdelivr.net/npm/select2@4.1.0-rc.0/dist/js/select2.min.js';
+            s.onload = callback;
+            document.head.appendChild(s);
+        };
+        if (!window.jQuery) {
+            const jq = document.createElement('script');
+            jq.src = 'https://code.jquery.com/jquery-3.7.1.min.js';
+            jq.onload = loadSelect2;
+            document.head.appendChild(jq);
+        } else {
+            loadSelect2();
+        }
+    }
+
+    function initSelect2PenagihanKop() {
+        if (!(window.jQuery && $.fn.select2)) return;
+
+        $('.select2-penagihan-kop').each(function() {
+            const $el = $(this);
+            if ($el.hasClass('select2-hidden-accessible')) {
+                $el.select2('destroy');
+            }
+            $el.select2({
+                theme: 'bootstrap-5',
+                width: '100%',
+                placeholder: 'Semua Cabang',
+                allowClear: false,
+                language: {
+                    noResults: function() {
+                        return 'Data tidak ditemukan';
+                    },
+                    searching: function() {
+                        return 'Mencari...';
+                    }
+                }
+            });
+        });
+
+        $('.select2-penagihan-kop-modal').each(function() {
+            const $el = $(this);
+            const placeholderText = $el.find('option:first').text() || '-- Pilih COA Kas / Bank --';
+            if ($el.hasClass('select2-hidden-accessible')) {
+                $el.select2('destroy');
+            }
+            $el.select2({
+                theme: 'bootstrap-5',
+                width: '100%',
+                placeholder: placeholderText,
+                allowClear: true,
+                dropdownParent: $('#modalPelunasanTagihan'),
+                language: {
+                    noResults: function() {
+                        return 'Data tidak ditemukan';
+                    },
+                    searching: function() {
+                        return 'Mencari...';
+                    }
+                }
+            });
+        });
+    }
 
     function formatSeparatorRupiah(val) {
         const clean = String(val ?? '').replace(/[^\d]/g, '').replace(/^0+(?=\d)/, '');
@@ -583,6 +731,12 @@
         document.getElementById('lunas_nominal_bayar').value = formatSeparatorRupiah(nominalAngka);
         document.getElementById('lunas_keterangan').value = `Pelunasan tagihan ${item.kop_req_tagihan_code} (${pesertaLabel})`;
 
+        if (window.jQuery && $.fn.select2) {
+            $('#lunas_coa_kas').val('').trigger('change.select2');
+        } else {
+            document.getElementById('lunas_coa_kas').value = '';
+        }
+
         if (!modalPelunasanTagihanInstance) {
             modalPelunasanTagihanInstance = new bootstrap.Modal(document.getElementById('modalPelunasanTagihan'));
         }
@@ -590,6 +744,10 @@
     }
 
     document.addEventListener('DOMContentLoaded', function() {
+        runWhenSelect2Ready(function() {
+            initSelect2PenagihanKop();
+        });
+
         const inputBayar = document.getElementById('lunas_nominal_bayar');
         if (inputBayar) {
             inputBayar.addEventListener('input', function() {

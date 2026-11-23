@@ -1,6 +1,8 @@
 @extends('layouts.layouts')
 
 @section('base.css')
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/select2@4.1.0-rc.0/dist/css/select2.min.css" />
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/select2-bootstrap-5-theme@1.3.0/dist/select2-bootstrap-5-theme.min.css" />
 <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
 <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&family=JetBrains+Mono:wght@500;700&display=swap" rel="stylesheet">
 
@@ -183,6 +185,83 @@
         border-bottom-right-radius: 0 !important;
     }
 
+    /* Select2 Custom Enterprise Integration */
+    .select2-container--bootstrap-5 {
+        width: 100% !important;
+    }
+
+    .ent-form .select2-container--bootstrap-5 .select2-selection--single {
+        border: 1px solid var(--ent-grid-border) !important;
+        border-radius: 10px !important;
+        font-weight: 600 !important;
+        color: var(--bs-body-color) !important;
+        background-color: var(--bs-body-bg) !important;
+        padding: 6px 34px 6px 12px !important;
+        font-size: 0.82rem !important;
+        height: 40px !important;
+        min-height: 40px !important;
+        display: flex !important;
+        align-items: center !important;
+        box-shadow: none !important;
+        transition: all 0.2s ease;
+    }
+
+    .select2-container--bootstrap-5.select2-container--focus .select2-selection--single,
+    .select2-container--bootstrap-5.select2-container--open .select2-selection--single {
+        border-color: var(--ent-indigo) !important;
+        box-shadow: 0 0 0 3.5px rgba(79, 70, 229, 0.15) !important;
+    }
+
+    .select2-container--bootstrap-5 .select2-selection--single .select2-selection__rendered {
+        padding: 0 !important;
+        line-height: 1.25 !important;
+        color: var(--bs-body-color) !important;
+        font-weight: 600 !important;
+    }
+
+    .select2-container--bootstrap-5 .select2-dropdown {
+        border: 1px solid var(--ent-grid-border) !important;
+        border-radius: 12px !important;
+        background-color: var(--bs-body-bg, var(--ent-surface)) !important;
+        color: var(--bs-body-color) !important;
+        box-shadow: 0 12px 24px -6px rgba(15, 23, 42, 0.18) !important;
+        overflow: hidden;
+        z-index: 1065;
+    }
+
+    .select2-container--bootstrap-5 .select2-search--dropdown .select2-search__field {
+        border: 1px solid var(--ent-grid-border) !important;
+        border-radius: 8px !important;
+        background-color: var(--bs-body-bg) !important;
+        color: var(--bs-body-color) !important;
+        font-size: 0.8rem !important;
+        font-weight: 600 !important;
+        padding: 6px 10px !important;
+    }
+
+    .select2-container--bootstrap-5 .select2-search--dropdown .select2-search__field:focus {
+        border-color: var(--ent-indigo) !important;
+        outline: none;
+        box-shadow: 0 0 0 2.5px rgba(79, 70, 229, 0.15) !important;
+    }
+
+    .select2-container--bootstrap-5 .select2-results__option {
+        font-size: 0.8rem !important;
+        font-weight: 600 !important;
+        padding: 8px 12px !important;
+        color: var(--bs-body-color) !important;
+    }
+
+    .select2-container--bootstrap-5 .select2-results__option--highlighted[aria-selected] {
+        background-color: var(--ent-indigo) !important;
+        color: #ffffff !important;
+    }
+
+    .select2-container--bootstrap-5 .select2-results__option[aria-selected="true"] {
+        background-color: rgba(79, 70, 229, 0.14) !important;
+        color: var(--ent-indigo) !important;
+    }
+
     /* Interactive Radio Cards (Aset vs Non-Aset) */
     .card-radio {
         border: 1.5px solid var(--ent-grid-border);
@@ -324,7 +403,7 @@
                                 </span>
                                 <span style="color: #94a3b8; font-size: 0.75rem; font-weight: 600;">Pengadaan &amp; Pembelian Barang</span>
                             </div>
-                            <h4 class="mb-0 fw-bold text-white" style="letter-spacing: -0.02em;">Pengadaan &amp; Pembelian Barang</h4>
+                            <h4 class="mb-0 fw-bold" style="letter-spacing: -0.02em;color: #ffffff;">Pengadaan &amp; Pembelian Barang</h4>
                             <p class="mb-0 small" style="color: #cbd5e1;">Pencatatan transaksi pembelian barang operasional dan inventaris koperasi.</p>
                         </div>
                     </div>
@@ -386,7 +465,7 @@
                     <!-- Pilihan COA Pembayaran -->
                     <div class="mb-3">
                         <label for="coa_pembayaran" class="form-label ent-form-label">Sumber Dana / Metode Pembayaran <span class="text-danger">*</span></label>
-                        <select id="coa_pembayaran" name="coa_pembayaran" class="form-select" required>
+                        <select id="coa_pembayaran" name="coa_pembayaran" class="form-select select2-pembelian" required>
                             <option value="">-- Pilih Rekening Pembayaran --</option>
                             @foreach($coas as $coa)
                             <option value="{{ $coa->coa_code }}">{{ $coa->coa_code }} - {{ $coa->coa_name }}</option>
@@ -460,7 +539,7 @@
                         </div>
                         <div class="col-md-4">
                             <label for="satuan" class="form-label ent-form-label">Satuan <span class="text-danger">*</span></label>
-                            <select id="satuan" name="satuan" class="form-select text-center" required>
+                            <select id="satuan" name="satuan" class="form-select text-center select2-pembelian" required>
                                 <option value="Unit">Unit / Pcs</option>
                                 <option value="Rim">Rim</option>
                                 <option value="Box">Box</option>
@@ -492,7 +571,7 @@
                         <div class="row g-3">
                             <div class="col-md-6">
                                 <label for="coa_aset" class="form-label ent-form-label">Target Akun Aset (COA) <span class="text-danger">*</span></label>
-                                <select id="coa_aset" name="coa_aset" class="form-select">
+                                <select id="coa_aset" name="coa_aset" class="form-select select2-pembelian">
                                     <option value="">-- Pilih COA Aset Tetap --</option>
                                     @foreach($coas as $coa)
                                     <option value="{{ $coa->coa_code }}">{{ $coa->coa_code }} - {{ $coa->coa_name }}</option>
@@ -519,7 +598,7 @@
                         <div class="row g-3">
                             <div class="col-md-12">
                                 <label for="coa_beban" class="form-label ent-form-label">Target Akun Beban / Perlengkapan (COA) <span class="text-danger">*</span></label>
-                                <select id="coa_beban" name="coa_beban" class="form-select">
+                                <select id="coa_beban" name="coa_beban" class="form-select select2-pembelian">
                                     <option value="">-- Pilih COA Beban / Perlengkapan --</option>
                                     @foreach($coas as $coa)
                                     <option value="{{ $coa->coa_code }}">{{ $coa->coa_code }} - {{ $coa->coa_name }}</option>
@@ -564,7 +643,7 @@
                     <span class="ent-badge mb-1" style="background: rgba(56, 189, 248, 0.2); border: 1px solid rgba(56, 189, 248, 0.4); color: #7dd3fc; font-size: 0.62rem;">
                         <i class="fas fa-history me-1"></i> ARSIP PENGADAAN &amp; INVENTARIS
                     </span>
-                    <h5 class="modal-title fw-bold text-white mb-0" id="modalListBarangLabel">
+                    <h5 class="modal-title fw-bold mb-0" id="modalListBarangLabel" style="color: white;">
                         Riwayat &amp; List Pembelian Barang
                     </h5>
                 </div>
@@ -604,7 +683,62 @@
 @section('base.js')
 <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
 <script>
+    function runWhenSelect2Ready(callback) {
+        if (window.jQuery && $.fn.select2) {
+            callback();
+            return;
+        }
+        const loadSelect2 = () => {
+            const s = document.createElement('script');
+            s.src = 'https://cdn.jsdelivr.net/npm/select2@4.1.0-rc.0/dist/js/select2.min.js';
+            s.onload = callback;
+            document.head.appendChild(s);
+        };
+        if (!window.jQuery) {
+            const jq = document.createElement('script');
+            jq.src = 'https://code.jquery.com/jquery-3.7.1.min.js';
+            jq.onload = loadSelect2;
+            document.head.appendChild(jq);
+        } else {
+            loadSelect2();
+        }
+    }
+
+    function initSelect2Pembelian() {
+        if (!(window.jQuery && $.fn.select2)) return;
+
+        $('.select2-pembelian').each(function() {
+            const $el = $(this);
+            const firstOpt = $el.find('option:first');
+            const hasEmptyPlaceholder = firstOpt.val() === '';
+            const placeholderText = hasEmptyPlaceholder ? firstOpt.text() : '-- Pilih --';
+
+            if ($el.hasClass('select2-hidden-accessible')) {
+                $el.select2('destroy');
+            }
+
+            $el.select2({
+                theme: 'bootstrap-5',
+                width: '100%',
+                placeholder: placeholderText,
+                allowClear: hasEmptyPlaceholder,
+                language: {
+                    noResults: function() {
+                        return 'Data tidak ditemukan';
+                    },
+                    searching: function() {
+                        return 'Mencari...';
+                    }
+                }
+            });
+        });
+    }
+
     document.addEventListener('DOMContentLoaded', function() {
+        runWhenSelect2Ready(function() {
+            initSelect2Pembelian();
+        });
+
         const rupiahFormatter = new Intl.NumberFormat('id-ID', {
             style: 'currency',
             currency: 'IDR',
@@ -646,6 +780,9 @@
                 selectCoaAset.required = true;
                 selectCoaBban.required = false;
                 selectCoaBban.value = "";
+                if (window.jQuery && $.fn.select2) {
+                    $('#coa_beban').val('').trigger('change.select2');
+                }
             } else {
                 sectionAset.classList.add('d-none');
                 sectionNonAset.classList.remove('d-none');
@@ -653,6 +790,9 @@
                 selectCoaAset.required = false;
                 selectCoaBban.required = true;
                 selectCoaAset.value = "";
+                if (window.jQuery && $.fn.select2) {
+                    $('#coa_aset').val('').trigger('change.select2');
+                }
             }
         }
 
@@ -683,6 +823,12 @@
         document.getElementById('form-pembelian').addEventListener('reset', function() {
             setTimeout(() => {
                 labelTotal.innerText = "Rp 0";
+                if (window.jQuery && $.fn.select2) {
+                    $('#coa_pembayaran').val('').trigger('change.select2');
+                    $('#satuan').val('Unit').trigger('change.select2');
+                    $('#coa_aset').val('').trigger('change.select2');
+                    $('#coa_beban').val('').trigger('change.select2');
+                }
                 toggleCategoryPanels();
             }, 10);
         });

@@ -112,7 +112,7 @@
     <div class="modal-body p-0">
         <div class="coa-modal-header rounded-top-4 py-3 px-4 pe-5 d-flex flex-wrap align-items-center justify-content-between gap-2">
             <div>
-                <h5 class="mb-1 fw-bold text-white" id="staticBackdropLabel">
+                <h5 class="mb-1 fw-bold" id="staticBackdropLabel" style="color: white;">
                     <i class="fas fa-folder-plus me-2 text-info"></i>Form Add Account Koperasi
                 </h5>
                 <p class="fs--2 mb-0" style="color: #cbd5e1;">

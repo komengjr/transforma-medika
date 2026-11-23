@@ -267,11 +267,17 @@ class KoperasiController extends Controller
     {
         if ($this->url_akses_sub($akses, $id) == true) {
             // Ambil list cabang dari master peserta
-            $list_cabang = DB::table('kop_master_peserta')
-                ->select('kop_master_peserta_cabang')
+            $list_cabang = DB::table('kop_master_peserta as p')
+                ->leftJoin('kop_master_cabang as c', 'p.kop_master_peserta_cabang', '=', 'c.kop_master_cabang_code')
+                ->select([
+                    'p.kop_master_peserta_cabang as kop_master_cabang_code',
+                    DB::raw("COALESCE(c.kop_master_cabang_name, p.kop_master_peserta_cabang) as kop_master_cabang_name"),
+                ])
+                ->whereNotNull('p.kop_master_peserta_cabang')
+                ->where('p.kop_master_peserta_cabang', '!=', '')
                 ->distinct()
-                ->whereNotNull('kop_master_peserta_cabang')
-                ->pluck('kop_master_peserta_cabang');
+                ->orderBy('p.kop_master_peserta_cabang')
+                ->get();
 
             // Ambil COA Pembayaran (Aset)
             $coa_pembayaran = DB::table('kop_fin_master_coa')
@@ -421,11 +427,17 @@ class KoperasiController extends Controller
     public function menu_koperasi_simpanan_sukarela_koperasi($akses, $id)
     {
         if ($this->url_akses_sub($akses, $id) == true) {
-            $list_cabang = DB::table('kop_master_peserta')
-                ->select('kop_master_peserta_cabang')
+            $list_cabang = DB::table('kop_master_peserta as p')
+                ->leftJoin('kop_master_cabang as c', 'p.kop_master_peserta_cabang', '=', 'c.kop_master_cabang_code')
+                ->select([
+                    'p.kop_master_peserta_cabang as kop_master_cabang_code',
+                    DB::raw("COALESCE(c.kop_master_cabang_name, p.kop_master_peserta_cabang) as kop_master_cabang_name"),
+                ])
+                ->whereNotNull('p.kop_master_peserta_cabang')
+                ->where('p.kop_master_peserta_cabang', '!=', '')
                 ->distinct()
-                ->whereNotNull('kop_master_peserta_cabang')
-                ->pluck('kop_master_peserta_cabang');
+                ->orderBy('p.kop_master_peserta_cabang')
+                ->get();
 
             // COA Aset (Kas/Bank)
             $coa_pembayaran = DB::table('kop_fin_master_coa')

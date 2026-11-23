@@ -3,6 +3,8 @@
 @section('base.css')
 <link rel="stylesheet" href="https://cdn.datatables.net/2.2.2/css/dataTables.bootstrap5.css">
 <link rel="stylesheet" href="https://cdn.datatables.net/responsive/3.0.4/css/responsive.bootstrap5.css">
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/select2@4.1.0-rc.0/dist/css/select2.min.css" />
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/select2-bootstrap-5-theme@1.3.0/dist/select2-bootstrap-5-theme.min.css" />
 <link href="{{ asset('vendors/choices/choices.min.css') }}" rel="stylesheet" />
 <link href="{{ asset('vendors/flatpickr/flatpickr.min.css') }}" rel="stylesheet" />
 <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
@@ -142,7 +144,7 @@
         letter-spacing: 0.03em;
         color: var(--bs-secondary-color, #64748b);
         pointer-events: none;
-        z-index: 5;
+        z-index: 6;
     }
 
     .form-control {
@@ -213,6 +215,90 @@
         border-color: var(--ent-indigo) !important;
         box-shadow: 0 0 0 3.5px rgba(79, 70, 229, 0.15) !important;
         outline: none;
+    }
+
+    /* Select2 Custom Enterprise Integration */
+    .select2-container--bootstrap-5 {
+        width: 100% !important;
+    }
+
+    .select2-container--bootstrap-5 .select2-selection--single {
+        border: 1px solid var(--ent-grid-border) !important;
+        border-radius: 10px !important;
+        font-weight: 600 !important;
+        color: var(--bs-body-color) !important;
+        background-color: var(--bs-body-bg) !important;
+        padding: 18px 34px 4px 11px !important;
+        font-size: 0.82rem !important;
+        height: 44px !important;
+        min-height: 44px !important;
+        display: flex !important;
+        align-items: center !important;
+        box-shadow: none !important;
+        transition: all 0.2s ease;
+    }
+
+    .ent-modal-form .select2-container--bootstrap-5 .select2-selection--single {
+        padding: 6px 34px 6px 12px !important;
+        height: 40px !important;
+        min-height: 40px !important;
+        font-size: 0.82rem !important;
+    }
+
+    .select2-container--bootstrap-5.select2-container--focus .select2-selection--single,
+    .select2-container--bootstrap-5.select2-container--open .select2-selection--single {
+        border-color: var(--ent-indigo) !important;
+        box-shadow: 0 0 0 3.5px rgba(79, 70, 229, 0.15) !important;
+    }
+
+    .select2-container--bootstrap-5 .select2-selection--single .select2-selection__rendered {
+        padding: 0 !important;
+        line-height: 1.25 !important;
+        color: var(--bs-body-color) !important;
+        font-weight: 600 !important;
+    }
+
+    .select2-container--bootstrap-5 .select2-dropdown {
+        border: 1px solid var(--ent-grid-border) !important;
+        border-radius: 12px !important;
+        background-color: var(--bs-body-bg, var(--ent-surface)) !important;
+        color: var(--bs-body-color) !important;
+        box-shadow: 0 12px 24px -6px rgba(15, 23, 42, 0.18) !important;
+        overflow: hidden;
+        z-index: 1075;
+    }
+
+    .select2-container--bootstrap-5 .select2-search--dropdown .select2-search__field {
+        border: 1px solid var(--ent-grid-border) !important;
+        border-radius: 8px !important;
+        background-color: var(--bs-body-bg) !important;
+        color: var(--bs-body-color) !important;
+        font-size: 0.8rem !important;
+        font-weight: 600 !important;
+        padding: 6px 10px !important;
+    }
+
+    .select2-container--bootstrap-5 .select2-search--dropdown .select2-search__field:focus {
+        border-color: var(--ent-indigo) !important;
+        outline: none;
+        box-shadow: 0 0 0 2.5px rgba(79, 70, 229, 0.15) !important;
+    }
+
+    .select2-container--bootstrap-5 .select2-results__option {
+        font-size: 0.8rem !important;
+        font-weight: 600 !important;
+        padding: 8px 12px !important;
+        color: var(--bs-body-color) !important;
+    }
+
+    .select2-container--bootstrap-5 .select2-results__option--highlighted[aria-selected] {
+        background-color: var(--ent-indigo) !important;
+        color: #ffffff !important;
+    }
+
+    .select2-container--bootstrap-5 .select2-results__option[aria-selected="true"] {
+        background-color: rgba(79, 70, 229, 0.14) !important;
+        color: var(--ent-indigo) !important;
     }
 
     /* Soft Badges */
@@ -397,7 +483,7 @@
                                 </span>
                                 <span style="color: #94a3b8; font-size: 0.75rem; font-weight: 600;">Arisan Penagihan</span>
                             </div>
-                            <h4 class="mb-0 fw-bold text-white" style="letter-spacing: -0.02em;">Monitoring Pembayaran &amp; Penagihan Arisan</h4>
+                            <h4 class="mb-0 fw-bold" style="letter-spacing: -0.02em;color: white;">Monitoring Pembayaran &amp; Penagihan Arisan</h4>
                             <p class="mb-0 small" style="color: #cbd5e1;">Klik pada kotak indikator bulan berwarna merah untuk memproses pembayaran iuran arisan anggota.</p>
                         </div>
                     </div>
@@ -426,13 +512,13 @@
             <div class="col-md-6">
                 <div class="form-floating-custom">
                     <label for="penagihanMaster">1. Program Arisan Aktif <span class="text-danger">*</span></label>
-                    <select id="penagihanMaster" class="form-select ent-input" required></select>
+                    <select id="penagihanMaster" class="form-select ent-input select2-penagihan" required></select>
                 </div>
             </div>
             <div class="col-md-4">
                 <div class="form-floating-custom">
                     <label for="penagihanTahun">2. Pilih Tahun Berjalan <span class="text-danger">*</span></label>
-                    <select id="penagihanTahun" class="form-select ent-input" required>
+                    <select id="penagihanTahun" class="form-select ent-input select2-penagihan" required>
                         <option value="">-- Pilih Tahun --</option>
                         @for ($year = 2026; $year <= 2035; $year++)
                             <option value="{{ $year }}">{{ $year }}</option>
@@ -568,7 +654,7 @@
 
                     <div class="col-12">
                         <label class="form-label ent-modal-label">Metode Pembayaran (Akun Kas / Bank) <span class="text-danger">*</span></label>
-                        <select id="modalMetodeBayar" class="form-select" required>
+                        <select id="modalMetodeBayar" class="form-select select2-penagihan-modal" required>
                             <option value="">-- Pilih Akun Kas / Bank --</option>
                             @foreach ($akun as $akuns)
                             <option value="{{ $akuns->coa_code }}">{{ $akuns->coa_code }} - {{ $akuns->coa_name }}</option>
@@ -641,8 +727,74 @@
     let nominalPerPoin = 0;
     let modalBootstrapInstance;
 
+    function runWhenSelect2Ready(callback) {
+        if (window.jQuery && $.fn.select2) {
+            callback();
+            return;
+        }
+        const loadSelect2 = () => {
+            const s = document.createElement('script');
+            s.src = 'https://cdn.jsdelivr.net/npm/select2@4.1.0-rc.0/dist/js/select2.min.js';
+            s.onload = callback;
+            document.head.appendChild(s);
+        };
+        if (!window.jQuery) {
+            const jq = document.createElement('script');
+            jq.src = 'https://code.jquery.com/jquery-3.7.1.min.js';
+            jq.onload = loadSelect2;
+            document.head.appendChild(jq);
+        } else {
+            loadSelect2();
+        }
+    }
+
+    function initSelect2Penagihan() {
+        if (!(window.jQuery && $.fn.select2)) return;
+
+        const baseOpts = {
+            theme: 'bootstrap-5',
+            width: '100%',
+            allowClear: true,
+            language: {
+                noResults: function() {
+                    return 'Data tidak ditemukan';
+                },
+                searching: function() {
+                    return 'Mencari...';
+                }
+            }
+        };
+
+        $('.select2-penagihan').each(function() {
+            const $el = $(this);
+            const placeholderText = $el.find('option:first').text() || '-- Pilih --';
+            if ($el.hasClass('select2-hidden-accessible')) {
+                $el.select2('destroy');
+            }
+            $el.select2({
+                ...baseOpts,
+                placeholder: placeholderText
+            });
+        });
+
+        $('.select2-penagihan-modal').each(function() {
+            const $el = $(this);
+            const placeholderText = $el.find('option:first').text() || '-- Pilih Akun Kas / Bank --';
+            if ($el.hasClass('select2-hidden-accessible')) {
+                $el.select2('destroy');
+            }
+            $el.select2({
+                ...baseOpts,
+                placeholder: placeholderText,
+                dropdownParent: $('#modalBayarArisan')
+            });
+        });
+    }
+
     async function initPenagihanPage() {
         modalBootstrapInstance = new bootstrap.Modal(document.getElementById('modalBayarArisan'));
+        initSelect2Penagihan();
+
         try {
             const res = await fetch(`{{ route('menu_koperasi_penagihan_arisan_get_data') }}`);
             const data = await res.json();
@@ -654,6 +806,10 @@
                 opt.textContent = m.kop_master_arisan_name;
                 selectMaster.appendChild(opt);
             });
+
+            if (window.jQuery && $.fn.select2) {
+                $('#penagihanMaster').val('').trigger('change.select2');
+            }
         } catch (err) {
             console.error(err);
         }
@@ -665,7 +821,7 @@
         const tahun = document.getElementById('penagihanTahun').value;
 
         try {
-            const res = await fetch(`{{ url('koperasi/menu-koperasi/penagihan-arisan/get-laporan') }}?id_master=${idMaster}&tahun=${tahun}`);
+            const res = await fetch(`{{ url('koperasi/menu-koperasi/penagihan-arisan/get-laporan') }}?id_master=${encodeURIComponent(idMaster)}&tahun=${encodeURIComponent(tahun)}`);
             const result = await res.json();
 
             document.getElementById('placeholderPenagihanArisan').classList.add('d-none');
@@ -749,6 +905,12 @@
         document.getElementById('modalTextBulan').value = namaBulanLengkap[bulan].toUpperCase();
         document.getElementById('modalKeterangan').value = '';
 
+        if (window.jQuery && $.fn.select2) {
+            $('#modalMetodeBayar').val('').trigger('change.select2');
+        } else {
+            document.getElementById('modalMetodeBayar').value = '';
+        }
+
         document.getElementById('modalDisplayNominal').innerText = `Rp ` + new Intl.NumberFormat('id-ID').format(nominal);
 
         modalBootstrapInstance.show();
@@ -792,6 +954,10 @@
         }
     }
 
-    window.onload = initPenagihanPage;
+    window.addEventListener('DOMContentLoaded', function() {
+        runWhenSelect2Ready(function() {
+            initPenagihanPage();
+        });
+    });
 </script>
 @endsection

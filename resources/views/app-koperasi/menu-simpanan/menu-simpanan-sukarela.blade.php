@@ -1,6 +1,8 @@
 @extends('layouts.layouts')
 
 @section('base.css')
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/select2@4.1.0-rc.0/dist/css/select2.min.css" />
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/select2-bootstrap-5-theme@1.3.0/dist/select2-bootstrap-5-theme.min.css" />
 <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
 <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&family=JetBrains+Mono:wght@500;700&display=swap" rel="stylesheet">
 
@@ -114,7 +116,7 @@
         letter-spacing: 0.03em;
         color: var(--bs-secondary-color, #64748b);
         pointer-events: none;
-        z-index: 5;
+        z-index: 6;
     }
 
     .form-control {
@@ -195,6 +197,90 @@
     .ent-modal-form .input-group > .form-control {
         border-top-left-radius: 0 !important;
         border-bottom-left-radius: 0 !important;
+    }
+
+    /* Select2 Custom Enterprise Integration */
+    .select2-container--bootstrap-5 {
+        width: 100% !important;
+    }
+
+    .select2-container--bootstrap-5 .select2-selection--single {
+        border: 1px solid var(--ent-grid-border) !important;
+        border-radius: 10px !important;
+        font-weight: 600 !important;
+        color: var(--bs-body-color) !important;
+        background-color: var(--bs-body-bg) !important;
+        padding: 18px 34px 4px 11px !important;
+        font-size: 0.8rem !important;
+        height: 44px !important;
+        min-height: 44px !important;
+        display: flex !important;
+        align-items: center !important;
+        box-shadow: none !important;
+        transition: all 0.2s ease;
+    }
+
+    .ent-modal-form .select2-container--bootstrap-5 .select2-selection--single {
+        padding: 6px 34px 6px 12px !important;
+        height: 40px !important;
+        min-height: 40px !important;
+        font-size: 0.82rem !important;
+    }
+
+    .select2-container--bootstrap-5.select2-container--focus .select2-selection--single,
+    .select2-container--bootstrap-5.select2-container--open .select2-selection--single {
+        border-color: var(--ent-indigo) !important;
+        box-shadow: 0 0 0 3.5px rgba(79, 70, 229, 0.15) !important;
+    }
+
+    .select2-container--bootstrap-5 .select2-selection--single .select2-selection__rendered {
+        padding: 0 !important;
+        line-height: 1.25 !important;
+        color: var(--bs-body-color) !important;
+        font-weight: 600 !important;
+    }
+
+    .select2-container--bootstrap-5 .select2-dropdown {
+        border: 1px solid var(--ent-grid-border) !important;
+        border-radius: 12px !important;
+        background-color: var(--bs-body-bg, var(--ent-surface)) !important;
+        color: var(--bs-body-color) !important;
+        box-shadow: 0 12px 24px -6px rgba(15, 23, 42, 0.18) !important;
+        overflow: hidden;
+        z-index: 1075;
+    }
+
+    .select2-container--bootstrap-5 .select2-search--dropdown .select2-search__field {
+        border: 1px solid var(--ent-grid-border) !important;
+        border-radius: 8px !important;
+        background-color: var(--bs-body-bg) !important;
+        color: var(--bs-body-color) !important;
+        font-size: 0.8rem !important;
+        font-weight: 600 !important;
+        padding: 6px 10px !important;
+    }
+
+    .select2-container--bootstrap-5 .select2-search--dropdown .select2-search__field:focus {
+        border-color: var(--ent-indigo) !important;
+        outline: none;
+        box-shadow: 0 0 0 2.5px rgba(79, 70, 229, 0.15) !important;
+    }
+
+    .select2-container--bootstrap-5 .select2-results__option {
+        font-size: 0.8rem !important;
+        font-weight: 600 !important;
+        padding: 8px 12px !important;
+        color: var(--bs-body-color) !important;
+    }
+
+    .select2-container--bootstrap-5 .select2-results__option--highlighted[aria-selected] {
+        background-color: var(--ent-indigo) !important;
+        color: #ffffff !important;
+    }
+
+    .select2-container--bootstrap-5 .select2-results__option[aria-selected="true"] {
+        background-color: rgba(79, 70, 229, 0.14) !important;
+        color: var(--ent-indigo) !important;
     }
 
     /* Avatar Peserta */
@@ -419,10 +505,10 @@
             <div class="col-md-5">
                 <div class="form-floating-custom">
                     <label for="select-cabang">1. Filter Cabang Koperasi</label>
-                    <select id="select-cabang" class="form-select ent-input">
+                    <select id="select-cabang" class="form-select ent-input select2-search">
                         <option value="">-- Pilih Cabang --</option>
                         @foreach($list_cabang as $cabang)
-                        <option value="{{ $cabang }}">{{ strtoupper($cabang) }}</option>
+                        <option value="{{ $cabang->kop_master_cabang_code }}">{{ $cabang->kop_master_cabang_name }}</option>
                         @endforeach
                     </select>
                 </div>
@@ -499,7 +585,7 @@
 
                 <div class="mb-3">
                     <label class="form-label ent-modal-label">Jenis Perubahan Saldo <span class="text-danger">*</span></label>
-                    <select name="jenis_transaksi" id="jenis_transaksi" class="form-select" required>
+                    <select name="jenis_transaksi" id="jenis_transaksi" class="form-select select2-modal" required>
                         <option value="SETORAN">SETORAN (Tambah Saldo / Uang Masuk)</option>
                         <option value="PENARIKAN">PENARIKAN (Tarik Tunai / Saldo Berkurang)</option>
                         <option value="POTONG_VOUCHER">POTONG VOUCHER (Bayar Belanjaan / Potong Saldo)</option>
@@ -517,7 +603,7 @@
 
                 <div class="mb-3">
                     <label class="form-label ent-modal-label">Metode Keuangan (Kas/Bank) <span class="text-danger">*</span></label>
-                    <select name="coa_kas_bank" class="form-select" required>
+                    <select name="coa_kas_bank" id="coa_kas_bank" class="form-select select2-modal" required>
                         @foreach($coa_pembayaran as $coa)
                         <option value="{{ $coa->coa_code }}">{{ $coa->coa_code }} - {{ $coa->coa_name }}</option>
                         @endforeach
@@ -526,7 +612,7 @@
 
                 <div class="mb-3">
                     <label class="form-label ent-modal-label">Akun Rekening Sukarela <span class="text-danger">*</span></label>
-                    <select name="coa_sukarela" class="form-select" required>
+                    <select name="coa_sukarela" id="coa_sukarela" class="form-select select2-modal" required>
                         @foreach($coa_sukarela as $coa)
                         <option value="{{ $coa->coa_code }}">{{ $coa->coa_code }} - {{ $coa->coa_name }}</option>
                         @endforeach
@@ -553,6 +639,64 @@
 @section('base.js')
 <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
 <script>
+    (function ensureSelect2Loaded(callback) {
+        if (window.jQuery && $.fn.select2) {
+            callback();
+            return;
+        }
+        const loadSelect2 = () => {
+            const s = document.createElement('script');
+            s.src = 'https://cdn.jsdelivr.net/npm/select2@4.1.0-rc.0/dist/js/select2.min.js';
+            s.onload = callback;
+            document.head.appendChild(s);
+        };
+        if (!window.jQuery) {
+            const jq = document.createElement('script');
+            jq.src = 'https://code.jquery.com/jquery-3.7.1.min.js';
+            jq.onload = loadSelect2;
+            document.head.appendChild(jq);
+        } else {
+            loadSelect2();
+        }
+    })(function() {
+        $(function() {
+            const commonOpts = {
+                theme: 'bootstrap-5',
+                width: '100%',
+                allowClear: true,
+                language: {
+                    noResults: function() {
+                        return 'Data tidak ditemukan';
+                    },
+                    searching: function() {
+                        return 'Mencari...';
+                    }
+                }
+            };
+
+            $('.select2-search').each(function() {
+                const placeholderText = $(this).find('option:first').text() || '-- Pilih --';
+                $(this).select2({
+                    ...commonOpts,
+                    placeholder: placeholderText
+                });
+            });
+
+            $('.select2-modal').each(function() {
+                const placeholderText = $(this).find('option:first').text() || '-- Pilih --';
+                $(this).select2({
+                    ...commonOpts,
+                    placeholder: placeholderText,
+                    dropdownParent: $('#modalTransaksi')
+                });
+            });
+
+            $('#select-cabang').on('change', function() {
+                handleCabangChange(this.value);
+            });
+        });
+    });
+
     function resolvePesertaPhotoUrl(rawPhoto) {
         if (!rawPhoto) return '';
         let clean = rawPhoto.toString().replace(/\\/g, '/').trim().replace(/^\/+/, '');
@@ -603,8 +747,8 @@
 
     document.getElementById('search-sukarela').addEventListener('input', filterSukarelaRows);
 
-    document.getElementById('select-cabang').addEventListener('change', function() {
-        const cabang = this.value;
+    function handleCabangChange(cabangVal) {
+        const cabang = (cabangVal || '').toString();
         const cardTabel = document.getElementById('card-tabel');
         const statusEl = document.getElementById('status-sukarela');
         const tabelBody = document.getElementById('tabel-body');
@@ -702,13 +846,21 @@
                     </div>
                 `;
             });
-    });
+    }
 
     function bukaModalTransaksi(id, nama) {
         document.getElementById('modal-id-peserta').value = id;
         document.getElementById('modal-nama-label').textContent = nama;
         document.getElementById('nominal-display').value = '';
         document.getElementById('nominal-raw').value = '';
+
+        if (window.jQuery && $.fn.select2) {
+            $('#jenis_transaksi').val('SETORAN').trigger('change');
+            const firstKas = $('#coa_kas_bank option:first').val() || '';
+            const firstSukarela = $('#coa_sukarela option:first').val() || '';
+            $('#coa_kas_bank').val(firstKas).trigger('change');
+            $('#coa_sukarela').val(firstSukarela).trigger('change');
+        }
 
         let modalEl = new bootstrap.Modal(document.getElementById('modalTransaksi'));
         modalEl.show();

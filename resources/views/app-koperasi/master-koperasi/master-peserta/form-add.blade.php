@@ -109,7 +109,7 @@
                 <span class="badge rounded-pill mb-1" style="background: rgba(56, 189, 248, 0.2); border: 1px solid rgba(56, 189, 248, 0.4); color: #7dd3fc; font-size: 0.65rem; letter-spacing: 0.04em;">
                     <i class="fas fa-user-plus me-1"></i> KOPERASI MEMBER REGISTRATION
                 </span>
-                <h4 class="mb-0 fw-bold text-white" id="staticBackdropLabel" style="letter-spacing: -0.02em;">Form Add Data Anggota</h4>
+                <h4 class="mb-0 fw-bold" id="staticBackdropLabel" style="letter-spacing: -0.02em; color: white;">Form Add Data Anggota</h4>
                 <p class="small mb-0 mt-0.5" style="color: #cbd5e1;">
                     Support by <a class="fw-semibold text-info text-decoration-none" href="#!">Transforma</a>
                 </p>

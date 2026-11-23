@@ -3,6 +3,8 @@
 @section('base.css')
 <link rel="stylesheet" href="https://cdn.datatables.net/2.2.2/css/dataTables.bootstrap5.css">
 <link rel="stylesheet" href="https://cdn.datatables.net/responsive/3.0.4/css/responsive.bootstrap5.css">
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/select2@4.1.0-rc.0/dist/css/select2.min.css" />
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/select2-bootstrap-5-theme@1.3.0/dist/select2-bootstrap-5-theme.min.css" />
 <link href="{{ asset('vendors/choices/choices.min.css') }}" rel="stylesheet" />
 <link href="{{ asset('vendors/flatpickr/flatpickr.min.css') }}" rel="stylesheet" />
 <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
@@ -122,7 +124,7 @@
         letter-spacing: 0.03em;
         color: var(--bs-secondary-color, #64748b);
         pointer-events: none;
-        z-index: 5;
+        z-index: 6;
     }
 
     .form-control {
@@ -200,6 +202,95 @@
     .ent-std-form .input-group>.form-control {
         border-top-left-radius: 0 !important;
         border-bottom-left-radius: 0 !important;
+    }
+
+    /* Select2 Custom Enterprise Integration */
+    .select2-container--bootstrap-5 {
+        width: 100% !important;
+    }
+
+    .select2-container--bootstrap-5 .select2-selection--single {
+        border: 1px solid var(--ent-grid-border) !important;
+        border-radius: 10px !important;
+        font-weight: 600 !important;
+        color: var(--bs-body-color) !important;
+        background-color: var(--bs-body-bg) !important;
+        padding: 18px 34px 4px 11px !important;
+        font-size: 0.8rem !important;
+        height: 44px !important;
+        min-height: 44px !important;
+        display: flex !important;
+        align-items: center !important;
+        box-shadow: none !important;
+        transition: all 0.2s ease;
+    }
+
+    .ent-std-form .select2-container--bootstrap-5 .select2-selection--single {
+        padding: 6px 34px 6px 12px !important;
+        height: 40px !important;
+        min-height: 40px !important;
+        font-size: 0.82rem !important;
+    }
+
+    .select2-container--bootstrap-5.select2-container--disabled .select2-selection--single {
+        opacity: 0.65;
+        cursor: not-allowed;
+    }
+
+    .select2-container--bootstrap-5.select2-container--focus .select2-selection--single,
+    .select2-container--bootstrap-5.select2-container--open .select2-selection--single {
+        border-color: var(--ent-indigo) !important;
+        box-shadow: 0 0 0 3.5px rgba(79, 70, 229, 0.15) !important;
+    }
+
+    .select2-container--bootstrap-5 .select2-selection--single .select2-selection__rendered {
+        padding: 0 !important;
+        line-height: 1.25 !important;
+        color: var(--bs-body-color) !important;
+        font-weight: 600 !important;
+    }
+
+    .select2-container--bootstrap-5 .select2-dropdown {
+        border: 1px solid var(--ent-grid-border) !important;
+        border-radius: 12px !important;
+        background-color: var(--bs-body-bg, var(--ent-surface)) !important;
+        color: var(--bs-body-color) !important;
+        box-shadow: 0 12px 24px -6px rgba(15, 23, 42, 0.18) !important;
+        overflow: hidden;
+        z-index: 1065;
+    }
+
+    .select2-container--bootstrap-5 .select2-search--dropdown .select2-search__field {
+        border: 1px solid var(--ent-grid-border) !important;
+        border-radius: 8px !important;
+        background-color: var(--bs-body-bg) !important;
+        color: var(--bs-body-color) !important;
+        font-size: 0.8rem !important;
+        font-weight: 600 !important;
+        padding: 6px 10px !important;
+    }
+
+    .select2-container--bootstrap-5 .select2-search--dropdown .select2-search__field:focus {
+        border-color: var(--ent-indigo) !important;
+        outline: none;
+        box-shadow: 0 0 0 2.5px rgba(79, 70, 229, 0.15) !important;
+    }
+
+    .select2-container--bootstrap-5 .select2-results__option {
+        font-size: 0.8rem !important;
+        font-weight: 600 !important;
+        padding: 8px 12px !important;
+        color: var(--bs-body-color) !important;
+    }
+
+    .select2-container--bootstrap-5 .select2-results__option--highlighted[aria-selected] {
+        background-color: var(--ent-indigo) !important;
+        color: #ffffff !important;
+    }
+
+    .select2-container--bootstrap-5 .select2-results__option[aria-selected="true"] {
+        background-color: rgba(79, 70, 229, 0.14) !important;
+        color: var(--ent-indigo) !important;
     }
 
     /* Soft Badges */
@@ -361,7 +452,7 @@
                                 </span>
                                 <span style="color: #94a3b8; font-size: 0.75rem; font-weight: 600;">Setup Program &amp; Jadwal Undian</span>
                             </div>
-                            <h4 class="mb-0 fw-bold text-white" style="letter-spacing: -0.02em;">Arisan Koperasi &amp; Plotting Jadwal Anggota</h4>
+                            <h4 class="mb-0 fw-bold" style="letter-spacing: -0.02em;color: white;">Arisan Koperasi &amp; Plotting Jadwal Anggota</h4>
                             <p class="mb-0 small" style="color: #cbd5e1;">Kelola program master arisan 1 dekade, alokasi poin peserta, dan jadwal penerimaan bulanan.</p>
                         </div>
                     </div>
@@ -427,7 +518,7 @@
             <div class="col-md-5">
                 <div class="form-floating-custom">
                     <label for="selectMasterArisan">1. Filter Pratama (Master Arisan)</label>
-                    <select id="selectMasterArisan" class="form-select ent-input" onchange="handleMasterChange()">
+                    <select id="selectMasterArisan" class="form-select ent-input select2-arisan" onchange="handleMasterChange()">
                         <option value="">-- Pilih Master Arisan --</option>
                     </select>
                 </div>
@@ -435,7 +526,7 @@
             <div class="col-md-3">
                 <div class="form-floating-custom">
                     <label for="filterTahun">2. Pilih Tahun Jadwal</label>
-                    <select id="filterTahun" class="form-select ent-input" onchange="loadJadwalBulan()" disabled>
+                    <select id="filterTahun" class="form-select ent-input select2-arisan" onchange="loadJadwalBulan()" disabled>
                         <option value="">-- Pilih Master Dahulu --</option>
                     </select>
                 </div>
@@ -476,19 +567,19 @@
                 <form id="formPenjadwalan" class="row g-2 align-items-end" onsubmit="submitFormJadwal(event)">
                     <div class="col-md-3">
                         <label class="form-label ent-form-label">Cabang <span class="text-danger">*</span></label>
-                        <select id="selectCabang" class="form-select" onchange="fetchPesertaByCabang()" required>
+                        <select id="selectCabang" class="form-select select2-arisan" onchange="fetchPesertaByCabang()" required>
                             <option value="">-- Pilih Cabang --</option>
                         </select>
                     </div>
                     <div class="col-md-3">
                         <label class="form-label ent-form-label">Nama Peserta <span class="text-danger">*</span></label>
-                        <select id="selectPeserta" class="form-select" disabled required>
+                        <select id="selectPeserta" class="form-select select2-arisan" disabled required>
                             <option value="">-- Pilih Cabang Dahulu --</option>
                         </select>
                     </div>
                     <div class="col-md-2">
                         <label class="form-label ent-form-label">Bulan <span class="text-danger">*</span></label>
-                        <select id="selectBulan" class="form-select" required>
+                        <select id="selectBulan" class="form-select select2-arisan" required>
                             <option value="1">Januari</option>
                             <option value="2">Februari</option>
                             <option value="3">Maret</option>
@@ -580,6 +671,95 @@
     let currentStatusMaster = 'Draft';
     let nominalPerPoin = 0;
 
+    function runWhenSelect2Ready(callback) {
+        if (window.jQuery && $.fn.select2) {
+            callback();
+            return;
+        }
+        const loadSelect2 = () => {
+            const s = document.createElement('script');
+            s.src = 'https://cdn.jsdelivr.net/npm/select2@4.1.0-rc.0/dist/js/select2.min.js';
+            s.onload = callback;
+            document.head.appendChild(s);
+        };
+        if (!window.jQuery) {
+            const jq = document.createElement('script');
+            jq.src = 'https://code.jquery.com/jquery-3.7.1.min.js';
+            jq.onload = loadSelect2;
+            document.head.appendChild(jq);
+        } else {
+            loadSelect2();
+        }
+    }
+
+    function initSelect2Elements() {
+        if (!(window.jQuery && $.fn.select2)) return;
+        $('.select2-arisan').each(function() {
+            const $el = $(this);
+            const placeholderText = $el.find('option:first').text() || '-- Pilih --';
+            if ($el.hasClass('select2-hidden-accessible')) {
+                $el.select2('destroy');
+            }
+            $el.select2({
+                theme: 'bootstrap-5',
+                width: '100%',
+                placeholder: placeholderText,
+                allowClear: true,
+                language: {
+                    noResults: function() {
+                        return 'Data tidak ditemukan';
+                    },
+                    searching: function() {
+                        return 'Mencari...';
+                    }
+                }
+            });
+        });
+    }
+
+    function setSelectOptions(selectId, options, placeholderText, disabled = false, selectedValue = '') {
+        const el = document.getElementById(selectId);
+        if (!el) return;
+
+        el.innerHTML = '';
+        const ph = document.createElement('option');
+        ph.value = '';
+        ph.textContent = placeholderText;
+        el.appendChild(ph);
+
+        options.forEach(item => {
+            const opt = document.createElement('option');
+            opt.value = item.value;
+            opt.textContent = item.label;
+            el.appendChild(opt);
+        });
+
+        el.disabled = Boolean(disabled);
+        el.value = selectedValue;
+
+        if (window.jQuery && $.fn.select2) {
+            const $el = $(el);
+            if ($el.hasClass('select2-hidden-accessible')) {
+                $el.select2('destroy');
+            }
+            $el.select2({
+                theme: 'bootstrap-5',
+                width: '100%',
+                placeholder: placeholderText,
+                allowClear: true,
+                language: {
+                    noResults: function() {
+                        return 'Data tidak ditemukan';
+                    },
+                    searching: function() {
+                        return 'Mencari...';
+                    }
+                }
+            });
+            $el.val(selectedValue).trigger('change.select2');
+        }
+    }
+
     // 1. Ambil data Konfigurasi Master Arisan & List Cabang saat dimuat
     async function initPage() {
         try {
@@ -588,23 +768,20 @@
 
             masterDataGlobal = data.master_arisan_list || [];
 
-            const selectMaster = document.getElementById('selectMasterArisan');
-            selectMaster.innerHTML = '<option value="">-- Pilih Master Arisan --</option>';
-            masterDataGlobal.forEach(m => {
-                let opt = document.createElement('option');
-                opt.value = m.id_kop_master_arisan;
-                opt.textContent = `${m.kop_master_arisan_name} (${m.kop_master_arisan_status})`;
-                selectMaster.appendChild(opt);
-            });
+            const masterOptions = masterDataGlobal.map(m => ({
+                value: m.id_kop_master_arisan,
+                label: `${m.kop_master_arisan_name} (${m.kop_master_arisan_status})`
+            }));
+            setSelectOptions('selectMasterArisan', masterOptions, '-- Pilih Master Arisan --', false, '');
 
-            const selectCabang = document.getElementById('selectCabang');
-            selectCabang.innerHTML = '<option value="">-- Pilih Cabang --</option>';
-            (data.cabang_list || []).forEach(c => {
-                let opt = document.createElement('option');
-                opt.value = c.kop_master_cabang_code;
-                opt.textContent = `${c.kop_master_cabang_code} - ${c.kop_master_cabang_name}`;
-                selectCabang.appendChild(opt);
-            });
+            const cabangOptions = (data.cabang_list || []).map(c => ({
+                value: c.kop_master_cabang_code,
+                label: `${c.kop_master_cabang_code} - ${c.kop_master_cabang_name}`
+            }));
+            setSelectOptions('selectCabang', cabangOptions, '-- Pilih Cabang --', false, '');
+
+            setSelectOptions('filterTahun', [], '-- Pilih Master Dahulu --', true, '');
+            setSelectOptions('selectPeserta', [], '-- Pilih Cabang Dahulu --', true, '');
         } catch (err) {
             console.error("Gagal inisialisasi awal:", err);
         }
@@ -613,7 +790,6 @@
     // 2. Aksi ketika Filter Pratama Berubah (Pilih Tahun Dekade)
     function handleMasterChange() {
         const idMaster = document.getElementById('selectMasterArisan').value;
-        const selectTahun = document.getElementById('filterTahun');
         const badge = document.getElementById('badgeStatusArisan');
 
         document.getElementById('panelInputContainer').classList.add('d-none');
@@ -624,8 +800,7 @@
         badge.innerHTML = `<i class="fas fa-info-circle me-1"></i> Status: Belum Memilih`;
 
         if (!idMaster) {
-            selectTahun.disabled = true;
-            selectTahun.innerHTML = '<option value="">-- Pilih Master Dahulu --</option>';
+            setSelectOptions('filterTahun', [], '-- Pilih Master Dahulu --', true, '');
             return;
         }
 
@@ -633,38 +808,31 @@
         const startYear = selectedMaster && selectedMaster.kop_master_arisan_thn_mulai ? parseInt(selectedMaster.kop_master_arisan_thn_mulai, 10) : 2026;
         const endYear = selectedMaster && selectedMaster.kop_master_arisan_thn_selesai ? parseInt(selectedMaster.kop_master_arisan_thn_selesai, 10) : 2035;
 
-        selectTahun.innerHTML = '<option value="">-- Pilih Tahun --</option>';
+        const yearOptions = [];
         for (let y = startYear; y <= endYear; y++) {
-            let opt = document.createElement('option');
-            opt.value = y;
-            opt.textContent = y;
-            selectTahun.appendChild(opt);
+            yearOptions.push({ value: y, label: String(y) });
         }
-        selectTahun.disabled = false;
+        setSelectOptions('filterTahun', yearOptions, '-- Pilih Tahun --', false, '');
     }
 
     // 3. Mengambil data peserta berdasarkan filter cabang
     async function fetchPesertaByCabang() {
         const cabang = document.getElementById('selectCabang').value;
-        const selectPeserta = document.getElementById('selectPeserta');
 
-        selectPeserta.innerHTML = '<option value="">-- Pilih Peserta --</option>';
         if (!cabang) {
-            selectPeserta.disabled = true;
+            setSelectOptions('selectPeserta', [], '-- Pilih Cabang Dahulu --', true, '');
             return;
         }
 
         try {
-            const res = await fetch(`{{ url('koperasi/menu-koperasi/setup-arisan/peserta-by-cabang') }}/${cabang}`);
+            const res = await fetch(`{{ url('koperasi/menu-koperasi/setup-arisan/peserta-by-cabang') }}/${encodeURIComponent(cabang)}`);
             const data = await res.json();
 
-            data.forEach(p => {
-                let opt = document.createElement('option');
-                opt.value = p.id_kop_master_peserta;
-                opt.textContent = `${p.kop_master_peserta_name} (${p.kop_master_peserta_code})`;
-                selectPeserta.appendChild(opt);
-            });
-            selectPeserta.disabled = false;
+            const pesertaOptions = (data || []).map(p => ({
+                value: p.id_kop_master_peserta,
+                label: `${p.kop_master_peserta_name} (${p.kop_master_peserta_code})`
+            }));
+            setSelectOptions('selectPeserta', pesertaOptions, '-- Pilih Peserta --', false, '');
         } catch (err) {
             console.error("Gagal memuat peserta:", err);
         }
@@ -681,7 +849,7 @@
         document.getElementById('panelInputContainer').classList.remove('d-none');
 
         try {
-            const res = await fetch(`{{ url('koperasi/menu-koperasi/setup-arisan/jadwal') }}?id_master=${idMaster}&tahun=${tahun}`);
+            const res = await fetch(`{{ url('koperasi/menu-koperasi/setup-arisan/jadwal') }}?id_master=${encodeURIComponent(idMaster)}&tahun=${encodeURIComponent(tahun)}`);
             const data = await res.json();
 
             currentStatusMaster = data.status_master;
@@ -805,6 +973,9 @@
 
             if (res.ok) {
                 document.getElementById('selectPeserta').value = "";
+                if (window.jQuery && $.fn.select2) {
+                    $('#selectPeserta').val('').trigger('change.select2');
+                }
                 loadJadwalBulan();
             } else {
                 Swal.fire('Perhatian', result.message || 'Gagal menyimpan.', 'warning');
@@ -879,6 +1050,11 @@
         }
     }
 
-    window.onload = initPage;
+    window.addEventListener('DOMContentLoaded', function() {
+        runWhenSelect2Ready(function() {
+            initSelect2Elements();
+            initPage();
+        });
+    });
 </script>
 @endsection

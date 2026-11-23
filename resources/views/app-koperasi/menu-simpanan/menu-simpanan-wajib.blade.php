@@ -1,6 +1,8 @@
 @extends('layouts.layouts')
 
 @section('base.css')
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/select2@4.1.0-rc.0/dist/css/select2.min.css" />
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/select2-bootstrap-5-theme@1.3.0/dist/select2-bootstrap-5-theme.min.css" />
 <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
 <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&family=JetBrains+Mono:wght@500;700&display=swap" rel="stylesheet">
 
@@ -111,7 +113,7 @@
         letter-spacing: 0.03em;
         color: var(--bs-secondary-color, #64748b);
         pointer-events: none;
-        z-index: 5;
+        z-index: 6;
     }
 
     .form-control {
@@ -145,6 +147,84 @@
         border-color: var(--ent-indigo) !important;
         box-shadow: 0 0 0 3.5px rgba(79, 70, 229, 0.15) !important;
         outline: none;
+    }
+
+    /* Select2 Custom Enterprise Integration */
+    .select2-container--bootstrap-5 {
+        width: 100% !important;
+    }
+
+    .select2-container--bootstrap-5 .select2-selection--single {
+        border: 1px solid var(--ent-grid-border) !important;
+        border-radius: 10px !important;
+        font-weight: 600 !important;
+        color: var(--bs-body-color) !important;
+        background-color: var(--bs-body-bg) !important;
+        padding: 18px 34px 4px 11px !important;
+        font-size: 0.8rem !important;
+        height: 44px !important;
+        min-height: 44px !important;
+        display: flex !important;
+        align-items: center !important;
+        box-shadow: none !important;
+        transition: all 0.2s ease;
+    }
+
+    .select2-container--bootstrap-5.select2-container--focus .select2-selection--single,
+    .select2-container--bootstrap-5.select2-container--open .select2-selection--single {
+        border-color: var(--ent-indigo) !important;
+        box-shadow: 0 0 0 3.5px rgba(79, 70, 229, 0.15) !important;
+    }
+
+    .select2-container--bootstrap-5 .select2-selection--single .select2-selection__rendered {
+        padding: 0 !important;
+        line-height: 1.25 !important;
+        color: var(--bs-body-color) !important;
+        font-weight: 600 !important;
+        font-size: 0.8rem !important;
+    }
+
+    .select2-container--bootstrap-5 .select2-dropdown {
+        border: 1px solid var(--ent-grid-border) !important;
+        border-radius: 12px !important;
+        background-color: var(--bs-body-bg, var(--ent-surface)) !important;
+        color: var(--bs-body-color) !important;
+        box-shadow: 0 12px 24px -6px rgba(15, 23, 42, 0.18) !important;
+        overflow: hidden;
+        z-index: 1065;
+    }
+
+    .select2-container--bootstrap-5 .select2-search--dropdown .select2-search__field {
+        border: 1px solid var(--ent-grid-border) !important;
+        border-radius: 8px !important;
+        background-color: var(--bs-body-bg) !important;
+        color: var(--bs-body-color) !important;
+        font-size: 0.8rem !important;
+        font-weight: 600 !important;
+        padding: 6px 10px !important;
+    }
+
+    .select2-container--bootstrap-5 .select2-search--dropdown .select2-search__field:focus {
+        border-color: var(--ent-indigo) !important;
+        outline: none;
+        box-shadow: 0 0 0 2.5px rgba(79, 70, 229, 0.15) !important;
+    }
+
+    .select2-container--bootstrap-5 .select2-results__option {
+        font-size: 0.8rem !important;
+        font-weight: 600 !important;
+        padding: 8px 12px !important;
+        color: var(--bs-body-color) !important;
+    }
+
+    .select2-container--bootstrap-5 .select2-results__option--highlighted[aria-selected] {
+        background-color: var(--ent-indigo) !important;
+        color: #ffffff !important;
+    }
+
+    .select2-container--bootstrap-5 .select2-results__option[aria-selected="true"] {
+        background-color: rgba(79, 70, 229, 0.14) !important;
+        color: var(--ent-indigo) !important;
     }
 
     /* Avatar Peserta */
@@ -300,7 +380,7 @@
                                 </span>
                                 <span style="color: #94a3b8; font-size: 0.75rem; font-weight: 600;">Simpanan Wajib Bulanan</span>
                             </div>
-                            <h4 class="mb-0 fw-bold text-white" style="letter-spacing: -0.02em;">Penagihan Kolektif Simpanan Wajib (Akhir Bulan)</h4>
+                            <h4 class="mb-0 fw-bold" style="letter-spacing: -0.02em;color: white;">Penagihan Kolektif Simpanan Wajib (Akhir Bulan)</h4>
                             <p class="mb-0 small" style="color: #cbd5e1;">Pemotongan dan pembukuan kolektif simpanan wajib anggota aktif berdasarkan cabang.</p>
                         </div>
                     </div>
@@ -349,10 +429,10 @@
                 <div class="col-md-4">
                     <div class="form-floating-custom">
                         <label for="select-cabang">1. Pilih Cabang <span class="text-danger">*</span></label>
-                        <select id="select-cabang" class="form-select ent-input">
+                        <select id="select-cabang" class="form-select ent-input select2-search">
                             <option value="">-- Pilih Cabang --</option>
                             @foreach($list_cabang as $cabang)
-                            <option value="{{ $cabang }}">{{ strtoupper($cabang) }}</option>
+                            <option value="{{ $cabang->kop_master_cabang_code }}">{{ $cabang->kop_master_cabang_name }}</option>
                             @endforeach
                         </select>
                     </div>
@@ -362,7 +442,7 @@
                 <div class="col-md-4">
                     <div class="form-floating-custom">
                         <label for="coa_pembayaran">2. Metode Penerimaan Uang <span class="text-danger">*</span></label>
-                        <select name="coa_pembayaran" id="coa_pembayaran" class="form-select ent-input" required>
+                        <select name="coa_pembayaran" id="coa_pembayaran" class="form-select ent-input select2-search" required>
                             <option value="">-- Pilih Kas / Bank --</option>
                             @foreach($coa_pembayaran as $coa)
                             <option value="{{ $coa->coa_code }}">{{ $coa->coa_code }} - {{ $coa->coa_name }}</option>
@@ -375,7 +455,7 @@
                 <div class="col-md-4">
                     <div class="form-floating-custom">
                         <label for="coa_simpanan">3. Alokasi Akun Rekening <span class="text-danger">*</span></label>
-                        <select name="coa_simpanan" id="coa_simpanan" class="form-select ent-input" required>
+                        <select name="coa_simpanan" id="coa_simpanan" class="form-select ent-input select2-search" required>
                             <option value="">-- Pilih Akun Simpanan Wajib --</option>
                             @foreach($coa_simpanan as $coa)
                             <option value="{{ $coa->coa_code }}">{{ $coa->coa_code }} - {{ $coa->coa_name }}</option>
@@ -462,6 +542,51 @@
 @section('base.js')
 <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
 <script>
+    (function ensureSelect2Loaded(callback) {
+        if (window.jQuery && $.fn.select2) {
+            callback();
+            return;
+        }
+        const loadSelect2 = () => {
+            const s = document.createElement('script');
+            s.src = 'https://cdn.jsdelivr.net/npm/select2@4.1.0-rc.0/dist/js/select2.min.js';
+            s.onload = callback;
+            document.head.appendChild(s);
+        };
+        if (!window.jQuery) {
+            const jq = document.createElement('script');
+            jq.src = 'https://code.jquery.com/jquery-3.7.1.min.js';
+            jq.onload = loadSelect2;
+            document.head.appendChild(jq);
+        } else {
+            loadSelect2();
+        }
+    })(function() {
+        $(function() {
+            $('.select2-search').each(function() {
+                const placeholderText = $(this).find('option:first').text() || '-- Pilih --';
+                $(this).select2({
+                    theme: 'bootstrap-5',
+                    width: '100%',
+                    placeholder: placeholderText,
+                    allowClear: true,
+                    language: {
+                        noResults: function() {
+                            return 'Data tidak ditemukan';
+                        },
+                        searching: function() {
+                            return 'Mencari...';
+                        }
+                    }
+                });
+            });
+
+            $('#select-cabang').on('change', function() {
+                handleCabangChange(this.value);
+            });
+        });
+    });
+
     const nominalWajibPerAnggota = parseFloat(document.getElementById('nominal_wajib_val').value || 0);
 
     function formatRupiah(angka) {
@@ -482,8 +607,8 @@
 
     document.getElementById('search-peserta-wajib').addEventListener('input', filterPesertaWajibRows);
 
-    document.getElementById('select-cabang').addEventListener('change', function() {
-        const cabang = this.value;
+    function handleCabangChange(cabangVal) {
+        const cabang = (cabangVal || '').toString();
         const statusMessage = document.getElementById('status-message');
         const cardPeserta = document.getElementById('card-peserta');
         const labelCabang = document.getElementById('label-cabang');
@@ -523,7 +648,9 @@
             .then(res => {
                 if (res.status === 'success' && res.data.length > 0) {
                     statusMessage.classList.add('d-none');
-                    labelCabang.textContent = cabang.toUpperCase();
+                    const selectedOption = document.querySelector(`#select-cabang option[value="${CSS.escape(cabang)}"]`);
+                    const cabangText = selectedOption ? selectedOption.textContent.trim() : cabang.toUpperCase();
+                    labelCabang.textContent = cabangText;
 
                     const options = {
                         month: 'long',
@@ -589,7 +716,7 @@
                     </div>
                 `;
             });
-    });
+    }
 
     // Logika Fungsi Pilihan Checkbox Massal
     function initCheckboxLogic() {

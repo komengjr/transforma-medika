@@ -1,6 +1,8 @@
 @extends('layouts.layouts')
 
 @section('base.css')
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/select2@4.1.0-rc.0/dist/css/select2.min.css" />
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/select2-bootstrap-5-theme@1.3.0/dist/select2-bootstrap-5-theme.min.css" />
 <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
 <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&family=JetBrains+Mono:wght@500;700&display=swap" rel="stylesheet">
 
@@ -169,6 +171,83 @@
 
     .ent-form .form-control[readonly] {
         background-color: rgba(79, 70, 229, 0.06) !important;
+    }
+
+    /* Select2 Custom Enterprise Integration */
+    .select2-container--bootstrap-5 {
+        width: 100% !important;
+    }
+
+    .ent-form .select2-container--bootstrap-5 .select2-selection--single {
+        border: 1px solid var(--ent-grid-border) !important;
+        border-radius: 10px !important;
+        font-weight: 600 !important;
+        color: var(--ent-text) !important;
+        background-color: var(--ent-surface) !important;
+        padding: 6px 34px 6px 12px !important;
+        font-size: 0.82rem !important;
+        height: 40px !important;
+        min-height: 40px !important;
+        display: flex !important;
+        align-items: center !important;
+        box-shadow: none !important;
+        transition: all 0.2s ease;
+    }
+
+    .select2-container--bootstrap-5.select2-container--focus .select2-selection--single,
+    .select2-container--bootstrap-5.select2-container--open .select2-selection--single {
+        border-color: var(--ent-indigo) !important;
+        box-shadow: 0 0 0 3.5px rgba(79, 70, 229, 0.15) !important;
+    }
+
+    .select2-container--bootstrap-5 .select2-selection--single .select2-selection__rendered {
+        padding: 0 !important;
+        line-height: 1.25 !important;
+        color: var(--ent-text) !important;
+        font-weight: 600 !important;
+    }
+
+    .select2-container--bootstrap-5 .select2-dropdown {
+        border: 1px solid var(--ent-grid-border) !important;
+        border-radius: 12px !important;
+        background-color: var(--ent-surface) !important;
+        color: var(--ent-text) !important;
+        box-shadow: 0 12px 24px -6px rgba(15, 23, 42, 0.18) !important;
+        overflow: hidden;
+        z-index: 1075;
+    }
+
+    .select2-container--bootstrap-5 .select2-search--dropdown .select2-search__field {
+        border: 1px solid var(--ent-grid-border) !important;
+        border-radius: 8px !important;
+        background-color: var(--ent-surface) !important;
+        color: var(--ent-text) !important;
+        font-size: 0.8rem !important;
+        font-weight: 600 !important;
+        padding: 6px 10px !important;
+    }
+
+    .select2-container--bootstrap-5 .select2-search--dropdown .select2-search__field:focus {
+        border-color: var(--ent-indigo) !important;
+        outline: none;
+        box-shadow: 0 0 0 2.5px rgba(79, 70, 229, 0.15) !important;
+    }
+
+    .select2-container--bootstrap-5 .select2-results__option {
+        font-size: 0.8rem !important;
+        font-weight: 600 !important;
+        padding: 8px 12px !important;
+        color: var(--ent-text) !important;
+    }
+
+    .select2-container--bootstrap-5 .select2-results__option--highlighted[aria-selected] {
+        background-color: var(--ent-indigo) !important;
+        color: #ffffff !important;
+    }
+
+    .select2-container--bootstrap-5 .select2-results__option[aria-selected="true"] {
+        background-color: rgba(79, 70, 229, 0.14) !important;
+        color: var(--ent-indigo) !important;
     }
 
     /* Interactive Payment Method Cards */
@@ -348,7 +427,7 @@
                                 </span>
                                 <span style="color: #94a3b8; font-size: 0.75rem; font-weight: 600;">Layanan Anggota</span>
                             </div>
-                            <h4 class="mb-0 fw-bold text-white" style="letter-spacing: -0.02em;">Tagihan &amp; Layanan Pembelian</h4>
+                            <h4 class="mb-0 fw-bold" style="letter-spacing: -0.02em;color: white;">Tagihan &amp; Layanan Pembelian</h4>
                             <p class="mb-0 small" style="color: #cbd5e1;">Kelola transaksi tagihan layanan anggota (Listrik, PDAM, Internet, Pulsa, dll) secara langsung.</p>
                         </div>
                     </div>
@@ -368,7 +447,7 @@
                     <div class="fw-bold text-warning text-uppercase mb-1" style="font-size: 0.68rem; letter-spacing: 0.04em;">Status Pending</div>
                     <div class="mb-0 fw-bold" style="font-family: 'JetBrains Mono', monospace; font-size: 1.05rem;">Rp {{ number_format($totalPending ?? 0, 0, ',', '.') }}</div>
                 </div>
-                <div class="rounded-3 bg-warning bg-opacity-10 p-2 text-warning">
+                <div class="rounded-3 bg-warning bg-opacity-10 p-2 text-white">
                     <i class="fas fa-clock fa-lg"></i>
                 </div>
             </div>
@@ -382,7 +461,7 @@
                     <div class="fw-bold text-info text-uppercase mb-1" style="font-size: 0.68rem; letter-spacing: 0.04em;">Status Piutang</div>
                     <div class="mb-0 fw-bold" style="font-family: 'JetBrains Mono', monospace; font-size: 1.05rem;">Rp {{ number_format($totalPiutang ?? 0, 0, ',', '.') }}</div>
                 </div>
-                <div class="rounded-3 bg-info bg-opacity-10 p-2 text-info">
+                <div class="rounded-3 bg-info bg-opacity-10 p-2 text-white">
                     <i class="fas fa-file-invoice-dollar fa-lg"></i>
                 </div>
             </div>
@@ -396,7 +475,7 @@
                     <div class="fw-bold text-success text-uppercase mb-1" style="font-size: 0.68rem; letter-spacing: 0.04em;">Total Lunas Bulan Ini</div>
                     <div class="mb-0 fw-bold" style="font-family: 'JetBrains Mono', monospace; font-size: 1.05rem;">Rp {{ number_format($totalLunasBulanIni ?? 0, 0, ',', '.') }}</div>
                 </div>
-                <div class="rounded-3 bg-success bg-opacity-10 p-2 text-success">
+                <div class="rounded-3 bg-success bg-opacity-10 p-2 text-white">
                     <i class="fas fa-check-circle fa-lg"></i>
                 </div>
             </div>
@@ -410,7 +489,7 @@
                     <div class="fw-bold text-danger text-uppercase mb-1" style="font-size: 0.68rem; letter-spacing: 0.04em;">Status Batal</div>
                     <div class="mb-0 fw-bold" style="font-family: 'JetBrains Mono', monospace; font-size: 1.05rem;">Rp {{ number_format($totalBatal ?? 0, 0, ',', '.') }}</div>
                 </div>
-                <div class="rounded-3 bg-danger bg-opacity-10 p-2 text-danger">
+                <div class="rounded-3 bg-danger bg-opacity-10 p-2 text-white">
                     <i class="fas fa-times-circle fa-lg"></i>
                 </div>
             </div>
@@ -428,7 +507,7 @@
                     <i class="fas fa-file-invoice-dollar text-primary me-2"></i>Form Transaksi Baru
                 </h6>
             </div>
-            <form action="{{ route('menu_koperasi_pembelian_vocher_layanan_save') }}" method="POST" class="ent-form">
+            <form id="formTagihanLayanan" action="{{ route('menu_koperasi_pembelian_vocher_layanan_save') }}" method="POST" class="ent-form">
                 @csrf
                 <div class="card-body p-3 p-md-4">
                     <div class="row g-3">
@@ -441,8 +520,8 @@
                         <!-- Anggota ID -->
                         <div class="col-12">
                             <label class="form-label ent-form-label">Anggota (Peserta)</label>
-                            <select class="form-select" name="anggota_id" required>
-                                <option value="" selected disabled>-- Pilih Anggota --</option>
+                            <select class="form-select select2-tagihan" name="anggota_id" required>
+                                <option value="" selected>-- Pilih Anggota --</option>
                                 @foreach($peserta as $p)
                                 <option value="{{ $p->id_kop_master_peserta }}">
                                     {{ $p->kop_master_peserta_code }} - {{ $p->kop_master_peserta_name }} (NIP: {{ $p->kop_master_peserta_nip }})
@@ -454,8 +533,8 @@
                         <!-- Jenis Layanan Enum -->
                         <div class="col-12">
                             <label class="form-label ent-form-label">Jenis Layanan</label>
-                            <select class="form-select" name="jenis_layanan" required>
-                                <option value="" selected disabled>-- Pilih Layanan --</option>
+                            <select class="form-select select2-tagihan" name="jenis_layanan" required>
+                                <option value="" selected>-- Pilih Layanan --</option>
                                 <option value="LISTRIK">LISTRIK (Token / PLN)</option>
                                 <option value="PDAM">PDAM (Air)</option>
                                 <option value="INTERNET">INTERNET / WiFi</option>
@@ -547,8 +626,8 @@
                                             <label class="form-label fw-bold mb-0" style="font-size: 0.72rem;">Akun Piutang Anggota (Debet)</label>
                                             <span class="text-success fw-bold" id="txtDebitPiutang" style="font-family: 'JetBrains Mono', monospace; font-size: 0.78rem;">Rp 0</span>
                                         </div>
-                                        <select class="form-select" name="piutang_coa" id="selectPiutangCoa" required>
-                                            <option value="" disabled selected>-- Pilih COA Piutang --</option>
+                                        <select class="form-select select2-tagihan" name="piutang_coa" id="selectPiutangCoa" required>
+                                            <option value="" selected>-- Pilih COA Piutang --</option>
                                             @foreach($coas as $coa)
                                             <option value="{{ $coa->coa_code }}">
                                                 {{ $coa->coa_code }} - {{ $coa->coa_name }} ({{ strtoupper($coa->coa_type) }})
@@ -566,8 +645,8 @@
                                             <span class="text-danger fw-bold" id="txtKreditKas" style="font-family: 'JetBrains Mono', monospace; font-size: 0.78rem;">Rp 0</span>
                                         </div>
                                         <div class="ps-2">
-                                            <select class="form-select" name="sumber_dana_coa" id="selectKasCoa" required>
-                                                <option value="" disabled selected>-- Pilih COA Kas/Bank --</option>
+                                            <select class="form-select select2-tagihan" name="sumber_dana_coa" id="selectKasCoa" required>
+                                                <option value="" selected>-- Pilih COA Kas/Bank --</option>
                                                 @foreach($coas as $coa)
                                                 <option value="{{ $coa->coa_code }}">
                                                     {{ $coa->coa_code }} - {{ $coa->coa_name }} ({{ strtoupper($coa->coa_type) }})
@@ -586,8 +665,8 @@
                                             <span class="text-danger fw-bold" id="txtKreditAdmin" style="font-family: 'JetBrains Mono', monospace; font-size: 0.78rem;">Rp 0</span>
                                         </div>
                                         <div class="ps-2">
-                                            <select class="form-select" name="pendapatan_admin_coa" id="selectAdminCoa" required>
-                                                <option value="" disabled selected>-- Pilih COA Admin --</option>
+                                            <select class="form-select select2-tagihan" name="pendapatan_admin_coa" id="selectAdminCoa" required>
+                                                <option value="">-- Pilih COA Admin --</option>
                                                 @foreach($coas as $coa)
                                                 <option value="{{ $coa->coa_code }}" {{ $coa->coa_type == 'pendapatan' ? 'selected' : '' }}>
                                                     {{ $coa->coa_code }} - {{ $coa->coa_name }} ({{ strtoupper($coa->coa_type) }})
@@ -754,8 +833,8 @@
 
                     <div class="mb-2">
                         <label class="form-label ent-form-label">Pilih Akun Kas / Bank Pembayaran (Debet/Kas Masuk)</label>
-                        <select class="form-select" name="sumber_dana_pelunasan_coa" required>
-                            <option value="" disabled selected>-- Pilih COA Kas / Bank --</option>
+                        <select class="form-select select2-tagihan-modal" id="selectPelunasanCoa" name="sumber_dana_pelunasan_coa" required>
+                            <option value="" selected>-- Pilih COA Kas / Bank --</option>
                             @foreach($coas as $coa)
                             <option value="{{ $coa->coa_code }}">
                                 {{ $coa->coa_code }} - {{ $coa->coa_name }} ({{ strtoupper($coa->coa_type) }})
@@ -776,7 +855,77 @@
 
 @section('base.js')
 <script>
+    function runWhenSelect2Ready(callback) {
+        if (window.jQuery && $.fn.select2) {
+            callback();
+            return;
+        }
+        const loadSelect2 = () => {
+            const s = document.createElement('script');
+            s.src = 'https://cdn.jsdelivr.net/npm/select2@4.1.0-rc.0/dist/js/select2.min.js';
+            s.onload = callback;
+            document.head.appendChild(s);
+        };
+        if (!window.jQuery) {
+            const jq = document.createElement('script');
+            jq.src = 'https://code.jquery.com/jquery-3.7.1.min.js';
+            jq.onload = loadSelect2;
+            document.head.appendChild(jq);
+        } else {
+            loadSelect2();
+        }
+    }
+
+    function initSelect2Tagihan() {
+        if (!(window.jQuery && $.fn.select2)) return;
+
+        const baseOpts = {
+            theme: 'bootstrap-5',
+            width: '100%',
+            allowClear: true,
+            language: {
+                noResults: function() {
+                    return 'Data tidak ditemukan';
+                },
+                searching: function() {
+                    return 'Mencari...';
+                }
+            }
+        };
+
+        $('.select2-tagihan').each(function() {
+            const $el = $(this);
+            const placeholderText = $el.find('option:first').text() || '-- Pilih --';
+            if ($el.hasClass('select2-hidden-accessible')) {
+                $el.select2('destroy');
+            }
+            $el.select2({
+                ...baseOpts,
+                placeholder: placeholderText
+            });
+        });
+
+        $('.select2-tagihan-modal').each(function() {
+            const $el = $(this);
+            const placeholderText = $el.find('option:first').text() || '-- Pilih COA Kas / Bank --';
+            if ($el.hasClass('select2-hidden-accessible')) {
+                $el.select2('destroy');
+            }
+            $el.select2({
+                ...baseOpts,
+                placeholder: placeholderText,
+                dropdownParent: $('#modalPelunasan')
+            });
+        });
+    }
+
     document.addEventListener('DOMContentLoaded', function() {
+        const defaultAdminCoaVal = document.getElementById('selectAdminCoa')?.value || '';
+
+        runWhenSelect2Ready(function() {
+            initSelect2Tagihan();
+        });
+
         const inputNominal = document.getElementById('inputNominal');
         const inputAdmin = document.getElementById('inputAdmin');
 
@@ -916,6 +1065,24 @@
             calculateJournal();
         }
 
+        // Reset handler untuk form & Select2
+        const formTagihan = document.getElementById('formTagihanLayanan');
+        if (formTagihan) {
+            formTagihan.addEventListener('reset', function() {
+                setTimeout(() => {
+                    updateStatusTagihan();
+                    calculateJournal();
+                    if (window.jQuery && $.fn.select2) {
+                        $('select[name="anggota_id"]').val('').trigger('change.select2');
+                        $('select[name="jenis_layanan"]').val('').trigger('change.select2');
+                        $('#selectPiutangCoa').val('').trigger('change.select2');
+                        $('#selectKasCoa').val('').trigger('change.select2');
+                        $('#selectAdminCoa').val(defaultAdminCoaVal).trigger('change.select2');
+                    }
+                }, 10);
+            });
+        }
+
         // Filter Pencarian Cepat pada Tabel Riwayat
         const searchTagihanInput = document.getElementById('searchTagihanInput');
         if (searchTagihanInput) {
@@ -947,6 +1114,12 @@
                     currency: 'IDR',
                     maximumFractionDigits: 0
                 }).format(total);
+
+                if (window.jQuery && $.fn.select2) {
+                    $('#selectPelunasanCoa').val('').trigger('change.select2');
+                } else {
+                    document.getElementById('selectPelunasanCoa').value = '';
+                }
             });
         }
     });

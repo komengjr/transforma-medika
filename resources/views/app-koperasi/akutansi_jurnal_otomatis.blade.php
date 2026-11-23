@@ -3,6 +3,8 @@
 @section('base.css')
 <link rel="stylesheet" href="https://cdn.datatables.net/2.2.2/css/dataTables.bootstrap5.css">
 <link rel="stylesheet" href="https://cdn.datatables.net/responsive/3.0.4/css/responsive.bootstrap5.css">
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/select2@4.1.0-rc.0/dist/css/select2.min.css" />
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/select2-bootstrap-5-theme@1.3.0/dist/select2-bootstrap-5-theme.min.css" />
 <link href="{{ asset('vendors/choices/choices.min.css') }}" rel="stylesheet" />
 <link href="{{ asset('vendors/flatpickr/flatpickr.min.css') }}" rel="stylesheet" />
 <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
@@ -165,6 +167,83 @@
 
     .ent-form .form-control[readonly] {
         background-color: rgba(79, 70, 229, 0.06) !important;
+    }
+
+    /* Select2 Custom Enterprise Integration */
+    .select2-container--bootstrap-5 {
+        width: 100% !important;
+    }
+
+    .ent-form .select2-container--bootstrap-5 .select2-selection--single {
+        border: 1px solid var(--ent-grid-border) !important;
+        border-radius: 10px !important;
+        font-weight: 600 !important;
+        color: var(--ent-text) !important;
+        background-color: var(--ent-surface) !important;
+        padding: 6px 34px 6px 12px !important;
+        font-size: 0.82rem !important;
+        height: 40px !important;
+        min-height: 40px !important;
+        display: flex !important;
+        align-items: center !important;
+        box-shadow: none !important;
+        transition: all 0.2s ease;
+    }
+
+    .select2-container--bootstrap-5.select2-container--focus .select2-selection--single,
+    .select2-container--bootstrap-5.select2-container--open .select2-selection--single {
+        border-color: var(--ent-indigo) !important;
+        box-shadow: 0 0 0 3.5px rgba(79, 70, 229, 0.15) !important;
+    }
+
+    .select2-container--bootstrap-5 .select2-selection--single .select2-selection__rendered {
+        padding: 0 !important;
+        line-height: 1.25 !important;
+        color: var(--ent-text) !important;
+        font-weight: 600 !important;
+    }
+
+    .select2-container--bootstrap-5 .select2-dropdown {
+        border: 1px solid var(--ent-grid-border) !important;
+        border-radius: 12px !important;
+        background-color: var(--ent-surface) !important;
+        color: var(--ent-text) !important;
+        box-shadow: 0 12px 24px -6px rgba(15, 23, 42, 0.18) !important;
+        overflow: hidden;
+        z-index: 1075;
+    }
+
+    .select2-container--bootstrap-5 .select2-search--dropdown .select2-search__field {
+        border: 1px solid var(--ent-grid-border) !important;
+        border-radius: 8px !important;
+        background-color: var(--ent-surface) !important;
+        color: var(--ent-text) !important;
+        font-size: 0.8rem !important;
+        font-weight: 600 !important;
+        padding: 6px 10px !important;
+    }
+
+    .select2-container--bootstrap-5 .select2-search--dropdown .select2-search__field:focus {
+        border-color: var(--ent-indigo) !important;
+        outline: none;
+        box-shadow: 0 0 0 2.5px rgba(79, 70, 229, 0.15) !important;
+    }
+
+    .select2-container--bootstrap-5 .select2-results__option {
+        font-size: 0.8rem !important;
+        font-weight: 600 !important;
+        padding: 8px 12px !important;
+        color: var(--ent-text) !important;
+    }
+
+    .select2-container--bootstrap-5 .select2-results__option--highlighted[aria-selected] {
+        background-color: var(--ent-indigo) !important;
+        color: #ffffff !important;
+    }
+
+    .select2-container--bootstrap-5 .select2-results__option[aria-selected="true"] {
+        background-color: rgba(79, 70, 229, 0.14) !important;
+        color: var(--ent-indigo) !important;
     }
 
     /* Navigation Tabs */
@@ -342,7 +421,7 @@
         </div>
         <div class="col-md-4" id="wrapper-select-coa" style="display:none;">
             <label class="form-label ent-form-label">Pilih Akun COA (Buku Besar)</label>
-            <select id="bb-coa-code" class="form-select">
+            <select id="bb-coa-code" class="form-select select2-laporan-coa">
                 @foreach ($coa as $coas)
                 <option value="{{ $coas->coa_code }}">{{ $coas->coa_code }} - {{ $coas->coa_name }}</option>
                 @endforeach
@@ -572,6 +651,55 @@
     // Daftar COA dari Blade untuk opsi dropdown di modal saldo awal & koreksi jurnal
     const daftarCoaMaster = @json($coa);
 
+    function runWhenSelect2Ready(callback) {
+        if (window.jQuery && $.fn.select2) {
+            callback();
+            return;
+        }
+        const loadSelect2 = () => {
+            const s = document.createElement('script');
+            s.src = 'https://cdn.jsdelivr.net/npm/select2@4.1.0-rc.0/dist/js/select2.min.js';
+            s.onload = callback;
+            document.head.appendChild(s);
+        };
+        if (!window.jQuery) {
+            const jq = document.createElement('script');
+            jq.src = 'https://code.jquery.com/jquery-3.7.1.min.js';
+            jq.onload = loadSelect2;
+            document.head.appendChild(jq);
+        } else {
+            loadSelect2();
+        }
+    }
+
+    function initSelect2OnElement(selectorOrEl, dropdownParentSelector = null, allowClear = true) {
+        if (!(window.jQuery && $.fn.select2)) return;
+        $(selectorOrEl).each(function() {
+            const $el = $(this);
+            if ($el.hasClass('select2-hidden-accessible')) {
+                $el.select2('destroy');
+            }
+            const opts = {
+                theme: 'bootstrap-5',
+                width: '100%',
+                placeholder: '-- Pilih Akun COA --',
+                allowClear: allowClear,
+                language: {
+                    noResults: function() {
+                        return 'Akun tidak ditemukan';
+                    },
+                    searching: function() {
+                        return 'Mencari...';
+                    }
+                }
+            };
+            if (dropdownParentSelector) {
+                opts.dropdownParent = $(dropdownParentSelector);
+            }
+            $el.select2(opts);
+        });
+    }
+
     function buildCoaOptionsHtml(selectedCode = '') {
         let options = `<option value="">-- Pilih Akun COA --</option>`;
         daftarCoaMaster.forEach(c => {
@@ -586,6 +714,9 @@
 
         // Tampilkan dropdown pilih COA hanya jika menu Buku Besar aktif
         document.getElementById('wrapper-select-coa').style.display = (tipe === 'bukubesar') ? 'block' : 'none';
+        if (tipe === 'bukubesar') {
+            runWhenSelect2Ready(() => initSelect2OnElement('#bb-coa-code', null, false));
+        }
 
         // Ubah status aktif tombol tab
         document.querySelectorAll('#laporanTab .nav-link').forEach(btn => btn.classList.remove('active'));
@@ -716,6 +847,7 @@
             </td>
         `;
         tbody.appendChild(tr);
+        runWhenSelect2Ready(() => initSelect2OnElement(tr.querySelector('.sa-row-coa'), '#modalSaldoAwal', true));
         hitungTotalSaldoAwal();
     }
 
@@ -741,7 +873,12 @@
             Swal.fire('Minimal 2 Baris', 'Saldo awal double-entry minimal memiliki 2 baris akun (Debit dan Kredit).', 'warning');
             return;
         }
-        btn.closest('tr').remove();
+        const tr = btn.closest('tr');
+        if (window.jQuery && $.fn.select2) {
+            const $sel = $(tr).find('.sa-row-coa');
+            if ($sel.hasClass('select2-hidden-accessible')) $sel.select2('destroy');
+        }
+        tr.remove();
         hitungTotalSaldoAwal();
     }
 
@@ -925,6 +1062,7 @@
             </td>
         `;
         tbody.appendChild(tr);
+        runWhenSelect2Ready(() => initSelect2OnElement(tr.querySelector('.edit-row-coa'), '#modalEditJurnal', true));
         hitungTotalEditJurnal();
     }
 
@@ -950,7 +1088,12 @@
             Swal.fire('Minimal 2 Baris', 'Transaksi double-entry minimal memiliki 2 baris akun (Debit dan Kredit).', 'warning');
             return;
         }
-        btn.closest('tr').remove();
+        const tr = btn.closest('tr');
+        if (window.jQuery && $.fn.select2) {
+            const $sel = $(tr).find('.edit-row-coa');
+            if ($sel.hasClass('select2-hidden-accessible')) $sel.select2('destroy');
+        }
+        tr.remove();
         hitungTotalEditJurnal();
     }
 
@@ -1582,6 +1725,7 @@
 
     // Jalankan otomatis load Jurnal Umum di awal pembukaan form
     document.addEventListener("DOMContentLoaded", function() {
+        runWhenSelect2Ready(() => initSelect2OnElement('#bb-coa-code', null, false));
         loadLaporanAktif();
     });
 </script>

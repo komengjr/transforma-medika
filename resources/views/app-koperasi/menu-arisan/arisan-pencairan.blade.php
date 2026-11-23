@@ -3,6 +3,8 @@
 @section('base.css')
 <link rel="stylesheet" href="https://cdn.datatables.net/2.2.2/css/dataTables.bootstrap5.css">
 <link rel="stylesheet" href="https://cdn.datatables.net/responsive/3.0.4/css/responsive.bootstrap5.css">
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/select2@4.1.0-rc.0/dist/css/select2.min.css" />
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/select2-bootstrap-5-theme@1.3.0/dist/select2-bootstrap-5-theme.min.css" />
 <link href="{{ asset('vendors/choices/choices.min.css') }}" rel="stylesheet" />
 <link href="{{ asset('vendors/flatpickr/flatpickr.min.css') }}" rel="stylesheet" />
 <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
@@ -128,7 +130,7 @@
         letter-spacing: 0.03em;
         color: var(--bs-secondary-color, #64748b);
         pointer-events: none;
-        z-index: 5;
+        z-index: 6;
     }
 
     .form-control {
@@ -195,6 +197,90 @@
         border-color: var(--ent-indigo) !important;
         box-shadow: 0 0 0 3.5px rgba(79, 70, 229, 0.15) !important;
         outline: none;
+    }
+
+    /* Select2 Custom Enterprise Integration */
+    .select2-container--bootstrap-5 {
+        width: 100% !important;
+    }
+
+    .select2-container--bootstrap-5 .select2-selection--single {
+        border: 1px solid var(--ent-grid-border) !important;
+        border-radius: 10px !important;
+        font-weight: 600 !important;
+        color: var(--bs-body-color) !important;
+        background-color: var(--bs-body-bg) !important;
+        padding: 18px 34px 4px 11px !important;
+        font-size: 0.82rem !important;
+        height: 44px !important;
+        min-height: 44px !important;
+        display: flex !important;
+        align-items: center !important;
+        box-shadow: none !important;
+        transition: all 0.2s ease;
+    }
+
+    .ent-modal-form .select2-container--bootstrap-5 .select2-selection--single {
+        padding: 6px 34px 6px 12px !important;
+        height: 40px !important;
+        min-height: 40px !important;
+        font-size: 0.82rem !important;
+    }
+
+    .select2-container--bootstrap-5.select2-container--focus .select2-selection--single,
+    .select2-container--bootstrap-5.select2-container--open .select2-selection--single {
+        border-color: var(--ent-indigo) !important;
+        box-shadow: 0 0 0 3.5px rgba(79, 70, 229, 0.15) !important;
+    }
+
+    .select2-container--bootstrap-5 .select2-selection--single .select2-selection__rendered {
+        padding: 0 !important;
+        line-height: 1.25 !important;
+        color: var(--bs-body-color) !important;
+        font-weight: 600 !important;
+    }
+
+    .select2-container--bootstrap-5 .select2-dropdown {
+        border: 1px solid var(--ent-grid-border) !important;
+        border-radius: 12px !important;
+        background-color: var(--bs-body-bg, var(--ent-surface)) !important;
+        color: var(--bs-body-color) !important;
+        box-shadow: 0 12px 24px -6px rgba(15, 23, 42, 0.18) !important;
+        overflow: hidden;
+        z-index: 1075;
+    }
+
+    .select2-container--bootstrap-5 .select2-search--dropdown .select2-search__field {
+        border: 1px solid var(--ent-grid-border) !important;
+        border-radius: 8px !important;
+        background-color: var(--bs-body-bg) !important;
+        color: var(--bs-body-color) !important;
+        font-size: 0.8rem !important;
+        font-weight: 600 !important;
+        padding: 6px 10px !important;
+    }
+
+    .select2-container--bootstrap-5 .select2-search--dropdown .select2-search__field:focus {
+        border-color: var(--ent-indigo) !important;
+        outline: none;
+        box-shadow: 0 0 0 2.5px rgba(79, 70, 229, 0.15) !important;
+    }
+
+    .select2-container--bootstrap-5 .select2-results__option {
+        font-size: 0.8rem !important;
+        font-weight: 600 !important;
+        padding: 8px 12px !important;
+        color: var(--bs-body-color) !important;
+    }
+
+    .select2-container--bootstrap-5 .select2-results__option--highlighted[aria-selected] {
+        background-color: var(--ent-indigo) !important;
+        color: #ffffff !important;
+    }
+
+    .select2-container--bootstrap-5 .select2-results__option[aria-selected="true"] {
+        background-color: rgba(79, 70, 229, 0.14) !important;
+        color: var(--ent-indigo) !important;
     }
 
     /* Soft Badges */
@@ -289,9 +375,9 @@
                                 <span class="ent-badge" style="background: rgba(56, 189, 248, 0.2); border: 1px solid rgba(56, 189, 248, 0.4); color: #7dd3fc;">
                                     <i class="fas fa-money-bill-wave me-1"></i> {{ env('APP_LABEL', 'KOPERASI') }} PAYOUT
                                 </span>
-                                <span style="color: #94a3b8; font-size: 0.75rem; font-weight: 600;">Pencairan Paket Dana Arisan</span>
+                                <!-- <span style="color: #94a3b8; font-size: 0.75rem; font-weight: 600;">Pencairan Paket Dana Arisan</span> -->
                             </div>
-                            <h4 class="mb-0 fw-bold text-white" style="letter-spacing: -0.02em;">Pencairan Paket Dana Arisan</h4>
+                            <h4 class="mb-0 fw-bold" style="letter-spacing: -0.02em;color: white;">Pencairan Paket Dana Arisan</h4>
                             <p class="mb-0 small" style="color: #cbd5e1;">Pencairan dihitung mandiri berdasarkan plot kapasitas poin pada bulan klaim berjalan ($\text{Poin Bulan Ini} \times \text{Rate} \times 12$).</p>
                         </div>
                     </div>
@@ -313,13 +399,13 @@
             <div class="col-md-4">
                 <div class="form-floating-custom">
                     <label for="pencairanMaster">1. Program Arisan <span class="text-danger">*</span></label>
-                    <select id="pencairanMaster" class="form-select ent-input" required></select>
+                    <select id="pencairanMaster" class="form-select ent-input select2-pencairan" required></select>
                 </div>
             </div>
             <div class="col-md-3">
                 <div class="form-floating-custom">
                     <label for="pencairanTahun">2. Tahun <span class="text-danger">*</span></label>
-                    <select id="pencairanTahun" class="form-select ent-input" required>
+                    <select id="pencairanTahun" class="form-select ent-input select2-pencairan" required>
                         <option value="">-- Pilih Tahun --</option>
                         @for ($year = 2026; $year <= 2035; $year++)
                             <option value="{{ $year }}">{{ $year }}</option>
@@ -330,7 +416,7 @@
             <div class="col-md-3">
                 <div class="form-floating-custom">
                     <label for="pencairanBulan">3. Bulan Klaim <span class="text-danger">*</span></label>
-                    <select id="pencairanBulan" class="form-select ent-input" required>
+                    <select id="pencairanBulan" class="form-select ent-input select2-pencairan" required>
                         <option value="1">Januari</option>
                         <option value="2">Februari</option>
                         <option value="3">Maret</option>
@@ -381,7 +467,7 @@
                     <span class="ent-badge mb-1" style="background: rgba(56, 189, 248, 0.2); border: 1px solid rgba(56, 189, 248, 0.4); color: #7dd3fc; font-size: 0.62rem;">
                         <i class="fas fa-wallet me-1"></i> EKSEKUSI PENCAIRAN DANA
                     </span>
-                    <h5 class="modal-title fw-bold text-white mb-0" id="modalPencairanLabel">Konfirmasi Pencairan Dana</h5>
+                    <h5 class="modal-title fw-bold mb-0" id="modalPencairanLabel" style="color: white;">Konfirmasi Pencairan Dana</h5>
                 </div>
                 <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal" aria-label="Close"></button>
             </div>
@@ -390,7 +476,7 @@
                 <div class="modal-body p-4">
                     <div class="mb-3 pb-3" style="border-bottom: 1px solid var(--ent-grid-border);">
                         <span class="ent-modal-label d-block mb-1">Penerima / Anggota</span>
-                        <h5 id="modalNamaPeserta" class="fw-bold text-uppercase mb-0">-</h5>
+                        <h5 id="modalNamaPeserta" class="fw-bold text-uppercase mb-0" style="color: darkblue;">-</h5>
                         <small id="modalKodePeserta" class="opacity-75" style="font-family: 'JetBrains Mono', monospace;">-</small>
                     </div>
 
@@ -406,7 +492,7 @@
 
                     <div class="mb-3">
                         <label for="pencairanAkun" class="form-label ent-modal-label">Pilih Akun Sumber Dana (Pencairan) <span class="text-danger">*</span></label>
-                        <select id="pencairanAkun" class="form-select" required>
+                        <select id="pencairanAkun" class="form-select select2-pencairan-modal" required>
                             <option value="">-- Hubungkan ke Akun Kas/Bank --</option>
                             @foreach ($akun as $akuns)
                             <option value="{{ $akuns->coa_code }}">{{ $akuns->coa_code }} - {{ $akuns->coa_name }}</option>
@@ -431,6 +517,8 @@
     </div>
 </div>
 
+<script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+
 <script>
     const namaBulanIndo = {
         1: "Januari",
@@ -450,8 +538,74 @@
 
     let modalPencairanInstance;
 
+    function runWhenSelect2Ready(callback) {
+        if (window.jQuery && $.fn.select2) {
+            callback();
+            return;
+        }
+        const loadSelect2 = () => {
+            const s = document.createElement('script');
+            s.src = 'https://cdn.jsdelivr.net/npm/select2@4.1.0-rc.0/dist/js/select2.min.js';
+            s.onload = callback;
+            document.head.appendChild(s);
+        };
+        if (!window.jQuery) {
+            const jq = document.createElement('script');
+            jq.src = 'https://code.jquery.com/jquery-3.7.1.min.js';
+            jq.onload = loadSelect2;
+            document.head.appendChild(jq);
+        } else {
+            loadSelect2();
+        }
+    }
+
+    function initSelect2Pencairan() {
+        if (!(window.jQuery && $.fn.select2)) return;
+
+        const baseOpts = {
+            theme: 'bootstrap-5',
+            width: '100%',
+            allowClear: true,
+            language: {
+                noResults: function() {
+                    return 'Data tidak ditemukan';
+                },
+                searching: function() {
+                    return 'Mencari...';
+                }
+            }
+        };
+
+        $('.select2-pencairan').each(function() {
+            const $el = $(this);
+            const placeholderText = $el.find('option:first').text() || '-- Pilih --';
+            if ($el.hasClass('select2-hidden-accessible')) {
+                $el.select2('destroy');
+            }
+            $el.select2({
+                ...baseOpts,
+                placeholder: placeholderText
+            });
+        });
+
+        $('.select2-pencairan-modal').each(function() {
+            const $el = $(this);
+            const placeholderText = $el.find('option:first').text() || '-- Hubungkan ke Akun Kas/Bank --';
+            if ($el.hasClass('select2-hidden-accessible')) {
+                $el.select2('destroy');
+            }
+            $el.select2({
+                ...baseOpts,
+                placeholder: placeholderText,
+                dropdownParent: $('#modalPencairan')
+            });
+        });
+    }
+
     async function initPencairanPage() {
         modalPencairanInstance = new bootstrap.Modal(document.getElementById('modalPencairan'));
+        initSelect2Pencairan();
+
         try {
             const res = await fetch(`{{ route('menu_koperasi_pencairan_arisan_get_data') }}`);
             const data = await res.json();
@@ -464,6 +618,10 @@
                 opt.textContent = m.kop_master_arisan_name;
                 selectMaster.appendChild(opt);
             });
+
+            if (window.jQuery && $.fn.select2) {
+                $('#pencairanMaster').val('').trigger('change.select2');
+            }
         } catch (err) {
             console.error(err);
         }
@@ -476,7 +634,7 @@
         const bulan = document.getElementById('pencairanBulan').value;
 
         try {
-            const res = await fetch(`{{ url('koperasi/menu-koperasi/pencairan-arisan/cek-pemenang') }}?id_master=${idMaster}&tahun=${tahun}&bulan=${bulan}`);
+            const res = await fetch(`{{ url('koperasi/menu-koperasi/pencairan-arisan/cek-pemenang') }}?id_master=${encodeURIComponent(idMaster)}&tahun=${encodeURIComponent(tahun)}&bulan=${encodeURIComponent(bulan)}`);
             const data = await res.json();
 
             const wrapper = document.getElementById('wrapperPemenang');
@@ -595,7 +753,12 @@
         document.getElementById('submitPoin').value = dataPeserta.poin_bulan_ini;
 
         document.getElementById('pencairanKeterangan').value = `Pencairan Klaim Paket ${dataPeserta.poin_bulan_ini} Poin Terjadwal (${bulanText})`;
-        document.getElementById('pencairanAkun').value = "";
+
+        if (window.jQuery && $.fn.select2) {
+            $('#pencairanAkun').val('').trigger('change.select2');
+        } else {
+            document.getElementById('pencairanAkun').value = '';
+        }
 
         modalPencairanInstance.show();
     }
@@ -641,6 +804,10 @@
         }
     }
 
-    window.onload = initPencairanPage;
+    window.addEventListener('DOMContentLoaded', function() {
+        runWhenSelect2Ready(function() {
+            initPencairanPage();
+        });
+    });
 </script>
 @endsection

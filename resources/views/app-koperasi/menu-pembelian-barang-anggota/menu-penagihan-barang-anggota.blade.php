@@ -389,7 +389,7 @@
                                 </span>
                                 <span style="color: #94a3b8; font-size: 0.75rem; font-weight: 600;">Penagihan &amp; Pelunasan</span>
                             </div>
-                            <h4 class="mb-0 fw-bold text-white" style="letter-spacing: -0.02em;">Penagihan &amp; Pelunasan Cicilan</h4>
+                            <h4 class="mb-0 fw-bold" style="letter-spacing: -0.02em;color: white;">Penagihan &amp; Pelunasan Cicilan</h4>
                             <p class="mb-0 small" style="color: #cbd5e1;">Penerimaan setoran uang angsuran barang dari peserta koperasi.</p>
                         </div>
                     </div>

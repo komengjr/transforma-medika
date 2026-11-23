@@ -419,7 +419,7 @@
                                 </span>
                                 <span style="color: #94a3b8; font-size: 0.75rem; font-weight: 600;">Pengadaan Anggota</span>
                             </div>
-                            <h4 class="mb-0 fw-bold text-white" style="letter-spacing: -0.02em;">Pembelian Barang Anggota / Peserta</h4>
+                            <h4 class="mb-0 fw-bold" style="letter-spacing: -0.02em;color: white;">Pembelian Barang Anggota / Peserta</h4>
                             <p class="mb-0 small" style="color: #cbd5e1;">Sistem pengadaan barang inventaris/kebutuhan anggota dengan skema pembayaran tenor (cicilan).</p>
                         </div>
                     </div>

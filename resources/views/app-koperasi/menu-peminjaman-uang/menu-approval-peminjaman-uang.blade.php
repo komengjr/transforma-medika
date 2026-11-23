@@ -271,6 +271,42 @@
         padding-right: 18px !important;
     }
 
+    /* Collapsible Riwayat Row Styling */
+    .ent-riwayat-toggle {
+        cursor: pointer;
+        user-select: none;
+    }
+
+    .ent-riwayat-toggle.is-open > td {
+        background-color: rgba(79, 70, 229, 0.11) !important;
+    }
+
+    .ent-chevron {
+        display: inline-flex;
+        align-items: center;
+        justify-content: center;
+        width: 22px;
+        height: 22px;
+        border-radius: 6px;
+        background-color: rgba(79, 70, 229, 0.12);
+        color: #4f46e5;
+        font-size: 0.7rem;
+        transition: transform 0.2s ease, background-color 0.2s ease, color 0.2s ease;
+        margin-right: 6px;
+        flex-shrink: 0;
+    }
+
+    .ent-riwayat-toggle.is-open .ent-chevron {
+        transform: rotate(180deg);
+        background-color: #4f46e5;
+        color: #ffffff;
+    }
+
+    .ent-riwayat-detail-cell {
+        background-color: rgba(79, 70, 229, 0.03) !important;
+        border-top: none !important;
+    }
+
     /* SOLID FULL-CELL ACTION BUTTON STYLING (NON-TRANSPARENT) */
     .table-custom td.action-cell-full {
         padding: 0 !important;
@@ -450,9 +486,8 @@
                                 <span class="ent-badge" style="background: rgba(56, 189, 248, 0.2); border: 1px solid rgba(56, 189, 248, 0.4); color: #7dd3fc;">
                                     <i class="fas fa-user-check me-1"></i> {{ env('APP_LABEL', 'KOPERASI') }} APPROVAL
                                 </span>
-                                <span style="color: #94a3b8; font-size: 0.75rem; font-weight: 600;">Approval Peminjaman Uang</span>
                             </div>
-                            <h4 class="mb-0 fw-bold text-white" style="letter-spacing: -0.02em;">Approval Peminjaman Uang</h4>
+                            <h4 class="mb-0 fw-bold" style="letter-spacing: -0.02em;color: #ffffff;">Approval Peminjaman Uang</h4>
                             <p class="mb-0 small" style="color: #cbd5e1;">Daftar pengajuan pinjaman anggota yang menunggu otorisasi persetujuan.</p>
                         </div>
                     </div>
@@ -632,7 +667,7 @@
                     <span class="ent-badge mb-1" style="background: rgba(56, 189, 248, 0.2); border: 1px solid rgba(56, 189, 248, 0.4); color: #7dd3fc; font-size: 0.62rem;">
                         <i class="fas fa-file-contract me-1"></i> OTORISASI AKAD
                     </span>
-                    <h5 class="modal-title fw-bold text-white mb-0" id="modalReviewLabel">Review Pengajuan Pinjaman</h5>
+                    <h5 class="modal-title fw-bold mb-0" id="modalReviewLabel" style="color: white;">Review Pengajuan Pinjaman</h5>
                 </div>
                 <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal" aria-label="Close"></button>
             </div>
@@ -712,8 +747,9 @@
 
                     <div class="col-12">
                         <div class="ent-sub-card">
-                            <div class="ent-sub-card-header">
-                                <i class="fas fa-history text-primary me-1"></i> Riwayat Pinjaman Sebelumnya
+                            <div class="ent-sub-card-header d-flex align-items-center justify-content-between">
+                                <span><i class="fas fa-history text-primary me-1"></i> Riwayat Pinjaman Sebelumnya</span>
+                                <span class="text-muted fw-normal" style="font-size: 0.68rem; text-transform: none;">Klik baris untuk buka/tutup rincian tenor</span>
                             </div>
                             <div class="table-responsive">
                                 <table class="table table-custom align-middle mb-0 small">
@@ -836,6 +872,26 @@
             }).format(angka);
         }
 
+        // Toggle buka/tutup detail tenor pada Riwayat Pinjaman Sebelumnya
+        $(document).on('click', '.ent-riwayat-toggle', function() {
+            const targetId = $(this).data('target');
+            const detailRow = $('#' + targetId);
+            const isOpen = $(this).hasClass('is-open');
+
+            if (isOpen) {
+                $(this).removeClass('is-open');
+                detailRow.stop(true, true).slideUp(180);
+            } else {
+                $(this).addClass('is-open');
+                detailRow.stop(true, true).slideDown(180);
+            }
+        });
+
+        $('#modalReview').on('hidden.bs.modal', function() {
+            $('.ent-riwayat-toggle').removeClass('is-open');
+            $('.ent-riwayat-detail-row').hide();
+        });
+
         // 1. Event Klik Tombol Review di Tabel
         $(document).on('click', '.btn-review', function() {
             let trxId = $(this).data('id');
@@ -874,17 +930,23 @@
                     $('#prof_nip').text(p.kop_master_peserta_nip || '-');
                     $('#prof_hp').text(p.kop_master_peserta_no_hp || '-');
 
-                    // Render Riwayat Pinjaman Beserta Tenornya
+                    // Render Riwayat Pinjaman dengan baris tenor collapsible (default tertutup)
                     let historyHtml = '';
                     if (h.length > 0) {
                         $.each(h, function(i, val) {
                             let badgeClass = val.status_pinjaman === 'APPROVED' ? 'badge-approved' : (val.status_pinjaman === 'REJECTED' ? 'badge-rejected' : 'badge-pending');
                             let statusTagihanRiwayat = val.status_tagihan || 'PENDING';
                             let badgeTagihanRwy = statusTagihanRiwayat === 'LUNAS' ? 'badge-approved' : 'badge-pending';
+                            let collapseId = 'riwayatDetail_' + (val.id || i) + '_' + i;
 
                             historyHtml += `
-                                <tr class="fw-bold">
-                                    <td><i class="fas fa-history text-primary me-1"></i> ${val.tanggal_pinjaman}</td>
+                                <tr class="fw-bold ent-riwayat-toggle" data-target="${collapseId}" title="Klik untuk buka/tutup rincian tenor">
+                                    <td>
+                                        <div class="d-flex align-items-center">
+                                            <span class="ent-chevron"><i class="fas fa-chevron-down"></i></span>
+                                            <span>${val.tanggal_pinjaman}</span>
+                                        </div>
+                                    </td>
                                     <td style="font-family: 'JetBrains Mono', monospace;">${val.nota_nomor}</td>
                                     <td class="text-end" style="font-family: 'JetBrains Mono', monospace;">${formatRp(val.jumlah_pinjaman)}</td>
                                     <td class="text-center">${val.tenor_bulan} Bln</td>
@@ -895,8 +957,8 @@
 
                             if (val.tenors && val.tenors.length > 0) {
                                 historyHtml += `
-                                    <tr>
-                                        <td colspan="6" class="p-3">
+                                    <tr id="${collapseId}" class="ent-riwayat-detail-row" style="display: none;">
+                                        <td colspan="6" class="p-3 ent-riwayat-detail-cell">
                                             <div class="small fw-bold opacity-75 mb-2">Rincian Angsuran / Tenor (${val.nota_nomor}):</div>
                                             <div class="table-responsive">
                                                 <table class="table table-custom mb-0 align-middle" style="font-family: 'JetBrains Mono', monospace; font-size: 0.78rem;">
@@ -937,8 +999,8 @@
                                 `;
                             } else {
                                 historyHtml += `
-                                    <tr>
-                                        <td colspan="6" class="opacity-75 fst-italic ps-4">Tidak ada rincian tenor untuk riwayat ini.</td>
+                                    <tr id="${collapseId}" class="ent-riwayat-detail-row" style="display: none;">
+                                        <td colspan="6" class="opacity-75 fst-italic ps-4 ent-riwayat-detail-cell">Tidak ada rincian tenor untuk riwayat ini.</td>
                                     </tr>
                                 `;
                             }
