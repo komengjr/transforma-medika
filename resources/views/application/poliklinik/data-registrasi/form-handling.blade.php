@@ -243,7 +243,7 @@
                     </span>
                     <span class="small fw-semibold" style="color: #94a3b8;">Transforma HIS</span>
                 </div>
-                <h5 class="mb-0 text-white fw-bold" style="letter-spacing: -0.02em;">
+                <h5 class="mb-0 fw-bold" style="letter-spacing: -0.02em;color: white;">
                     Handling Pasien: {{ $data->nama_poli ?? 'Poliklinik' }}
                 </h5>
             </div>
