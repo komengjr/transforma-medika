@@ -13,26 +13,31 @@ class BrainTestSoal extends Model
 
     protected $table = 'brain_test_soal';
 
-    // Gunakan fillable secara spesifik untuk menghindari mass-assignment error
     protected $fillable = [
         'kategori_id',
         'pertanyaan',
-        'gambar', // <-- Tambahkan ini
+        'gambar',
+        'tipe_soal',
+        'kunci_jawaban_isian',
+        'bobot_nilai',
+        'pembahasan',
     ];
 
-    // Relasi ke Kategori
+    protected $casts = [
+        'kategori_id' => 'integer',
+        'bobot_nilai' => 'integer',
+    ];
+
     public function kategori(): BelongsTo
     {
         return $this->belongsTo(BrainTestKategori::class, 'kategori_id');
     }
 
-    // Relasi ke Opsi Jawaban (untuk pilihan ganda)
     public function opsiJawabans(): HasMany
     {
         return $this->hasMany(BrainTestOpsiJawaban::class, 'soal_id');
     }
 
-    // Relasi ke Jawaban Responden
     public function jawabanRespondens(): HasMany
     {
         return $this->hasMany(BrainTestJawabanResponden::class, 'soal_id');

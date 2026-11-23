@@ -9,16 +9,30 @@ use Illuminate\Database\Eloquent\Relations\HasMany;
 
 class BrainTestKategori extends Model
 {
-    protected $table = 'brain_test_kategori';
-    protected $guarded = ['id'];
+    use HasFactory;
 
-    // Relasi ke Klasifikasi (Sudah ada sebelumnya)
-    public function klasifikasi(): BelongsTo
+    protected $table = 'brain_test_kategori';
+
+    protected $fillable = [
+        'paket_id',
+        'nama_kategori',
+        'passing_grade',
+        'urutan',
+        'slug',
+        'deskripsi',
+    ];
+
+    protected $casts = [
+        'paket_id'      => 'integer',
+        'passing_grade' => 'integer',
+        'urutan'        => 'integer',
+    ];
+
+    public function paket(): BelongsTo
     {
-        return $this->belongsTo(BrainTestKlasifikasi::class, 'klasifikasi_id');
+        return $this->belongsTo(BrainTestPaket::class, 'paket_id');
     }
 
-    // TAMBAHKAN INI: Relasi ke tabel Soal (brain_test_soal)
     public function soals(): HasMany
     {
         return $this->hasMany(BrainTestSoal::class, 'kategori_id');

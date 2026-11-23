@@ -1,229 +1,737 @@
 @extends('layouts.layouts')
 
+@section('base.css')
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
+<link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&family=JetBrains+Mono:wght@500;700&display=swap" rel="stylesheet">
+
+<style>
+    :root {
+        --ent-indigo: #4f46e5;
+        --ent-indigo-dark: #4338ca;
+        --ent-indigo-soft: rgba(79, 70, 229, 0.12);
+        --ent-grid-border: rgba(99, 102, 241, 0.28);
+        --ent-emerald: #059669;
+        --ent-sky: #0284c7;
+        --ent-amber: #d97706;
+        --ent-rose: #e11d48;
+        --ent-solid-bg: #ffffff;
+        --ent-solid-text: #0f172a;
+    }
+
+    [data-bs-theme="dark"],
+    .dark {
+        --ent-solid-bg: #0f172a;
+        --ent-solid-text: #f8fafc;
+    }
+
+    body {
+        font-family: 'Plus Jakarta Sans', sans-serif;
+    }
+
+    .font-mono-code {
+        font-family: 'JetBrains Mono', monospace;
+    }
+
+    .ent-card {
+        border: 1px solid var(--ent-grid-border);
+        border-radius: 16px;
+        background-color: var(--bs-body-bg, var(--ent-solid-bg));
+        box-shadow: 0 4px 20px -2px rgba(15, 23, 42, 0.08);
+        overflow: hidden;
+    }
+
+    .ent-card-header {
+        background-color: rgba(79, 70, 229, 0.06) !important;
+        border-bottom: 1px solid var(--ent-grid-border) !important;
+        padding: 15px 20px;
+    }
+
+    .ent-header-banner {
+        background: linear-gradient(135deg, #0f172a 0%, #1e1b4b 55%, #312e81 100%);
+        border: 1px solid rgba(99, 102, 241, 0.35);
+        border-radius: 18px;
+        box-shadow: 0 14px 32px -8px rgba(15, 23, 42, 0.25);
+        color: #ffffff;
+        position: relative;
+        overflow: hidden;
+    }
+
+    .ent-header-banner::before {
+        content: '';
+        position: absolute;
+        top: -55%;
+        right: -5%;
+        width: 380px;
+        height: 380px;
+        background: radial-gradient(circle, rgba(56, 189, 248, 0.22) 0%, transparent 70%);
+        pointer-events: none;
+    }
+
+    .ent-glass-pill {
+        background: rgba(255, 255, 255, 0.09);
+        backdrop-filter: blur(8px);
+        border: 1px solid rgba(255, 255, 255, 0.16);
+        border-radius: 12px;
+        color: #ffffff;
+    }
+
+    .form-control,
+    .form-select {
+        border: 1px solid var(--ent-grid-border) !important;
+        border-radius: 10px !important;
+        font-weight: 600 !important;
+        color: var(--bs-body-color) !important;
+        background-color: var(--bs-body-bg) !important;
+        font-size: 0.82rem !important;
+        min-height: 38px;
+        transition: all 0.2s ease;
+    }
+
+    .form-control[type="file"] {
+        padding-top: 6px;
+        padding-bottom: 6px;
+        font-weight: 500 !important;
+        font-size: 0.76rem !important;
+    }
+
+    .form-control:focus,
+    .form-select:focus {
+        border-color: var(--ent-indigo) !important;
+        box-shadow: 0 0 0 3px rgba(79, 70, 229, 0.14) !important;
+    }
+
+    .ent-btn {
+        font-weight: 600 !important;
+        border-radius: 10px;
+        transition: all 0.18s ease;
+        letter-spacing: 0.01em;
+        cursor: pointer;
+        font-size: 0.82rem;
+    }
+
+    .ent-btn:hover {
+        transform: translateY(-1px);
+    }
+
+    .ent-btn-primary {
+        background: linear-gradient(135deg, #4f46e5 0%, #4338ca 100%);
+        border: none;
+        color: #ffffff;
+        box-shadow: 0 4px 12px rgba(79, 70, 229, 0.28);
+    }
+
+    .ent-btn-primary:hover {
+        box-shadow: 0 6px 18px rgba(79, 70, 229, 0.4);
+        color: #ffffff;
+    }
+
+    .ent-btn-light {
+        background-color: #ffffff;
+        border: 1px solid rgba(255, 255, 255, 0.35);
+        color: #0f172a;
+        box-shadow: 0 4px 12px rgba(15, 23, 42, 0.18);
+    }
+
+    .ent-btn-light:hover {
+        background-color: #f8fafc;
+        color: #0f172a;
+    }
+
+    .icon-shape-sm {
+        width: 36px;
+        height: 36px;
+        display: inline-flex;
+        align-items: center;
+        justify-content: center;
+        border-radius: 10px;
+        flex-shrink: 0;
+    }
+
+    .card-feature-hover {
+        transition: all 0.2s ease;
+        border: 1px solid var(--ent-grid-border) !important;
+        border-radius: 16px !important;
+        background-color: var(--bs-body-bg, var(--ent-solid-bg));
+        box-shadow: 0 4px 18px -4px rgba(15, 23, 42, 0.07);
+    }
+
+    .card-feature-hover:hover {
+        transform: translateY(-3px);
+        border-color: var(--ent-indigo) !important;
+        box-shadow: 0 12px 24px -6px rgba(79, 70, 229, 0.16);
+    }
+
+    .ent-badge {
+        border-radius: 9999px;
+        padding: 4px 10px;
+        font-weight: 700;
+        text-transform: uppercase;
+        display: inline-flex;
+        align-items: center;
+        font-size: 0.68rem;
+        letter-spacing: 0.03em;
+    }
+
+    .ent-nav-pills .nav-link {
+        border: 1px solid var(--ent-grid-border);
+        border-radius: 10px !important;
+        font-weight: 600;
+        font-size: 0.82rem;
+        color: var(--bs-body-color);
+        background-color: var(--bs-body-bg, var(--ent-solid-bg));
+        padding: 8px 16px;
+        transition: all 0.18s ease;
+    }
+
+    .ent-nav-pills .nav-link:hover {
+        border-color: var(--ent-indigo);
+        background-color: rgba(79, 70, 229, 0.08);
+    }
+
+    .ent-nav-pills .nav-link.active {
+        background: linear-gradient(135deg, #4f46e5 0%, #4338ca 100%) !important;
+        border-color: transparent !important;
+        color: #ffffff !important;
+        box-shadow: 0 4px 12px rgba(79, 70, 229, 0.28);
+    }
+
+    .ent-paket-box {
+        border: 1px solid var(--ent-grid-border);
+        border-radius: 14px;
+        background-color: rgba(79, 70, 229, 0.025);
+        padding: 14px;
+    }
+
+    .ent-kategori-row {
+        border: 1px solid var(--ent-grid-border);
+        border-radius: 10px;
+        background-color: var(--bs-body-bg, var(--ent-solid-bg));
+        transition: border-color 0.18s ease, background-color 0.18s ease;
+    }
+
+    .ent-kategori-row:hover {
+        border-color: rgba(79, 70, 229, 0.45);
+        background-color: rgba(79, 70, 229, 0.05);
+    }
+
+    .ent-table thead th {
+        background-color: rgba(79, 70, 229, 0.06) !important;
+        border-bottom: 1px solid var(--ent-grid-border) !important;
+        font-size: 0.72rem;
+        font-weight: 700;
+        letter-spacing: 0.04em;
+        text-transform: uppercase;
+    }
+
+    .ent-table tbody td {
+        border-bottom-color: var(--ent-grid-border) !important;
+        font-size: 0.84rem;
+    }
+
+    .ent-modal-content {
+        border: 1px solid var(--ent-grid-border);
+        border-radius: 18px;
+        background-color: var(--bs-body-bg, var(--ent-solid-bg));
+        box-shadow: 0 24px 48px -12px rgba(15, 23, 42, 0.25);
+        overflow: hidden;
+    }
+
+    .ent-modal-header {
+        background-color: rgba(79, 70, 229, 0.06);
+        border-bottom: 1px solid var(--ent-grid-border);
+        padding: 16px 22px;
+    }
+
+    .ent-opsi-card {
+        border: 1px solid var(--ent-grid-border);
+        border-radius: 12px;
+        padding: 10px 12px;
+        background-color: rgba(79, 70, 229, 0.02);
+        transition: border-color 0.18s ease;
+    }
+
+    .ent-opsi-card:hover {
+        border-color: rgba(79, 70, 229, 0.45);
+    }
+
+    .img-preview-box {
+        position: relative;
+        display: inline-flex;
+        align-items: center;
+        gap: 8px;
+        padding: 6px 10px;
+        border: 1px dashed var(--ent-grid-border);
+        border-radius: 10px;
+        background-color: rgba(79, 70, 229, 0.04);
+    }
+
+    .img-preview-thumb {
+        max-height: 76px;
+        max-width: 150px;
+        object-fit: contain;
+        border-radius: 8px;
+        border: 1px solid var(--ent-grid-border);
+        background-color: #ffffff;
+    }
+
+    .soal-list-img {
+        max-height: 110px;
+        max-width: 220px;
+        object-fit: contain;
+        border-radius: 8px;
+        border: 1px solid var(--ent-grid-border);
+        background-color: #ffffff;
+    }
+
+    .opsi-list-img {
+        max-height: 56px;
+        max-width: 110px;
+        object-fit: contain;
+        border-radius: 6px;
+        border: 1px solid var(--ent-grid-border);
+        background-color: #ffffff;
+        vertical-align: middle;
+    }
+
+    .modal-dialog-scrollable .modal-content.ent-modal-content {
+        max-height: 100%;
+        overflow: hidden !important;
+        display: flex;
+        flex-direction: column;
+    }
+
+    .modal-dialog-scrollable .ent-modal-content>form {
+        display: flex;
+        flex-direction: column;
+        flex: 1 1 auto;
+        min-height: 0;
+        overflow: hidden;
+    }
+
+    .modal-dialog-scrollable .ent-modal-content .ent-modal-header,
+    .modal-dialog-scrollable .ent-modal-content .modal-footer {
+        flex-shrink: 0;
+    }
+
+    .modal-dialog-scrollable .ent-modal-content .modal-body {
+        flex: 1 1 auto;
+        min-height: 0;
+        overflow-y: auto !important;
+    }
+</style>
+@endsection
+
 @section('content')
-<div class="container-fluid px-4 py-4">
-    <!-- Header Page -->
-    <div class="d-flex justify-content-between align-items-center mb-4">
-        <div>
-            <h3 class="fw-bold text-dark m-0"><i class="bi bi-layers-fill text-primary me-2"></i>Manajemen Master Data Tes</h3>
-            <p class="text-muted small m-0">Kelola klasifikasi ujian, struktur kategori, dan bank soal secara terpusat.</p>
-        </div>
-        <div class="d-flex gap-2">
-            <button class="btn btn-outline-primary rounded-pill px-3 fw-semibold shadow-sm" data-bs-toggle="modal" data-bs-target="#modalTambahKlasifikasi">
-                <i class="bi bi-folder-plus me-1"></i> Tambah Klasifikasi
-            </button>
-            <button class="btn btn-primary rounded-pill px-4 fw-semibold shadow-sm" data-bs-toggle="modal" data-bs-target="#modalTambahKategori">
-                <i class="bi bi-plus-lg me-1"></i> Tambah Kategori Baru
-            </button>
-        </div>
-    </div>
-
-    <!-- Notifikasi Flash Message -->
-    @if(session('success'))
-    <div class="alert alert-success alert-dismissible fade show rounded-4 border-0 shadow-sm mb-4" role="alert">
-        <i class="bi bi-check-circle-fill me-2"></i> {{ session('success') }}
-        <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
-    </div>
-    @endif
-
-    <!-- Filter / Navigasi Klasifikasi Tes (Dynamic Tabs) -->
-    <div class="row mb-4">
-        <div class="col-12">
-            <ul class="nav nav-pills gap-2" id="klasifikasiTab" role="tablist">
-                <li class="nav-item" role="presentation">
-                    <button class="nav-link active rounded-pill px-4 fw-semibold shadow-sm" id="all-tab" data-bs-toggle="pill" data-bs-target="#content-all" type="button" role="tab">Semua Klasifikasi</button>
-                </li>
-                @foreach($klasifikasiList as$klas)
-                <li class="nav-item" role="presentation">
-                    <button class="nav-link rounded-pill px-4 fw-semibold shadow-sm bg-white text-dark border" id="tab-{{ $klas->id }}" data-bs-toggle="pill" data-bs-target="#content-{{ $klas->id }}" type="button" role="tab">{{ $klas->nama_klasifikasi }}</button>
-                </li>
-                @endforeach
-            </ul>
+<!-- Hero Header Master Data Tes -->
+<div class="card mb-3 ent-header-banner p-1">
+    <div class="card-body position-relative p-4" style="z-index: 2;">
+        <div class="row align-items-center gy-3">
+            <div class="col-lg-6">
+                <div class="ent-glass-pill d-inline-flex align-items-center rounded-pill px-3 py-1 mb-2">
+                    <i class="fas fa-layer-group me-2 text-info" style="font-size: 0.78rem;"></i>
+                    <small class="fw-semibold" style="font-size: 0.76rem; color: #cbd5e1;">Klasifikasi &rarr; Nama Tes &rarr; Kategori &rarr; Soal</small>
+                </div>
+                <h3 class="fw-bold mb-1" style="letter-spacing: -0.02em; color: #ffffff;">
+                    Manajemen Master Data Tes
+                </h3>
+                <p class="mb-0" style="color: #cbd5e1; font-size: 0.88rem;">
+                    Kelola klasifikasi ujian, nama paket tes, kategori materi (TIU/TWK/TKP), dan bank soal.
+                </p>
+            </div>
+            <div class="col-lg-6 d-flex flex-wrap justify-content-lg-end gap-2">
+                <button type="button" class="btn ent-btn ent-btn-light px-3 py-2" data-bs-toggle="modal" data-bs-target="#modalTambahKlasifikasi">
+                    <i class="fas fa-folder-plus me-1 text-primary"></i> Klasifikasi
+                </button>
+                <button type="button" class="btn ent-btn px-3 py-2" style="background-color: rgba(2, 132, 199, 0.2); color: #7dd3fc; border: 1px solid rgba(125, 211, 252, 0.4);" data-bs-toggle="modal" data-bs-target="#modalTambahPaket">
+                    <i class="fas fa-file-signature me-1"></i> Nama Tes
+                </button>
+                <button type="button" class="btn ent-btn ent-btn-primary px-3 py-2" data-bs-toggle="modal" data-bs-target="#modalTambahKategori">
+                    <i class="fas fa-plus me-1"></i> Kategori
+                </button>
+            </div>
         </div>
     </div>
+</div>
 
-    <!-- Konten Berdasarkan Klasifikasi -->
-    <div class="tab-content" id="klasifikasiTabContent">
+<!-- Notifikasi Flash Message -->
+@if(session('success'))
+<div class="alert alert-dismissible fade show mb-3 d-flex align-items-center justify-content-between" role="alert" style="border-radius: 12px; border: 1px solid rgba(5, 150, 105, 0.35); background-color: rgba(5, 150, 105, 0.12); color: #10b981;">
+    <div class="fw-semibold" style="font-size: 0.85rem;">
+        <i class="fas fa-check-circle me-2"></i> {{ session('success') }}
+    </div>
+    <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+</div>
+@endif
 
-        <!-- Tab: Semua Klasifikasi / Ringkasan -->
-        <div class="tab-pane fade show active" id="content-all" role="tabpanel">
-            <div class="row g-4">
-                @forelse($klasifikasiList as$klas)
-                <div class="col-xl-6">
-                    <div class="card border-0 shadow-sm rounded-4 h-100">
-                        <div class="card-header bg-white border-0 pt-4 px-4 d-flex justify-content-between align-items-center">
+<!-- Filter / Navigasi Klasifikasi Tes (Dynamic Tabs) -->
+<div class="ent-card mb-3">
+    <div class="card-body p-3">
+        <ul class="nav nav-pills ent-nav-pills gap-2 flex-wrap" id="klasifikasiTab" role="tablist">
+            <li class="nav-item" role="presentation">
+                <button class="nav-link active" id="all-tab" data-bs-toggle="pill" data-bs-target="#content-all" type="button" role="tab">
+                    <i class="fas fa-border-all me-1"></i> Semua Klasifikasi
+                </button>
+            </li>
+            @foreach($klasifikasiList as $klas)
+            <li class="nav-item" role="presentation">
+                <button class="nav-link" id="tab-{{ $klas->id }}" data-bs-toggle="pill" data-bs-target="#content-{{ $klas->id }}" type="button" role="tab">
+                    {{ $klas->nama_klasifikasi }}
+                </button>
+            </li>
+            @endforeach
+        </ul>
+    </div>
+</div>
+
+<!-- Konten Berdasarkan Klasifikasi -->
+<div class="tab-content" id="klasifikasiTabContent">
+
+    <!-- Tab: Semua Klasifikasi -->
+    <div class="tab-pane fade show active" id="content-all" role="tabpanel">
+        <div class="row g-3 g-md-3">
+            @forelse($klasifikasiList as $klas)
+            <div class="col-xl-6">
+                <div class="card-feature-hover h-100 d-flex flex-column justify-content-between" style="border-top: 4px solid var(--ent-indigo) !important;">
+                    <div class="p-4">
+                        <div class="d-flex justify-content-between align-items-start gap-2 mb-2">
                             <div>
-                                <span class="badge bg-primary-subtle text-primary fw-bold mb-1">KLASIFIKASI UTAMA</span>
-                                <h4 class="fw-bold text-dark m-0">{{ $klas->nama_klasifikasi }}</h4>
-                                <a href="{{ route('admin.brain-test.preview', $klas->id) }}" class="btn btn-sm btn-white border shadow-sm text-success" title="Preview Tryout">
-                                    <i class="bi bi-play-circle"></i> Preview
-                                </a>
+                                <span class="ent-badge mb-2" style="background-color: rgba(79, 70, 229, 0.14); color: #818cf8; border: 1px solid rgba(79, 70, 229, 0.32);">
+                                    Klasifikasi Utama
+                                </span>
+                                <h5 class="fw-bold mb-1">{{ $klas->nama_klasifikasi }}</h5>
                             </div>
-                            <div class="dropdown">
-                                <button class="btn btn-sm btn-light rounded-circle" type="button" data-bs-toggle="dropdown"><i class="bi bi-three-dots-vertical"></i></button>
-                                <ul class="dropdown-menu border-0 shadow">
-                                    <li><a class="dropdown-item" href="#"><i class="bi bi-pencil me-2"></i>Edit Klasifikasi</a></li>
-                                    <li>
-                                        <form action="{{ route('admin.brain-test.klasifikasi.destroy', $klas->id) }}" method="POST" onsubmit="return confirm('Hapus klasifikasi ini beserta seluruh kategorinya?')">
-                                            @csrf @method('DELETE')
-                                            <button type="submit" class="dropdown-item text-danger"><i class="bi bi-trash me-2"></i>Hapus</button>
-                                        </form>
-                                    </li>
-                                </ul>
+                            <div class="d-flex align-items-center gap-1">
+                                <button type="button" class="btn ent-btn px-2.5 py-1 btn-tambah-paket"
+                                    style="background-color: rgba(2, 132, 199, 0.12); color: #0ea5e9; border: 1px solid rgba(2, 132, 199, 0.3);"
+                                    data-bs-toggle="modal"
+                                    data-bs-target="#modalTambahPaket"
+                                    data-klasifikasi-id="{{ $klas->id }}">
+                                    <i class="fas fa-plus me-1"></i> Tes
+                                </button>
+                                <div class="dropdown">
+                                    <button class="btn ent-btn px-2.5 py-1" type="button" data-bs-toggle="dropdown" style="background-color: rgba(79, 70, 229, 0.08); border: 1px solid var(--ent-grid-border);">
+                                        <i class="fas fa-ellipsis-v"></i>
+                                    </button>
+                                    <ul class="dropdown-menu dropdown-menu-end shadow" style="border-radius: 12px; border: 1px solid var(--ent-grid-border);">
+                                        <li>
+                                            <form action="{{ route('admin.brain-test.klasifikasi.destroy', $klas->id) }}" method="POST" onsubmit="return confirm('Hapus klasifikasi ini beserta seluruh nama tes, kategori, dan soal di dalamnya?')">
+                                                @csrf @method('DELETE')
+                                                <button type="submit" class="dropdown-item text-danger fw-semibold" style="font-size: 0.82rem;">
+                                                    <i class="fas fa-trash me-2"></i>Hapus Klasifikasi
+                                                </button>
+                                            </form>
+                                        </li>
+                                    </ul>
+                                </div>
                             </div>
                         </div>
-                        <div class="card-body px-4">
-                            <p class="text-muted small mb-3">{{ $klas->deskripsi ?? 'Tidak ada deskripsi.' }}</p>
 
-                            <h6 class="fw-bold text-dark fs-2 text-uppercase mb-2">Daftar Kategori di Dalamnya:</h6>
-                            <div class="list-group list-group-flush gap-2">
-                                @forelse($klas->kategoris as$kat)
-                                <div class="list-group-item border rounded-3 d-flex justify-content-between align-items-center py-2 px-3 bg-light">
+                        <p class="opacity-75 mb-3" style="font-size: 0.82rem; line-height: 1.55;">
+                            {{ $klas->deskripsi ?? 'Tidak ada deskripsi.' }}
+                        </p>
+
+                        <!-- Daftar Nama Tes / Paket di dalam Klasifikasi -->
+                        <div class="d-flex flex-column gap-3">
+                            @forelse($klas->pakets as $paket)
+                            <div class="ent-paket-box">
+                                <div class="d-flex justify-content-between align-items-center gap-2 mb-2">
                                     <div>
-                                        <span class="fw-semibold text-dark">{{ $kat->nama_kategori }}</span>
-                                        <div class="text-muted" style="font-size: 0.75rem;">{{ $kat->soals_count ?? 0 }} Soal Terdaftar</div>
+                                        <span class="fw-bold d-block" style="font-size: 0.9rem;">
+                                            <i class="fas fa-file-alt text-primary me-1"></i> {{ $paket->nama_test }}
+                                        </span>
+                                        <span class="opacity-75 font-mono-code" style="font-size: 0.72rem;">
+                                            Durasi: {{ $paket->durasi_menit }} mnt &bull; Passing Grade: {{ $paket->passing_grade }}
+                                        </span>
                                     </div>
-                                    <div class="d-flex gap-1">
-                                        <!-- Tombol Kelola Soal dengan Atribut data-id dan data-nama yang akurat -->
-                                        <button type="button" class="btn btn-sm btn-white border shadow-sm text-primary btn-kelola-soal"
+                                    <div class="d-flex align-items-center gap-1">
+                                        <a href="{{ route('admin.brain-test.preview', $paket->id) }}" class="btn ent-btn px-2 py-1" style="background-color: rgba(5, 150, 105, 0.12); color: #10b981; border: 1px solid rgba(5, 150, 105, 0.3);" title="Preview Tryout">
+                                            <i class="fas fa-play"></i>
+                                        </a>
+                                        <button type="button" class="btn ent-btn px-2 py-1 btn-tambah-kategori"
+                                            style="background-color: rgba(79, 70, 229, 0.12); color: #6366f1; border: 1px solid rgba(79, 70, 229, 0.3);"
                                             data-bs-toggle="modal"
-                                            data-bs-target="#modalKelolaSoal"
-                                            data-id="{{ $kat->id }}"
-                                            data-nama="{{ $kat->nama_kategori }}"
-                                            title="Kelola Soal">
-                                            <i class="bi bi-file-earmark-text"></i> Soal
+                                            data-bs-target="#modalTambahKategori"
+                                            data-paket-id="{{ $paket->id }}"
+                                            title="Tambah Kategori">
+                                            <i class="fas fa-plus"></i>
                                         </button>
-                                        <form action="{{ route('admin.brain-test.kategori.destroy', $kat->id) }}" method="POST" onsubmit="return confirm('Hapus kategori ini?')">
+                                        <form action="{{ route('admin.brain-test.paket.destroy', $paket->id) }}" method="POST" onsubmit="return confirm('Hapus nama tes ini beserta kategorinya?')">
                                             @csrf @method('DELETE')
-                                            <button type="submit" class="btn btn-sm btn-white border shadow-sm text-danger" title="Hapus"><i class="bi bi-trash"></i></button>
+                                            <button type="submit" class="btn ent-btn px-2 py-1" style="background-color: rgba(225, 29, 72, 0.12); color: #e11d48; border: 1px solid rgba(225, 29, 72, 0.3);" title="Hapus Tes">
+                                                <i class="fas fa-trash"></i>
+                                            </button>
                                         </form>
                                     </div>
                                 </div>
-                                @empty
-                                <div class="text-muted small fst-italic">Belum ada kategori dalam klasifikasi ini.</div>
-                                @endforelse
+
+                                <!-- Daftar Kategori (TIU, TWK, TKP, dll.) di dalam Paket -->
+                                <div class="d-flex flex-column gap-1 mt-2">
+                                    @forelse($paket->kategoris as $kat)
+                                    <div class="ent-kategori-row d-flex justify-content-between align-items-center py-1 px-2">
+                                        <div>
+                                            <span class="fw-bold" style="font-size: 0.82rem;">{{ $kat->nama_kategori }}</span>
+                                            <span class="opacity-75 font-mono-code ms-2" style="font-size: 0.72rem;">({{ $kat->soals_count ?? 0 }} Soal)</span>
+                                        </div>
+                                        <div class="d-flex align-items-center gap-1">
+                                            <button type="button" class="btn ent-btn px-2 py-0.5 btn-kelola-soal"
+                                                style="background-color: rgba(79, 70, 229, 0.12); color: #6366f1; border: 1px solid rgba(79, 70, 229, 0.3); font-size: 0.75rem;"
+                                                data-bs-toggle="modal"
+                                                data-bs-target="#modalKelolaSoal"
+                                                data-id="{{ $kat->id }}"
+                                                data-nama="{{ $paket->nama_test }} - {{ $kat->nama_kategori }}">
+                                                <i class="fas fa-list-ol me-1"></i> Soal
+                                            </button>
+                                            <form action="{{ route('admin.brain-test.kategori.destroy', $kat->id) }}" method="POST" onsubmit="return confirm('Hapus kategori ini?')">
+                                                @csrf @method('DELETE')
+                                                <button type="submit" class="btn ent-btn px-2 py-0.5" style="background-color: rgba(225, 29, 72, 0.12); color: #e11d48; border: 1px solid rgba(225, 29, 72, 0.3); font-size: 0.75rem;" title="Hapus Kategori">
+                                                    <i class="fas fa-times"></i>
+                                                </button>
+                                            </form>
+                                        </div>
+                                    </div>
+                                    @empty
+                                    <div class="opacity-75 fst-italic py-1" style="font-size: 0.78rem;">Belum ada kategori (TIU/TWK/TKP) pada tes ini.</div>
+                                    @endforelse
+                                </div>
                             </div>
-                        </div>
-                        <div class="card-footer bg-white border-0 pb-4 px-4 pt-2">
-                            <button class="btn btn-sm btn-outline-primary rounded-pill w-100 fw-semibold" data-bs-toggle="modal" data-bs-target="#modalTambahKategori">
-                                <i class="bi bi-plus-circle me-1"></i> Tambah Kategori ke {{ $klas->nama_klasifikasi }}
-                            </button>
+                            @empty
+                            <div class="opacity-75 fst-italic py-2" style="font-size: 0.82rem;">Belum ada nama tes di klasifikasi ini.</div>
+                            @endforelse
                         </div>
                     </div>
+
+                    <div class="px-4 pb-4 pt-2">
+                        <button type="button" class="btn ent-btn w-100 py-2 btn-tambah-paket"
+                            style="background-color: rgba(79, 70, 229, 0.1); color: #6366f1; border: 1px solid rgba(79, 70, 229, 0.3);"
+                            data-bs-toggle="modal"
+                            data-bs-target="#modalTambahPaket"
+                            data-klasifikasi-id="{{ $klas->id }}">
+                            <i class="fas fa-plus-circle me-1"></i> Tambah Nama Tes ke {{ $klas->nama_klasifikasi }}
+                        </button>
+                    </div>
                 </div>
-                @empty
-                <div class="col-12 text-center py-5">
-                    <p class="text-muted">Belum ada data klasifikasi tes yang dibuat. Silakan klik tombol "Tambah Klasifikasi" di atas.</p>
-                </div>
-                @endforelse
             </div>
+            @empty
+            <div class="col-12">
+                <div class="ent-card p-5 text-center">
+                    <p class="opacity-75 mb-0" style="font-size: 0.88rem;">Belum ada data klasifikasi tes. Silakan klik tombol <strong>Klasifikasi</strong> di atas.</p>
+                </div>
+            </div>
+            @endforelse
         </div>
+    </div>
 
-        <!-- Tab Dinamis Per Klasifikasi -->
-        @foreach($klasifikasiList as$klas)
-        <div class="tab-pane fade" id="content-{{ $klas->id }}" role="tabpanel">
-            <div class="card border-0 shadow-sm rounded-4 p-4">
-                <h4 class="fw-bold text-dark mb-2">Pengaturan Khusus: {{ $klas->nama_klasifikasi }}</h4>
-                <p class="text-muted small mb-4">{{ $klas->deskripsi }}</p>
-
+    <!-- Tab Dinamis Per Klasifikasi -->
+    @foreach($klasifikasiList as $klas)
+    <div class="tab-pane fade" id="content-{{ $klas->id }}" role="tabpanel">
+        <div class="ent-card">
+            <div class="ent-card-header d-flex flex-wrap align-items-center justify-content-between gap-2">
+                <div>
+                    <h6 class="fw-bold mb-0">{{ $klas->nama_klasifikasi }}</h6>
+                    <small class="opacity-75">{{ $klas->deskripsi ?? 'Daftar nama tes dan kategori soal.' }}</small>
+                </div>
+                <button type="button" class="btn ent-btn ent-btn-primary px-3 py-1 btn-tambah-paket"
+                    data-bs-toggle="modal"
+                    data-bs-target="#modalTambahPaket"
+                    data-klasifikasi-id="{{ $klas->id }}">
+                    <i class="fas fa-plus me-1"></i> Tambah Nama Tes
+                </button>
+            </div>
+            <div class="card-body p-0">
                 <div class="table-responsive">
-                    <table class="table table-hover align-middle mb-0">
-                        <thead class="table-light text-uppercase fs-2">
+                    <table class="table table-hover align-middle mb-0 ent-table">
+                        <thead>
                             <tr>
-                                <th class="py-3">No</th>
-                                <th class="py-3">Nama Kategori</th>
-                                <th class="py-3">Deskripsi</th>
-                                <th class="py-3 text-end">Aksi</th>
+                                <th class="py-3 ps-4" style="width: 60px;">No</th>
+                                <th class="py-3">Nama Tes / Paket</th>
+                                <th class="py-3">Durasi &amp; PG</th>
+                                <th class="py-3">Kategori &amp; Jumlah Soal</th>
+                                <th class="py-3 pe-4 text-end">Aksi</th>
                             </tr>
                         </thead>
                         <tbody>
-                            @foreach($klas->kategoris as $index =>$kat)
+                            @forelse($klas->pakets as $index => $paket)
                             <tr>
-                                <td class="fw-semibold">{{ $index + 1 }}</td>
-                                <td class="fw-bold text-dark">{{ $kat->nama_kategori }}</td>
-                                <td class="text-muted">{{ $kat->deskripsi ?? '-' }}</td>
-                                <td class="text-end">
-                                    <button type="button" class="btn btn-sm btn-light text-primary fw-semibold btn-kelola-soal"
+                                <td class="fw-bold ps-4 font-mono-code">{{ $index + 1 }}</td>
+                                <td class="fw-bold">{{ $paket->nama_test }}</td>
+                                <td class="font-mono-code" style="font-size: 0.78rem;">{{ $paket->durasi_menit }}m / PG {{ $paket->passing_grade }}</td>
+                                <td>
+                                    <div class="d-flex flex-wrap gap-1">
+                                        @foreach($paket->kategoris as $kat)
+                                        <button type="button" class="btn ent-btn px-2.5 py-1 btn-kelola-soal"
+                                            style="background-color: rgba(79, 70, 229, 0.12); color: #6366f1; border: 1px solid rgba(79, 70, 229, 0.3); font-size: 0.76rem;"
+                                            data-bs-toggle="modal"
+                                            data-bs-target="#modalKelolaSoal"
+                                            data-id="{{ $kat->id }}"
+                                            data-nama="{{ $paket->nama_test }} - {{ $kat->nama_kategori }}">
+                                            {{ $kat->nama_kategori }} ({{ $kat->soals_count ?? 0 }})
+                                        </button>
+                                        @endforeach
+                                    </div>
+                                </td>
+                                <td class="pe-4 text-end">
+                                    <button type="button" class="btn ent-btn px-2.5 py-1 btn-tambah-kategori"
+                                        style="background-color: rgba(5, 150, 105, 0.12); color: #10b981; border: 1px solid rgba(5, 150, 105, 0.3);"
                                         data-bs-toggle="modal"
-                                        data-bs-target="#modalKelolaSoal"
-                                        data-id="{{ $kat->id }}"
-                                        data-nama="{{ $kat->nama_kategori }}">
-                                        <i class="bi bi-file-earmark-text"></i> Kelola Soal
+                                        data-bs-target="#modalTambahKategori"
+                                        data-paket-id="{{ $paket->id }}">
+                                        <i class="fas fa-plus me-1"></i> Kategori
                                     </button>
                                 </td>
                             </tr>
-                            @endforeach
+                            @empty
+                            <tr>
+                                <td colspan="5" class="text-center py-4 opacity-75 fst-italic">Belum ada nama tes pada klasifikasi ini.</td>
+                            </tr>
+                            @endforelse
                         </tbody>
                     </table>
                 </div>
             </div>
         </div>
-        @endforeach
-
     </div>
+    @endforeach
+
 </div>
 
-<!-- Modal Tambah Klasifikasi Baru -->
+<!-- Modal Tambah Klasifikasi -->
 <div class="modal fade" id="modalTambahKlasifikasi" tabindex="-1" aria-hidden="true">
     <div class="modal-dialog modal-dialog-centered">
-        <div class="modal-content border-0 shadow-lg rounded-4">
-            <div class="modal-header border-0 pb-0 px-4 pt-4">
-                <h5 class="fw-bold text-dark m-0">Tambah Klasifikasi Tes</h5>
+        <div class="modal-content ent-modal-content">
+            <div class="ent-modal-header d-flex align-items-center justify-content-between">
+                <h6 class="fw-bold mb-0 d-flex align-items-center gap-2">
+                    <span class="icon-shape-sm" style="background-color: rgba(79, 70, 229, 0.14); color: #6366f1;">
+                        <i class="fas fa-folder-plus"></i>
+                    </span>
+                    Tambah Klasifikasi Tes
+                </h6>
                 <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
             </div>
             <form action="{{ route('admin.brain-test.klasifikasi.store') }}" method="POST">
                 @csrf
-                <div class="modal-body px-4 py-3">
+                <div class="modal-body p-4">
                     <div class="mb-3">
-                        <label class="form-label fw-semibold small">Nama Klasifikasi Tes</label>
-                        <input type="text" name="nama_klasifikasi" class="form-control rounded-pill py-2 px-3" placeholder="Contoh: Tes BUMN, Tes CPNS" required>
+                        <label class="form-label fw-bold" style="font-size: 0.78rem;">Nama Klasifikasi Tes</label>
+                        <input type="text" name="nama_klasifikasi" class="form-control" placeholder="Contoh: Tes CPNS, Tes BUMN" required>
                     </div>
-                    <div class="mb-3">
-                        <label class="form-label fw-semibold small">Deskripsi (Opsional)</label>
-                        <textarea name="deskripsi" class="form-control rounded-3 px-3 py-2" rows="3" placeholder="Keterangan singkat klasifikasi tes..."></textarea>
+                    <div class="mb-0">
+                        <label class="form-label fw-bold" style="font-size: 0.78rem;">Deskripsi (Opsional)</label>
+                        <textarea name="deskripsi" class="form-control" rows="3" placeholder="Keterangan singkat klasifikasi tes..."></textarea>
                     </div>
                 </div>
-                <div class="modal-footer border-0 pt-0 pb-4 px-4">
-                    <button type="button" class="btn btn-light rounded-pill px-4 fw-semibold" data-bs-dismiss="modal">Batal</button>
-                    <button type="submit" class="btn btn-primary rounded-pill px-4 fw-semibold shadow-sm">Simpan Klasifikasi</button>
+                <div class="modal-footer px-4 py-3" style="border-top: 1px solid var(--ent-grid-border);">
+                    <button type="button" class="btn ent-btn px-3 py-2" style="background-color: rgba(100, 116, 139, 0.12); border: 1px solid var(--ent-grid-border);" data-bs-dismiss="modal">Batal</button>
+                    <button type="submit" class="btn ent-btn ent-btn-primary px-4 py-2">Simpan Klasifikasi</button>
                 </div>
             </form>
         </div>
     </div>
 </div>
 
-<!-- Modal Tambah Kategori Baru -->
-<div class="modal fade" id="modalTambahKategori" tabindex="-1" aria-hidden="true">
+<!-- Modal Tambah Nama Tes / Paket -->
+<div class="modal fade" id="modalTambahPaket" tabindex="-1" aria-hidden="true">
     <div class="modal-dialog modal-dialog-centered">
-        <div class="modal-content border-0 shadow-lg rounded-4">
-            <div class="modal-header border-0 pb-0 px-4 pt-4">
-                <h5 class="fw-bold text-dark m-0">Tambah Kategori Tes</h5>
+        <div class="modal-content ent-modal-content">
+            <div class="ent-modal-header d-flex align-items-center justify-content-between">
+                <h6 class="fw-bold mb-0 d-flex align-items-center gap-2">
+                    <span class="icon-shape-sm" style="background-color: rgba(2, 132, 199, 0.14); color: #0ea5e9;">
+                        <i class="fas fa-file-signature"></i>
+                    </span>
+                    Tambah Nama Tes / Paket
+                </h6>
                 <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
             </div>
-            <form action="{{ route('admin.brain-test.kategori.store') }}" method="POST">
+            <form action="{{ route('admin.brain-test.paket.store') }}" method="POST">
                 @csrf
-                <div class="modal-body px-4 py-3">
+                <div class="modal-body p-4">
                     <div class="mb-3">
-                        <label class="form-label fw-semibold small">Pilih Klasifikasi Tes</label>
-                        <select name="klasifikasi_id" class="form-select rounded-pill py-2 px-3" required>
+                        <label class="form-label fw-bold" style="font-size: 0.78rem;">Klasifikasi Tes</label>
+                        <select name="klasifikasi_id" id="selectKlasifikasiId" class="form-select" required>
                             <option value="">-- Pilih Klasifikasi --</option>
-                            @foreach($klasifikasiList as$klas)
+                            @foreach($klasifikasiList as $klas)
                             <option value="{{ $klas->id }}">{{ $klas->nama_klasifikasi }}</option>
                             @endforeach
                         </select>
                     </div>
                     <div class="mb-3">
-                        <label class="form-label fw-semibold small">Nama Kategori</label>
-                        <input type="text" name="nama_kategori" class="form-control rounded-pill py-2 px-3" placeholder="Contoh: Matematika, TWK" required>
+                        <label class="form-label fw-bold" style="font-size: 0.78rem;">Nama Tes</label>
+                        <input type="text" name="nama_test" class="form-control" placeholder="Contoh: Soal CPNS 2025, Soal CPNS 2026" required>
                     </div>
-                    <div class="mb-3">
-                        <label class="form-label fw-semibold small">Deskripsi Kategori (Opsional)</label>
-                        <textarea name="deskripsi" class="form-control rounded-3 px-3 py-2" rows="3" placeholder="Keterangan singkat materi kategori..."></textarea>
+                    <div class="row g-2 mb-3">
+                        <div class="col-6">
+                            <label class="form-label fw-bold" style="font-size: 0.78rem;">Durasi (Menit)</label>
+                            <input type="number" name="durasi_menit" class="form-control font-mono-code" value="60" min="1" required>
+                        </div>
+                        <div class="col-6">
+                            <label class="form-label fw-bold" style="font-size: 0.78rem;">Passing Grade</label>
+                            <input type="number" name="passing_grade" class="form-control font-mono-code" value="0" min="0" required>
+                        </div>
+                    </div>
+                    <div class="mb-0">
+                        <label class="form-label fw-bold" style="font-size: 0.78rem;">Deskripsi (Opsional)</label>
+                        <textarea name="deskripsi" class="form-control" rows="2" placeholder="Keterangan paket tes..."></textarea>
                     </div>
                 </div>
-                <div class="modal-footer border-0 pt-0 pb-4 px-4">
-                    <button type="button" class="btn btn-light rounded-pill px-4 fw-semibold" data-bs-dismiss="modal">Batal</button>
-                    <button type="submit" class="btn btn-primary rounded-pill px-4 fw-semibold shadow-sm">Simpan Kategori</button>
+                <div class="modal-footer px-4 py-3" style="border-top: 1px solid var(--ent-grid-border);">
+                    <button type="button" class="btn ent-btn px-3 py-2" style="background-color: rgba(100, 116, 139, 0.12); border: 1px solid var(--ent-grid-border);" data-bs-dismiss="modal">Batal</button>
+                    <button type="submit" class="btn ent-btn ent-btn-primary px-4 py-2">Simpan Nama Tes</button>
+                </div>
+            </form>
+        </div>
+    </div>
+</div>
+
+<!-- Modal Tambah Kategori (TIU, TWK, TKP, dll.) -->
+<div class="modal fade" id="modalTambahKategori" tabindex="-1" aria-hidden="true">
+    <div class="modal-dialog modal-dialog-centered">
+        <div class="modal-content ent-modal-content">
+            <div class="ent-modal-header d-flex align-items-center justify-content-between">
+                <h6 class="fw-bold mb-0 d-flex align-items-center gap-2">
+                    <span class="icon-shape-sm" style="background-color: rgba(79, 70, 229, 0.14); color: #6366f1;">
+                        <i class="fas fa-tags"></i>
+                    </span>
+                    Tambah Kategori Soal
+                </h6>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <form action="{{ route('admin.brain-test.kategori.store') }}" method="POST">
+                @csrf
+                <div class="modal-body p-4">
+                    <div class="mb-3">
+                        <label class="form-label fw-bold" style="font-size: 0.78rem;">Pilih Nama Tes / Paket</label>
+                        <select name="paket_id" id="selectPaketId" class="form-select" required>
+                            <option value="">-- Pilih Nama Tes --</option>
+                            @foreach($klasifikasiList as $klas)
+                            <optgroup label="{{ $klas->nama_klasifikasi }}">
+                                @foreach($klas->pakets as $paket)
+                                <option value="{{ $paket->id }}">{{ $paket->nama_test }}</option>
+                                @endforeach
+                            </optgroup>
+                            @endforeach
+                        </select>
+                    </div>
+                    <div class="mb-3">
+                        <label class="form-label fw-bold" style="font-size: 0.78rem;">Nama Kategori</label>
+                        <input type="text" name="nama_kategori" class="form-control" placeholder="Contoh: TIU, TWK, TKP" required>
+                    </div>
+                    <div class="row g-2 mb-3">
+                        <div class="col-6">
+                            <label class="form-label fw-bold" style="font-size: 0.78rem;">Passing Grade Kategori</label>
+                            <input type="number" name="passing_grade" class="form-control font-mono-code" value="0" min="0">
+                        </div>
+                        <div class="col-6">
+                            <label class="form-label fw-bold" style="font-size: 0.78rem;">Urutan</label>
+                            <input type="number" name="urutan" class="form-control font-mono-code" value="1" min="1">
+                        </div>
+                    </div>
+                    <div class="mb-0">
+                        <label class="form-label fw-bold" style="font-size: 0.78rem;">Deskripsi (Opsional)</label>
+                        <textarea name="deskripsi" class="form-control" rows="2" placeholder="Keterangan singkat kategori..."></textarea>
+                    </div>
+                </div>
+                <div class="modal-footer px-4 py-3" style="border-top: 1px solid var(--ent-grid-border);">
+                    <button type="button" class="btn ent-btn px-3 py-2" style="background-color: rgba(100, 116, 139, 0.12); border: 1px solid var(--ent-grid-border);" data-bs-dismiss="modal">Batal</button>
+                    <button type="submit" class="btn ent-btn ent-btn-primary px-4 py-2">Simpan Kategori</button>
                 </div>
             </form>
         </div>
@@ -233,93 +741,160 @@
 <!-- Modal Kelola Soal (Utama) -->
 <div class="modal fade" id="modalKelolaSoal" tabindex="-1" aria-hidden="true">
     <div class="modal-dialog modal-xl modal-dialog-centered modal-dialog-scrollable">
-        <div class="modal-content border-0 shadow-lg rounded-4">
-            <div class="modal-header border-0 px-4 pt-4 pb-2 bg-light rounded-top-4">
+        <div class="modal-content ent-modal-content">
+            <div class="ent-modal-header d-flex align-items-center justify-content-between">
                 <div>
-                    <h5 class="fw-bold text-dark m-0" id="modalSoalTitle">Kelola Bank Soal</h5>
-                    <p class="text-muted small m-0">Kelola pertanyaan dan opsi jawaban langsung dari sini.</p>
+                    <h6 class="fw-bold mb-0" id="modalSoalTitle">Kelola Bank Soal</h6>
+                    <small class="opacity-75">Kelola pertanyaan (teks/gambar) dan opsi jawaban langsung dari sini.</small>
                 </div>
                 <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
             </div>
-            <div class="modal-body px-4 py-3" id="modalSoalBody">
-                <!-- Loading State -->
+            <div class="modal-body p-4" id="modalSoalBody">
                 <div class="text-center py-5" id="soalLoading">
                     <div class="spinner-border text-primary" role="status">
                         <span class="visually-hidden">Loading...</span>
                     </div>
-                    <p class="text-muted small mt-2">Memuat data soal...</p>
+                    <p class="opacity-75 mt-2 mb-0" style="font-size: 0.84rem;">Memuat data soal...</p>
                 </div>
 
-                <!-- Konten Soal -->
                 <div id="soalContentWrapper" style="display: none;">
-                    <div class="d-flex justify-content-between align-items-center mb-3">
-                        <h6 class="fw-bold text-dark m-0">Daftar Pertanyaan</h6>
+                    <div class="d-flex flex-wrap justify-content-between align-items-center gap-2 mb-3">
+                        <h6 class="fw-bold mb-0">Daftar Pertanyaan</h6>
                         <div class="d-flex gap-2">
-                            <button class="btn btn-sm btn-outline-success rounded-pill px-3 fw-semibold" data-bs-toggle="modal" data-bs-target="#modalImportExcelInModal">
-                                <i class="bi bi-file-earmark-excel me-1"></i> Import Excel
+                            <button type="button" class="btn ent-btn px-3 py-1" style="background-color: rgba(5, 150, 105, 0.12); color: #10b981; border: 1px solid rgba(5, 150, 105, 0.35);" data-bs-toggle="modal" data-bs-target="#modalImportExcelInModal">
+                                <i class="fas fa-file-excel me-1"></i> Import Excel
                             </button>
-                            <button class="btn btn-sm btn-primary rounded-pill px-3 fw-semibold shadow-sm" data-bs-toggle="modal" data-bs-target="#modalTambahSoalInModal">
-                                <i class="bi bi-plus-lg me-1"></i> Tambah Soal
+                            <button type="button" class="btn ent-btn ent-btn-primary px-3 py-1" data-bs-toggle="modal" data-bs-target="#modalTambahSoalInModal">
+                                <i class="fas fa-plus me-1"></i> Tambah Soal
                             </button>
                         </div>
                     </div>
 
-                    <div class="table-responsive">
-                        <table class="table table-hover align-middle mb-0 border rounded-3 overflow-hidden">
-                            <thead class="table-light text-uppercase fs-2">
+                    <div class="table-responsive" style="border: 1px solid var(--ent-grid-border); border-radius: 12px;">
+                        <table class="table table-hover align-middle mb-0 ent-table">
+                            <thead>
                                 <tr>
-                                    <th class="py-3 px-3" style="width: 5%;">No</th>
-                                    <th class="py-3" style="width: 60%;">Pertanyaan & Pilihan</th>
-                                    <th class="py-3 text-center" style="width: 15%;">Opsi</th>
-                                    <th class="py-3 text-end px-3" style="width: 20%;">Aksi</th>
+                                    <th class="py-3 ps-3" style="width: 60px;">No</th>
+                                    <th class="py-3">Pertanyaan &amp; Pilihan</th>
+                                    <th class="py-3 text-center" style="width: 110px;">Opsi</th>
+                                    <th class="py-3 pe-3 text-end" style="width: 100px;">Aksi</th>
                                 </tr>
                             </thead>
-                            <tbody id="tabelSoalBody">
-                                <!-- Data soal dimuat via JS -->
-                            </tbody>
+                            <tbody id="tabelSoalBody"></tbody>
                         </table>
                     </div>
                 </div>
             </div>
-            <div class="modal-footer border-0 px-4 pb-4 pt-2">
-                <button type="button" class="btn btn-light rounded-pill px-4 fw-semibold" data-bs-dismiss="modal">Tutup</button>
+            <div class="modal-footer px-4 py-3" style="border-top: 1px solid var(--ent-grid-border);">
+                <button type="button" class="btn ent-btn px-4 py-2" style="background-color: rgba(100, 116, 139, 0.12); border: 1px solid var(--ent-grid-border);" data-bs-dismiss="modal">Tutup</button>
             </div>
         </div>
     </div>
 </div>
 
+<!-- Modal Tambah Soal Manual (Sub-Modal) -->
 <div class="modal fade" id="modalTambahSoalInModal" tabindex="-1" aria-hidden="true" style="z-index: 1060;">
-    <div class="modal-dialog modal-lg modal-dialog-centered">
-        <div class="modal-content border-0 shadow-lg rounded-4">
-            <div class="modal-header border-0 pb-0 px-4 pt-4">
-                <h5 class="fw-bold text-dark m-0">Tambah Soal Manual</h5>
+    <div class="modal-dialog modal-lg modal-dialog-centered modal-dialog-scrollable">
+        <div class="modal-content ent-modal-content">
+            <div class="ent-modal-header d-flex align-items-center justify-content-between">
+                <h6 class="fw-bold mb-0">Tambah Soal Manual (Teks &amp; Gambar)</h6>
                 <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
             </div>
-            <form id="formTambahSoalAjax">
+            <form id="formTambahSoalAjax" enctype="multipart/form-data">
                 @csrf
                 <input type="hidden" name="kategori_id" id="inputKategoriId">
-                <div class="modal-body px-4 py-3">
+                <div class="modal-body p-4">
                     <div class="mb-3">
-                        <label class="form-label fw-semibold small">Pertanyaan Soal</label>
-                        <textarea name="pertanyaan" class="form-control rounded-3 px-3 py-2" rows="3" placeholder="Tuliskan teks pertanyaan di sini..." required></textarea>
+                        <label class="form-label fw-bold" style="font-size: 0.78rem;">Pertanyaan Soal</label>
+                        <textarea name="pertanyaan" id="inputPertanyaanSoal" class="form-control" rows="2" placeholder="Tuliskan teks pertanyaan (boleh dikosongkan jika soal murni gambar)..."></textarea>
                     </div>
-                    <hr class="my-3 text-muted">
-                    <h6 class="fw-bold text-dark mb-2">Pilihan Opsi Jawaban</h6>
-                    <div id="opsi-container">
-                        @for($i = 0; $i < 4; $i++)
-                            <div class="input-group mb-2 align-items-center gap-2">
-                            <div class="input-group-text bg-light border rounded-pill px-3">
-                                <input class="form-check-input mt-0" type="radio" name="jawaban_benar" value="{{ $i }}" {{ $i == 0 ? 'checked' : '' }} title="Kunci Jawaban">
+
+                    <div class="mb-3">
+                        <label class="form-label fw-bold" style="font-size: 0.78rem;">
+                            <i class="fas fa-image me-1 text-primary"></i> Gambar Soal (Opsional)
+                        </label>
+                        <div class="d-flex flex-wrap align-items-center gap-2">
+                            <input type="file" name="gambar_soal" id="inputGambarSoal" class="form-control flex-grow-1" accept="image/jpeg,image/png,image/webp,image/gif" onchange="previewSoalImage(this)">
+                            <button type="button" id="btnResetGambarSoal" class="btn ent-btn px-2.5 py-2" style="display: none; background-color: rgba(225, 29, 72, 0.12); color: #e11d48; border: 1px solid rgba(225, 29, 72, 0.3);" onclick="resetSoalImage()">
+                                <i class="fas fa-times"></i>
+                            </button>
+                        </div>
+                        <div id="previewGambarSoalWrapper" class="mt-2" style="display: none;">
+                            <div class="img-preview-box">
+                                <img id="previewGambarSoal" src="" alt="Preview Gambar Soal" class="img-preview-thumb">
+                                <span class="opacity-75 font-mono-code" style="font-size: 0.72rem;">Preview Soal</span>
                             </div>
-                            <input type="text" name="opsi[{{ $i }}][teks]" class="form-control rounded-pill px-3 py-2" placeholder="Teks pilihan {{ $i + 1 }}" required>
-                            <input type="number" name="opsi[{{ $i }}][bobot]" class="form-control rounded-pill px-3 py-2" style="max-width: 100px;" value="{{ $i == 0 ? 5 : 0 }}" required>
-                            </div>
-                        @endfor
+                        </div>
                     </div>
+
+                    <hr style="border-color: var(--ent-grid-border);">
+
+                    <div class="d-flex flex-wrap justify-content-between align-items-center gap-1 mb-2">
+                        <label class="form-label fw-bold mb-0" style="font-size: 0.78rem;">
+                            Pilihan Opsi Jawaban (A–E: Bisa Teks, Gambar, atau Keduanya)
+                        </label>
+                        <span class="opacity-75 font-mono-code" style="font-size: 0.72rem;">Radio = Kunci Jawaban</span>
+                    </div>
+
+                    <div id="opsi-container" class="d-flex flex-column gap-2">
+                        @php $hurufOpsi = ['A', 'B', 'C', 'D', 'E']; @endphp
+                        @for($i = 0; $i < 5; $i++)
+                            @php $isWajib=$i < 4; @endphp
+                            <div class="ent-opsi-card">
+                            <div class="d-flex flex-wrap align-items-center gap-2">
+                                <div class="d-flex align-items-center justify-content-center px-2 gap-1" style="height: 38px; min-width: 64px; border: 1px solid var(--ent-grid-border); border-radius: 10px; background-color: rgba(79, 70, 229, 0.05);">
+                                    <input class="form-check-input mt-0" type="radio" name="jawaban_benar" value="{{ $i }}" {{ $i == 0 ? 'checked' : '' }} title="Kunci Jawaban {{ $hurufOpsi[$i] }}">
+                                    <span class="fw-bold font-mono-code" style="font-size: 0.78rem;">{{ $hurufOpsi[$i] }}</span>
+                                </div>
+                                <input
+                                    type="text"
+                                    name="opsi[{{ $i }}][teks]"
+                                    class="form-control flex-grow-1"
+                                    style="min-width: 170px;"
+                                    placeholder="Teks pilihan {{ $hurufOpsi[$i] }}{{ !$isWajib ? ' (Opsional)' : ' (Boleh kosong jika pakai gambar)' }}">
+                                <input
+                                    type="number"
+                                    name="opsi[{{ $i }}][poin]"
+                                    class="form-control font-mono-code"
+                                    style="max-width: 90px;"
+                                    value="{{ $i == 0 ? 5 : 0 }}"
+                                    placeholder="Poin">
+                            </div>
+
+                            <div class="d-flex flex-wrap align-items-center justify-content-between gap-2 mt-2 pt-2" style="border-top: 1px dashed var(--ent-grid-border);">
+                                <div class="d-flex align-items-center gap-2 flex-grow-1">
+                                    <span class="opacity-75" style="font-size: 0.74rem; white-space: nowrap;">
+                                        <i class="fas fa-image me-1 text-info"></i> Gambar {{ $hurufOpsi[$i] }}:
+                                    </span>
+                                    <input
+                                        type="file"
+                                        name="opsi[{{ $i }}][gambar]"
+                                        id="inputGambarOpsi_{{ $i }}"
+                                        class="form-control"
+                                        accept="image/jpeg,image/png,image/webp,image/gif"
+                                        onchange="previewOpsiImage(this, {{ $i }})">
+                                    <button
+                                        type="button"
+                                        id="btnResetGambarOpsi_{{ $i }}"
+                                        class="btn ent-btn px-2 py-1"
+                                        style="display: none; background-color: rgba(225, 29, 72, 0.12); color: #e11d48; border: 1px solid rgba(225, 29, 72, 0.3);"
+                                        title="Hapus Gambar Opsi {{ $hurufOpsi[$i] }}"
+                                        onclick="resetOpsiImage({{ $i }})">
+                                        <i class="fas fa-times"></i>
+                                    </button>
+                                </div>
+
+                                <div id="previewGambarOpsiWrapper_{{ $i }}" style="display: none;">
+                                    <img id="previewGambarOpsi_{{ $i }}" src="" alt="Preview Opsi {{ $hurufOpsi[$i] }}" class="opsi-list-img">
+                                </div>
+                            </div>
+                    </div>
+                    @endfor
                 </div>
-        <div class="modal-footer border-0 pt-0 pb-4 px-4">
-            <button type="button" class="btn btn-light rounded-pill px-4 fw-semibold" data-bs-dismiss="modal">Batal</button>
-            <button type="submit" class="btn btn-primary rounded-pill px-4 fw-semibold shadow-sm">Simpan Soal</button>
+        </div>
+        <div class="modal-footer px-4 py-3" style="border-top: 1px solid var(--ent-grid-border);">
+            <button type="button" class="btn ent-btn px-3 py-2" style="background-color: rgba(100, 116, 139, 0.12); border: 1px solid var(--ent-grid-border);" data-bs-dismiss="modal">Batal</button>
+            <button type="submit" class="btn ent-btn ent-btn-primary px-4 py-2">Simpan Soal</button>
         </div>
         </form>
     </div>
@@ -329,62 +904,163 @@
 <!-- Modal Import Excel (Sub-Modal) -->
 <div class="modal fade" id="modalImportExcelInModal" tabindex="-1" aria-hidden="true" style="z-index: 1070;">
     <div class="modal-dialog modal-dialog-centered">
-        <div class="modal-content border-0 shadow-lg rounded-4">
-            <div class="modal-header border-0 pb-0 px-4 pt-4">
-                <h5 class="fw-bold text-dark m-0">Import Soal via Excel</h5>
+        <div class="modal-content ent-modal-content">
+            <div class="ent-modal-header d-flex align-items-center justify-content-between">
+                <h6 class="fw-bold mb-0">Import Soal via Excel</h6>
                 <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
             </div>
             <form id="formImportExcel" enctype="multipart/form-data">
                 @csrf
-                <div class="modal-body px-4 py-3">
+                <div class="modal-body p-4">
                     <div class="mb-3">
-                        <label class="form-label fw-semibold small">Pilih File Excel (.xlsx / .csv)</label>
-                        <input type="file" name="file_excel" class="form-control rounded-pill py-2 px-3" accept=".xlsx, .xls, .csv" required>
+                        <label class="form-label fw-bold" style="font-size: 0.78rem;">Pilih File Excel (.xlsx / .csv)</label>
+                        <input type="file" name="file_excel" class="form-control" accept=".xlsx, .xls, .csv" required>
                     </div>
-
                     <div class="mb-3">
-                        <a href="{{ route('admin.brain-test.soal.template') }}" class="small text-decoration-none fw-semibold text-primary">
-                            <i class="bi bi-download me-1"></i> Download Contoh Format Template Excel
+                        <a href="{{ route('admin.brain-test.soal.template') }}" class="text-decoration-none fw-bold text-primary" style="font-size: 0.8rem;">
+                            <i class="fas fa-download me-1"></i> Download Contoh Format Template Excel
                         </a>
                     </div>
-
-                    <div class="p-3 bg-light rounded-4 small text-muted">
-                        <p class="fw-bold text-dark mb-1"><i class="bi bi-info-circle me-1"></i> Ketentuan Kolom Excel:</p>
-                        <ul class="mb-0 ps-3">
+                    <div class="p-3" style="border: 1px solid var(--ent-grid-border); border-radius: 12px; background-color: rgba(79, 70, 229, 0.04); font-size: 0.8rem;">
+                        <div class="fw-bold mb-1"><i class="fas fa-info-circle me-1 text-primary"></i> Ketentuan Kolom Excel:</div>
+                        <ul class="mb-0 ps-3 opacity-75">
                             <li><strong>pertanyaan</strong>: Teks soal</li>
                             <li><strong>opsi_a, opsi_b, opsi_c, opsi_d</strong>: Pilihan jawaban</li>
                             <li><strong>kunci_jawaban</strong>: Huruf kapital (A, B, C, atau D)</li>
                         </ul>
                     </div>
                 </div>
-                <div class="modal-footer border-0 pt-0 pb-4 px-4">
-                    <button type="button" class="btn btn-light rounded-pill px-4 fw-semibold" data-bs-dismiss="modal">Batal</button>
-                    <button type="submit" class="btn btn-success rounded-pill px-4 fw-semibold shadow-sm">Upload & Import</button>
+                <div class="modal-footer px-4 py-3" style="border-top: 1px solid var(--ent-grid-border);">
+                    <button type="button" class="btn ent-btn px-3 py-2" style="background-color: rgba(100, 116, 139, 0.12); border: 1px solid var(--ent-grid-border);" data-bs-dismiss="modal">Batal</button>
+                    <button type="submit" class="btn ent-btn px-4 py-2" style="background: linear-gradient(135deg, #059669 0%, #047857 100%); color: #ffffff; border: none;">Upload &amp; Import</button>
                 </div>
             </form>
         </div>
     </div>
 </div>
+@endsection
 
+@section('base.js')
 <script>
-    document.addEventListener('DOMContentLoaded', function() {
-        const modalKelolaSoal = document.getElementById('modalKelolaSoal');
+    function resolveStorageImg(path) {
+        if (!path) return '';
+        if (String(path).startsWith('http://') || String(path).startsWith('https://')) {
+            return path;
+        }
+        return `{{ asset('storage') }}/${String(path).replace(/^\/+/, '')}`;
+    }
 
+    function escapeHtmlText(text) {
+        if (text === null || text === undefined) return '';
+        return String(text)
+            .replace(/&/g, '&amp;')
+            .replace(/</g, '&lt;')
+            .replace(/>/g, '&gt;')
+            .replace(/"/g, '&quot;')
+            .replace(/'/g, '&#039;');
+    }
+
+    function previewSoalImage(input) {
+        const wrapper = document.getElementById('previewGambarSoalWrapper');
+        const img = document.getElementById('previewGambarSoal');
+        const btnReset = document.getElementById('btnResetGambarSoal');
+
+        if (input.files && input.files[0]) {
+            const reader = new FileReader();
+            reader.onload = function(e) {
+                img.src = e.target.result;
+                wrapper.style.display = 'block';
+                btnReset.style.display = 'inline-flex';
+            };
+            reader.readAsDataURL(input.files[0]);
+        } else {
+            resetSoalImage();
+        }
+    }
+
+    function resetSoalImage() {
+        const input = document.getElementById('inputGambarSoal');
+        const wrapper = document.getElementById('previewGambarSoalWrapper');
+        const img = document.getElementById('previewGambarSoal');
+        const btnReset = document.getElementById('btnResetGambarSoal');
+
+        if (input) input.value = '';
+        if (img) img.src = '';
+        if (wrapper) wrapper.style.display = 'none';
+        if (btnReset) btnReset.style.display = 'none';
+    }
+
+    function previewOpsiImage(input, index) {
+        const wrapper = document.getElementById(`previewGambarOpsiWrapper_${index}`);
+        const img = document.getElementById(`previewGambarOpsi_${index}`);
+        const btnReset = document.getElementById(`btnResetGambarOpsi_${index}`);
+
+        if (input.files && input.files[0]) {
+            const reader = new FileReader();
+            reader.onload = function(e) {
+                img.src = e.target.result;
+                wrapper.style.display = 'block';
+                btnReset.style.display = 'inline-flex';
+            };
+            reader.readAsDataURL(input.files[0]);
+        } else {
+            resetOpsiImage(index);
+        }
+    }
+
+    function resetOpsiImage(index) {
+        const input = document.getElementById(`inputGambarOpsi_${index}`);
+        const wrapper = document.getElementById(`previewGambarOpsiWrapper_${index}`);
+        const img = document.getElementById(`previewGambarOpsi_${index}`);
+        const btnReset = document.getElementById(`btnResetGambarOpsi_${index}`);
+
+        if (input) input.value = '';
+        if (img) img.src = '';
+        if (wrapper) wrapper.style.display = 'none';
+        if (btnReset) btnReset.style.display = 'none';
+    }
+
+    function resetAllFormSoalMedia() {
+        resetSoalImage();
+        for (let i = 0; i < 5; i++) {
+            resetOpsiImage(i);
+        }
+    }
+
+    document.addEventListener('DOMContentLoaded', function() {
+        // Pre-select klasifikasi saat tombol tambah tes di klasifikasi diklik
+        document.querySelectorAll('.btn-tambah-paket').forEach(btn => {
+            btn.addEventListener('click', function() {
+                const klasId = this.getAttribute('data-klasifikasi-id');
+                if (klasId) {
+                    document.getElementById('selectKlasifikasiId').value = klasId;
+                }
+            });
+        });
+
+        // Pre-select paket saat tombol tambah kategori di paket diklik
+        document.querySelectorAll('.btn-tambah-kategori').forEach(btn => {
+            btn.addEventListener('click', function() {
+                const paketId = this.getAttribute('data-paket-id');
+                if (paketId) {
+                    document.getElementById('selectPaketId').value = paketId;
+                }
+            });
+        });
+
+        const modalKelolaSoal = document.getElementById('modalKelolaSoal');
         modalKelolaSoal.addEventListener('show.bs.modal', function(event) {
             const button = event.relatedTarget;
             const kategoriId = button.getAttribute('data-id');
             const namaKategori = button.getAttribute('data-nama');
 
-            // Set judul modal & input hidden kategori id secara global
             document.getElementById('modalSoalTitle').innerText = 'Bank Soal: ' + namaKategori;
             document.getElementById('inputKategoriId').value = kategoriId;
             window.activeKategoriId = kategoriId;
 
-            // Tampilkan loading, sembunyikan konten
             document.getElementById('soalLoading').style.display = 'block';
             document.getElementById('soalContentWrapper').style.display = 'none';
 
-            // Ambil data soal via fetch AJAX ke route backend
             fetch(`/admin/brain-test/kategori/${kategoriId}/json-soal`)
                 .then(response => response.json())
                 .then(data => {
@@ -392,25 +1068,41 @@
                     tbody.innerHTML = '';
 
                     if (data.length === 0) {
-                        tbody.innerHTML = `<tr><td colspan="4" class="text-center py-4 text-muted fst-italic">Belum ada soal pada kategori ini.</td></tr>`;
+                        tbody.innerHTML = `<tr><td colspan="4" class="text-center py-4 opacity-75 fst-italic">Belum ada soal pada kategori ini.</td></tr>`;
                     } else {
                         data.forEach((soal, index) => {
-                            let opsiHtml = soal.opsi_jawabans.map(opt => `
-                                <div class="small ${opt.is_benar ? 'text-success fw-bold' : 'text-muted'}">
-                                    - ${opt.teks_jawaban} ${opt.is_benar ? '(Kunci)' : ''}
-                                </div>
-                            `).join('');
+                            const soalImgHtml = soal.gambar ?
+                                `<div class="mb-2"><img src="${escapeHtmlText(resolveStorageImg(soal.gambar))}" alt="Gambar Soal" class="soal-list-img"></div>` :
+                                '';
+
+                            let opsiHtml = (soal.opsi_jawabans || []).map(opt => {
+                                const optImgHtml = opt.gambar ?
+                                    `<div class="mt-1"><img src="${escapeHtmlText(resolveStorageImg(opt.gambar))}" alt="Gambar Opsi" class="opsi-list-img"></div>` :
+                                    '';
+
+                                return `
+                                    <div class="mb-1 ${opt.is_benar ? 'text-success fw-bold' : 'opacity-75'}" style="font-size: 0.78rem;">
+                                        - ${escapeHtmlText(opt.teks_jawaban || (opt.gambar ? '[Gambar]' : '-'))} ${opt.is_benar ? '(Kunci)' : ''} ${opt.poin ? '[' + opt.poin + ' poin]' : ''}
+                                        ${optImgHtml}
+                                    </div>
+                                `;
+                            }).join('');
 
                             tbody.innerHTML += `
                                 <tr>
-                                    <td class="px-3 fw-semibold">${index + 1}</td>
+                                    <td class="ps-3 fw-bold font-mono-code">${index + 1}</td>
                                     <td>
-                                        <div class="fw-semibold text-dark mb-1">${soal.pertanyaan}</div>
+                                        ${soal.pertanyaan ? `<div class="fw-bold mb-1">${escapeHtmlText(soal.pertanyaan)}</div>` : ''}
+                                        ${soalImgHtml}
                                         <div>${opsiHtml}</div>
                                     </td>
-                                    <td class="text-center"><span class="badge bg-light text-dark border">${soal.opsi_jawabans.length} Opsi</span></td>
-                                    <td class="text-end px-3">
-                                        <button class="btn btn-sm btn-light border text-danger" onclick="hapusSoal(${soal.id})"><i class="bi bi-trash"></i></button>
+                                    <td class="text-center">
+                                        <span class="ent-badge" style="background-color: rgba(79, 70, 229, 0.12); color: #818cf8; border: 1px solid rgba(79, 70, 229, 0.28);">${(soal.opsi_jawabans || []).length} Opsi</span>
+                                    </td>
+                                    <td class="pe-3 text-end">
+                                        <button type="button" class="btn ent-btn px-2.5 py-1" style="background-color: rgba(225, 29, 72, 0.12); color: #e11d48; border: 1px solid rgba(225, 29, 72, 0.3);" onclick="hapusSoal(${soal.id})">
+                                            <i class="fas fa-trash"></i>
+                                        </button>
                                     </td>
                                 </tr>
                             `;
@@ -422,28 +1114,33 @@
                 })
                 .catch(error => {
                     console.error('Error:', error);
-                    document.getElementById('soalLoading').innerHTML = `<p class="text-danger small">Gagal memuat data soal.</p>`;
+                    document.getElementById('soalLoading').innerHTML = `<p class="text-danger mb-0" style="font-size: 0.84rem;">Gagal memuat data soal.</p>`;
                 });
         });
     });
 
-    // Script AJAX untuk SIMPAN SOAL MANUAL
     document.getElementById('formTambahSoalAjax').addEventListener('submit', function(e) {
         e.preventDefault();
-
         let form = this;
         let formData = new FormData(form);
         let kategoriId = document.getElementById('inputKategoriId').value || window.activeKategoriId;
 
         if (!kategoriId) {
-            alert('ID Kategori tidak ditemukan. Silakan tutup dan buka ulang modal.');
+            alert('ID Kategori tidak ditemukan.');
+            return;
+        }
+
+        const pertanyaanVal = (document.getElementById('inputPertanyaanSoal')?.value || '').trim();
+        const gambarSoalFile = document.getElementById('inputGambarSoal')?.files?.[0];
+        if (!pertanyaanVal && !gambarSoalFile) {
+            alert('Isi teks pertanyaan atau unggah gambar soal terlebih dahulu.');
             return;
         }
 
         let submitBtn = form.querySelector('button[type="submit"]');
         let originalText = submitBtn.innerHTML;
         submitBtn.disabled = true;
-        submitBtn.innerHTML = `<span class="spinner-border spinner-border-sm me-1" role="status" aria-hidden="true"></span> Menyimpan...`;
+        submitBtn.innerHTML = `<span class="spinner-border spinner-border-sm me-1"></span> Menyimpan...`;
 
         fetch(`{{ url('admin/brain-test/kategori') }}/${kategoriId}/soal`, {
                 method: 'POST',
@@ -470,17 +1167,9 @@
                             timer: 1500,
                             showConfirmButton: false
                         });
-                    } else {
-                        alert('Soal berhasil ditambahkan!');
                     }
-
-                    let modalTambahEl = document.getElementById('modalTambahSoalInModal');
-                    if (modalTambahEl && typeof bootstrap !== 'undefined') {
-                        let modalTambah = bootstrap.Modal.getInstance(modalTambahEl) || new bootstrap.Modal(modalTambahEl);
-                        modalTambah.hide();
-                    }
-
                     form.reset();
+                    resetAllFormSoalMedia();
                     location.reload();
                 } else {
                     throw new Error(res.body.message || 'Gagal menyimpan soal.');
@@ -493,23 +1182,21 @@
             });
     });
 
-    // Script AJAX untuk IMPORT EXCEL
     document.getElementById('formImportExcel').addEventListener('submit', function(e) {
         e.preventDefault();
-
         let form = this;
         let formData = new FormData(form);
         let kategoriId = document.getElementById('inputKategoriId')?.value || window.activeKategoriId;
 
         if (!kategoriId) {
-            alert('ID Kategori tidak ditemukan. Silakan tutup dan buka ulang modal.');
+            alert('ID Kategori tidak ditemukan.');
             return;
         }
 
         let submitBtn = form.querySelector('button[type="submit"]');
         let originalText = submitBtn.innerHTML;
         submitBtn.disabled = true;
-        submitBtn.innerHTML = `<span class="spinner-border spinner-border-sm me-1" role="status" aria-hidden="true"></span> Mengimpor...`;
+        submitBtn.innerHTML = `<span class="spinner-border spinner-border-sm me-1"></span> Mengimpor...`;
 
         fetch(`{{ url('admin/brain-test/kategori') }}/${kategoriId}/soal/import`, {
                 method: 'POST',
@@ -536,16 +1223,7 @@
                             timer: 1500,
                             showConfirmButton: false
                         });
-                    } else {
-                        alert(res.body.message);
                     }
-
-                    let modalImportEl = document.getElementById('modalImportExcelInModal');
-                    if (modalImportEl && typeof bootstrap !== 'undefined') {
-                        let modalImport = bootstrap.Modal.getInstance(modalImportEl) || new bootstrap.Modal(modalImportEl);
-                        modalImport.hide();
-                    }
-
                     form.reset();
                     location.reload();
                 } else {

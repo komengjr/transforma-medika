@@ -11,23 +11,27 @@ class BrainTestOpsiJawaban extends Model
 {
     use HasFactory;
 
-    protected $table = 'brain_test_opsi_jawaban'; // <-- Diperbaiki ke nama tabel yang benar
+    protected $table = 'brain_test_opsi_jawaban';
 
     protected $fillable = [
         'soal_id',
         'teks_jawaban',
-        'gambar', // <-- Tambahkan ini
+        'gambar',
         'is_benar',
         'poin',
     ];
 
-    // Relasi ke Soal
+    protected $casts = [
+        'soal_id'  => 'integer',
+        'is_benar' => 'boolean',
+        'poin'     => 'integer',
+    ];
+
     public function soal(): BelongsTo
     {
         return $this->belongsTo(BrainTestSoal::class, 'soal_id');
     }
 
-    // Relasi ke Jawaban Responden
     public function jawabanRespondens(): HasMany
     {
         return $this->hasMany(BrainTestJawabanResponden::class, 'opsi_jawaban_id');

@@ -13,7 +13,10 @@
     <meta property="og:type" content="website">
     <meta property="og:url" content="https://www.innoventra.my.id">
     <title>PT Innoventra Solusi Digital — Ekosistem Aplikasi Bisnis, Koperasi, HRIS, Keuangan &amp; Kesehatan</title>
-
+    <link rel="apple-touch-icon" sizes="180x180" href="{{ asset('img/favicon.png') }}">
+    <link rel="icon" type="image/png" sizes="32x32" href="{{ asset('img/favicon.png') }}">
+    <link rel="icon" type="image/png" sizes="16x16" href="{{ asset('img/favicon.png') }}">
+    <link rel="shortcut icon" type="image/x-icon" href="{{ asset('img/favicon.png') }}">
     <script src="https://cdn.tailwindcss.com"></script>
     <script defer src="https://cdn.jsdelivr.net/npm/alpinejs@3.x.x/dist/cdn.min.js"></script>
     <link rel="preconnect" href="https://fonts.googleapis.com">
@@ -204,12 +207,13 @@
                 </div>
             </a>
 
-            <ul class="hidden lg:flex items-center gap-7 text-sm font-medium" role="list">
+            <ul class="hidden lg:flex items-center gap-4 text-sm font-medium" role="list" style="font-size: 10px;">
                 <li><a href="#solutions" class="nl text-slate-600 dark:text-slate-400 hover:text-indigo-600 dark:hover:text-white transition-colors" :class="s==='solutions'?'on !text-indigo-600 dark:!text-indigo-400':''">Produk Aplikasi</a></li>
                 <li><a href="#services" class="nl text-slate-600 dark:text-slate-400 hover:text-indigo-600 dark:hover:text-white transition-colors" :class="s==='services'?'on !text-indigo-600 dark:!text-indigo-400':''">Layanan</a></li>
                 <li><a href="#about" class="nl text-slate-600 dark:text-slate-400 hover:text-indigo-600 dark:hover:text-white transition-colors" :class="s==='about'?'on !text-indigo-600 dark:!text-indigo-400':''">Tentang Kami</a></li>
                 <li><a href="#process" class="nl text-slate-600 dark:text-slate-400 hover:text-indigo-600 dark:hover:text-white transition-colors" :class="s==='process'?'on !text-indigo-600 dark:!text-indigo-400':''">Alur Kerja</a></li>
                 <li><a href="{{ route('blog.index') }}" class="nl text-slate-600 dark:text-slate-400 hover:text-indigo-600 dark:hover:text-white transition-colors">Blog &amp; Info</a></li>
+                <li><a href="{{ route('public.brain-test.index') }}" @click="mm=false" class="block text-indigo-600 dark:text-indigo-400 font-semibold">Bank Soal &amp; Tryout</a></li>
                 <li><a href="#contact" class="nl text-slate-600 dark:text-slate-400 hover:text-indigo-600 dark:hover:text-white transition-colors" :class="s==='contact'?'on !text-indigo-600 dark:!text-indigo-400':''">Kontak</a></li>
             </ul>
 
