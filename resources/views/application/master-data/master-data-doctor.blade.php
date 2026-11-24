@@ -3,218 +3,397 @@
 @section('base.css')
 <link rel="stylesheet" href="https://cdn.datatables.net/2.2.2/css/dataTables.bootstrap5.css">
 <link rel="stylesheet" href="https://cdn.datatables.net/responsive/3.0.4/css/responsive.bootstrap5.css">
-<link href="{{ asset('vendors/choices/choices.min.css') }}" rel="stylesheet" />
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
+<link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&family=JetBrains+Mono:wght@500;700&display=swap" rel="stylesheet">
 
 <style>
-    /* =========================================
-       RETRO / NEUBRUTALISM THEME STYLES
-       ========================================= */
     :root {
-        --retro-dark: #1e1e24;
-        --retro-yellow: #ffde59;
-        --retro-pink: #ffa6c9;
-        --retro-cyan: #8bf0fa;
-        --retro-orange: #ff914d;
-        --retro-green: #c1ff72;
-        --retro-purple: #c8b6ff;
-        --retro-bg: #f4f0ea;
-        --retro-border: 3px solid var(--retro-dark);
-        --retro-shadow: 5px 5px 0px var(--retro-dark);
-        --retro-shadow-sm: 3px 3px 0px var(--retro-dark);
+        --ent-indigo: #4f46e5;
+        --ent-indigo-dark: #4338ca;
+        --ent-indigo-soft: rgba(79, 70, 229, 0.12);
+        --ent-grid-border: rgba(99, 102, 241, 0.28);
+        --ent-emerald: #059669;
+        --ent-sky: #0284c7;
+        --ent-amber: #d97706;
+        --ent-rose: #e11d48;
+        --ent-solid-bg: #ffffff;
+        --ent-solid-text: #0f172a;
+        --ent-subtle-surface: #f8fafc;
+    }
+
+    [data-bs-theme="dark"],
+    .dark {
+        --ent-solid-bg: #0f172a;
+        --ent-solid-text: #f8fafc;
+        --ent-subtle-surface: #1e293b;
     }
 
     body {
-        background-color: var(--retro-bg);
+        font-family: 'Plus Jakarta Sans', sans-serif;
     }
 
-    /* Retro Cards */
-    .retro-card {
-        border: var(--retro-border);
-        border-radius: 12px;
-        box-shadow: var(--retro-shadow);
-        background-color: #ffffff;
+    /* Header Banner */
+    .ent-header-banner {
+        background: linear-gradient(135deg, #0f172a 0%, #1e1b4b 55%, #312e81 100%);
+        border: 1px solid rgba(99, 102, 241, 0.35);
+        border-radius: 16px;
+        box-shadow: 0 12px 28px -6px rgba(15, 23, 42, 0.22);
+        color: #ffffff;
+        position: relative;
         overflow: hidden;
     }
 
-    /* Retro Header Banner */
-    .retro-header-banner {
-        background: linear-gradient(135deg, var(--retro-cyan) 0%, var(--retro-yellow) 100%);
-        border: var(--retro-border);
+    .ent-header-banner::before {
+        content: '';
+        position: absolute;
+        top: -50%;
+        right: -5%;
+        width: 340px;
+        height: 340px;
+        background: radial-gradient(circle, rgba(56, 189, 248, 0.22) 0%, transparent 70%);
+        pointer-events: none;
+    }
+
+    .ent-glass-pill {
+        background: rgba(255, 255, 255, 0.09);
+        backdrop-filter: blur(8px);
+        border: 1px solid rgba(255, 255, 255, 0.16);
         border-radius: 12px;
-        box-shadow: var(--retro-shadow);
-        color: var(--retro-dark);
+        color: #ffffff;
     }
 
-    /* Retro Buttons */
-    .retro-btn {
-        font-weight: 800 !important;
-        border: 2px solid var(--retro-dark);
-        box-shadow: var(--retro-shadow-sm);
-        border-radius: 6px;
-        transition: all 0.1s ease-in-out;
+    .ent-card {
+        border: 1px solid var(--ent-grid-border);
+        border-radius: 16px;
+        background-color: var(--bs-body-bg, var(--ent-solid-bg));
+        box-shadow: 0 4px 20px -2px rgba(15, 23, 42, 0.08);
+        overflow: hidden;
+    }
+
+    .ent-card-header {
+        background-color: rgba(79, 70, 229, 0.07) !important;
+        border-bottom: 1px solid var(--ent-grid-border) !important;
+        padding: 14px 20px;
+    }
+
+    .ent-badge {
+        border-radius: 9999px;
+        padding: 4px 10px;
+        font-weight: 700;
         text-transform: uppercase;
-        letter-spacing: 0.5px;
-        cursor: pointer;
+        display: inline-flex;
+        align-items: center;
+        gap: 4px;
+        font-size: 0.68rem;
+        letter-spacing: 0.03em;
     }
 
-    .retro-btn:active {
-        transform: translate(3px, 3px);
-        box-shadow: 0px 0px 0px var(--retro-dark);
-    }
-
-    .retro-btn-primary {
-        background-color: var(--retro-cyan);
-        color: var(--retro-dark);
-    }
-
-    .retro-btn-primary:hover {
-        background-color: #6ce0ed;
-        color: var(--retro-dark);
-    }
-
-    .retro-btn-warning {
-        background-color: var(--retro-yellow);
-        color: var(--retro-dark);
-    }
-
-    .retro-btn-warning:hover {
-        background-color: #e6c84c;
-        color: var(--retro-dark);
-    }
-
-    .retro-btn-success {
-        background-color: var(--retro-green);
-        color: var(--retro-dark);
-    }
-
-    .retro-btn-success:hover {
-        background-color: #b0f55b;
-        color: var(--retro-dark);
-    }
-
-    .retro-btn-light {
-        background-color: #ffffff;
-        color: var(--retro-dark);
-    }
-
-    .retro-btn-light:hover {
-        background-color: #f0f0f0;
-        color: var(--retro-dark);
-    }
-
-    .retro-btn-danger {
-        background-color: var(--retro-pink);
-        color: var(--retro-dark);
-    }
-
-    /* Inputs & Selects */
-    .retro-input,
-    .form-control,
-    .form-select {
-        border: 2px solid var(--retro-dark) !important;
-        border-radius: 6px !important;
-        box-shadow: 2px 2px 0px var(--retro-dark) !important;
-        font-weight: 700 !important;
-        color: var(--retro-dark) !important;
-    }
-
-    .retro-input:focus,
-    .form-control:focus,
-    .form-select:focus {
-        border-color: var(--retro-dark) !important;
-        box-shadow: 4px 4px 0px var(--retro-dark) !important;
-        outline: none;
-    }
-
-    /* Table Styling */
-    .retro-table-header {
-        background-color: var(--retro-dark);
-        color: var(--retro-green);
-        border-bottom: 3px solid var(--retro-dark);
-        font-weight: bold;
-        text-transform: uppercase;
-        letter-spacing: 1px;
-    }
-
-    #tableDoctor tbody tr {
-        border-bottom: 2px solid var(--retro-dark);
-        transition: background 0.2s;
-    }
-
-    #tableDoctor tbody tr:hover {
-        background-color: var(--retro-yellow) !important;
-    }
-
-    .retro-badge {
-        border: 2px solid var(--retro-dark);
-        border-radius: 6px;
-        padding: 4px 8px;
-        font-weight: 800;
-        box-shadow: 2px 2px 0px var(--retro-dark);
-        text-transform: uppercase;
+    .code-chip {
+        font-family: 'JetBrains Mono', monospace;
+        background-color: rgba(79, 70, 229, 0.1);
+        color: #4338ca;
+        border: 1px solid rgba(79, 70, 229, 0.25);
+        padding: 2px 8px;
+        border-radius: 7px;
+        font-weight: 700;
+        font-size: 0.72rem;
         display: inline-block;
     }
 
-    /* Modal Styling */
-    .retro-modal-content {
-        border: var(--retro-border);
-        border-radius: 12px;
-        box-shadow: 8px 8px 0px var(--retro-dark);
-        background-color: #ffffff;
+    [data-bs-theme="dark"] .code-chip,
+    .dark .code-chip {
+        background-color: rgba(129, 140, 248, 0.16);
+        color: #a5b4fc;
+        border-color: rgba(129, 140, 248, 0.32);
     }
 
-    /* DataTables Customization */
-    .dataTables_wrapper .dataTables_filter input {
-        border: 2px solid var(--retro-dark);
-        border-radius: 6px;
-        box-shadow: 2px 2px 0px var(--retro-dark);
-        padding: 4px 10px;
-        font-weight: 600;
+    /* Buttons */
+    .ent-btn {
+        font-weight: 600 !important;
+        border-radius: 10px;
+        transition: all 0.18s ease;
+        font-size: 0.8rem;
+        cursor: pointer;
+    }
+
+    .ent-btn:hover {
+        transform: translateY(-1px);
+    }
+
+    .ent-btn-primary {
+        background: linear-gradient(135deg, #4f46e5 0%, #4338ca 100%);
+        border: none;
+        color: #ffffff;
+        box-shadow: 0 4px 12px rgba(79, 70, 229, 0.25);
+    }
+
+    .ent-btn-primary:hover {
+        color: #ffffff;
+    }
+
+    .ent-btn-success {
+        background: linear-gradient(135deg, #059669 0%, #047857 100%);
+        border: none;
+        color: #ffffff;
+        box-shadow: 0 4px 12px rgba(5, 150, 105, 0.22);
+    }
+
+    .ent-btn-success:hover {
+        color: #ffffff;
+    }
+
+    .ent-btn-light {
+        background-color: var(--bs-body-bg, var(--ent-solid-bg));
+        border: 1px solid var(--ent-grid-border);
+        color: var(--bs-body-color, var(--ent-solid-text));
+    }
+
+    /* Labels & Form Controls */
+    .ent-label {
+        font-size: 0.72rem;
+        font-weight: 700;
+        text-transform: uppercase;
+        letter-spacing: 0.03em;
+        color: var(--bs-secondary-color, #64748b);
+        margin-bottom: 6px;
+        display: block;
+    }
+
+    .ent-input,
+    .form-control,
+    .form-select {
+        border: 1px solid var(--ent-grid-border) !important;
+        border-radius: 10px !important;
+        font-weight: 600 !important;
+        color: var(--bs-body-color, var(--ent-solid-text)) !important;
+        background-color: var(--bs-body-bg, var(--ent-solid-bg)) !important;
+        font-size: 0.82rem !important;
+        min-height: 40px;
+    }
+
+    .ent-input:focus,
+    .form-control:focus,
+    .form-select:focus {
+        border-color: var(--ent-indigo) !important;
+        box-shadow: 0 0 0 3.5px rgba(79, 70, 229, 0.15) !important;
         outline: none;
+    }
+
+    .form-select option {
+        background-color: var(--ent-solid-bg);
+        color: var(--ent-solid-text);
+        font-weight: 600;
+        padding: 6px 10px;
+    }
+
+    .input-group-text.ent-addon {
+        border: 1px solid var(--ent-grid-border) !important;
+        border-right: none !important;
+        border-radius: 10px 0 0 10px !important;
+        background-color: var(--ent-subtle-surface) !important;
+        color: var(--bs-secondary-color, #64748b) !important;
+    }
+
+    .input-group .ent-input-grouped {
+        border-radius: 0 10px 10px 0 !important;
+    }
+
+    /* =========================================================
+       TABLE WITH COLORED GRID BORDERS
+       ========================================================= */
+    .table-custom {
+        width: 100% !important;
+        border-collapse: collapse !important;
+        margin-bottom: 0 !important;
+        font-size: 0.83rem;
+    }
+
+    .table-custom thead th {
+        background-color: rgba(79, 70, 229, 0.12) !important;
+        color: var(--bs-body-color) !important;
+        font-size: 0.72rem;
+        font-weight: 700;
+        text-transform: uppercase;
+        border: 1px solid var(--ent-grid-border) !important;
+        border-bottom: 2px solid rgba(79, 70, 229, 0.45) !important;
+        padding: 13px 12px;
+        letter-spacing: 0.04em;
+    }
+
+    .table-custom thead th:first-child {
+        border-left: none !important;
+    }
+
+    .table-custom thead th:last-child {
+        border-right: none !important;
+        padding-right: 18px !important;
+    }
+
+    .table-custom tbody tr {
+        transition: background-color 0.15s ease;
+    }
+
+    .table-custom tbody tr:hover,
+    .table-custom tbody tr:hover td {
+        background-color: rgba(79, 70, 229, 0.07) !important;
+    }
+
+    .table-custom td {
+        border: 1px solid var(--ent-grid-border) !important;
+        font-weight: 500;
+        color: var(--bs-body-color) !important;
+        padding: 11px 12px;
+        vertical-align: middle;
+        font-size: 0.83rem;
+    }
+
+    .table-custom tbody td:first-child {
+        border-left: none !important;
+    }
+
+    .table-custom tbody td:last-child {
+        border-right: none !important;
+        padding-right: 18px !important;
+    }
+
+    .dt-container .dt-layout-row:first-child {
+        padding: 16px 20px 12px 20px;
+        margin: 0 !important;
+    }
+
+    .dt-container .dt-layout-row:last-child {
+        padding: 14px 20px 18px 20px;
+        margin: 0 !important;
+        border-top: 1px solid var(--ent-grid-border);
+    }
+
+    .dt-container .dt-layout-table {
+        margin: 0 !important;
+    }
+
+    .dt-container .dt-search input {
+        border: 1px solid var(--ent-grid-border) !important;
+        border-radius: 10px !important;
+        padding: 6px 12px !important;
+        font-size: 0.82rem !important;
+        height: 36px !important;
+        background-color: var(--bs-body-bg) !important;
+        color: var(--bs-body-color) !important;
+    }
+
+    .dt-container .dt-search input:focus {
+        border-color: var(--ent-indigo) !important;
+        box-shadow: 0 0 0 3px rgba(79, 70, 229, 0.15) !important;
+        outline: none;
+    }
+
+    .dt-container .dt-length select {
+        border: 1px solid var(--ent-grid-border) !important;
+        border-radius: 8px !important;
+        padding: 4px 28px 4px 10px !important;
+        height: 34px !important;
+        font-size: 0.82rem !important;
+        background-color: var(--bs-body-bg) !important;
+        color: var(--bs-body-color) !important;
+    }
+
+    .page-item.active .page-link {
+        background-color: var(--ent-indigo) !important;
+        border-color: var(--ent-indigo) !important;
+        color: #ffffff !important;
+        border-radius: 8px;
+    }
+
+    .page-link {
+        color: var(--bs-body-color);
+        border-radius: 8px;
+        margin: 0 2px;
+        border: 1px solid var(--ent-grid-border);
+        font-weight: 600;
+        font-size: 0.8rem;
+    }
+
+    /* Modal Styling */
+    .modal-ent-content {
+        border: 1px solid var(--ent-grid-border) !important;
+        border-radius: 18px !important;
+        background-color: var(--bs-body-bg, var(--ent-solid-bg)) !important;
+        color: var(--bs-body-color);
+        overflow: hidden;
+    }
+
+    .ent-modal-header {
+        background: linear-gradient(135deg, #0f172a 0%, #1e1b4b 55%, #312e81 100%);
+        color: #ffffff;
+    }
+
+    .ent-modal-footer {
+        background-color: var(--ent-subtle-surface);
+        border-top: 1px solid var(--ent-grid-border);
     }
 </style>
 @endsection
 
 @section('content')
-<!-- HEADER / INFORMASI MENU -->
-<div class="row mb-4">
-    <div class="col">
-        <div class="card retro-header-banner p-1">
-            <div class="row gx-0 flex-between-center">
-                <div class="col-sm-auto d-flex align-items-center p-3">
-                    <div style="background: white; border: 2px solid #1e1e24; border-radius: 50%; padding: 8px; box-shadow: 3px 3px 0px #1e1e24;" class="me-3">
-                        <img src="{{ asset('img/doctor.png') }}" alt="Doctor Icon" width="45" />
+<!-- HEADER BANNER -->
+<div class="row mb-3">
+    <div class="col-12">
+        <div class="card ent-header-banner p-1">
+            <div class="card-body p-3 p-md-4 text-white position-relative" style="z-index: 2;">
+                <div class="row align-items-center gy-3">
+                    <div class="col-lg-8 d-flex align-items-center">
+                        <div class="ent-glass-pill me-3 d-flex align-items-center justify-content-center flex-shrink-0"
+                            style="width: 58px; height: 58px;">
+                            <img src="{{ asset('img/doctor.png') }}" alt="Doctor Icon" width="38" />
+                        </div>
+                        <div>
+                            <div class="d-flex align-items-center gap-2 mb-1">
+                                <span class="ent-badge" style="background: rgba(56, 189, 248, 0.2); border: 1px solid rgba(56, 189, 248, 0.4); color: #7dd3fc;">
+                                    <i class="fas fa-user-doctor"></i> {{ env('APP_LABEL', 'HIS') }} MASTER DATA
+                                </span>
+                                <span style="color: #94a3b8; font-size: 0.75rem; font-weight: 600;">Direktori Tenaga Medis</span>
+                            </div>
+                            <h4 class="fw-bold mb-0" style="letter-spacing: -0.02em; color: white;">
+                                Master Data Dokter
+                            </h4>
+                            <p class="mb-0 small" style="color: #cbd5e1;">Pengelolaan data dokter, spesialisasi, SIP, status keaktifan, serta import data massal.</p>
+                        </div>
                     </div>
-                    <div>
-                        <h6 class="fs--1 mb-0 fw-bold" style="color: rgba(30, 30, 36, 0.7);">MANAGEMENT SYSTEM</h6>
-                        <h3 class="fw-bolder mb-0" style="color: var(--retro-dark); text-shadow: 1px 1px 0px white;">MASTER <span class="fw-normal">DATA DOKTER</span></h3>
+
+                    <div class="col-lg-4 text-lg-end d-flex flex-wrap justify-content-lg-end gap-2">
+                        @if(isset($listSpesialis))
+                        <div class="ent-glass-pill px-3 py-2 text-start">
+                            <span class="d-block text-uppercase" style="color: #94a3b8; font-size: 0.58rem;">Spesialisasi</span>
+                            <span class="fw-bold" style="color: #7dd3fc; font-family: 'JetBrains Mono', monospace;">{{ $listSpesialis->count() }}</span>
+                        </div>
+                        @endif
                     </div>
-                </div>
-                <div class="col-xl-auto px-4 py-2 text-end d-none d-md-block">
-                    <span class="retro-badge" style="background-color: var(--retro-pink);">TRANSFORMA MEDIKA</span>
                 </div>
             </div>
         </div>
     </div>
 </div>
 
-<!-- BOX FILTER PENCARIAN -->
-<div class="retro-card mb-4" style="background-color: var(--retro-cyan);">
-    <div class="card-header py-2 px-3 border-bottom border-dark" style="background-color: var(--retro-dark); color: var(--retro-yellow);">
-        <h6 class="mb-0 fw-bolder"><span class="fas fa-filter me-2"></span>FILTER DATA DOKTER</h6>
+<!-- FILTER CARD -->
+<div class="ent-card mb-3">
+    <div class="ent-card-header d-flex justify-content-between align-items-center">
+        <div>
+            <h6 class="mb-0 fw-bold"><i class="fas fa-sliders me-1 text-primary"></i> Filter Pencarian Data Dokter</h6>
+            <small class="opacity-75">Saring berdasarkan kata kunci, spesialisasi, atau status keaktifan.</small>
+        </div>
     </div>
-    <div class="card-body py-3 px-3">
+    <div class="card-body p-3 p-md-4">
         <div class="row g-3 align-items-end">
             <div class="col-md-4">
-                <label class="form-label fs--1 fw-bolder text-dark mb-1">PENCARIAN CEPAT / KEYWORD</label>
-                <div class="input-group input-group-sm">
-                    <span class="input-group-text fw-bold" style="border: 2px solid var(--retro-dark); border-right: none; background-color: var(--retro-bg);"><span class="fas fa-search"></span></span>
-                    <input type="text" class="form-control" id="customSearchBox" placeholder="Cari nama, kode, atau NIK...">
+                <label class="ent-label">Pencarian Cepat / Keyword</label>
+                <div class="input-group">
+                    <span class="input-group-text ent-addon"><i class="fas fa-search"></i></span>
+                    <input type="text" class="form-control ent-input ent-input-grouped" id="customSearchBox" placeholder="Cari nama, kode, atau NIK...">
                 </div>
             </div>
             <div class="col-md-3">
-                <label class="form-label fs--1 fw-bolder text-dark mb-1">FILTER SPESIALISASI</label>
-                <select class="form-select form-select-sm retro-input" id="filterSpesialis">
+                <label class="ent-label">Spesialisasi</label>
+                <select class="form-select ent-input" id="filterSpesialis">
                     <option value="">-- Semua Spesialisasi --</option>
                     @if(isset($listSpesialis))
                     @foreach($listSpesialis as $sp)
@@ -224,54 +403,55 @@
                 </select>
             </div>
             <div class="col-md-3">
-                <label class="form-label fs--1 fw-bolder text-dark mb-1">STATUS KEAKTIFAN</label>
-                <select class="form-select form-select-sm retro-input" id="filterStatus">
+                <label class="ent-label">Status Keaktifan</label>
+                <select class="form-select ent-input" id="filterStatus">
                     <option value="">-- Semua Status --</option>
                     <option value="1">Aktif</option>
                     <option value="0">Non-Aktif</option>
                 </select>
             </div>
             <div class="col-md-2">
-                <button type="button" class="btn btn-sm retro-btn retro-btn-danger w-100 fw-bold" id="btnResetFilter">
-                    <span class="fas fa-sync-alt me-1"></span> RESET
+                <button type="button" class="btn ent-btn ent-btn-light w-100 py-2" id="btnResetFilter">
+                    <i class="fas fa-rotate-left me-1 text-danger"></i> Reset
                 </button>
             </div>
         </div>
     </div>
 </div>
 
-<!-- MAIN CARD TABLE -->
-<div class="retro-card mb-4">
-    <div class="card-header py-3 px-4 d-flex justify-content-between align-items-center" style="background-color: var(--retro-dark);">
-        <h5 class="mb-0 fw-bolder" style="color: var(--retro-green);">
-            <span class="fas fa-user-md me-2"></span> DIREKTORI DOKTER
-        </h5>
+<!-- MAIN TABLE CARD -->
+<div class="ent-card mb-4">
+    <div class="ent-card-header d-flex flex-wrap justify-content-between align-items-center gap-2">
         <div>
-            <button class="btn btn-sm retro-btn retro-btn-light me-2" data-bs-toggle="modal" data-bs-target="#modal-doctor" id="button-add-doctor" data-code="0">
-                <span class="fas fa-plus me-1"></span> TAMBAH DOKTER
+            <h6 class="mb-0 fw-bold">Direktori Dokter</h6>
+            <small class="opacity-75">Daftar lengkap dokter terdaftar pada sistem.</small>
+        </div>
+        <div class="d-flex flex-wrap gap-2">
+            <button type="button" class="btn ent-btn ent-btn-light px-3 py-2" data-bs-toggle="modal" data-bs-target="#modal-import-excel">
+                <i class="fas fa-file-excel me-1 text-success"></i> Import Excel
             </button>
-            <button class="btn btn-sm retro-btn retro-btn-success" data-bs-toggle="modal" data-bs-target="#modal-import-excel">
-                <span class="fas fa-file-excel me-1"></span> IMPORT
+            <button type="button" class="btn ent-btn ent-btn-primary px-3 py-2" data-bs-toggle="modal" data-bs-target="#modal-doctor" id="button-add-doctor" data-code="0">
+                <i class="fas fa-plus me-1"></i> Tambah Dokter
             </button>
         </div>
     </div>
 
-    <div class="card-body p-4" style="background-color: #ffffff;">
-        <div class="table-responsive">
-            <table id="tableDoctor" class="table align-middle nowrap fw-bold fs--1" style="width:100%; border: 2px solid var(--retro-dark);">
-                <thead class="retro-table-header">
+    <div class="card-body p-0">
+        <div class="table-responsive pb-3">
+            <table id="tableDoctor" class="table table-custom align-middle mb-0 w-100">
+                <thead>
                     <tr>
-                        <th class="text-center py-3" style="width: 50px;">NO</th>
-                        <th class="py-3">KODE DOKTER</th>
-                        <th class="py-3">NAMA LENGKAP & GELAR</th>
-                        <th class="py-3">SPESIALISASI</th>
-                        <th class="py-3">SIP</th>
-                        <th class="py-3">NO HANDPHONE</th>
-                        <th class="py-3">STATUS</th>
-                        <th class="text-center py-3" style="width: 90px;">AKSI</th>
+                        <th class="text-center" style="width: 55px;">NO</th>
+                        <th>Kode Dokter</th>
+                        <th>Nama Lengkap &amp; Gelar</th>
+                        <th>Spesialisasi</th>
+                        <th>SIP</th>
+                        <th>No Handphone</th>
+                        <th>Status</th>
+                        <th class="text-center" style="width: 95px;">Aksi</th>
                     </tr>
                 </thead>
-                <tbody style="color: var(--retro-dark);">
+                <tbody>
                     <!-- Dirender via AJAX -->
                 </tbody>
             </table>
@@ -282,9 +462,12 @@
 <!-- MODAL FORM DOKTER -->
 <div class="modal fade" id="modal-doctor" data-bs-keyboard="false" data-bs-backdrop="static" tabindex="-1" aria-hidden="true">
     <div class="modal-dialog modal-dialog-centered modal-lg" role="document">
-        <div class="modal-content retro-modal-content">
-            <div class="position-absolute top-0 end-0 mt-3 me-3 z-index-1">
-                <button class="btn-close" data-bs-dismiss="modal" aria-label="Close" style="filter: brightness(0); border: 2px solid #1e1e24; border-radius: 50%; padding: 5px; box-shadow: 2px 2px 0px #1e1e24;"></button>
+        <div class="modal-content modal-ent-content">
+            <div class="modal-header ent-modal-header py-3 px-4 border-0">
+                <h5 class="modal-title fw-bold mb-0" style="color: white;">
+                    <i class="fas fa-user-md me-2" style="color: #38bdf8;"></i> Form Data Dokter
+                </h5>
+                <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal" aria-label="Close"></button>
             </div>
             <div id="menu-doctor"></div>
         </div>
@@ -294,25 +477,29 @@
 <!-- MODAL IMPORT EXCEL -->
 <div class="modal fade" id="modal-import-excel" data-bs-keyboard="false" data-bs-backdrop="static" tabindex="-1" aria-hidden="true">
     <div class="modal-dialog modal-dialog-centered" role="document">
-        <div class="modal-content retro-modal-content">
-            <div class="modal-header py-3 px-4" style="background-color: var(--retro-green); border-bottom: 3px solid var(--retro-dark); color: var(--retro-dark);">
-                <h5 class="modal-title fw-bolder"><span class="fas fa-file-excel me-2"></span> Import Data Dokter dari Excel</h5>
-                <button class="btn-close" data-bs-dismiss="modal" aria-label="Close" style="filter: brightness(0); border: 2px solid #1e1e24; border-radius: 50%; padding: 5px; box-shadow: 2px 2px 0px #1e1e24;"></button>
+        <div class="modal-content modal-ent-content">
+            <div class="modal-header ent-modal-header py-3 px-4 border-0">
+                <h5 class="modal-title fw-bold mb-0" style="color: white;">
+                    <i class="fas fa-file-excel me-2" style="color: #34d399;"></i> Import Data Dokter dari Excel
+                </h5>
+                <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal" aria-label="Close"></button>
             </div>
 
             <form id="form-import-doctor" action="{{ route('master_doctor_data_doctor_import') }}" method="POST" enctype="multipart/form-data">
                 @csrf
-                <div class="modal-body p-4" style="background-color: var(--retro-bg);">
-                    <div class="mb-3">
-                        <label class="form-label fw-bolder text-dark">Pilih File Excel (.xlsx / .xls)</label>
-                        <input class="form-control retro-input py-2" type="file" name="file_excel" accept=".xlsx, .xls, .csv" required />
-                        <small class="text-muted fw-bold mt-2 d-block">Pastikan format kolom (baris pertama) sesuai: nama_lengkap, spesialisasi, jenis_kelamin (L/P), nik, sip, email, no_telp, alamat.</small>
+                <div class="modal-body p-4">
+                    <div class="mb-2">
+                        <label class="ent-label">Pilih File Excel (.xlsx / .xls / .csv) <span class="text-danger">*</span></label>
+                        <input class="form-control ent-input py-2" type="file" name="file_excel" accept=".xlsx, .xls, .csv" required />
+                        <small class="opacity-75 mt-2 d-block">
+                            Pastikan format kolom (baris pertama) sesuai: <code>nama_lengkap</code>, <code>spesialisasi</code>, <code>jenis_kelamin</code> (L/P), <code>nik</code>, <code>sip</code>, <code>email</code>, <code>no_telp</code>, <code>alamat</code>.
+                        </small>
                     </div>
                 </div>
-                <div class="modal-footer bg-white border-top border-dark">
-                    <button class="btn retro-btn retro-btn-light" type="button" data-bs-dismiss="modal">Batal</button>
-                    <button class="btn retro-btn retro-btn-primary" type="submit" id="btn-submit-import">
-                        <span class="fas fa-upload me-1"></span> Upload & Import
+                <div class="modal-footer ent-modal-footer px-4 py-3">
+                    <button class="btn ent-btn ent-btn-light px-3 py-2" type="button" data-bs-dismiss="modal">Batal</button>
+                    <button class="btn ent-btn ent-btn-success px-4 py-2" type="submit" id="btn-submit-import">
+                        <i class="fas fa-upload me-1"></i> Upload &amp; Import
                     </button>
                 </div>
             </form>
@@ -326,7 +513,6 @@
 <script src="https://cdn.datatables.net/2.2.2/js/dataTables.bootstrap5.js"></script>
 <script src="https://cdn.datatables.net/responsive/3.0.4/js/dataTables.responsive.js"></script>
 <script src="https://cdn.datatables.net/responsive/3.0.4/js/responsive.bootstrap5.js"></script>
-<script src="{{ asset('vendors/choices/choices.min.js') }}"></script>
 <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
 
 <script>
@@ -349,87 +535,83 @@
                     name: 'DT_RowIndex',
                     orderable: false,
                     searchable: false,
-                    className: 'text-center fw-bold align-middle'
+                    className: 'text-center fw-bold'
                 },
                 {
                     data: 'kode_dokter',
                     name: 'kode_dokter',
-                    className: 'align-middle',
                     render: function(data) {
-                        return `<span class="retro-badge" style="background-color: var(--retro-bg);">${data}</span>`;
+                        return `<span class="code-chip">${data}</span>`;
                     }
                 },
                 {
                     data: 'nama_lengkap',
                     name: 'nama_lengkap',
-                    className: 'align-middle',
                     render: function(data, type, row) {
                         let baseUrl = "{{ asset('storage/doctors') }}";
                         let defaultImg = "{{ asset('img/doctor.png') }}";
                         let fotoUrl = row.foto ? `${baseUrl}/${row.foto}` : defaultImg;
 
-                        let statusColor = (row.is_active && row.is_active.includes('bg-success')) ? 'var(--retro-green)' : 'var(--retro-pink)';
+                        let isActive = (row.is_active && row.is_active.includes('bg-success'));
+                        let statusDotColor = isActive ? '#10b981' : '#f43f5e';
 
                         return `
                           <div class="d-flex align-items-center">
-                              <div class="position-relative me-3">
-                                  <div class="rounded-circle p-1" style="width: 48px; height: 48px; display: flex; align-items: center; justify-content: center; border: 2px solid var(--retro-dark); background-color: white; box-shadow: 2px 2px 0px var(--retro-dark);">
-                                      <img class="rounded-circle" src="${fotoUrl}" alt="Foto ${data}" style="object-fit: cover; width: 38px; height: 38px;" />
+                              <div class="position-relative me-3 flex-shrink-0">
+                                  <div class="rounded-circle p-1 d-flex align-items-center justify-content-center" style="width: 46px; height: 46px; border: 1px solid var(--ent-grid-border); background-color: var(--ent-subtle-surface);">
+                                      <img class="rounded-circle" src="${fotoUrl}" alt="Foto ${data}" style="object-fit: cover; width: 36px; height: 36px;" />
                                   </div>
-                                  <span class="position-absolute bottom-0 end-0 p-1 border border-2 border-dark rounded-circle" style="background-color: ${statusColor}; width: 14px; height: 14px; transform: translate(-10%, -10%);"></span>
+                                  <span class="position-absolute bottom-0 end-0 rounded-circle" style="background-color: ${statusDotColor}; width: 12px; height: 12px; border: 2px solid var(--ent-solid-bg);"></span>
                               </div>
 
                               <div class="flex-1">
-                                  <h6 class="mb-0 fw-bolder text-dark text-nowrap">${data}</h6>
-                                  <div class="fs--2 text-muted fw-bold mt-1 d-flex align-items-center">
-                                      <span class="fas fa-stethoscope text-dark me-1"></span> Profesional Medis
-                                  </div>
+                                  <div class="fw-bold text-nowrap">${data}</div>
+                                  <small class="opacity-75 d-flex align-items-center mt-1">
+                                      <i class="fas fa-stethoscope me-1 text-primary"></i> Profesional Medis
+                                  </small>
                               </div>
                           </div>`;
                     }
                 },
                 {
                     data: 'spesialisasi',
-                    name: 'spesialisasi',
-                    className: 'align-middle'
+                    name: 'spesialisasi'
                 },
                 {
                     data: 'sip',
-                    name: 'sip',
-                    className: 'align-middle'
+                    name: 'sip'
                 },
                 {
                     data: 'no_telp',
-                    name: 'no_telp',
-                    className: 'align-middle'
+                    name: 'no_telp'
                 },
                 {
                     data: 'is_active',
                     name: 'is_active',
                     orderable: false,
-                    searchable: false,
-                    className: 'align-middle'
+                    searchable: false
                 },
                 {
                     data: 'aksi',
                     name: 'aksi',
                     orderable: false,
                     searchable: false,
-                    className: 'text-center align-middle'
+                    className: 'text-center'
                 }
             ],
+            order: [],
             language: {
-                search: "CARI DATA:",
-                lengthMenu: "TAMPIL _MENU_ DATA",
-                info: "MENAMPILKAN _START_ S/D _END_ DARI _TOTAL_ DOKTER",
+                search: "_INPUT_",
+                searchPlaceholder: "Cari data...",
+                lengthMenu: "Tampilkan _MENU_ data",
+                info: "Menampilkan _START_ sampai _END_ dari _TOTAL_ dokter",
                 paginate: {
-                    first: "AWAL",
-                    last: "AKHIR",
-                    next: "❯",
-                    previous: "❮"
+                    first: "Awal",
+                    last: "Akhir",
+                    next: "<i class='fas fa-angle-right'></i>",
+                    previous: "<i class='fas fa-angle-left'></i>"
                 }
-            },
-            dom: '<"top"f>rt<"bottom"ip><"clear">'
+            }
         });
 
         // 2. Event Kotak Pencarian
@@ -465,7 +647,7 @@
     });
 
     function bukaFormModal(code) {
-        $('#menu-doctor').html('<div class="text-center p-5"><div class="spinner-border" style="color: var(--retro-pink); width: 3rem; height: 3rem;" role="status"></div><p class="mt-3 fw-bold" style="color: var(--retro-dark);">MEMUAT FORM...</p></div>');
+        $('#menu-doctor').html('<div class="text-center p-5"><div class="spinner-border text-primary" style="width: 2.5rem; height: 2.5rem;" role="status"></div><p class="mt-3 fw-semibold opacity-75">Memuat form...</p></div>');
         $.ajax({
             url: "{{ route('master_doctor_data_doctor_add') }}",
             type: "POST",
@@ -478,7 +660,7 @@
         }).done(function(data) {
             $('#menu-doctor').html(data);
         }).fail(function() {
-            $('#menu-doctor').html('<div class="alert alert-danger m-3 fw-bold border-dark shadow-sm">Gagal memuat form dari server.</div>');
+            $('#menu-doctor').html('<div class="alert alert-danger m-3 fw-semibold">Gagal memuat form dari server.</div>');
         });
     }
 
@@ -489,7 +671,7 @@
         let btnSubmit = form.find('button[type="submit"]');
         let originalBtnText = btnSubmit.html();
 
-        btnSubmit.prop('disabled', true).html('<span class="spinner-border spinner-border-sm me-2"></span> MENYIMPAN...');
+        btnSubmit.prop('disabled', true).html('<span class="spinner-border spinner-border-sm me-2"></span> Menyimpan...');
 
         $.ajax({
             url: form.attr('action'),
@@ -538,7 +720,7 @@
         let btnSubmit = $('#btn-submit-import');
         let originalBtnText = btnSubmit.html();
 
-        btnSubmit.prop('disabled', true).html('<span class="spinner-border spinner-border-sm me-2"></span> MENGIMPORT...');
+        btnSubmit.prop('disabled', true).html('<span class="spinner-border spinner-border-sm me-2"></span> Mengimport...');
 
         $.ajax({
             url: url,

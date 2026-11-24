@@ -13,11 +13,12 @@ class MedicalMasterParameter extends Migration
      */
     public function up()
     {
-        Schema::create('medical_master_parameter', function (Blueprint $table) {
+       Schema::create('medical_master_parameter', function (Blueprint $table) {
             $table->id();
             $table->unsignedBigInteger('master_pemeriksaan_id'); // Relasi ke master pemeriksaan utama (Hematologi Rutin)
-            $table->unsignedBigInteger('parent_id')->nullable(); // Jika diisi ID parameter induk, berarti ini adalah sub-parameter
-            $table->string('nama_parameter'); // Contoh: Hemoglobin, Hitung Jenis, Eosinofil
+            $table->unsignedBigInteger('parent_id')->nullable()->index(); // Jika diisi ID parameter induk, berarti ini adalah sub-parameter
+            $table->string('nama_parameter'); // Contoh: EO%, HGB, Hemoglobin, Hitung Jenis
+            $table->string('label')->nullable(); // Label tampilan jelas, contoh: Eosinofil, Hemoglobin
             $table->boolean('is_group')->default(false); // Penanda apakah ini judul kelompok (seperti "Hitung Jenis") atau parameter input
             $table->string('nilai_normal')->nullable();
             $table->string('satuan')->nullable();
@@ -28,6 +29,11 @@ class MedicalMasterParameter extends Migration
             $table->foreign('master_pemeriksaan_id')
                 ->references('id')
                 ->on('medical_master_pemeriksaan')
+                ->onDelete('cascade');
+
+            $table->foreign('parent_id')
+                ->references('id')
+                ->on('medical_master_parameter')
                 ->onDelete('cascade');
         });
         Schema::create('medical_transaksi_hasil', function (Blueprint $table) {

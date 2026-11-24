@@ -2195,87 +2195,744 @@ class LaboratoriumController extends Controller
     public function master_lab_parameter_pemeriksaan($akses, $id)
     {
         if ($this->url_akses_sub($akses, $id) == true) {
-            // Ambil daftar master pemeriksaan untuk dropdown filter/pilihan utama
             $pemeriksaanList = DB::table('medical_master_pemeriksaan')
                 ->join('medical_tipe_layanan', 'medical_tipe_layanan.id', '=', 'medical_master_pemeriksaan.tipe_layanan_id')
                 ->where('medical_master_pemeriksaan.is_paket', 0)
-                ->select('medical_master_pemeriksaan.id', 'medical_master_pemeriksaan.kode_layanan', 'medical_master_pemeriksaan.nama_layanan', 'medical_tipe_layanan.nama_tipe')
+                ->select(
+                    'medical_master_pemeriksaan.id',
+                    'medical_master_pemeriksaan.kode_layanan',
+                    'medical_master_pemeriksaan.nama_layanan',
+                    'medical_tipe_layanan.nama_tipe'
+                )
                 ->orderBy('medical_master_pemeriksaan.nama_layanan', 'asc')
                 ->get();
 
             return view('app-medical.laboratorium.master-parameter-pemeriksaan', [
                 'akses' => $akses,
                 'code' => $id,
-                'pemeriksaanList' => $pemeriksaanList
+                'pemeriksaanList' => $pemeriksaanList,
+            ]);
+        } else {
+            return Redirect::to('dashboard/home');
+        }
+    }
+    public function get_parameters_by_pemeriksaan(Request $request)
+    {
+        $masterId = $request->query('master_pemeriksaan_id');
+
+        $parameters = DB::table('medical_master_parameter')
+            ->where('master_pemeriksaan_id', $masterId)
+            ->orderBy('urutan', 'asc')
+            ->orderBy('id', 'asc')
+            ->get();
+
+        $groupParameters = $parameters->where('is_group', 1)->values();
+
+        return response()->json([
+            'parameters' => $parameters,
+            'groupParameters' => $groupParameters,
+        ]);
+    }
+    public function save_parameter(Request $request)
+    {
+        $validated = $request->validate([
+            'parameter_id' => 'nullable|integer|exists:medical_master_parameter,id',
+            'master_pemeriksaan_id' => 'required|integer|exists:medical_master_pemeriksaan,id',
+            'nama_parameter' => 'required|string|max:150',
+            'label' => 'nullable|string|max:150',
+            'parent_id' => 'nullable|integer|exists:medical_master_parameter,id',
+            'nilai_normal' => 'nullable|string|max:150',
+            'satuan' => 'nullable|string|max:50',
+            'metode' => 'nullable|string|max:100',
+            'urutan' => 'nullable|integer',
+        ]);
+
+        $isGroup = $request->boolean('is_group') ? 1 : 0;
+        $label = !empty(trim($validated['label'] ?? ''))
+            ? trim($validated['label'])
+            : trim($validated['nama_parameter']);
+
+        $data = [
+            'master_pemeriksaan_id' => $validated['master_pemeriksaan_id'],
+            'parent_id' => $validated['parent_id'] ?? null,
+            'nama_parameter' => trim($validated['nama_parameter']),
+            'label' => $label,
+            'is_group' => $isGroup,
+            'nilai_normal' => $validated['nilai_normal'] ?? null,
+            'satuan' => $validated['satuan'] ?? null,
+            'metode' => $validated['metode'] ?? null,
+            'urutan' => $validated['urutan'] ?? 0,
+            'updated_at' => now(),
+        ];
+
+        if (!empty($validated['parameter_id'])) {
+            DB::table('medical_master_parameter')
+                ->where('id', $validated['parameter_id'])
+                ->update($data);
+            $message = 'Parameter pemeriksaan berhasil diperbarui.';
+        } else {
+            $data['created_at'] = now();
+            DB::table('medical_master_parameter')->insert($data);
+            $message = 'Parameter pemeriksaan berhasil ditambahkan.';
+        }
+
+        return response()->json([
+            'status' => 'success',
+            'message' => $message,
+        ]);
+    }
+    public function delete_parameter(Request $request)
+    {
+        $request->validate([
+            'id' => 'required|integer|exists:medical_master_parameter,id',
+        ]);
+
+        DB::table('medical_master_parameter')->where('id', $request->id)->delete();
+
+        return response()->json([
+            'status' => 'success',
+            'message' => 'Parameter berhasil dihapus.',
+        ]);
+    }
+    // MASTER QUALITY CONTROL
+    public function master_lab_quality_control($akses, $id)
+    {
+        if ($this->url_akses_sub($akses, $id) == true) {
+            $materials = DB::table('medical_lab_qc_materials as m')
+                ->leftJoin('medical_master_alat as a', 'm.instrument_id', '=', 'a.instrument_id')
+                ->select(
+                    'm.*',
+                    'a.kode_alat',
+                    'a.lokasi_ruangan',
+                    DB::raw("COALESCE(a.nama_alat, m.nama_alat) as nama_alat_tampil")
+                )
+                ->orderBy('m.id', 'desc')
+                ->get();
+
+            $parameters = DB::table('medical_lab_qc_parameters as p')
+                ->leftJoin('medical_lab_qc_materials as m', 'p.qc_material_id', '=', 'm.id')
+                ->leftJoin('medical_master_pemeriksaan as mp', 'p.master_pemeriksaan_id', '=', 'mp.id')
+                ->select(
+                    'p.*',
+                    'm.nama_material',
+                    'm.lot_number',
+                    'm.kode_material',
+                    'mp.kode_layanan',
+                    'mp.nama_layanan'
+                )
+                ->orderBy('p.urutan', 'asc')
+                ->orderBy('p.id', 'desc')
+                ->get();
+
+            $logs = DB::table('medical_lab_qc_logs as l')
+                ->leftJoin('medical_lab_qc_materials as m', 'l.qc_material_id', '=', 'm.id')
+                ->leftJoin('medical_lab_qc_parameters as p', 'l.qc_parameter_id', '=', 'p.id')
+                ->select(
+                    'l.*',
+                    'm.nama_material',
+                    'm.lot_number',
+                    'p.nama_parameter',
+                    'p.label',
+                    'p.satuan',
+                    'p.target_mean',
+                    'p.target_sd'
+                )
+                ->orderBy('l.tanggal_qc', 'desc')
+                ->orderBy('l.jam_qc', 'desc')
+                ->orderBy('l.id', 'desc')
+                ->get();
+
+            $alatList = DB::table('medical_master_alat')
+                ->where('status', 'aktif')
+                ->orderBy('nama_alat', 'asc')
+                ->get();
+
+            $pemeriksaanLabList = DB::table('medical_master_pemeriksaan as mp')
+                ->join('medical_tipe_layanan as tl', 'mp.tipe_layanan_id', '=', 'tl.id')
+                ->where('mp.is_paket', 0)
+                ->where('mp.is_active', 1)
+                ->select('mp.id', 'mp.kode_layanan', 'mp.nama_layanan', 'tl.nama_tipe')
+                ->orderBy('mp.nama_layanan', 'asc')
+                ->get();
+
+            $masterParameterList = DB::table('medical_master_parameter as mparam')
+                ->leftJoin('medical_master_pemeriksaan as mp', 'mparam.master_pemeriksaan_id', '=', 'mp.id')
+                ->where('mparam.is_group', 0)
+                ->select(
+                    'mparam.id',
+                    'mparam.master_pemeriksaan_id',
+                    'mparam.nama_parameter',
+                    'mparam.label',
+                    'mparam.satuan',
+                    'mparam.metode',
+                    'mparam.urutan',
+                    'mp.nama_layanan'
+                )
+                ->orderBy('mparam.urutan', 'asc')
+                ->orderBy('mparam.id', 'asc')
+                ->get();
+
+            return view('app-medical.laboratorium.master-qc-lab', [
+                'akses'               => $akses,
+                'code'                => $id,
+                'materials'           => $materials,
+                'parameters'          => $parameters,
+                'logs'                => $logs,
+                'alatList'            => $alatList,
+                'pemeriksaanLabList'  => $pemeriksaanLabList,
+                'masterParameterList' => $masterParameterList,
             ]);
         } else {
             return Redirect::to('dashboard/home');
         }
     }
 
-    // Ambil daftar parameter berdasarkan master_pemeriksaan_id
-    public function get_parameters_by_pemeriksaan(Request $request)
+    public function storeMaterial(Request $request)
     {
-        $masterPemeriksaanId = $request->master_pemeriksaan_id;
-
-        $parameters = DB::table('medical_master_parameter')
-            ->where('master_pemeriksaan_id', $masterPemeriksaanId)
-            ->orderBy('urutan', 'asc')
-            ->get();
-
-        // Ambil juga parameter yang berstatus is_group = true untuk opsi parent di form modal
-        $groupParameters = DB::table('medical_master_parameter')
-            ->where('master_pemeriksaan_id', $masterPemeriksaanId)
-            ->where('is_group', true)
-            ->get();
-
-        return response()->json([
-            'parameters' => $parameters,
-            'groupParameters' => $groupParameters
-        ]);
-    }
-
-    // Simpan atau Update Parameter
-    public function save_parameter(Request $request)
-    {
-        $request->validate([
-            'master_pemeriksaan_id' => 'required|exists:medical_master_pemeriksaan,id',
-            'nama_parameter' => 'required|string|max:255',
-            'urutan' => 'nullable|integer'
+        $validated = $request->validate([
+            'material_id'     => 'nullable|integer|exists:medical_lab_qc_materials,id',
+            'kode_material'   => 'required|string|max:50',
+            'nama_material'   => 'required|string|max:150',
+            'lot_number'      => 'required|string|max:100',
+            'instrument_id'   => 'nullable|integer|exists:medical_master_alat,instrument_id',
+            'nama_alat'       => 'nullable|string|max:150',
+            'tanggal_expired' => 'nullable|date',
+            'status'          => 'required|in:AKTIF,NONAKTIF,EXPIRED',
         ]);
 
-        $id = $request->parameter_id; // Jika ada berarti edit
+        $existsKode = DB::table('medical_lab_qc_materials')
+            ->where('kode_material', $validated['kode_material'])
+            ->when(!empty($validated['material_id']), function ($q) use ($validated) {
+                $q->where('id', '!=', $validated['material_id']);
+            })
+            ->exists();
 
-        $data = [
-            'master_pemeriksaan_id' => $request->master_pemeriksaan_id,
-            'parent_id' => $request->parent_id ?: null,
-            'nama_parameter' => $request->nama_parameter,
-            'is_group' => $request->has('is_group') ? 1 : 0,
-            'nilai_normal' => $request->nilai_normal,
-            'satuan' => $request->satuan,
-            'metode' => $request->metode,
-            'urutan' => $request->urutan ?? 0,
-            'updated_at' => now(),
-        ];
-
-        if ($id) {
-            DB::table('medical_master_parameter')->where('id', $id)->update($data);
-            $message = 'Parameter berhasil diperbarui.';
-        } else {
-            $data['created_at'] = now();
-            DB::table('medical_master_parameter')->insert($data);
-            $message = 'Parameter baru berhasil ditambahkan.';
+        if ($existsKode) {
+            return response()->json([
+                'status'  => 'error',
+                'message' => 'Kode bahan QC sudah digunakan.',
+            ], 422);
         }
 
-        return response()->json(['status' => 'success', 'message' => $message]);
+        $namaAlat = $validated['nama_alat'];
+        if (!empty($validated['instrument_id'])) {
+            $alat = DB::table('medical_master_alat')
+                ->where('instrument_id', $validated['instrument_id'])
+                ->first();
+            if ($alat) {
+                $namaAlat = $alat->nama_alat;
+            }
+        }
+
+        $payload = [
+            'kode_material'   => $validated['kode_material'],
+            'nama_material'   => $validated['nama_material'],
+            'lot_number'      => $validated['lot_number'],
+            'instrument_id'   => $validated['instrument_id'] ?? null,
+            'nama_alat'       => $namaAlat,
+            'tanggal_expired' => $validated['tanggal_expired'],
+            'status'          => $validated['status'],
+            'updated_at'      => now(),
+        ];
+
+        if (!empty($validated['material_id'])) {
+            DB::table('medical_lab_qc_materials')
+                ->where('id', $validated['material_id'])
+                ->update($payload);
+            $message = 'Bahan kontrol QC berhasil diperbarui.';
+        } else {
+            $payload['created_at'] = now();
+            DB::table('medical_lab_qc_materials')->insert($payload);
+            $message = 'Bahan kontrol QC berhasil ditambahkan.';
+        }
+
+        return response()->json([
+            'status'  => 'success',
+            'message' => $message,
+        ]);
     }
 
-    // Hapus Parameter
-    public function delete_parameter(Request $request)
+    public function deleteMaterial(Request $request)
     {
-        $id = $request->id;
-        DB::table('medical_master_parameter')->where('id', $id)->delete();
+        $request->validate([
+            'id' => 'required|integer|exists:medical_lab_qc_materials,id',
+        ]);
 
-        return response()->json(['status' => 'success', 'message' => 'Parameter berhasil dihapus.']);
+        DB::table('medical_lab_qc_materials')->where('id', $request->id)->delete();
+
+        return response()->json([
+            'status'  => 'success',
+            'message' => 'Bahan kontrol QC berhasil dihapus.',
+        ]);
+    }
+
+    public function storeParameter(Request $request)
+    {
+        $validated = $request->validate([
+            'parameter_id'          => 'nullable|integer|exists:medical_lab_qc_parameters,id',
+            'qc_material_id'        => 'required|integer|exists:medical_lab_qc_materials,id',
+            'master_pemeriksaan_id' => 'required|integer|exists:medical_master_pemeriksaan,id',
+            'master_parameter_id'   => 'nullable|integer|exists:medical_master_parameter,id',
+            'nama_parameter'        => 'nullable|string|max:150',
+            'label'                 => 'nullable|string|max:150',
+            'satuan'                => 'nullable|string|max:50',
+            'metode'                => 'nullable|string|max:100',
+            'target_mean'           => 'required|numeric',
+            'target_sd'             => 'required|numeric|gt:0',
+            'batas_bawah'           => 'nullable|numeric',
+            'batas_atas'            => 'nullable|numeric',
+            'urutan'                => 'nullable|integer',
+        ]);
+
+        $masterParam = null;
+        if (!empty($validated['master_parameter_id'])) {
+            $masterParam = DB::table('medical_master_parameter')
+                ->where('id', $validated['master_parameter_id'])
+                ->first();
+        }
+
+        $namaParameter = $masterParam->nama_parameter ?? ($validated['nama_parameter'] ?? null);
+        if (empty($namaParameter)) {
+            return response()->json([
+                'status'  => 'error',
+                'message' => 'Parameter pemeriksaan wajib dipilih atau diisi.',
+            ], 422);
+        }
+
+        $label = $masterParam
+            ? ($masterParam->label ?: $masterParam->nama_parameter)
+            : (!empty($validated['label']) ? $validated['label'] : $namaParameter);
+
+        $satuan = $masterParam->satuan ?? ($validated['satuan'] ?? null);
+        $metode = $masterParam->metode ?? ($validated['metode'] ?? null);
+        $urutan = $masterParam->urutan ?? ($validated['urutan'] ?? 0);
+
+        $mean = (float) $validated['target_mean'];
+        $sd   = (float) $validated['target_sd'];
+        $low  = $validated['batas_bawah'] !== null && $validated['batas_bawah'] !== ''
+            ? (float) $validated['batas_bawah']
+            : round($mean - (3 * $sd), 4);
+        $high = $validated['batas_atas'] !== null && $validated['batas_atas'] !== ''
+            ? (float) $validated['batas_atas']
+            : round($mean + (3 * $sd), 4);
+
+        $payload = [
+            'qc_material_id'        => $validated['qc_material_id'],
+            'master_pemeriksaan_id' => $validated['master_pemeriksaan_id'],
+            'master_parameter_id'   => $validated['master_parameter_id'] ?? null,
+            'nama_parameter'        => $namaParameter,
+            'label'                 => $label,
+            'satuan'                => $satuan,
+            'metode'                => $metode,
+            'target_mean'           => $mean,
+            'target_sd'             => $sd,
+            'batas_bawah'           => $low,
+            'batas_atas'            => $high,
+            'urutan'                => $urutan,
+            'updated_at'            => now(),
+        ];
+
+        if (!empty($validated['parameter_id'])) {
+            DB::table('medical_lab_qc_parameters')
+                ->where('id', $validated['parameter_id'])
+                ->update($payload);
+            $message = 'Parameter QC berhasil diperbarui.';
+        } else {
+            $payload['created_at'] = now();
+            DB::table('medical_lab_qc_parameters')->insert($payload);
+            $message = 'Parameter QC berhasil ditambahkan.';
+        }
+
+        return response()->json([
+            'status'  => 'success',
+            'message' => $message,
+        ]);
+    }
+
+    public function deleteParameter(Request $request)
+    {
+        $request->validate([
+            'id' => 'required|integer|exists:medical_lab_qc_parameters,id',
+        ]);
+
+        DB::table('medical_lab_qc_parameters')->where('id', $request->id)->delete();
+
+        return response()->json([
+            'status'  => 'success',
+            'message' => 'Parameter QC berhasil dihapus.',
+        ]);
+    }
+
+    public function storeLog(Request $request)
+    {
+        $validated = $request->validate([
+            'qc_material_id'   => 'required|integer|exists:medical_lab_qc_materials,id',
+            'qc_parameter_id'  => 'required|integer|exists:medical_lab_qc_parameters,id',
+            'tanggal_qc'       => 'required|date',
+            'jam_qc'           => 'required',
+            'nilai_hasil'      => 'required|numeric',
+            'catatan_tindakan' => 'nullable|string',
+        ]);
+
+        $param = DB::table('medical_lab_qc_parameters')
+            ->where('id', $validated['qc_parameter_id'])
+            ->where('qc_material_id', $validated['qc_material_id'])
+            ->first();
+
+        if (!$param) {
+            return response()->json([
+                'status'  => 'error',
+                'message' => 'Parameter QC tidak sesuai dengan bahan kontrol yang dipilih.',
+            ], 422);
+        }
+
+        // Cek log pada bahan kontrol, parameter, dan tanggal QC yang sama
+        $existingLog = DB::table('medical_lab_qc_logs')
+            ->where('qc_material_id', $validated['qc_material_id'])
+            ->where('qc_parameter_id', $validated['qc_parameter_id'])
+            ->where('tanggal_qc', $validated['tanggal_qc'])
+            ->orderBy('id', 'desc')
+            ->first();
+
+        // Jika sudah DISETUJUI -> tidak perlu diisi lagi
+        if ($existingLog && $existingLog->status_review === 'DISETUJUI') {
+            return response()->json([
+                'status'  => 'error',
+                'message' => 'Hasil QC untuk parameter dan bahan kontrol ini pada tanggal tersebut sudah DISETUJUI sehingga tidak perlu diisi lagi.',
+            ], 422);
+        }
+
+        $nilai = (float) $validated['nilai_hasil'];
+        $mean  = (float) $param->target_mean;
+        $sd    = (float) $param->target_sd;
+
+        $zScore = $sd > 0 ? round(($nilai - $mean) / $sd, 3) : 0;
+        $absZ   = abs($zScore);
+
+        $prevQuery = DB::table('medical_lab_qc_logs')
+            ->where('qc_parameter_id', $param->id)
+            ->where('qc_material_id', $validated['qc_material_id'])
+            ->where('tanggal_qc', '<=', $validated['tanggal_qc']);
+
+        // Jika sedang meng-update log MENUNGGU, exclude id tersebut agar tidak double hitung diri sendiri
+        if ($existingLog && $existingLog->status_review === 'MENUNGGU') {
+            $prevQuery->where('id', '!=', $existingLog->id);
+        }
+
+        $prevLogs = $prevQuery
+            ->orderBy('tanggal_qc', 'desc')
+            ->orderBy('id', 'desc')
+            ->limit(9)
+            ->pluck('z_score')
+            ->map(fn($v) => (float) $v)
+            ->toArray();
+
+        $recentZ = array_merge([$zScore], $prevLogs);
+
+        $statusQc = 'IN_CONTROL';
+        $ruleTriggered = 'OK (Within ±2 SD)';
+
+        // Aturan Westgard sederhana: 1_3s, 2_2s, R_4s, 10_x
+        if ($absZ >= 3.0) {
+            $statusQc = 'OUT_OF_CONTROL';
+            $ruleTriggered = 'Westgard 1-3s';
+        } elseif (count($recentZ) >= 2 && abs($recentZ[0]) >= 2.0 && abs($recentZ[1]) >= 2.0 && (($recentZ[0] > 0 && $recentZ[1] > 0) || ($recentZ[0] < 0 && $recentZ[1] < 0))) {
+            $statusQc = 'OUT_OF_CONTROL';
+            $ruleTriggered = 'Westgard 2-2s';
+        } elseif (count($recentZ) >= 2 && (max($recentZ[0], $recentZ[1]) - min($recentZ[0], $recentZ[1])) >= 4.0) {
+            $statusQc = 'OUT_OF_CONTROL';
+            $ruleTriggered = 'Westgard R-4s';
+        } elseif (count($recentZ) >= 10) {
+            $ten = array_slice($recentZ, 0, 10);
+            $allPos = count(array_filter($ten, fn($v) => $v > 0)) === 10;
+            $allNeg = count(array_filter($ten, fn($v) => $v < 0)) === 10;
+            if ($allPos || $allNeg) {
+                $statusQc = 'OUT_OF_CONTROL';
+                $ruleTriggered = 'Westgard 10-x';
+            }
+        } elseif ($absZ >= 2.0) {
+            $statusQc = 'WARNING_2SD';
+            $ruleTriggered = 'Warning 1-2s';
+        }
+
+        $petugas = Auth::user()->name ?? Auth::user()->nama ?? 'Analis Lab';
+
+        // Jika sudah ada dan statusnya masih MENUNGGU -> langsung update data tersebut
+        if ($existingLog && $existingLog->status_review === 'MENUNGGU') {
+            DB::table('medical_lab_qc_logs')
+                ->where('id', $existingLog->id)
+                ->update([
+                    'jam_qc'           => $validated['jam_qc'],
+                    'nilai_hasil'      => $nilai,
+                    'z_score'          => $zScore,
+                    'status_qc'        => $statusQc,
+                    'rule_triggered'   => $ruleTriggered,
+                    'catatan_tindakan' => $validated['catatan_tindakan'],
+                    'petugas_qc'       => $petugas,
+                    'status_review'    => 'MENUNGGU',
+                    'updated_at'       => now(),
+                ]);
+
+            return response()->json([
+                'status'         => 'success',
+                'action'         => 'updated',
+                'message'        => 'Data hasil QC yang masih menunggu validasi berhasil diperbarui.',
+                'z_score'        => $zScore,
+                'status_qc'      => $statusQc,
+                'rule_triggered' => $ruleTriggered,
+            ]);
+        }
+
+        // Jika belum ada atau sebelumnya DITOLAK -> insert log baru
+        DB::table('medical_lab_qc_logs')->insert([
+            'qc_material_id'   => $validated['qc_material_id'],
+            'qc_parameter_id'  => $validated['qc_parameter_id'],
+            'tanggal_qc'       => $validated['tanggal_qc'],
+            'jam_qc'           => $validated['jam_qc'],
+            'nilai_hasil'      => $nilai,
+            'z_score'          => $zScore,
+            'status_qc'        => $statusQc,
+            'rule_triggered'   => $ruleTriggered,
+            'catatan_tindakan' => $validated['catatan_tindakan'],
+            'petugas_qc'       => $petugas,
+            'status_review'    => 'MENUNGGU',
+            'created_at'       => now(),
+            'updated_at'       => now(),
+        ]);
+
+        return response()->json([
+            'status'         => 'success',
+            'action'         => 'inserted',
+            'message'        => $existingLog && $existingLog->status_review === 'DITOLAK'
+                ? 'Hasil QC baru berhasil disimpan menggantikan pengajuan yang ditolak.'
+                : 'Hasil QC harian berhasil dicatat.',
+            'z_score'        => $zScore,
+            'status_qc'      => $statusQc,
+            'rule_triggered' => $ruleTriggered,
+        ]);
+    }
+
+    public function reviewLog(Request $request)
+    {
+        $validated = $request->validate([
+            'id'            => 'required|integer|exists:medical_lab_qc_logs,id',
+            'status_review' => 'required|in:DISETUJUI,DITOLAK',
+        ]);
+
+        $reviewer = Auth::user()->name ?? Auth::user()->nama ?? 'Supervisor Lab';
+
+        DB::table('medical_lab_qc_logs')
+            ->where('id', $validated['id'])
+            ->update([
+                'status_review' => $validated['status_review'],
+                'verified_by'   => $reviewer,
+                'verified_at'   => now(),
+                'updated_at'    => now(),
+            ]);
+
+        return response()->json([
+            'status'  => 'success',
+            'message' => 'Status review log QC berhasil diperbarui.',
+        ]);
+    }
+    // 1. Endpoint untuk menerima JSON hasil dari alat / bridge LIS
+    public function receiveIncomingQc(Request $request)
+    {
+        $validated = $request->validate([
+            'instrumentID' => 'nullable|integer',
+            'instrument_id' => 'nullable|integer',
+            'nolab'        => 'nullable|string|max:100',
+            'tanggal'      => 'nullable|string',
+            'result'       => 'required|array|min:1',
+        ]);
+
+        $instrumentId = $validated['instrumentID'] ?? $validated['instrument_id'] ?? null;
+        $tanggalAlat  = !empty($validated['tanggal']) ? date('Y-m-d H:i:s', strtotime($validated['tanggal'])) : now();
+
+        $id = DB::table('medical_lab_qc_incoming')->insertGetId([
+            'instrument_id' => $instrumentId,
+            'nolab'         => $validated['nolab'] ?? null,
+            'tanggal_alat'  => $tanggalAlat,
+            'payload_json'  => json_encode($request->all()),
+            'status'        => 'PENDING',
+            'created_at'    => now(),
+            'updated_at'    => now(),
+        ]);
+
+        return response()->json([
+            'status'      => 'success',
+            'message'     => 'Data hasil QC dari alat berhasil diterima.',
+            'incoming_id' => $id,
+        ]);
+    }
+
+    // 2. Dipanggil oleh modal saat polling menunggu data dari alat
+    public function pollIncomingQc(Request $request)
+    {
+        $instrumentId = $request->query('instrument_id');
+
+        $query = DB::table('medical_lab_qc_incoming as inc')
+            ->leftJoin('medical_master_alat as a', 'inc.instrument_id', '=', 'a.instrument_id')
+            ->where('inc.status', 'PENDING')
+            ->select('inc.*', 'a.nama_alat', 'a.kode_alat');
+
+        if (!empty($instrumentId)) {
+            $query->where('inc.instrument_id', $instrumentId);
+        }
+
+        $incoming = $query->orderBy('inc.id', 'desc')->first();
+
+        if (!$incoming) {
+            return response()->json([
+                'found' => false,
+            ]);
+        }
+
+        $decoded = json_decode($incoming->payload_json, true);
+
+        return response()->json([
+            'found'        => true,
+            'incoming_id'  => $incoming->id,
+            'instrument_id' => $incoming->instrument_id,
+            'nama_alat'    => $incoming->nama_alat ?? 'Analyzer',
+            'nolab'        => $incoming->nolab,
+            'tanggal_alat' => $incoming->tanggal_alat,
+            'total_item'   => count($decoded['result'] ?? []),
+        ]);
+    }
+
+    // 3. Proses data incoming -> cocokkan parameter QC -> hitung Z-Score/Westgard -> simpan ke logs
+    public function processIncomingQc(Request $request)
+    {
+        $validated = $request->validate([
+            'incoming_id'    => 'required|integer|exists:medical_lab_qc_incoming,id',
+            'qc_material_id' => 'required|integer|exists:medical_lab_qc_materials,id',
+            'catatan'        => 'nullable|string',
+        ]);
+
+        $incoming = DB::table('medical_lab_qc_incoming')
+            ->where('id', $validated['incoming_id'])
+            ->first();
+
+        if (!$incoming) {
+            return response()->json(['status' => 'error', 'message' => 'Data incoming tidak ditemukan.'], 404);
+        }
+
+        $decoded = json_decode($incoming->payload_json, true);
+        $items   = $decoded['result'] ?? [];
+
+        // Ambil parameter QC aktif untuk material terpilih
+        $qcParams = DB::table('medical_lab_qc_parameters')
+            ->where('qc_material_id', $validated['qc_material_id'])
+            ->where('is_active', 1)
+            ->get();
+
+        // Map berdasarkan nama_parameter (misal "HGB" atau "Hemoglobin (HGB)" mengandung "HGB")
+        $savedCount = 0;
+        $matchedList = [];
+        $petugas = Auth::user()->name ?? Auth::user()->nama ?? 'Analis Lab';
+
+        foreach ($items as $row) {
+            $pxCode = strtoupper(trim($row['px'] ?? ''));
+            $rawVal = $row['result'] ?? null;
+
+            // Lewati parameter non-numerik (seperti scattergram PNG atau flag interpretasi)
+            if ($pxCode === '' || $rawVal === null || !is_numeric($rawVal)) {
+                continue;
+            }
+
+            $matchedParam = $qcParams->first(function ($p) use ($pxCode) {
+                $paramName = strtoupper($p->nama_parameter);
+                return $paramName === $pxCode
+                    || str_contains($paramName, "({$pxCode})")
+                    || str_starts_with($paramName, $pxCode . ' ');
+            });
+
+            if (!$matchedParam) {
+                continue;
+            }
+
+            $nilai = (float) $rawVal;
+            $mean  = (float) $matchedParam->target_mean;
+            $sd    = (float) $matchedParam->target_sd;
+            $zScore = $sd > 0 ? round(($nilai - $mean) / $sd, 3) : 0;
+            $absZ   = abs($zScore);
+
+            $prevLogs = DB::table('medical_lab_qc_logs')
+                ->where('qc_parameter_id', $matchedParam->id)
+                ->orderBy('tanggal_qc', 'desc')
+                ->orderBy('id', 'desc')
+                ->limit(9)
+                ->pluck('z_score')
+                ->map(fn($v) => (float) $v)
+                ->toArray();
+
+            $recentZ = array_merge([$zScore], $prevLogs);
+
+            $statusQc = 'IN_CONTROL';
+            $ruleTriggered = 'OK (Within ±2 SD)';
+
+            if ($absZ >= 3.0) {
+                $statusQc = 'OUT_OF_CONTROL';
+                $ruleTriggered = 'Westgard 1-3s';
+            } elseif (count($recentZ) >= 2 && abs($recentZ[0]) >= 2.0 && abs($recentZ[1]) >= 2.0 && (($recentZ[0] > 0 && $recentZ[1] > 0) || ($recentZ[0] < 0 && $recentZ[1] < 0))) {
+                $statusQc = 'OUT_OF_CONTROL';
+                $ruleTriggered = 'Westgard 2-2s';
+            } elseif (count($recentZ) >= 2 && (max($recentZ[0], $recentZ[1]) - min($recentZ[0], $recentZ[1])) >= 4.0) {
+                $statusQc = 'OUT_OF_CONTROL';
+                $ruleTriggered = 'Westgard R-4s';
+            } elseif (count($recentZ) >= 10) {
+                $ten = array_slice($recentZ, 0, 10);
+                $allPos = count(array_filter($ten, fn($v) => $v > 0)) === 10;
+                $allNeg = count(array_filter($ten, fn($v) => $v < 0)) === 10;
+                if ($allPos || $allNeg) {
+                    $statusQc = 'OUT_OF_CONTROL';
+                    $ruleTriggered = 'Westgard 10-x';
+                }
+            } elseif ($absZ >= 2.0) {
+                $statusQc = 'WARNING_2SD';
+                $ruleTriggered = 'Warning 1-2s';
+            }
+
+            $dtString = !empty($row['date']) ? strtotime($row['date']) : strtotime($incoming->tanggal_alat ?? now());
+            $tglQc = date('Y-m-d', $dtString);
+            $jamQc = date('H:i:s', $dtString);
+
+            DB::table('medical_lab_qc_logs')->insert([
+                'qc_material_id'   => $validated['qc_material_id'],
+                'qc_parameter_id'  => $matchedParam->id,
+                'tanggal_qc'       => $tglQc,
+                'jam_qc'           => $jamQc,
+                'nilai_hasil'      => $nilai,
+                'z_score'          => $zScore,
+                'status_qc'        => $statusQc,
+                'rule_triggered'   => $ruleTriggered,
+                'catatan_tindakan' => $validated['catatan'] ?? ('Auto-QC Alat (' . ($incoming->nolab ?? '-') . ')'),
+                'petugas_qc'       => $petugas,
+                'status_review'    => 'MENUNGGU',
+                'created_at'       => now(),
+                'updated_at'       => now(),
+            ]);
+
+            $savedCount++;
+            $matchedList[] = "{$pxCode}: {$nilai} ({$statusQc})";
+        }
+
+        DB::table('medical_lab_qc_incoming')
+            ->where('id', $incoming->id)
+            ->update([
+                'status'       => 'PROCESSED',
+                'processed_at' => now(),
+                'updated_at'   => now(),
+            ]);
+
+        return response()->json([
+            'status'      => 'success',
+            'saved_count' => $savedCount,
+            'message'     => $savedCount > 0
+                ? "{$savedCount} hasil parameter QC berhasil diproses dan disimpan."
+                : "Data diterima, namun tidak ada kode parameter (`px`) yang cocok dengan parameter QC pada bahan kontrol ini.",
+            'details'     => $matchedList,
+        ]);
     }
 }

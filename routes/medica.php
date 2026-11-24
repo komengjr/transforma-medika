@@ -50,6 +50,7 @@ Route::prefix('{akses}/{id}/application')->group(function () {
     Route::get('pendaftaran-lab/registrasi', [LaboratoriumController::class, 'pendaftaran_lab_registrasi'])->name('pendaftaran_lab_registrasi');
     Route::get('interface-lab/data-result', [LaboratoriumController::class, 'interfave_lab_data_result'])->name('interfave_lab_data_result');
     Route::get('master-laboratorium/parameter-pemeriksaan', [LaboratoriumController::class, 'master_lab_parameter_pemeriksaan'])->name('master_lab_parameter_pemeriksaan');
+    Route::get('master-laboratorium/master-qc-laboratorium', [LaboratoriumController::class, 'master_lab_quality_control'])->name('master_lab_quality_control');
     // RADIOLOGI
     Route::get('menu-radiologi/data-registrasi-radiologi', [RadiologiController::class, 'data_registrasi_radiologi'])->name('data_registrasi_radiologi');
     Route::get('menu-radiologi/radiologi-handling', [RadiologiController::class, 'menu_radiologi_handling'])->name('menu_radiologi_handling');
@@ -465,3 +466,16 @@ Route::any('/pacs-proxy/{path?}', [RadiologiController::class, 'orthanc_proxy'])
     ->where('path', '.*')
     ->name('pacs.proxy');
 Route::get('/application/radiologi/pacs-server/{akses}/{id}/studies', [RadiologiController::class, 'pacs_studies_index'])->name('pacs.studies');
+
+
+Route::prefix('lab-qc')->group(function () {
+    Route::post('/material/store', [LaboratoriumController::class, 'storeMaterial'])->name('lab_qc.material.store');
+    Route::delete('/material/delete', [LaboratoriumController::class, 'deleteMaterial'])->name('lab_qc.material.delete');
+    Route::post('/parameter/store', [LaboratoriumController::class, 'storeParameter'])->name('lab_qc.parameter.store');
+    Route::delete('/parameter/delete', [LaboratoriumController::class, 'deleteParameter'])->name('lab_qc.parameter.delete');
+    Route::post('/log/store', [LaboratoriumController::class, 'storeLog'])->name('lab_qc.log.store');
+    Route::post('/log/review', [LaboratoriumController::class, 'reviewLog'])->name('lab_qc.log.review');
+    Route::post('/incoming', [LaboratoriumController::class, 'receiveIncomingQc'])->name('lab_qc.incoming.receive');
+    Route::get('incoming/poll', [LaboratoriumController::class, 'pollIncomingQc'])->name('lab_qc.incoming.poll');
+    Route::post('incoming/process', [LaboratoriumController::class, 'processIncomingQc'])->name('lab_qc.incoming.process');
+});
