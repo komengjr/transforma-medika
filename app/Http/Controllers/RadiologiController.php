@@ -62,6 +62,22 @@ class RadiologiController extends Controller
     }
     public function data_registrasi_radiologi_table(Request $request)
     {
+        $radCategoryFilter = function ($q) {
+            $q->where('tl.prefix', 'LIKE', '%RAD%')
+                ->orWhere('td.no_pemeriksaan', 'LIKE', 'RAD%')
+                ->orWhere(function ($subQ) {
+                    $subQ->where('mp.is_paket', 1)
+                        ->whereExists(function ($query) {
+                            $query->select(DB::raw(1))
+                                ->from('medical_paket_detail as pd')
+                                ->join('medical_master_pemeriksaan as sub_mp', 'pd.pemeriksaan_id', '=', 'sub_mp.id')
+                                ->join('medical_tipe_layanan as sub_tl', 'sub_mp.tipe_layanan_id', '=', 'sub_tl.id')
+                                ->whereColumn('pd.paket_id', 'mp.id')
+                                ->where('sub_tl.prefix', 'LIKE', '%RAD%');
+                        });
+                });
+        };
+
         // Base Query menggunakan skema medical_registrasi, transaksi, dan detail yang baru
         $query = DB::table('medical_transaksi_detail as td')
             ->join('medical_transaksi as t', 'td.transaksi_id', '=', 't.id')
@@ -71,23 +87,8 @@ class RadiologiController extends Controller
             ->leftJoin('medical_tipe_layanan as tl', 'mp.tipe_layanan_id', '=', 'tl.id')
             ->leftJoin('medical_sub_penjamin as sp', 'reg.sub_penjamin_id', '=', 'sp.id')
             ->leftJoin('medical_master_doctor as doc_pengirim', 'doc_pengirim.id', '=', 'reg.doctor_id')
-            ->where(function ($q) {
-                // Filter hanya yang masuk kategori Radiologi (RAD)
-                $q->where('tl.prefix', 'LIKE', '%RAD%')
-                    ->orWhere('td.no_pemeriksaan', 'LIKE', 'RAD%')
-                    ->orWhere(function ($subQ) {
-                        $subQ->where('mp.is_paket', 1)
-                            ->whereExists(function ($query) {
-                                $query->select(DB::raw(1))
-                                    ->from('medical_paket_detail as pd')
-                                    ->join('medical_master_pemeriksaan as sub_mp', 'pd.pemeriksaan_id', '=', 'sub_mp.id')
-                                    ->join('medical_tipe_layanan as sub_tl', 'sub_mp.tipe_layanan_id', '=', 'sub_tl.id')
-                                    ->whereColumn('pd.paket_id', 'mp.id')
-                                    ->where('sub_tl.prefix', 'LIKE', '%RAD%');
-                            });
-                    });
-            })
-            ->whereNull('td.deleted_at'); // Mengakomodasi softDeletes()
+            ->where($radCategoryFilter)
+            ->whereNull('td.deleted_at');
 
         // Filter Rentang Tanggal berdasarkan kolom tanggal_registrasi
         $tglAwal = $request->input('tgl1');
@@ -121,6 +122,9 @@ class RadiologiController extends Controller
         $totalQuery = DB::table('medical_transaksi_detail as td')
             ->join('medical_transaksi as t', 'td.transaksi_id', '=', 't.id')
             ->join('medical_registrasi as reg', 't.registrasi_id', '=', 'reg.id')
+            ->join('medical_master_pemeriksaan as mp', 'td.master_pemeriksaan_id', '=', 'mp.id')
+            ->leftJoin('medical_tipe_layanan as tl', 'mp.tipe_layanan_id', '=', 'tl.id')
+            ->where($radCategoryFilter)
             ->whereNull('td.deleted_at');
 
         if ($tglAwal && $tglAkhir) {
@@ -226,7 +230,6 @@ class RadiologiController extends Controller
                 'items' => $itemsPemeriksaan
             ];
         })->filter(function ($group) {
-            // Pastikan baris registrasi tidak kosong itemnya setelah difilter
             return count($group->items) > 0;
         })->values();
 
@@ -236,85 +239,88 @@ class RadiologiController extends Controller
 
         foreach ($groupedData as $datas) {
             $noRegHtml = '<div class="d-flex flex-column">
-                        <span class="code-block text-info">' . e($datas->no_registrasi) . '</span>
-                        <span class="text-muted fs--2 mt-1">Reg. Kunjungan</span>
-                      </div>';
+                    <span class="code-block text-primary">' . e($datas->no_registrasi) . '</span>
+                    <span class="opacity-75 fs--2 mt-1 fw-semibold">Reg. Kunjungan</span>
+                  </div>';
 
-            $pasienHtml = '<div class="fw-bold text-dark">' . e($datas->nama_pasien) . '</div>
-                       <span class="text-muted fs--2">PID: ' . e($datas->rm_pasien) . '</span>';
+            $pasienHtml = '<div class="fw-bold">' . e($datas->nama_pasien) . '</div>
+                   <span class="opacity-75 fs--2 fw-semibold" style="font-family: \'JetBrains Mono\', monospace;">PID: ' . e($datas->rm_pasien) . '</span>';
 
-            $tglHtml = '<div class="text-nowrap text-secondary">
-                        <i class="far fa-clock me-1 opacity-50"></i>' . date('d/m/Y H:i', strtotime($datas->tanggal_registrasi)) . '
-                    </div>';
+            $tglHtml = '<div class="text-nowrap fw-semibold" style="font-family: \'JetBrains Mono\', monospace; font-size: 0.78rem;">
+                    <i class="far fa-clock me-1 text-primary opacity-75"></i>' . date('d/m/Y H:i', strtotime($datas->tanggal_registrasi)) . '
+                </div>';
 
-            $rujukanHtml = '<span class="text-dark fw-medium">' . e($datas->dokter ?? '-') . '</span>';
+            $rujukanHtml = '<span class="fw-semibold">' . e($datas->dokter ?? '-') . '</span>';
 
-            $pemeriksaanHtml = '<div class="d-flex flex-column gap-3">';
+            $pemeriksaanHtml = '<div class="d-flex flex-column gap-2">';
             foreach ($datas->items as $item) {
                 $paketBadge = ($item['is_paket'] == 1 || $item['is_paket'] == true)
-                    ? '<span class="badge bg-warning text-dark ms-1" style="font-size: 0.65rem;">PAKET</span>'
+                    ? '<span class="ent-badge ms-1" style="background: rgba(217, 119, 6, 0.14); color: #d97706; border: 1px solid rgba(217, 119, 6, 0.35); font-size: 0.62rem;">PAKET</span>'
                     : '';
 
                 $subPaketHtml = '';
                 if (($item['is_paket'] == 1 || $item['is_paket'] == true) && !empty($item['sub_paket']) && count($item['sub_paket']) > 0) {
-                    $subPaketHtml .= '<div class="ms-3 border-start ps-2 my-1">
-                                    <span class="text-xs fw-bold text-muted d-block mb-1" style="font-size: 0.7rem;">Isi Paket Pemeriksaan:</span>';
+                    $subPaketHtml .= '<div class="ms-3 ps-2 my-1" style="border-left: 2px solid var(--ent-grid-border);">
+                                <span class="fw-bold opacity-75 d-block mb-1" style="font-size: 0.7rem;">Isi Paket Pemeriksaan:</span>';
                     foreach ($item['sub_paket'] as $sub) {
-                        $subPaketHtml .= '<span class="text-dark fs--2 d-block mb-1">
-                                            <i class="fas fa-angle-right text-info me-1"></i> ' . e($sub->nama_layanan) . ' <span class="text-muted">(' . e($sub->kode_layanan) . ')</span>
-                                         </span>';
+                        $subPaketHtml .= '<span class="fs--2 d-block mb-1 fw-medium">
+                                        <i class="fas fa-angle-right text-primary me-1"></i> ' . e($sub->nama_layanan) . ' <span class="opacity-75">(' . e($sub->kode_layanan) . ')</span>
+                                     </span>';
                     }
                     $subPaketHtml .= '</div>';
                 }
 
-                $pemeriksaanHtml .= '<div class="border-bottom pb-2 mb-1">
-                                    <div>
-                                        <span class="list-pemeriksaan-tag">
-                                            <i class="fas fa-radiation me-1 text-info fs--2"></i>' . e($item['nama_layanan']) . $paketBadge . '
-                                        </span>
-                                        <div class="code-block text-danger fs--2 mt-1">
-                                            <i class="fas fa-barcode me-1"></i>' . e($item['no_pemeriksaan']) . '
-                                        </div>
+                $pemeriksaanHtml .= '<div class="pb-2 mb-1" style="border-bottom: 1px dashed var(--ent-grid-border);">
+                                <div>
+                                    <span class="list-pemeriksaan-tag">
+                                        <i class="fas fa-radiation me-1 text-primary fs--2"></i>' . e($item['nama_layanan']) . $paketBadge . '
+                                    </span>
+                                    <div class="code-block text-danger fs--2 mt-1">
+                                        <i class="fas fa-barcode me-1"></i>' . e($item['no_pemeriksaan']) . '
                                     </div>
-                                    ' . $subPaketHtml . '
-                                 </div>';
+                                </div>
+                                ' . $subPaketHtml . '
+                             </div>';
             }
             $pemeriksaanHtml .= '</div>';
 
-            $status = $datas->items[0]['status_pemeriksaan'] ?? 'MENUNGGU';
+            $status = strtoupper($datas->items[0]['status_pemeriksaan'] ?? 'MENUNGGU');
             if ($status == 'MENUNGGU') {
-                $statusHtml = '<span class="badge badge-soft-danger px-2 py-1 rounded-pill"><i class="fas fa-exclamation-circle me-1"></i>Belum</span>';
+                $statusHtml = '<span class="ent-badge" style="background: rgba(225, 29, 72, 0.14); color: #e11d48; border: 1px solid rgba(225, 29, 72, 0.35);"><i class="fas fa-exclamation-circle me-1"></i>Belum</span>';
             } elseif ($status == 'PROSES') {
-                $statusHtml = '<span class="badge badge-soft-warning px-2 py-1 rounded-pill"><i class="fas fa-spinner fa-spin me-1"></i>Proses</span>';
+                $statusHtml = '<span class="ent-badge" style="background: rgba(217, 119, 6, 0.14); color: #d97706; border: 1px solid rgba(217, 119, 6, 0.35);"><i class="fas fa-spinner fa-spin me-1"></i>Proses</span>';
             } elseif ($status == 'SELESAI') {
-                $statusHtml = '<span class="badge badge-soft-success px-2 py-1 rounded-pill"><i class="fas fa-check me-1"></i>Selesai</span>';
+                $statusHtml = '<span class="ent-badge" style="background: rgba(5, 150, 105, 0.14); color: #059669; border: 1px solid rgba(5, 150, 105, 0.35);"><i class="fas fa-check me-1"></i>Selesai</span>';
             } elseif ($status == 'BATAL') {
-                $statusHtml = '<span class="badge bg-dark text-white px-2 py-1 rounded-pill"><i class="fas fa-times me-1"></i>Batal</span>';
+                $statusHtml = '<span class="ent-badge" style="background: rgba(100, 116, 139, 0.16); color: #64748b; border: 1px solid rgba(100, 116, 139, 0.35);"><i class="fas fa-times me-1"></i>Batal</span>';
             } else {
-                $statusHtml = '<span class="badge badge-soft-info px-2 py-1 rounded-pill">' . e($status) . '</span>';
+                $statusHtml = '<span class="ent-badge" style="background: rgba(2, 132, 199, 0.14); color: #0284c7; border: 1px solid rgba(2, 132, 199, 0.35);">' . e($status) . '</span>';
             }
 
-            $firstNoPemeriksaan = $datas->items[0]['no_pemeriksaan'] ?? '';
-            $actionHtml = '<div class="dropdown font-sans-serif position-static">
-                        <button class="btn btn-link text-600 btn-sm dropdown-toggle btn-reveal" type="button" data-bs-toggle="dropdown" data-boundary="viewport" aria-haspopup="true" aria-expanded="false">
-                            <span class="fas fa-ellipsis-h fs--1"></span>
-                        </button>
-                        <div class="dropdown-menu dropdown-menu-end border py-2">
-                            <a class="dropdown-item text-info fw-medium button-proses-handling-rad" href="#" data-bs-toggle="modal" data-bs-target="#modal-radiologi" data-code="' . e($firstNoPemeriksaan) . '">
-                                <i class="fas fa-radiation me-2"></i>Proses Handling Pasien
+            $firstNoPemeriksaan = $datas->items[0]['no_pemeriksaan'] ?? $datas->no_registrasi;
+            $actionHtml = '<div class="dropdown">
+                    <button class="btn" type="button" data-bs-toggle="dropdown" aria-expanded="false" title="Menu Aksi">
+                        <i class="fas fa-ellipsis-v"></i>
+                    </button>
+                    <ul class="dropdown-menu ent-dropdown-menu py-2">
+                        <li>
+                            <a class="dropdown-item fw-semibold py-2 button-proses-handling-rad" href="#" data-bs-toggle="modal" data-bs-target="#modal-radiologi" data-code="' . e($firstNoPemeriksaan) . '">
+                                <i class="fas fa-radiation me-2 text-primary"></i> Proses Handling Pasien
                             </a>
-                        </div>
-                       </div>';
+                        </li>
+                    </ul>
+                   </div>';
 
             $formattedData[] = [
                 'no'            => $no++,
+                'code'          => $firstNoPemeriksaan,
                 'no_registrasi' => $noRegHtml,
                 'nama_pasien'   => $pasienHtml,
                 'tanggal_reg'   => $tglHtml,
                 'rujukan'       => $rujukanHtml,
                 'pemeriksaan'   => $pemeriksaanHtml,
-                'status'        => '<div class="text-center">' . $statusHtml . '</div>',
-                'action'        => '<div class="text-center">' . $actionHtml . '</div>'
+                'status'        => $statusHtml,
+                'action'        => $actionHtml
             ];
         }
 

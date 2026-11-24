@@ -1,39 +1,198 @@
-<div class="card retro-card border-0 mb-0">
-    <div class="card-header py-3 px-4 d-flex justify-content-between align-items-center" style="background-color: var(--retro-green); border-bottom: 3px solid var(--retro-dark);">
-        <h5 class="mb-0 text-dark fw-bolder">
-            <i class="fas fa-bed me-2"></i> Form Handling Pasien Rawat Inap: <span class="text-danger">{{ $pasien->nama_pasien }}</span> (RM: {{ $pasien->pid }})
-        </h5>
-        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+<style>
+    .ranap-info-box {
+        background-color: rgba(79, 70, 229, 0.05);
+        border: 1px solid var(--ent-grid-border);
+        border-radius: 12px;
+        padding: 14px 16px;
+    }
+
+    .ranap-subbox {
+        background-color: rgba(79, 70, 229, 0.04);
+        border: 1px solid var(--ent-grid-border);
+        border-radius: 12px;
+        padding: 14px 16px;
+    }
+
+    .ent-nav-tabs {
+        border-bottom: 1px solid var(--ent-grid-border) !important;
+        gap: 6px;
+    }
+
+    .ent-nav-tabs .nav-link {
+        border: 1px solid transparent !important;
+        border-radius: 10px 10px 0 0 !important;
+        font-weight: 700 !important;
+        font-size: 0.8rem !important;
+        color: var(--bs-secondary-color, #64748b) !important;
+        padding: 9px 14px !important;
+        transition: all 0.15s ease;
+    }
+
+    .ent-nav-tabs .nav-link:hover {
+        color: var(--bs-body-color) !important;
+        background-color: rgba(79, 70, 229, 0.06) !important;
+    }
+
+    .ent-nav-tabs .nav-link.active {
+        color: var(--ent-indigo) !important;
+        background-color: var(--bs-body-bg) !important;
+        border-color: var(--ent-grid-border) var(--ent-grid-border) var(--bs-body-bg) !important;
+    }
+
+    [data-bs-theme="dark"] .ent-nav-tabs .nav-link.active,
+    .dark .ent-nav-tabs .nav-link.active {
+        color: #a5b4fc !important;
+    }
+
+    .ent-textarea {
+        border: 1px solid var(--ent-grid-border) !important;
+        border-radius: 10px !important;
+        font-weight: 500 !important;
+        color: var(--bs-body-color) !important;
+        background-color: var(--bs-body-bg) !important;
+        padding: 10px 12px !important;
+        font-size: 0.82rem !important;
+        min-height: 42px;
+        transition: all 0.2s ease;
+    }
+
+    .ent-textarea:focus {
+        border-color: var(--ent-indigo) !important;
+        box-shadow: 0 0 0 3.5px rgba(79, 70, 229, 0.15) !important;
+        outline: none;
+    }
+
+    .ent-btn-success {
+        background: linear-gradient(135deg, #059669 0%, #047857 100%);
+        border: none;
+        color: #ffffff;
+        box-shadow: 0 4px 12px rgba(5, 150, 105, 0.25);
+    }
+
+    .ent-btn-success:hover {
+        box-shadow: 0 6px 16px rgba(5, 150, 105, 0.35);
+        color: #ffffff;
+    }
+
+    .ent-btn-secondary {
+        background-color: rgba(100, 116, 139, 0.14);
+        border: 1px solid var(--ent-grid-border);
+        color: var(--bs-body-color);
+    }
+
+    .ent-btn-secondary:hover {
+        background-color: rgba(100, 116, 139, 0.24);
+        color: var(--bs-body-color);
+    }
+
+    /* Choices.js Adaptive Styling inside Modal */
+    #modal-handling-ranap .choices {
+        margin-bottom: 0;
+    }
+
+    #modal-handling-ranap .choices__inner {
+        min-height: 38px;
+        padding: 4px 10px;
+        border-radius: 10px;
+        background-color: var(--bs-body-bg);
+        border: 1px solid var(--ent-grid-border);
+        color: var(--bs-body-color);
+        font-size: 0.8rem;
+        font-weight: 600;
+        display: flex;
+        align-items: center;
+    }
+
+    #modal-handling-ranap .choices.is-focused .choices__inner,
+    #modal-handling-ranap .choices.is-open .choices__inner {
+        border-color: var(--ent-indigo);
+        box-shadow: 0 0 0 3.5px rgba(79, 70, 229, 0.15);
+    }
+
+    #modal-handling-ranap .choices__list--dropdown,
+    #modal-handling-ranap .choices__list[aria-expanded] {
+        background-color: var(--bs-body-bg, var(--ent-surface));
+        color: var(--bs-body-color);
+        border: 1px solid var(--ent-grid-border);
+        border-radius: 10px;
+        box-shadow: 0 14px 28px -6px rgba(15, 23, 42, 0.22);
+        z-index: 1090;
+    }
+
+    #modal-handling-ranap .choices__input {
+        background-color: var(--bs-body-bg);
+        color: var(--bs-body-color);
+        font-size: 0.8rem;
+        margin-bottom: 0;
+    }
+
+    #modal-handling-ranap .choices__list--dropdown .choices__item--selectable.is-highlighted {
+        background-color: var(--ent-indigo);
+        color: #ffffff;
+    }
+</style>
+
+<div class="card ent-card border-0 mb-0">
+    <div class="ent-card-header py-3 px-4 d-flex justify-content-between align-items-center gap-2">
+        <div class="d-flex flex-wrap align-items-center gap-2">
+            <h6 class="mb-0 fw-bold d-flex align-items-center gap-2">
+                <i class="fas fa-bed text-primary"></i>
+                <span>Form Handling Pasien Rawat Inap:</span>
+                <span class="text-danger">{{ $pasien->nama_pasien }}</span>
+            </h6>
+            <span class="code-chip">RM: {{ $pasien->pid }}</span>
+        </div>
+        <button type="button" class="btn btn-sm ent-btn ent-btn-secondary d-flex align-items-center justify-content-center" data-bs-dismiss="modal" aria-label="Close" style="width: 32px; height: 32px; border-radius: 50%; padding: 0;">
+            <i class="fas fa-times"></i>
+        </button>
     </div>
 
-    <div class="card-body p-4 bg-white">
+    <div class="card-body p-3 p-md-4 ent-table-surface">
         <!-- Info Singkat Pasien & Penjamin -->
-        <div class="alert alert-light border border-dark mb-4 shadow-sm" style="border-radius: 8px;">
+        <div class="ranap-info-box mb-4">
             <div class="row g-2 fs--1">
-                <div class="col-md-3"><strong>No. Registrasi:</strong> <span class="text-success fw-bold">{{ $pasien->no_registrasi }}</span></div>
-                <div class="col-md-3"><strong>Tgl Masuk:</strong> {{ date('d/m/Y H:i', strtotime($pasien->tanggal_registrasi)) }}</div>
-                <div class="col-md-3"><strong>Ruangan:</strong> {{ $pasien->nama_ruangan ?? '-' }} ({{ $pasien->nomor_bed }})</div>
-                <div class="col-md-3"><strong>DPJP:</strong> {{ $pasien->nama_dokter ?? '-' }}</div>
-                <div class="col-md-6 pt-2 border-top border-dark mt-2"><strong>Penjamin Utama:</strong> <span class="text-primary fw-bold">{{ $pasien->nama_penjamin ?? 'Umum / Mandiri' }}</span></div>
-                <div class="col-md-6 pt-2 border-top border-dark mt-2"><strong>Sub Penjamin:</strong> <span class="text-danger fw-bold">{{ $pasien->nama_sub_penjamin ?? '-' }}</span></div>
+                <div class="col-sm-6 col-lg-3">
+                    <span class="ent-field-label">No. Registrasi</span>
+                    <span class="fw-bold text-primary" style="font-family: 'JetBrains Mono', monospace;">{{ $pasien->no_registrasi }}</span>
+                </div>
+                <div class="col-sm-6 col-lg-3">
+                    <span class="ent-field-label">Tgl Masuk</span>
+                    <span class="fw-semibold" style="font-family: 'JetBrains Mono', monospace;">{{ date('d/m/Y H:i', strtotime($pasien->tanggal_registrasi)) }}</span>
+                </div>
+                <div class="col-sm-6 col-lg-3">
+                    <span class="ent-field-label">Ruangan / Bed</span>
+                    <span class="fw-semibold">{{ $pasien->nama_ruangan ?? '-' }} <span class="text-success fw-bold">({{ $pasien->nomor_bed }})</span></span>
+                </div>
+                <div class="col-sm-6 col-lg-3">
+                    <span class="ent-field-label">Dokter DPJP</span>
+                    <span class="fw-semibold"><i class="fas fa-user-md text-primary me-1"></i>{{ $pasien->nama_dokter ?? '-' }}</span>
+                </div>
+                <div class="col-sm-6 pt-2 mt-2" style="border-top: 1px dashed var(--ent-grid-border);">
+                    <span class="ent-field-label">Penjamin Utama</span>
+                    <span class="fw-bold text-primary">{{ $pasien->nama_penjamin ?? 'Umum / Mandiri' }}</span>
+                </div>
+                <div class="col-sm-6 pt-2 mt-2" style="border-top: 1px dashed var(--ent-grid-border);">
+                    <span class="ent-field-label">Sub Penjamin</span>
+                    <span class="fw-bold text-danger">{{ $pasien->nama_sub_penjamin ?? '-' }}</span>
+                </div>
             </div>
         </div>
 
         <!-- Tab Navigasi -->
-        <ul class="nav nav-tabs border-0 mb-3" id="handlingRanapTab" role="tablist">
+        <ul class="nav nav-tabs ent-nav-tabs mb-3" id="handlingRanapTab" role="tablist">
             <li class="nav-item" role="presentation">
-                <button class="nav-link active fw-bold" id="soap-ranap-tab" data-bs-toggle="tab" data-bs-target="#soap-ranap-pane" type="button" role="tab">
-                    <i class="fas fa-id-card me-1"></i> 1. SOAP & Perkembangan
+                <button class="nav-link active" id="soap-ranap-tab" data-bs-toggle="tab" data-bs-target="#soap-ranap-pane" type="button" role="tab">
+                    <i class="fas fa-notes-medical me-1"></i> 1. SOAP &amp; Perkembangan
                 </button>
             </li>
             <li class="nav-item" role="presentation">
-                <button class="nav-link fw-bold" id="tindakan-ranap-tab" data-bs-toggle="tab" data-bs-target="#tindakan-ranap-pane" type="button" role="tab">
-                    <i class="fas fa-stethoscope me-1"></i> 2. Tindakan & Visite
+                <button class="nav-link" id="tindakan-ranap-tab" data-bs-toggle="tab" data-bs-target="#tindakan-ranap-pane" type="button" role="tab">
+                    <i class="fas fa-stethoscope me-1"></i> 2. Tindakan &amp; Visite
                 </button>
             </li>
             <li class="nav-item" role="presentation">
-                <button class="nav-link fw-bold text-danger" id="resep-ranap-tab" data-bs-toggle="tab" data-bs-target="#resep-ranap-pane" type="button" role="tab">
-                    <i class="fas fa-pills me-1"></i> 3. Order Resep / Obat Farmasi
+                <button class="nav-link" id="resep-ranap-tab" data-bs-toggle="tab" data-bs-target="#resep-ranap-pane" type="button" role="tab">
+                    <i class="fas fa-pills me-1 text-danger"></i> 3. Order Resep / Obat Farmasi
                 </button>
             </li>
         </ul>
@@ -48,73 +207,77 @@
                 <div class="tab-pane fade show active" id="soap-ranap-pane" role="tabpanel">
                     <div class="row g-3">
                         <div class="col-md-6">
-                            <label class="form-label fw-bold text-dark fs--1">Subjektif (Keluhan Harian)</label>
-                            <textarea class="form-control retro-input" name="subjektif" rows="3" placeholder="Perkembangan keluhan pasien...">{{ optional($soap)->subjektif }}</textarea>
+                            <label class="ent-field-label">Subjektif (Keluhan Harian)</label>
+                            <textarea class="form-control ent-textarea" name="subjektif" rows="3" placeholder="Perkembangan keluhan pasien...">{{ optional($soap)->subjektif }}</textarea>
                         </div>
                         <div class="col-md-6">
-                            <label class="form-label fw-bold text-dark fs--1">Objektif (Pemeriksaan Fisik & TTV)</label>
-                            <textarea class="form-control retro-input" name="objektif" rows="3" placeholder="Keadaan umum, TTV, dll...">{{ optional($soap)->objektif }}</textarea>
+                            <label class="ent-field-label">Objektif (Pemeriksaan Fisik &amp; TTV)</label>
+                            <textarea class="form-control ent-textarea" name="objektif" rows="3" placeholder="Keadaan umum, TTV, dll...">{{ optional($soap)->objektif }}</textarea>
                         </div>
                         <div class="col-md-6">
-                            <label class="form-label fw-bold text-dark fs--1">Asesmen (Diagnosis Medis)</label>
-                            <textarea class="form-control retro-input" name="asesmen" rows="3" placeholder="Diagnosis saat ini...">{{ optional($soap)->asesmen }}</textarea>
+                            <label class="ent-field-label">Asesmen (Diagnosis Medis)</label>
+                            <textarea class="form-control ent-textarea" name="asesmen" rows="3" placeholder="Diagnosis saat ini...">{{ optional($soap)->asesmen }}</textarea>
                         </div>
                         <div class="col-md-6">
-                            <label class="form-label fw-bold text-dark fs--1">Planning (Instruksi / Terapi Lanjutan)</label>
-                            <textarea class="form-control retro-input" name="planning" rows="3" placeholder="Instruksi cairan infus, obat, diet...">{{ optional($soap)->planning }}</textarea>
+                            <label class="ent-field-label">Planning (Instruksi / Terapi Lanjutan)</label>
+                            <textarea class="form-control ent-textarea" name="planning" rows="3" placeholder="Instruksi cairan infus, obat, diet...">{{ optional($soap)->planning }}</textarea>
                         </div>
                     </div>
                 </div>
 
                 <!-- PANE 2: TINDAKAN RANAP -->
                 <div class="tab-pane fade" id="tindakan-ranap-pane" role="tabpanel">
-                    <div class="p-3 bg-light border border-dark rounded mb-3">
-                        <h6 class="fw-bolder text-dark mb-3"><i class="fas fa-hand-holding-medical me-1"></i> Penambahan Tindakan & Layanan (Menyesuaikan Penjamin Pasien)</h6>
-                        <div class="row g-3">
+                    <div class="ranap-subbox mb-3">
+                        <h6 class="fw-bold mb-3 fs--1">
+                            <i class="fas fa-hand-holding-medical me-1 text-primary"></i> Penambahan Tindakan &amp; Layanan (Menyesuaikan Penjamin Pasien)
+                        </h6>
+                        <div class="row g-3 align-items-end">
                             <div class="col-md-10">
-                                <label class="form-label fw-bold text-dark fs--1">Pilih Layanan, Tindakan & Jasa Dokter Visite</label>
-                                <select class="form-select retro-input" id="select-master-tindakan-ranap">
+                                <label class="ent-field-label">Pilih Layanan, Tindakan &amp; Jasa Dokter Visite</label>
+                                <select class="form-select ent-input" id="select-master-tindakan-ranap">
                                     <option value="">-- Memuat Data Layanan --</option>
                                 </select>
                             </div>
-                            <div class="col-md-2 d-flex align-items-end">
-                                <button type="button" class="btn retro-btn retro-btn-success w-100 fw-bold" id="btn-tambah-tindakan-ranap" style="height: 38px;">+ Tambah</button>
+                            <div class="col-md-2">
+                                <button type="button" class="btn ent-btn ent-btn-success w-100 fw-semibold" id="btn-tambah-tindakan-ranap" style="height: 38px;">
+                                    <i class="fas fa-plus me-1"></i> Tambah
+                                </button>
                             </div>
                         </div>
                     </div>
 
-                    <div class="table-responsive">
-                        <table class="table table-bordered table-sm fs--1 table-custom align-middle mb-0" style="border: 2px solid var(--retro-dark);">
-                            <thead class="table-dark" style="background-color: var(--retro-dark); color: var(--retro-green);">
+                    <div class="table-responsive rounded-3" style="border: 1px solid var(--ent-grid-border);">
+                        <table class="table table-sm fs--1 table-custom align-middle mb-0">
+                            <thead>
                                 <tr>
                                     <th class="py-2 px-3 text-start">Nama Tindakan / Pemeriksaan</th>
                                     <th class="py-2 px-3 text-end" style="width: 180px;">Tarif (Rp)</th>
                                     <th class="py-2 px-3 text-center" style="width: 70px;">Aksi</th>
                                 </tr>
                             </thead>
-                            <tbody id="tindakan-ranap-tbody" class="bg-white">
+                            <tbody id="tindakan-ranap-tbody" class="ent-table-surface">
                                 @forelse($tindakanList as $tind)
                                 <tr data-id="{{ $tind->master_pemeriksaan_id }}" data-tarif="{{ $tind->tarif ?? 0 }}">
-                                    <td class="fw-bold text-dark px-3 py-2">
+                                    <td class="fw-semibold px-3 py-2">
                                         {{ $tind->nama_layanan }}
                                         <input type="hidden" name="tindakan_ids[]" value="{{ $tind->master_pemeriksaan_id }}">
                                         <input type="hidden" name="tarif_tindakan[]" value="{{ $tind->tarif }}">
                                     </td>
-                                    <td class="text-end fw-bold text-dark px-3 py-2">Rp {{ number_format($tind->tarif ?? 0, 0, ',', '.') }}</td>
+                                    <td class="text-end fw-bold px-3 py-2" style="font-family: 'JetBrains Mono', monospace;">Rp {{ number_format($tind->tarif ?? 0, 0, ',', '.') }}</td>
                                     <td class="text-center py-2">
-                                        <button type="button" class="btn btn-sm btn-danger py-0 px-1 btn-hapus-tindakan fw-bold">x</button>
+                                        <button type="button" class="btn btn-sm btn-danger py-0 px-2 btn-hapus-tindakan fw-bold rounded-2"><i class="fas fa-times"></i></button>
                                     </td>
                                 </tr>
                                 @empty
                                 <tr id="empty-row-ranap">
-                                    <td colspan="3" class="text-center text-muted py-3 fw-bold">Belum ada tindakan yang ditambahkan.</td>
+                                    <td colspan="3" class="text-center opacity-75 py-3 fw-semibold">Belum ada tindakan yang ditambahkan.</td>
                                 </tr>
                                 @endforelse
                             </tbody>
-                            <tfoot class="bg-light">
-                                <tr style="border-top: 3px solid var(--retro-dark);">
-                                    <td class="text-end fw-bolder text-dark px-3 py-2 text-uppercase">Total Keseluruhan Tarif:</td>
-                                    <td class="text-end fw-bolder text-danger px-3 py-2" id="total-tarif-ranap-text">Rp 0</td>
+                            <tfoot>
+                                <tr style="background-color: rgba(79, 70, 229, 0.06);">
+                                    <td class="text-end fw-bold px-3 py-2 text-uppercase">Total Keseluruhan Tarif:</td>
+                                    <td class="text-end fw-bold text-danger px-3 py-2" id="total-tarif-ranap-text" style="font-family: 'JetBrains Mono', monospace;">Rp 0</td>
                                     <td></td>
                                 </tr>
                             </tfoot>
@@ -124,12 +287,14 @@
 
                 <!-- PANE 3: ORDER RESEP / OBAT FARMASI -->
                 <div class="tab-pane fade" id="resep-ranap-pane" role="tabpanel">
-                    <div class="p-3 bg-light border border-dark rounded mb-3">
-                        <h6 class="fw-bolder text-dark mb-3"><i class="fas fa-prescription-bottle-medical me-1"></i> Input Resep & Permintaan Obat ke Farmasi</h6>
-                        <div class="row g-3">
+                    <div class="ranap-subbox mb-3">
+                        <h6 class="fw-bold mb-3 fs--1">
+                            <i class="fas fa-prescription-bottle-medical me-1 text-primary"></i> Input Resep &amp; Permintaan Obat ke Farmasi
+                        </h6>
+                        <div class="row g-3 align-items-end">
                             <div class="col-md-6">
-                                <label class="form-label fw-bold text-dark fs--1">Pilih Master Obat</label>
-                                <select class="form-select retro-input" id="select_obat_farmasi">
+                                <label class="ent-field-label">Pilih Master Obat</label>
+                                <select class="form-select ent-input" id="select_obat_farmasi">
                                     <option value="">-- Pilih Obat --</option>
                                     @foreach($obatList as $obt)
                                     <option value="{{ $obt->farm_data_obat_code }}">
@@ -139,22 +304,24 @@
                                 </select>
                             </div>
                             <div class="col-md-2">
-                                <label class="form-label fw-bold text-dark fs--1">Jumlah (Qty)</label>
-                                <input type="number" class="form-control retro-input text-center" id="qty_obat_resep" value="1" min="1">
+                                <label class="ent-field-label">Jumlah (Qty)</label>
+                                <input type="number" class="form-control ent-input text-center" id="qty_obat_resep" value="1" min="1" style="height: 38px !important; padding-top: 6px !important;">
                             </div>
                             <div class="col-md-3">
-                                <label class="form-label fw-bold text-dark fs--1">Aturan Pakai / Signa</label>
-                                <input type="text" class="form-control retro-input" id="signa_obat_resep" placeholder="Cth: 3 x 1 Tablet">
+                                <label class="ent-field-label">Aturan Pakai / Signa</label>
+                                <input type="text" class="form-control ent-input" id="signa_obat_resep" placeholder="Cth: 3 x 1 Tablet" style="height: 38px !important; padding-top: 6px !important;">
                             </div>
-                            <div class="col-md-1 d-flex align-items-end">
-                                <button type="button" class="btn retro-btn retro-btn-success w-100 fw-bold" id="btn-tambah-resep-ranap" style="height: 38px;">+</button>
+                            <div class="col-md-1">
+                                <button type="button" class="btn ent-btn ent-btn-success w-100 fw-bold" id="btn-tambah-resep-ranap" style="height: 38px;" title="Tambah Resep">
+                                    <i class="fas fa-plus"></i>
+                                </button>
                             </div>
                         </div>
                     </div>
 
-                    <div class="table-responsive">
-                        <table class="table table-bordered table-sm fs--1 table-custom align-middle mb-0" style="border: 2px solid var(--retro-dark);">
-                            <thead class="table-dark" style="background-color: var(--retro-dark); color: var(--retro-green);">
+                    <div class="table-responsive rounded-3" style="border: 1px solid var(--ent-grid-border);">
+                        <table class="table table-sm fs--1 table-custom align-middle mb-0">
+                            <thead>
                                 <tr>
                                     <th class="py-2 px-3 text-start">Nama Obat</th>
                                     <th class="py-2 px-3 text-center" style="width: 80px;">Qty</th>
@@ -164,34 +331,34 @@
                                     <th class="py-2 px-3 text-center" style="width: 70px;">Aksi</th>
                                 </tr>
                             </thead>
-                            <tbody id="resep-ranap-tbody" class="bg-white">
+                            <tbody id="resep-ranap-tbody" class="ent-table-surface">
                                 @forelse($resepList as $rsp)
                                 <tr data-kode="{{ $rsp->farm_data_obat_code }}" data-qty="{{ $rsp->qty }}" data-harga="{{ $rsp->harga }}">
-                                    <td class="fw-bold text-dark px-3 py-2">
+                                    <td class="fw-semibold px-3 py-2">
                                         {{ $rsp->farm_data_obat_name }}
                                         <input type="hidden" name="resep_obat_code[]" value="{{ $rsp->farm_data_obat_code }}">
                                         <input type="hidden" name="resep_qty[]" value="{{ $rsp->qty }}">
                                         <input type="hidden" name="resep_signa[]" value="{{ $rsp->signa }}">
                                         <input type="hidden" name="resep_harga[]" value="{{ $rsp->harga }}">
                                     </td>
-                                    <td class="text-center px-3 py-2">{{ $rsp->qty }}</td>
+                                    <td class="text-center px-3 py-2" style="font-family: 'JetBrains Mono', monospace;">{{ $rsp->qty }}</td>
                                     <td class="px-3 py-2">{{ $rsp->signa }}</td>
-                                    <td class="text-end px-3 py-2">Rp {{ number_format($rsp->harga, 0, ',', '.') }}</td>
-                                    <td class="text-end fw-bold text-success px-3 py-2">Rp {{ number_format($rsp->qty * $rsp->harga, 0, ',', '.') }}</td>
+                                    <td class="text-end px-3 py-2" style="font-family: 'JetBrains Mono', monospace;">Rp {{ number_format($rsp->harga, 0, ',', '.') }}</td>
+                                    <td class="text-end fw-bold text-success px-3 py-2" style="font-family: 'JetBrains Mono', monospace;">Rp {{ number_format($rsp->qty * $rsp->harga, 0, ',', '.') }}</td>
                                     <td class="text-center py-2">
-                                        <button type="button" class="btn btn-sm btn-danger py-0 px-1 btn-hapus-resep fw-bold">x</button>
+                                        <button type="button" class="btn btn-sm btn-danger py-0 px-2 btn-hapus-resep fw-bold rounded-2"><i class="fas fa-times"></i></button>
                                     </td>
                                 </tr>
                                 @empty
                                 <tr id="empty-row-resep">
-                                    <td colspan="6" class="text-center text-muted py-3 fw-bold">Belum ada item resep obat yang ditambahkan.</td>
+                                    <td colspan="6" class="text-center opacity-75 py-3 fw-semibold">Belum ada item resep obat yang ditambahkan.</td>
                                 </tr>
                                 @endforelse
                             </tbody>
-                            <tfoot class="bg-light">
-                                <tr style="border-top: 3px solid var(--retro-dark);">
-                                    <td colspan="4" class="text-end fw-bolder text-dark px-3 py-2 text-uppercase">Total Estimasi Biaya Resep:</td>
-                                    <td class="text-end fw-bolder text-danger px-3 py-2" id="total-resep-ranap-text">Rp 0</td>
+                            <tfoot>
+                                <tr style="background-color: rgba(79, 70, 229, 0.06);">
+                                    <td colspan="4" class="text-end fw-bold px-3 py-2 text-uppercase">Total Estimasi Biaya Resep:</td>
+                                    <td class="text-end fw-bold text-danger px-3 py-2" id="total-resep-ranap-text" style="font-family: 'JetBrains Mono', monospace;">Rp 0</td>
                                     <td></td>
                                 </tr>
                             </tfoot>
@@ -200,9 +367,11 @@
                 </div>
             </div>
 
-            <div class="d-flex justify-content-end gap-2 pt-3 mt-4 border-top border-dark">
-                <button type="button" class="btn retro-btn btn-secondary btn-sm px-3" data-bs-dismiss="modal">Tutup</button>
-                <button type="button" class="btn retro-btn retro-btn-success btn-sm px-4" id="btn-simpan-handling-ranap">Simpan Handling Ranap</button>
+            <div class="d-flex justify-content-end gap-2 pt-3 mt-4" style="border-top: 1px dashed var(--ent-grid-border);">
+                <button type="button" class="btn ent-btn ent-btn-secondary btn-sm px-3" data-bs-dismiss="modal">Tutup</button>
+                <button type="button" class="btn ent-btn ent-btn-success btn-sm px-4" id="btn-simpan-handling-ranap">
+                    <i class="fas fa-save me-1"></i> Simpan Handling Ranap
+                </button>
             </div>
         </form>
     </div>
@@ -210,12 +379,20 @@
 
 <script>
 (function() {
-    if (typeof window.choicesRanap === 'undefined') window.choicesRanap = null;
-    if (typeof window.choicesObat === 'undefined') window.choicesObat = null;
+    $(document).off('.ranapHandlingForm');
 
-    // Gunakan window agar aman dari duplikasi deklarasi saat modal dibuka berulang kali
+    if (window.choicesRanap && typeof window.choicesRanap.destroy === 'function') {
+        try { window.choicesRanap.destroy(); } catch (err) {}
+        window.choicesRanap = null;
+    }
+    if (window.choicesObat && typeof window.choicesObat.destroy === 'function') {
+        try { window.choicesObat.destroy(); } catch (err) {}
+        window.choicesObat = null;
+    }
+
     window.masterLayananData = window.masterLayananData || {};
     window.masterObatData = window.masterObatData || {};
+    let isSavingRanap = false;
 
     @foreach($obatList as $obt)
         window.masterObatData["{{ $obt->farm_data_obat_code }}"] = {
@@ -226,7 +403,7 @@
 
     function hitungTotalRanap() {
         let total = 0;
-        $('#tindakan-ranap-tbody tr').each(function() {
+        $('#tindakan-ranap-tbody tr[data-tarif]').each(function() {
             let tarif = parseFloat($(this).attr('data-tarif')) || 0;
             total += tarif;
         });
@@ -235,7 +412,7 @@
 
     function hitungTotalResep() {
         let total = 0;
-        $('#resep-ranap-tbody tr').each(function() {
+        $('#resep-ranap-tbody tr[data-qty][data-harga]').each(function() {
             let qty = parseFloat($(this).attr('data-qty')) || 0;
             let harga = parseFloat($(this).attr('data-harga')) || 0;
             total += (qty * harga);
@@ -243,12 +420,54 @@
         $('#total-resep-ranap-text').text('Rp ' + total.toLocaleString('id-ID'));
     }
 
+    function loadLayananDanJasa(subPenjaminId) {
+        let laySelect = $('#select-master-tindakan-ranap');
+        if (window.choicesRanap && typeof window.choicesRanap.destroy === 'function') {
+            try { window.choicesRanap.destroy(); } catch (err) {}
+            window.choicesRanap = null;
+        }
+        laySelect.html('<option value="">Sedang memuat layanan...</option>');
+
+        $.ajax({
+            url: "{{ route('ranap.get.layanan') }}",
+            type: "GET",
+            data: { sub_penjamin_id: subPenjaminId },
+            success: function(res) {
+                let options = '<option value="">-- Pilih Pemeriksaan / Jasa Visite --</option>';
+                window.masterLayananData = {};
+
+                (res || []).forEach(function(item) {
+                    window.masterLayananData[item.id] = {
+                        nama: item.nama_layanan,
+                        tarif: parseFloat(item.tarif) || 0
+                    };
+
+                    options += `<option value="${item.id}">
+                        ${item.nama_layanan} (Rp ${Number(item.tarif).toLocaleString('id-ID')})
+                    </option>`;
+                });
+
+                laySelect.html(options);
+                const el = document.getElementById('select-master-tindakan-ranap');
+                if (el && typeof Choices !== 'undefined') {
+                    window.choicesRanap = new Choices(el, {
+                        searchEnabled: true,
+                        itemSelectText: '',
+                        placeholder: true,
+                        shouldSort: false
+                    });
+                }
+            }
+        });
+    }
+
     $(document).ready(function() {
         hitungTotalRanap();
         hitungTotalResep();
 
-        if (document.getElementById('select_obat_farmasi')) {
-            window.choicesObat = new Choices(document.getElementById('select_obat_farmasi'), {
+        const obatEl = document.getElementById('select_obat_farmasi');
+        if (obatEl && typeof Choices !== 'undefined') {
+            window.choicesObat = new Choices(obatEl, {
                 searchEnabled: true,
                 itemSelectText: '',
                 placeholder: true,
@@ -262,44 +481,11 @@
         }
     });
 
-    function loadLayananDanJasa(subPenjaminId) {
-        let laySelect = $('#select-master-tindakan-ranap');
-        if (window.choicesRanap) window.choicesRanap.destroy();
-        laySelect.html('<option value="">Sedang memuat layanan...</option>');
-
-        $.ajax({
-            url: "{{ route('ranap.get.layanan') }}",
-            type: "GET",
-            data: { sub_penjamin_id: subPenjaminId },
-            success: function(res) {
-                let options = '<option value="">-- Pilih Pemeriksaan / Jasa Visite --</option>';
-                window.masterLayananData = {}; // Reset dictionary
-
-                res.forEach(function(item) {
-                    window.masterLayananData[item.id] = {
-                        nama: item.nama_layanan,
-                        tarif: parseFloat(item.tarif) || 0
-                    };
-
-                    options += `<option value="${item.id}">
-                                    ${item.nama_layanan} (Rp ${Number(item.tarif).toLocaleString('id-ID')})
-                                </option>`;
-                });
-                laySelect.html(options);
-                window.choicesRanap = new Choices(document.getElementById('select-master-tindakan-ranap'), {
-                    searchEnabled: true,
-                    itemSelectText: '',
-                    placeholder: true,
-                    shouldSort: false
-                });
-            }
-        });
-    }
-
     // Tambah Tindakan ke Tabel Sementara
-    $('#btn-tambah-tindakan-ranap').off('click').on('click', function(e) {
+    $(document).on('click.ranapHandlingForm', '#btn-tambah-tindakan-ranap', function(e) {
         e.preventDefault();
         let selectEl = document.getElementById('select-master-tindakan-ranap');
+        if (!selectEl) return;
         let idTindakan = selectEl.value;
 
         if (!idTindakan) {
@@ -317,7 +503,7 @@
         let tarifTindakan = tindakanInfo.tarif;
 
         let sudahAda = false;
-        $('#tindakan-ranap-tbody tr').each(function() {
+        $('#tindakan-ranap-tbody tr[data-id]').each(function() {
             if ($(this).attr('data-id') == idTindakan) sudahAda = true;
         });
 
@@ -329,12 +515,12 @@
         $('#empty-row-ranap').remove();
         let htmlRow = `
             <tr data-id="${idTindakan}" data-tarif="${tarifTindakan}">
-                <td class="fw-bold text-dark px-3 py-2">${namaPemeriksaan}
+                <td class="fw-semibold px-3 py-2">${namaPemeriksaan}
                     <input type="hidden" name="tindakan_ids[]" value="${idTindakan}">
                     <input type="hidden" name="tarif_tindakan[]" value="${tarifTindakan}">
                 </td>
-                <td class="text-end fw-bold text-dark px-3 py-2">Rp ${tarifTindakan.toLocaleString('id-ID')}</td>
-                <td class="text-center py-2"><button type="button" class="btn btn-sm btn-danger py-0 px-1 btn-hapus-tindakan fw-bold">x</button></td>
+                <td class="text-end fw-bold px-3 py-2" style="font-family: 'JetBrains Mono', monospace;">Rp ${tarifTindakan.toLocaleString('id-ID')}</td>
+                <td class="text-center py-2"><button type="button" class="btn btn-sm btn-danger py-0 px-2 btn-hapus-tindakan fw-bold rounded-2"><i class="fas fa-times"></i></button></td>
             </tr>`;
         $('#tindakan-ranap-tbody').append(htmlRow);
         hitungTotalRanap();
@@ -346,18 +532,19 @@
         }
     });
 
-    $(document).off('click', '.btn-hapus-tindakan').on('click', '.btn-hapus-tindakan', function() {
+    $(document).on('click.ranapHandlingForm', '.btn-hapus-tindakan', function() {
         $(this).closest('tr').remove();
-        if ($('#tindakan-ranap-tbody tr').length === 0) {
-            $('#tindakan-ranap-tbody').html('<tr id="empty-row-ranap"><td colspan="3" class="text-center text-muted py-3 fw-bold">Belum ada tindakan yang ditambahkan.</td></tr>');
+        if ($('#tindakan-ranap-tbody tr[data-tarif]').length === 0) {
+            $('#tindakan-ranap-tbody').html('<tr id="empty-row-ranap"><td colspan="3" class="text-center opacity-75 py-3 fw-semibold">Belum ada tindakan yang ditambahkan.</td></tr>');
         }
         hitungTotalRanap();
     });
 
     // Tambah Resep Obat ke Tabel Sementara
-    $('#btn-tambah-resep-ranap').off('click').on('click', function(e) {
+    $(document).on('click.ranapHandlingForm', '#btn-tambah-resep-ranap', function(e) {
         e.preventDefault();
         let selectEl = document.getElementById('select_obat_farmasi');
+        if (!selectEl) return;
         let obatCode = selectEl.value;
         let qty = parseInt($('#qty_obat_resep').val()) || 1;
         let signa = $('#signa_obat_resep').val().trim();
@@ -378,7 +565,7 @@
         let subtotal = qty * hargaJual;
 
         let sudahAda = false;
-        $('#resep-ranap-tbody tr').each(function() {
+        $('#resep-ranap-tbody tr[data-kode]').each(function() {
             if ($(this).attr('data-kode') == obatCode) sudahAda = true;
         });
 
@@ -390,17 +577,17 @@
         $('#empty-row-resep').remove();
         let htmlRow = `
             <tr data-kode="${obatCode}" data-qty="${qty}" data-harga="${hargaJual}">
-                <td class="fw-bold text-dark px-3 py-2">${namaObat}
+                <td class="fw-semibold px-3 py-2">${namaObat}
                     <input type="hidden" name="resep_obat_code[]" value="${obatCode}">
                     <input type="hidden" name="resep_qty[]" value="${qty}">
                     <input type="hidden" name="resep_signa[]" value="${signa}">
                     <input type="hidden" name="resep_harga[]" value="${hargaJual}">
                 </td>
-                <td class="text-center px-3 py-2">${qty}</td>
+                <td class="text-center px-3 py-2" style="font-family: 'JetBrains Mono', monospace;">${qty}</td>
                 <td class="px-3 py-2">${signa || '-'}</td>
-                <td class="text-end px-3 py-2">Rp ${hargaJual.toLocaleString('id-ID')}</td>
-                <td class="text-end fw-bold text-success px-3 py-2">Rp ${subtotal.toLocaleString('id-ID')}</td>
-                <td class="text-center py-2"><button type="button" class="btn btn-sm btn-danger py-0 px-1 btn-hapus-resep fw-bold">x</button></td>
+                <td class="text-end px-3 py-2" style="font-family: 'JetBrains Mono', monospace;">Rp ${hargaJual.toLocaleString('id-ID')}</td>
+                <td class="text-end fw-bold text-success px-3 py-2" style="font-family: 'JetBrains Mono', monospace;">Rp ${subtotal.toLocaleString('id-ID')}</td>
+                <td class="text-center py-2"><button type="button" class="btn btn-sm btn-danger py-0 px-2 btn-hapus-resep fw-bold rounded-2"><i class="fas fa-times"></i></button></td>
             </tr>`;
         $('#resep-ranap-tbody').append(htmlRow);
         hitungTotalResep();
@@ -414,26 +601,29 @@
         $('#signa_obat_resep').val('');
     });
 
-    $(document).off('click', '.btn-hapus-resep').on('click', '.btn-hapus-resep', function() {
+    $(document).on('click.ranapHandlingForm', '.btn-hapus-resep', function() {
         $(this).closest('tr').remove();
-        if ($('#resep-ranap-tbody tr').length === 0) {
-            $('#resep-ranap-tbody').html('<tr id="empty-row-resep"><td colspan="6" class="text-center text-muted py-3 fw-bold">Belum ada item resep obat yang ditambahkan.</td></tr>');
+        if ($('#resep-ranap-tbody tr[data-qty][data-harga]').length === 0) {
+            $('#resep-ranap-tbody').html('<tr id="empty-row-resep"><td colspan="6" class="text-center opacity-75 py-3 fw-semibold">Belum ada item resep obat yang ditambahkan.</td></tr>');
         }
         hitungTotalResep();
     });
 
     // Simpan Handling Ranap
-    $('#btn-simpan-handling-ranap').off('click').on('click', function(e) {
+    $(document).on('click.ranapHandlingForm', '#btn-simpan-handling-ranap', function(e) {
         e.preventDefault();
+        if (isSavingRanap) return;
+        isSavingRanap = true;
+
         let btn = $(this);
-        btn.prop('disabled', true).text('Menyimpan...');
+        let originalHtml = btn.html();
+        btn.prop('disabled', true).html('<i class="fas fa-spinner fa-spin me-1"></i> Menyimpan...');
 
         $.ajax({
             url: "{{ route('ranap.handling.store') }}",
             type: "POST",
             data: $('#form-handling-ranap').serialize(),
             success: function(response) {
-                btn.prop('disabled', false).text('Simpan Handling Ranap');
                 if (response.success) {
                     Swal.fire({
                         icon: 'success',
@@ -442,7 +632,11 @@
                         timer: 1500,
                         showConfirmButton: false
                     }).then(() => {
-                        $('#modal-handling-ranap').modal('hide');
+                        const modalEl = document.getElementById('modal-handling-ranap');
+                        if (modalEl && window.bootstrap) {
+                            const inst = bootstrap.Modal.getInstance(modalEl);
+                            if (inst) inst.hide();
+                        }
                         if (typeof reloadTable === 'function') reloadTable();
                     });
                 } else {
@@ -450,8 +644,11 @@
                 }
             },
             error: function() {
-                btn.prop('disabled', false).text('Simpan Handling Ranap');
                 Swal.fire('Error', 'Terjadi kesalahan pada server.', 'error');
+            },
+            complete: function() {
+                isSavingRanap = false;
+                btn.prop('disabled', false).html(originalHtml);
             }
         });
     });

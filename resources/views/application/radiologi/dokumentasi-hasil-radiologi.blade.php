@@ -5,137 +5,237 @@
 <link rel="stylesheet" href="https://cdn.datatables.net/responsive/3.0.4/css/responsive.bootstrap5.css">
 <link href="{{ asset('vendors/choices/choices.min.css') }}" rel="stylesheet" />
 <link href="{{ asset('vendors/flatpickr/flatpickr.min.css') }}" rel="stylesheet" />
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
+<link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&family=JetBrains+Mono:wght@500;700&display=swap" rel="stylesheet">
 
 <style>
     /* =========================================
-       RETRO / NEUBRUTALISM THEME STYLES
+       MODERN ENTERPRISE HEALTHCARE UI STYLES
+       (ADAPTIVE LIGHT & DARK MODE BOOTSTRAP 5)
        ========================================= */
     :root {
-        --retro-dark: #1e1e24;
-        --retro-yellow: #ffde59;
-        --retro-pink: #ffa6c9;
-        --retro-cyan: #8bf0fa;
-        --retro-orange: #ff914d;
-        --retro-green: #c1ff72;
-        --retro-purple: #c8b6ff;
-        --retro-bg: #f4f0ea;
-        --retro-border: 3px solid var(--retro-dark);
-        --retro-shadow: 5px 5px 0px var(--retro-dark);
-        --retro-shadow-sm: 3px 3px 0px var(--retro-dark);
+        --ent-indigo: #4f46e5;
+        --ent-indigo-dark: #4338ca;
+        --ent-indigo-soft: rgba(79, 70, 229, 0.12);
+        --ent-grid-border: rgba(99, 102, 241, 0.28);
+        --ent-emerald: #059669;
+        --ent-sky: #0284c7;
+        --ent-amber: #d97706;
+        --ent-rose: #e11d48;
+        --ent-solid-bg: #ffffff;
+        --ent-solid-text: #0f172a;
+    }
+
+    [data-bs-theme="dark"],
+    .dark {
+        --ent-solid-bg: #0f172a;
+        --ent-solid-text: #f8fafc;
     }
 
     body {
-        /* background-color: var(--retro-bg); */
-        color: var(--retro-dark);
         font-family: 'Plus Jakarta Sans', sans-serif;
     }
 
-    /* Retro Cards & Banners */
-    .retro-card {
-        border: var(--retro-border);
-        border-radius: 12px;
-        box-shadow: var(--retro-shadow);
-        background-color: #ffffff;
+    /* Adaptive Enterprise Card */
+    .ent-card {
+        border: 1px solid var(--ent-grid-border);
+        border-radius: 16px;
+        background-color: var(--bs-body-bg, var(--ent-solid-bg));
+        box-shadow: 0 4px 20px -2px rgba(15, 23, 42, 0.08);
         overflow: hidden;
     }
 
-    .retro-header-banner {
-        background: linear-gradient(135deg, var(--retro-cyan) 0%, var(--retro-purple) 100%);
-        border: var(--retro-border);
-        border-radius: 12px;
-        box-shadow: var(--retro-shadow);
-        color: var(--retro-dark);
-    }
-
-    .retro-badge {
-        border: 2px solid var(--retro-dark);
-        border-radius: 6px;
-        padding: 4px 8px;
-        font-weight: 800;
-        box-shadow: 2px 2px 0px var(--retro-dark);
-        text-transform: uppercase;
-        display: inline-block;
-        font-size: 0.7rem;
-    }
-
-    /* Handling List Sidebar Card */
-    .rad-sidebar-card {
-        background: #ffffff;
-        border: var(--retro-border);
-        border-radius: 12px;
-        box-shadow: var(--retro-shadow);
-        overflow: hidden;
-    }
-
-    .rad-sidebar-header {
-        background-color: var(--retro-dark);
-        color: var(--retro-green);
-        border-bottom: 2px solid var(--retro-dark);
+    .ent-card-header {
+        background-color: rgba(79, 70, 229, 0.07) !important;
+        border-bottom: 1px solid var(--ent-grid-border) !important;
         padding: 14px 18px;
+    }
+
+    .ent-table-surface {
+        background-color: var(--bs-body-bg, var(--ent-solid-bg));
+    }
+
+    /* Hero Banner */
+    .ent-header-banner {
+        background: linear-gradient(135deg, #0f172a 0%, #1e1b4b 55%, #312e81 100%);
+        border: 1px solid rgba(99, 102, 241, 0.35);
+        border-radius: 16px;
+        box-shadow: 0 12px 28px -6px rgba(15, 23, 42, 0.22);
+        color: #ffffff;
+        position: relative;
+        overflow: hidden;
+    }
+
+    .ent-header-banner::before {
+        content: '';
+        position: absolute;
+        top: -50%;
+        right: -5%;
+        width: 340px;
+        height: 340px;
+        background: radial-gradient(circle, rgba(244, 63, 94, 0.22) 0%, transparent 70%);
+        pointer-events: none;
+    }
+
+    .ent-glass-pill {
+        background: rgba(255, 255, 255, 0.09);
+        backdrop-filter: blur(8px);
+        border: 1px solid rgba(255, 255, 255, 0.16);
+        border-radius: 12px;
+        color: #ffffff;
+    }
+
+    /* Badges */
+    .ent-badge {
+        border-radius: 9999px;
+        padding: 4px 10px;
+        font-weight: 700;
+        text-transform: uppercase;
+        display: inline-flex;
+        align-items: center;
+        font-size: 0.68rem;
+        letter-spacing: 0.03em;
+    }
+
+    /* Buttons */
+    .ent-btn {
+        font-weight: 600 !important;
+        border-radius: 10px;
+        transition: all 0.18s ease;
+        cursor: pointer;
+        font-size: 0.8rem;
+    }
+
+    .ent-btn:hover {
+        transform: translateY(-1px);
+    }
+
+    .ent-btn-primary {
+        background: linear-gradient(135deg, #4f46e5 0%, #4338ca 100%);
+        border: none;
+        color: #ffffff;
+        box-shadow: 0 4px 12px rgba(79, 70, 229, 0.25);
+    }
+
+    .ent-btn-primary:hover {
+        box-shadow: 0 6px 16px rgba(79, 70, 229, 0.35);
+        color: #ffffff;
+    }
+
+    .ent-btn-reset {
+        background-color: rgba(100, 116, 139, 0.12);
+        border: 1px solid var(--ent-grid-border);
+        color: var(--bs-body-color);
+    }
+
+    .ent-btn-reset:hover {
+        background-color: rgba(100, 116, 139, 0.22);
+        color: var(--bs-body-color);
+    }
+
+    /* Form Controls & Input Groups */
+    .ent-field-label {
+        font-size: 0.68rem;
+        font-weight: 700;
+        text-transform: uppercase;
+        letter-spacing: 0.03em;
+        color: var(--bs-secondary-color, #64748b);
+        margin-bottom: 4px;
+        display: block;
+    }
+
+    .ent-input,
+    .form-control,
+    .form-select {
+        border: 1px solid var(--ent-grid-border) !important;
+        border-radius: 10px !important;
+        font-weight: 600 !important;
+        color: var(--bs-body-color) !important;
+        background-color: var(--bs-body-bg) !important;
+        font-size: 0.8rem !important;
+        min-height: 36px;
+        transition: all 0.2s ease;
+    }
+
+    .ent-input:focus,
+    .form-control:focus,
+    .form-select:focus {
+        border-color: var(--ent-indigo) !important;
+        box-shadow: 0 0 0 3.5px rgba(79, 70, 229, 0.15) !important;
+        outline: none;
+    }
+
+    .ent-input-group .input-group-text {
+        background-color: rgba(79, 70, 229, 0.08) !important;
+        color: var(--ent-indigo) !important;
+        border: 1px solid var(--ent-grid-border) !important;
+        border-right: none !important;
+        border-radius: 10px 0 0 10px !important;
+        padding: 0 12px;
+    }
+
+    .ent-input-group .form-control {
+        border-left: none !important;
+        border-radius: 0 10px 10px 0 !important;
     }
 
     /* Interactive Handling Item Card */
     .handling-item-card {
-        border: 2px solid var(--retro-dark);
-        border-radius: 8px;
-        background-color: #ffffff;
-        transition: all 0.1s ease-in-out;
+        border: 1px solid var(--ent-grid-border);
+        border-radius: 12px;
+        background-color: var(--bs-body-bg, var(--ent-solid-bg));
+        transition: all 0.16s ease;
         cursor: pointer;
-        box-shadow: 2px 2px 0px var(--retro-dark);
+        position: relative;
     }
 
     .handling-item-card:hover {
-        background-color: var(--retro-cyan) !important;
-        transform: translate(-1px, -1px);
-        box-shadow: 3px 3px 0px var(--retro-dark);
+        background-color: rgba(79, 70, 229, 0.07) !important;
+        border-color: var(--ent-indigo);
+        transform: translateY(-1px);
     }
 
     .handling-item-card.active-rad-item {
-        background-color: var(--retro-yellow) !important;
-        border-color: var(--retro-dark) !important;
-        color: var(--retro-dark) !important;
-        box-shadow: 3px 3px 0px var(--retro-dark) !important;
+        background: linear-gradient(135deg, rgba(79, 70, 229, 0.14) 0%, rgba(2, 132, 199, 0.12) 100%) !important;
+        border: 1.5px solid var(--ent-indigo) !important;
+        box-shadow: 0 4px 14px rgba(79, 70, 229, 0.16);
     }
 
     .handling-item-card.active-rad-item .patient-title {
-        color: var(--retro-dark) !important;
+        color: var(--ent-indigo) !important;
+    }
+
+    [data-bs-theme="dark"] .handling-item-card.active-rad-item .patient-title,
+    .dark .handling-item-card.active-rad-item .patient-title {
+        color: #a5b4fc !important;
     }
 
     .handling-item-card.active-rad-item .reg-code-badge {
-        background-color: #ffffff !important;
-        color: var(--retro-dark) !important;
-        border: 2px solid var(--retro-dark);
+        background-color: var(--ent-indigo) !important;
+        color: #ffffff !important;
+        border-color: var(--ent-indigo) !important;
     }
 
     /* Code Chips */
     .code-chip {
-        font-family: 'Courier New', Courier, monospace;
-        font-weight: 800;
+        font-family: 'JetBrains Mono', monospace;
+        font-weight: 700;
+        font-size: 0.72rem;
         padding: 2px 8px;
         border-radius: 6px;
-        background-color: #ffffff;
-        border: 2px solid var(--retro-dark);
+        background-color: rgba(79, 70, 229, 0.08);
+        border: 1px solid var(--ent-grid-border);
         display: inline-block;
-    }
-
-    /* Input Custom Styles */
-    .rad-search-input {
-        border-radius: 6px !important;
-        border: 2px solid var(--retro-dark) !important;
-        font-weight: 700 !important;
-        color: var(--retro-dark) !important;
-    }
-
-    .rad-search-input:focus {
-        box-shadow: 2px 2px 0px var(--retro-dark) !important;
+        color: var(--bs-body-color);
     }
 
     /* Modals Custom Styling */
-    .modal-content.rad-modal {
-        border: 3px solid var(--retro-dark);
-        border-radius: 14px;
-        box-shadow: 8px 8px 0px var(--retro-dark);
-        background-color: var(--retro-bg);
+    .modal-ent-content {
+        border: 1px solid var(--ent-grid-border) !important;
+        border-radius: 18px !important;
+        box-shadow: 0 25px 50px -12px rgba(15, 23, 42, 0.35) !important;
+        background-color: var(--bs-body-bg, var(--ent-solid-bg)) !important;
+        color: var(--bs-body-color);
         overflow: hidden;
     }
 </style>
@@ -143,34 +243,34 @@
 
 @section('content')
 <!-- HERO HEADER RADIOLOGI -->
-<div class="row mb-4">
+<div class="row mb-3">
     <div class="col-12">
-        <div class="card retro-header-banner p-1">
-            <div class="card-body p-4 text-dark position-relative z-1">
+        <div class="card ent-header-banner p-1">
+            <div class="card-body p-3 p-md-4 text-white position-relative" style="z-index: 2;">
                 <div class="row align-items-center gy-3">
                     <div class="col-lg-7 d-flex align-items-center">
-                        <div class="p-2 rounded-4 me-3 d-flex align-items-center justify-content-center"
-                            style="width: 65px; height: 65px; background: white; border: 2px solid var(--retro-dark); box-shadow: 3px 3px 0px var(--retro-dark);">
-                            <img src="{{ asset('img/verif.png') }}" alt="Radiology Dokumentasi Logo" class="img-fluid" width="42" />
+                        <div class="ent-glass-pill me-3 d-flex align-items-center justify-content-center flex-shrink-0"
+                            style="width: 60px; height: 60px;">
+                            <img src="{{ asset('img/verif.png') }}" alt="Radiology Dokumentasi Logo" class="img-fluid" width="40" />
                         </div>
                         <div>
                             <div class="d-flex align-items-center gap-2 mb-1">
-                                <span class="retro-badge" style="background-color: var(--retro-yellow); color: var(--retro-dark);">
-                                    <i class="fas fa-radiation me-1"></i> TRANS MANAGEMENT SYSTEM
+                                <span class="ent-badge" style="background: rgba(79, 70, 229, 0.25); border: 1px solid rgba(129, 140, 248, 0.45); color: #c7d2fe;">
+                                    <i class="fas fa-radiation me-1"></i> v2.4 Medical Suite
                                 </span>
+                                <span style="color: #94a3b8; font-size: 0.75rem; font-weight: 600;">Instalasi Radiologi</span>
                             </div>
-                            <h3 class="fw-bolder mb-0 text-dark" style="font-size: 1.3rem; text-shadow: 1px 1px 0px white;">
-                                Welcome to <span style="text-decoration: underline;">Management System</span>
-                            </h3>
-                            <p class="text-dark fw-bold mb-0 small opacity-75" style="font-size: 0.75rem;">Modul Pengolahan & Dokumentasi Hasil Radiologi</p>
+                            <h4 class="fw-bold mb-0" style="letter-spacing: -0.02em;color: white;">
+                                Modul <span style="text-decoration: underline;">Dokumentasi Hasil Radiologi</span>
+                            </h4>
+                            <p class="mb-0 small" style="color: #cbd5e1;">Pengolahan, Verifikasi & Pengiriman Dokumentasi Pemeriksaan Radiologi</p>
                         </div>
                     </div>
 
                     <div class="col-lg-5 text-lg-end">
-                        <div class="d-inline-flex align-items-center bg-white px-3 py-2 rounded-pill" style="border: 2px solid var(--retro-dark); box-shadow: 3px 3px 0px var(--retro-dark);">
-                            <h6 class="fw-bolder mb-0 text-dark" style="font-size: 0.95rem;">
-                                <i class="fas fa-file-medical-alt me-1 text-danger"></i> Radiologi : Dokumentasi Hasil
-                            </h6>
+                        <div class="ent-glass-pill px-3 py-2 d-inline-flex align-items-center gap-2">
+                            <i class="fas fa-file-medical-alt text-info"></i>
+                            <span class="fw-semibold" style="font-size: 0.86rem;">Radiologi : Dokumentasi Hasil</span>
                         </div>
                     </div>
                 </div>
@@ -184,51 +284,54 @@
     <!-- LEFT SIDEBAR: DAFTAR HANDLING -->
     <div class="col-lg-4">
         <div class="sticky-sidebar" style="top: 20px;">
-            <div class="rad-sidebar-card">
-                <div class="rad-sidebar-header d-flex align-items-center justify-content-between">
-                    <h6 class="mb-0 text-white fw-bolder">
-                        <i class="fas fa-tasks me-2"></i>Daftar Handling
+            <div class="ent-card">
+                <div class="ent-card-header d-flex align-items-center justify-content-between">
+                    <h6 class="mb-0 fw-bold fs--1">
+                        <i class="fas fa-tasks me-2 text-primary"></i>Daftar Handling
                     </h6>
-                    <span class="badge bg-white text-dark border border-dark rounded-2 px-2 py-1 fw-bold shadow-sm">
+                    <span class="ent-badge" style="background: rgba(79, 70, 229, 0.14); color: #4f46e5; border: 1px solid rgba(79, 70, 229, 0.35);">
                         {{ count($data) }} Pasien
                     </span>
                 </div>
-                <div class="card-body bg-white p-3">
+                <div class="card-body ent-table-surface p-3">
                     <!-- FILTER CONTROLS -->
                     <div class="col-12 mb-3">
-                        <div class="input-group input-group-sm mb-2 shadow-sm">
-                            <span class="input-group-text bg-white text-dark border-dark border-end-0 fw-bold" style="border-width: 2px 0 2px 2px;"><i class="fas fa-calendar-alt"></i></span>
-                            <input class="form-control datetimepicker rad-search-input" id="timepicker3" type="text" placeholder="Filter Rentang Tanggal..." data-options='{"mode":"range","dateFormat":"d/m/Y","disableMobile":true,"locale":"en"}' />
+                        <label class="ent-field-label">Rentang Tanggal</label>
+                        <div class="input-group input-group-sm ent-input-group mb-2">
+                            <span class="input-group-text"><i class="fas fa-calendar-alt"></i></span>
+                            <input class="form-control datetimepicker" id="timepicker3" type="text" placeholder="Filter Rentang Tanggal..." data-options='{"mode":"range","dateFormat":"d/m/Y","disableMobile":true,"locale":"en"}' />
                         </div>
-                        <div class="input-group input-group-sm shadow-sm">
-                            <span class="input-group-text bg-white text-dark border-dark border-end-0 fw-bold" style="border-width: 2px 0 2px 2px;"><i class="fas fa-qrcode"></i></span>
-                            <input type="text" name="nik" class="form-control rad-search-input" id="nik" placeholder="Scan QR / No. Reg / NIK...">
+
+                        <label class="ent-field-label">Pencarian Cepat</label>
+                        <div class="input-group input-group-sm ent-input-group">
+                            <span class="input-group-text"><i class="fas fa-qrcode"></i></span>
+                            <input type="text" name="nik" class="form-control" id="nik" placeholder="Scan QR / Nama / No. Reg...">
                         </div>
                     </div>
 
-                    <hr class="my-3 text-dark" style="border-top: 2px solid var(--retro-dark);" />
+                    <hr class="my-3" style="border-top: 1px dashed var(--ent-grid-border); opacity: 1;" />
 
                     <!-- HANDLING ITEMS SCROLL CONTAINER -->
-                    <div class="handling-list-wrapper pe-1" style="max-height: 580px; overflow-y: auto;">
+                    <div class="handling-list-wrapper pe-1" id="handling-list-container" style="max-height: 580px; overflow-y: auto;">
                         @forelse ($data as $datas)
-                        <div class="handling-item-card remove-class p-3 mb-2"
-                            id="button-dokumentasi-hasil-rad"
-                            data-code="{{ $datas->d_reg_order_rad_code }}">
+                        <div class="handling-item-card remove-class p-3 mb-2 button-dokumentasi-hasil-rad"
+                            data-code="{{ $datas->d_reg_order_rad_code }}"
+                            data-search="{{ strtolower(($datas->master_patient_name ?? '') . ' ' . ($datas->d_reg_order_rad_code ?? '') . ' ' . ($datas->master_patient_nik ?? '')) }}">
                             <div class="d-flex justify-content-between align-items-start mb-1">
-                                <h6 class="fw-bolder text-dark patient-title mb-0 transition-base" style="font-size: 0.9rem;">
+                                <h6 class="fw-bold patient-title mb-0" style="font-size: 0.88rem;">
                                     {{ $datas->master_patient_name }}
                                 </h6>
-                                <i class="fas fa-chevron-right text-dark fs--2 mt-1"></i>
+                                <i class="fas fa-chevron-right opacity-50 fs--2 mt-1"></i>
                             </div>
                             <div class="d-flex align-items-center justify-content-between mt-2">
-                                <span class="text-dark fw-bold small fs--2">No. Registrasi:</span>
-                                <span class="code-chip reg-code-badge fs--2 text-dark">{{ $datas->d_reg_order_rad_code }}</span>
+                                <span class="fw-semibold small fs--2 opacity-75">No. Registrasi:</span>
+                                <span class="code-chip reg-code-badge fs--2">{{ $datas->d_reg_order_rad_code }}</span>
                             </div>
                         </div>
                         @empty
-                        <div class="text-center py-4 px-2 border-2 border-dashed border-dark rounded-3 bg-light">
-                            <i class="fas fa-inbox text-dark fa-2x mb-2"></i>
-                            <p class="text-dark fw-bold small mb-0">Tidak ada daftar handling pemeriksaan.</p>
+                        <div class="text-center py-4 px-2 rounded-3" style="border: 1px dashed var(--ent-grid-border); background: rgba(79, 70, 229, 0.04);">
+                            <i class="fas fa-inbox text-primary opacity-75 fa-2x mb-2"></i>
+                            <p class="fw-semibold small mb-0 opacity-75">Tidak ada daftar handling pemeriksaan.</p>
                         </div>
                         @endforelse
                     </div>
@@ -240,13 +343,13 @@
     <!-- RIGHT SECTION: DETAIL DOKUMENTASI HASIL -->
     <div class="col-lg-8">
         <div id="menu-detail-handling">
-            <div class="rad-sidebar-card p-5 text-center bg-white">
+            <div class="ent-card p-5 text-center ent-table-surface">
                 <div class="py-4">
-                    <div class="p-3 rounded-circle d-inline-block mb-3 fw-bold" style="width: 80px; height: 80px; background-color: var(--retro-yellow); border: 2px solid var(--retro-dark); box-shadow: 3px 3px 0px var(--retro-dark);">
-                        <i class="fas fa-file-medical fa-2x text-dark mt-2"></i>
+                    <div class="rounded-circle d-inline-flex align-items-center justify-content-center mb-3" style="width: 76px; height: 76px; background: rgba(79, 70, 229, 0.12); border: 1px solid var(--ent-grid-border);">
+                        <i class="fas fa-file-medical fa-2x text-primary"></i>
                     </div>
-                    <h5 class="fw-bolder text-dark">Pilih Pasien Dari Daftar Handling</h5>
-                    <p class="text-dark fw-bold small mx-auto mb-0 opacity-75" style="max-width: 420px;">
+                    <h5 class="fw-bold">Pilih Pasien Dari Daftar Handling</h5>
+                    <p class="fw-semibold small mx-auto mb-0 opacity-75" style="max-width: 420px;">
                         Silakan klik salah satu pasien pada panel sebelah kiri untuk menampilkan detail pemeriksaan dan mengunggah dokumentasi hasil radiologi.
                     </p>
                 </div>
@@ -260,22 +363,26 @@
 <!-- Modals Section -->
 <div class="modal fade" id="modal-poliklinik-full" data-bs-keyboard="false" data-bs-backdrop="static" tabindex="-1" aria-labelledby="staticBackdropLabel" aria-hidden="true">
     <div class="modal-dialog modal-dialog-centered" role="document" style="max-width: 95%;">
-        <div class="modal-content rad-modal border-0 shadow-lg">
-            <div class="position-absolute top-0 end-0 mt-3 me-3 z-index-1">
-                <button class="btn-close btn btn-sm btn-circle d-flex flex-center transition-base bg-white border border-dark fw-bold shadow-sm" data-bs-dismiss="modal" aria-label="Close"></button>
+        <div class="modal-content modal-ent-content border-0 shadow-lg">
+            <div class="position-absolute top-0 end-0 mt-3 me-3" style="z-index: 10;">
+                <button class="btn btn-sm ent-btn ent-btn-reset d-flex align-items-center justify-content-center" data-bs-dismiss="modal" aria-label="Close" style="width: 32px; height: 32px; border-radius: 50%; padding: 0;">
+                    <i class="fas fa-times"></i>
+                </button>
             </div>
-            <div id="menu-poliklinik-full" class="p-3"></div>
+            <div id="menu-poliklinik-full" class="p-3 p-md-4"></div>
         </div>
     </div>
 </div>
 
 <div class="modal fade" id="modal-poliklinik" data-bs-keyboard="false" data-bs-backdrop="static" tabindex="-1" aria-labelledby="staticBackdropLabel" aria-hidden="true">
     <div class="modal-dialog modal-dialog-centered modal-xl" role="document">
-        <div class="modal-content rad-modal border-0 shadow-lg">
-            <div class="position-absolute top-0 end-0 mt-3 me-3 z-index-1">
-                <button class="btn-close btn btn-sm btn-circle d-flex flex-center transition-base bg-white border border-dark fw-bold shadow-sm" data-bs-dismiss="modal" aria-label="Close"></button>
+        <div class="modal-content modal-ent-content border-0 shadow-lg">
+            <div class="position-absolute top-0 end-0 mt-3 me-3" style="z-index: 10;">
+                <button class="btn btn-sm ent-btn ent-btn-reset d-flex align-items-center justify-content-center" data-bs-dismiss="modal" aria-label="Close" style="width: 32px; height: 32px; border-radius: 50%; padding: 0;">
+                    <i class="fas fa-times"></i>
+                </button>
             </div>
-            <div id="menu-poliklinik" class="p-3"></div>
+            <div id="menu-poliklinik" class="p-3 p-md-4"></div>
         </div>
     </div>
 </div>
@@ -290,16 +397,27 @@
 <script src="{{ asset('asset/js/swetalert.js') }}"></script>
 
 <script>
+    let activeDokDetailAjax = null;
+
     $(document).ready(function() {
         if ($('#example').length) {
             new DataTable('#example', {
                 responsive: true
             });
         }
+
+        // Filter cepat daftar handling berdasarkan Nama / No. Reg / NIK
+        $('#nik').on('input', function() {
+            const keyword = $(this).val().toLowerCase().trim();
+            $('.button-dokumentasi-hasil-rad').each(function() {
+                const searchable = $(this).data('search') || '';
+                $(this).toggle(searchable.indexOf(keyword) !== -1);
+            });
+        });
     });
 
     // Event Handler: Klik Item Antrean Handling Radiologi
-    $(document).on("click", "#button-dokumentasi-hasil-rad", function(e) {
+    $(document).on("click", ".button-dokumentasi-hasil-rad", function(e) {
         e.preventDefault();
         var code = $(this).data("code");
 
@@ -307,21 +425,25 @@
         $(".remove-class").removeClass("active-rad-item");
         $(this).addClass("active-rad-item");
 
+        if (activeDokDetailAjax && activeDokDetailAjax.readyState !== 4) {
+            activeDokDetailAjax.abort();
+        }
+
         // Loading Indicator State
         $('#menu-detail-handling').html(`
-            <div class="rad-sidebar-card p-5 text-center bg-white">
+            <div class="ent-card p-5 text-center ent-table-surface">
                 <div class="py-5">
-                    <div class="spinner-border text-dark mb-3" style="width: 3rem; height: 3rem;" role="status">
+                    <div class="spinner-border text-primary mb-3" style="width: 3rem; height: 3rem;" role="status">
                         <span class="visually-hidden">Loading...</span>
                     </div>
-                    <h6 class="fw-bolder text-dark mb-1">Memuat Dokumentasi Hasil Radiologi...</h6>
-                    <p class="text-dark small mb-0 fw-bold opacity-75">Sedang mengambil data pemeriksaan pasien.</p>
+                    <h6 class="fw-bold mb-1">Memuat Dokumentasi Hasil Radiologi...</h6>
+                    <p class="small mb-0 fw-semibold opacity-75">Sedang mengambil data pemeriksaan pasien.</p>
                 </div>
             </div>
         `);
 
         // Request Detail handling via AJAX
-        $.ajax({
+        activeDokDetailAjax = $.ajax({
             url: "{{ route('dokumentasi_hasil_radiologi_detail') }}",
             type: "POST",
             cache: false,
@@ -332,21 +454,27 @@
             dataType: 'html',
         }).done(function(data) {
             $('#menu-detail-handling').html(data);
-        }).fail(function() {
+        }).fail(function(xhr, status) {
+            if (status === 'abort') return;
             $('#menu-detail-handling').html(`
-                <div class="alert alert-danger border-2 border-dark rounded-3 p-4 text-center fw-bold shadow-sm" role="alert" style="background-color: var(--retro-pink); color: var(--retro-dark);">
+                <div class="alert alert-danger rounded-3 p-4 text-center fw-semibold" role="alert" style="border: 1px solid rgba(225, 29, 72, 0.35);">
                     <i class="fas fa-exclamation-triangle fa-2x mb-2"></i>
-                    <h6 class="fw-bolder">Gagal Memuat Detail Handling</h6>
+                    <h6 class="fw-bold">Gagal Memuat Detail Handling</h6>
                     <p class="small mb-0">Terjadi kesalahan pada jaringan atau server. Silakan coba lagi.</p>
                 </div>
             `);
+        }).always(function() {
+            activeDokDetailAjax = null;
         });
     });
 
     // Event Handler: Kirim Dokumentasi Hasil Radiologi
     $(document).on("click", "#button-kirim-dokumentasi-hasil", function(e) {
         e.preventDefault();
-        var code = $(this).data("code");
+        var $btn = $(this);
+        if ($btn.prop('disabled')) return;
+
+        var code = $btn.data("code");
 
         Swal.fire({
             title: "Konfirmasi Pengiriman Hasil?",
@@ -355,14 +483,14 @@
             allowOutsideClick: false,
             allowEscapeKey: false,
             showCancelButton: true,
-            confirmButtonColor: "#ffde59",
-            cancelButtonColor: "#ffa6c9",
-            confirmButtonText: "<i class='fas fa-paper-plane me-1 text-dark'></i> Ya, Kirim Hasil!",
+            confirmButtonColor: "#4f46e5",
+            cancelButtonColor: "#e11d48",
+            confirmButtonText: "<i class='fas fa-paper-plane me-1'></i> Ya, Kirim Hasil!",
             cancelButtonText: "Batal",
             reverseButtons: true
         }).then((result) => {
             if (result.isConfirmed) {
-                $('#button-kirim-dokumentasi-hasil').prop('disabled', true).html(`
+                $btn.prop('disabled', true).html(`
                     <span class="spinner-border spinner-border-sm me-2" role="status" aria-hidden="true"></span>
                     Mengirimkan...
                 `);
@@ -376,7 +504,7 @@
                         "code": code,
                     },
                     dataType: 'html',
-                }).done(function(data) {
+                }).done(function() {
                     Swal.fire({
                         title: "Berhasil Dikirim!",
                         text: "Dokumentasi hasil radiologi telah berhasil dikirim.",
@@ -387,7 +515,7 @@
                         location.reload();
                     });
                 }).fail(function() {
-                    $('#button-kirim-dokumentasi-hasil').prop('disabled', false).html(`
+                    $btn.prop('disabled', false).html(`
                         <i class="fas fa-paper-plane me-1"></i> Kirim Hasil
                     `);
 
@@ -395,7 +523,7 @@
                         title: "Gagal Mengirim",
                         text: "Terjadi kesalahan saat proses pengiriman hasil radiologi.",
                         icon: "error",
-                        confirmButtonColor: "#1e1e24"
+                        confirmButtonColor: "#4f46e5"
                     });
                 });
             }

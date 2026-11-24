@@ -24,6 +24,14 @@
         --ent-sky: #0284c7;
         --ent-amber: #d97706;
         --ent-rose: #e11d48;
+        --ent-solid-bg: #ffffff;
+        --ent-solid-text: #0f172a;
+    }
+
+    [data-bs-theme="dark"],
+    .dark {
+        --ent-solid-bg: #0f172a;
+        --ent-solid-text: #f8fafc;
     }
 
     body {
@@ -177,34 +185,104 @@
         outline: none;
     }
 
-    /* Select2 Adaptive Styling */
+    /* Select2 Adaptive & Solid Dropdown Styling */
+    .form-floating-custom .select2-container--bootstrap-5 {
+        width: 100% !important;
+    }
+
     .form-floating-custom .select2-container--bootstrap-5 .select2-selection {
         height: 44px !important;
         padding-top: 16px !important;
         padding-bottom: 4px !important;
         padding-left: 8px !important;
+        padding-right: 28px !important;
         border-radius: 10px !important;
-        background-color: var(--bs-body-bg) !important;
+        background-color: var(--ent-solid-bg) !important;
         border: 1px solid var(--ent-grid-border) !important;
+        display: flex !important;
+        align-items: center !important;
+        box-shadow: none !important;
+        opacity: 1 !important;
         transition: all 0.2s ease;
     }
 
     .form-floating-custom .select2-container--bootstrap-5.select2-container--focus .select2-selection,
     .form-floating-custom .select2-container--bootstrap-5.select2-container--open .select2-selection {
         border-color: var(--ent-indigo) !important;
+        background-color: var(--ent-solid-bg) !important;
         box-shadow: 0 0 0 3.5px rgba(79, 70, 229, 0.15) !important;
     }
 
     .form-floating-custom .select2-container--bootstrap-5 .select2-selection--single .select2-selection__rendered {
         font-size: 0.8rem !important;
         font-weight: 600 !important;
-        color: var(--bs-body-color) !important;
+        color: var(--ent-solid-text) !important;
         padding-left: 3px !important;
-        line-height: 1.5 !important;
+        line-height: 1.4 !important;
     }
 
     .form-floating-custom .select2-container--bootstrap-5 .select2-selection--single .select2-selection__arrow {
         top: 10px !important;
+    }
+
+    .select2-container--bootstrap-5 .select2-dropdown {
+        background-color: var(--ent-solid-bg) !important;
+        color: var(--ent-solid-text) !important;
+        border: 1px solid var(--ent-grid-border) !important;
+        border-radius: 12px !important;
+        box-shadow: 0 14px 28px -6px rgba(15, 23, 42, 0.24) !important;
+        overflow: hidden;
+        opacity: 1 !important;
+        z-index: 1080 !important;
+        font-size: 0.8rem;
+    }
+
+    .select2-container--bootstrap-5 .select2-search--dropdown {
+        background-color: var(--ent-solid-bg) !important;
+        padding: 8px !important;
+        border-bottom: 1px solid var(--ent-grid-border);
+    }
+
+    .select2-container--bootstrap-5 .select2-search--dropdown .select2-search__field {
+        background-color: var(--ent-solid-bg) !important;
+        color: var(--ent-solid-text) !important;
+        border: 1px solid var(--ent-grid-border) !important;
+        border-radius: 8px !important;
+        font-size: 0.8rem !important;
+        font-weight: 600 !important;
+        padding: 6px 10px !important;
+    }
+
+    .select2-container--bootstrap-5 .select2-search--dropdown .select2-search__field:focus {
+        border-color: var(--ent-indigo) !important;
+        outline: none;
+        box-shadow: 0 0 0 2.5px rgba(79, 70, 229, 0.15) !important;
+    }
+
+    .select2-container--bootstrap-5 .select2-results__options {
+        background-color: var(--ent-solid-bg) !important;
+        color: var(--ent-solid-text) !important;
+        max-height: 240px;
+        overflow-y: auto;
+    }
+
+    .select2-container--bootstrap-5 .select2-results__option {
+        background-color: var(--ent-solid-bg) !important;
+        color: var(--ent-solid-text) !important;
+        font-size: 0.8rem !important;
+        font-weight: 600 !important;
+        padding: 7px 12px !important;
+        line-height: 1.35 !important;
+    }
+
+    .select2-container--bootstrap-5 .select2-results__option--highlighted[aria-selected] {
+        background-color: var(--ent-indigo) !important;
+        color: #ffffff !important;
+    }
+
+    .select2-container--bootstrap-5 .select2-results__option[aria-selected="true"] {
+        background-color: rgba(79, 70, 229, 0.14) !important;
+        color: var(--ent-indigo) !important;
     }
 
     /* =========================================================
@@ -433,7 +511,7 @@
     </div>
 </div>
 
-<!-- MAIN DATA TABLE CARD (TRANSPARENT HEADER + WHITE TABLE BODY + COLORED GRID) -->
+<!-- MAIN DATA TABLE CARD (TRANSPARENT HEADER + ADAPTIVE TABLE BODY + COLORED GRID) -->
 <div class="ent-card mb-3">
     <div class="card-header py-3 px-3 px-md-4">
         <form method="GET" action="" class="row align-items-center g-2">
@@ -478,7 +556,7 @@
                     <div class="col-12 col-sm-6 col-md-4">
                         <div class="form-floating-custom">
                             <label>Pilih Poliklinik</label>
-                            <select name="poli_id" class="form-select ent-input" id="filter_poli_id">
+                            <select name="poli_id" class="form-select ent-input select2-verif-poli" id="filter_poli_id" data-placeholder="Semua Poliklinik">
                                 <option value="">Semua Poliklinik</option>
                                 @foreach($polis ?? [] as $p)
                                 <option value="{{ $p->id }}" {{ request('poli_id') == $p->id ? 'selected' : '' }}>
@@ -503,7 +581,7 @@
         </form>
     </div>
 
-    <div class="card-body p-0 bg-white">
+    <div class="card-body p-0" style="background-color: var(--bs-body-bg);">
         <div class="table-responsive pb-3">
             <table id="example" class="table table-custom align-middle pb-3 w-100">
                 <thead class="text-dark">
@@ -593,13 +671,33 @@
 <script src="https://cdn.jsdelivr.net/npm/select2@4.1.0-rc.0/dist/js/select2.min.js"></script>
 <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
 <script>
-    $(document).ready(function() {
-        $('#filter_poli_id').select2({
-            theme: 'bootstrap-5',
-            width: '100%',
-            allowClear: true,
-            placeholder: 'Semua Poliklinik'
+    function initSelect2VerifPoli(selector) {
+        if (!(window.jQuery && $.fn.select2)) return;
+        $(selector).each(function() {
+            const $el = $(this);
+            if ($el.hasClass('select2-hidden-accessible')) {
+                $el.select2('destroy');
+            }
+            const placeholderText = $el.data('placeholder') || $el.find('option:first').text() || 'Pilih';
+            $el.select2({
+                theme: 'bootstrap-5',
+                width: '100%',
+                placeholder: placeholderText,
+                allowClear: true,
+                language: {
+                    noResults: function() {
+                        return 'Data tidak ditemukan';
+                    },
+                    searching: function() {
+                        return 'Mencari...';
+                    }
+                }
+            });
         });
+    }
+
+    $(document).ready(function() {
+        initSelect2VerifPoli('.select2-verif-poli');
 
         new DataTable('#example', {
             responsive: true,

@@ -6,70 +6,187 @@
 <link href="{{ asset('vendors/choices/choices.min.css') }}" rel="stylesheet" />
 <link href="{{ asset('vendors/flatpickr/flatpickr.min.css') }}" rel="stylesheet" />
 <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
+<link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&family=JetBrains+Mono:wght@500;700&display=swap" rel="stylesheet">
 
 <style>
     /* =========================================
-       RETRO / NEUBRUTALISM THEME STYLES
+       MODERN ENTERPRISE HEALTHCARE UI STYLES
+       (ADAPTIVE LIGHT & DARK MODE BOOTSTRAP 5)
        ========================================= */
     :root {
-        --retro-dark: #1e1e24;
-        --retro-yellow: #ffde59;
-        --retro-pink: #ffa6c9;
-        --retro-cyan: #8bf0fa;
-        --retro-orange: #ff914d;
-        --retro-green: #c1ff72;
-        --retro-purple: #c8b6ff;
-        --retro-bg: #f4f0ea;
-        --retro-border: 3px solid var(--retro-dark);
-        --retro-shadow: 5px 5px 0px var(--retro-dark);
-        --retro-shadow-sm: 3px 3px 0px var(--retro-dark);
+        --ent-indigo: #4f46e5;
+        --ent-indigo-dark: #4338ca;
+        --ent-indigo-soft: rgba(79, 70, 229, 0.12);
+        --ent-grid-border: rgba(99, 102, 241, 0.28);
+        --ent-emerald: #059669;
+        --ent-sky: #0284c7;
+        --ent-amber: #d97706;
+        --ent-rose: #e11d48;
+        --ent-solid-bg: #ffffff;
+        --ent-solid-text: #0f172a;
+    }
+
+    [data-bs-theme="dark"],
+    .dark {
+        --ent-solid-bg: #0f172a;
+        --ent-solid-text: #f8fafc;
     }
 
     body {
-        /* background-color: var(--retro-bg); */
+        font-family: 'Plus Jakarta Sans', sans-serif;
     }
 
-    /* Retro Cards & Banners */
-    .retro-card {
-        border: var(--retro-border);
-        border-radius: 12px;
-        box-shadow: var(--retro-shadow);
-        /* background-color: #ffffff; */
+    /* Adaptive Enterprise Card */
+    .ent-card {
+        border: 1px solid var(--ent-grid-border);
+        border-radius: 16px;
+        background-color: var(--bs-body-bg, var(--ent-solid-bg));
+        box-shadow: 0 4px 20px -2px rgba(15, 23, 42, 0.08);
         overflow: hidden;
     }
 
-    .retro-header-banner {
-        background: linear-gradient(135deg, var(--retro-yellow) 0%, var(--retro-orange) 100%);
-        border: var(--retro-border);
-        border-radius: 12px;
-        box-shadow: var(--retro-shadow);
-        color: var(--retro-dark);
+    .ent-card>.card-header,
+    .ent-card-header {
+        background-color: rgba(79, 70, 229, 0.07) !important;
+        border-bottom: 1px solid var(--ent-grid-border) !important;
+        padding: 14px 18px;
     }
 
-    /* Patient Card Styling Retro */
+    /* Hero Banner */
+    .ent-header-banner {
+        background: linear-gradient(135deg, #0f172a 0%, #1e1b4b 55%, #312e81 100%);
+        border: 1px solid rgba(99, 102, 241, 0.35);
+        border-radius: 16px;
+        box-shadow: 0 12px 28px -6px rgba(15, 23, 42, 0.22);
+        color: #ffffff;
+        position: relative;
+        overflow: hidden;
+    }
+
+    .ent-header-banner::before {
+        content: '';
+        position: absolute;
+        top: -50%;
+        right: -5%;
+        width: 340px;
+        height: 340px;
+        background: radial-gradient(circle, rgba(56, 189, 248, 0.22) 0%, transparent 70%);
+        pointer-events: none;
+    }
+
+    .ent-glass-pill {
+        background: rgba(255, 255, 255, 0.09);
+        backdrop-filter: blur(8px);
+        border: 1px solid rgba(255, 255, 255, 0.16);
+        border-radius: 12px;
+        color: #ffffff;
+    }
+
+    /* Badges & Chips */
+    .ent-badge {
+        border-radius: 9999px;
+        padding: 4px 10px;
+        font-weight: 700;
+        text-transform: uppercase;
+        display: inline-flex;
+        align-items: center;
+        font-size: 0.68rem;
+        letter-spacing: 0.03em;
+    }
+
+    .code-chip {
+        font-family: 'JetBrains Mono', monospace;
+        background-color: rgba(79, 70, 229, 0.1);
+        color: #4338ca;
+        border: 1px solid rgba(79, 70, 229, 0.25);
+        padding: 2px 8px;
+        border-radius: 7px;
+        font-weight: 700;
+        font-size: 0.72rem;
+        display: inline-block;
+    }
+
+    [data-bs-theme="dark"] .code-chip,
+    .dark .code-chip {
+        background-color: rgba(129, 140, 248, 0.16);
+        color: #a5b4fc;
+        border-color: rgba(129, 140, 248, 0.32);
+    }
+
+    /* Form Controls & Input Groups */
+    .ent-field-label {
+        font-size: 0.68rem;
+        font-weight: 700;
+        text-transform: uppercase;
+        letter-spacing: 0.03em;
+        color: var(--bs-secondary-color, #64748b);
+        margin-bottom: 5px;
+        display: block;
+    }
+
+    .ent-input,
+    .form-control {
+        border: 1px solid var(--ent-grid-border) !important;
+        border-radius: 10px !important;
+        font-weight: 600 !important;
+        color: var(--bs-body-color) !important;
+        background-color: var(--bs-body-bg) !important;
+        font-size: 0.82rem !important;
+        min-height: 38px;
+        transition: all 0.2s ease;
+    }
+
+    .ent-input:focus,
+    .form-control:focus {
+        border-color: var(--ent-indigo) !important;
+        box-shadow: 0 0 0 3.5px rgba(79, 70, 229, 0.15) !important;
+        outline: none;
+    }
+
+    .ent-input-group .input-group-text {
+        background-color: rgba(79, 70, 229, 0.09) !important;
+        border: 1px solid var(--ent-grid-border) !important;
+        border-right: none !important;
+        border-radius: 10px 0 0 10px !important;
+        color: var(--ent-indigo) !important;
+        min-width: 38px;
+        justify-content: center;
+    }
+
+    [data-bs-theme="dark"] .ent-input-group .input-group-text,
+    .dark .ent-input-group .input-group-text {
+        color: #a5b4fc !important;
+    }
+
+    .ent-input-group .form-control {
+        border-left: none !important;
+        border-radius: 0 10px 10px 0 !important;
+    }
+
+    /* Patient Queue Cards */
     .patient-card {
-        transition: all 0.1s ease-in-out;
+        transition: all 0.16s ease;
         cursor: pointer;
-        border: 2px solid var(--retro-dark) !important;
-        border-left: 6px solid var(--retro-dark) !important;
-        border-radius: 8px !important;
-        box-shadow: 2px 2px 0px var(--retro-dark);
+        border: 1px solid var(--ent-grid-border) !important;
+        border-left: 4px solid var(--ent-grid-border) !important;
+        border-radius: 12px !important;
         margin-bottom: 10px;
-        background-color: #ffffff;
+        background-color: var(--bs-body-bg, var(--ent-solid-bg));
     }
 
     .patient-card:hover {
-        transform: translate(-2px, -2px);
-        box-shadow: 4px 4px 0px var(--retro-dark) !important;
-        background-color: var(--retro-cyan) !important;
+        transform: translateY(-1px);
+        border-color: rgba(79, 70, 229, 0.5) !important;
+        border-left-color: var(--ent-indigo) !important;
+        background-color: rgba(79, 70, 229, 0.05);
+        box-shadow: 0 6px 16px -4px rgba(79, 70, 229, 0.18);
     }
 
-    /* Active State saat item dipilih */
     .patient-card.active-patient {
-        border-left-color: var(--retro-green) !important;
-        background-color: var(--retro-yellow) !important;
-        box-shadow: 4px 4px 0px var(--retro-dark) !important;
-        transform: translate(-2px, -2px);
+        border-color: var(--ent-indigo) !important;
+        border-left: 4px solid var(--ent-indigo) !important;
+        background-color: rgba(79, 70, 229, 0.11) !important;
+        box-shadow: 0 8px 20px -6px rgba(79, 70, 229, 0.25);
     }
 
     /* Scrollable Patient List */
@@ -79,145 +196,156 @@
         padding-right: 4px;
     }
 
-    /* Custom Scrollbar Retro */
     .patient-list-container::-webkit-scrollbar {
-        width: 8px;
+        width: 6px;
     }
 
     .patient-list-container::-webkit-scrollbar-track {
-        background: var(--retro-bg);
-        border-left: 2px solid var(--retro-dark);
+        background: transparent;
     }
 
     .patient-list-container::-webkit-scrollbar-thumb {
-        background: var(--retro-dark);
-        border-radius: 4px;
+        background: rgba(99, 102, 241, 0.35);
+        border-radius: 9999px;
     }
 
-    .retro-input,
-    .form-control {
-        border: 2px solid var(--retro-dark) !important;
-        border-radius: 6px !important;
-        box-shadow: 2px 2px 0px var(--retro-dark) !important;
-        font-weight: 700 !important;
-        color: var(--retro-dark) !important;
-        background-color: #ffffff !important;
+    .patient-list-container::-webkit-scrollbar-thumb:hover {
+        background: var(--ent-indigo);
     }
 
-    .retro-input:focus,
-    .form-control:focus {
-        box-shadow: 4px 4px 0px var(--retro-dark) !important;
-        outline: none;
+    /* Empty State & Modal Adaptive */
+    .empty-result-state {
+        border: 1px dashed var(--ent-grid-border);
+        border-radius: 16px;
+        background-color: var(--bs-body-bg, var(--ent-solid-bg));
+        padding: 3.5rem 1.5rem;
+        text-align: center;
+        box-shadow: 0 4px 20px -2px rgba(15, 23, 42, 0.06);
     }
 
-    .retro-badge {
-        border: 2px solid var(--retro-dark);
-        border-radius: 6px;
-        padding: 4px 8px;
-        font-weight: 800;
-        box-shadow: 2px 2px 0px var(--retro-dark);
-        text-transform: uppercase;
-        display: inline-block;
-        font-size: 0.7rem;
+    .empty-icon-wrap {
+        width: 68px;
+        height: 68px;
+        border-radius: 18px;
+        background: rgba(79, 70, 229, 0.1);
+        border: 1px solid var(--ent-grid-border);
+        color: var(--ent-indigo);
+        display: inline-flex;
+        align-items: center;
+        justify-content: center;
+        font-size: 1.65rem;
+    }
+
+    [data-bs-theme="dark"] .empty-icon-wrap,
+    .dark .empty-icon-wrap {
+        color: #a5b4fc;
+    }
+
+    .modal-ent-content {
+        border: 1px solid var(--ent-grid-border) !important;
+        border-radius: 18px !important;
+        box-shadow: 0 25px 50px -12px rgba(15, 23, 42, 0.35) !important;
+        background-color: var(--bs-body-bg, var(--ent-solid-bg)) !important;
+        color: var(--bs-body-color);
+        overflow: hidden;
     }
 </style>
 @endsection
 
 @section('content')
-<!-- BANNER HEADER ATAS -->
-<div class="row mb-4">
+<!-- HERO HEADER BANNER -->
+<div class="row mb-3">
     <div class="col-12">
-        <div class="card retro-header-banner p-1">
-            <div class="card-body p-4 text-dark position-relative z-1">
+        <div class="card ent-header-banner p-1">
+            <div class="card-body p-3 p-md-4 text-white position-relative" style="z-index: 2;">
                 <div class="row align-items-center gy-3">
-
                     <!-- Brand & App Label -->
-                    <div class="col-lg-7 d-flex align-items-center">
-                        <div class="p-2 rounded-4 me-3 d-flex align-items-center justify-content-center"
-                            style="width: 65px; height: 65px; background: white; border: 2px solid var(--retro-dark); box-shadow: 3px 3px 0px var(--retro-dark);">
-                            <img src="{{ asset('img/dashboard.png') }}" alt="Logo" class="img-fluid" width="42" />
+                    <div class="col-lg-8 d-flex align-items-center">
+                        <div class="ent-glass-pill me-3 d-flex align-items-center justify-content-center flex-shrink-0"
+                            style="width: 60px; height: 60px;">
+                            <img src="{{ asset('img/dashboard.png') }}" alt="Logo" class="img-fluid" width="40" />
                         </div>
                         <div>
                             <div class="d-flex align-items-center gap-2 mb-1">
-                                <span class="retro-badge" style="background-color: var(--retro-cyan); color: var(--retro-dark);">
-                                    <i class="fas fa-shield-alt me-1"></i> v2.4 Medical Suite
+                                <span class="ent-badge" style="background: rgba(56, 189, 248, 0.2); border: 1px solid rgba(56, 189, 248, 0.4); color: #7dd3fc;">
+                                    <i class="fas fa-flask me-1"></i> {{ env('APP_LABEL', 'HIS') }} SYSTEM
                                 </span>
+                                <span style="color: #94a3b8; font-size: 0.75rem; font-weight: 600;">Laboratorium Klinis</span>
                             </div>
-                            <h3 class="fw-bolder mb-0 text-dark" style="font-size: 1.4rem; text-shadow: 1px 1px 0px white;">
-                                Welcome to {{ Env('APP_LABEL')}} <span class="fw-normal">Management System</span>
-                            </h3>
+                            <h4 class="fw-bold mb-0 text-white" style="letter-spacing: -0.02em;">
+                                Proses Result Entry
+                            </h4>
+                            <p class="mb-0 small" style="color: #cbd5e1;">Input dan verifikasi parameter hasil pemeriksaan laboratorium pasien.</p>
                         </div>
                     </div>
 
-                    <!-- Module Badge / Quick Nav -->
-                    <div class="col-lg-5 text-lg-end">
-                        <div class="d-inline-flex align-items-center bg-white px-3 py-2 rounded-pill" style="border: 2px solid var(--retro-dark); box-shadow: 3px 3px 0px var(--retro-dark);">
-                            <h6 class="fw-bolder mb-0 text-dark" style="font-size: 0.95rem;">
-                                <i class="fas fa-file-prescription me-1 text-warning"></i> Proses Result Entry
-                            </h6>
+                    <!-- Date Indicator Pill -->
+                    <div class="col-lg-4 text-lg-end">
+                        <div class="ent-glass-pill px-3 py-2 d-inline-flex align-items-center gap-2">
+                            <i class="fas fa-calendar-check text-info"></i>
+                            <span class="fw-semibold" style="font-size: 0.86rem;">{{ date('d F Y') }}</span>
                         </div>
                     </div>
-
                 </div>
             </div>
         </div>
     </div>
 </div>
 
-
 <!-- CONTENT MAIN GRID -->
-<div class="row g-4">
+<div class="row g-3 g-md-4">
     <!-- KIRI: FILTER & DAFTAR PASIEN -->
     <div class="col-lg-4">
         <div class="sticky-sidebar">
-            <div class="card retro-card">
-                <div class="card-header py-3 px-3 border-bottom border-dark d-flex justify-content-between align-items-center" style="background-color: var(--retro-yellow);">
-                    <h6 class="mb-0 fw-bolder text-dark">
-                        <i class="fas fa-list-alt text-dark me-1"></i> Antrean Pasien Lab
+            <div class="card ent-card">
+                <div class="ent-card-header py-3 px-3 d-flex justify-content-between align-items-center">
+                    <h6 class="mb-0 fw-bold d-flex align-items-center gap-2">
+                        <i class="fas fa-list-alt text-primary"></i>
+                        <span>Antrean Pasien Lab</span>
                     </h6>
-                    <span class="retro-badge" style="background-color: #ffffff; color: var(--retro-dark);">{{ count($data) }} Pasien</span>
+                    <span class="code-chip">{{ count($data) }} Pasien</span>
                 </div>
 
                 <div class="card-body p-3">
                     <!-- FILTER AREA -->
                     <div class="mb-3">
-                        <label class="form-label fs--2 fw-bolder text-dark mb-1">Rentang Tanggal</label>
-                        <div class="input-group input-group-sm mb-2">
-                            <span class="input-group-text text-dark fw-bold" style="background-color: var(--retro-cyan); border: 2px solid var(--retro-dark); border-right: none; border-top-left-radius: 6px; border-bottom-left-radius: 6px;"><i class="fas fa-calendar-alt"></i></span>
-                            <input class="form-control datetimepicker border-start-0 retro-input" id="timepicker3" type="text" placeholder="Pilih rentang tanggal..." data-options='{"mode":"range","dateFormat":"d/m/y","disableMobile":true,"locale":"en"}' style="border-top-left-radius: 0 !important; border-bottom-left-radius: 0 !important;" />
+                        <label for="timepicker3" class="ent-field-label">Rentang Tanggal</label>
+                        <div class="input-group ent-input-group mb-2">
+                            <span class="input-group-text"><i class="fas fa-calendar-alt"></i></span>
+                            <input class="form-control datetimepicker ent-input" id="timepicker3" type="text" placeholder="Pilih rentang tanggal..." data-options='{"mode":"range","dateFormat":"d/m/y","disableMobile":true,"locale":"en"}' />
                         </div>
 
-                        <label class="form-label fs--2 fw-bolder text-dark mb-1">Scan / Cari No Reg</label>
-                        <div class="input-group input-group-sm">
-                            <span class="input-group-text text-dark fw-bold" style="background-color: var(--retro-cyan); border: 2px solid var(--retro-dark); border-right: none; border-top-left-radius: 6px; border-bottom-left-radius: 6px;"><i class="fas fa-qrcode"></i></span>
-                            <input type="text" name="no_reg" class="form-control border-start-0 retro-input" id="no_reg" placeholder="Scan barcode / ketik No Reg..." onkeydown="search(this)" autofocus style="border-top-left-radius: 0 !important; border-bottom-left-radius: 0 !important;">
+                        <label for="no_reg" class="ent-field-label">Scan / Cari No Reg</label>
+                        <div class="input-group ent-input-group">
+                            <span class="input-group-text"><i class="fas fa-qrcode"></i></span>
+                            <input type="text" name="no_reg" class="form-control ent-input" id="no_reg" placeholder="Scan barcode / ketik No Reg..." onkeydown="if(typeof search === 'function') search(this)" autofocus autocomplete="off" style="font-family: 'JetBrains Mono', monospace;">
                         </div>
                     </div>
 
-                    <hr class="my-3 border-dark" style="border-width: 2px;">
+                    <hr class="my-3" style="border-color: var(--ent-grid-border); opacity: 1;">
 
                     <!-- LIST PASIEN / REGISTRASI -->
                     <div class="patient-list-container">
                         @forelse ($data as $datas)
-                        <div class="patient-card remove-class shadow-none button-pilih-registrasi p-2.5" data-code="{{ $datas->registrasi_id }}">
-                            <div class="card-body p-1">
-                                <div class="d-flex justify-content-between align-items-start mb-1">
-                                    <h6 class="mb-0 fw-bolder text-dark fs--1">{{ $datas->master_patient_name }}</h6>
-                                    <span class="retro-badge" style="background-color: var(--retro-cyan); color: var(--retro-dark); font-size: 0.65rem;">
-                                        {{ $datas->no_registrasi }}
+                            <div class="patient-card remove-class button-pilih-registrasi p-2" data-code="{{ $datas->registrasi_id }}">
+                                <div class="d-flex justify-content-between align-items-start gap-2 mb-1">
+                                    <h6 class="mb-0 fw-bold small">{{ $datas->master_patient_name }}</h6>
+                                    <span class="code-chip flex-shrink-0">{{ $datas->no_registrasi }}</span>
+                                </div>
+                                <div class="d-flex justify-content-between align-items-center small opacity-75 fw-semibold" style="font-size: 0.74rem;">
+                                    <span style="font-family: 'JetBrains Mono', monospace;">
+                                        <i class="far fa-clock me-1 text-primary"></i>{{ $datas->d_reg_order_lab_date }}
+                                    </span>
+                                    <span class="fw-bold text-primary">
+                                        {{ $datas->total_pemeriksaan }} Pemeriksaan <i class="fas fa-chevron-right ms-1"></i>
                                     </span>
                                 </div>
-                                <div class="d-flex justify-content-between align-items-center fs--2 text-dark fw-bold">
-                                    <span><i class="fas fa-clock me-1 text-dark"></i>{{ $datas->d_reg_order_lab_date }}</span>
-                                    <span class="text-dark fw-bolder">{{ $datas->total_pemeriksaan }} Pemeriksaan <i class="fas fa-chevron-right ms-1"></i></span>
-                                </div>
                             </div>
-                        </div>
                         @empty
-                        <div class="text-center py-4 text-dark fw-bold">
-                            <i class="fas fa-inbox fa-2x mb-2 text-dark"></i>
-                            <p class="fs--1 mb-0">Tidak ada antrean registrasi lab</p>
-                        </div>
+                            <div class="text-center py-4 opacity-75">
+                                <i class="fas fa-inbox fa-2x mb-2 text-primary"></i>
+                                <p class="small fw-semibold mb-0">Tidak ada antrean registrasi lab</p>
+                            </div>
                         @endforelse
                     </div>
                 </div>
@@ -229,17 +357,16 @@
     <div class="col-lg-8">
         <div id="menu-detail-result">
             <!-- Empty Placeholder -->
-            <div class="retro-card text-center py-5">
-                <div class="card-body">
-                    <div class="mb-3">
-                        <span class="fa-stack fa-2x">
-                            <i class="fas fa-circle fa-stack-1x" style="color: var(--retro-yellow);"></i>
-                            <i class="fas fa-file-medical fa-stack-1x text-dark"></i>
-                        </span>
+            <div class="empty-result-state">
+                <div class="mb-3">
+                    <div class="empty-icon-wrap">
+                        <i class="fas fa-file-medical"></i>
                     </div>
-                    <h5 class="text-dark fw-bolder">Pilih Pasien Lab</h5>
-                    <p class="text-dark fs--1 mb-0 mx-auto fw-bold opacity-75" style="max-width: 400px;">Klik salah satu pasien dari antrean di sebelah kiri atau scan Barcode untuk memproses hasil laboratorium.</p>
                 </div>
+                <h5 class="fw-bold mb-2">Pilih Pasien Lab</h5>
+                <p class="small opacity-75 mb-0 mx-auto" style="max-width: 420px;">
+                    Klik salah satu pasien dari antrean di sebelah kiri atau scan Barcode untuk memproses hasil laboratorium.
+                </p>
             </div>
         </div>
     </div>
@@ -250,9 +377,11 @@
 <!-- MODALS -->
 <div class="modal fade" id="modal-poliklinik-full" data-bs-keyboard="false" data-bs-backdrop="static" tabindex="-1" aria-hidden="true">
     <div class="modal-dialog modal-dialog-centered" role="document" style="max-width: 95%;">
-        <div class="modal-content retro-card border-0">
-            <div class="position-absolute top-0 end-0 mt-3 me-3 z-index-1">
-                <button class="btn-close btn btn-sm btn-circle d-flex flex-center transition-base" data-bs-dismiss="modal" aria-label="Close" style="border: 2px solid var(--retro-dark); border-radius: 50%; padding: 5px; box-shadow: 2px 2px 0px var(--retro-dark); background-color: var(--retro-yellow);"></button>
+        <div class="modal-content modal-ent-content">
+            <div class="position-absolute top-0 end-0 mt-3 me-3" style="z-index: 10;">
+                <button class="btn btn-sm rounded-circle d-flex align-items-center justify-content-center" data-bs-dismiss="modal" aria-label="Close" style="width: 32px; height: 32px; background-color: var(--ent-solid-bg); color: var(--ent-solid-text); border: 1px solid var(--ent-grid-border);">
+                    <i class="fas fa-times"></i>
+                </button>
             </div>
             <div id="menu-poliklinik-full"></div>
         </div>
@@ -261,9 +390,11 @@
 
 <div class="modal fade" id="modal-poliklinik" data-bs-keyboard="false" data-bs-backdrop="static" tabindex="-1" aria-hidden="true">
     <div class="modal-dialog modal-dialog-centered modal-xl" role="document">
-        <div class="modal-content retro-card border-0">
-            <div class="position-absolute top-0 end-0 mt-3 me-3 z-index-1">
-                <button class="btn-close btn btn-sm btn-circle d-flex flex-center transition-base" data-bs-dismiss="modal" aria-label="Close" style="border: 2px solid var(--retro-dark); border-radius: 50%; padding: 5px; box-shadow: 2px 2px 0px var(--retro-dark); background-color: var(--retro-yellow);"></button>
+        <div class="modal-content modal-ent-content">
+            <div class="position-absolute top-0 end-0 mt-3 me-3" style="z-index: 10;">
+                <button class="btn btn-sm rounded-circle d-flex align-items-center justify-content-center" data-bs-dismiss="modal" aria-label="Close" style="width: 32px; height: 32px; background-color: var(--ent-solid-bg); color: var(--ent-solid-text); border: 1px solid var(--ent-grid-border);">
+                    <i class="fas fa-times"></i>
+                </button>
             </div>
             <div id="menu-poliklinik"></div>
         </div>
@@ -280,48 +411,60 @@
 <script src="{{ asset('asset/js/swetalert.js') }}"></script>
 
 <script>
+    let activeResultDetailAjax = null;
+
     // Event listener untuk klik antrean registrasi pasien lab di sebelah kiri
     $(document).on("click", ".button-pilih-registrasi", function(e) {
         e.preventDefault();
 
-        // Mengatur status aktif pada kartu pasien
         $('.patient-card').removeClass('active-patient');
         $(this).addClass('active-patient');
 
         var registrasiId = $(this).data("code");
 
-        $('#menu-detail-result').html(
-            '<div class="retro-card py-5 text-center">' +
-            '<div class="card-body">' +
-            '<div class="spinner-border text-dark my-3" role="status" style="width: 2.5rem; height: 2.5rem;"><span class="visually-hidden">Loading...</span></div>' +
-            '<p class="text-dark fw-bold fs--1 mb-0">Memuat daftar pemeriksaan & parameter lab...</p>' +
-            '</div>' +
-            '</div>'
-        );
+        if (activeResultDetailAjax && activeResultDetailAjax.readyState !== 4) {
+            activeResultDetailAjax.abort();
+        }
 
-        $.ajax({
+        $('#menu-detail-result').html(`
+            <div class="card ent-card py-5 text-center">
+                <div class="card-body">
+                    <div class="spinner-border text-primary my-3" role="status" style="width: 2.5rem; height: 2.5rem;">
+                        <span class="visually-hidden">Loading...</span>
+                    </div>
+                    <p class="opacity-75 fw-semibold small mb-0">Memuat daftar pemeriksaan &amp; parameter lab...</p>
+                </div>
+            </div>
+        `);
+
+        activeResultDetailAjax = $.ajax({
             url: "{{ route('menu_lab_proses_result_detail') }}",
             type: "POST",
             cache: false,
             data: {
                 "_token": "{{ csrf_token() }}",
-                "code": registrasiId, // Mengirim ID Registrasi
+                "code": registrasiId,
             },
             dataType: 'html',
         }).done(function(data) {
             $('#menu-detail-result').html(data);
-        }).fail(function() {
-            $('#menu-detail-result').html(
-                '<div class="alert alert-danger shadow-sm border-2 border-dark" role="alert" style="border-radius: 8px;">' +
-                '<i class="fas fa-exclamation-triangle me-2"></i> Gagal memuat data pemeriksaan. Silakan coba lagi.' +
-                '</div>'
-            );
+        }).fail(function(xhr, status) {
+            if (status === 'abort') return;
+            $('#menu-detail-result').html(`
+                <div class="alert alert-danger rounded-3" role="alert">
+                    <i class="fas fa-exclamation-triangle me-2"></i> Gagal memuat data pemeriksaan. Silakan coba lagi.
+                </div>
+            `);
+        }).always(function() {
+            activeResultDetailAjax = null;
         });
     });
 
     // Event listener untuk menyimpan hasil pemeriksaan lab
     $(document).on("click", "#button-simpan-proses-result", function(e) {
         e.preventDefault();
+        var btn = $(this);
+        if (btn.prop('disabled')) return;
         var data = $("#form-result-pasien").serialize();
 
         Swal.fire({
@@ -329,27 +472,29 @@
             text: "Pastikan seluruh parameter data hasil telah sesuai!",
             icon: "question",
             showCancelButton: true,
-            confirmButtonColor: "#c1ff72",
-            cancelButtonColor: "#ffa6c9",
+            confirmButtonColor: "#059669",
+            cancelButtonColor: "#e11d48",
             confirmButtonText: "Ya, Simpan!",
             cancelButtonText: "Batal",
             reverseButtons: true
         }).then((result) => {
             if (result.isConfirmed) {
+                btn.prop('disabled', true);
                 $.ajax({
                     url: "{{ route('menu_lab_proses_result_detail_proses_save') }}",
                     type: "POST",
                     cache: false,
                     data: data,
                     dataType: 'html',
-                }).done(function(data) {
+                }).done(function(response) {
                     Swal.fire({
                         title: "Tersimpan!",
                         text: "Data hasil laboratorium berhasil disimpan.",
                         icon: "success"
                     });
-                    $('#menu-detail-result').html(data);
+                    $('#menu-detail-result').html(response);
                 }).fail(function() {
+                    btn.prop('disabled', false);
                     Swal.fire({
                         title: "Gagal!",
                         text: "Terjadi kesalahan saat menyimpan data.",

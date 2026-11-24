@@ -41,7 +41,7 @@
     .ent-card {
         border: 1px solid var(--ent-grid-border);
         border-radius: 16px;
-        background-color: transparent;
+        background-color: var(--bs-body-bg, var(--ent-solid-bg));
         box-shadow: 0 4px 20px -2px rgba(15, 23, 42, 0.08);
         overflow: hidden;
     }
@@ -116,6 +116,7 @@
         color: var(--ent-solid-text) !important;
         background-color: var(--ent-solid-bg) !important;
         font-size: 0.82rem;
+        min-height: 38px;
         transition: all 0.2s ease;
     }
 
@@ -132,22 +133,33 @@
         cursor: pointer;
     }
 
+    .select2-container--bootstrap-5 {
+        width: 100% !important;
+    }
+
     .select2-container--bootstrap-5 .select2-selection {
         border: 1px solid var(--ent-grid-border) !important;
         border-radius: 10px !important;
-        font-weight: 600;
+        font-weight: 600 !important;
         color: var(--ent-solid-text) !important;
         background-color: var(--ent-solid-bg) !important;
         opacity: 1 !important;
-        font-size: 0.82rem;
-        min-height: 36px;
-        padding-top: 0.22rem;
-        padding-bottom: 0.22rem;
+        font-size: 0.82rem !important;
+        min-height: 38px !important;
+        display: flex !important;
+        align-items: center !important;
+        padding-left: 10px !important;
+        padding-right: 28px !important;
+        box-shadow: none !important;
         transition: all 0.2s ease;
     }
 
     .select2-container--bootstrap-5 .select2-selection--single .select2-selection__rendered {
         color: var(--ent-solid-text) !important;
+        font-weight: 600 !important;
+        font-size: 0.82rem !important;
+        padding-left: 0 !important;
+        line-height: 1.4 !important;
     }
 
     .select2-container--bootstrap-5.select2-container--focus .select2-selection,
@@ -159,16 +171,20 @@
 
     .select2-container--bootstrap-5 .select2-dropdown {
         border: 1px solid var(--ent-grid-border) !important;
-        border-radius: 10px !important;
+        border-radius: 12px !important;
         background-color: var(--ent-solid-bg) !important;
         color: var(--ent-solid-text) !important;
         opacity: 1 !important;
+        z-index: 1080 !important;
         font-size: 0.82rem;
-        box-shadow: 0 12px 28px -6px rgba(15, 23, 42, 0.24) !important;
+        box-shadow: 0 14px 28px -6px rgba(15, 23, 42, 0.24) !important;
+        overflow: hidden;
     }
 
     .select2-container--bootstrap-5 .select2-search--dropdown {
         background-color: var(--ent-solid-bg) !important;
+        padding: 8px !important;
+        border-bottom: 1px solid var(--ent-grid-border);
     }
 
     .select2-container--bootstrap-5 .select2-search--dropdown .select2-search__field {
@@ -177,23 +193,41 @@
         background-color: var(--ent-solid-bg) !important;
         color: var(--ent-solid-text) !important;
         opacity: 1 !important;
-        font-size: 0.82rem;
+        font-size: 0.82rem !important;
+        font-weight: 600 !important;
+        padding: 6px 10px !important;
+    }
+
+    .select2-container--bootstrap-5 .select2-search--dropdown .select2-search__field:focus {
+        border-color: var(--ent-indigo) !important;
+        outline: none;
+        box-shadow: 0 0 0 2.5px rgba(79, 70, 229, 0.15) !important;
     }
 
     .select2-container--bootstrap-5 .select2-results__options {
         background-color: var(--ent-solid-bg) !important;
         color: var(--ent-solid-text) !important;
+        max-height: 240px;
+        overflow-y: auto;
     }
 
     .select2-container--bootstrap-5 .select2-results__option {
         background-color: var(--ent-solid-bg) !important;
         color: var(--ent-solid-text) !important;
+        font-size: 0.82rem !important;
+        font-weight: 600 !important;
+        padding: 7px 12px !important;
+        line-height: 1.35 !important;
     }
 
-    .select2-container--bootstrap-5 .select2-results__option--highlighted,
-    .select2-container--bootstrap-5 .select2-results__option--selected {
+    .select2-container--bootstrap-5 .select2-results__option--highlighted[aria-selected] {
         background-color: var(--ent-indigo) !important;
         color: #ffffff !important;
+    }
+
+    .select2-container--bootstrap-5 .select2-results__option[aria-selected="true"] {
+        background-color: rgba(79, 70, 229, 0.14) !important;
+        color: var(--ent-indigo) !important;
     }
 
     .input-group-text-ent {
@@ -334,7 +368,7 @@
 <!-- Main Content Split Area -->
 <div class="row g-3">
     <!-- Sidebar Patient List & Filters -->
-    <div class="col-lg-5">
+    <div class="col-lg-4">
         <div class="sticky-sidebar">
             <!-- Card Filter -->
             <div class="ent-card mb-3">
@@ -343,7 +377,7 @@
                         <i class="fas fa-filter text-primary"></i> Filter Pencarian
                     </h6>
                 </div>
-                <div class="card-body p-3 bg-white">
+                <div class="card-body p-3">
                     <!-- Form Filter -->
                     <form method="GET" action="{{ url()->current() }}">
                         <div class="row g-2.5">
@@ -357,7 +391,7 @@
                             </div>
                             <div class="col-12 mt-2">
                                 <label class="fw-semibold small text-uppercase opacity-75 mb-1" style="font-size: 0.68rem;">Poliklinik</label>
-                                <select id="poli_id" name="poli_id" class="form-select form-select-ent form-select-sm select2-poli">
+                                <select id="poli_id" name="poli_id" class="form-select form-select-ent form-select-sm select2-poli" data-placeholder="-- Semua Poliklinik --">
                                     <option value="">-- Semua Poliklinik --</option>
                                     @foreach($polis ?? [] as $poli)
                                     <option value="{{ $poli->id }}" {{ ($request->poli_id == $poli->id) ? 'selected' : '' }}>
@@ -393,7 +427,7 @@
                         {{ count($data) }} Pasien
                     </span>
                 </div>
-                <div class="card-body p-3 bg-white">
+                <div class="card-body p-3">
                     <!-- Patients List -->
                     <div class="patient-list-container pe-1" style="max-height: 52vh; overflow-y: auto;">
                         @forelse ($data as $datas)
@@ -433,7 +467,7 @@
     </div>
 
     <!-- Detail Handling Area -->
-    <div class="col-lg-7">
+    <div class="col-lg-8">
         <div id="menu-detail-handling" class="h-100">
             <div class="ent-card text-center py-5 h-100 d-flex align-items-center justify-content-center" style="min-height: 460px;">
                 <div class="card-body px-4">
@@ -461,14 +495,34 @@
 <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
 
 <script>
+    function initSelect2HandlingPoli(selector) {
+        if (!(window.jQuery && $.fn.select2)) return;
+        $(selector).each(function() {
+            const $el = $(this);
+            if ($el.hasClass('select2-hidden-accessible')) {
+                $el.select2('destroy');
+            }
+            const placeholderText = $el.data('placeholder') || $el.find('option:first').text() || 'Pilih';
+            $el.select2({
+                theme: 'bootstrap-5',
+                width: '100%',
+                placeholder: placeholderText,
+                allowClear: true,
+                language: {
+                    noResults: function() {
+                        return 'Data tidak ditemukan';
+                    },
+                    searching: function() {
+                        return 'Mencari...';
+                    }
+                }
+            });
+        });
+    }
+
     $(document).ready(function() {
         // Inisialisasi Select2 pada dropdown Poliklinik agar bisa diketik/dicari
-        $('.select2-poli').select2({
-            theme: 'bootstrap-5',
-            placeholder: '-- Semua Poliklinik --',
-            allowClear: true,
-            width: '100%'
-        });
+        initSelect2HandlingPoli('.select2-poli');
 
         // Inisialisasi Flatpickr pada input tanggal
         flatpickr('.flatpickr-date', {

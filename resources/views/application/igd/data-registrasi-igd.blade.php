@@ -151,7 +151,6 @@
         background: transparent;
     }
 
-
     .form-control {
         border: 1px solid var(--ent-grid-border) !important;
         border-radius: 10px !important;
@@ -183,18 +182,26 @@
     .form-select:focus {
         border-color: var(--ent-indigo) !important;
         box-shadow: 0 0 0 3.5px rgba(79, 70, 229, 0.15) !important;
-        /* outline: none; */
+        outline: none;
     }
 
     /* Select2 Adaptive & Solid Dropdown Styling */
+    .form-floating-custom .select2-container--bootstrap-5 {
+        width: 100% !important;
+    }
+
     .form-floating-custom .select2-container--bootstrap-5 .select2-selection {
         height: 44px !important;
         padding-top: 16px !important;
         padding-bottom: 4px !important;
         padding-left: 8px !important;
+        padding-right: 28px !important;
         border-radius: 10px !important;
         background-color: var(--ent-solid-bg) !important;
         border: 1px solid var(--ent-grid-border) !important;
+        display: flex !important;
+        align-items: center !important;
+        box-shadow: none !important;
         opacity: 1 !important;
         transition: all 0.2s ease;
     }
@@ -211,7 +218,7 @@
         font-weight: 600 !important;
         color: var(--ent-solid-text) !important;
         padding-left: 3px !important;
-        line-height: 1.5 !important;
+        line-height: 1.4 !important;
     }
 
     .form-floating-custom .select2-container--bootstrap-5 .select2-selection--single .select2-selection__arrow {
@@ -220,18 +227,19 @@
 
     .select2-container--bootstrap-5 .select2-dropdown {
         border: 1px solid var(--ent-grid-border) !important;
-        border-radius: 10px !important;
+        border-radius: 12px !important;
         background-color: var(--ent-solid-bg) !important;
         color: var(--ent-solid-text) !important;
         opacity: 1 !important;
-        box-shadow: 0 12px 28px -6px rgba(15, 23, 42, 0.24) !important;
+        z-index: 1080 !important;
+        box-shadow: 0 14px 28px -6px rgba(15, 23, 42, 0.24) !important;
+        overflow: hidden;
     }
 
-    .select2-container--bootstrap-5 .select2-search--dropdown,
-    .select2-container--bootstrap-5 .select2-results__options,
-    .select2-container--bootstrap-5 .select2-results__option {
+    .select2-container--bootstrap-5 .select2-search--dropdown {
         background-color: var(--ent-solid-bg) !important;
-        color: var(--ent-solid-text) !important;
+        padding: 8px !important;
+        border-bottom: 1px solid var(--ent-grid-border);
     }
 
     .select2-container--bootstrap-5 .select2-search--dropdown .select2-search__field {
@@ -240,12 +248,40 @@
         background-color: var(--ent-solid-bg) !important;
         color: var(--ent-solid-text) !important;
         font-size: 0.8rem !important;
+        font-weight: 600 !important;
+        padding: 6px 10px !important;
     }
 
-    .select2-container--bootstrap-5 .select2-results__option--highlighted,
-    .select2-container--bootstrap-5 .select2-results__option--selected {
+    .select2-container--bootstrap-5 .select2-search--dropdown .select2-search__field:focus {
+        border-color: var(--ent-indigo) !important;
+        outline: none;
+        box-shadow: 0 0 0 2.5px rgba(79, 70, 229, 0.15) !important;
+    }
+
+    .select2-container--bootstrap-5 .select2-results__options {
+        background-color: var(--ent-solid-bg) !important;
+        color: var(--ent-solid-text) !important;
+        max-height: 240px;
+        overflow-y: auto;
+    }
+
+    .select2-container--bootstrap-5 .select2-results__option {
+        background-color: var(--ent-solid-bg) !important;
+        color: var(--ent-solid-text) !important;
+        font-size: 0.8rem !important;
+        font-weight: 600 !important;
+        padding: 7px 12px !important;
+        line-height: 1.35 !important;
+    }
+
+    .select2-container--bootstrap-5 .select2-results__option--highlighted[aria-selected] {
         background-color: var(--ent-indigo) !important;
         color: #ffffff !important;
+    }
+
+    .select2-container--bootstrap-5 .select2-results__option[aria-selected="true"] {
+        background-color: rgba(79, 70, 229, 0.14) !important;
+        color: var(--ent-indigo) !important;
     }
 
     /* =========================================================
@@ -527,7 +563,7 @@
                     <div class="col-12 col-sm-6 col-md">
                         <div class="form-floating-custom">
                             <label>Poli / Ruangan IGD</label>
-                            <select class="form-select ent-input" id="poli_id" name="poli_id">
+                            <select class="form-select ent-input select2-filter-igd" id="poli_id" name="poli_id" data-placeholder="Semua Poli/Ruangan">
                                 <option value="">Semua Poli/Ruangan</option>
                                 @if(isset($polis))
                                 @foreach ($polis as $poli)
@@ -542,7 +578,7 @@
                     <div class="col-12 col-sm-6 col-md">
                         <div class="form-floating-custom">
                             <label>Dokter Pemeriksa</label>
-                            <select class="form-select ent-input" id="dokter" name="dokter">
+                            <select class="form-select ent-input select2-filter-igd" id="dokter" name="dokter" data-placeholder="Semua Dokter">
                                 <option value="">Semua Dokter</option>
                                 @if(isset($doctors))
                                 @foreach ($doctors as $doc)
@@ -557,7 +593,7 @@
                     <div class="col-12 col-sm-6 col-md">
                         <div class="form-floating-custom">
                             <label>Kel. Pelanggan</label>
-                            <select class="form-select ent-input" id="sub_penjamin_id" name="sub_penjamin_id">
+                            <select class="form-select ent-input select2-filter-igd" id="sub_penjamin_id" name="sub_penjamin_id" data-placeholder="Semua Kelompok">
                                 <option value="">Semua Kelompok</option>
                                 @if(isset($subPenjamins))
                                 @foreach ($subPenjamins as $sp)
@@ -628,12 +664,34 @@
 
 <script>
     let tableIgd;
-    $(document).ready(function() {
-        $('#poli_id, #dokter, #sub_penjamin_id').select2({
-            theme: 'bootstrap-5',
-            width: '100%',
-            allowClear: true
+
+    function initSelect2Igd(selector) {
+        if (!(window.jQuery && $.fn.select2)) return;
+        $(selector).each(function() {
+            const $el = $(this);
+            if ($el.hasClass('select2-hidden-accessible')) {
+                $el.select2('destroy');
+            }
+            const placeholderText = $el.data('placeholder') || $el.find('option:first').text() || 'Pilih';
+            $el.select2({
+                theme: 'bootstrap-5',
+                width: '100%',
+                placeholder: placeholderText,
+                allowClear: true,
+                language: {
+                    noResults: function() {
+                        return 'Data tidak ditemukan';
+                    },
+                    searching: function() {
+                        return 'Mencari...';
+                    }
+                }
+            });
         });
+    }
+
+    $(document).ready(function() {
+        initSelect2Igd('.select2-filter-igd');
 
         tableIgd = $('#table-registrasi-igd').DataTable({
             processing: true,

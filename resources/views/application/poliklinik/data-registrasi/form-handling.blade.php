@@ -231,7 +231,7 @@
 
 <div class="modal-body p-0 ent-handling-wrap">
     <!-- Header Modern Enterprise -->
-    <div class="ent-handling-header py-3 px-4 pe-5 d-flex flex-wrap justify-content-between align-items-center gap-3">
+    <div class="ent-handling-header py-3 px-3 pe-3 d-flex flex-wrap justify-content-between align-items-center gap-3">
         <div class="d-flex align-items-center gap-3 position-relative" style="z-index: 2;">
             <div class="ent-handling-icon-box">
                 <i class="fas fa-notes-medical"></i>
@@ -255,8 +255,8 @@
         </div>
     </div>
 
-    <div class="p-3 p-md-4 bg-white">
-        <div class="row g-3 g-md-4">
+    <div class="p-3 p-md-3 bg-white">
+        <div class="row g-3 g-md-3">
             <!-- Profil Foto Pasien -->
             <div class="col-md-3 col-lg-2 d-flex">
                 <div class="ent-panel-card w-100 text-center p-3 d-flex flex-column align-items-center justify-content-center">
@@ -435,7 +435,7 @@
 
             <!-- Footer Action Button -->
             <div class="col-12 pt-3 border-top d-flex flex-wrap justify-content-between align-items-center gap-2" style="border-color: var(--ent-h-border) !important;">
-                <button type="button" class="btn btn-dark ent-btn-action px-4" data-bs-dismiss="modal">
+                <button type="button" class="btn btn-danger  px-3" data-bs-dismiss="modal">
                     <i class="fas fa-times me-1"></i> Tutup
                 </button>
                 <span id="menu-handling-pasien-poliklinik">

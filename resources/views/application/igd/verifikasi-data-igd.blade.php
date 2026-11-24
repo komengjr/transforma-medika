@@ -3,6 +3,8 @@
 @section('base.css')
 <link rel="stylesheet" href="https://cdn.datatables.net/2.2.2/css/dataTables.bootstrap5.css">
 <link rel="stylesheet" href="https://cdn.datatables.net/responsive/3.0.4/css/responsive.bootstrap5.css">
+<link href="https://cdn.jsdelivr.net/npm/select2@4.1.0-rc.0/dist/css/select2.min.css" rel="stylesheet" />
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/select2-bootstrap-5-theme@1.3.0/dist/select2-bootstrap-5-theme.min.css" />
 <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
 <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/sweetalert2@11/dist/sweetalert2.min.css">
 <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&family=JetBrains+Mono:wght@500;700&display=swap" rel="stylesheet">
@@ -144,6 +146,7 @@
         letter-spacing: 0.03em;
         color: var(--bs-secondary-color, #64748b);
         margin-bottom: 5px;
+        display: block;
     }
 
     .ent-input,
@@ -165,6 +168,100 @@
         border-color: var(--ent-indigo) !important;
         box-shadow: 0 0 0 3.5px rgba(79, 70, 229, 0.15) !important;
         outline: none;
+    }
+
+    /* Select2 Adaptive & Solid Dropdown Styling */
+    .select2-container--bootstrap-5 {
+        width: 100% !important;
+    }
+
+    .select2-container--bootstrap-5 .select2-selection {
+        min-height: 38px !important;
+        border-radius: 10px !important;
+        background-color: var(--ent-solid-bg) !important;
+        border: 1px solid var(--ent-grid-border) !important;
+        display: flex !important;
+        align-items: center !important;
+        padding-left: 11px !important;
+        padding-right: 30px !important;
+        box-shadow: none !important;
+        opacity: 1 !important;
+        transition: all 0.2s ease;
+    }
+
+    .select2-container--bootstrap-5.select2-container--focus .select2-selection,
+    .select2-container--bootstrap-5.select2-container--open .select2-selection {
+        border-color: var(--ent-indigo) !important;
+        background-color: var(--ent-solid-bg) !important;
+        box-shadow: 0 0 0 3.5px rgba(79, 70, 229, 0.15) !important;
+    }
+
+    .select2-container--bootstrap-5 .select2-selection--single .select2-selection__rendered {
+        font-size: 0.82rem !important;
+        font-weight: 600 !important;
+        color: var(--ent-solid-text) !important;
+        padding-left: 0 !important;
+        line-height: 1.4 !important;
+    }
+
+    .select2-container--bootstrap-5 .select2-dropdown {
+        background-color: var(--ent-solid-bg) !important;
+        color: var(--ent-solid-text) !important;
+        border: 1px solid var(--ent-grid-border) !important;
+        border-radius: 12px !important;
+        box-shadow: 0 14px 28px -6px rgba(15, 23, 42, 0.24) !important;
+        overflow: hidden;
+        opacity: 1 !important;
+        z-index: 1080 !important;
+        font-size: 0.82rem;
+    }
+
+    .select2-container--bootstrap-5 .select2-search--dropdown {
+        background-color: var(--ent-solid-bg) !important;
+        padding: 8px !important;
+        border-bottom: 1px solid var(--ent-grid-border);
+    }
+
+    .select2-container--bootstrap-5 .select2-search--dropdown .select2-search__field {
+        background-color: var(--ent-solid-bg) !important;
+        color: var(--ent-solid-text) !important;
+        border: 1px solid var(--ent-grid-border) !important;
+        border-radius: 8px !important;
+        font-size: 0.82rem !important;
+        font-weight: 600 !important;
+        padding: 6px 10px !important;
+    }
+
+    .select2-container--bootstrap-5 .select2-search--dropdown .select2-search__field:focus {
+        border-color: var(--ent-indigo) !important;
+        outline: none;
+        box-shadow: 0 0 0 2.5px rgba(79, 70, 229, 0.15) !important;
+    }
+
+    .select2-container--bootstrap-5 .select2-results__options {
+        background-color: var(--ent-solid-bg) !important;
+        color: var(--ent-solid-text) !important;
+        max-height: 240px;
+        overflow-y: auto;
+    }
+
+    .select2-container--bootstrap-5 .select2-results__option {
+        background-color: var(--ent-solid-bg) !important;
+        color: var(--ent-solid-text) !important;
+        font-size: 0.82rem !important;
+        font-weight: 600 !important;
+        padding: 7px 12px !important;
+        line-height: 1.35 !important;
+    }
+
+    .select2-container--bootstrap-5 .select2-results__option--highlighted[aria-selected] {
+        background-color: var(--ent-indigo) !important;
+        color: #ffffff !important;
+    }
+
+    .select2-container--bootstrap-5 .select2-results__option[aria-selected="true"] {
+        background-color: rgba(79, 70, 229, 0.14) !important;
+        color: var(--ent-indigo) !important;
     }
 
     /* Table Styling */
@@ -336,7 +433,7 @@
             </div>
             <div class="col-sm-6 col-md-3">
                 <label class="ent-field-label"><i class="fas fa-heartbeat text-danger me-1"></i> Status Triage</label>
-                <select id="triage" name="triage" class="form-select ent-input">
+                <select id="triage" name="triage" class="form-select ent-input select2-verifikasi-igd" data-placeholder="-- Semua Triage --">
                     <option value="">-- Semua Triage --</option>
                     <option value="MERAH">Merah (Emergency)</option>
                     <option value="KUNING">Kuning (Urgent)</option>
@@ -346,7 +443,7 @@
             </div>
             <div class="col-sm-6 col-md-3">
                 <label class="ent-field-label"><i class="fas fa-check-circle text-success me-1"></i> Status Kunjungan</label>
-                <select id="status_kunjungan" name="status_kunjungan" class="form-select ent-input">
+                <select id="status_kunjungan" name="status_kunjungan" class="form-select ent-input select2-verifikasi-igd" data-placeholder="-- Semua Status --">
                     <option value="">-- Semua Status --</option>
                     <option value="PROSES">Proses Penanganan</option>
                     <option value="SELESAI">Selesai / Pulang</option>
@@ -458,11 +555,39 @@
 @section('base.js')
 <script src="https://cdn.datatables.net/2.2.2/js/dataTables.js"></script>
 <script src="https://cdn.datatables.net/2.2.2/js/dataTables.bootstrap5.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/select2@4.1.0-rc.0/dist/js/select2.min.js"></script>
 <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
 <script>
     let tableVerifikasiIgd;
 
+    function initSelect2VerifikasiIgd(selector) {
+        if (!(window.jQuery && $.fn.select2)) return;
+        $(selector).each(function() {
+            const $el = $(this);
+            if ($el.hasClass('select2-hidden-accessible')) {
+                $el.select2('destroy');
+            }
+            const placeholderText = $el.data('placeholder') || $el.find('option:first').text() || 'Pilih';
+            $el.select2({
+                theme: 'bootstrap-5',
+                width: '100%',
+                placeholder: placeholderText,
+                allowClear: true,
+                language: {
+                    noResults: function() {
+                        return 'Data tidak ditemukan';
+                    },
+                    searching: function() {
+                        return 'Mencari...';
+                    }
+                }
+            });
+        });
+    }
+
     $(document).ready(function() {
+        initSelect2VerifikasiIgd('.select2-verifikasi-igd');
+
         tableVerifikasiIgd = $('#table-verifikasi-igd').DataTable({
             processing: true,
             serverSide: true,
@@ -531,8 +656,8 @@
     function resetFilter() {
         $('#start_date').val("{{ date('Y-m-d') }}");
         $('#end_date').val("{{ date('Y-m-d') }}");
-        $('#triage').val('');
-        $('#status_kunjungan').val('');
+        $('#triage').val('').trigger('change');
+        $('#status_kunjungan').val('').trigger('change');
         $('#keyword').val('');
         reloadTable();
     }

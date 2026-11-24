@@ -12,12 +12,20 @@
         --ent-sky: #0284c7;
         --ent-amber: #d97706;
         --ent-rose: #e11d48;
+        --ent-solid-bg: #ffffff;
+        --ent-solid-text: #0f172a;
         font-family: 'Plus Jakarta Sans', sans-serif;
         color: var(--bs-body-color);
         background-color: var(--bs-body-bg);
         border: 1px solid var(--ent-grid-border) !important;
         border-radius: 16px;
         overflow: hidden;
+    }
+
+    [data-bs-theme="dark"] .ent-igd-modal,
+    .dark .ent-igd-modal {
+        --ent-solid-bg: #0f172a;
+        --ent-solid-text: #f8fafc;
     }
 
     .ent-igd-modal .ent-banner-top {
@@ -149,37 +157,105 @@
         outline: none;
     }
 
-    /* Choices.js Adaptive Styling */
-    .ent-igd-modal .choices {
-        margin-bottom: 0 !important;
+    /* Select2 Adaptive & Solid Dropdown Styling di Dalam Modal */
+    .ent-igd-modal .select2-container--bootstrap-5 {
+        width: 100% !important;
     }
 
-    .ent-igd-modal .choices__inner {
-        border: 1px solid var(--ent-grid-border) !important;
-        border-radius: 10px !important;
-        background-color: var(--bs-body-bg) !important;
-        color: var(--bs-body-color) !important;
+    .ent-igd-modal .select2-container--bootstrap-5 .select2-selection {
         min-height: 42px !important;
-        padding: 6px 12px !important;
-        font-weight: 600;
-        font-size: 0.82rem;
-        display: flex;
-        align-items: center;
+        border-radius: 10px !important;
+        background-color: var(--ent-solid-bg) !important;
+        border: 1px solid var(--ent-grid-border) !important;
+        display: flex !important;
+        align-items: center !important;
+        padding-left: 11px !important;
+        padding-right: 30px !important;
+        box-shadow: none !important;
+        opacity: 1 !important;
+        transition: all 0.2s ease;
     }
 
-    .ent-igd-modal .is-focused .choices__inner,
-    .ent-igd-modal .is-open .choices__inner {
+    .ent-igd-modal .select2-container--bootstrap-5.select2-container--disabled .select2-selection {
+        background-color: rgba(99, 102, 241, 0.08) !important;
+        opacity: 0.75 !important;
+    }
+
+    .ent-igd-modal .select2-container--bootstrap-5.select2-container--focus .select2-selection,
+    .ent-igd-modal .select2-container--bootstrap-5.select2-container--open .select2-selection {
         border-color: var(--ent-indigo) !important;
+        background-color: var(--ent-solid-bg) !important;
         box-shadow: 0 0 0 3.5px rgba(79, 70, 229, 0.15) !important;
     }
 
-    .ent-igd-modal .choices__list--dropdown {
-        border: 1px solid var(--ent-grid-border) !important;
-        border-radius: 10px !important;
-        background-color: var(--bs-body-bg) !important;
-        color: var(--bs-body-color) !important;
-        box-shadow: 0 10px 25px rgba(15, 23, 42, 0.18) !important;
-        z-index: 1060 !important;
+    .ent-igd-modal .select2-container--bootstrap-5 .select2-selection--single .select2-selection__rendered {
+        font-size: 0.82rem !important;
+        font-weight: 600 !important;
+        color: var(--ent-solid-text) !important;
+        padding-left: 0 !important;
+        line-height: 1.4 !important;
+    }
+
+    .select2-container--bootstrap-5 .select2-dropdown.select2-dropdown-igd-modal {
+        background-color: var(--ent-solid-bg, #ffffff) !important;
+        color: var(--ent-solid-text, #0f172a) !important;
+        border: 1px solid rgba(99, 102, 241, 0.28) !important;
+        border-radius: 12px !important;
+        box-shadow: 0 14px 28px -6px rgba(15, 23, 42, 0.28) !important;
+        overflow: hidden;
+        opacity: 1 !important;
+        z-index: 1095 !important;
+        font-size: 0.82rem;
+    }
+
+    [data-bs-theme="dark"] .select2-container--bootstrap-5 .select2-dropdown.select2-dropdown-igd-modal,
+    .dark .select2-container--bootstrap-5 .select2-dropdown.select2-dropdown-igd-modal {
+        background-color: #0f172a !important;
+        color: #f8fafc !important;
+    }
+
+    .select2-container--bootstrap-5 .select2-dropdown.select2-dropdown-igd-modal .select2-search--dropdown {
+        background-color: inherit !important;
+        padding: 8px !important;
+        border-bottom: 1px solid rgba(99, 102, 241, 0.24);
+    }
+
+    .select2-container--bootstrap-5 .select2-dropdown.select2-dropdown-igd-modal .select2-search--dropdown .select2-search__field {
+        background-color: inherit !important;
+        color: inherit !important;
+        border: 1px solid rgba(99, 102, 241, 0.28) !important;
+        border-radius: 8px !important;
+        font-size: 0.82rem !important;
+        font-weight: 600 !important;
+        padding: 6px 10px !important;
+        opacity: 1 !important;
+    }
+
+    .select2-container--bootstrap-5 .select2-dropdown.select2-dropdown-igd-modal .select2-results__options {
+        background-color: inherit !important;
+        color: inherit !important;
+        max-height: 240px;
+        overflow-y: auto;
+    }
+
+    .select2-container--bootstrap-5 .select2-dropdown.select2-dropdown-igd-modal .select2-results__option {
+        background-color: inherit !important;
+        color: inherit !important;
+        font-size: 0.82rem !important;
+        font-weight: 600 !important;
+        padding: 8px 12px !important;
+        line-height: 1.35 !important;
+        opacity: 1 !important;
+    }
+
+    .select2-container--bootstrap-5 .select2-dropdown.select2-dropdown-igd-modal .select2-results__option--highlighted[aria-selected] {
+        background-color: #4f46e5 !important;
+        color: #ffffff !important;
+    }
+
+    .select2-container--bootstrap-5 .select2-dropdown.select2-dropdown-igd-modal .select2-results__option[aria-selected="true"] {
+        background-color: rgba(79, 70, 229, 0.14) !important;
+        color: #4f46e5 !important;
     }
 
     /* Modern Buttons */
@@ -347,7 +423,7 @@
         </div>
     </div>
 
-    <div class="p-3 p-md-4 bg-white">
+    <div class="p-3 p-md-4" style="background-color: var(--bs-body-bg);">
         <!-- INFORMASI SINGKAT PASIEN -->
         <div class="ent-section-card p-3 mb-4" style="background-color: rgba(79, 70, 229, 0.04);">
             <div class="row g-3 align-items-center">
@@ -358,7 +434,7 @@
                     </span>
                 </div>
                 <div class="col-6 col-md-3">
-                    <span class="form-label-ent">Tanggal & Jam Masuk</span>
+                    <span class="form-label-ent">Tanggal &amp; Jam Masuk</span>
                     <div class="fw-bold" style="font-size: 0.84rem;">
                         <i class="far fa-clock text-primary me-1"></i>{{ date('d/m/Y H:i', strtotime($pasien->tanggal_registrasi)) }}
                     </div>
@@ -384,7 +460,7 @@
         <ul class="nav ent-nav-tabs mb-4" id="handlingTab" role="tablist">
             <li class="nav-item" role="presentation">
                 <button class="nav-link active" id="triase-tab" data-bs-toggle="tab" data-bs-target="#triase-pane" type="button" role="tab">
-                    <i class="fas fa-heartbeat me-1"></i> 1. Triase & TTV
+                    <i class="fas fa-heartbeat me-1"></i> 1. Triase &amp; TTV
                 </button>
             </li>
             <li class="nav-item" role="presentation">
@@ -419,13 +495,13 @@
                 <div class="tab-pane fade show active" id="triase-pane" role="tabpanel">
                     <div class="ent-section-card">
                         <div class="form-header-ent d-flex align-items-center gap-2">
-                            <i class="fas fa-heartbeat text-danger"></i> Asesmen Triase & Tanda-Tanda Vital (TTV)
+                            <i class="fas fa-heartbeat text-danger"></i> Asesmen Triase &amp; Tanda-Tanda Vital (TTV)
                         </div>
                         <div class="card-body p-3 p-md-4">
                             <div class="row g-3">
                                 <div class="col-md-4">
                                     <label class="form-label-ent">Skala Triase</label>
-                                    <select class="form-select ent-input" name="skala_triage">
+                                    <select class="form-select ent-input select2-igd-modal" id="select-skala-triage" name="skala_triage" data-placeholder="Pilih Skala Triase">
                                         <option value="1" {{ optional($triase)->skala_triage == 1 ? 'selected' : '' }}>Level 1 - Resusitasi (Merah)</option>
                                         <option value="2" {{ optional($triase)->skala_triage == 2 ? 'selected' : '' }}>Level 2 - Emergent (Kuning)</option>
                                         <option value="3" {{ optional($triase)->skala_triage == 3 ? 'selected' : '' }}>Level 3 - Urgent (Hijau)</option>
@@ -499,7 +575,7 @@
                     <div class="ent-section-card mb-3">
                         <div class="form-header-ent d-flex justify-content-between align-items-center flex-wrap gap-2">
                             <span class="d-flex align-items-center gap-2">
-                                <i class="fas fa-plus-circle text-primary"></i> Order Pemeriksaan & Tindakan IGD
+                                <i class="fas fa-plus-circle text-primary"></i> Order Pemeriksaan &amp; Tindakan IGD
                             </span>
                             <span class="ent-badge-pill" style="background: rgba(14, 165, 233, 0.14); color: #0284c7; border: 1px solid rgba(14, 165, 233, 0.35);">
                                 Tarif Berlaku: {{ $pasien->nama_sub_penjamin ?? 'UMUM' }}
@@ -509,7 +585,7 @@
                             <div class="row g-3 align-items-end">
                                 <div class="col-md-9">
                                     <label class="form-label-ent">Cari Pemeriksaan / Tindakan Medis</label>
-                                    <select class="form-select ent-input" id="select-master-tindakan" disabled>
+                                    <select class="form-select ent-input select2-igd-modal" id="select-master-tindakan" data-placeholder="-- Cari Layanan Medis / Tindakan IGD --" disabled>
                                         <option value="">-- Memuat Data Layanan... --</option>
                                     </select>
                                 </div>
@@ -580,7 +656,7 @@
                             <div class="row g-3 align-items-end">
                                 <div class="col-md-5">
                                     <label class="form-label-ent">Cari Obat Farmasi</label>
-                                    <select class="form-select ent-input" id="select-master-obat">
+                                    <select class="form-select ent-input select2-igd-modal" id="select-master-obat" data-placeholder="-- Cari atau Pilih Obat --">
                                         <option value="">-- Cari atau Pilih Obat --</option>
                                         @foreach($daftarObat ?? [] as $obat)
                                         <option value="{{ $obat->farm_data_obat_code }}"
@@ -668,20 +744,20 @@
                 <div class="tab-pane fade" id="disposisi-pane" role="tabpanel">
                     <div class="ent-section-card">
                         <div class="form-header-ent d-flex align-items-center gap-2">
-                            <i class="fas fa-door-open text-success"></i> Status Kunjungan & Disposisi Akhir Pasien
+                            <i class="fas fa-door-open text-success"></i> Status Kunjungan &amp; Disposisi Akhir Pasien
                         </div>
                         <div class="card-body p-3 p-md-4">
                             <div class="row g-3">
                                 <div class="col-md-6">
                                     <label class="form-label-ent">Status Kunjungan Akhir</label>
-                                    <select class="form-select ent-input" name="status_kunjungan">
+                                    <select class="form-select ent-input select2-igd-modal" id="select-status-kunjungan" name="status_kunjungan" data-placeholder="Pilih Status Kunjungan">
                                         <option value="PROSES" {{ $pasien->status_kunjungan == 'PROSES' ? 'selected' : '' }}>Dalam Penanganan / Observasi</option>
                                         <option value="SELESAI" {{ $pasien->status_kunjungan == 'SELESAI' ? 'selected' : '' }}>Selesai / Pulang / Rawat Inap</option>
                                     </select>
                                 </div>
                                 <div class="col-md-6">
                                     <label class="form-label-ent">Tindak Lanjut / Disposisi (Verifikasi Akhir)</label>
-                                    <select class="form-select ent-input" id="select-tindak-lanjut" name="tindak_lanjut">
+                                    <select class="form-select ent-input select2-igd-modal" id="select-tindak-lanjut" name="tindak_lanjut" data-placeholder="Pilih Tindak Lanjut">
                                         <option value="PULANG">Pulang (Berobat Jalan / Kontrol)</option>
                                         <option value="RAWAT_INAP">Pindah Rawat Inap (Otomatis Masuk Ranap)</option>
                                         <option value="RUJUK">Rujuk ke Rumah Sakit Lain</option>
@@ -689,8 +765,8 @@
                                     </select>
                                 </div>
                                 <div class="col-md-12" id="div-ruangan-inap" style="display: none;">
-                                    <label class="form-label-ent text-danger"><i class="fas fa-bed me-1"></i> Pilih Ruangan & Bed / Kasur Rawat Inap</label>
-                                    <select class="form-select ent-input" name="ruangan_bed_id">
+                                    <label class="form-label-ent text-danger"><i class="fas fa-bed me-1"></i> Pilih Ruangan &amp; Bed / Kasur Rawat Inap</label>
+                                    <select class="form-select ent-input select2-igd-modal" id="select-ruangan-bed" name="ruangan_bed_id" data-placeholder="-- Pilih Bed / Kasur Kosong --">
                                         <option value="">-- Pilih Bed / Kasur Kosong --</option>
                                         @foreach($ruanganInap as $bed)
                                         <option value="{{ $bed->id }}">{{ $bed->nama_ruangan ?? 'Bangsal' }} - Bed: {{ $bed->nomor_bed ?? $bed->id }}</option>
@@ -719,28 +795,38 @@
 </div>
 
 <script>
-    if (typeof window.choicesTindakan === 'undefined') window.choicesTindakan = null;
-    if (typeof window.choicesObat === 'undefined') window.choicesObat = null;
-
     window.cacheDataPemeriksaan = {}; // Cache tindakan medis
     window.cacheDataObat = {}; // Cache obat farmasi
 
-    function initChoices(elementId, instanceName, placeholderText = "Pilih...") {
-        const element = document.getElementById(elementId);
-        if (element) {
-            if (window[instanceName]) {
-                window[instanceName].destroy();
-                window[instanceName] = null;
-            }
+    function initSelect2IgdModal(selector) {
+        if (!(window.jQuery && $.fn.select2)) return;
+        const $modalParent = $('#modal-handling-igd').length ? $('#modal-handling-igd') : $(document.body);
 
-            window[instanceName] = new Choices(element, {
-                searchEnabled: true,
-                itemSelectText: '',
-                placeholder: true,
-                placeholderValue: placeholderText,
-                shouldSort: false
+        $(selector).each(function() {
+            const $el = $(this);
+            if ($el.hasClass('select2-hidden-accessible')) {
+                $el.select2('destroy');
+            }
+            const placeholderText = $el.data('placeholder') || $el.find('option:first').text() || 'Pilih';
+            const hasEmptyOption = $el.find('option[value=""]').length > 0;
+
+            $el.select2({
+                theme: 'bootstrap-5',
+                width: '100%',
+                dropdownParent: $modalParent,
+                dropdownCssClass: 'select2-dropdown-igd-modal',
+                placeholder: placeholderText,
+                allowClear: hasEmptyOption,
+                language: {
+                    noResults: function() {
+                        return 'Data tidak ditemukan';
+                    },
+                    searching: function() {
+                        return 'Mencari...';
+                    }
+                }
             });
-        }
+        });
     }
 
     // ==========================================
@@ -759,9 +845,8 @@
         let subPenjaminId = $('#current_sub_penjamin_id').val();
         let tindakanSelect = $('#select-master-tindakan');
 
-        if (window.choicesTindakan) {
-            window.choicesTindakan.destroy();
-            window.choicesTindakan = null;
+        if (tindakanSelect.hasClass('select2-hidden-accessible')) {
+            tindakanSelect.select2('destroy');
         }
 
         tindakanSelect.html('<option value="">-- Memuat Layanan... --</option>').prop('disabled', true);
@@ -797,11 +882,15 @@
                     });
 
                     tindakanSelect.prop('disabled', false);
-                    initChoices('select-master-tindakan', 'choicesTindakan', 'Cari tindakan atau pemeriksaan...');
+                    initSelect2IgdModal('#select-master-tindakan');
                 } else {
                     tindakanSelect.html('<option value="">Tidak ada data layanan</option>');
-                    initChoices('select-master-tindakan', 'choicesTindakan', 'Tidak ada data tersedia');
+                    initSelect2IgdModal('#select-master-tindakan');
                 }
+            },
+            error: function() {
+                tindakanSelect.html('<option value="">Gagal memuat layanan</option>');
+                initSelect2IgdModal('#select-master-tindakan');
             }
         });
     }
@@ -851,15 +940,19 @@
             </tr>
         `;
         $('#tindakan-terpilih-tbody').append(htmlRow);
+        $('#select-master-tindakan option[value="' + idTindakan + '"]').prop('disabled', true);
 
         hitungTotalTarif();
-
-        if (window.choicesTindakan) window.choicesTindakan.setChoiceByValue("");
-        else $('#select-master-tindakan').val('').trigger('change');
+        $('#select-master-tindakan').val('').trigger('change');
     });
 
     $(document).on('click', '.btn-hapus-tindakan', function() {
-        $(this).closest('tr').remove();
+        const $row = $(this).closest('tr');
+        const removedId = $row.data('id');
+        if (removedId) {
+            $('#select-master-tindakan option[value="' + removedId + '"]').prop('disabled', false);
+        }
+        $row.remove();
         if ($('#tindakan-terpilih-tbody tr').length === 0) {
             $('#tindakan-terpilih-tbody').html('<tr id="empty-row-tindakan"><td colspan="3" class="text-center opacity-75 py-4 fw-semibold">Belum ada tindakan atau pemeriksaan yang ditambahkan.</td></tr>');
         }
@@ -881,9 +974,18 @@
 
     function setupCacheObat() {
         window.cacheDataObat = {};
+        let existingCodes = [];
+        $('#resep-terpilih-tbody tr').each(function() {
+            let code = $(this).data('code');
+            if (code) existingCodes.push(String(code));
+        });
+
         $('#select-master-obat option').each(function() {
             let code = $(this).val();
             if (code) {
+                if (existingCodes.includes(String(code))) {
+                    $(this).prop('disabled', true);
+                }
                 window.cacheDataObat[code] = {
                     nama: $(this).attr('data-nama'),
                     satuan: $(this).attr('data-satuan'),
@@ -951,18 +1053,22 @@
             </tr>
         `;
         $('#resep-terpilih-tbody').append(htmlRow);
+        $('#select-master-obat option[value="' + kodeObat + '"]').prop('disabled', true);
 
         hitungTotalObat();
-
-        if (window.choicesObat) window.choicesObat.setChoiceByValue("");
-        else $('#select-master-obat').val('').trigger('change');
+        $('#select-master-obat').val('').trigger('change');
 
         $('#input_jumlah_obat').val(1);
         $('#input_signa_obat').val('');
     });
 
     $(document).on('click', '.btn-hapus-obat', function() {
-        $(this).closest('tr').remove();
+        const $row = $(this).closest('tr');
+        const removedCode = $row.data('code');
+        if (removedCode) {
+            $('#select-master-obat option[value="' + removedCode + '"]').prop('disabled', false);
+        }
+        $row.remove();
         if ($('#resep-terpilih-tbody tr').length === 0) {
             $('#resep-terpilih-tbody').html('<tr id="empty-row-obat"><td colspan="5" class="text-center opacity-75 py-4 fw-semibold">Belum ada resep obat yang ditambahkan.</td></tr>');
         }
@@ -1042,17 +1148,19 @@
         hitungTotalTarif();
         hitungTotalObat();
 
-        loadLayananTarifIGD();
         setupCacheObat();
-        initChoices('select-master-obat', 'choicesObat', 'Cari obat farmasi...');
+        initSelect2IgdModal('#select-skala-triage, #select-master-obat, #select-status-kunjungan, #select-tindak-lanjut, #select-ruangan-bed');
+        loadLayananTarifIGD();
 
         // Tampilkan/Sembunyikan Pilihan Ruangan Inap berdasarkan Disposisi
         $('#select-tindak-lanjut').on('change', function() {
             if ($(this).val() === 'RAWAT_INAP') {
-                $('#div-ruangan-inap').slideDown();
+                $('#div-ruangan-inap').slideDown(180, function() {
+                    initSelect2IgdModal('#select-ruangan-bed');
+                });
             } else {
-                $('#div-ruangan-inap').slideUp();
-                $('select[name="ruangan_bed_id"]').val('');
+                $('#div-ruangan-inap').slideUp(180);
+                $('#select-ruangan-bed').val('').trigger('change');
             }
         });
     });

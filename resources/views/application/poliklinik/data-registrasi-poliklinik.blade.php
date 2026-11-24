@@ -503,7 +503,6 @@
         border: 1px solid var(--ent-grid-border) !important;
         border-radius: 12px !important;
         box-shadow: 0 10px 25px -5px rgba(15, 23, 42, 0.25) !important;
-        background-color: var(--bs-body-bg, #ffffff) !important;
     }
 
     .modal-ent-content {

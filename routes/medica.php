@@ -216,6 +216,8 @@ Route::prefix('igd')->group(function () {
     Route::post('/detail/cancel-item', [IgdController::class, 'cancelDetailIgd'])->name('igd.detail.cancel-item');
 
     Route::get('/medic/igd/riwayat/datatable', [IgdController::class, 'data_riwayat_igd_table'])->name('igd.riwayat.datatable');
+
+    Route::get('/riwayat/detail', [IgdController::class, 'detailHandling'])->name('igd.detail.handling');
 });
 Route::prefix('poliklinik')->group(function () {
     Route::post('handling/store', [PoliklinikController::class, 'store_handling_medis'])->name('store_handling_medis');

@@ -298,6 +298,7 @@
         display: inline-flex;
         align-items: center;
         line-height: 1.25;
+        white-space: nowrap;
     }
 
     .lvl-0 {
@@ -329,7 +330,12 @@
         border: 1px solid rgba(217, 119, 6, 0.3);
     }
 
-    .lvl-5 {
+    .lvl-5,
+    .lvl-6,
+    .lvl-7,
+    .lvl-8,
+    .lvl-9,
+    .lvl-10 {
         background: rgba(100, 116, 139, 0.14);
         color: #64748b;
         border: 1px solid rgba(100, 116, 139, 0.3);
@@ -397,7 +403,6 @@
         border-radius: 10px !important;
         font-weight: 600 !important;
         color: var(--bs-body-color, #0f172a) !important;
-        /* background-color: var(--bs-body-bg, #ffffff) !important; */
         font-size: 0.82rem !important;
         min-height: 38px;
         transition: all 0.2s ease;
@@ -409,7 +414,6 @@
         border-radius: 10px !important;
         font-weight: 600 !important;
         color: var(--bs-body-color, #0f172a) !important;
-        /* background-color: var(--bs-body-bg, #ffffff) !important; */
         padding-top: 18px !important;
         padding-bottom: 5px !important;
         padding-left: 11px !important;
@@ -421,6 +425,81 @@
 @endsection
 
 @section('content')
+@php
+    $maxCoaSegments = 10; // Maksimal 10 angka / segmen penomoran COA
+
+    $formatCoaNumber = function (array $segments) use ($maxCoaSegments) {
+        $clean = array_values(array_filter(
+            array_map(fn($s) => trim((string) $s), $segments),
+            fn($s) => $s !== ''
+        ));
+        return implode('.', array_slice($clean, 0, $maxCoaSegments));
+    };
+
+    $renderCoaChildren = function ($parentCode, array $prefixSegments, $level) use (&$renderCoaChildren, $formatCoaNumber, $maxCoaSegments) {
+        if (count($prefixSegments) >= $maxCoaSegments) {
+            return;
+        }
+
+        $children = DB::table('kop_master_coa_data')
+            ->where('kop_master_coa_code', $parentCode)
+            ->where('kop_coa_data_level', $level)
+            ->orderBy('id_kop_master_coa_data', 'asc')
+            ->get();
+
+        $urutan = 1;
+        foreach ($children as $child) {
+            $currentSegments = array_slice(array_merge($prefixSegments, [$urutan]), 0, $maxCoaSegments);
+            $currentNomor = $formatCoaNumber($currentSegments);
+            $lvlClass = 'lvl-' . min(count($currentSegments), 10);
+            $collapseId = 'coa-branch-' . $level . '-' . $child->id_kop_master_coa_data;
+            $hasSub = ($child->kop_coa_data_opt == 1) && (count($currentSegments) < $maxCoaSegments);
+            $urutan++;
+
+            echo '<li class="coa-branch-item coa-searchable-node">';
+            if ($hasSub) {
+                echo '<a class="coa-node-row" data-bs-toggle="collapse" href="#' . e($collapseId) . '" oncontextmenu="myFunction(\'' . e($child->kop_coa_data_code) . '\'); return false;" role="button" aria-expanded="true">';
+                echo '<div class="d-flex align-items-center gap-2">';
+                echo '<i class="fas fa-chevron-right coa-chevron-sm"></i>';
+                echo '<span class="coa-code-badge ' . e($lvlClass) . '">' . e($currentNomor) . '</span>';
+                echo '<span class="fw-semibold coa-label-text">' . e($child->kop_coa_data_name) . '</span>';
+                echo '</div>';
+                echo '<span class="coa-edit-pill" onclick="event.preventDefault(); event.stopPropagation(); myFunction(\'' . e($child->kop_coa_data_code) . '\');"><i class="fas fa-pen me-1"></i>Edit</span>';
+                echo '</a>';
+
+                echo '<ul class="collapse show coa-branch-list" id="' . e($collapseId) . '">';
+                $renderCoaChildren($child->kop_coa_data_code, $currentSegments, $level + 1);
+                echo '</ul>';
+            } else {
+                echo '<a class="coa-node-row is-leaf" href="#!" oncontextmenu="myFunction(\'' . e($child->kop_coa_data_code) . '\'); return false;">';
+                echo '<div class="d-flex align-items-center gap-2">';
+                echo '<i class="fas fa-file-alt text-primary" style="font-size: 0.65rem;"></i>';
+                echo '<span class="coa-code-badge ' . e($lvlClass) . '">' . e($currentNomor) . '</span>';
+                echo '<span class="coa-label-text">' . e($child->kop_coa_data_name) . '</span>';
+                echo '</div>';
+                echo '<div class="d-flex align-items-center gap-2">';
+                echo '<span class="coa-edit-pill" onclick="event.preventDefault(); myFunction(\'' . e($child->kop_coa_data_code) . '\');"><i class="fas fa-pen me-1"></i>Edit</span>';
+                echo '<span class="rounded-circle bg-info" style="width: 5px; height: 5px;" title="Akun Detail"></span>';
+                echo '</div>';
+                echo '</a>';
+            }
+            echo '</li>';
+        }
+
+        if (count($prefixSegments) < $maxCoaSegments) {
+            $nextSegments = array_slice(array_merge($prefixSegments, [$urutan]), 0, $maxCoaSegments);
+            $nextNomor = $formatCoaNumber($nextSegments);
+
+            echo '<li class="coa-branch-item">';
+            echo '<a class="coa-add-trigger" href="#!" id="button-add-level" data-bs-toggle="modal" data-bs-target="#modal-coa" data-nomor="' . e($nextNomor) . '" data-level="' . e($level) . '" data-code="' . e($parentCode) . '">';
+            echo '<i class="fas fa-plus-circle"></i>';
+            echo '<span>add Data ' . e($nextNomor) . '</span>';
+            echo '</a>';
+            echo '</li>';
+        }
+    };
+@endphp
+
 <!-- COMPACT HERO HEADER BANNER -->
 <div class="row mb-3">
     <div class="col">
@@ -473,7 +552,7 @@
 
             <div class="col-md-auto d-flex flex-wrap align-items-center gap-2">
                 <span class="d-none d-xl-inline-block opacity-75 me-2" style="font-size: 0.68rem;">
-                    <i class="fas fa-info-circle text-primary me-1"></i>Klik kanan / klik <strong>Edit</strong> untuk ubah akun
+                    <i class="fas fa-info-circle text-primary me-1"></i>Maks. {{ $maxCoaSegments }} angka COA • Klik kanan / klik <strong>Edit</strong> untuk ubah akun
                 </span>
 
                 <button type="button" class="btn btn-coa-outline" id="btnExpandAllCoa">
@@ -492,257 +571,23 @@
     <!-- Treeview Container (Semua Terbuka / Expanded by Default) -->
     <div class="card-body p-2 p-md-3">
         <ul class="coa-tree-root" id="treeviewStriped">
-            <!-- TINGKAT MASTER -->
             @foreach ($data as $datas)
+            @php
+                $masterNomor = $formatCoaNumber([$datas->kop_master_coa_no]);
+                $masterSegments = explode('.', $masterNomor);
+            @endphp
             <li class="coa-master-node coa-searchable-node">
                 <a class="coa-master-trigger" data-bs-toggle="collapse" href="#treeviewStriped-1-{{ $datas->id_kop_master_coa }}" role="button" aria-expanded="true">
                     <div class="d-flex align-items-center gap-2">
                         <i class="fas fa-chevron-right coa-chevron"></i>
-                        <span class="coa-code-badge lvl-0">{{ $datas->kop_master_coa_no }}</span>
+                        <span class="coa-code-badge lvl-0">{{ $masterNomor }}</span>
                         <span class="coa-font-display coa-master-title coa-label-text">{{ $datas->kop_master_coa_name }}</span>
                     </div>
-                    <span class="badge coa-bab-pill">BAB {{ $datas->kop_master_coa_no }}</span>
+                    <span class="badge coa-bab-pill">BAB {{ $masterNomor }}</span>
                 </a>
 
                 <ul class="collapse show coa-branch-list" id="treeviewStriped-1-{{ $datas->id_kop_master_coa }}">
-                    @php
-                    $sub = DB::table('kop_master_coa_data')
-                    ->where('kop_master_coa_code', $datas->kop_master_coa_code)
-                    ->where('kop_coa_data_level', 1)
-                    ->get();
-                    $no = 1;
-                    @endphp
-
-                    <!-- TINGKAT 1 START -->
-                    @foreach ($sub as $subs)
-                    @if ($subs->kop_coa_data_opt == 1)
-                    <li class="coa-branch-item coa-searchable-node">
-                        <a class="coa-node-row" data-bs-toggle="collapse" href="#treeviewStriped-2-{{ $subs->id_kop_master_coa_data }}" oncontextmenu="myFunction('{{ $subs->kop_coa_data_code }}'); return false;" role="button" aria-expanded="true">
-                            <div class="d-flex align-items-center gap-2">
-                                <i class="fas fa-chevron-right coa-chevron-sm"></i>
-                                <span class="coa-code-badge lvl-1">{{ $datas->kop_master_coa_no }}.{{ $no++ }}</span>
-                                <span class="fw-semibold coa-label-text">{{ $subs->kop_coa_data_name }}</span>
-                            </div>
-                            <span class="coa-edit-pill" onclick="event.preventDefault(); event.stopPropagation(); myFunction('{{ $subs->kop_coa_data_code }}');">
-                                <i class="fas fa-pen me-1"></i>Edit
-                            </span>
-                        </a>
-
-                        <ul class="collapse show coa-branch-list" id="treeviewStriped-2-{{ $subs->id_kop_master_coa_data }}">
-                            @php
-                            $sub1 = DB::table('kop_master_coa_data')
-                            ->where('kop_master_coa_code', $subs->kop_coa_data_code)
-                            ->where('kop_coa_data_level', 2)
-                            ->get();
-                            $no1 = 1;
-                            @endphp
-
-                            <!-- TINGKAT 2 -->
-                            @foreach ($sub1 as $subs1)
-                            @if ($subs1->kop_coa_data_opt == 1)
-                            <li class="coa-branch-item coa-searchable-node">
-                                <a class="coa-node-row" data-bs-toggle="collapse" href="#treeviewStriped-2-{{ $subs1->id_kop_master_coa_data }}" role="button" oncontextmenu="myFunction('{{ $subs1->kop_coa_data_code }}'); return false;" aria-expanded="true">
-                                    <div class="d-flex align-items-center gap-2">
-                                        <i class="fas fa-chevron-right coa-chevron-sm"></i>
-                                        <span class="coa-code-badge lvl-2">{{ $datas->kop_master_coa_no }}.{{ $no-1 }}.{{ $no1++ }}</span>
-                                        <span class="fw-semibold coa-label-text">{{ $subs1->kop_coa_data_name }}</span>
-                                    </div>
-                                    <span class="coa-edit-pill" onclick="event.preventDefault(); event.stopPropagation(); myFunction('{{ $subs1->kop_coa_data_code }}');">
-                                        <i class="fas fa-pen me-1"></i>Edit
-                                    </span>
-                                </a>
-
-                                <ul class="collapse show coa-branch-list" id="treeviewStriped-2-{{ $subs1->id_kop_master_coa_data }}">
-                                    @php
-                                    $sub2 = DB::table('kop_master_coa_data')
-                                    ->where('kop_master_coa_code', $subs1->kop_coa_data_code)
-                                    ->where('kop_coa_data_level', 3)
-                                    ->get();
-                                    $no2 = 1;
-                                    @endphp
-
-                                    <!-- TINGKAT 3 -->
-                                    @foreach ($sub2 as $subs2)
-                                    @if ($subs2->kop_coa_data_opt == 1)
-                                    <li class="coa-branch-item coa-searchable-node">
-                                        <a class="coa-node-row" data-bs-toggle="collapse" href="#treeviewStriped-3-{{ $subs2->id_kop_master_coa_data }}" role="button" oncontextmenu="myFunction('{{ $subs2->kop_coa_data_code }}'); return false;" aria-expanded="true">
-                                            <div class="d-flex align-items-center gap-2">
-                                                <i class="fas fa-chevron-right coa-chevron-sm"></i>
-                                                <span class="coa-code-badge lvl-3">{{ $datas->kop_master_coa_no }}.{{ $no-1 }}.{{ $no1-1 }}.{{ $no2++ }}</span>
-                                                <span class="fw-semibold coa-label-text">{{ $subs2->kop_coa_data_name }}</span>
-                                            </div>
-                                            <span class="coa-edit-pill" onclick="event.preventDefault(); event.stopPropagation(); myFunction('{{ $subs2->kop_coa_data_code }}');">
-                                                <i class="fas fa-pen me-1"></i>Edit
-                                            </span>
-                                        </a>
-
-                                        <ul class="collapse show coa-branch-list" id="treeviewStriped-3-{{ $subs2->id_kop_master_coa_data }}">
-                                            @php
-                                            $sub3 = DB::table('kop_master_coa_data')
-                                            ->where('kop_master_coa_code', $subs2->kop_coa_data_code)
-                                            ->where('kop_coa_data_level', 4)
-                                            ->get();
-                                            $no3 = 1;
-                                            @endphp
-
-                                            <!-- TINGKAT 4 -->
-                                            @foreach ($sub3 as $subs3)
-                                            @if ($subs3->kop_coa_data_opt == 1)
-                                            <li class="coa-branch-item coa-searchable-node">
-                                                <a class="coa-node-row" data-bs-toggle="collapse" href="#treeviewStriped-3-{{ $subs3->id_kop_master_coa_data }}" role="button" oncontextmenu="myFunction('{{ $subs3->kop_coa_data_code }}'); return false;" aria-expanded="true">
-                                                    <div class="d-flex align-items-center gap-2">
-                                                        <i class="fas fa-chevron-right coa-chevron-sm"></i>
-                                                        <span class="coa-code-badge lvl-4">{{ $datas->kop_master_coa_no }}.{{ $no-1 }}.{{ $no1-1 }}.{{ $no2-1 }}.{{ $no3++ }}</span>
-                                                        <span class="fw-semibold coa-label-text">{{ $subs3->kop_coa_data_name }}</span>
-                                                    </div>
-                                                    <span class="coa-edit-pill" onclick="event.preventDefault(); event.stopPropagation(); myFunction('{{ $subs3->kop_coa_data_code }}');">
-                                                        <i class="fas fa-pen me-1"></i>Edit
-                                                    </span>
-                                                </a>
-
-                                                <ul class="collapse show coa-branch-list" id="treeviewStriped-3-{{ $subs3->id_kop_master_coa_data }}">
-                                                    @php
-                                                    $sub4 = DB::table('kop_master_coa_data')
-                                                    ->where('kop_master_coa_code', $subs3->kop_coa_data_code)
-                                                    ->where('kop_coa_data_level', 5)
-                                                    ->get();
-                                                    $no4 = 1;
-                                                    @endphp
-
-                                                    <!-- TINGKAT 5 -->
-                                                    @foreach ($sub4 as $subs4)
-                                                    <li class="coa-branch-item coa-searchable-node">
-                                                        <a class="coa-node-row is-leaf" href="#!" oncontextmenu="myFunction('{{ $subs4->kop_coa_data_code }}'); return false;">
-                                                            <div class="d-flex align-items-center gap-2">
-                                                                <i class="fas fa-file-alt text-primary" style="font-size: 0.65rem;"></i>
-                                                                <span class="coa-code-badge lvl-5">{{ $datas->kop_master_coa_no }}.{{ $no-1 }}.{{ $no1-1 }}.{{ $no2-1 }}.{{ $no3-1 }}.{{ $no4++ }}</span>
-                                                                <span class="coa-label-text">{{ $subs4->kop_coa_data_name }}</span>
-                                                            </div>
-                                                            <div class="d-flex align-items-center gap-2">
-                                                                <span class="coa-edit-pill" onclick="event.preventDefault(); myFunction('{{ $subs4->kop_coa_data_code }}');">
-                                                                    <i class="fas fa-pen me-1"></i>Edit
-                                                                </span>
-                                                                <span class="rounded-circle bg-info" style="width: 5px; height: 5px;" title="Akun Detail"></span>
-                                                            </div>
-                                                        </a>
-                                                    </li>
-                                                    @endforeach
-
-                                                    <li class="coa-branch-item">
-                                                        <a class="coa-add-trigger" href="#!" id="button-add-level" data-bs-toggle="modal" data-bs-target="#modal-coa" data-nomor="{{ $datas->kop_master_coa_no }}.{{ $no-1 }}.{{ $no1-1 }}.{{ $no2-1 }}.{{ $no3-1 }}.{{ $no4 }}" data-level="5" data-code="{{ $subs3->kop_coa_data_code }}">
-                                                            <i class="fas fa-plus-circle"></i>
-                                                            <span>add Data {{ $datas->kop_master_coa_no }}.{{ $no-1 }}.{{ $no1-1 }}.{{ $no2-1 }}.{{ $no3-1 }}.{{ $no4 }}</span>
-                                                        </a>
-                                                    </li>
-                                                </ul>
-                                            </li>
-                                            @else
-                                            <li class="coa-branch-item coa-searchable-node">
-                                                <a class="coa-node-row is-leaf" href="#!" oncontextmenu="myFunction('{{ $subs3->kop_coa_data_code }}'); return false;">
-                                                    <div class="d-flex align-items-center gap-2">
-                                                        <i class="fas fa-file-alt text-primary" style="font-size: 0.65rem;"></i>
-                                                        <span class="coa-code-badge lvl-4">{{ $datas->kop_master_coa_no }}.{{ $no-1 }}.{{ $no1-1 }}.{{ $no2-1 }}.{{ $no3++ }}</span>
-                                                        <span class="coa-label-text">{{ $subs3->kop_coa_data_name }}</span>
-                                                    </div>
-                                                    <div class="d-flex align-items-center gap-2">
-                                                        <span class="coa-edit-pill" onclick="event.preventDefault(); myFunction('{{ $subs3->kop_coa_data_code }}');">
-                                                            <i class="fas fa-pen me-1"></i>Edit
-                                                        </span>
-                                                        <span class="rounded-circle bg-info" style="width: 5px; height: 5px;" title="Akun Detail"></span>
-                                                    </div>
-                                                </a>
-                                            </li>
-                                            @endif
-                                            @endforeach
-
-                                            <li class="coa-branch-item">
-                                                <a class="coa-add-trigger" href="#!" id="button-add-level" data-bs-toggle="modal" data-bs-target="#modal-coa" data-nomor="{{ $datas->kop_master_coa_no }}.{{ $no-1 }}.{{ $no1-1 }}.{{ $no2-1 }}.{{ $no3 }}" data-level="4" data-code="{{ $subs2->kop_coa_data_code }}">
-                                                    <i class="fas fa-plus-circle"></i>
-                                                    <span>add Data {{ $datas->kop_master_coa_no }}.{{ $no-1 }}.{{ $no1-1 }}.{{ $no2-1 }}.{{ $no3 }}</span>
-                                                </a>
-                                            </li>
-                                        </ul>
-                                    </li>
-                                    @else
-                                    <li class="coa-branch-item coa-searchable-node">
-                                        <a class="coa-node-row is-leaf" href="#!" oncontextmenu="myFunction('{{ $subs2->kop_coa_data_code }}'); return false;">
-                                            <div class="d-flex align-items-center gap-2">
-                                                <i class="fas fa-file-alt text-primary" style="font-size: 0.65rem;"></i>
-                                                <span class="coa-code-badge lvl-3">{{ $datas->kop_master_coa_no }}.{{ $no-1 }}.{{ $no1-1 }}.{{ $no2++ }}</span>
-                                                <span class="coa-label-text">{{ $subs2->kop_coa_data_name }}</span>
-                                            </div>
-                                            <div class="d-flex align-items-center gap-2">
-                                                <span class="coa-edit-pill" onclick="event.preventDefault(); myFunction('{{ $subs2->kop_coa_data_code }}');">
-                                                    <i class="fas fa-pen me-1"></i>Edit
-                                                </span>
-                                                <span class="rounded-circle bg-info" style="width: 5px; height: 5px;" title="Akun Detail"></span>
-                                            </div>
-                                        </a>
-                                    </li>
-                                    @endif
-                                    @endforeach
-
-                                    <li class="coa-branch-item">
-                                        <a class="coa-add-trigger" href="#!" id="button-add-level" data-bs-toggle="modal" data-bs-target="#modal-coa" data-nomor="{{ $datas->kop_master_coa_no }}.{{ $no-1 }}.{{ $no1-1 }}.{{ $no2 }}" data-level="3" data-code="{{ $subs1->kop_coa_data_code }}">
-                                            <i class="fas fa-plus-circle"></i>
-                                            <span>add Data {{ $datas->kop_master_coa_no }}.{{ $no-1 }}.{{ $no1-1 }}.{{ $no2 }}</span>
-                                        </a>
-                                    </li>
-                                </ul>
-                            </li>
-                            @else
-                            <li class="coa-branch-item coa-searchable-node">
-                                <a class="coa-node-row is-leaf" href="#!" oncontextmenu="myFunction('{{ $subs1->kop_coa_data_code }}'); return false;">
-                                    <div class="d-flex align-items-center gap-2">
-                                        <i class="fas fa-file-alt text-primary" style="font-size: 0.65rem;"></i>
-                                        <span class="coa-code-badge lvl-2">{{ $datas->kop_master_coa_no }}.{{ $no-1 }}.{{ $no1++ }}</span>
-                                        <span class="coa-label-text">{{ $subs1->kop_coa_data_name }}</span>
-                                    </div>
-                                    <div class="d-flex align-items-center gap-2">
-                                        <span class="coa-edit-pill" onclick="event.preventDefault(); myFunction('{{ $subs1->kop_coa_data_code }}');">
-                                            <i class="fas fa-pen me-1"></i>Edit
-                                        </span>
-                                        <span class="rounded-circle bg-info" style="width: 5px; height: 5px;" title="Akun Detail"></span>
-                                    </div>
-                                </a>
-                            </li>
-                            @endif
-                            @endforeach
-
-                            <li class="coa-branch-item">
-                                <a class="coa-add-trigger" href="#!" id="button-add-level" data-bs-toggle="modal" data-bs-target="#modal-coa" data-nomor="{{ $datas->kop_master_coa_no }}.{{ $no-1 }}.{{ $no1 }}" data-level="2" data-code="{{ $subs->kop_coa_data_code }}">
-                                    <i class="fas fa-plus-circle"></i>
-                                    <span>add Data {{ $datas->kop_master_coa_no }}.{{ $no-1 }}.{{ $no1 }}</span>
-                                </a>
-                            </li>
-                        </ul>
-                    </li>
-                    @elseif($subs->kop_coa_data_opt == 0)
-                    <li class="coa-branch-item coa-searchable-node">
-                        <a class="coa-node-row is-leaf" href="#!" oncontextmenu="myFunction('{{ $subs->kop_coa_data_code }}'); return false;">
-                            <div class="d-flex align-items-center gap-2">
-                                <i class="fas fa-file-alt text-primary" style="font-size: 0.65rem;"></i>
-                                <span class="coa-code-badge lvl-1">{{ $datas->kop_master_coa_no }}.{{ $no++ }}</span>
-                                <span class="coa-label-text">{{ $subs->kop_coa_data_name }}</span>
-                            </div>
-                            <div class="d-flex align-items-center gap-2">
-                                <span class="coa-edit-pill" onclick="event.preventDefault(); myFunction('{{ $subs->kop_coa_data_code }}');">
-                                    <i class="fas fa-pen me-1"></i>Edit
-                                </span>
-                                <span class="rounded-circle bg-info" style="width: 5px; height: 5px;" title="Akun Detail"></span>
-                            </div>
-                        </a>
-                    </li>
-                    @endif
-                    @endforeach
-                    <!-- TINGKAT 1 END -->
-
-                    <li class="coa-branch-item">
-                        <a class="coa-add-trigger" href="#!" id="button-add-level" data-bs-toggle="modal" data-bs-target="#modal-coa" data-nomor="{{ $datas->kop_master_coa_no }}.{{ $no }}" data-level="1" data-code="{{ $datas->kop_master_coa_code }}">
-                            <i class="fas fa-plus-circle"></i>
-                            <span>add Data {{ $datas->kop_master_coa_no }}.{{ $no }}</span>
-                        </a>
-                    </li>
+                    @php $renderCoaChildren($datas->kop_master_coa_code, $masterSegments, 1); @endphp
                 </ul>
             </li>
             @endforeach
@@ -757,8 +602,6 @@
     <div class="modal-dialog modal-dialog-centered modal-lg" role="document">
         <div class="modal-content coa-modal-content">
             <div class="position-absolute top-0 end-0 mt-3 me-3 z-index-1">
-                <!-- <button class="btn-close btn btn-sm btn-circle d-flex flex-center transition-base" onclick="location.reload()"
-                    data-bs-dismiss="modal" aria-label="Close"></button> -->
             </div>
             <div id="menu-coa"></div>
         </div>
@@ -787,6 +630,17 @@
 <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
 
 <script>
+    const MAX_COA_SEGMENTS = 10;
+
+    function clampCoaNumber(nomor) {
+        if (!nomor) return '';
+        const parts = String(nomor)
+            .split('.')
+            .map(p => p.trim())
+            .filter(p => p !== '');
+        return parts.slice(0, MAX_COA_SEGMENTS).join('.');
+    }
+
     window.addEventListener('load', () => {
         const shouldCenter = localStorage.getItem('reloadToCenter');
         if (shouldCenter === 'true') {
@@ -844,7 +698,6 @@
                             const row = node.querySelector(':scope > a');
                             if (row) row.classList.add('coa-highlight');
 
-                            // Buka parent collapse jika tertutup
                             let parentCollapse = node.closest('.collapse');
                             while (parentCollapse) {
                                 parentCollapse.classList.add('show');
@@ -869,10 +722,6 @@
 </script>
 
 <script>
-
-</script>
-
-<script>
     if (document.getElementById('example')) {
         new DataTable('#example', {
             responsive: true
@@ -885,7 +734,7 @@
         e.preventDefault();
         let code = $(this).data("code");
         let level = $(this).data("level");
-        let nomor = $(this).data("nomor");
+        let nomor = clampCoaNumber($(this).data("nomor"));
         $.ajax({
             url: "{{ route('master_koperasi_data_coa_add_level') }}",
             type: "POST",
@@ -903,8 +752,6 @@
             $('#menu-coa').html('<div class="p-4 text-center text-danger">Gagal memuat form tambah COA.</div>');
         });
     });
-
-
 
     $(document).on("click", "#button-simpan-data-level-coa", function(e) {
         e.preventDefault();
@@ -990,7 +837,7 @@
         });
 
         $.ajax({
-            url: "{{ route('master_accounting_coa_update_save_level') }}",
+            url: "{{ route('master_koperasi_data_coa_update_save_level') }}",
             type: "POST",
             cache: false,
             data: $form.serialize(),

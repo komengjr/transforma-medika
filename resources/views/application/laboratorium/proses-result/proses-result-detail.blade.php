@@ -1,79 +1,200 @@
-<div class="card retro-card mb-4 overflow-hidden" style="border: var(--retro-border); box-shadow: var(--retro-shadow);">
-    <!-- CARD HEADER -->
-    <div class="card-header py-3 px-3 border-bottom border-dark d-flex justify-content-between align-items-center" style="background-color: var(--retro-yellow);">
-        <!-- Judul Header -->
-        <h6 class="mb-0 fs-0 text-dark fw-bolder">
-            <i class="fas fa-user-check text-dark me-1"></i> Pasien Details No Reg: <span class="text-primary text-decoration-underline">{{ $code ?? '-' }}</span>
-        </h6>
+<style>
+    .res-detail-card {
+        border: 1px solid var(--ent-grid-border) !important;
+        border-radius: 16px !important;
+        background-color: var(--bs-body-bg, var(--ent-solid-bg)) !important;
+        box-shadow: 0 4px 20px -2px rgba(15, 23, 42, 0.08) !important;
+        overflow: hidden;
+    }
 
-        <!-- Group Tombol Aksi Berwarna -->
-        <div class="d-flex gap-2">
-            <button type="button" class="btn btn-sm retro-btn text-dark shadow-sm fw-bold px-2 py-1 fs--1" id="button-sinkronisasi-proses-result" style="background-color: var(--retro-cyan);">
+    .res-patient-avatar {
+        width: 96px;
+        height: 96px;
+        border-radius: 18px;
+        border: 1px solid var(--ent-grid-border);
+        background-color: rgba(79, 70, 229, 0.06);
+        box-shadow: 0 6px 16px rgba(15, 23, 42, 0.08);
+        overflow: hidden;
+    }
+
+    .res-info-grid {
+        background-color: rgba(79, 70, 229, 0.04);
+        border: 1px solid var(--ent-grid-border);
+        border-radius: 12px;
+        padding: 12px 14px;
+    }
+
+    .ent-btn-cyan {
+        background: linear-gradient(135deg, #0284c7 0%, #0369a1 100%);
+        border: none;
+        color: #ffffff;
+        box-shadow: 0 4px 12px rgba(2, 132, 199, 0.25);
+    }
+
+    .ent-btn-cyan:hover {
+        box-shadow: 0 6px 16px rgba(2, 132, 199, 0.35);
+        color: #ffffff;
+    }
+
+    .ent-btn-success {
+        background: linear-gradient(135deg, #059669 0%, #047857 100%);
+        border: none;
+        color: #ffffff;
+        box-shadow: 0 4px 12px rgba(5, 150, 105, 0.25);
+    }
+
+    .ent-btn-success:hover {
+        box-shadow: 0 6px 16px rgba(5, 150, 105, 0.35);
+        color: #ffffff;
+    }
+
+    /* Result Table Hierarchy & Controls */
+    .res-group-main td {
+        background-color: rgba(79, 70, 229, 0.14) !important;
+        color: var(--bs-body-color) !important;
+        font-weight: 700 !important;
+        font-size: 0.8rem !important;
+    }
+
+    .res-group-sub td {
+        background-color: rgba(79, 70, 229, 0.05) !important;
+        color: var(--bs-body-color) !important;
+        font-weight: 700 !important;
+        font-size: 0.78rem !important;
+    }
+
+    .res-table .form-control,
+    .res-table .form-select {
+        min-height: 32px !important;
+        height: 32px !important;
+        padding-top: 4px !important;
+        padding-bottom: 4px !important;
+        padding-left: 8px !important;
+        padding-right: 8px !important;
+        font-size: 0.78rem !important;
+        border-radius: 8px !important;
+    }
+
+    .res-unit-addon {
+        background-color: rgba(79, 70, 229, 0.08) !important;
+        border: 1px solid var(--ent-grid-border) !important;
+        border-left: none !important;
+        border-radius: 0 8px 8px 0 !important;
+        color: var(--bs-body-color) !important;
+        font-size: 0.72rem !important;
+        font-weight: 700 !important;
+        font-family: 'JetBrains Mono', monospace;
+    }
+
+    .res-table .input-group .form-control {
+        border-radius: 8px 0 0 8px !important;
+        font-family: 'JetBrains Mono', monospace !important;
+    }
+
+    .res-filled {
+        border-color: #059669 !important;
+        background-color: rgba(16, 185, 129, 0.08) !important;
+    }
+
+    .res-unit-addon.res-filled {
+        border-color: #059669 !important;
+        background-color: rgba(16, 185, 129, 0.14) !important;
+        color: #059669 !important;
+    }
+
+    [data-bs-theme="dark"] .res-unit-addon.res-filled,
+    .dark .res-unit-addon.res-filled {
+        color: #34d399 !important;
+    }
+</style>
+
+<div class="card res-detail-card mb-4">
+    <!-- CARD HEADER -->
+    <div class="ent-card-header py-3 px-3 px-md-4 d-flex flex-wrap justify-content-between align-items-center gap-2">
+        <div class="d-flex align-items-center gap-2 flex-wrap">
+            <i class="fas fa-user-check text-primary"></i>
+            <h6 class="mb-0 fw-bold">
+                Pasien Details No Reg:
+            </h6>
+            <span class="code-chip">{{ $code ?? '-' }}</span>
+        </div>
+
+        <div class="d-flex flex-wrap gap-2">
+            <button type="button" class="btn btn-sm ent-btn ent-btn-cyan px-3 py-1.5" id="button-sinkronisasi-proses-result">
                 <i class="fas fa-sync-alt me-1"></i> Sinkronisasi Alat
             </button>
-            <button type="button" class="btn btn-sm retro-btn retro-btn-success text-dark shadow-sm fw-bold px-3 py-1 fs--1" id="button-simpan-proses-result">
+            <button type="button" class="btn btn-sm ent-btn ent-btn-success px-3 py-1.5" id="button-simpan-proses-result">
                 <i class="fas fa-check-circle me-1"></i> Simpan
             </button>
         </div>
     </div>
 
     <!-- CARD BODY -->
-    <div class="card-body bg-white p-3 p-md-4">
+    <div class="card-body p-3 p-md-4 ent-table-surface">
 
-        <div class="row align-items-center">
+        <div class="row g-3 g-md-4 align-items-center">
 
             <!-- KIRI: Foto Pasien -->
-            <div class="col-md-3 col-lg-2 text-center border-end-md mb-3 mb-md-0 border-dark" style="border-right-width: 2px !important;">
-                <div class="mx-auto mb-2 overflow-hidden rounded-circle" style="width: 100px; height: 100px; border: 2px solid var(--retro-dark); box-shadow: 3px 3px 0px var(--retro-dark);">
+            <div class="col-md-3 col-lg-2 text-center">
+                <div class="res-patient-avatar mx-auto mb-2">
                     @if (empty($data->master_patient_profile ?? null))
-                    <img src="{{ asset('img/pasien.png') }}" class="w-100 h-100 object-fit-cover" alt="Foto Pasien">
+                        <img src="{{ asset('img/pasien.png') }}" class="w-100 h-100 object-fit-cover" alt="Foto Pasien">
                     @else
-                    <img src="{{ Storage::url($data->master_patient_profile) }}" class="w-100 h-100 object-fit-cover" alt="Foto Pasien">
+                        <img src="{{ Storage::url($data->master_patient_profile) }}" class="w-100 h-100 object-fit-cover" alt="Foto Pasien">
                     @endif
                 </div>
-                <span class="retro-badge" style="background-color: var(--retro-cyan); color: var(--retro-dark);">
-                    {{ $data->master_patient_code ?? '-' }}
-                </span>
+                <span class="code-chip">{{ $data->master_patient_code ?? '-' }}</span>
             </div>
 
             <!-- KANAN: Detail Informasi Pasien -->
-            <div class="col-md-9 col-lg-10 ps-md-4">
-                <!-- Nama Pasien Utama -->
+            <div class="col-md-9 col-lg-10">
                 <div class="mb-3">
-                    <h4 class="mb-1 text-dark fw-bolder">{{ $data->master_patient_name ?? '-' }}</h4>
-                    <small class="text-dark fw-bold"><i class="fas fa-id-badge me-1 text-primary"></i> NIK: <strong>{{ $data->master_patient_nik ?? '-' }}</strong></small>
+                    <h5 class="mb-1 fw-bold">{{ $data->master_patient_name ?? '-' }}</h5>
+                    <div class="small d-flex align-items-center gap-1.5 flex-wrap">
+                        <i class="fas fa-id-badge text-primary"></i>
+                        <span class="opacity-75 fw-semibold">NIK:</span>
+                        <strong style="font-family: 'JetBrains Mono', monospace;">{{ $data->master_patient_nik ?? '-' }}</strong>
+                    </div>
                 </div>
 
-                <hr class="border-dark my-2" style="border-width: 2px;">
-
-                <!-- Informasi Ringkas Grid -->
-                <div class="row g-2 fs--1 text-dark">
-                    <div class="col-sm-6 col-md-4">
-                        <div class="text-dark fw-bold fs--2">No. Rekam Medis</div>
-                        <div class="fw-bolder text-primary"><i class="fas fa-hashtag me-1"></i>{{ $data->master_patient_code ?? '-' }}</div>
-                    </div>
-
-                    <div class="col-sm-6 col-md-4">
-                        <div class="text-dark fw-bold fs--2">Jenis Kelamin</div>
-                        <div class="fw-bolder">
-                            @if(strtolower($data->master_patient_jk ?? '') == 'l' || strtolower($data->master_patient_jk ?? '') == 'laki-laki')
-                            <i class="fas fa-mars text-primary me-1"></i> Laki-laki
-                            @elseif(strtolower($data->master_patient_jk ?? '') == 'p' || strtolower($data->master_patient_jk ?? '') == 'perempuan')
-                            <i class="fas fa-venus text-danger me-1"></i> Perempuan
-                            @else
-                            <i class="fas fa-genderless me-1"></i> {{ $data->master_patient_jk ?? '-' }}
-                            @endif
+                <div class="res-info-grid">
+                    <div class="row g-3">
+                        <div class="col-sm-6 col-md-3">
+                            <span class="ent-field-label">No. Rekam Medis</span>
+                            <div class="fw-bold small d-flex align-items-center gap-1.5 text-primary" style="font-family: 'JetBrains Mono', monospace;">
+                                <i class="fas fa-hashtag"></i>
+                                <span>{{ $data->master_patient_code ?? '-' }}</span>
+                            </div>
                         </div>
-                    </div>
 
-                    <div class="col-sm-6 col-md-4">
-                        <div class="text-dark fw-bold fs--2">Tanggal Lahir</div>
-                        <div class="fw-bolder"><i class="fas fa-calendar-alt text-warning me-1"></i>{{ !empty($data->master_patient_tgl_lahir) ? date('d-m-Y', strtotime($data->master_patient_tgl_lahir)) : '-' }}</div>
-                    </div>
+                        <div class="col-sm-6 col-md-3">
+                            <span class="ent-field-label">Jenis Kelamin</span>
+                            <div class="fw-bold small d-flex align-items-center gap-1.5">
+                                @if(strtolower($data->master_patient_jk ?? '') == 'l' || strtolower($data->master_patient_jk ?? '') == 'laki-laki')
+                                    <i class="fas fa-mars text-primary"></i> <span>Laki-laki</span>
+                                @elseif(strtolower($data->master_patient_jk ?? '') == 'p' || strtolower($data->master_patient_jk ?? '') == 'perempuan')
+                                    <i class="fas fa-venus text-danger"></i> <span>Perempuan</span>
+                                @else
+                                    <i class="fas fa-genderless opacity-75"></i> <span>{{ $data->master_patient_jk ?? '-' }}</span>
+                                @endif
+                            </div>
+                        </div>
 
-                    <div class="col-sm-6 col-md-4 mt-2">
-                        <div class="text-dark fw-bold fs--2">Tempat Lahir</div>
-                        <div class="fw-bolder"><i class="fas fa-map-marker-alt text-danger me-1"></i>{{ $data->master_patient_tempat_lahir ?? '-' }}</div>
+                        <div class="col-sm-6 col-md-3">
+                            <span class="ent-field-label">Tanggal Lahir</span>
+                            <div class="fw-bold small d-flex align-items-center gap-1.5" style="font-family: 'JetBrains Mono', monospace;">
+                                <i class="far fa-calendar-alt text-warning"></i>
+                                <span>{{ !empty($data->master_patient_tgl_lahir) ? date('d-m-Y', strtotime($data->master_patient_tgl_lahir)) : '-' }}</span>
+                            </div>
+                        </div>
+
+                        <div class="col-sm-6 col-md-3">
+                            <span class="ent-field-label">Tempat Lahir</span>
+                            <div class="fw-bold small d-flex align-items-center gap-1.5">
+                                <i class="fas fa-map-marker-alt text-danger"></i>
+                                <span>{{ $data->master_patient_tempat_lahir ?? '-' }}</span>
+                            </div>
+                        </div>
                     </div>
                 </div>
             </div>
@@ -85,166 +206,164 @@
                 @csrf
                 <input type="hidden" name="code" value="{{ $code ?? '' }}">
 
-                <!-- TABEL DENGAN GARIS TEGAS / BORDER GRID -->
-                <div class="table-responsive">
-                    <table class="table table-custom align-middle fs--2 mb-0 table-bordered text-dark" style="width: 100%; border: 2px solid var(--retro-dark);">
-                        <thead style="background-color: var(--retro-dark); color: var(--retro-green);">
+                <div class="table-responsive rounded-3" style="border: 1px solid var(--ent-grid-border);">
+                    <table class="table table-custom res-table align-middle mb-0" style="width: 100%;">
+                        <thead>
                             <tr>
-                                <th style="border: 2px solid var(--retro-dark); color: var(--retro-green); font-weight: 800;">Nama Pemeriksaan</th>
-                                <th style="width: 25%; border: 2px solid var(--retro-dark); color: var(--retro-green); font-weight: 800;">Hasil ( Unit )</th>
-                                <th style="width: 18%; border: 2px solid var(--retro-dark); color: var(--retro-green); font-weight: 800;" class="text-center">Flag</th>
-                                <th style="width: 20%; border: 2px solid var(--retro-dark); color: var(--retro-green); font-weight: 800;">Nilai Normal</th>
-                                <th style="width: 20%; border: 2px solid var(--retro-dark); color: var(--retro-green); font-weight: 800;">Metode</th>
+                                <th>Nama Pemeriksaan</th>
+                                <th style="width: 25%;">Hasil (Unit)</th>
+                                <th style="width: 18%;" class="text-center">Flag</th>
+                                <th style="width: 20%;">Nilai Normal</th>
+                                <th style="width: 17%;">Metode</th>
                             </tr>
                         </thead>
-                        <tbody class="text-dark">
+                        <tbody class="ent-table-surface">
                             @forelse ($pemeriksaan ?? [] as $pem)
-                            <!-- HEADER UTAMA PEMERIKSAAN -->
-                            <tr style="background-color: var(--retro-yellow); font-weight: 900;">
-                                <td colspan="5" class="py-2 text-dark" style="border: 2px solid var(--retro-dark);">
-                                    <i class="fas fa-flask me-1 text-dark"></i> {{ $pem->t_pemeriksaan_list_name ?? '-' }}
-                                </td>
-                            </tr>
+                                <!-- HEADER UTAMA PEMERIKSAAN -->
+                                <tr class="res-group-main">
+                                    <td colspan="5" class="py-2 px-3">
+                                        <i class="fas fa-flask me-1.5 text-primary"></i> {{ $pem->t_pemeriksaan_list_name ?? '-' }}
+                                    </td>
+                                </tr>
 
-                            @php
-                            $parameters = DB::table('medical_master_parameter')
-                            ->where('master_pemeriksaan_id', $pem->t_pemeriksaan_list_code)
-                            ->whereNull('parent_id')
-                            ->orderBy('urutan', 'ASC')
-                            ->get();
-                            @endphp
+                                @php
+                                    $parameters = DB::table('medical_master_parameter')
+                                        ->where('master_pemeriksaan_id', $pem->t_pemeriksaan_list_code)
+                                        ->whereNull('parent_id')
+                                        ->orderBy('urutan', 'ASC')
+                                        ->get();
+                                @endphp
 
-                            @foreach ($parameters as $param)
-                            @if($param->is_group == 1)
-                            <!-- JIKA INI KELOMPOK/SUB-HEADER -->
-                            <tr style="background-color: #f4f0ea; font-weight: 800;">
-                                <td colspan="5" class="ps-3 py-2 text-dark" style="border: 2px solid var(--retro-dark);">
-                                    <i class="fas fa-folder-open text-warning me-1"></i> {{ $param->nama_parameter }}
-                                </td>
-                            </tr>
+                                @foreach ($parameters as $param)
+                                    @if($param->is_group == 1)
+                                        <!-- KELOMPOK / SUB-HEADER -->
+                                        <tr class="res-group-sub">
+                                            <td colspan="5" class="ps-3 py-2">
+                                                <i class="fas fa-folder-open text-warning me-1.5"></i> {{ $param->nama_parameter }}
+                                            </td>
+                                        </tr>
 
-                            @php
-                            $subParameters = DB::table('medical_master_parameter')
-                            ->where('parent_id', $param->id)
-                            ->orderBy('urutan', 'ASC')
-                            ->get();
-                            @endphp
+                                        @php
+                                            $subParameters = DB::table('medical_master_parameter')
+                                                ->where('parent_id', $param->id)
+                                                ->orderBy('urutan', 'ASC')
+                                                ->get();
+                                        @endphp
 
-                            @foreach ($subParameters as $sub)
-                            @php
-                            $nilai = DB::table('medical_transaksi_hasil')
-                            ->where('detail_id', $pem->detail_id)
-                            ->where('parameter_id', $sub->id)
-                            ->first();
+                                        @foreach ($subParameters as $sub)
+                                            @php
+                                                $nilai = DB::table('medical_transaksi_hasil')
+                                                    ->where('detail_id', $pem->detail_id)
+                                                    ->where('parameter_id', $sub->id)
+                                                    ->first();
 
-                            $hasValue = $nilai && !empty($nilai->hasil);
-                            $currentFlag = $nilai ? $nilai->flag : '*';
-                            $currentCatatan = $nilai ? $nilai->catatan : '';
-                            @endphp
-                            <!-- RENDER SUB-PARAMETER -->
-                            <tr style="background-color: #ffffff;">
-                                <td class="ps-4" style="border: 2px solid var(--retro-dark);">
-                                    <i class="fas fa-level-up-alt fa-rotate-90 text-dark me-2"></i>
-                                    <span class="fw-bold text-dark">{{ $sub->nama_parameter }}</span>
-                                </td>
-                                <td style="border: 2px solid var(--retro-dark);">
-                                    <div class="input-group has-validation">
-                                        <input type="text"
-                                            class="form-control form-control-sm input-hasil retro-input {{ $hasValue ? 'border-success bg-light-success' : '' }}"
-                                            data-code="{{ $sub->id }}"
-                                            name="hasil[{{ $pem->detail_id }}][{{ $sub->id }}]"
-                                            value="{{ $hasValue ? $nilai->hasil : '' }}"
-                                            placeholder="0.0">
+                                                $hasValue = $nilai && !empty($nilai->hasil);
+                                                $currentFlag = $nilai ? $nilai->flag : '*';
+                                            @endphp
+                                            <tr>
+                                                <td class="ps-4">
+                                                    <i class="fas fa-level-up-alt fa-rotate-90 opacity-60 me-2"></i>
+                                                    <span class="fw-semibold">{{ $sub->nama_parameter }}</span>
+                                                </td>
+                                                <td>
+                                                    <div class="input-group has-validation">
+                                                        <input type="text"
+                                                            class="form-control form-control-sm input-hasil ent-input {{ $hasValue ? 'res-filled' : '' }}"
+                                                            data-code="{{ $sub->id }}"
+                                                            name="hasil[{{ $pem->detail_id }}][{{ $sub->id }}]"
+                                                            value="{{ $hasValue ? $nilai->hasil : '' }}"
+                                                            placeholder="0.0">
 
-                                        <span class="input-group-text {{ $hasValue ? 'border-success' : '' }} fs--2 py-0 px-2 fw-bold text-dark" style="border: 2px solid var(--retro-dark); background-color: var(--retro-bg);">
-                                            {{ $sub->satuan ?? '-' }}
-                                        </span>
-                                    </div>
-                                </td>
+                                                        <span class="input-group-text res-unit-addon px-2 {{ $hasValue ? 'res-filled' : '' }}">
+                                                            {{ $sub->satuan ?? '-' }}
+                                                        </span>
+                                                    </div>
+                                                </td>
 
-                                <!-- INPUT / SELECT FLAG -->
-                                <td class="text-center align-middle" style="border: 2px solid var(--retro-dark);">
-                                    <select name="flag[{{ $pem->detail_id }}][{{ $sub->id }}]"
-                                        class="form-select form-select-sm fs--2 text-center select-flag retro-input {{ $hasValue ? 'border-success bg-light-success' : '' }}"
-                                        data-code="{{ $sub->id }}">
-                                        <option value="*" {{ $currentFlag == '*' ? 'selected' : '' }}>*</option>
-                                        <option value="N" {{ $currentFlag == 'N' ? 'selected' : '' }}>N (Normal)</option>
-                                        <option value="H" {{ $currentFlag == 'H' ? 'selected' : '' }}>H (High)</option>
-                                        <option value="L" {{ $currentFlag == 'L' ? 'selected' : '' }}>L (Low)</option>
-                                        <option value="A" {{ $currentFlag == 'A' ? 'selected' : '' }}>A (Abnormal)</option>
-                                    </select>
-                                </td>
+                                                <td class="text-center align-middle">
+                                                    <select name="flag[{{ $pem->detail_id }}][{{ $sub->id }}]"
+                                                        class="form-select form-select-sm text-center select-flag ent-input {{ $hasValue ? 'res-filled' : '' }}"
+                                                        data-code="{{ $sub->id }}">
+                                                        <option value="*" {{ $currentFlag == '*' ? 'selected' : '' }}>*</option>
+                                                        <option value="N" {{ $currentFlag == 'N' ? 'selected' : '' }}>N (Normal)</option>
+                                                        <option value="H" {{ $currentFlag == 'H' ? 'selected' : '' }}>H (High)</option>
+                                                        <option value="L" {{ $currentFlag == 'L' ? 'selected' : '' }}>L (Low)</option>
+                                                        <option value="A" {{ $currentFlag == 'A' ? 'selected' : '' }}>A (Abnormal)</option>
+                                                    </select>
+                                                </td>
 
-                                <td class="align-middle fw-bold text-dark" style="border: 2px solid var(--retro-dark);">{{ $sub->nilai_normal ?? '-' }}</td>
-                                <td class="fs--2 align-middle" style="border: 2px solid var(--retro-dark);">
-                                    <select name="metode[{{ $pem->detail_id }}][{{ $sub->id }}]"
-                                        class="form-select form-select-sm fs--2 select-metode retro-input {{ $hasValue ? 'border-success bg-light-success' : '' }}"
-                                        data-code="{{ $sub->id }}">
-                                        <option value="{{ $sub->metode ?? '-' }}" selected>{{ $sub->metode ?? '-' }}</option>
-                                    </select>
-                                </td>
-                            </tr>
-                            @endforeach
+                                                <td class="align-middle fw-semibold" style="font-family: 'JetBrains Mono', monospace; font-size: 0.76rem;">
+                                                    {{ $sub->nilai_normal ?? '-' }}
+                                                </td>
 
-                            @else
-                            @php
-                            $nilai = DB::table('medical_transaksi_hasil')
-                            ->where('detail_id', $pem->detail_id)
-                            ->where('parameter_id', $param->id)
-                            ->first();
+                                                <td class="align-middle">
+                                                    <select name="metode[{{ $pem->detail_id }}][{{ $sub->id }}]"
+                                                        class="form-select form-select-sm select-metode ent-input {{ $hasValue ? 'res-filled' : '' }}"
+                                                        data-code="{{ $sub->id }}">
+                                                        <option value="{{ $sub->metode ?? '-' }}" selected>{{ $sub->metode ?? '-' }}</option>
+                                                    </select>
+                                                </td>
+                                            </tr>
+                                        @endforeach
+                                    @else
+                                        @php
+                                            $nilai = DB::table('medical_transaksi_hasil')
+                                                ->where('detail_id', $pem->detail_id)
+                                                ->where('parameter_id', $param->id)
+                                                ->first();
 
-                            $hasValue = $nilai && !empty($nilai->hasil);
-                            $currentFlag = $nilai ? $nilai->flag : '*';
-                            @endphp
-                            <!-- RENDER PARAMETER BIASA / SINGLE -->
-                            <tr style="background-color: #ffffff;">
-                                <td class="ps-3 fw-bolder text-dark" style="border: 2px solid var(--retro-dark);">
-                                    {{ $param->nama_parameter }}
-                                </td>
-                                <td style="border: 2px solid var(--retro-dark);">
-                                    <div class="input-group has-validation">
-                                        <input type="text"
-                                            class="form-control form-control-sm input-hasil retro-input {{ $hasValue ? 'border-success bg-light-success' : '' }}"
-                                            data-code="{{ $param->id }}"
-                                            name="hasil[{{ $pem->detail_id }}][{{ $param->id }}]"
-                                            value="{{ $hasValue ? $nilai->hasil : '' }}"
-                                            placeholder="0.0">
+                                            $hasValue = $nilai && !empty($nilai->hasil);
+                                            $currentFlag = $nilai ? $nilai->flag : '*';
+                                        @endphp
+                                        <tr>
+                                            <td class="ps-3 fw-semibold">
+                                                {{ $param->nama_parameter }}
+                                            </td>
+                                            <td>
+                                                <div class="input-group has-validation">
+                                                    <input type="text"
+                                                        class="form-control form-control-sm input-hasil ent-input {{ $hasValue ? 'res-filled' : '' }}"
+                                                        data-code="{{ $param->id }}"
+                                                        name="hasil[{{ $pem->detail_id }}][{{ $param->id }}]"
+                                                        value="{{ $hasValue ? $nilai->hasil : '' }}"
+                                                        placeholder="0.0">
 
-                                        <span class="input-group-text {{ $hasValue ? 'border-success' : '' }} fs--2 py-0 px-2 fw-bold text-dark" style="border: 2px solid var(--retro-dark); background-color: var(--retro-bg);">
-                                            {{ $param->satuan ?? '-' }}
-                                        </span>
-                                    </div>
-                                </td>
+                                                    <span class="input-group-text res-unit-addon px-2 {{ $hasValue ? 'res-filled' : '' }}">
+                                                        {{ $param->satuan ?? '-' }}
+                                                    </span>
+                                                </div>
+                                            </td>
 
-                                <!-- INPUT / SELECT FLAG -->
-                                <td class="text-center align-middle" style="border: 2px solid var(--retro-dark);">
-                                    <select name="flag[{{ $pem->detail_id }}][{{ $param->id }}]"
-                                        class="form-select form-select-sm fs--2 text-center select-flag retro-input {{ $hasValue ? 'border-success bg-light-success' : '' }}"
-                                        data-code="{{ $param->id }}">
-                                        <option value="*" {{ $currentFlag == '*' ? 'selected' : '' }}>*</option>
-                                        <option value="N" {{ $currentFlag == 'N' ? 'selected' : '' }}>N (Normal)</option>
-                                        <option value="H" {{ $currentFlag == 'H' ? 'selected' : '' }}>H (High)</option>
-                                        <option value="L" {{ $currentFlag == 'L' ? 'selected' : '' }}>L (Low)</option>
-                                        <option value="A" {{ $currentFlag == 'A' ? 'selected' : '' }}>A (Abnormal)</option>
-                                    </select>
-                                </td>
+                                            <td class="text-center align-middle">
+                                                <select name="flag[{{ $pem->detail_id }}][{{ $param->id }}]"
+                                                    class="form-select form-select-sm text-center select-flag ent-input {{ $hasValue ? 'res-filled' : '' }}"
+                                                    data-code="{{ $param->id }}">
+                                                    <option value="*" {{ $currentFlag == '*' ? 'selected' : '' }}>*</option>
+                                                    <option value="N" {{ $currentFlag == 'N' ? 'selected' : '' }}>N (Normal)</option>
+                                                    <option value="H" {{ $currentFlag == 'H' ? 'selected' : '' }}>H (High)</option>
+                                                    <option value="L" {{ $currentFlag == 'L' ? 'selected' : '' }}>L (Low)</option>
+                                                    <option value="A" {{ $currentFlag == 'A' ? 'selected' : '' }}>A (Abnormal)</option>
+                                                </select>
+                                            </td>
 
-                                <td class="align-middle fw-bold text-dark" style="border: 2px solid var(--retro-dark);">{{ $param->nilai_normal ?? '-' }}</td>
-                                <td class="fs--2 align-middle" style="border: 2px solid var(--retro-dark);">
-                                    <select name="metode[{{ $pem->detail_id }}][{{ $param->id }}]"
-                                        class="form-select form-select-sm fs--2 select-metode retro-input {{ $hasValue ? 'border-success bg-light-success' : '' }}"
-                                        data-code="{{ $param->id }}">
-                                        <option value="{{ $param->metode ?? '-' }}" selected>{{ $param->metode ?? '-' }}</option>
-                                    </select>
-                                </td>
-                            </tr>
-                            @endif
-                            @endforeach
+                                            <td class="align-middle fw-semibold" style="font-family: 'JetBrains Mono', monospace; font-size: 0.76rem;">
+                                                {{ $param->nilai_normal ?? '-' }}
+                                            </td>
 
+                                            <td class="align-middle">
+                                                <select name="metode[{{ $pem->detail_id }}][{{ $param->id }}]"
+                                                    class="form-select form-select-sm select-metode ent-input {{ $hasValue ? 'res-filled' : '' }}"
+                                                    data-code="{{ $param->id }}">
+                                                    <option value="{{ $param->metode ?? '-' }}" selected>{{ $param->metode ?? '-' }}</option>
+                                                </select>
+                                            </td>
+                                        </tr>
+                                    @endif
+                                @endforeach
                             @empty
-                            <tr>
-                                <td colspan="5" class="text-center py-3 text-dark fw-bold" style="border: 2px solid var(--retro-dark);">Tidak ada data pemeriksaan laboratorium.</td>
-                            </tr>
+                                <tr>
+                                    <td colspan="5" class="text-center py-4 opacity-75 fw-semibold">Tidak ada data pemeriksaan laboratorium.</td>
+                                </tr>
                             @endforelse
                         </tbody>
                     </table>
@@ -256,6 +375,28 @@
 
 <script>
     $(document).ready(function() {
+        function notifyResult(icon, title) {
+            if (typeof Toast !== 'undefined' && Toast && typeof Toast.fire === 'function') {
+                Toast.fire({ icon: icon, title: title });
+            } else if (typeof Swal !== 'undefined') {
+                Swal.fire({ icon: icon, title: title, timer: 2000, showConfirmButton: false });
+            } else {
+                alert(title);
+            }
+        }
+
+        function markResultFilled(code) {
+            let inputEl = $('.input-hasil[data-code="' + code + '"]');
+            let selectMetode = $('.select-metode[data-code="' + code + '"]');
+            let selectFlag = $('.select-flag[data-code="' + code + '"]');
+            let inputGroupText = inputEl.siblings('.input-group-text');
+
+            inputEl.addClass('res-filled');
+            selectMetode.addClass('res-filled');
+            selectFlag.addClass('res-filled');
+            inputGroupText.addClass('res-filled');
+        }
+
         // --- SINKRONISASI ALAT ---
         $('#button-sinkronisasi-proses-result').off('click').on('click', function(e) {
             e.preventDefault();
@@ -272,16 +413,17 @@
             });
 
             if (listCodes.length === 0) {
-                alert('Tidak ada parameter pemeriksaan yang dapat disinkronkan.');
+                notifyResult('warning', 'Tidak ada parameter pemeriksaan yang dapat disinkronkan.');
                 return;
             }
 
             if (!orderLabListCode) {
-                alert('Kode Order Lab List tidak ditemukan.');
+                notifyResult('error', 'Kode Order Lab List tidak ditemukan.');
                 return;
             }
 
-            btn.prop('disabled', true).html('<span class="spinner-border spinner-border-sm"></span> Menyinkronkan...');
+            let originalHtml = btn.html();
+            btn.prop('disabled', true).html('<span class="spinner-border spinner-border-sm me-1"></span> Menyinkronkan...');
 
             $.ajax({
                 url: "{{ route('menu_lab_proses_result_detail_sinkronisasi') }}",
@@ -299,28 +441,22 @@
                             let code = $(this).data('code');
 
                             if (updatedData[code] !== undefined && updatedData[code] !== '') {
-                                let inputEl = $(this);
-                                let selectMetode = $('.select-metode[data-code="' + code + '"]');
-                                let selectFlag = $('.select-flag[data-code="' + code + '"]');
-                                let inputGroupText = inputEl.siblings('.input-group-text');
-
-                                inputEl.val(updatedData[code]);
-                                inputEl.addClass('border-success bg-light-success');
-                                selectMetode.addClass('border-success bg-light-success');
-                                selectFlag.addClass('border-success bg-light-success');
-                                inputGroupText.addClass('border-success');
+                                $(this).val(updatedData[code]);
+                                markResultFilled(code);
                             }
                         });
 
-                        alert(response.message);
+                        notifyResult('success', response.message || 'Sinkronisasi alat berhasil.');
+                    } else {
+                        notifyResult('warning', response.message || 'Tidak ada data baru dari alat.');
                     }
                 },
                 error: function(xhr) {
                     let msg = xhr.responseJSON ? xhr.responseJSON.message : 'Terjadi kesalahan saat sinkronisasi.';
-                    alert(msg);
+                    notifyResult('error', msg);
                 },
                 complete: function() {
-                    btn.prop('disabled', false).html('<i class="fas fa-sync-alt me-1"></i> Sinkronisasi Alat');
+                    btn.prop('disabled', false).html(originalHtml);
                 }
             });
         });
@@ -331,8 +467,9 @@
 
             let btn = $(this);
             let form = $('#form-result-pasien');
+            let originalHtml = btn.html();
 
-            btn.prop('disabled', true).html('<span class="spinner-border spinner-border-sm"></span> Menyimpan...');
+            btn.prop('disabled', true).html('<span class="spinner-border spinner-border-sm me-1"></span> Menyimpan...');
 
             let formData = form.serialize();
 
@@ -345,28 +482,20 @@
                         let savedCodes = response.saved_codes || [];
 
                         savedCodes.forEach(function(code) {
-                            let inputEl = $('.input-hasil[data-code="' + code + '"]');
-                            let selectMetode = $('.select-metode[data-code="' + code + '"]');
-                            let selectFlag = $('.select-flag[data-code="' + code + '"]');
-                            let inputGroupText = inputEl.siblings('.input-group-text');
-
-                            inputEl.addClass('border-success bg-light-success');
-                            selectMetode.addClass('border-success bg-light-success');
-                            selectFlag.addClass('border-success bg-light-success');
-                            inputGroupText.addClass('border-success');
+                            markResultFilled(code);
                         });
 
-                        alert(response.message);
+                        notifyResult('success', response.message || 'Data hasil laboratorium berhasil disimpan.');
                     } else {
-                        alert(response.message || 'Gagal menyimpan data.');
+                        notifyResult('error', response.message || 'Gagal menyimpan data.');
                     }
                 },
                 error: function(xhr) {
                     let msg = xhr.responseJSON ? xhr.responseJSON.message : 'Terjadi kesalahan saat menyimpan data.';
-                    alert(msg);
+                    notifyResult('error', msg);
                 },
                 complete: function() {
-                    btn.prop('disabled', false).html('<i class="fas fa-check-circle me-1"></i> Simpan');
+                    btn.prop('disabled', false).html(originalHtml);
                 }
             });
         });
