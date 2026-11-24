@@ -37,7 +37,9 @@ class MedicalLabQc extends Migration
                 ->constrained('medical_lab_qc_materials')
                 ->cascadeOnDelete();
             $table->unsignedBigInteger('master_pemeriksaan_id')->nullable();
+            $table->unsignedBigInteger('master_parameter_id')->nullable();
             $table->string('nama_parameter', 150);
+            $table->string('label', 150)->nullable();
             $table->string('satuan', 50)->nullable();
             $table->string('metode', 100)->nullable();
             $table->decimal('target_mean', 12, 4);
@@ -48,10 +50,20 @@ class MedicalLabQc extends Migration
             $table->boolean('is_active')->default(true);
             $table->timestamps();
 
+            $table->index(['qc_material_id', 'is_active'], 'idx_qc_param_material_active');
+            $table->index(['qc_material_id', 'nama_parameter'], 'idx_qc_param_material_nama');
+
             if (Schema::hasTable('medical_master_pemeriksaan')) {
                 $table->foreign('master_pemeriksaan_id', 'fk_qc_param_master_pemeriksaan')
                     ->references('id')
                     ->on('medical_master_pemeriksaan')
+                    ->nullOnDelete();
+            }
+
+            if (Schema::hasTable('medical_master_parameters')) {
+                $table->foreign('master_parameter_id', 'fk_qc_param_master_parameter')
+                    ->references('id')
+                    ->on('medical_master_parameters')
                     ->nullOnDelete();
             }
         });
