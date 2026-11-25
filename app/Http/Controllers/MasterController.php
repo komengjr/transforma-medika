@@ -9,6 +9,7 @@ use Illuminate\Support\Facades\Hash;
 use Illuminate\Support\Facades\Redirect;
 use Illuminate\Support\Str;
 use TianRosandhy\LaravelFonnte\Fonnte;
+
 class MasterController extends Controller
 {
     public function __construct()
@@ -306,28 +307,101 @@ class MasterController extends Controller
     public function master_menu_akses_update_sub_menu(Request $request)
     {
         if (Auth::user()->access_code == 'master') {
-            $cek = DB::table('z_menu_user_sub')->where('menu_main_sub_code', $request->code)->where('access_code', $request->id)->first();
-            if ($cek) {
-                DB::table('z_menu_user_sub')->where('menu_main_sub_code', $request->code)->where('access_code', $request->id)->delete();
+            $code = $request->code;       // bisa berupa menu_main_sub_code atau menu_sub_code
+            $accessCode = $request->id; // access_code
+            $parentSubCode = null;
+            $parentActivated = false;
+
+            // Cek apakah $code adalah menu_main_sub_code (sub turunan)
+            $subMain = DB::table('z_menu_sub_main')
+                ->where('menu_main_sub_code', $code)
+                ->first();
+
+            if ($subMain) {
+                $parentSubCode = $subMain->menu_sub_code;
+
+                $cek = DB::table('z_menu_user_sub')
+                    ->where('menu_main_sub_code', $code)
+                    ->where('access_code', $accessCode)
+                    ->first();
+
+                if ($cek) {
+                    DB::table('z_menu_user_sub')
+                        ->where('menu_main_sub_code', $code)
+                        ->where('access_code', $accessCode)
+                        ->delete();
+                    $isActive = false;
+                } else {
+                    DB::table('z_menu_user_sub')->insert([
+                        'menu_main_sub_code' => $code,
+                        'access_code'        => $accessCode,
+                        'created_at'         => now(),
+                    ]);
+                    $isActive = true;
+
+                    // Pastikan kepala (menu_sub_code) juga aktif di z_menu_user agar sub tampil di menu
+                    $cekParent = DB::table('z_menu_user')
+                        ->where('menu_sub_code', $parentSubCode)
+                        ->where('access_code', $accessCode)
+                        ->first();
+
+                    if (!$cekParent) {
+                        DB::table('z_menu_user')->insert([
+                            'menu_sub_code' => $parentSubCode,
+                            'access_code'   => $accessCode,
+                            'created_at'    => now(),
+                        ]);
+                        $parentActivated = true;
+                    }
+                }
             } else {
-                DB::table('z_menu_user_sub')->insert([
-                    'menu_main_sub_code' => $request->code,
-                    'access_code' => $request->id,
-                    'created_at' => now()
+                // Jika $code adalah menu_sub_code (kepala sub menu langsung)
+                $cekParent = DB::table('z_menu_user')
+                    ->where('menu_sub_code', $code)
+                    ->where('access_code', $accessCode)
+                    ->first();
+
+                if ($cekParent) {
+                    DB::table('z_menu_user')
+                        ->where('menu_sub_code', $code)
+                        ->where('access_code', $accessCode)
+                        ->delete();
+                    $isActive = false;
+                } else {
+                    DB::table('z_menu_user')->insert([
+                        'menu_sub_code' => $code,
+                        'access_code'   => $accessCode,
+                        'created_at'    => now(),
+                    ]);
+                    $isActive = true;
+                }
+            }
+
+            if ($request->ajax() || $request->wantsJson()) {
+                return response()->json([
+                    'success'          => true,
+                    'active'           => $isActive,
+                    'label'            => $isActive ? 'Aktif' : 'Tidak Aktif',
+                    'code'             => $code,
+                    'id'               => $accessCode,
+                    'parent_sub_code'  => $parentSubCode,
+                    'parent_activated' => $parentActivated,
                 ]);
             }
+
             $data = DB::table('z_menu')
                 ->join('z_menu_super', 'z_menu_super.menu_super_code', '=', 'z_menu.menu_super_code')
                 ->join('z_menu_user_super', 'z_menu_user_super.menu_super_code', '=', 'z_menu_super.menu_super_code')
-                ->where('z_menu_user_super.access_code', $request->id)
+                ->where('z_menu_user_super.access_code', $accessCode)
                 ->get();
+
             return view('master.access.table-menu-akses', [
-                'code' => $request->id,
+                'code' => $accessCode,
                 'data' => $data,
             ]);
-        } else {
-            return view('application.error.404');
         }
+
+        return view('application.error.404');
     }
     public function master_gateway_whatsapp(Request $request)
     {

@@ -207,7 +207,6 @@ Route::prefix('{akses}/{id}')->group(function (): void {
     Route::get('master-event/pengiriman-whatsapp', [EventController::class, 'master_event_pengiriman_whatsapp'])->name('master_event_pengiriman_whatsapp');
     Route::get('master-event/event-access', [EventController::class, 'master_event_access_event'])->name('master_event_access_event');
     Route::get('master-event/master-whatsapp', [EventController::class, 'master_event_master_whatsapp'])->name('master_event_master_whatsapp');
-
 });
 
 
@@ -356,7 +355,7 @@ Route::prefix('inventaris/')->group(function (): void {
 // ACCOUNTING
 Route::prefix('accounting/')->group(function (): void {
     Route::post('ledger/general-ledger/search', [AccountingController::class, 'general_ledger_search'])->name('general_ledger_search');
-
+    Route::post('general-ledger/post-accounting', [AccountingController::class, 'general_ledger_post_accounting'])->name('general_ledger_post_accounting');
     Route::post('master-accounting/master-coa/add-level', [AccountingController::class, 'master_accounting_coa_add_level'])->name('master_accounting_coa_add_level');
     Route::post('master-accounting/master-coa/save-level', [AccountingController::class, 'master_accounting_coa_save_level'])->name('master_accounting_coa_save_level');
     Route::post('master-accounting/master-coa/update-level', [AccountingController::class, 'master_accounting_coa_update_level'])->name('master_accounting_coa_update_level');
