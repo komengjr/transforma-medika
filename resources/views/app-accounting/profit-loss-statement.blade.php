@@ -327,7 +327,7 @@
                         <h4 class="fw-bold mb-0" style="letter-spacing: -0.02em; color: white;">
                             Laporan Laba Rugi Terpusat (Profit &amp; Loss)
                         </h4>
-                        <p class="mb-0 small" style="color: #cbd5e1;">Rincian pendapatan dan beban per akun COA dari jurnal terposting lintas project.</p>
+                        <p class="mb-0 small" style="color: #cbd5e1;">Rincian pendapatan (4xxx) dan beban (5xxx-9xxx) per akun COA dari jurnal terposting.</p>
                     </div>
                 </div>
 

@@ -222,24 +222,24 @@
     .bs-table {
         border-collapse: separate;
         border-spacing: 0;
-        font-size: 0.81rem;
+        font-size: 0.8rem;
         margin-bottom: 0;
     }
 
     .bs-table thead th {
         background: linear-gradient(135deg, #0f172a 0%, #1e1b4b 100%);
         color: #ffffff;
-        font-size: 0.7rem;
+        font-size: 0.69rem;
         font-weight: 700;
         text-transform: uppercase;
         letter-spacing: 0.04em;
-        padding: 9px 11px;
+        padding: 9px 10px;
         border-color: rgba(99, 102, 241, 0.35);
         white-space: nowrap;
     }
 
     .bs-table tbody td {
-        padding: 8px 11px;
+        padding: 8px 10px;
         vertical-align: middle;
         border-color: rgba(148, 163, 184, 0.22);
     }
@@ -253,7 +253,7 @@
         border-top: 2px solid rgba(99, 102, 241, 0.35) !important;
         border-bottom: 1px solid rgba(99, 102, 241, 0.25) !important;
         font-weight: 700;
-        padding: 9px 11px !important;
+        padding: 9px 10px !important;
     }
 
     .bs-grand-row td {
@@ -261,7 +261,7 @@
         border-top: 2px solid #4f46e5 !important;
         border-bottom: 2px solid #4f46e5 !important;
         font-weight: 700;
-        padding: 10px 11px !important;
+        padding: 10px 10px !important;
     }
 
     .bs-mono {
@@ -331,7 +331,7 @@
                         <h4 class="fw-bold mb-0" style="letter-spacing: -0.02em; color: white;">
                             Neraca Keuangan Terpusat (Balance Sheet)
                         </h4>
-                        <p class="mb-0 small" style="color: #cbd5e1;">Posisi Aset, Kewajiban, dan Ekuitas per akun COA dari jurnal terposting lintas project.</p>
+                        <p class="mb-0 small" style="color: #cbd5e1;">Posisi Aset (1xxx), Kewajiban (2xxx), dan Ekuitas (3xxx) dari jurnal terposting lintas project.</p>
                     </div>
                 </div>
 
@@ -424,7 +424,7 @@
                 </div>
                 <h6 class="mb-0 fw-bold">Rincian Neraca (Aset, Kewajiban &amp; Ekuitas)</h6>
                 <small class="opacity-75">
-                    Periode: <strong>{{ !empty($tanggal_awal) ? $tanggal_awal : 'Semua Tanggal' }}</strong>
+                    Periode: <strong>{{ !empty($tanggal_awal) ? $tanggal_awal : 'Awal' }}</strong>
                     s/d <strong>{{ !empty($tanggal_akhir) ? $tanggal_akhir : 'Semua Tanggal' }}</strong>
                 </small>
             </div>
@@ -439,17 +439,17 @@
     <div class="card-body p-3 p-md-4">
         <div class="bs-summary-grid">
             <div class="bs-stat-card" style="border-left: 4px solid #0284c7 !important;">
-                <span class="bs-stat-label">Total Aset</span>
+                <span class="bs-stat-label">Total Aset (1xxx)</span>
                 <span class="bs-stat-value text-info">Rp {{ number_format($totAset, 0, ',', '.') }}</span>
             </div>
 
             <div class="bs-stat-card" style="border-left: 4px solid #e11d48 !important;">
-                <span class="bs-stat-label">Total Kewajiban</span>
+                <span class="bs-stat-label">Total Kewajiban (2xxx)</span>
                 <span class="bs-stat-value text-danger">Rp {{ number_format($totKewajiban, 0, ',', '.') }}</span>
             </div>
 
             <div class="bs-stat-card" style="border-left: 4px solid #059669 !important;">
-                <span class="bs-stat-label">Total Ekuitas (+ Laba/Rugi)</span>
+                <span class="bs-stat-label">Total Ekuitas (3xxx + Laba/Rugi)</span>
                 <span class="bs-stat-value text-success">Rp {{ number_format($totEkuitas + $labaBerjalan, 0, ',', '.') }}</span>
             </div>
 
@@ -470,17 +470,18 @@
             <div class="col-lg-6">
                 <div class="bs-section-box h-100">
                     <div class="bs-section-header" style="background: rgba(2, 132, 199, 0.1); border-bottom: 1px solid rgba(2, 132, 199, 0.25); color: #0284c7;">
-                        <span><i class="fas fa-landmark me-2"></i>I. ASET (ASSETS)</span>
+                        <span><i class="fas fa-landmark me-2"></i>I. ASET (ASSETS - 1xxx)</span>
                         <span class="badge bg-info-subtle text-info border border-info-subtle rounded-pill">{{ $asetList->count() }} Akun</span>
                     </div>
                     <div class="table-responsive">
                         <table class="table table-bordered bs-table w-100" id="tableAset">
                             <thead>
                                 <tr>
-                                    <th style="width: 115px;">Kode COA</th>
+                                    <th style="width: 110px;">Kode COA</th>
                                     <th>Nama Akun Aset</th>
-                                    <th class="text-center" style="width: 75px;">Jurnal</th>
-                                    <th class="text-end" style="width: 150px;">Saldo (Rp)</th>
+                                    <th class="text-end" style="width: 115px;">Debit</th>
+                                    <th class="text-end" style="width: 115px;">Kredit</th>
+                                    <th class="text-end" style="width: 135px;">Saldo (Rp)</th>
                                 </tr>
                             </thead>
                             <tbody>
@@ -488,20 +489,21 @@
                                     <tr class="bs-filterable-row">
                                         <td><span class="bs-coa-pill">{{ $item->coa_code }}</span></td>
                                         <td class="fw-semibold">{{ $item->coa_name }}</td>
-                                        <td class="text-center bs-mono">{{ $item->jumlah_jurnal }}</td>
+                                        <td class="text-end bs-mono opacity-75">{{ number_format((int) $item->total_debit, 0, ',', '.') }}</td>
+                                        <td class="text-end bs-mono opacity-75">{{ number_format((int) $item->total_kredit, 0, ',', '.') }}</td>
                                         <td class="text-end bs-mono fw-semibold text-info">
                                             {{ number_format((int) $item->saldo, 0, ',', '.') }}
                                         </td>
                                     </tr>
                                 @empty
                                     <tr>
-                                        <td colspan="4" class="text-center py-4 opacity-75">Belum ada mutasi akun aset pada periode ini.</td>
+                                        <td colspan="5" class="text-center py-4 opacity-75">Belum ada mutasi akun aset pada periode ini.</td>
                                     </tr>
                                 @endforelse
                             </tbody>
                             <tfoot>
                                 <tr class="bs-grand-row">
-                                    <td colspan="3" class="text-end text-uppercase">Total Aset</td>
+                                    <td colspan="4" class="text-end text-uppercase">Total Aset</td>
                                     <td class="text-end bs-mono text-info" id="totalAset">
                                         Rp {{ number_format($totAset, 0, ',', '.') }}
                                     </td>
@@ -516,17 +518,18 @@
             <div class="col-lg-6">
                 <div class="bs-section-box">
                     <div class="bs-section-header" style="background: rgba(225, 29, 72, 0.1); border-bottom: 1px solid rgba(225, 29, 72, 0.25); color: #e11d48;">
-                        <span><i class="fas fa-file-contract me-2"></i>II. KEWAJIBAN (LIABILITIES)</span>
+                        <span><i class="fas fa-file-contract me-2"></i>II. KEWAJIBAN (LIABILITIES - 2xxx)</span>
                         <span class="badge bg-danger-subtle text-danger border border-danger-subtle rounded-pill">{{ $kewajibanList->count() }} Akun</span>
                     </div>
                     <div class="table-responsive">
                         <table class="table table-bordered bs-table w-100" id="tableKewajiban">
                             <thead>
                                 <tr>
-                                    <th style="width: 115px;">Kode COA</th>
+                                    <th style="width: 110px;">Kode COA</th>
                                     <th>Nama Akun Kewajiban</th>
-                                    <th class="text-center" style="width: 75px;">Jurnal</th>
-                                    <th class="text-end" style="width: 150px;">Saldo (Rp)</th>
+                                    <th class="text-end" style="width: 115px;">Debit</th>
+                                    <th class="text-end" style="width: 115px;">Kredit</th>
+                                    <th class="text-end" style="width: 135px;">Saldo (Rp)</th>
                                 </tr>
                             </thead>
                             <tbody>
@@ -534,20 +537,21 @@
                                     <tr class="bs-filterable-row">
                                         <td><span class="bs-coa-pill">{{ $item->coa_code }}</span></td>
                                         <td class="fw-semibold">{{ $item->coa_name }}</td>
-                                        <td class="text-center bs-mono">{{ $item->jumlah_jurnal }}</td>
+                                        <td class="text-end bs-mono opacity-75">{{ number_format((int) $item->total_debit, 0, ',', '.') }}</td>
+                                        <td class="text-end bs-mono opacity-75">{{ number_format((int) $item->total_kredit, 0, ',', '.') }}</td>
                                         <td class="text-end bs-mono fw-semibold text-danger">
                                             {{ number_format((int) $item->saldo, 0, ',', '.') }}
                                         </td>
                                     </tr>
                                 @empty
                                     <tr>
-                                        <td colspan="4" class="text-center py-3 opacity-75">Belum ada mutasi akun kewajiban pada periode ini.</td>
+                                        <td colspan="5" class="text-center py-3 opacity-75">Belum ada mutasi akun kewajiban pada periode ini.</td>
                                     </tr>
                                 @endforelse
                             </tbody>
                             <tfoot>
                                 <tr class="bs-subtotal-row">
-                                    <td colspan="3" class="text-end text-uppercase">Subtotal Kewajiban</td>
+                                    <td colspan="4" class="text-end text-uppercase">Subtotal Kewajiban</td>
                                     <td class="text-end bs-mono text-danger">
                                         Rp {{ number_format($totKewajiban, 0, ',', '.') }}
                                     </td>
@@ -559,17 +563,18 @@
 
                 <div class="bs-section-box mb-0">
                     <div class="bs-section-header" style="background: rgba(5, 150, 105, 0.1); border-bottom: 1px solid rgba(5, 150, 105, 0.25); color: #059669;">
-                        <span><i class="fas fa-coins me-2"></i>III. EKUITAS (EQUITY)</span>
+                        <span><i class="fas fa-coins me-2"></i>III. EKUITAS / MODAL (EQUITY - 3xxx)</span>
                         <span class="badge bg-success-subtle text-success border border-success-subtle rounded-pill">{{ $ekuitasList->count() }} Akun</span>
                     </div>
                     <div class="table-responsive">
                         <table class="table table-bordered bs-table w-100" id="tableEkuitas">
                             <thead>
                                 <tr>
-                                    <th style="width: 115px;">Kode COA</th>
+                                    <th style="width: 110px;">Kode COA</th>
                                     <th>Nama Akun Ekuitas</th>
-                                    <th class="text-center" style="width: 75px;">Jurnal</th>
-                                    <th class="text-end" style="width: 150px;">Saldo (Rp)</th>
+                                    <th class="text-end" style="width: 115px;">Debit</th>
+                                    <th class="text-end" style="width: 115px;">Kredit</th>
+                                    <th class="text-end" style="width: 135px;">Saldo (Rp)</th>
                                 </tr>
                             </thead>
                             <tbody>
@@ -577,20 +582,22 @@
                                     <tr class="bs-filterable-row">
                                         <td><span class="bs-coa-pill">{{ $item->coa_code }}</span></td>
                                         <td class="fw-semibold">{{ $item->coa_name }}</td>
-                                        <td class="text-center bs-mono">{{ $item->jumlah_jurnal }}</td>
+                                        <td class="text-end bs-mono opacity-75">{{ number_format((int) $item->total_debit, 0, ',', '.') }}</td>
+                                        <td class="text-end bs-mono opacity-75">{{ number_format((int) $item->total_kredit, 0, ',', '.') }}</td>
                                         <td class="text-end bs-mono fw-semibold text-success">
                                             {{ number_format((int) $item->saldo, 0, ',', '.') }}
                                         </td>
                                     </tr>
                                 @empty
                                     <tr>
-                                        <td colspan="4" class="text-center py-3 opacity-75">Belum ada mutasi akun ekuitas pada periode ini.</td>
+                                        <td colspan="5" class="text-center py-3 opacity-75">Belum ada mutasi akun ekuitas pada periode ini.</td>
                                     </tr>
                                 @endforelse
                                 <tr>
                                     <td><span class="bs-coa-pill">PL-YTD</span></td>
                                     <td class="fw-semibold">{{ $labaBerjalan >= 0 ? 'Laba Periode Berjalan' : 'Rugi Periode Berjalan' }}</td>
-                                    <td class="text-center bs-mono">-</td>
+                                    <td class="text-end bs-mono opacity-75">-</td>
+                                    <td class="text-end bs-mono opacity-75">-</td>
                                     <td class="text-end bs-mono fw-semibold {{ $labaBerjalan >= 0 ? 'text-success' : 'text-danger' }}">
                                         {{ $labaBerjalan < 0 ? '-' : '' }}{{ number_format(abs($labaBerjalan), 0, ',', '.') }}
                                     </td>
@@ -598,13 +605,13 @@
                             </tbody>
                             <tfoot>
                                 <tr class="bs-subtotal-row">
-                                    <td colspan="3" class="text-end text-uppercase">Subtotal Ekuitas (+ Laba/Rugi)</td>
+                                    <td colspan="4" class="text-end text-uppercase">Subtotal Ekuitas (+ Laba/Rugi)</td>
                                     <td class="text-end bs-mono text-success">
                                         Rp {{ number_format($totEkuitas + $labaBerjalan, 0, ',', '.') }}
                                     </td>
                                 </tr>
                                 <tr class="bs-grand-row">
-                                    <td colspan="3" class="text-end text-uppercase">Total Kewajiban + Ekuitas</td>
+                                    <td colspan="4" class="text-end text-uppercase">Total Kewajiban + Ekuitas</td>
                                     <td class="text-end bs-mono text-primary" id="totalLiab">
                                         Rp {{ number_format($totKewEkuitas, 0, ',', '.') }}
                                     </td>

@@ -418,9 +418,9 @@ class AccountingController extends Controller
                 ->orderBy('menu_super_name', 'asc')
                 ->get();
 
-            $project      = trim((string) $request->input('project', ''));
-            $tanggalAwal  = trim((string) $request->input('tanggal_awal', ''));
-            $tanggalAkhir = trim((string) $request->input('tanggal_akhir', ''));
+            $project      = trim((string)$request->input('project', ''));
+            $tanggalAwal  = trim((string)$request->input('tanggal_awal', ''));
+            $tanggalAkhir = trim((string)$request->input('tanggal_akhir', ''));
 
             $startDate = $this->parseGlDate($tanggalAwal);
             $endDate   = $this->parseGlDate($tanggalAkhir);
@@ -431,28 +431,30 @@ class AccountingController extends Controller
 
             $query = DB::table('acc_jurnal_detail as ad')
                 ->join('acc_jurnal as aj', 'aj.id_acc_jurnal', '=', 'ad.acc_jurnal_id')
-                ->leftJoin('kop_fin_master_coa as mc', 'mc.coa_code', '=', 'ad.coa_code')
+                ->leftJoin('kop_fin_master_coa as mc', function ($join) {
+                    $join->on(DB::raw('TRIM(mc.coa_code)'), '=', DB::raw('TRIM(ad.coa_code)'));
+                })
                 ->select(
-                    'ad.coa_code',
-                    DB::raw('COALESCE(NULLIF(ad.coa_name, ""), NULLIF(mc.coa_name, ""), CONCAT("Akun COA ", ad.coa_code)) as coa_name'),
-                    DB::raw('LOWER(COALESCE(NULLIF(ad.coa_type, ""), NULLIF(mc.coa_type, ""), "")) as coa_type'),
+                    DB::raw('TRIM(ad.coa_code) as coa_code'),
+                    DB::raw('MAX(COALESCE(NULLIF(TRIM(ad.coa_name), ""), NULLIF(TRIM(mc.coa_name), ""), CONCAT("Akun COA ", TRIM(ad.coa_code)))) as coa_name'),
+                    DB::raw('MAX(LOWER(TRIM(COALESCE(NULLIF(TRIM(ad.coa_type), ""), NULLIF(TRIM(mc.coa_type), ""), "")))) as coa_type'),
                     DB::raw('COUNT(DISTINCT aj.id_acc_jurnal) as jumlah_jurnal'),
                     DB::raw('COALESCE(SUM(ad.jurnal_debit), 0) as total_debit'),
                     DB::raw('COALESCE(SUM(ad.jurnal_kredit), 0) as total_kredit')
                 )
                 ->where(function ($q) {
-                    $q->whereIn(DB::raw('LOWER(COALESCE(NULLIF(ad.coa_type, ""), mc.coa_type))'), ['pendapatan', 'beban'])
-                        ->orWhere('ad.coa_code', 'like', '4%')
-                        ->orWhere('ad.coa_code', 'like', '5%')
-                        ->orWhere('ad.coa_code', 'like', '6%')
-                        ->orWhere('ad.coa_code', 'like', '7%');
+                    $q->whereIn(
+                        DB::raw('LOWER(TRIM(COALESCE(NULLIF(TRIM(ad.coa_type), ""), NULLIF(TRIM(mc.coa_type), ""), "")))'),
+                        ['pendapatan', 'revenue', 'income', 'penjualan', 'beban', 'expense', 'expenses', 'biaya', 'hpp']
+                    )
+                        ->orWhereRaw('LEFT(TRIM(ad.coa_code), 1) IN ("4", "5", "6", "7", "8", "9")');
                 });
 
             if ($project !== '') {
                 $projLower = strtolower($project);
                 $query->where(function ($q) use ($project, $projLower) {
-                    $q->whereRaw('LOWER(aj.source_project) = ?', [$projLower])
-                        ->orWhereRaw('LOWER(aj.source_project) LIKE ?', ['%' . $projLower . '%']);
+                    $q->whereRaw('LOWER(TRIM(aj.source_project)) = ?', [$projLower])
+                        ->orWhereRaw('LOWER(TRIM(aj.source_project)) LIKE ?', ['%' . $projLower . '%']);
                 });
             }
 
@@ -465,43 +467,47 @@ class AccountingController extends Controller
             }
 
             $rows = $query
-                ->groupBy(
-                    'ad.coa_code',
-                    DB::raw('COALESCE(NULLIF(ad.coa_name, ""), NULLIF(mc.coa_name, ""), CONCAT("Akun COA ", ad.coa_code))'),
-                    DB::raw('LOWER(COALESCE(NULLIF(ad.coa_type, ""), NULLIF(mc.coa_type, ""), ""))')
-                )
-                ->orderBy('ad.coa_code', 'ASC')
+                ->groupBy(DB::raw('TRIM(ad.coa_code)'))
+                ->orderBy(DB::raw('TRIM(ad.coa_code)'), 'ASC')
                 ->get();
 
             $pendapatanItems = collect();
             $bebanItems      = collect();
 
             foreach ($rows as $row) {
-                $debit  = (int) ($row->total_debit ?? 0);
-                $kredit = (int) ($row->total_kredit ?? 0);
-                $type   = strtolower((string) ($row->coa_type ?? ''));
+                $debit   = (int) ($row->total_debit ?? 0);
+                $kredit  = (int) ($row->total_kredit ?? 0);
+                $codeStr = trim((string) ($row->coa_code ?? ''));
+                $type    = strtolower(trim((string) ($row->coa_type ?? '')));
+                $firstCh = substr($codeStr, 0, 1);
 
-                if ($type === 'pendapatan' || ($type === '' && str_starts_with((string) $row->coa_code, '4'))) {
+                $isPendapatan = in_array($type, ['pendapatan', 'revenue', 'income', 'penjualan'], true)
+                    || ($firstCh === '4' && !in_array($type, ['aset', 'asset', 'kewajiban', 'liabilitas', 'ekuitas', 'equity', 'modal', 'beban', 'expense', 'expenses', 'biaya', 'hpp'], true));
+
+                $isBeban = in_array($type, ['beban', 'expense', 'expenses', 'biaya', 'hpp'], true)
+                    || (in_array($firstCh, ['5', '6', '7', '8', '9'], true) && !in_array($type, ['aset', 'asset', 'kewajiban', 'liabilitas', 'ekuitas', 'equity', 'modal', 'pendapatan', 'revenue', 'income', 'penjualan'], true));
+
+                if ($isPendapatan) {
                     $saldo = $kredit - $debit;
                     $pendapatanItems->push((object) [
-                        'coa_code'       => $row->coa_code,
-                        'coa_name'       => $row->coa_name,
-                        'coa_type'       => 'pendapatan',
-                        'jumlah_jurnal'  => (int) $row->jumlah_jurnal,
-                        'total_debit'    => $debit,
-                        'total_kredit'   => $kredit,
-                        'saldo'          => $saldo,
+                        'coa_code'      => $codeStr,
+                        'coa_name'      => $row->coa_name,
+                        'coa_type'      => 'pendapatan',
+                        'jumlah_jurnal' => (int) $row->jumlah_jurnal,
+                        'total_debit'   => $debit,
+                        'total_kredit'  => $kredit,
+                        'saldo'         => $saldo,
                     ]);
-                } elseif ($type === 'beban' || ($type === '' && in_array(substr((string) $row->coa_code, 0, 1), ['5', '6', '7'], true))) {
+                } elseif ($isBeban) {
                     $saldo = $debit - $kredit;
                     $bebanItems->push((object) [
-                        'coa_code'       => $row->coa_code,
-                        'coa_name'       => $row->coa_name,
-                        'coa_type'       => 'beban',
-                        'jumlah_jurnal'  => (int) $row->jumlah_jurnal,
-                        'total_debit'    => $debit,
-                        'total_kredit'   => $kredit,
-                        'saldo'          => $saldo,
+                        'coa_code'      => $codeStr,
+                        'coa_name'      => $row->coa_name,
+                        'coa_type'      => 'beban',
+                        'jumlah_jurnal' => (int) $row->jumlah_jurnal,
+                        'total_debit'   => $debit,
+                        'total_kredit'  => $kredit,
+                        'saldo'         => $saldo,
                     ]);
                 }
             }
@@ -536,9 +542,9 @@ class AccountingController extends Controller
                 ->orderBy('menu_super_name', 'asc')
                 ->get();
 
-            $project      = trim((string) $request->input('project', ''));
-            $tanggalAwal  = trim((string) $request->input('tanggal_awal', ''));
-            $tanggalAkhir = trim((string) $request->input('tanggal_akhir', ''));
+            $project      = trim((string)$request->input('project', ''));
+            $tanggalAwal  = trim((string)$request->input('tanggal_awal', ''));
+            $tanggalAkhir = trim((string)$request->input('tanggal_akhir', ''));
 
             $startDate = $this->parseGlDate($tanggalAwal);
             $endDate   = $this->parseGlDate($tanggalAkhir);
@@ -549,11 +555,13 @@ class AccountingController extends Controller
 
             $query = DB::table('acc_jurnal_detail as ad')
                 ->join('acc_jurnal as aj', 'aj.id_acc_jurnal', '=', 'ad.acc_jurnal_id')
-                ->leftJoin('kop_fin_master_coa as mc', 'mc.coa_code', '=', 'ad.coa_code')
+                ->leftJoin('kop_fin_master_coa as mc', function ($join) {
+                    $join->on(DB::raw('TRIM(mc.coa_code)'), '=', DB::raw('TRIM(ad.coa_code)'));
+                })
                 ->select(
-                    'ad.coa_code',
-                    DB::raw('COALESCE(NULLIF(ad.coa_name, ""), NULLIF(mc.coa_name, ""), CONCAT("Akun COA ", ad.coa_code)) as coa_name'),
-                    DB::raw('LOWER(COALESCE(NULLIF(ad.coa_type, ""), NULLIF(mc.coa_type, ""), "")) as coa_type'),
+                    DB::raw('TRIM(ad.coa_code) as coa_code'),
+                    DB::raw('MAX(COALESCE(NULLIF(TRIM(ad.coa_name), ""), NULLIF(TRIM(mc.coa_name), ""), CONCAT("Akun COA ", TRIM(ad.coa_code)))) as coa_name'),
+                    DB::raw('MAX(LOWER(TRIM(COALESCE(NULLIF(TRIM(ad.coa_type), ""), NULLIF(TRIM(mc.coa_type), ""), "")))) as coa_type'),
                     DB::raw('COUNT(DISTINCT aj.id_acc_jurnal) as jumlah_jurnal'),
                     DB::raw('COALESCE(SUM(ad.jurnal_debit), 0) as total_debit'),
                     DB::raw('COALESCE(SUM(ad.jurnal_kredit), 0) as total_kredit')
@@ -561,27 +569,22 @@ class AccountingController extends Controller
 
             if ($project !== '') {
                 $projLower = strtolower($project);
-                $query->where(function ($q) use ($project, $projLower) {
-                    $q->whereRaw('LOWER(aj.source_project) = ?', [$projLower])
-                        ->orWhereRaw('LOWER(aj.source_project) LIKE ?', ['%' . $projLower . '%']);
+                $query->where(function ($q) use ($projLower) {
+                    $q->whereRaw('LOWER(TRIM(aj.source_project)) = ?', [$projLower])
+                        ->orWhereRaw('LOWER(TRIM(aj.source_project)) LIKE ?', ['%' . $projLower . '%']);
                 });
             }
 
-            if ($startDate && $endDate) {
-                $query->whereBetween('aj.jurnal_tgl', [$startDate, $endDate]);
+            // Neraca (Balance Sheet) bersifat posisi kumulatif sampai dengan Tanggal Akhir
+            if ($endDate) {
+                $query->whereDate('aj.jurnal_tgl', '<=', $endDate);
             } elseif ($startDate) {
                 $query->whereDate('aj.jurnal_tgl', '>=', $startDate);
-            } elseif ($endDate) {
-                $query->whereDate('aj.jurnal_tgl', '<=', $endDate);
             }
 
             $rows = $query
-                ->groupBy(
-                    'ad.coa_code',
-                    DB::raw('COALESCE(NULLIF(ad.coa_name, ""), NULLIF(mc.coa_name, ""), CONCAT("Akun COA ", ad.coa_code))'),
-                    DB::raw('LOWER(COALESCE(NULLIF(ad.coa_type, ""), NULLIF(mc.coa_type, ""), ""))')
-                )
-                ->orderBy('ad.coa_code', 'ASC')
+                ->groupBy(DB::raw('TRIM(ad.coa_code)'))
+                ->orderBy(DB::raw('TRIM(ad.coa_code)'), 'ASC')
                 ->get();
 
             $asetItems      = collect();
@@ -594,46 +597,62 @@ class AccountingController extends Controller
             foreach ($rows as $row) {
                 $debit   = (int) ($row->total_debit ?? 0);
                 $kredit  = (int) ($row->total_kredit ?? 0);
-                $type    = strtolower((string) ($row->coa_type ?? ''));
-                $firstCh = substr(trim((string) $row->coa_code), 0, 1);
+                $codeStr = trim((string) ($row->coa_code ?? ''));
+                $type    = strtolower(trim((string) ($row->coa_type ?? '')));
+                $firstCh = substr($codeStr, 0, 1);
 
-                if ($type === 'aset' || ($type === '' && $firstCh === '1')) {
+                $isAset = in_array($type, ['aset', 'asset', 'aktiva', 'harta'], true)
+                    || ($firstCh === '1' && !in_array($type, ['kewajiban', 'liabilitas', 'liability', 'ekuitas', 'equity', 'modal', 'pendapatan', 'revenue', 'beban', 'expense'], true));
+
+                $isKewajiban = in_array($type, ['kewajiban', 'liabilitas', 'liability', 'liabilities', 'hutang', 'utang', 'passiva'], true)
+                    || ($firstCh === '2' && !in_array($type, ['aset', 'asset', 'ekuitas', 'equity', 'modal', 'pendapatan', 'revenue', 'beban', 'expense'], true));
+
+                $isEkuitas = in_array($type, ['ekuitas', 'equity', 'modal', 'capital'], true)
+                    || ($firstCh === '3' && !in_array($type, ['aset', 'asset', 'kewajiban', 'liabilitas', 'liability', 'pendapatan', 'revenue', 'beban', 'expense'], true));
+
+                $isPendapatan = in_array($type, ['pendapatan', 'revenue', 'income', 'penjualan'], true)
+                    || ($firstCh === '4' && !in_array($type, ['aset', 'asset', 'kewajiban', 'liabilitas', 'ekuitas', 'modal', 'beban', 'expense'], true));
+
+                $isBeban = in_array($type, ['beban', 'expense', 'expenses', 'biaya', 'hpp'], true)
+                    || in_array($firstCh, ['5', '6', '7', '8', '9'], true);
+
+                if ($isAset) {
                     $asetItems->push((object) [
-                        'coa_code'      => $row->coa_code,
+                        'coa_code'      => $codeStr,
                         'coa_name'      => $row->coa_name,
                         'jumlah_jurnal' => (int) $row->jumlah_jurnal,
                         'total_debit'   => $debit,
                         'total_kredit'  => $kredit,
                         'saldo'         => $debit - $kredit,
                     ]);
-                } elseif ($type === 'kewajiban' || ($type === '' && $firstCh === '2')) {
+                } elseif ($isKewajiban) {
                     $kewajibanItems->push((object) [
-                        'coa_code'      => $row->coa_code,
+                        'coa_code'      => $codeStr,
                         'coa_name'      => $row->coa_name,
                         'jumlah_jurnal' => (int) $row->jumlah_jurnal,
                         'total_debit'   => $debit,
                         'total_kredit'  => $kredit,
                         'saldo'         => $kredit - $debit,
                     ]);
-                } elseif ($type === 'ekuitas' || ($type === '' && $firstCh === '3')) {
+                } elseif ($isEkuitas) {
                     $ekuitasItems->push((object) [
-                        'coa_code'      => $row->coa_code,
+                        'coa_code'      => $codeStr,
                         'coa_name'      => $row->coa_name,
                         'jumlah_jurnal' => (int) $row->jumlah_jurnal,
                         'total_debit'   => $debit,
                         'total_kredit'  => $kredit,
                         'saldo'         => $kredit - $debit,
                     ]);
-                } elseif ($type === 'pendapatan' || ($type === '' && $firstCh === '4')) {
+                } elseif ($isPendapatan) {
                     $totalPendapatanMutasi += ($kredit - $debit);
-                } elseif ($type === 'beban' || ($type === '' && in_array($firstCh, ['5', '6', '7'], true))) {
+                } elseif ($isBeban) {
                     $totalBebanMutasi += ($debit - $kredit);
                 }
             }
 
-            $totalAset      = (int) $asetItems->sum('saldo');
-            $totalKewajiban = (int) $kewajibanItems->sum('saldo');
-            $totalEkuitas   = (int) $ekuitasItems->sum('saldo');
+            $totalAset        = (int) $asetItems->sum('saldo');
+            $totalKewajiban   = (int) $kewajibanItems->sum('saldo');
+            $totalEkuitas     = (int) $ekuitasItems->sum('saldo');
             $labaRugiBerjalan = $totalPendapatanMutasi - $totalBebanMutasi;
 
             // Total Kewajiban + Ekuitas + Laba/Rugi Berjalan
@@ -661,28 +680,524 @@ class AccountingController extends Controller
             return Redirect::to('dashboard/home');
         }
     }
-    public function statement_capital_statement($akses, $id)
+    public function statement_capital_statement(Request $request, $akses, $id)
     {
         if ($this->url_akses($akses, $id) == true) {
-            return view('app-accounting.capital-statement', ['akses' => $akses, 'code' => $id]);
+            $projects = DB::table('z_menu_super')
+                ->orderBy('menu_super_name', 'asc')
+                ->get();
+
+            $project      = trim((string) $request->input('project', ''));
+            $tanggalAwal  = trim((string) $request->input('tanggal_awal', ''));
+            $tanggalAkhir = trim((string) $request->input('tanggal_akhir', ''));
+
+            $startDate = $this->parseGlDate($tanggalAwal);
+            $endDate   = $this->parseGlDate($tanggalAkhir);
+
+            if ($startDate && $endDate && $startDate > $endDate) {
+                [$startDate, $endDate] = [$endDate, $startDate];
+            }
+
+            $baseQuery = function () use ($project) {
+                $q = DB::table('acc_jurnal_detail as ad')
+                    ->join('acc_jurnal as aj', 'aj.id_acc_jurnal', '=', 'ad.acc_jurnal_id')
+                    ->leftJoin('kop_fin_master_coa as mc', 'mc.coa_code', '=', 'ad.coa_code');
+
+                if ($project !== '') {
+                    $projLower = strtolower($project);
+                    $q->where(function ($sub) use ($projLower) {
+                        $sub->whereRaw('LOWER(aj.source_project) = ?', [$projLower])
+                            ->orWhereRaw('LOWER(aj.source_project) LIKE ?', ['%' . $projLower . '%']);
+                    });
+                }
+
+                return $q;
+            };
+
+            // 1. Hitung Modal Awal sebelum tanggal_awal (jika tanggal_awal diisi)
+            $modalAwal = 0;
+            if ($startDate) {
+                $priorRows = $baseQuery()
+                    ->select(
+                        'ad.coa_code',
+                        DB::raw('LOWER(COALESCE(NULLIF(ad.coa_type, ""), NULLIF(mc.coa_type, ""), "")) as coa_type'),
+                        DB::raw('COALESCE(SUM(ad.jurnal_debit), 0) as total_debit'),
+                        DB::raw('COALESCE(SUM(ad.jurnal_kredit), 0) as total_kredit')
+                    )
+                    ->whereDate('aj.jurnal_tgl', '<', $startDate)
+                    ->groupBy(
+                        'ad.coa_code',
+                        DB::raw('LOWER(COALESCE(NULLIF(ad.coa_type, ""), NULLIF(mc.coa_type, ""), ""))')
+                    )
+                    ->get();
+
+                foreach ($priorRows as $r) {
+                    $d   = (int) ($r->total_debit ?? 0);
+                    $k   = (int) ($r->total_kredit ?? 0);
+                    $t   = strtolower((string) ($r->coa_type ?? ''));
+                    $ch1 = substr(trim((string) $r->coa_code), 0, 1);
+
+                    if ($t === 'ekuitas' || ($t === '' && $ch1 === '3')) {
+                        $modalAwal += ($k - $d);
+                    } elseif ($t === 'pendapatan' || ($t === '' && $ch1 === '4')) {
+                        $modalAwal += ($k - $d);
+                    } elseif ($t === 'beban' || ($t === '' && in_array($ch1, ['5', '6', '7'], true))) {
+                        $modalAwal -= ($d - $k);
+                    }
+                }
+            }
+
+            // 2. Hitung mutasi pada periode yang dipilih
+            $periodQuery = $baseQuery()
+                ->select(
+                    'ad.coa_code',
+                    DB::raw('COALESCE(NULLIF(ad.coa_name, ""), NULLIF(mc.coa_name, ""), CONCAT("Akun COA ", ad.coa_code)) as coa_name'),
+                    DB::raw('LOWER(COALESCE(NULLIF(ad.coa_type, ""), NULLIF(mc.coa_type, ""), "")) as coa_type'),
+                    DB::raw('COUNT(DISTINCT aj.id_acc_jurnal) as jumlah_jurnal'),
+                    DB::raw('COALESCE(SUM(ad.jurnal_debit), 0) as total_debit'),
+                    DB::raw('COALESCE(SUM(ad.jurnal_kredit), 0) as total_kredit')
+                );
+
+            if ($startDate && $endDate) {
+                $periodQuery->whereBetween('aj.jurnal_tgl', [$startDate, $endDate]);
+            } elseif ($startDate) {
+                $periodQuery->whereDate('aj.jurnal_tgl', '>=', $startDate);
+            } elseif ($endDate) {
+                $periodQuery->whereDate('aj.jurnal_tgl', '<=', $endDate);
+            }
+
+            $periodRows = $periodQuery
+                ->groupBy(
+                    'ad.coa_code',
+                    DB::raw('COALESCE(NULLIF(ad.coa_name, ""), NULLIF(mc.coa_name, ""), CONCAT("Akun COA ", ad.coa_code))'),
+                    DB::raw('LOWER(COALESCE(NULLIF(ad.coa_type, ""), NULLIF(mc.coa_type, ""), ""))')
+                )
+                ->orderBy('ad.coa_code', 'ASC')
+                ->get();
+
+            $ekuitasDetails    = collect();
+            $tambahanInvestasi = 0;
+            $privePenarikan    = 0;
+            $pendapatanPeriode = 0;
+            $bebanPeriode      = 0;
+
+            foreach ($periodRows as $row) {
+                $debit   = (int) ($row->total_debit ?? 0);
+                $kredit  = (int) ($row->total_kredit ?? 0);
+                $type    = strtolower((string) ($row->coa_type ?? ''));
+                $nameLow = strtolower((string) ($row->coa_name ?? ''));
+                $firstCh = substr(trim((string) $row->coa_code), 0, 1);
+
+                if ($type === 'ekuitas' || ($type === '' && $firstCh === '3')) {
+                    $isPrive = (strpos($nameLow, 'prive') !== false)
+                        || (strpos($nameLow, 'penarikan') !== false)
+                        || (strpos($nameLow, 'dividen') !== false);
+
+                    $tambahanInvestasi += $kredit;
+                    $privePenarikan    += $debit;
+
+                    $ekuitasDetails->push((object) [
+                        'coa_code'      => $row->coa_code,
+                        'coa_name'      => $row->coa_name,
+                        'kategori'      => $isPrive ? 'Prive / Penarikan' : 'Modal / Ekuitas',
+                        'jumlah_jurnal' => (int) $row->jumlah_jurnal,
+                        'total_debit'   => $debit,
+                        'total_kredit'  => $kredit,
+                        'net_change'    => $kredit - $debit,
+                    ]);
+                } elseif ($type === 'pendapatan' || ($type === '' && $firstCh === '4')) {
+                    $pendapatanPeriode += ($kredit - $debit);
+                } elseif ($type === 'beban' || ($type === '' && in_array($firstCh, ['5', '6', '7'], true))) {
+                    $bebanPeriode += ($debit - $kredit);
+                }
+            }
+
+            $labaBersihPeriode = $pendapatanPeriode - $bebanPeriode;
+            $kenaikanModal     = $tambahanInvestasi - $privePenarikan + $labaBersihPeriode;
+            $modalAkhir        = $modalAwal + $kenaikanModal;
+
+            return view('app-accounting.capital-statement', [
+                'akses'             => $akses,
+                'code'              => $id,
+                'projects'          => $projects,
+                'project'           => $project,
+                'tanggal_awal'      => $tanggalAwal,
+                'tanggal_akhir'     => $tanggalAkhir,
+                'modalAwal'         => $modalAwal,
+                'tambahanInvestasi' => $tambahanInvestasi,
+                'privePenarikan'    => $privePenarikan,
+                'labaBersihPeriode' => $labaBersihPeriode,
+                'kenaikanModal'     => $kenaikanModal,
+                'modalAkhir'        => $modalAkhir,
+                'ekuitasDetails'    => $ekuitasDetails,
+            ]);
         } else {
             return Redirect::to('dashboard/home');
         }
     }
     // CASH FLOW
-    public function statement_cash_flow($akses, $id)
+    public function statement_cash_flow(Request $request, $akses, $id)
     {
         if ($this->url_akses($akses, $id) == true) {
-            return view('app-accounting.cash-flow', ['akses' => $akses, 'code' => $id]);
+            $projects = DB::table('z_menu_super')
+                ->orderBy('menu_super_name', 'asc')
+                ->get();
+
+            $project      = trim((string) $request->input('project', ''));
+            $tanggalAwal  = trim((string) $request->input('tanggal_awal', ''));
+            $tanggalAkhir = trim((string) $request->input('tanggal_akhir', ''));
+
+            $startDate = $this->parseGlDate($tanggalAwal);
+            $endDate   = $this->parseGlDate($tanggalAkhir);
+
+            if ($startDate && $endDate && $startDate > $endDate) {
+                [$startDate, $endDate] = [$endDate, $startDate];
+            }
+
+            $applyProjectFilter = function ($q) use ($project) {
+                if ($project !== '') {
+                    $projLower = strtolower($project);
+                    $q->where(function ($sub) use ($projLower) {
+                        $sub->whereRaw('LOWER(TRIM(aj.source_project)) = ?', [$projLower])
+                            ->orWhereRaw('LOWER(TRIM(aj.source_project)) LIKE ?', ['%' . $projLower . '%']);
+                    });
+                }
+            };
+
+            $isCashAccount = function ($coaCode, $coaName, $coaType) {
+                $t = strtolower(trim((string) $coaType));
+                $n = strtolower(trim((string) $coaName));
+                $c = trim((string) $coaCode);
+
+                if (in_array($t, ['kas', 'bank', 'kas & bank', 'kas dan bank', 'cash', 'cash & bank'], true)) {
+                    return true;
+                }
+                if (strpos($n, 'kas') !== false || strpos($n, 'bank') !== false || strpos($n, 'cash') !== false) {
+                    return true;
+                }
+                if (strpos($c, '1.1.1') === 0 || strpos($c, '110') === 0 || strpos($c, '101') === 0) {
+                    return true;
+                }
+
+                return false;
+            };
+
+            $classifyActivity = function ($coaCode, $coaName, $coaType) {
+                $t       = strtolower(trim((string) $coaType));
+                $n       = strtolower(trim((string) $coaName));
+                $c       = trim((string) $coaCode);
+                $firstCh = substr($c, 0, 1);
+
+                if (
+                    in_array($t, ['pendapatan', 'revenue', 'income', 'penjualan', 'beban', 'expense', 'expenses', 'biaya', 'hpp', 'piutang', 'persediaan', 'hutang usaha', 'utang usaha'], true)
+                    || in_array($firstCh, ['4', '5', '6', '7', '8', '9'], true)
+                    || strpos($n, 'piutang') !== false
+                    || strpos($n, 'persediaan') !== false
+                    || strpos($n, 'gaji') !== false
+                    || strpos($n, 'listrik') !== false
+                    || strpos($n, 'sewa') !== false
+                    || strpos($n, 'operasional') !== false
+                ) {
+                    return 'operasi';
+                }
+
+                if (
+                    in_array($t, ['aset tetap', 'fixed asset', 'investasi', 'investment'], true)
+                    || $firstCh === '1'
+                    || strpos($n, 'aset tetap') !== false
+                    || strpos($n, 'peralatan') !== false
+                    || strpos($n, 'kendaraan') !== false
+                    || strpos($n, 'gedung') !== false
+                    || strpos($n, 'tanah') !== false
+                    || strpos($n, 'investasi') !== false
+                ) {
+                    return 'investasi';
+                }
+
+                if (
+                    in_array($t, ['kewajiban', 'liabilitas', 'liability', 'hutang', 'utang', 'ekuitas', 'equity', 'modal', 'capital'], true)
+                    || in_array($firstCh, ['2', '3'], true)
+                    || strpos($n, 'pinjaman') !== false
+                    || strpos($n, 'modal') !== false
+                    || strpos($n, 'prive') !== false
+                    || strpos($n, 'dividen') !== false
+                ) {
+                    return 'pendanaan';
+                }
+
+                return 'operasi';
+            };
+
+            // 1. Hitung Saldo Kas Awal sebelum tanggal_awal (jika tanggal_awal diisi)
+            $saldoKasAwal = 0;
+            if ($startDate) {
+                $priorCashRows = DB::table('acc_jurnal_detail as ad')
+                    ->join('acc_jurnal as aj', 'aj.id_acc_jurnal', '=', 'ad.acc_jurnal_id')
+                    ->leftJoin('kop_fin_master_coa as mc', function ($join) {
+                        $join->on(DB::raw('TRIM(mc.coa_code)'), '=', DB::raw('TRIM(ad.coa_code)'));
+                    })
+                    ->select(
+                        DB::raw('TRIM(ad.coa_code) as coa_code'),
+                        DB::raw('MAX(COALESCE(NULLIF(TRIM(ad.coa_name), ""), NULLIF(TRIM(mc.coa_name), ""), CONCAT("Akun COA ", TRIM(ad.coa_code)))) as coa_name'),
+                        DB::raw('MAX(LOWER(TRIM(COALESCE(NULLIF(TRIM(ad.coa_type), ""), NULLIF(TRIM(mc.coa_type), ""), "")))) as coa_type'),
+                        DB::raw('COALESCE(SUM(ad.jurnal_debit), 0) as total_debit'),
+                        DB::raw('COALESCE(SUM(ad.jurnal_kredit), 0) as total_kredit')
+                    )
+                    ->where($applyProjectFilter)
+                    ->whereDate('aj.jurnal_tgl', '<', $startDate)
+                    ->groupBy(DB::raw('TRIM(ad.coa_code)'))
+                    ->get();
+
+                foreach ($priorCashRows as $pr) {
+                    if ($isCashAccount($pr->coa_code, $pr->coa_name, $pr->coa_type)) {
+                        $saldoKasAwal += ((int) ($pr->total_debit ?? 0)) - ((int) ($pr->total_kredit ?? 0));
+                    }
+                }
+            }
+
+            // 2. Ambil baris jurnal pada periode untuk menelusuri mutasi kas per aktivitas
+            $periodQuery = DB::table('acc_jurnal_detail as ad')
+                ->join('acc_jurnal as aj', 'aj.id_acc_jurnal', '=', 'ad.acc_jurnal_id')
+                ->leftJoin('kop_fin_master_coa as mc', function ($join) {
+                    $join->on(DB::raw('TRIM(mc.coa_code)'), '=', DB::raw('TRIM(ad.coa_code)'));
+                })
+                ->select(
+                    'aj.id_acc_jurnal',
+                    'aj.jurnal_tgl',
+                    DB::raw('TRIM(ad.coa_code) as coa_code'),
+                    DB::raw('COALESCE(NULLIF(TRIM(ad.coa_name), ""), NULLIF(TRIM(mc.coa_name), ""), CONCAT("Akun COA ", TRIM(ad.coa_code))) as coa_name'),
+                    DB::raw('LOWER(TRIM(COALESCE(NULLIF(TRIM(ad.coa_type), ""), NULLIF(TRIM(mc.coa_type), ""), ""))) as coa_type'),
+                    DB::raw('COALESCE(ad.jurnal_debit, 0) as jurnal_debit'),
+                    DB::raw('COALESCE(ad.jurnal_kredit, 0) as jurnal_kredit')
+                )
+                ->where($applyProjectFilter);
+
+            if ($startDate && $endDate) {
+                $periodQuery->whereBetween('aj.jurnal_tgl', [$startDate, $endDate]);
+            } elseif ($startDate) {
+                $periodQuery->whereDate('aj.jurnal_tgl', '>=', $startDate);
+            } elseif ($endDate) {
+                $periodQuery->whereDate('aj.jurnal_tgl', '<=', $endDate);
+            }
+
+            $linesByJournal = $periodQuery->get()->groupBy('id_acc_jurnal');
+
+            $operasiMap   = [];
+            $investasiMap = [];
+            $pendanaanMap = [];
+
+            foreach ($linesByJournal as $lines) {
+                $cashNetInJournal = 0;
+                $counterpartLines = [];
+
+                foreach ($lines as $ln) {
+                    $d = (int) ($ln->jurnal_debit ?? 0);
+                    $k = (int) ($ln->jurnal_kredit ?? 0);
+                    if ($isCashAccount($ln->coa_code, $ln->coa_name, $ln->coa_type)) {
+                        $cashNetInJournal += ($d - $k);
+                    } else {
+                        $counterpartLines[] = $ln;
+                    }
+                }
+
+                if ($cashNetInJournal === 0) {
+                    continue;
+                }
+
+                if (count($counterpartLines) > 0) {
+                    $totalWeight = 0;
+                    foreach ($counterpartLines as $cl) {
+                        $w = abs((int) ($cl->jurnal_debit ?? 0) - (int) ($cl->jurnal_kredit ?? 0));
+                        if ($w === 0) {
+                            $w = max((int) ($cl->jurnal_debit ?? 0), (int) ($cl->jurnal_kredit ?? 0), 1);
+                        }
+                        $totalWeight += $w;
+                    }
+
+                    foreach ($counterpartLines as $cl) {
+                        $w = abs((int) ($cl->jurnal_debit ?? 0) - (int) ($cl->jurnal_kredit ?? 0));
+                        if ($w === 0) {
+                            $w = max((int) ($cl->jurnal_debit ?? 0), (int) ($cl->jurnal_kredit ?? 0), 1);
+                        }
+                        $share    = $totalWeight > 0 ? ($cashNetInJournal * ($w / $totalWeight)) : $cashNetInJournal;
+                        $activity = $classifyActivity($cl->coa_code, $cl->coa_name, $cl->coa_type);
+                        $key      = trim((string) $cl->coa_code);
+
+                        if ($activity === 'investasi') {
+                            if (!isset($investasiMap[$key])) {
+                                $investasiMap[$key] = ['coa_code' => $key, 'coa_name' => $cl->coa_name, 'nominal' => 0];
+                            }
+                            $investasiMap[$key]['nominal'] += $share;
+                        } elseif ($activity === 'pendanaan') {
+                            if (!isset($pendanaanMap[$key])) {
+                                $pendanaanMap[$key] = ['coa_code' => $key, 'coa_name' => $cl->coa_name, 'nominal' => 0];
+                            }
+                            $pendanaanMap[$key]['nominal'] += $share;
+                        } else {
+                            if (!isset($operasiMap[$key])) {
+                                $operasiMap[$key] = ['coa_code' => $key, 'coa_name' => $cl->coa_name, 'nominal' => 0];
+                            }
+                            $operasiMap[$key]['nominal'] += $share;
+                        }
+                    }
+                } else {
+                    $key = 'CASH-DIRECT';
+                    if (!isset($operasiMap[$key])) {
+                        $operasiMap[$key] = ['coa_code' => $key, 'coa_name' => 'Mutasi Langsung Kas & Bank', 'nominal' => 0];
+                    }
+                    $operasiMap[$key]['nominal'] += $cashNetInJournal;
+                }
+            }
+
+            $toRoundedCollection = function (array $map) {
+                return collect($map)
+                    ->map(function ($item) {
+                        return (object) [
+                            'coa_code' => $item['coa_code'],
+                            'coa_name' => $item['coa_name'],
+                            'nominal'  => (int) round($item['nominal']),
+                        ];
+                    })
+                    ->sortBy('coa_code')
+                    ->values();
+            };
+
+            $operasiItems   = $toRoundedCollection($operasiMap);
+            $investasiItems = $toRoundedCollection($investasiMap);
+            $pendanaanItems = $toRoundedCollection($pendanaanMap);
+
+            $kasOperasi   = (int) $operasiItems->sum('nominal');
+            $kasInvestasi = (int) $investasiItems->sum('nominal');
+            $kasPendanaan = (int) $pendanaanItems->sum('nominal');
+
+            $kenaikanKasBersih = $kasOperasi + $kasInvestasi + $kasPendanaan;
+            $saldoKasAkhir     = $saldoKasAwal + $kenaikanKasBersih;
+
+            return view('app-accounting.cash-flow', [
+                'akses'             => $akses,
+                'code'              => $id,
+                'projects'          => $projects,
+                'project'           => $project,
+                'tanggal_awal'      => $tanggalAwal,
+                'tanggal_akhir'     => $tanggalAkhir,
+                'operasiItems'      => $operasiItems,
+                'investasiItems'    => $investasiItems,
+                'pendanaanItems'    => $pendanaanItems,
+                'kasOperasi'        => $kasOperasi,
+                'kasInvestasi'      => $kasInvestasi,
+                'kasPendanaan'      => $kasPendanaan,
+                'kenaikanKasBersih' => $kenaikanKasBersih,
+                'saldoKasAwal'      => $saldoKasAwal,
+                'saldoKasAkhir'     => $saldoKasAkhir,
+            ]);
         } else {
             return Redirect::to('dashboard/home');
         }
     }
     // CASH FLOW
-    public function statement_notes_to_financial($akses, $id)
+    public function statement_notes_to_financial(Request $request, $akses, $id)
     {
         if ($this->url_akses($akses, $id) == true) {
-            return view('app-accounting.notes-to-financial', ['akses' => $akses, 'code' => $id]);
+            $projects = DB::table('z_menu_super')
+                ->orderBy('menu_super_name', 'asc')
+                ->get();
+
+            $project      = trim((string) $request->input('project', ''));
+            $tanggalAwal  = trim((string) $request->input('tanggal_awal', ''));
+            $tanggalAkhir = trim((string) $request->input('tanggal_akhir', ''));
+
+            $startDate = $this->parseGlDate($tanggalAwal);
+            $endDate   = $this->parseGlDate($tanggalAkhir);
+
+            if ($startDate && $endDate && $startDate > $endDate) {
+                [$startDate, $endDate] = [$endDate, $startDate];
+            }
+
+            $query = DB::table('acc_jurnal_detail as ad')
+                ->join('acc_jurnal as aj', 'aj.id_acc_jurnal', '=', 'ad.acc_jurnal_id')
+                ->leftJoin('kop_fin_master_coa as mc', function ($join) {
+                    $join->on(DB::raw('TRIM(mc.coa_code)'), '=', DB::raw('TRIM(ad.coa_code)'));
+                })
+                ->select(
+                    DB::raw('TRIM(ad.coa_code) as coa_code'),
+                    DB::raw('MAX(COALESCE(NULLIF(TRIM(ad.coa_name), ""), NULLIF(TRIM(mc.coa_name), ""), CONCAT("Akun COA ", TRIM(ad.coa_code)))) as coa_name'),
+                    DB::raw('MAX(LOWER(TRIM(COALESCE(NULLIF(TRIM(ad.coa_type), ""), NULLIF(TRIM(mc.coa_type), ""), "")))) as coa_type'),
+                    DB::raw('COUNT(DISTINCT aj.id_acc_jurnal) as jumlah_jurnal'),
+                    DB::raw('COALESCE(SUM(ad.jurnal_debit), 0) as total_debit'),
+                    DB::raw('COALESCE(SUM(ad.jurnal_kredit), 0) as total_kredit')
+                );
+
+            if ($project !== '') {
+                $projLower = strtolower($project);
+                $query->where(function ($q) use ($projLower) {
+                    $q->whereRaw('LOWER(TRIM(aj.source_project)) = ?', [$projLower])
+                        ->orWhereRaw('LOWER(TRIM(aj.source_project)) LIKE ?', ['%' . $projLower . '%']);
+                });
+            }
+
+            if ($startDate && $endDate) {
+                $query->whereBetween('aj.jurnal_tgl', [$startDate, $endDate]);
+            } elseif ($startDate) {
+                $query->whereDate('aj.jurnal_tgl', '>=', $startDate);
+            } elseif ($endDate) {
+                $query->whereDate('aj.jurnal_tgl', '<=', $endDate);
+            }
+
+            $rows = $query
+                ->groupBy(DB::raw('TRIM(ad.coa_code)'))
+                ->orderBy(DB::raw('TRIM(ad.coa_code)'), 'ASC')
+                ->get();
+
+            $noteItems = collect();
+
+            foreach ($rows as $row) {
+                $debit   = (int) ($row->total_debit ?? 0);
+                $kredit  = (int) ($row->total_kredit ?? 0);
+                $codeStr = trim((string) ($row->coa_code ?? ''));
+                $type    = strtolower(trim((string) ($row->coa_type ?? '')));
+                $firstCh = substr($codeStr, 0, 1);
+
+                if (in_array($type, ['aset', 'asset', 'aktiva', 'harta'], true) || ($type === '' && $firstCh === '1')) {
+                    $kelompok = 'Aset';
+                    $saldo    = $debit - $kredit;
+                } elseif (in_array($type, ['kewajiban', 'liabilitas', 'liability', 'hutang', 'utang', 'passiva'], true) || ($type === '' && $firstCh === '2')) {
+                    $kelompok = 'Kewajiban';
+                    $saldo    = $kredit - $debit;
+                } elseif (in_array($type, ['ekuitas', 'equity', 'modal', 'capital'], true) || ($type === '' && $firstCh === '3')) {
+                    $kelompok = 'Ekuitas';
+                    $saldo    = $kredit - $debit;
+                } elseif (in_array($type, ['pendapatan', 'revenue', 'income', 'penjualan'], true) || ($type === '' && $firstCh === '4')) {
+                    $kelompok = 'Pendapatan';
+                    $saldo    = $kredit - $debit;
+                } elseif (in_array($type, ['beban', 'expense', 'expenses', 'biaya', 'hpp'], true) || ($type === '' && in_array($firstCh, ['5', '6', '7', '8', '9'], true))) {
+                    $kelompok = 'Beban';
+                    $saldo    = $debit - $kredit;
+                } else {
+                    $kelompok = $type !== '' ? ucfirst($type) : 'Lain-lain';
+                    $saldo    = $debit - $kredit;
+                }
+
+                $noteItems->push((object) [
+                    'coa_code'      => $codeStr,
+                    'coa_name'      => $row->coa_name,
+                    'kelompok'      => $kelompok,
+                    'jumlah_jurnal' => (int) $row->jumlah_jurnal,
+                    'total_debit'   => $debit,
+                    'total_kredit'  => $kredit,
+                    'saldo'         => $saldo,
+                    'deskripsi'     => 'Ringkasan saldo akun ' . $row->coa_name . ' (' . $kelompok . ') dari ' . (int) $row->jumlah_jurnal . ' jurnal terposting.',
+                ]);
+            }
+
+            return view('app-accounting.notes-to-financial', [
+                'akses'         => $akses,
+                'code'          => $id,
+                'projects'      => $projects,
+                'project'       => $project,
+                'tanggal_awal'  => $tanggalAwal,
+                'tanggal_akhir' => $tanggalAkhir,
+                'noteItems'     => $noteItems,
+            ]);
         } else {
             return Redirect::to('dashboard/home');
         }
