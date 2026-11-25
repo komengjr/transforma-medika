@@ -478,4 +478,7 @@ Route::prefix('lab-qc')->group(function () {
     Route::post('/incoming', [LaboratoriumController::class, 'receiveIncomingQc'])->name('lab_qc.incoming.receive');
     Route::get('incoming/poll', [LaboratoriumController::class, 'pollIncomingQc'])->name('lab_qc.incoming.poll');
     Route::post('incoming/process', [LaboratoriumController::class, 'processIncomingQc'])->name('lab_qc.incoming.process');
+    Route::get('/ajax/logs', [LaboratoriumController::class, 'getLogsAjax'])->name('lab_qc.ajax.logs');
+    Route::get('/ajax/report', [LaboratoriumController::class, 'getReportAjax'])->name('lab_qc.ajax.report');
+    Route::get('/ajax/parameters', [LaboratoriumController::class, 'getParametersAjax'])->name('lab_qc.ajax.parameters');
 });

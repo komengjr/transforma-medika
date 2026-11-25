@@ -2298,6 +2298,7 @@ class LaboratoriumController extends Controller
     public function master_lab_quality_control($akses, $id)
     {
         if ($this->url_akses_sub($akses, $id) == true) {
+            // 1. Bahan kontrol: batasi atau ambil yang aktif/terbaru saja (misal 25 data)
             $materials = DB::table('medical_lab_qc_materials as m')
                 ->leftJoin('medical_master_alat as a', 'm.instrument_id', '=', 'a.instrument_id')
                 ->select(
@@ -2307,8 +2308,10 @@ class LaboratoriumController extends Controller
                     DB::raw("COALESCE(a.nama_alat, m.nama_alat) as nama_alat_tampil")
                 )
                 ->orderBy('m.id', 'desc')
+                ->limit(25)
                 ->get();
 
+            // 2. Parameter QC: ambil batch awal saja, sisanya dimuat via /lab-qc/ajax/parameters
             $parameters = DB::table('medical_lab_qc_parameters as p')
                 ->leftJoin('medical_lab_qc_materials as m', 'p.qc_material_id', '=', 'm.id')
                 ->leftJoin('medical_master_pemeriksaan as mp', 'p.master_pemeriksaan_id', '=', 'mp.id')
@@ -2322,8 +2325,10 @@ class LaboratoriumController extends Controller
                 )
                 ->orderBy('p.urutan', 'asc')
                 ->orderBy('p.id', 'desc')
+                ->limit(30)
                 ->get();
 
+            // 3. Log QC harian: cukup ambil 50 log terbaru saat initial load, sisanya via /lab-qc/ajax/logs
             $logs = DB::table('medical_lab_qc_logs as l')
                 ->leftJoin('medical_lab_qc_materials as m', 'l.qc_material_id', '=', 'm.id')
                 ->leftJoin('medical_lab_qc_parameters as p', 'l.qc_parameter_id', '=', 'p.id')
@@ -2340,7 +2345,21 @@ class LaboratoriumController extends Controller
                 ->orderBy('l.tanggal_qc', 'desc')
                 ->orderBy('l.jam_qc', 'desc')
                 ->orderBy('l.id', 'desc')
+                ->limit(50)
                 ->get();
+
+            // Hitung ringkasan status langsung di SQL (tanpa tarik semua baris log ke PHP)
+            $qcSummary = DB::table('medical_lab_qc_logs')
+                ->selectRaw("
+                COUNT(*) as total_log,
+                SUM(CASE WHEN status_qc = 'IN_CONTROL' THEN 1 ELSE 0 END) as in_control,
+                SUM(CASE WHEN status_qc = 'WARNING_2SD' THEN 1 ELSE 0 END) as warning_2sd,
+                SUM(CASE WHEN status_qc = 'OUT_OF_CONTROL' THEN 1 ELSE 0 END) as out_of_control
+            ")
+                ->first();
+
+            $totalParametersCount = DB::table('medical_lab_qc_parameters')->count();
+            $totalMaterialsCount  = DB::table('medical_lab_qc_materials')->count();
 
             $alatList = DB::table('medical_master_alat')
                 ->where('status', 'aktif')
@@ -2351,10 +2370,15 @@ class LaboratoriumController extends Controller
                 ->join('medical_tipe_layanan as tl', 'mp.tipe_layanan_id', '=', 'tl.id')
                 ->where('mp.is_paket', 0)
                 ->where('mp.is_active', 1)
+                ->where(function ($q) {
+                    $q->where('tl.prefix', 'LAB')
+                        ->orWhere('tl.nama_tipe', 'like', '%Laboratorium%');
+                })
                 ->select('mp.id', 'mp.kode_layanan', 'mp.nama_layanan', 'tl.nama_tipe')
                 ->orderBy('mp.nama_layanan', 'asc')
                 ->get();
 
+            // Master parameter: batasi atau muat sesuai kebutuhan agar tidak berat
             $masterParameterList = DB::table('medical_master_parameter as mparam')
                 ->leftJoin('medical_master_pemeriksaan as mp', 'mparam.master_pemeriksaan_id', '=', 'mp.id')
                 ->where('mparam.is_group', 0)
@@ -2370,17 +2394,21 @@ class LaboratoriumController extends Controller
                 )
                 ->orderBy('mparam.urutan', 'asc')
                 ->orderBy('mparam.id', 'asc')
+                ->limit(200)
                 ->get();
 
             return view('app-medical.laboratorium.master-qc-lab', [
-                'akses'               => $akses,
-                'code'                => $id,
-                'materials'           => $materials,
-                'parameters'          => $parameters,
-                'logs'                => $logs,
-                'alatList'            => $alatList,
-                'pemeriksaanLabList'  => $pemeriksaanLabList,
-                'masterParameterList' => $masterParameterList,
+                'akses'                => $akses,
+                'code'                 => $id,
+                'materials'            => $materials,
+                'parameters'           => $parameters,
+                'logs'                 => $logs,
+                'qcSummary'            => $qcSummary,
+                'totalParametersCount' => $totalParametersCount,
+                'totalMaterialsCount'  => $totalMaterialsCount,
+                'alatList'             => $alatList,
+                'pemeriksaanLabList'   => $pemeriksaanLabList,
+                'masterParameterList'  => $masterParameterList,
             ]);
         } else {
             return Redirect::to('dashboard/home');
@@ -2933,6 +2961,126 @@ class LaboratoriumController extends Controller
                 ? "{$savedCount} hasil parameter QC berhasil diproses dan disimpan."
                 : "Data diterima, namun tidak ada kode parameter (`px`) yang cocok dengan parameter QC pada bahan kontrol ini.",
             'details'     => $matchedList,
+        ]);
+    }
+    public function getLogsAjax(Request $request)
+    {
+        $query = DB::table('medical_lab_qc_logs as l')
+            ->join('medical_lab_qc_materials as m', 'm.id', '=', 'l.qc_material_id')
+            ->join('medical_lab_qc_parameters as p', 'p.id', '=', 'l.qc_parameter_id')
+            ->select(
+                'l.*',
+                'm.nama_material',
+                'm.lot_number',
+                'm.instrument_id',
+                'p.nama_parameter',
+                'p.label',
+                'p.satuan',
+                'p.target_mean',
+                'p.target_sd'
+            )
+            ->orderByDesc('l.tanggal_qc')
+            ->orderByDesc('l.jam_qc')
+            ->orderByDesc('l.id');
+
+        if ($request->filled('instrument_id')) {
+            $query->where('m.instrument_id', $request->instrument_id);
+        }
+        if ($request->filled('qc_material_id')) {
+            $query->where('l.qc_material_id', $request->qc_material_id);
+        }
+        if ($request->filled('date_from')) {
+            $query->where('l.tanggal_qc', '>=', $request->date_from);
+        }
+        if ($request->filled('date_to')) {
+            $query->where('l.tanggal_qc', '<=', $request->date_to);
+        }
+
+        $logs = $query->get();
+
+        return response()->json([
+            'status' => true,
+            'data' => $logs,
+            'summary' => [
+                'total' => $logs->count(),
+                'in_control' => $logs->where('status_qc', 'IN_CONTROL')->count(),
+                'warning_2sd' => $logs->where('status_qc', 'WARNING_2SD')->count(),
+                'out_of_control' => $logs->where('status_qc', 'OUT_OF_CONTROL')->count(),
+            ],
+        ]);
+    }
+
+    public function getReportAjax(Request $request)
+    {
+        $query = DB::table('medical_lab_qc_logs as l')
+            ->join('medical_lab_qc_materials as m', 'm.id', '=', 'l.qc_material_id')
+            ->join('medical_lab_qc_parameters as p', 'p.id', '=', 'l.qc_parameter_id')
+            ->select(
+                'l.*',
+                'm.nama_material',
+                'm.lot_number',
+                'm.instrument_id',
+                'p.nama_parameter',
+                'p.label',
+                'p.satuan',
+                'p.target_mean',
+                'p.target_sd'
+            )
+            ->orderBy('l.tanggal_qc')
+            ->orderBy('l.jam_qc')
+            ->orderBy('l.id');
+
+        if ($request->filled('qc_material_id')) {
+            $query->where('l.qc_material_id', $request->qc_material_id);
+        }
+        if ($request->filled('qc_parameter_id')) {
+            $query->where('l.qc_parameter_id', $request->qc_parameter_id);
+        }
+        if ($request->filled('date_from')) {
+            $query->where('l.tanggal_qc', '>=', $request->date_from);
+        }
+        if ($request->filled('date_to')) {
+            $query->where('l.tanggal_qc', '<=', $request->date_to);
+        }
+        if ($request->filled('status_review')) {
+            $query->where('l.status_review', $request->status_review);
+        }
+
+        return response()->json([
+            'status' => true,
+            'data' => $query->get(),
+        ]);
+    }
+
+    public function getParametersAjax(Request $request)
+    {
+        $query = DB::table('medical_lab_qc_parameters as p')
+            ->join('medical_lab_qc_materials as m', 'm.id', '=', 'p.qc_material_id')
+            ->leftJoin('medical_master_pemeriksaan as mp', 'mp.id', '=', 'p.master_pemeriksaan_id')
+            ->select(
+                'p.*',
+                'm.nama_material',
+                'm.lot_number',
+                'mp.kode_layanan',
+                'mp.nama_layanan',
+                'mp.jenis_sampel'
+            );
+
+        if ($request->filled('qc_material_id')) {
+            $query->where('p.qc_material_id', $request->qc_material_id);
+        }
+        if ($request->filled('qc_parameter_id')) {
+            $query->where('p.id', $request->qc_parameter_id);
+        }
+
+        $rows = $query
+            ->orderBy('p.qc_material_id')
+            ->orderBy('p.urutan')
+            ->get();
+
+        return response()->json([
+            'status' => true,
+            'data' => $rows,
         ]);
     }
 }

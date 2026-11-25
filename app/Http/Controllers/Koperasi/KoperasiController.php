@@ -7465,59 +7465,93 @@ class KoperasiController extends Controller
     }
     public function akutansi_koperasi_report_neraca(Request $request)
     {
-        $dari = $request->query('tgl_mulai', now()->startOfMonth()->format('Y-m-d'));
         $sampai = $request->query('tgl_selesai', now()->endOfMonth()->format('Y-m-d'));
 
-        // Hitung SHU tahun berjalan sebagai penyeimbang
-        $ringkasanLaba = $this->hitungLabaBersihInternal($dari, $sampai);
-        $labaBersih = (float)$ringkasanLaba['laba_bersih'];
+        $coaCodeExpr = 'TRIM(d.coa_code)';
+        $coaNameExpr = "COALESCE(c.coa_name, CONCAT('Akun ', TRIM(d.coa_code)))";
+        $coaTypeExpr = 'LOWER(TRIM(COALESCE(c.coa_type, "")))';
 
-        // 1. DETAIL AKTIVA: Aset [Kepala 1] -> Saldo Normal: (Debit - Kredit)
-        $aset = DB::table('kop_fin_jurnal_detail as d')
+        $rows = DB::table('kop_fin_jurnal_detail as d')
             ->join('kop_fin_jurnal as j', 'd.jurnal_id', '=', 'j.id_jurnal')
-            ->join('kop_fin_master_coa as c', 'd.coa_code', '=', 'c.coa_code')
-            ->select('d.coa_code', 'c.coa_name', DB::raw('SUM(d.jurnal_debit - d.jurnal_kredit) as total'))
-            ->where('c.coa_type', 'aset')
-            ->where('j.jurnal_tgl', '<=', $sampai)
-            ->groupBy('d.coa_code', 'c.coa_name')
-            ->having('total', '!=', 0)
+            ->leftJoin('kop_fin_master_coa as c', DB::raw('TRIM(d.coa_code)'), '=', DB::raw('TRIM(c.coa_code)'))
+            ->select(
+                DB::raw("{$coaCodeExpr} as coa_code"),
+                DB::raw("{$coaNameExpr} as coa_name"),
+                DB::raw("{$coaTypeExpr} as coa_type"),
+                DB::raw('COALESCE(SUM(d.jurnal_debit), 0) as total_debit'),
+                DB::raw('COALESCE(SUM(d.jurnal_kredit), 0) as total_kredit')
+            )
+            ->whereDate('j.jurnal_tgl', '<=', $sampai)
+            ->groupBy(
+                DB::raw($coaCodeExpr),
+                DB::raw($coaNameExpr),
+                DB::raw($coaTypeExpr)
+            )
+            ->orderBy('coa_code', 'asc')
             ->get();
 
-        // 2. DETAIL PASIVA: Kewajiban/Hutang [Kepala 2] -> Saldo Normal: (Kredit - Debit)
-        $kewajiban = DB::table('kop_fin_jurnal_detail as d')
-            ->join('kop_fin_jurnal as j', 'd.jurnal_id', '=', 'j.id_jurnal')
-            ->join('kop_fin_master_coa as c', 'd.coa_code', '=', 'c.coa_code')
-            ->select('d.coa_code', 'c.coa_name', DB::raw('SUM(d.jurnal_kredit - d.jurnal_debit) as total'))
-            ->where('c.coa_type', 'kewajiban')
-            ->where('j.jurnal_tgl', '<=', $sampai)
-            ->groupBy('d.coa_code', 'c.coa_name')
-            ->having('total', '!=', 0)
-            ->get();
+        $aset = [];
+        $kewajiban = [];
+        $modal = [];
+        $totalPendapatanKumulatif = 0.0;
+        $totalBebanKumulatif = 0.0;
 
-        // 3. DETAIL PASIVA: Modal/Ekuitas [Kepala 3] -> Saldo Normal: (Kredit - Debit)
-        $modal = DB::table('kop_fin_jurnal_detail as d')
-            ->join('kop_fin_jurnal as j', 'd.jurnal_id', '=', 'j.id_jurnal')
-            ->join('kop_fin_master_coa as c', 'd.coa_code', '=', 'c.coa_code')
-            ->select('d.coa_code', 'c.coa_name', DB::raw('SUM(d.jurnal_kredit - d.jurnal_debit) as total'))
-            ->where('c.coa_type', 'modal')
-            ->where('j.jurnal_tgl', '<=', $sampai)
-            ->groupBy('d.coa_code', 'c.coa_name')
-            ->having('total', '!=', 0)
-            ->get();
+        foreach ($rows as $r) {
+            $code = (string) $r->coa_code;
+            $firstDigit = substr(ltrim($code), 0, 1);
+            $type = (string) $r->coa_type;
+            $debit = (float) $r->total_debit;
+            $kredit = (float) $r->total_kredit;
 
-        $totalAset = $aset->sum('total');
-        $totalKewajiban = $kewajiban->sum('total');
-        $totalModal = $modal->sum('total');
+            if ($firstDigit === '1' || in_array($type, ['aset', 'aktiva', 'asset'])) {
+                $saldo = round($debit - $kredit, 2);
+                if (abs($saldo) >= 0.01) {
+                    $aset[] = [
+                        'coa_code' => $code,
+                        'coa_name' => $r->coa_name,
+                        'total'    => $saldo,
+                    ];
+                }
+            } elseif ($firstDigit === '2' || in_array($type, ['kewajiban', 'liabilitas', 'hutang', 'utang'])) {
+                $saldo = round($kredit - $debit, 2);
+                if (abs($saldo) >= 0.01) {
+                    $kewajiban[] = [
+                        'coa_code' => $code,
+                        'coa_name' => $r->coa_name,
+                        'total'    => $saldo,
+                    ];
+                }
+            } elseif ($firstDigit === '3' || in_array($type, ['modal', 'ekuitas', 'equity'])) {
+                $saldo = round($kredit - $debit, 2);
+                if (abs($saldo) >= 0.01) {
+                    $modal[] = [
+                        'coa_code' => $code,
+                        'coa_name' => $r->coa_name,
+                        'total'    => $saldo,
+                    ];
+                }
+            } elseif ($firstDigit === '4' || in_array($type, ['pendapatan', 'revenue', 'income'])) {
+                $totalPendapatanKumulatif += ($kredit - $debit);
+            } elseif (in_array($firstDigit, ['5', '6', '7', '8', '9']) || in_array($type, ['beban', 'biaya', 'hpp', 'expense'])) {
+                $totalBebanKumulatif += ($debit - $kredit);
+            }
+        }
+
+        $labaBersih = round($totalPendapatanKumulatif - $totalBebanKumulatif, 2);
+        $totalAset = round(collect($aset)->sum('total'), 2);
+        $totalKewajiban = round(collect($kewajiban)->sum('total'), 2);
+        $totalModal = round(collect($modal)->sum('total'), 2);
+        $totalPasiva = round($totalKewajiban + $totalModal + $labaBersih, 2);
 
         return response()->json([
-            'aset' => $aset,
-            'kewajiban' => $kewajiban,
-            'modal' => $modal,
-            'laba_bersih_berjalan' => $labaBersih,
-            'total_aset' => (float)$totalAset,
-            'total_kewajiban' => (float)$totalKewajiban,
-            'total_modal' => (float)$totalModal,
-            'total_pasiva' => (float)($totalKewajiban + $totalModal + $labaBersih)
+            'aset'                 => $aset,
+            'kewajiban'            => $kewajiban,
+            'modal'                => $modal,
+            'laba_bersih_berjalan' => (float) $labaBersih,
+            'total_aset'           => (float) $totalAset,
+            'total_kewajiban'      => (float) $totalKewajiban,
+            'total_modal'          => (float) $totalModal,
+            'total_pasiva'         => (float) $totalPasiva,
         ]);
     }
     public function akutansi_koperasi_report_rugi_laba(Request $request)

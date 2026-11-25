@@ -4,197 +4,371 @@
 <link rel="stylesheet" href="https://cdn.datatables.net/2.2.2/css/dataTables.bootstrap5.css">
 <link rel="stylesheet" href="https://cdn.datatables.net/responsive/3.0.4/css/responsive.bootstrap5.css">
 <link href="{{ asset('vendors/choices/choices.min.css') }}" rel="stylesheet" />
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
+<link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&family=JetBrains+Mono:wght@500;700&display=swap" rel="stylesheet">
 
 <style>
-    /* =========================================
-       RETRO / NEUBRUTALISM THEME STYLES
-       ========================================= */
     :root {
-        --retro-dark: #1e1e24;
-        --retro-yellow: #ffde59;
-        --retro-pink: #ffa6c9;
-        --retro-cyan: #8bf0fa;
-        --retro-orange: #ff914d;
-        --retro-green: #c1ff72;
-        --retro-bg: #f4f0ea;
-        --retro-border: 3px solid var(--retro-dark);
-        --retro-shadow: 5px 5px 0px var(--retro-dark);
-        --retro-shadow-sm: 3px 3px 0px var(--retro-dark);
+        --ent-indigo: #4f46e5;
+        --ent-indigo-dark: #4338ca;
+        --ent-indigo-soft: rgba(79, 70, 229, 0.12);
+        --ent-grid-border: rgba(99, 102, 241, 0.28);
+        --ent-emerald: #059669;
+        --ent-sky: #0284c7;
+        --ent-amber: #d97706;
+        --ent-rose: #e11d48;
+        --ent-solid-bg: #ffffff;
+        --ent-solid-text: #0f172a;
+        --ent-subtle-surface: #f8fafc;
+    }
+
+    [data-bs-theme="dark"],
+    .dark {
+        --ent-solid-bg: #0f172a;
+        --ent-solid-text: #f8fafc;
+        --ent-subtle-surface: #1e293b;
     }
 
     body {
-        /* background-color: var(--retro-bg); */
+        font-family: 'Plus Jakarta Sans', sans-serif;
     }
 
-    /* Retro Cards */
-    .retro-card {
-        border: var(--retro-border);
-        border-radius: 12px;
-        box-shadow: var(--retro-shadow);
-        /* background-color: #ffffff; */
+    /* Header Banner */
+    .ent-header-banner {
+        background: linear-gradient(135deg, #0f172a 0%, #1e1b4b 55%, #312e81 100%);
+        border: 1px solid rgba(99, 102, 241, 0.35);
+        border-radius: 16px;
+        box-shadow: 0 12px 28px -6px rgba(15, 23, 42, 0.22);
+        color: #ffffff;
+        position: relative;
         overflow: hidden;
     }
 
-    /* Retro Header Banner */
-    .retro-header-banner {
-        /* background: linear-gradient(135deg, var(--retro-pink) 0%, var(--retro-orange) 100%); */
-        border: var(--retro-border);
+    .ent-header-banner::before {
+        content: '';
+        position: absolute;
+        top: -50%;
+        right: -5%;
+        width: 340px;
+        height: 340px;
+        background: radial-gradient(circle, rgba(56, 189, 248, 0.22) 0%, transparent 70%);
+        pointer-events: none;
+    }
+
+    .ent-glass-pill {
+        background: rgba(255, 255, 255, 0.09);
+        backdrop-filter: blur(8px);
+        border: 1px solid rgba(255, 255, 255, 0.16);
         border-radius: 12px;
-        box-shadow: var(--retro-shadow);
-        color: var(--retro-dark);
+        color: #ffffff;
     }
 
-    /* Retro Buttons */
-    .retro-btn {
+    /* Cards */
+    .ent-card {
+        border: 1px solid var(--ent-grid-border);
+        border-radius: 16px;
+        background-color: var(--bs-body-bg, var(--ent-solid-bg));
+        box-shadow: 0 4px 20px -2px rgba(15, 23, 42, 0.08);
+        overflow: hidden;
+    }
+
+    .ent-card-header {
+        background-color: rgba(79, 70, 229, 0.07) !important;
+        border-bottom: 1px solid var(--ent-grid-border) !important;
+        padding: 14px 20px;
+    }
+
+    /* Badges & Code Chips */
+    .ent-badge {
+        border-radius: 9999px;
+        padding: 4px 10px;
         font-weight: 700;
-        border: 2px solid var(--retro-dark);
-        box-shadow: var(--retro-shadow-sm);
-        border-radius: 6px;
-        transition: all 0.1s ease-in-out;
         text-transform: uppercase;
-        letter-spacing: 0.5px;
+        display: inline-flex;
+        align-items: center;
+        gap: 4px;
+        font-size: 0.68rem;
+        letter-spacing: 0.03em;
     }
 
-    .retro-btn:active {
-        transform: translate(3px, 3px);
-        box-shadow: 0px 0px 0px var(--retro-dark);
+    .code-chip {
+        font-family: 'JetBrains Mono', monospace;
+        background-color: rgba(79, 70, 229, 0.1);
+        color: #4338ca;
+        border: 1px solid rgba(79, 70, 229, 0.25);
+        padding: 2px 8px;
+        border-radius: 7px;
+        font-weight: 700;
+        font-size: 0.72rem;
+        display: inline-block;
     }
 
-    .retro-btn-primary {
-        background-color: var(--retro-cyan);
-        color: var(--retro-dark);
+    [data-bs-theme="dark"] .code-chip,
+    .dark .code-chip {
+        background-color: rgba(129, 140, 248, 0.16);
+        color: #a5b4fc;
+        border-color: rgba(129, 140, 248, 0.32);
     }
 
-    .retro-btn-primary:hover {
-        background-color: #6ce0ed;
-        color: var(--retro-dark);
+    /* Buttons */
+    .ent-btn {
+        font-weight: 600 !important;
+        border-radius: 10px;
+        transition: all 0.18s ease;
+        font-size: 0.78rem;
+        cursor: pointer;
     }
 
-    .retro-btn-danger {
-        background-color: var(--retro-pink);
-        color: var(--retro-dark);
+    .ent-btn:hover {
+        transform: translateY(-1px);
     }
 
-    .retro-btn-danger:hover {
-        background-color: #ff8cb7;
-        color: var(--retro-dark);
+    .ent-btn-primary {
+        background: linear-gradient(135deg, #4f46e5 0%, #4338ca 100%);
+        border: none;
+        color: #ffffff;
+        box-shadow: 0 4px 12px rgba(79, 70, 229, 0.25);
     }
 
-    .retro-btn-light {
-        background-color: #ffffff;
-        color: var(--retro-dark);
+    .ent-btn-primary:hover {
+        color: #ffffff;
     }
 
-    .retro-btn-light:hover {
-        background-color: #f0f0f0;
-        color: var(--retro-dark);
+    .ent-btn-danger {
+        background: linear-gradient(135deg, #f43f5e 0%, #e11d48 100%);
+        border: none;
+        color: #ffffff;
+        box-shadow: 0 4px 12px rgba(225, 29, 72, 0.22);
     }
 
-    /* Inputs & Selects */
-    .retro-input {
-        border: 2px solid var(--retro-dark) !important;
-        border-radius: 6px;
-        box-shadow: 2px 2px 0px var(--retro-dark) !important;
-        font-weight: 600;
+    .ent-btn-danger:hover {
+        color: #ffffff;
     }
 
-    .retro-input:focus {
-        border-color: var(--retro-dark) !important;
-        box-shadow: 4px 4px 0px var(--retro-dark) !important;
+    .ent-btn-light {
+        background-color: var(--bs-body-bg, var(--ent-solid-bg));
+        border: 1px solid var(--ent-grid-border);
+        color: var(--bs-body-color, var(--ent-solid-text));
+    }
+
+    /* Inputs & Labels */
+    .ent-label {
+        font-size: 0.72rem;
+        font-weight: 700;
+        text-transform: uppercase;
+        letter-spacing: 0.03em;
+        color: var(--bs-secondary-color, #64748b);
+        margin-bottom: 6px;
+    }
+
+    .ent-input,
+    .form-control,
+    .form-select {
+        border: 1px solid var(--ent-grid-border) !important;
+        border-radius: 10px !important;
+        font-weight: 600 !important;
+        color: var(--bs-body-color, var(--ent-solid-text)) !important;
+        background-color: var(--bs-body-bg, var(--ent-solid-bg)) !important;
+        font-size: 0.82rem !important;
+        min-height: 40px;
+    }
+
+    .ent-input:focus,
+    .form-control:focus,
+    .form-select:focus {
+        border-color: var(--ent-indigo) !important;
+        box-shadow: 0 0 0 3.5px rgba(79, 70, 229, 0.15) !important;
         outline: none;
     }
 
     /* Poliklinik Item Cards */
     .poli-item-card {
         cursor: pointer;
-        border: 2px solid var(--retro-dark);
-        border-radius: 8px;
-        box-shadow: var(--retro-shadow-sm);
-        background-color: #ffffff;
-        transition: all 0.2s ease-in-out;
-        margin-bottom: 12px;
+        border: 1px solid var(--ent-grid-border);
+        border-radius: 12px;
+        background-color: var(--bs-body-bg, var(--ent-solid-bg));
+        transition: all 0.18s ease;
+        margin-bottom: 10px;
     }
 
     .poli-item-card:hover {
-        background-color: var(--retro-yellow);
-        transform: translateY(-3px);
-        box-shadow: 5px 6px 0px var(--retro-dark);
+        border-color: var(--ent-indigo);
+        background-color: rgba(79, 70, 229, 0.05);
+        transform: translateY(-1px);
     }
 
     .poli-item-card.active {
-        background-color: var(--retro-green) !important;
-        transform: translate(2px, 2px);
-        box-shadow: 1px 1px 0px var(--retro-dark);
+        border-color: var(--ent-indigo);
+        background: linear-gradient(135deg, rgba(79, 70, 229, 0.12) 0%, rgba(2, 132, 199, 0.08) 100%);
+        box-shadow: 0 4px 12px rgba(79, 70, 229, 0.15);
     }
 
-    .poli-item-card h6 {
-        color: var(--retro-dark) !important;
-        font-weight: 800 !important;
+    /* Empty State Card */
+    .ent-empty-state {
+        border: 1px dashed var(--ent-grid-border);
+        border-radius: 16px;
+        background-color: var(--ent-subtle-surface);
     }
 
     /* Table Styling */
-    .retro-table-header {
-        background-color: var(--retro-dark);
-        color: var(--retro-green);
-        border-bottom: 3px solid var(--retro-dark);
-        font-weight: bold;
+    .table-custom {
+        width: 100% !important;
+        border-collapse: collapse !important;
+        margin-bottom: 0 !important;
+        font-size: 0.83rem;
+    }
+
+    .table-custom thead th {
+        background-color: rgba(79, 70, 229, 0.12) !important;
+        color: var(--bs-body-color) !important;
+        font-size: 0.72rem;
+        font-weight: 700;
         text-transform: uppercase;
-        letter-spacing: 1px;
+        border: 1px solid var(--ent-grid-border) !important;
+        border-bottom: 2px solid rgba(79, 70, 229, 0.45) !important;
+        padding: 13px 12px;
+        letter-spacing: 0.04em;
     }
 
-    #table-doctor-poli tbody tr {
-        border-bottom: 2px solid var(--retro-dark);
-        transition: background 0.2s;
+    .table-custom thead th:first-child {
+        border-left: none !important;
     }
 
-    #table-doctor-poli tbody tr:hover {
-        background-color: var(--retro-yellow) !important;
+    .table-custom thead th:last-child {
+        border-right: none !important;
+        padding-right: 18px !important;
     }
 
-    .retro-badge {
-        border: 2px solid var(--retro-dark);
-        border-radius: 4px;
-        padding: 4px 8px;
-        font-weight: bold;
-        background-color: var(--retro-cyan);
-        color: var(--retro-dark);
-        box-shadow: 2px 2px 0px var(--retro-dark);
+    .table-custom tbody tr {
+        transition: background-color 0.15s ease;
     }
 
-    /* Modal Styling */
-    .retro-modal-content {
-        border: var(--retro-border);
-        border-radius: 12px;
-        box-shadow: 8px 8px 0px var(--retro-dark);
-        background-color: #ffffff;
+    .table-custom tbody tr:hover,
+    .table-custom tbody tr:hover td {
+        background-color: rgba(79, 70, 229, 0.06) !important;
     }
 
-    .retro-modal-header {
-        background-color: var(--retro-dark);
-        color: var(--retro-yellow);
-        border-bottom: var(--retro-border);
+    .table-custom td {
+        border: 1px solid var(--ent-grid-border) !important;
+        font-weight: 500;
+        color: var(--bs-body-color) !important;
+        padding: 11px 12px;
+        vertical-align: middle;
+        font-size: 0.83rem;
+    }
+
+    .table-custom tbody td:first-child {
+        border-left: none !important;
+    }
+
+    .table-custom tbody td:last-child {
+        border-right: none !important;
+        padding-right: 18px !important;
+    }
+
+    /* DataTables Search & Length Styling */
+    .dt-container .dt-search input,
+    .dt-container .dt-length select {
+        border: 1px solid var(--ent-grid-border) !important;
+        border-radius: 9px !important;
+        padding: 5px 10px !important;
+        font-size: 0.8rem !important;
+        font-weight: 600 !important;
+        background-color: var(--bs-body-bg, var(--ent-solid-bg)) !important;
+        color: var(--bs-body-color, var(--ent-solid-text)) !important;
+    }
+
+    .dt-container .dt-search input:focus,
+    .dt-container .dt-length select:focus {
+        border-color: var(--ent-indigo) !important;
+        box-shadow: 0 0 0 3px rgba(79, 70, 229, 0.14) !important;
+        outline: none;
+    }
+
+    /* Modal & Choices.js Styling */
+    .modal-ent-content {
+        border: 1px solid var(--ent-grid-border) !important;
+        border-radius: 18px !important;
+        background-color: var(--bs-body-bg, var(--ent-solid-bg)) !important;
+        color: var(--bs-body-color);
+        overflow: visible;
+    }
+
+    .ent-modal-header {
+        background: linear-gradient(135deg, #0f172a 0%, #1e1b4b 55%, #312e81 100%);
+        color: #ffffff;
+        border-radius: 17px 17px 0 0;
+    }
+
+    .ent-modal-footer {
+        background-color: var(--ent-subtle-surface);
+        border-top: 1px solid var(--ent-grid-border);
+        border-radius: 0 0 17px 17px;
+    }
+
+    .choices__inner {
+        border: 1px solid var(--ent-grid-border) !important;
+        border-radius: 10px !important;
+        background-color: var(--bs-body-bg, var(--ent-solid-bg)) !important;
+        color: var(--bs-body-color, var(--ent-solid-text)) !important;
+        font-size: 0.82rem !important;
+        font-weight: 600 !important;
+        min-height: 40px !important;
+        padding: 4px 10px !important;
+    }
+
+    .choices__list--dropdown {
+        border: 1px solid var(--ent-grid-border) !important;
+        border-radius: 10px !important;
+        background-color: var(--bs-body-bg, var(--ent-solid-bg)) !important;
+        color: var(--bs-body-color, var(--ent-solid-text)) !important;
+        box-shadow: 0 10px 25px -5px rgba(15, 23, 42, 0.15) !important;
+        z-index: 1070;
+    }
+
+    .choices__list--dropdown .choices__item--selectable.is-highlighted {
+        background-color: var(--ent-indigo) !important;
+        color: #ffffff !important;
     }
 </style>
 @endsection
 
 @section('content')
 <!-- HEADER BANNER -->
-<div class="row mb-4">
-    <div class="col">
-        <div class="card retro-header-banner p-1">
-            <div class="row gx-0 flex-between-center">
-                <div class="col-sm-auto d-flex align-items-center p-3">
-                    <div style="background: white; border: 2px solid #1e1e24; border-radius: 50%; padding: 5px; box-shadow: 3px 3px 0px #1e1e24;" class="me-3">
-                        <img src="{{ asset('img/doctor.png') }}" alt="" width="50" />
+<div class="row mb-3">
+    <div class="col-12">
+        <div class="card ent-header-banner p-1">
+            <div class="card-body p-3 p-md-4 text-white position-relative" style="z-index: 2;">
+                <div class="row align-items-center gy-3">
+                    <div class="col-lg-8 d-flex align-items-center">
+                        <div class="ent-glass-pill me-3 d-flex align-items-center justify-content-center flex-shrink-0"
+                            style="width: 58px; height: 58px;">
+                            <img src="{{ asset('img/doctor.png') }}" alt="Dokter Poliklinik" width="38" />
+                        </div>
+                        <div>
+                            <div class="d-flex align-items-center gap-2 mb-1">
+                                <span class="ent-badge" style="background: rgba(56, 189, 248, 0.2); border: 1px solid rgba(56, 189, 248, 0.4); color: #7dd3fc;">
+                                    <i class="fas fa-hospital-user"></i> SETTING MAPPING
+                                </span>
+                                <span style="color: #94a3b8; font-size: 0.75rem; font-weight: 600;">Master Doctor Poli</span>
+                            </div>
+                            <h4 class="fw-bold mb-0" style="letter-spacing: -0.02em; color: white;">
+                                Dokter Poliklinik
+                            </h4>
+                            <p class="mb-0 small" style="color: #cbd5e1;">Atur penugasan dokter praktik untuk setiap poliklinik secara terpusat.</p>
+                        </div>
                     </div>
-                    <div>
-                        <h6 class="fs--1 mb-0 fw-bold" style="color: rgba(30, 30, 36, 0.7);">SETTING MAPPING</h6>
-                        <h3 class="fw-bolder mb-0" style="color: var(--retro-dark); text-shadow: 1px 1px 0px white;">DOKTER <span class="fw-normal">POLIKLINIK</span></h3>
+
+                    <div class="col-lg-4 text-lg-end d-flex flex-wrap justify-content-lg-end gap-2">
+                        <div class="ent-glass-pill px-3 py-2 text-start">
+                            <span class="d-block text-uppercase" style="color: #94a3b8; font-size: 0.58rem;">Total Poliklinik</span>
+                            <span class="fw-bold" id="badge-total-poli" style="color: #7dd3fc; font-family: 'JetBrains Mono', monospace;">0</span>
+                        </div>
+                        <div class="ent-glass-pill px-3 py-2 text-start">
+                            <span class="d-block text-uppercase" style="color: #94a3b8; font-size: 0.58rem;">Dokter Bertugas</span>
+                            <span class="fw-bold text-success" id="badge-total-dokter" style="font-family: 'JetBrains Mono', monospace;">-</span>
+                        </div>
                     </div>
-                </div>
-                <div class="col-xl-auto px-4 py-2 text-end d-none d-sm-block">
-                    <h6 class="fs--1 mb-0 fw-bold" style="color: rgba(30, 30, 36, 0.7);">MENU :</h6>
-                    <h4 class="fw-bolder mb-0" style="color: var(--retro-dark);">MASTER <span class="fw-normal">DOCTOR POLI</span></h4>
                 </div>
             </div>
         </div>
@@ -205,28 +379,28 @@
 <div id="ajax-alert-container"></div>
 
 <!-- MAIN LAYOUT 2 KOLOM -->
-<div class="row g-4">
+<div class="row g-3">
 
     <!-- KOLOM KIRI: DAFTAR POLIKLINIK -->
     <div class="col-lg-4 col-md-5">
-        <div class="retro-card h-100">
-            <div class="card-header py-3 px-4" style="background-color: var(--retro-yellow); border-bottom: 3px solid var(--retro-dark);">
-                <h5 class="mb-0 fw-bolder" style="color: var(--retro-dark);">
-                    <span class="fas fa-clinic-medical me-2"></span>DAFTAR POLIKLINIK
-                </h5>
+        <div class="ent-card h-100">
+            <div class="ent-card-header">
+                <h6 class="mb-0 fw-bold"><i class="fas fa-clinic-medical me-2 text-primary"></i>Daftar Poliklinik</h6>
+                <small class="opacity-75">Klik poliklinik untuk melihat dan mengatur dokter.</small>
             </div>
-            <div class="card-body p-3" style="background-color: #ffffff; max-height: 650px; overflow-y: auto;">
+            <div class="card-body p-3" style="max-height: 650px; overflow-y: auto;">
 
                 <div class="mb-3">
-                    <input type="text" id="search-poli-input" class="form-control retro-input py-2" placeholder="🔍 Cari poliklinik...">
+                    <label for="search-poli-input" class="ent-label">Cari Poliklinik</label>
+                    <input type="text" id="search-poli-input" class="form-control ent-input" placeholder="Ketik nama atau kode poliklinik..." autocomplete="off">
                 </div>
 
                 <div id="poli-list-loading" class="text-center py-5">
-                    <div class="spinner-border" style="color: var(--retro-pink); width: 3rem; height: 3rem;" role="status"></div>
-                    <p class="mb-0 mt-3 fw-bold" style="color: var(--retro-dark);">Memuat Poliklinik...</p>
+                    <div class="spinner-border text-primary" style="width: 2.5rem; height: 2.5rem;" role="status"></div>
+                    <p class="mb-0 mt-3 fw-semibold small opacity-75">Memuat daftar poliklinik...</p>
                 </div>
 
-                <div id="container-poli-cards" class="d-flex flex-column pt-1"></div>
+                <div id="container-poli-cards" class="d-flex flex-column"></div>
             </div>
         </div>
     </div>
@@ -234,43 +408,47 @@
     <!-- KOLOM KANAN: TABEL DOKTER -->
     <div class="col-lg-8 col-md-7">
 
-        <!-- ALERT JIKA BELUM PILIH POLI -->
-        <div class="retro-card h-100 d-flex flex-column justify-content-center align-items-center p-5 text-center" id="alert-select-poli" style="background-color: var(--retro-cyan);">
-            <div style="background: white; border: 3px solid #1e1e24; box-shadow: 4px 4px 0px #1e1e24; border-radius: 50%; padding: 20px; margin-bottom: 20px;">
-                <span class="fas fa-hand-point-left fa-4x" style="color: var(--retro-dark);"></span>
+        <!-- EMPTY STATE JIKA BELUM PILIH POLI -->
+        <div class="ent-card ent-empty-state h-100 d-flex flex-column justify-content-center align-items-center p-5 text-center" id="alert-select-poli">
+            <div class="d-inline-flex align-items-center justify-content-center rounded-circle mb-3"
+                style="width: 68px; height: 68px; background: rgba(79, 70, 229, 0.12); color: var(--ent-indigo);">
+                <i class="fas fa-hand-point-left fs-3"></i>
             </div>
-            <h3 class="fw-bolder" style="color: var(--retro-dark);">SILAKAN PILIH POLIKLINIK</h3>
-            <p class="fw-bold mb-0" style="color: rgba(30,30,36,0.8);">Pilih salah satu poliklinik pada daftar di sebelah kiri untuk menampilkan dokter bertugas.</p>
+            <h5 class="fw-bold mb-1">Silakan Pilih Poliklinik</h5>
+            <p class="small opacity-75 mb-0" style="max-width: 380px;">Pilih salah satu poliklinik pada daftar di sebelah kiri untuk menampilkan dan mengelola dokter yang bertugas.</p>
         </div>
 
         <!-- CONTAINER TABEL DOKTER -->
-        <div class="retro-card h-100 d-none" id="card-table-doctors">
-            <div class="card-header py-3 px-4 d-flex justify-content-between align-items-center" style="background-color: var(--retro-dark);">
-                <h5 class="mb-0 fw-bolder" id="title-table-doctor" style="color: var(--retro-cyan);">
-                    <span class="fas fa-list me-2"></span> DAFTAR DOKTER BERTUGAS
-                </h5>
-                <button type="button" class="btn btn-sm retro-btn retro-btn-light d-none" id="btn-open-modal-add" data-bs-toggle="modal" data-bs-target="#modal-add-doctor-poli">
-                    <span class="fas fa-user-plus me-1"></span> Tambah Dokter
+        <div class="ent-card d-none" id="card-table-doctors">
+            <div class="ent-card-header d-flex flex-wrap justify-content-between align-items-center gap-2">
+                <div>
+                    <h6 class="mb-0 fw-bold" id="title-table-doctor">
+                        <i class="fas fa-user-md me-2 text-primary"></i>Daftar Dokter Bertugas
+                    </h6>
+                    <small class="opacity-75">Kelola mapping dokter aktif pada poliklinik terpilih.</small>
+                </div>
+                <button type="button" class="btn btn-sm ent-btn ent-btn-primary px-3 py-2 d-none" id="btn-open-modal-add" data-bs-toggle="modal" data-bs-target="#modal-add-doctor-poli">
+                    <i class="fas fa-user-plus me-1"></i> Tambah Dokter
                 </button>
             </div>
-            <div class="card-body p-4">
+            <div class="card-body p-0">
                 <div id="table-loading" class="text-center py-5 d-none">
-                    <div class="spinner-border" style="color: var(--retro-orange); width: 3rem; height: 3rem;" role="status"></div>
-                    <p class="mb-0 mt-3 fw-bold" style="color: var(--retro-dark);">Memuat data dokter...</p>
+                    <div class="spinner-border text-primary" style="width: 2.5rem; height: 2.5rem;" role="status"></div>
+                    <p class="mb-0 mt-3 fw-semibold small opacity-75">Memuat data dokter...</p>
                 </div>
 
-                <div class="table-responsive">
-                    <table id="table-doctor-poli" class="table align-middle nowrap fw-bold" style="width:100%; border: 2px solid var(--retro-dark);">
-                        <thead class="retro-table-header">
+                <div class="table-responsive p-3">
+                    <table id="table-doctor-poli" class="table table-custom align-middle nowrap w-100">
+                        <thead>
                             <tr>
-                                <th class="text-center py-3" style="width: 50px;">No</th>
-                                <th class="py-3">Kode Dokter</th>
-                                <th class="py-3">NIK Dokter</th>
-                                <th class="py-3">Nama Dokter</th>
-                                <th class="text-center py-3" style="width: 100px;">Aksi</th>
+                                <th class="text-center" style="width: 48px;">No</th>
+                                <th>Kode Dokter</th>
+                                <th>NIK Dokter</th>
+                                <th>Nama Dokter</th>
+                                <th class="text-center" style="width: 105px;">Aksi</th>
                             </tr>
                         </thead>
-                        <tbody id="tbody-doctor-poli" style="color: var(--retro-dark);"></tbody>
+                        <tbody id="tbody-doctor-poli"></tbody>
                     </table>
                 </div>
             </div>
@@ -282,29 +460,30 @@
 <!-- MODAL ASSIGN DOKTER -->
 <div class="modal fade" id="modal-add-doctor-poli" data-bs-backdrop="static" tabindex="-1" aria-hidden="true">
     <div class="modal-dialog modal-dialog-centered">
-        <div class="modal-content retro-modal-content">
-            <div class="modal-header retro-modal-header py-3 px-4">
-                <h5 class="modal-title fw-bolder mb-0">
-                    <span class="fas fa-plus-circle me-2"></span> TAMBAH DOKTER KE POLI
+        <div class="modal-content modal-ent-content">
+            <div class="modal-header ent-modal-header py-3 px-4 border-0">
+                <h5 class="modal-title fw-bold mb-0" style="color: white;">
+                    <i class="fas fa-user-plus me-2"></i>Tambah Dokter ke Poli
                 </h5>
-                <button class="btn-close btn-close-white" data-bs-dismiss="modal" aria-label="Close" style="filter: invert(1) grayscale(100%) brightness(200%);"></button>
+                <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal" aria-label="Close"></button>
             </div>
             <form id="form-add-doctor-poli">
                 @csrf
                 <input type="hidden" name="poli_id" id="modal_input_poli_id">
 
-                <div class="modal-body p-4" style="background-color: var(--retro-bg);">
-                    <div class="mb-4">
-                        <label class="form-label fw-bolder fs-5" style="color: var(--retro-dark);" for="select_available_doctors">Pilih Dokter :</label>
-                        <select class="form-select retro-input py-2" id="select_available_doctors" name="doctor_id" required>
+                <div class="modal-body p-4">
+                    <div class="mb-2">
+                        <label class="ent-label" for="select_available_doctors">Pilih Dokter <span class="text-danger">*</span></label>
+                        <select class="form-select" id="select_available_doctors" name="doctor_id" required>
                             <option value="">-- Pilih Dokter --</option>
                         </select>
+                        <small class="opacity-75 d-block mt-2">Ketik nama atau kode dokter untuk mencari dokter yang belum ter-mapping ke poli ini.</small>
                     </div>
                 </div>
-                <div class="modal-footer p-3" style="background-color: #ffffff; border-top: 3px solid var(--retro-dark);">
-                    <button class="btn retro-btn retro-btn-light" type="button" data-bs-dismiss="modal">Batal</button>
-                    <button class="btn retro-btn retro-btn-primary" type="submit" id="btn-save-doctor">
-                        <span class="fas fa-save me-1"></span> Simpan Mapping
+                <div class="modal-footer ent-modal-footer px-4 py-3">
+                    <button class="btn ent-btn ent-btn-light px-3 py-2" type="button" data-bs-dismiss="modal">Batal</button>
+                    <button class="btn ent-btn ent-btn-primary px-4 py-2" type="submit" id="btn-save-doctor">
+                        <i class="fas fa-save me-1"></i> Simpan Mapping
                     </button>
                 </div>
             </form>
@@ -316,19 +495,41 @@
 @section('base.js')
 <script src="https://cdn.datatables.net/2.2.2/js/dataTables.js"></script>
 <script src="https://cdn.datatables.net/2.2.2/js/dataTables.bootstrap5.js"></script>
+<script src="https://cdn.datatables.net/responsive/3.0.4/js/dataTables.responsive.js"></script>
 <script src="https://cdn.datatables.net/responsive/3.0.4/js/responsive.bootstrap5.js"></script>
 <script src="{{ asset('vendors/choices/choices.min.js') }}"></script>
+<script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
 
 <script>
     let dataTableInstance = null;
     let selectedPoliId = null;
+    let doctorChoicesInstance = null;
+
+    function initDoctorChoices() {
+        const selectEl = document.getElementById('select_available_doctors');
+        if (!selectEl || typeof Choices === 'undefined') return;
+
+        if (doctorChoicesInstance && typeof doctorChoicesInstance.destroy === 'function') {
+            doctorChoicesInstance.destroy();
+            doctorChoicesInstance = null;
+        }
+
+        doctorChoicesInstance = new Choices(selectEl, {
+            searchEnabled: true,
+            shouldSort: false,
+            itemSelectText: '',
+            placeholderValue: 'Ketik atau pilih dokter...',
+            searchPlaceholderValue: 'Cari nama atau kode dokter...'
+        });
+    }
 
     $(document).ready(function() {
+        initDoctorChoices();
         fetchPolis();
 
-        $('#search-poli-input').on('keyup', function() {
+        $('#search-poli-input').on('keyup input', function() {
             const value = $(this).val().toLowerCase();
-            $('.poli-item-card').filter(function() {
+            $('.poli-item-card').each(function() {
                 $(this).toggle($(this).text().toLowerCase().indexOf(value) > -1);
             });
         });
@@ -346,7 +547,7 @@
                 $('#btn-open-modal-add').removeClass('d-none');
                 $('#card-table-doctors').removeClass('d-none');
                 $('#alert-select-poli').addClass('d-none');
-                $('#title-table-doctor').html(`<span class="fas fa-list me-2"></span> DOKTER DI ${poliName.toUpperCase()}`);
+                $('#title-table-doctor').html(`<i class="fas fa-user-md me-2 text-primary"></i>Dokter di ${poliName}`);
 
                 fetchDoctorsByPoli(selectedPoliId);
             }
@@ -356,7 +557,7 @@
         $('#form-add-doctor-poli').on('submit', function(e) {
             e.preventDefault();
             const btnSave = $('#btn-save-doctor');
-            btnSave.prop('disabled', true).html('<span class="spinner-border spinner-border-sm me-1"></span> MENYIMPAN...');
+            btnSave.prop('disabled', true).html('<span class="spinner-border spinner-border-sm me-1"></span> Menyimpan...');
 
             const formData = new FormData(this);
 
@@ -370,42 +571,37 @@
                 })
                 .then(response => response.json())
                 .then(res => {
-                    btnSave.prop('disabled', false).html('<span class="fas fa-save me-1"></span> SIMPAN MAPPING');
+                    btnSave.prop('disabled', false).html('<i class="fas fa-save me-1"></i> Simpan Mapping');
 
                     if (res.status === 'success' || res.success) {
-                        showAlert('success', res.message);
+                        Swal.fire({
+                            icon: 'success',
+                            title: 'Berhasil',
+                            text: res.message,
+                            timer: 1400,
+                            showConfirmButton: false
+                        });
                         const modalInstance = bootstrap.Modal.getInstance(document.getElementById('modal-add-doctor-poli'));
                         if (modalInstance) modalInstance.hide();
                         if (selectedPoliId) fetchDoctorsByPoli(selectedPoliId);
                     } else {
-                        showAlert('danger', res.message);
+                        Swal.fire({
+                            icon: 'error',
+                            title: 'Gagal',
+                            text: res.message || 'Gagal menyimpan mapping dokter.'
+                        });
                     }
                 })
-                .catch(err => {
-                    btnSave.prop('disabled', false).html('<span class="fas fa-save me-1"></span> SIMPAN MAPPING');
-                    showAlert('danger', 'Terjadi kesalahan sistem server.');
+                .catch(() => {
+                    btnSave.prop('disabled', false).html('<i class="fas fa-save me-1"></i> Simpan Mapping');
+                    Swal.fire({
+                        icon: 'error',
+                        title: 'Error',
+                        text: 'Terjadi kesalahan sistem server.'
+                    });
                 });
         });
     });
-
-    function showAlert(type, message) {
-        // Retro colors for alerts
-        let bgColor = type === 'success' ? '#c1ff72' : '#ffa6c9';
-        let icon = type === 'success' ? 'check-circle' : 'exclamation-triangle';
-
-        const alertHtml = `
-            <div class="alert alert-dismissible fade show" role="alert" style="background-color: ${bgColor}; border: 3px solid #1e1e24; box-shadow: 4px 4px 0px #1e1e24; color: #1e1e24; font-weight: bold; border-radius: 8px;">
-                <span class="fas fa-${icon} me-2 fs-5"></span> <span class="fs-6">${message}</span>
-                <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close" style="filter: brightness(0);"></button>
-            </div>
-        `;
-        $('#ajax-alert-container').html(alertHtml);
-        setTimeout(() => {
-            $('#ajax-alert-container .alert').fadeOut('slow', function() {
-                $(this).remove();
-            });
-        }, 4000);
-    }
 
     // Fetch Daftar Poli
     function fetchPolis() {
@@ -417,25 +613,26 @@
                 let cardsHtml = '';
 
                 if (res.status === 'success' && res.data.length > 0) {
+                    $('#badge-total-poli').text(res.data.length);
                     res.data.forEach(item => {
                         cardsHtml += `
                             <div class="poli-item-card p-3" data-id="${item.id}" data-code="${item.kode_poli}" data-name="${item.nama_poli}">
-                                <div class="d-flex align-items-center justify-content-between">
+                                <div class="d-flex align-items-center justify-content-between gap-2">
                                     <div>
-                                        <h6 class="mb-1 text-uppercase">${item.nama_poli}</h6>
-                                        <span class="badge" style="background-color: var(--retro-dark); color: var(--retro-yellow); border-radius: 4px; border: 1px solid var(--retro-dark);">
-                                            <i class="fas fa-hashtag me-1"></i>${item.kode_poli}
-                                        </span>
+                                        <div class="fw-bold mb-1">${item.nama_poli}</div>
+                                        <span class="code-chip"><i class="fas fa-hashtag me-1"></i>${item.kode_poli}</span>
                                     </div>
-                                    <div style="background-color: var(--retro-bg); border: 2px solid var(--retro-dark); border-radius: 50%; width: 35px; height: 35px; display: flex; align-items: center; justify-content: center; box-shadow: 2px 2px 0px var(--retro-dark);">
-                                        <i class="fas fa-stethoscope" style="color: var(--retro-dark);"></i>
+                                    <div class="d-flex align-items-center justify-content-center rounded-circle flex-shrink-0"
+                                        style="width: 36px; height: 36px; background: rgba(79, 70, 229, 0.1); color: var(--ent-indigo);">
+                                        <i class="fas fa-stethoscope"></i>
                                     </div>
                                 </div>
                             </div>
                         `;
                     });
                 } else {
-                    cardsHtml = `<div class="text-center fw-bold py-4" style="color: var(--retro-dark);">Tidak ada data poliklinik aktif</div>`;
+                    $('#badge-total-poli').text('0');
+                    cardsHtml = `<div class="text-center fw-semibold small opacity-75 py-4">Tidak ada data poliklinik aktif</div>`;
                 }
                 $('#container-poli-cards').html(cardsHtml);
             });
@@ -448,23 +645,29 @@
             .then(response => response.json())
             .then(res => {
                 $('#table-loading').addClass('d-none');
-                if (dataTableInstance) dataTableInstance.destroy();
+                if (dataTableInstance) {
+                    dataTableInstance.destroy();
+                    dataTableInstance = null;
+                }
 
                 let tbodyContent = '';
                 let availableDocOptions = '<option value="">-- Pilih Dokter --</option>';
 
                 if (res.status === 'success') {
-                    if (res.data.mapped_doctors.length > 0) {
-                        res.data.mapped_doctors.forEach((doc, idx) => {
+                    const mappedList = res.data.mapped_doctors || [];
+                    $('#badge-total-dokter').text(mappedList.length);
+
+                    if (mappedList.length > 0) {
+                        mappedList.forEach((doc, idx) => {
                             tbodyContent += `
                                 <tr>
-                                    <td class="text-center">${idx + 1}</td>
-                                    <td><span class="retro-badge">${doc.kode_dokter}</span></td>
-                                    <td>${doc.nik || '-'}</td>
-                                    <td class="text-uppercase">${doc.nama_lengkap}</td>
+                                    <td class="text-center fw-semibold">${idx + 1}</td>
+                                    <td><span class="code-chip">${doc.kode_dokter}</span></td>
+                                    <td style="font-family: 'JetBrains Mono', monospace; font-size: 0.78rem;">${doc.nik || '-'}</td>
+                                    <td class="fw-bold">${doc.nama_lengkap}</td>
                                     <td class="text-center">
-                                        <button type="button" class="btn btn-sm retro-btn retro-btn-danger btn-delete-doctor" data-mapping-id="${doc.mapping_id}">
-                                            <span class="fas fa-trash-alt me-1"></span> Hapus
+                                        <button type="button" class="btn btn-sm ent-btn ent-btn-danger btn-delete-doctor px-2 py-1" data-mapping-id="${doc.mapping_id}">
+                                            <i class="fas fa-trash-alt me-1"></i> Hapus
                                         </button>
                                     </td>
                                 </tr>
@@ -472,13 +675,14 @@
                         });
                     }
 
-                    res.data.available_doctors.forEach(doc => {
+                    (res.data.available_doctors || []).forEach(doc => {
                         availableDocOptions += `<option value="${doc.id}">${doc.kode_dokter} - ${doc.nama_lengkap}</option>`;
                     });
                 }
 
                 $('#tbody-doctor-poli').html(tbodyContent);
                 $('#select_available_doctors').html(availableDocOptions);
+                initDoctorChoices();
 
                 dataTableInstance = new DataTable('#table-doctor-poli', {
                     responsive: true,
@@ -486,6 +690,7 @@
                         search: "Cari Dokter:",
                         lengthMenu: "Tampil _MENU_ data",
                         info: "Menampilkan _START_ s/d _END_ dari _TOTAL_ dokter",
+                        emptyTable: "Belum ada dokter yang di-mapping ke poliklinik ini.",
                         paginate: {
                             first: "Awal",
                             last: "Akhir",
@@ -500,32 +705,52 @@
     // Hapus Dokter dari Poli
     $(document).on('click', '.btn-delete-doctor', function() {
         const mappingId = $(this).data('mapping-id');
-        if (!confirm('Keluarkan dokter dari poliklinik ini?')) return;
-
         const btn = $(this);
-        btn.prop('disabled', true).html('<span class="spinner-border spinner-border-sm"></span>');
 
-        fetch("{{ route('master_doctor_poliklinik_remove') }}", {
-                method: 'DELETE',
-                headers: {
-                    'X-CSRF-TOKEN': '{{ csrf_token() }}',
-                    'Content-Type': 'application/json',
-                    'Accept': 'application/json'
-                },
-                body: JSON.stringify({
-                    mapping_id: mappingId
+        Swal.fire({
+            title: 'Keluarkan Dokter?',
+            text: 'Dokter akan dihapus dari mapping poliklinik ini.',
+            icon: 'warning',
+            showCancelButton: true,
+            confirmButtonText: 'Ya, Hapus',
+            cancelButtonText: 'Batal'
+        }).then((result) => {
+            if (!result.isConfirmed) return;
+
+            btn.prop('disabled', true).html('<span class="spinner-border spinner-border-sm"></span>');
+
+            fetch("{{ route('master_doctor_poliklinik_remove') }}", {
+                    method: 'DELETE',
+                    headers: {
+                        'X-CSRF-TOKEN': '{{ csrf_token() }}',
+                        'Content-Type': 'application/json',
+                        'Accept': 'application/json'
+                    },
+                    body: JSON.stringify({
+                        mapping_id: mappingId
+                    })
                 })
-            })
-            .then(response => response.json())
-            .then(res => {
-                if (res.status === 'success') {
-                    showAlert('success', res.message);
-                    if (selectedPoliId) fetchDoctorsByPoli(selectedPoliId);
-                } else {
-                    btn.prop('disabled', false).html('<span class="fas fa-trash-alt me-1"></span> Hapus');
-                    showAlert('danger', res.message);
-                }
-            });
+                .then(response => response.json())
+                .then(res => {
+                    if (res.status === 'success') {
+                        Swal.fire({
+                            icon: 'success',
+                            title: 'Berhasil',
+                            text: res.message,
+                            timer: 1400,
+                            showConfirmButton: false
+                        });
+                        if (selectedPoliId) fetchDoctorsByPoli(selectedPoliId);
+                    } else {
+                        btn.prop('disabled', false).html('<i class="fas fa-trash-alt me-1"></i> Hapus');
+                        Swal.fire({
+                            icon: 'error',
+                            title: 'Gagal',
+                            text: res.message || 'Gagal menghapus mapping dokter.'
+                        });
+                    }
+                });
+        });
     });
 </script>
 @endsection

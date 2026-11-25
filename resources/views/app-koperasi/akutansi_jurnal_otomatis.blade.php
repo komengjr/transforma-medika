@@ -11,10 +11,6 @@
 <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&family=JetBrains+Mono:wght@500;700&display=swap" rel="stylesheet">
 
 <style>
-    /* =========================================
-       MODERN ENTERPRISE UI STYLES (LAPORAN KEUANGAN)
-       (ADAPTIVE LIGHT & DARK MODE BOOTSTRAP 5)
-       ========================================= */
     :root {
         --ent-indigo: #4f46e5;
         --ent-indigo-dark: #4338ca;
@@ -38,7 +34,6 @@
         font-family: 'Plus Jakarta Sans', sans-serif;
     }
 
-    /* Adaptive Enterprise Card */
     .ent-card {
         border: 1px solid var(--ent-grid-border);
         border-radius: 16px;
@@ -51,7 +46,6 @@
         color: var(--ent-text);
     }
 
-    /* Hero Banner */
     .ent-header-banner {
         background: linear-gradient(135deg, #0f172a 0%, #1e1b4b 55%, #312e81 100%);
         border: 1px solid rgba(99, 102, 241, 0.35);
@@ -70,7 +64,6 @@
         color: #ffffff;
     }
 
-    /* Modern Buttons */
     .ent-btn {
         font-weight: 600 !important;
         border-radius: 10px;
@@ -120,7 +113,6 @@
         color: #ffffff;
     }
 
-    /* Form Controls */
     .ent-form-label {
         font-size: 0.68rem;
         font-weight: 700;
@@ -169,7 +161,6 @@
         background-color: rgba(79, 70, 229, 0.06) !important;
     }
 
-    /* Select2 Custom Enterprise Integration */
     .select2-container--bootstrap-5 {
         width: 100% !important;
     }
@@ -246,7 +237,6 @@
         color: var(--ent-indigo) !important;
     }
 
-    /* Navigation Tabs */
     .ent-nav-tabs {
         background-color: var(--ent-surface);
         border: 1px solid var(--ent-grid-border);
@@ -279,7 +269,6 @@
         box-shadow: 0 4px 12px rgba(79, 70, 229, 0.25);
     }
 
-    /* Soft Badges */
     .ent-badge {
         border-radius: 9999px;
         padding: 4px 10px;
@@ -291,9 +280,6 @@
         letter-spacing: 0.03em;
     }
 
-    /* =========================================================
-       TABLE WITH COLORED GRID BORDERS
-       ========================================================= */
     .table-custom {
         width: 100% !important;
         border-collapse: collapse !important;
@@ -338,7 +324,6 @@
         background-color: rgba(79, 70, 229, 0.02) !important;
     }
 
-    /* Modal Enterprise Styling */
     .modal-ent-content {
         border: 1px solid var(--ent-grid-border) !important;
         border-radius: 18px !important;
@@ -354,7 +339,6 @@
         color: #ffffff;
     }
 
-    /* Tweak khusus untuk Mode Cetak / Print Printer */
     @media print {
         .no-print {
             display: none !important;
@@ -502,9 +486,7 @@
                                 <th style="width: 8%;" class="text-center">Hapus</th>
                             </tr>
                         </thead>
-                        <tbody id="tbody-saldo-awal">
-                            <!-- Baris saldo awal diisi via JS -->
-                        </tbody>
+                        <tbody id="tbody-saldo-awal"></tbody>
                         <tfoot>
                             <tr style="background-color: rgba(79, 70, 229, 0.08);">
                                 <td class="fw-bold text-uppercase text-end">Total Saldo Awal :</td>
@@ -580,9 +562,7 @@
                                 <th style="width: 8%;" class="text-center">Hapus</th>
                             </tr>
                         </thead>
-                        <tbody id="tbody-edit-jurnal">
-                            <!-- Baris jurnal diisi via JS -->
-                        </tbody>
+                        <tbody id="tbody-edit-jurnal"></tbody>
                         <tfoot>
                             <tr style="background-color: rgba(79, 70, 229, 0.08);">
                                 <td class="fw-bold text-uppercase text-end">Total Debit &amp; Kredit :</td>
@@ -648,7 +628,6 @@
     let modalEditJurnalInstance = null;
     let modalSaldoAwalInstance = null;
 
-    // Daftar COA dari Blade untuk opsi dropdown di modal saldo awal & koreksi jurnal
     const daftarCoaMaster = @json($coa);
 
     function runWhenSelect2Ready(callback) {
@@ -712,13 +691,11 @@
     function switchLaporan(tipe, btnEl) {
         laporanAktif = tipe;
 
-        // Tampilkan dropdown pilih COA hanya jika menu Buku Besar aktif
         document.getElementById('wrapper-select-coa').style.display = (tipe === 'bukubesar') ? 'block' : 'none';
         if (tipe === 'bukubesar') {
             runWhenSelect2Ready(() => initSelect2OnElement('#bb-coa-code', null, false));
         }
 
-        // Ubah status aktif tombol tab
         document.querySelectorAll('#laporanTab .nav-link').forEach(btn => btn.classList.remove('active'));
         if (btnEl) {
             btnEl.classList.add('active');
@@ -727,28 +704,21 @@
         loadLaporanAktif();
     }
 
-    // =========================================================
-    // HELPER FORMAT & PARSE SEPARATOR RUPIAH
-    // =========================================================
     function formatRupiahInput(rawValue) {
         if (rawValue === null || rawValue === undefined) return '0';
         let str = String(rawValue).trim();
         if (str === '') return '0';
 
-        // Hilangkan spasi dan karakter selain angka, titik, atau koma
         str = str.replace(/[^\d.,]/g, '');
         if (str === '') return '0';
 
-        // Pisahkan bagian bulat dan desimal (jika ada koma)
         let parts = str.split(',');
         let intPart = parts[0].replace(/\./g, '');
         let decPart = parts.length > 1 ? parts.slice(1).join('').replace(/\./g, '') : '';
 
-        // Jika tidak ada koma tapi ada titik, cek apakah titik adalah pemisah ribuan atau desimal
         if (parts.length === 1 && str.includes('.')) {
             const dotParts = str.split('.');
             const lastSeg = dotParts[dotParts.length - 1];
-            // Jika bagian setelah titik 1-2 digit, anggap sebagai desimal; selain itu pemisah ribuan
             if (dotParts.length === 2 && lastSeg.length > 0 && lastSeg.length <= 2) {
                 intPart = dotParts[0].replace(/\./g, '');
                 decPart = lastSeg;
@@ -770,7 +740,6 @@
         let str = String(formattedValue).trim();
         if (str === '') return 0;
 
-        // Hapus karakter selain angka, titik, dan koma
         str = str.replace(/[^\d.,]/g, '');
         if (str === '') return 0;
 
@@ -807,9 +776,6 @@
         });
     }
 
-    // =========================================================
-    // FUNGSI INPUT SALDO AWAL KOPERASI
-    // =========================================================
     function openSaldoAwalModal() {
         const tbody = document.getElementById('tbody-saldo-awal');
         tbody.innerHTML = '';
@@ -1003,9 +969,6 @@
         });
     }
 
-    // =========================================================
-    // FUNGSI EDIT / KOREKSI JURNAL UMUM
-    // =========================================================
     function openEditJurnalModal(noBukti) {
         const jurnal = cachedGroupedJurnal[noBukti];
         if (!jurnal) {
@@ -1214,6 +1177,14 @@
         });
     }
 
+    function normalizeNeracaItem(item) {
+        return {
+            coa_code: item.coa_code ?? item.kode_akun ?? item.code ?? '-',
+            coa_name: item.coa_name ?? item.nama_akun ?? item.name ?? 'Akun Tanpa Nama',
+            total: Number(item.total ?? item.saldo ?? item.jumlah ?? 0)
+        };
+    }
+
     function loadLaporanAktif() {
         const tglMulai = document.getElementById('global-tgl-mulai').value;
         const tglSelesai = document.getElementById('global-tgl-selesai').value;
@@ -1367,7 +1338,7 @@
                     let html = `
                     <div class="text-center mb-4 pb-3" style="border-bottom: 1px solid var(--ent-grid-border);">
                         <h5 class="fw-bold m-0">LAPORAN LABA RUGI OPERASIONAL</h5>
-                        <p class="opacity-75 small mb-0" style="font-family: 'JetBrains Mono', monospace;">Periode: ${document.getElementById('global-tgl-mulai').value} s/d ${document.getElementById('global-tgl-selesai').value}</p>
+                        <p class="opacity-75 small mb-0" style="font-family: 'JetBrains Mono', monospace;">Periode: ${tglMulai} s/d ${tglSelesai}</p>
                     </div>
 
                     <div class="table-responsive rounded-3 mb-3" style="border: 1px solid var(--ent-grid-border);">
@@ -1378,7 +1349,7 @@
                                     <td></td>
                                 </tr>`;
 
-                    if (data.pendapatan.length === 0) {
+                    if ((data.pendapatan || []).length === 0) {
                         html += `<tr><td colspan="3" class="opacity-75 ps-4 fst-italic">Tidak ada aktivitas pendapatan pada periode ini</td></tr>`;
                     } else {
                         data.pendapatan.forEach(p => {
@@ -1386,7 +1357,7 @@
                             <tr>
                                 <td class="ps-4 fw-semibold" style="width: 20%; font-family: 'JetBrains Mono', monospace;">${p.coa_code}</td>
                                 <td style="width: 50%;">${p.coa_name}</td>
-                                <td class="text-end fw-semibold" style="width: 30%; font-family: 'JetBrains Mono', monospace;">Rp ${Number(p.total).toLocaleString('id-ID')}</td>
+                                <td class="text-end fw-semibold" style="width: 30%; font-family: 'JetBrains Mono', monospace;">Rp ${Number(p.total || 0).toLocaleString('id-ID')}</td>
                             </tr>`;
                         });
                     }
@@ -1394,7 +1365,7 @@
                     html += `
                                 <tr class="fw-bold" style="background-color: rgba(16, 185, 129, 0.14);">
                                     <td colspan="2" class="ps-3 text-uppercase text-success">TOTAL PENDAPATAN (A)</td>
-                                    <td class="text-end text-success" style="font-family: 'JetBrains Mono', monospace;">Rp ${Number(data.total_pendapatan).toLocaleString('id-ID')}</td>
+                                    <td class="text-end text-success" style="font-family: 'JetBrains Mono', monospace;">Rp ${Number(data.total_pendapatan || 0).toLocaleString('id-ID')}</td>
                                 </tr>
 
                                 <tr style="background-color: rgba(79, 70, 229, 0.08);" class="fw-bold">
@@ -1402,7 +1373,7 @@
                                     <td></td>
                                 </tr>`;
 
-                    if (data.beban.length === 0) {
+                    if ((data.beban || []).length === 0) {
                         html += `<tr><td colspan="3" class="opacity-75 ps-4 fst-italic">Tidak ada aktivitas beban operasional pada periode ini</td></tr>`;
                     } else {
                         data.beban.forEach(b => {
@@ -1410,19 +1381,20 @@
                             <tr>
                                 <td class="ps-4 fw-semibold" style="font-family: 'JetBrains Mono', monospace;">${b.coa_code}</td>
                                 <td>${b.coa_name}</td>
-                                <td class="text-end text-danger fw-semibold" style="font-family: 'JetBrains Mono', monospace;">Rp ${Number(b.total).toLocaleString('id-ID')}</td>
+                                <td class="text-end text-danger fw-semibold" style="font-family: 'JetBrains Mono', monospace;">Rp ${Number(b.total || 0).toLocaleString('id-ID')}</td>
                             </tr>`;
                         });
                     }
 
-                    const isUntung = data.laba_bersih >= 0;
+                    const labaBersih = Number(data.laba_bersih || 0);
+                    const isUntung = labaBersih >= 0;
                     const badgeSHUColor = isUntung ? 'alert-success border-success text-success' : 'alert-danger border-danger text-danger';
                     const statusTeks = isUntung ? 'SISA HASIL USAHA (LABA BERSIH)' : 'KERUGIAN OPERASIONAL (RUGI BERSIH)';
 
                     html += `
                                 <tr class="fw-bold" style="background-color: rgba(225, 29, 72, 0.14);">
                                     <td colspan="2" class="ps-3 text-uppercase text-danger">TOTAL BEBAN OPERASIONAL (B)</td>
-                                    <td class="text-end text-danger" style="font-family: 'JetBrains Mono', monospace;">Rp ${Number(data.total_beban).toLocaleString('id-ID')}</td>
+                                    <td class="text-end text-danger" style="font-family: 'JetBrains Mono', monospace;">Rp ${Number(data.total_beban || 0).toLocaleString('id-ID')}</td>
                                 </tr>
                             </tbody>
                         </table>
@@ -1430,7 +1402,7 @@
 
                     <div class="alert ${badgeSHUColor} d-flex justify-content-between align-items-center p-3 rounded-3 shadow-sm border mb-0">
                         <span class="fw-bold text-uppercase"><i class="fas fa-calculator me-2"></i> ${statusTeks} (A - B)</span>
-                        <span class="fw-bold fs-5" style="font-family: 'JetBrains Mono', monospace;">Rp ${Number(data.laba_bersih).toLocaleString('id-ID')}</span>
+                        <span class="fw-bold fs-5" style="font-family: 'JetBrains Mono', monospace;">Rp ${labaBersih.toLocaleString('id-ID')}</span>
                     </div>
                 `;
 
@@ -1447,7 +1419,7 @@
                     let html = `
                     <div class="text-center mb-4 pb-3" style="border-bottom: 1px solid var(--ent-grid-border);">
                         <h5 class="fw-bold m-0">LAPORAN PERUBAHAN MODAL / EKUITAS</h5>
-                        <p class="opacity-75 small m-0" style="font-family: 'JetBrains Mono', monospace;">Periode: ${document.getElementById('global-tgl-mulai').value} s/d ${document.getElementById('global-tgl-selesai').value}</p>
+                        <p class="opacity-75 small m-0" style="font-family: 'JetBrains Mono', monospace;">Periode: ${tglMulai} s/d ${tglSelesai}</p>
                     </div>
 
                     <div class="table-responsive rounded-3 mb-3" style="border: 1px solid var(--ent-grid-border);">
@@ -1461,7 +1433,7 @@
                             </thead>
                             <tbody>`;
 
-                    if (data.detail_modal.length === 0) {
+                    if ((data.detail_modal || []).length === 0) {
                         html += `<tr><td colspan="3" class="opacity-75 text-center fst-italic py-3">Tidak ditemukan data akun ekuitas</td></tr>`;
                     } else {
                         data.detail_modal.forEach(m => {
@@ -1469,7 +1441,7 @@
                             <tr>
                                 <td class="fw-bold" style="font-family: 'JetBrains Mono', monospace;">${m.coa_code}</td>
                                 <td>${m.coa_name}</td>
-                                <td class="text-end fw-semibold" style="font-family: 'JetBrains Mono', monospace;">Rp ${Number(m.total).toLocaleString('id-ID')}</td>
+                                <td class="text-end fw-semibold" style="font-family: 'JetBrains Mono', monospace;">Rp ${Number(m.total || 0).toLocaleString('id-ID')}</td>
                             </tr>`;
                         });
                     }
@@ -1477,13 +1449,13 @@
                     html += `
                             <tr class="fw-bold" style="background-color: rgba(79, 70, 229, 0.08);">
                                 <td colspan="2" class="text-uppercase">Sub-Total Modal Ekuitas (A)</td>
-                                <td class="text-end" style="font-family: 'JetBrains Mono', monospace;">Rp ${Number(data.total_modal_awal).toLocaleString('id-ID')}</td>
+                                <td class="text-end" style="font-family: 'JetBrains Mono', monospace;">Rp ${Number(data.total_modal_awal || 0).toLocaleString('id-ID')}</td>
                             </tr>
 
                             <tr class="fw-bold" style="background-color: rgba(16, 185, 129, 0.14);">
                                 <td class="text-success"><i class="fas fa-plus-circle me-1"></i> SHU</td>
                                 <td class="text-success">Sisa Hasil Usaha (Laba Bersih) Periode Berjalan (B)</td>
-                                <td class="text-end text-success" style="font-family: 'JetBrains Mono', monospace;">+ Rp ${Number(data.laba_bersih_shu).toLocaleString('id-ID')}</td>
+                                <td class="text-end text-success" style="font-family: 'JetBrains Mono', monospace;">+ Rp ${Number(data.laba_bersih_shu || 0).toLocaleString('id-ID')}</td>
                             </tr>
                         </tbody>
                     </table>
@@ -1494,7 +1466,7 @@
                             <i class="fas fa-landmark me-2"></i> TOTAL MODAL AKHIR KOPERASI (A + B)
                         </span>
                         <span class="fw-bold fs-5" style="font-family: 'JetBrains Mono', monospace;">
-                            Rp ${Number(data.total_modal_akhir).toLocaleString('id-ID')}
+                            Rp ${Number(data.total_modal_akhir || 0).toLocaleString('id-ID')}
                         </span>
                     </div>
                 `;
@@ -1509,10 +1481,31 @@
             fetch(`{{ route('akutansi_koperasi_report_neraca') }}${params}`)
                 .then(res => res.json())
                 .then(data => {
+                    const rawAset = Array.isArray(data.aset) ? data.aset : (Array.isArray(data.aktiva) ? data.aktiva : []);
+                    const rawKewajiban = Array.isArray(data.kewajiban) ? data.kewajiban : (Array.isArray(data.liabilitas) ? data.liabilitas : []);
+                    const rawModal = Array.isArray(data.modal) ? data.modal : (Array.isArray(data.ekuitas) ? data.ekuitas : []);
+
+                    const asetList = rawAset.map(normalizeNeracaItem);
+                    const kewajibanList = rawKewajiban.map(normalizeNeracaItem);
+                    const modalList = rawModal.map(normalizeNeracaItem);
+
+                    const sumAset = asetList.reduce((acc, r) => acc + r.total, 0);
+                    const sumKewajiban = kewajibanList.reduce((acc, r) => acc + r.total, 0);
+                    const sumModal = modalList.reduce((acc, r) => acc + r.total, 0);
+
+                    const labaBerjalan = Number(data.laba_bersih_berjalan ?? data.laba_bersih ?? data.shu ?? 0);
+                    const totalAset = Number(data.total_aset ?? data.total_aktiva ?? sumAset);
+                    const totalPasiva = Number(data.total_pasiva ?? (sumKewajiban + sumModal + labaBerjalan));
+
                     let html = `
                     <div class="text-center mb-4 pb-3" style="border-bottom: 1px solid var(--ent-grid-border);">
                         <h5 class="fw-bold m-0">LAPORAN POSISI KEUANGAN (NERACA)</h5>
-                        <p class="opacity-75 small m-0" style="font-family: 'JetBrains Mono', monospace;">Kondisi Kumulatif Finansial Koperasi per Tanggal: ${document.getElementById('global-tgl-selesai').value}</p>
+                        <p class="opacity-75 small m-0" style="font-family: 'JetBrains Mono', monospace;">Kondisi Kumulatif Finansial Koperasi per Tanggal: ${tglSelesai}</p>
+                        <div class="mt-2 d-flex justify-content-center flex-wrap gap-2">
+                            <span class="ent-badge" style="background: rgba(79, 70, 229, 0.12); color: #4f46e5;">Kode 1.x Aset: ${asetList.length} akun</span>
+                            <span class="ent-badge" style="background: rgba(2, 132, 199, 0.12); color: #0284c7;">Kode 2.x Kewajiban: ${kewajibanList.length} akun</span>
+                            <span class="ent-badge" style="background: rgba(5, 150, 105, 0.12); color: #059669;">Kode 3.x Modal: ${modalList.length} akun</span>
+                        </div>
                     </div>
 
                     <div class="row g-3">
@@ -1521,27 +1514,27 @@
                                 <table class="table table-custom align-middle mb-0 w-100">
                                     <thead>
                                         <tr>
-                                            <th style="width: 25%;">Kode</th>
+                                            <th style="width: 25%;">Kode (1.x)</th>
                                             <th style="width: 45%;">AKTIVA (ASET / KEKAYAAN)</th>
                                             <th style="width: 30%;" class="text-end">Saldo</th>
                                         </tr>
                                     </thead>
                                     <tbody>`;
 
-                    if (data.aset.length === 0) {
-                        html += `<tr><td colspan="3" class="opacity-75 text-center fst-italic">Tidak ada saldo aset lancar/tetap</td></tr>`;
+                    if (asetList.length === 0) {
+                        html += `<tr><td colspan="3" class="opacity-75 text-center fst-italic">Tidak ada saldo aset (1.x) tercatat</td></tr>`;
                     } else {
-                        data.aset.forEach(a => {
+                        asetList.forEach(a => {
                             html += `
                             <tr>
                                 <td class="opacity-75" style="font-family: 'JetBrains Mono', monospace;">${a.coa_code}</td>
                                 <td class="fw-semibold">${a.coa_name}</td>
-                                <td class="text-end text-success fw-semibold" style="font-family: 'JetBrains Mono', monospace;">Rp ${Number(a.total).toLocaleString('id-ID')}</td>
+                                <td class="text-end text-success fw-semibold" style="font-family: 'JetBrains Mono', monospace;">Rp ${a.total.toLocaleString('id-ID')}</td>
                             </tr>`;
                         });
                     }
 
-                    let selisihBaris = Math.max(0, (data.kewajiban.length + data.modal.length + 2) - data.aset.length);
+                    let selisihBaris = Math.max(0, (kewajibanList.length + modalList.length + 3) - asetList.length);
                     for (let i = 0; i < selisihBaris; i++) {
                         html += `<tr style="visibility:hidden;"><td colspan="3">&nbsp;</td></tr>`;
                     }
@@ -1551,7 +1544,7 @@
                                     <tfoot>
                                         <tr class="fw-bold" style="background-color: rgba(79, 70, 229, 0.14);">
                                             <td colspan="2" class="text-uppercase text-primary"><i class="fas fa-box-open me-2"></i> TOTAL AKTIVA (A)</td>
-                                            <td class="text-end text-primary" style="font-family: 'JetBrains Mono', monospace;">Rp ${data.total_aset.toLocaleString('id-ID')}</td>
+                                            <td class="text-end text-primary" style="font-family: 'JetBrains Mono', monospace;">Rp ${totalAset.toLocaleString('id-ID')}</td>
                                         </tr>
                                     </tfoot>
                                 </table>
@@ -1563,52 +1556,56 @@
                                 <table class="table table-custom align-middle mb-0 w-100">
                                     <thead>
                                         <tr>
-                                            <th style="width: 25%;">Kode</th>
+                                            <th style="width: 25%;">Kode (2.x/3.x)</th>
                                             <th style="width: 45%;">PASIVA (KEWAJIBAN &amp; EKUITAS)</th>
                                             <th style="width: 30%;" class="text-end">Saldo</th>
                                         </tr>
                                     </thead>
                                     <tbody>
-                                        <tr style="background-color: rgba(79, 70, 229, 0.07);" class="fw-bold opacity-75 small"><td colspan="3">1. LIABILITAS / KEWAJIBAN HUTANG</td></tr>`;
+                                        <tr style="background-color: rgba(79, 70, 229, 0.07);" class="fw-bold opacity-75 small"><td colspan="3">1. LIABILITAS / KEWAJIBAN (KODE 2.x)</td></tr>`;
 
-                    if (data.kewajiban.length === 0) {
-                        html += `<tr><td colspan="3" class="opacity-75 text-center fst-italic">Tidak ada liabilitas/titipan</td></tr>`;
+                    if (kewajibanList.length === 0) {
+                        html += `<tr><td colspan="3" class="opacity-75 text-center fst-italic">Tidak ada kewajiban/liabilitas (2.x) tercatat</td></tr>`;
                     } else {
-                        data.kewajiban.forEach(k => {
+                        kewajibanList.forEach(k => {
                             html += `
                             <tr>
                                 <td class="opacity-75" style="font-family: 'JetBrains Mono', monospace;">${k.coa_code}</td>
                                 <td>${k.coa_name}</td>
-                                <td class="text-end fw-semibold" style="font-family: 'JetBrains Mono', monospace;">Rp ${Number(k.total).toLocaleString('id-ID')}</td>
+                                <td class="text-end fw-semibold" style="font-family: 'JetBrains Mono', monospace;">Rp ${k.total.toLocaleString('id-ID')}</td>
                             </tr>`;
                         });
                     }
 
                     html += `
-                                        <tr style="background-color: rgba(79, 70, 229, 0.07);" class="fw-bold opacity-75 small"><td colspan="3">2. EKUITAS / MODAL BERJALAN</td></tr>`;
+                                        <tr style="background-color: rgba(79, 70, 229, 0.07);" class="fw-bold opacity-75 small"><td colspan="3">2. EKUITAS / MODAL (KODE 3.x)</td></tr>`;
 
-                    data.modal.forEach(m => {
-                        html += `
-                        <tr>
-                            <td class="opacity-75" style="font-family: 'JetBrains Mono', monospace;">${m.coa_code}</td>
-                            <td>${m.coa_name}</td>
-                            <td class="text-end fw-semibold" style="font-family: 'JetBrains Mono', monospace;">Rp ${Number(m.total).toLocaleString('id-ID')}</td>
-                        </tr>`;
-                    });
+                    if (modalList.length === 0) {
+                        html += `<tr><td colspan="3" class="opacity-75 text-center fst-italic">Tidak ada modal/ekuitas (3.x) tercatat</td></tr>`;
+                    } else {
+                        modalList.forEach(m => {
+                            html += `
+                            <tr>
+                                <td class="opacity-75" style="font-family: 'JetBrains Mono', monospace;">${m.coa_code}</td>
+                                <td>${m.coa_name}</td>
+                                <td class="text-end fw-semibold" style="font-family: 'JetBrains Mono', monospace;">Rp ${m.total.toLocaleString('id-ID')}</td>
+                            </tr>`;
+                        });
+                    }
 
                     html += `
                             <tr style="background-color: rgba(245, 158, 11, 0.12);" class="fw-bold">
                                 <td class="opacity-75" style="font-family: 'JetBrains Mono', monospace;">-</td>
                                 <td class="fst-italic text-primary"><i class="fas fa-arrow-right me-1"></i> SHU Tahun Berjalan (Laba Bersih)</td>
-                                <td class="text-end text-primary" style="font-family: 'JetBrains Mono', monospace;">+ Rp ${data.laba_bersih_berjalan.toLocaleString('id-ID')}</td>
+                                <td class="text-end text-primary" style="font-family: 'JetBrains Mono', monospace;">+ Rp ${labaBerjalan.toLocaleString('id-ID')}</td>
                             </tr>`;
 
-                    let selisihBarisPasiva = Math.max(0, data.aset.length - (data.kewajiban.length + data.modal.length + 2));
+                    let selisihBarisPasiva = Math.max(0, asetList.length - (kewajibanList.length + modalList.length + 3));
                     for (let i = 0; i < selisihBarisPasiva; i++) {
                         html += `<tr style="visibility:hidden;"><td colspan="3">&nbsp;</td></tr>`;
                     }
 
-                    const isBalance = Math.abs(data.total_aset - data.total_pasiva) < 0.01;
+                    const isBalance = Math.abs(totalAset - totalPasiva) < 0.01;
                     const statusAlertClass = isBalance ? 'alert-success border-success text-success' : 'alert-danger border-danger text-danger';
                     const statusText = isBalance ? 'DEBIT & KREDIT SEIMBANG (BALANCE)' : 'NERACA TIDAK SEIMBANG (UNBALANCED)';
 
@@ -1617,7 +1614,7 @@
                                     <tfoot>
                                         <tr class="fw-bold" style="background-color: rgba(16, 185, 129, 0.14);">
                                             <td colspan="2" class="text-uppercase text-success"><i class="fas fa-wallet me-2"></i> TOTAL PASIVA (B)</td>
-                                            <td class="text-end text-success" style="font-family: 'JetBrains Mono', monospace;">Rp ${data.total_pasiva.toLocaleString('id-ID')}</td>
+                                            <td class="text-end text-success" style="font-family: 'JetBrains Mono', monospace;">Rp ${totalPasiva.toLocaleString('id-ID')}</td>
                                         </tr>
                                     </tfoot>
                                 </table>
@@ -1654,7 +1651,7 @@
                                     <td></td>
                                 </tr>`;
 
-                    if (data.arus_masuk_detail.length === 0) {
+                    if ((data.arus_masuk_detail || []).length === 0) {
                         html += `<tr><td colspan="3" class="opacity-75 ps-4 fst-italic">Tidak ada aliran kas masuk</td></tr>`;
                     } else {
                         data.arus_masuk_detail.forEach(m => {
@@ -1662,7 +1659,7 @@
                             <tr>
                                 <td class="ps-4 opacity-75" style="width: 20%; font-family: 'JetBrains Mono', monospace;">${m.coa_code}</td>
                                 <td style="width: 50%;">Penerimaan dari ${m.coa_name}</td>
-                                <td class="text-end text-success fw-semibold" style="width: 30%; font-family: 'JetBrains Mono', monospace;">+ Rp ${Number(m.total).toLocaleString('id-ID')}</td>
+                                <td class="text-end text-success fw-semibold" style="width: 30%; font-family: 'JetBrains Mono', monospace;">+ Rp ${Number(m.total || 0).toLocaleString('id-ID')}</td>
                             </tr>`;
                         });
                     }
@@ -1670,7 +1667,7 @@
                     html += `
                                 <tr class="fw-bold" style="background-color: rgba(16, 185, 129, 0.14);">
                                     <td colspan="2" class="ps-3 text-uppercase text-success">Total Penerimaan Kas (A)</td>
-                                    <td class="text-end text-success" style="font-family: 'JetBrains Mono', monospace;">Rp ${Number(data.total_arus_masuk).toLocaleString('id-ID')}</td>
+                                    <td class="text-end text-success" style="font-family: 'JetBrains Mono', monospace;">Rp ${Number(data.total_arus_masuk || 0).toLocaleString('id-ID')}</td>
                                 </tr>
 
                                 <tr style="background-color: rgba(79, 70, 229, 0.08);" class="fw-bold">
@@ -1678,7 +1675,7 @@
                                     <td></td>
                                 </tr>`;
 
-                    if (data.arus_keluar_detail.length === 0) {
+                    if ((data.arus_keluar_detail || []).length === 0) {
                         html += `<tr><td colspan="3" class="opacity-75 ps-4 fst-italic">Tidak ada aliran kas keluar</td></tr>`;
                     } else {
                         data.arus_keluar_detail.forEach(k => {
@@ -1686,19 +1683,20 @@
                             <tr>
                                 <td class="ps-4 opacity-75" style="font-family: 'JetBrains Mono', monospace;">${k.coa_code}</td>
                                 <td>Pengeluaran / Pembayaran ${k.coa_name}</td>
-                                <td class="text-end text-danger fw-semibold" style="font-family: 'JetBrains Mono', monospace;">- Rp ${Number(k.total).toLocaleString('id-ID')}</td>
+                                <td class="text-end text-danger fw-semibold" style="font-family: 'JetBrains Mono', monospace;">- Rp ${Number(k.total || 0).toLocaleString('id-ID')}</td>
                             </tr>`;
                         });
                     }
 
-                    const isSurplus = data.kenaikan_bersih >= 0;
+                    const kenaikanBersih = Number(data.kenaikan_bersih || 0);
+                    const isSurplus = kenaikanBersih >= 0;
                     const statusTeks = isSurplus ? 'KENAIKAN BERSIH KAS (SURPLUS)' : 'PENURUNAN BERSIH KAS (DEFISIT)';
                     const badgeColor = isSurplus ? 'alert-primary border-primary text-primary' : 'alert-danger border-danger text-danger';
 
                     html += `
                                 <tr class="fw-bold" style="background-color: rgba(225, 29, 72, 0.14);">
                                     <td colspan="2" class="ps-3 text-uppercase text-danger">Total Pengeluaran Kas (B)</td>
-                                    <td class="text-end text-danger" style="font-family: 'JetBrains Mono', monospace;">Rp ${Number(data.total_arus_keluar).toLocaleString('id-ID')}</td>
+                                    <td class="text-end text-danger" style="font-family: 'JetBrains Mono', monospace;">Rp ${Number(data.total_arus_keluar || 0).toLocaleString('id-ID')}</td>
                                 </tr>
                             </tbody>
                         </table>
@@ -1709,7 +1707,7 @@
                             <i class="fas fa-coins me-2"></i> ${statusTeks} (A - B)
                         </span>
                         <span class="fw-bold fs-5" style="font-family: 'JetBrains Mono', monospace;">
-                            Rp ${Number(data.kenaikan_bersih).toLocaleString('id-ID')}
+                            Rp ${kenaikanBersih.toLocaleString('id-ID')}
                         </span>
                     </div>
                 `;
@@ -1723,7 +1721,6 @@
         }
     }
 
-    // Jalankan otomatis load Jurnal Umum di awal pembukaan form
     document.addEventListener("DOMContentLoaded", function() {
         runWhenSelect2Ready(() => initSelect2OnElement('#bb-coa-code', null, false));
         loadLaporanAktif();

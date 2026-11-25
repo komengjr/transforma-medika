@@ -177,9 +177,6 @@
         width: 100%;
     }
 
-    /* =========================================================
-       TABLE WITH COLORED GRID BORDERS (MATCHING REGISTER POLI)
-       ========================================================= */
     .table-custom {
         width: 100% !important;
         border-collapse: collapse !important;
@@ -340,10 +337,14 @@
 
 @section('content')
 @php
-$totalLog = $logs->count();
-$inControlCount = $logs->where('status_qc', 'IN_CONTROL')->count();
-$warningCount = $logs->where('status_qc', 'WARNING_2SD')->count();
-$outOfControlCount = $logs->where('status_qc', 'OUT_OF_CONTROL')->count();
+$totalLog = $qcSummary->total_log ?? $logs->count();
+$inControlCount = $qcSummary->in_control ?? 0;
+$warningCount = $qcSummary->warning_2sd ?? 0;
+$outOfControlCount = $qcSummary->out_of_control ?? 0;
+
+$materialInstrumentMap = $materials->mapWithKeys(function ($m) {
+    return [$m->id => $m->instrument_id];
+});
 @endphp
 
 <!-- HEADER BANNER -->
@@ -374,15 +375,15 @@ $outOfControlCount = $logs->where('status_qc', 'OUT_OF_CONTROL')->count();
                     <div class="col-lg-5 text-lg-end d-flex flex-wrap justify-content-lg-end gap-2">
                         <div class="ent-glass-pill px-3 py-2 text-start">
                             <span class="d-block text-uppercase" style="color: #94a3b8; font-size: 0.58rem;">In Control</span>
-                            <span class="fw-bold text-success" style="font-family: 'JetBrains Mono', monospace;">{{ $inControlCount }}</span>
+                            <span class="fw-bold text-success" id="bannerInControlCount" style="font-family: 'JetBrains Mono', monospace;">{{ $inControlCount }}</span>
                         </div>
                         <div class="ent-glass-pill px-3 py-2 text-start">
                             <span class="d-block text-uppercase" style="color: #94a3b8; font-size: 0.58rem;">Warning 2SD</span>
-                            <span class="fw-bold text-warning" style="font-family: 'JetBrains Mono', monospace;">{{ $warningCount }}</span>
+                            <span class="fw-bold text-warning" id="bannerWarningCount" style="font-family: 'JetBrains Mono', monospace;">{{ $warningCount }}</span>
                         </div>
                         <div class="ent-glass-pill px-3 py-2 text-start">
                             <span class="d-block text-uppercase" style="color: #94a3b8; font-size: 0.58rem;">Out of Control</span>
-                            <span class="fw-bold text-danger" style="font-family: 'JetBrains Mono', monospace;">{{ $outOfControlCount }}</span>
+                            <span class="fw-bold text-danger" id="bannerOutControlCount" style="font-family: 'JetBrains Mono', monospace;">{{ $outOfControlCount }}</span>
                         </div>
                     </div>
                 </div>
@@ -391,12 +392,12 @@ $outOfControlCount = $logs->where('status_qc', 'OUT_OF_CONTROL')->count();
     </div>
 </div>
 
-<!-- NAV TABS & ACTION BUTTONS -->
+<!-- NAV TABS -->
 <div class="d-flex flex-wrap justify-content-between align-items-center gap-2 mb-3">
     <ul class="nav nav-pills gap-2" id="qcTabs" role="tablist">
         <li class="nav-item" role="presentation">
             <button class="nav-link active" id="tab-log-qc" data-bs-toggle="pill" data-bs-target="#pane-log-qc" type="button" role="tab">
-                <i class="fas fa-clipboard-list me-1"></i> Log Hasil QC Harian ({{ $totalLog }})
+                <i class="fas fa-clipboard-list me-1"></i> Log Hasil QC Harian (<span id="badgeTabLogCount">{{ $totalLog }}</span>)
             </button>
         </li>
         <li class="nav-item" role="presentation">
@@ -406,7 +407,7 @@ $outOfControlCount = $logs->where('status_qc', 'OUT_OF_CONTROL')->count();
         </li>
         <li class="nav-item" role="presentation">
             <button class="nav-link" id="tab-param-qc" data-bs-toggle="pill" data-bs-target="#pane-param-qc" type="button" role="tab">
-                <i class="fas fa-sliders me-1"></i> Parameter &amp; Target Mean/SD ({{ $parameters->count() }})
+                <i class="fas fa-sliders me-1"></i> Parameter &amp; Target Mean/SD (<span id="badgeTabParamCount">{{ $parameters->count() }}</span>)
             </button>
         </li>
         <li class="nav-item" role="presentation">
@@ -415,32 +416,70 @@ $outOfControlCount = $logs->where('status_qc', 'OUT_OF_CONTROL')->count();
             </button>
         </li>
     </ul>
-
-    <div class="d-flex flex-wrap gap-2">
-        <button type="button" class="btn ent-btn ent-btn-light px-3 py-2" data-bs-toggle="modal" data-bs-target="#modalMaterial" id="btnOpenMaterialModal">
-            <i class="fas fa-vial me-1 text-primary"></i> + Bahan QC
-        </button>
-        <button type="button" class="btn ent-btn ent-btn-light px-3 py-2" data-bs-toggle="modal" data-bs-target="#modalParameterQc" id="btnOpenParameterModal">
-            <i class="fas fa-sliders-h me-1 text-primary"></i> + Parameter QC
-        </button>
-        <button type="button" class="btn ent-btn ent-btn-primary px-3 py-2" data-bs-toggle="modal" data-bs-target="#modalInputQc" id="btnOpenInputQcModal">
-            <i class="fas fa-plus me-1"></i> Input Hasil QC
-        </button>
-        <button type="button" class="btn ent-btn ent-btn-light px-3 py-2" id="btnProsesHasilQc">
-            <i class="fas fa-satellite-dish me-1 text-success"></i> Proses Hasil QC
-        </button>
-    </div>
 </div>
 
 <!-- TAB CONTENT -->
 <div class="tab-content" id="qcTabsContent">
     <!-- TAB 1: LOG QC HARIAN -->
     <div class="tab-pane fade show active" id="pane-log-qc" role="tabpanel">
+        <!-- FILTER PENCARIAN DI ATAS TABEL -->
+        <div class="ent-card mb-3">
+            <div class="ent-card-header">
+                <h6 class="mb-0 fw-bold"><i class="fas fa-filter me-1 text-primary"></i> Filter Pencarian Riwayat QC Harian</h6>
+                <small class="opacity-75">Saring berdasarkan instrumen / analyzer, bahan kontrol, atau rentang tanggal.</small>
+            </div>
+            <div class="card-body p-3 p-md-4">
+                <div class="row g-3 align-items-end">
+                    <div class="col-md-3">
+                        <label class="ent-label">Instrumen / Alat</label>
+                        <select class="form-select ent-input" id="log_filter_instrument_id">
+                            <option value="">-- Semua Instrumen --</option>
+                            @foreach($alatList as $alat)
+                            <option value="{{ $alat->instrument_id }}">{{ $alat->nama_alat }} ({{ $alat->kode_alat }})</option>
+                            @endforeach
+                        </select>
+                    </div>
+                    <div class="col-md-3">
+                        <label class="ent-label">Bahan Kontrol</label>
+                        <select class="form-select ent-input" id="log_filter_material_id">
+                            <option value="">-- Semua Bahan Kontrol --</option>
+                            @foreach($materials as $mat)
+                            <option value="{{ $mat->id }}" data-instrument="{{ $mat->instrument_id }}">
+                                {{ $mat->nama_material }} ({{ $mat->lot_number }})
+                            </option>
+                            @endforeach
+                        </select>
+                    </div>
+                    <div class="col-md-2">
+                        <label class="ent-label">Dari Tanggal</label>
+                        <input type="date" class="form-control ent-input" id="log_filter_date_from">
+                    </div>
+                    <div class="col-md-2">
+                        <label class="ent-label">Sampai Tanggal</label>
+                        <input type="date" class="form-control ent-input" id="log_filter_date_to">
+                    </div>
+                    <div class="col-md-2">
+                        <button type="button" class="btn ent-btn ent-btn-light w-100 py-2" id="btnResetLogFilter">
+                            <i class="fas fa-rotate-left me-1 text-danger"></i> Reset
+                        </button>
+                    </div>
+                </div>
+            </div>
+        </div>
+
         <div class="ent-card mb-4">
-            <div class="ent-card-header d-flex justify-content-between align-items-center">
+            <div class="ent-card-header d-flex flex-wrap justify-content-between align-items-center gap-2">
                 <div>
                     <h6 class="mb-0 fw-bold">Riwayat Hasil Quality Control Harian</h6>
                     <small class="opacity-75">Evaluasi otomatis Z-Score dan aturan Westgard.</small>
+                </div>
+                <div class="d-flex flex-wrap gap-2">
+                    <button type="button" class="btn ent-btn ent-btn-primary px-3 py-2" data-bs-toggle="modal" data-bs-target="#modalInputQc" id="btnOpenInputQcModal">
+                        <i class="fas fa-plus me-1"></i> Input Hasil QC
+                    </button>
+                    <button type="button" class="btn ent-btn ent-btn-light px-3 py-2" id="btnProsesHasilQc">
+                        <i class="fas fa-satellite-dish me-1 text-success"></i> Proses Hasil QC
+                    </button>
                 </div>
             </div>
             <div class="card-body p-0">
@@ -460,7 +499,7 @@ $outOfControlCount = $logs->where('status_qc', 'OUT_OF_CONTROL')->count();
                                 <th class="text-center">Review</th>
                             </tr>
                         </thead>
-                        <tbody>
+                        <tbody id="tbodyQcLogs">
                             @forelse($logs as $index => $log)
                             <tr>
                                 <td class="text-center fw-semibold">{{ $index + 1 }}</td>
@@ -707,9 +746,54 @@ $outOfControlCount = $logs->where('status_qc', 'OUT_OF_CONTROL')->count();
 
     <!-- TAB 3: PARAMETER QC -->
     <div class="tab-pane fade" id="pane-param-qc" role="tabpanel">
-        <div class="ent-card mb-4">
+        <!-- FILTER BAHAN KONTROL & PARAMETER -->
+        <div class="ent-card mb-3">
             <div class="ent-card-header">
-                <h6 class="mb-0 fw-bold">Master Parameter &amp; Target Statistik QC</h6>
+                <h6 class="mb-0 fw-bold"><i class="fas fa-filter me-1 text-primary"></i> Filter Parameter &amp; Target Statistik QC</h6>
+                <small class="opacity-75">Pilih bahan kontrol terlebih dahulu untuk memunculkan daftar parameter yang tersedia.</small>
+            </div>
+            <div class="card-body p-3 p-md-4">
+                <div class="row g-3 align-items-end">
+                    <div class="col-md-5">
+                        <label class="ent-label">Bahan Kontrol</label>
+                        <select class="form-select ent-input" id="param_filter_material_id">
+                            <option value="">-- Semua Bahan Kontrol --</option>
+                            @foreach($materials as $mat)
+                            <option value="{{ $mat->id }}">{{ $mat->nama_material }} ({{ $mat->lot_number }})</option>
+                            @endforeach
+                        </select>
+                    </div>
+                    <div class="col-md-5">
+                        <label class="ent-label">Parameter QC</label>
+                        <select class="form-select ent-input" id="param_filter_parameter_id" disabled>
+                            <option value="">-- Pilih Bahan Kontrol Terlebih Dahulu --</option>
+                            @foreach($parameters as $param)
+                            <option value="{{ $param->id }}" data-material="{{ $param->qc_material_id }}">
+                                {{ $param->label ?? $param->nama_parameter }} ({{ $param->nama_parameter }})
+                            </option>
+                            @endforeach
+                        </select>
+                    </div>
+                    <div class="col-md-2">
+                        <button type="button" class="btn ent-btn ent-btn-light w-100 py-2" id="btnResetParamFilter">
+                            <i class="fas fa-rotate-left me-1 text-danger"></i> Reset
+                        </button>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div class="ent-card mb-4">
+            <div class="ent-card-header d-flex flex-wrap justify-content-between align-items-center gap-2">
+                <div>
+                    <h6 class="mb-0 fw-bold">Master Parameter &amp; Target Statistik QC</h6>
+                    <small class="opacity-75">Pengaturan target Mean, SD, serta batas kontrol parameter QC.</small>
+                </div>
+                <div>
+                    <button type="button" class="btn ent-btn ent-btn-primary px-3 py-2" data-bs-toggle="modal" data-bs-target="#modalParameterQc" id="btnOpenParameterModal">
+                        <i class="fas fa-plus me-1"></i> + Parameter QC
+                    </button>
+                </div>
             </div>
             <div class="card-body p-0">
                 <div class="table-responsive pb-3">
@@ -726,7 +810,7 @@ $outOfControlCount = $logs->where('status_qc', 'OUT_OF_CONTROL')->count();
                                 <th class="text-center" style="width: 110px;">Aksi</th>
                             </tr>
                         </thead>
-                        <tbody>
+                        <tbody id="tbodyQcParams">
                             @forelse($parameters as $param)
                             <tr>
                                 <td class="text-center"><span class="code-chip">{{ $param->urutan }}</span></td>
@@ -788,8 +872,16 @@ $outOfControlCount = $logs->where('status_qc', 'OUT_OF_CONTROL')->count();
     <!-- TAB 4: BAHAN KONTROL -->
     <div class="tab-pane fade" id="pane-material-qc" role="tabpanel">
         <div class="ent-card mb-4">
-            <div class="ent-card-header">
-                <h6 class="mb-0 fw-bold">Daftar Bahan &amp; Lot Kontrol Laboratorium</h6>
+            <div class="ent-card-header d-flex flex-wrap justify-content-between align-items-center gap-2">
+                <div>
+                    <h6 class="mb-0 fw-bold">Daftar Bahan &amp; Lot Kontrol Laboratorium</h6>
+                    <small class="opacity-75">Kelola bahan kontrol, nomor lot, analyzer, dan masa kedaluwarsa.</small>
+                </div>
+                <div>
+                    <button type="button" class="btn ent-btn ent-btn-primary px-3 py-2" data-bs-toggle="modal" data-bs-target="#modalMaterial" id="btnOpenMaterialModal">
+                        <i class="fas fa-plus me-1"></i> + Bahan QC
+                    </button>
+                </div>
             </div>
             <div class="card-body p-0">
                 <div class="table-responsive pb-3">
@@ -1250,25 +1342,370 @@ $outOfControlCount = $logs->where('status_qc', 'OUT_OF_CONTROL')->count();
     });
 
     $(document).ready(function() {
-        ['#tableQcLogs', '#tableQcParams', '#tableQcMaterials'].forEach(function(selector) {
+        let existingQcLogs = @json($logs);
+        let qcParametersList = @json($parameters);
+        const materialInstrumentMap = @json($materialInstrumentMap);
+
+        const dtLanguageConfig = {
+            search: "_INPUT_",
+            searchPlaceholder: "Cari data...",
+            lengthMenu: "Tampilkan _MENU_ data",
+            info: "Menampilkan _START_ sampai _END_ dari _TOTAL_ data",
+            paginate: {
+                first: "Awal",
+                last: "Akhir",
+                next: "<i class='fas fa-angle-right'></i>",
+                previous: "<i class='fas fa-angle-left'></i>"
+            }
+        };
+
+        ['#tableQcMaterials'].forEach(function(selector) {
             if ($(selector).length && $(selector).find('tbody tr').length > 0 && !$(selector).find('tbody tr td[colspan]').length) {
                 new DataTable(selector, {
                     responsive: true,
                     pageLength: 10,
-                    language: {
-                        search: "_INPUT_",
-                        searchPlaceholder: "Cari data...",
-                        lengthMenu: "Tampilkan _MENU_ data",
-                        info: "Menampilkan _START_ sampai _END_ dari _TOTAL_ data",
-                        paginate: {
-                            first: "Awal",
-                            last: "Akhir",
-                            next: "<i class='fas fa-angle-right'></i>",
-                            previous: "<i class='fas fa-angle-left'></i>"
-                        }
-                    }
+                    language: dtLanguageConfig
                 });
             }
+        });
+
+        // =========================================================
+        // AJAX GET DATA: MASTER PARAMETER & TARGET MEAN/SD
+        // =========================================================
+        function initQcParamsDataTable() {
+            const $tbl = $('#tableQcParams');
+            if ($.fn.DataTable.isDataTable($tbl)) {
+                $tbl.DataTable().destroy();
+            }
+            if ($tbl.find('tbody tr').length > 0 && !$tbl.find('tbody tr td[colspan]').length) {
+                new DataTable('#tableQcParams', {
+                    responsive: true,
+                    pageLength: 10,
+                    language: dtLanguageConfig
+                });
+            }
+        }
+
+        function syncParamFilterOptions(matId, selectedParamId = '') {
+            const selectParam = $('#param_filter_parameter_id');
+            if (!matId) {
+                selectParam.prop('disabled', true);
+                selectParam.find('option').each(function() {
+                    if (!$(this).val()) {
+                        $(this).text('-- Pilih Bahan Kontrol Terlebih Dahulu --');
+                        $(this).prop('disabled', false).show();
+                    } else {
+                        $(this).prop('disabled', true).hide();
+                    }
+                });
+                selectParam.val('');
+                return;
+            }
+
+            selectParam.prop('disabled', false);
+            selectParam.find('option').each(function() {
+                const val = $(this).val();
+                if (!val) {
+                    $(this).text('-- Semua Parameter pada Bahan Ini --');
+                    $(this).prop('disabled', false).show();
+                    return;
+                }
+                const optMat = String($(this).data('material') || '');
+                if (optMat === String(matId)) {
+                    $(this).prop('disabled', false).show();
+                } else {
+                    $(this).prop('disabled', true).hide();
+                }
+            });
+            selectParam.val(selectedParamId || '');
+        }
+
+        function renderQcParamsRows(rows) {
+            const tbody = $('#tbodyQcParams');
+            if (!rows.length) {
+                if ($.fn.DataTable.isDataTable('#tableQcParams')) {
+                    $('#tableQcParams').DataTable().destroy();
+                }
+                tbody.html('<tr><td colspan="8" class="text-center py-5 opacity-75">Tidak ada parameter QC yang sesuai filter.</td></tr>');
+                return;
+            }
+
+            let html = '';
+            rows.forEach(param => {
+                const layananHtml = param.nama_layanan
+                    ? `<small class="opacity-75 d-block mt-1"><span class="code-chip">${param.kode_layanan || ''}</span> ${param.nama_layanan}</small>`
+                    : '';
+
+                html += `
+                    <tr>
+                        <td class="text-center"><span class="code-chip">${param.urutan ?? 0}</span></td>
+                        <td>
+                            <div class="fw-bold">${param.nama_material || '-'}</div>
+                            <small class="opacity-75">${param.lot_number || '-'}</small>
+                        </td>
+                        <td>
+                            <div class="fw-bold">
+                                <span class="code-chip me-1">${param.nama_parameter || '-'}</span>
+                                <span>${param.label || param.nama_parameter || '-'}</span>
+                            </div>
+                            ${layananHtml}
+                        </td>
+                        <td>${param.satuan || '-'}</td>
+                        <td class="text-end fw-bold" style="font-family: 'JetBrains Mono', monospace;">${Number(param.target_mean || 0).toFixed(2)}</td>
+                        <td class="text-end fw-bold" style="font-family: 'JetBrains Mono', monospace;">${Number(param.target_sd || 0).toFixed(2)}</td>
+                        <td class="text-end" style="font-family: 'JetBrains Mono', monospace; font-size: 0.76rem;">
+                            ${Number(param.batas_bawah || 0).toFixed(2)} s/d ${Number(param.batas_atas || 0).toFixed(2)}
+                        </td>
+                        <td class="text-center">
+                            <div class="d-inline-flex gap-1">
+                                <button type="button" class="btn btn-sm btn-outline-primary py-1 px-2 btn-edit-param-qc"
+                                    data-id="${param.id}"
+                                    data-material="${param.qc_material_id}"
+                                    data-pemeriksaan="${param.master_pemeriksaan_id || ''}"
+                                    data-master-param="${param.master_parameter_id || ''}"
+                                    data-nama="${param.nama_parameter || ''}"
+                                    data-label="${param.label || param.nama_parameter || ''}"
+                                    data-satuan="${param.satuan || ''}"
+                                    data-metode="${param.metode || ''}"
+                                    data-mean="${param.target_mean ?? ''}"
+                                    data-sd="${param.target_sd ?? ''}"
+                                    data-low="${param.batas_bawah ?? ''}"
+                                    data-high="${param.batas_atas ?? ''}"
+                                    data-urutan="${param.urutan ?? 0}">
+                                    <i class="fas fa-pen"></i>
+                                </button>
+                                <button type="button" class="btn btn-sm btn-outline-danger py-1 px-2 btn-delete-param-qc" data-id="${param.id}">
+                                    <i class="fas fa-trash"></i>
+                                </button>
+                            </div>
+                        </td>
+                    </tr>
+                `;
+            });
+
+            tbody.html(html);
+            initQcParamsDataTable();
+        }
+
+        function fetchQcParametersAjax() {
+            const matId = $('#param_filter_material_id').val();
+            const paramId = $('#param_filter_parameter_id').val();
+
+            if ($.fn.DataTable.isDataTable('#tableQcParams')) {
+                $('#tableQcParams').DataTable().destroy();
+            }
+            $('#tbodyQcParams').html('<tr><td colspan="8" class="text-center py-4 opacity-75"><i class="fas fa-spinner fa-spin me-1"></i> Memuat data parameter QC...</td></tr>');
+
+            $.get("{{ route('lab_qc.ajax.parameters') }}", {
+                qc_material_id: matId,
+                qc_parameter_id: paramId
+            }, function(res) {
+                const rows = res.data || [];
+                if (!matId && !paramId) {
+                    qcParametersList = rows;
+                    $('#badgeTabParamCount').text(rows.length);
+                }
+                renderQcParamsRows(rows);
+            }).fail(function() {
+                const fallback = qcParametersList.filter(item => {
+                    if (matId && String(item.qc_material_id) !== String(matId)) return false;
+                    if (paramId && String(item.id) !== String(paramId)) return false;
+                    return true;
+                });
+                renderQcParamsRows(fallback);
+            });
+        }
+
+        syncParamFilterOptions('', '');
+        initQcParamsDataTable();
+
+        $('#tab-param-qc').on('shown.bs.tab', function() {
+            fetchQcParametersAjax();
+        });
+
+        $('#param_filter_material_id').on('change', function() {
+            syncParamFilterOptions($(this).val(), '');
+            fetchQcParametersAjax();
+        });
+
+        $('#param_filter_parameter_id').on('change', function() {
+            fetchQcParametersAjax();
+        });
+
+        $('#btnResetParamFilter').on('click', function() {
+            $('#param_filter_material_id').val('');
+            syncParamFilterOptions('', '');
+            fetchQcParametersAjax();
+        });
+
+        // =========================================================
+        // AJAX GET DATA: LOG HASIL QC HARIAN
+        // =========================================================
+        function initQcLogsDataTable() {
+            const $tbl = $('#tableQcLogs');
+            if ($.fn.DataTable.isDataTable($tbl)) {
+                $tbl.DataTable().destroy();
+            }
+            if ($tbl.find('tbody tr').length > 0 && !$tbl.find('tbody tr td[colspan]').length) {
+                new DataTable('#tableQcLogs', {
+                    responsive: true,
+                    pageLength: 10,
+                    language: dtLanguageConfig
+                });
+            }
+        }
+
+        function renderQcLogsRows(rows) {
+            const tbody = $('#tbodyQcLogs');
+            if (!rows.length) {
+                if ($.fn.DataTable.isDataTable('#tableQcLogs')) {
+                    $('#tableQcLogs').DataTable().destroy();
+                }
+                tbody.html('<tr><td colspan="10" class="text-center py-5 opacity-75">Tidak ada data log QC harian yang sesuai filter.</td></tr>');
+                return;
+            }
+
+            let html = '';
+            rows.forEach((log, idx) => {
+                let statusBadge = '';
+                if (log.status_qc === 'IN_CONTROL') {
+                    statusBadge = `<span class="ent-badge" style="background: rgba(5, 150, 105, 0.15); color: #10b981; border: 1px solid rgba(5, 150, 105, 0.35);"><i class="fas fa-check-circle me-1"></i> In Control</span>`;
+                } else if (log.status_qc === 'WARNING_2SD') {
+                    statusBadge = `<span class="ent-badge" style="background: rgba(217, 119, 6, 0.15); color: #f59e0b; border: 1px solid rgba(217, 119, 6, 0.35);"><i class="fas fa-exclamation-triangle me-1"></i> Warning 2SD</span>`;
+                } else {
+                    statusBadge = `<span class="ent-badge" style="background: rgba(225, 29, 72, 0.15); color: #f43f5e; border: 1px solid rgba(225, 29, 72, 0.35);"><i class="fas fa-times-circle me-1"></i> Out of Control</span>`;
+                }
+
+                const paramTitle = log.label || log.nama_parameter || '-';
+                const paramSub = (log.label && log.label !== log.nama_parameter)
+                    ? `<span class="code-chip mt-1">${log.nama_parameter}</span>`
+                    : '';
+
+                let reviewHtml = '';
+                if (log.status_review === 'MENUNGGU') {
+                    reviewHtml = `
+                        <div class="d-inline-flex gap-1">
+                            <button type="button" class="btn btn-sm btn-success py-1 px-2 btn-review-qc" data-id="${log.id}" data-status="DISETUJUI" title="Setujui">
+                                <i class="fas fa-check"></i>
+                            </button>
+                            <button type="button" class="btn btn-sm btn-danger py-1 px-2 btn-review-qc" data-id="${log.id}" data-status="DITOLAK" title="Tolak">
+                                <i class="fas fa-times"></i>
+                            </button>
+                        </div>`;
+                } else {
+                    reviewHtml = `<span class="ent-badge" style="background: rgba(79, 70, 229, 0.14); color: #818cf8; border: 1px solid rgba(79, 70, 229, 0.3);">${log.status_review || '-'}</span>`;
+                }
+
+                html += `
+                    <tr>
+                        <td class="text-center fw-semibold">${idx + 1}</td>
+                        <td style="font-family: 'JetBrains Mono', monospace; font-size: 0.76rem;">
+                            <div class="fw-bold">${log.tanggal_qc || '-'}</div>
+                            <small class="opacity-75">${String(log.jam_qc || '').substring(0, 5)}</small>
+                        </td>
+                        <td>
+                            <div class="fw-bold">${log.nama_material || '-'}</div>
+                            <span class="code-chip mt-1">LOT: ${log.lot_number || '-'}</span>
+                        </td>
+                        <td>
+                            <div class="fw-bold">${paramTitle}</div>
+                            ${paramSub}
+                        </td>
+                        <td class="text-end fw-bold" style="font-family: 'JetBrains Mono', monospace; font-size: 0.88rem;">
+                            ${Number(log.nilai_hasil || 0).toFixed(2)} <small class="opacity-75">${log.satuan || ''}</small>
+                        </td>
+                        <td class="text-end" style="font-family: 'JetBrains Mono', monospace; font-size: 0.76rem;">
+                            ${Number(log.target_mean || 0).toFixed(2)} ± ${Number(log.target_sd || 0).toFixed(2)}
+                        </td>
+                        <td class="text-center">
+                            <span class="code-chip">${Number(log.z_score || 0).toFixed(2)} SD</span>
+                        </td>
+                        <td class="text-center">${statusBadge}</td>
+                        <td>
+                            <div class="fw-semibold" style="font-size: 0.78rem;">${log.rule_triggered || '-'}</div>
+                            <small class="opacity-75 d-block">${log.catatan_tindakan || '-'}</small>
+                        </td>
+                        <td class="text-center">${reviewHtml}</td>
+                    </tr>
+                `;
+            });
+
+            tbody.html(html);
+            initQcLogsDataTable();
+        }
+
+        function fetchQcLogsAjax() {
+            const instId = $('#log_filter_instrument_id').val();
+            const matId = $('#log_filter_material_id').val();
+            const dateFrom = $('#log_filter_date_from').val();
+            const dateTo = $('#log_filter_date_to').val();
+
+            if ($.fn.DataTable.isDataTable('#tableQcLogs')) {
+                $('#tableQcLogs').DataTable().destroy();
+            }
+            $('#tbodyQcLogs').html('<tr><td colspan="10" class="text-center py-4 opacity-75"><i class="fas fa-spinner fa-spin me-1"></i> Memuat data riwayat QC harian...</td></tr>');
+
+            $.get("{{ route('lab_qc.ajax.logs') }}", {
+                instrument_id: instId,
+                qc_material_id: matId,
+                date_from: dateFrom,
+                date_to: dateTo
+            }, function(res) {
+                const rows = res.data || [];
+                if (!instId && !matId && !dateFrom && !dateTo) {
+                    existingQcLogs = rows;
+                    $('#badgeTabLogCount').text(rows.length);
+                    if (res.summary) {
+                        $('#bannerInControlCount').text(res.summary.in_control ?? 0);
+                        $('#bannerWarningCount').text(res.summary.warning_2sd ?? 0);
+                        $('#bannerOutControlCount').text(res.summary.out_of_control ?? 0);
+                    }
+                }
+                renderQcLogsRows(rows);
+            }).fail(function() {
+                const fallback = existingQcLogs.filter(item => {
+                    const itemInst = item.instrument_id ?? materialInstrumentMap[item.qc_material_id] ?? '';
+                    if (instId && String(itemInst) !== String(instId)) return false;
+                    if (matId && String(item.qc_material_id) !== String(matId)) return false;
+                    if (dateFrom && String(item.tanggal_qc) < dateFrom) return false;
+                    if (dateTo && String(item.tanggal_qc) > dateTo) return false;
+                    return true;
+                });
+                renderQcLogsRows(fallback);
+            });
+        }
+
+        initQcLogsDataTable();
+
+        $('#tab-log-qc').on('shown.bs.tab', function() {
+            fetchQcLogsAjax();
+        });
+
+        $('#log_filter_instrument_id').on('change', function() {
+            const instId = $(this).val();
+            $('#log_filter_material_id option').each(function() {
+                const optInst = $(this).data('instrument');
+                if (!optInst || !instId || String(optInst) === String(instId)) {
+                    $(this).prop('disabled', false).show();
+                } else {
+                    $(this).prop('disabled', true).hide();
+                }
+            });
+            $('#log_filter_material_id').val('');
+            fetchQcLogsAjax();
+        });
+
+        $('#log_filter_material_id, #log_filter_date_from, #log_filter_date_to').on('change', function() {
+            fetchQcLogsAjax();
+        });
+
+        $('#btnResetLogFilter').on('click', function() {
+            $('#log_filter_instrument_id').val('');
+            $('#log_filter_material_id option').prop('disabled', false).show();
+            $('#log_filter_material_id').val('');
+            $('#log_filter_date_from').val('');
+            $('#log_filter_date_to').val('');
+            fetchQcLogsAjax();
         });
 
         $('#instrument_id').on('change', function() {
@@ -1439,7 +1876,12 @@ $outOfControlCount = $logs->where('status_qc', 'OUT_OF_CONTROL')->count();
                         text: res.message,
                         timer: 1400,
                         showConfirmButton: false
-                    }).then(() => location.reload());
+                    }).then(() => {
+                        const modalEl = document.getElementById('modalParameterQc');
+                        const inst = bootstrap.Modal.getInstance(modalEl);
+                        if (inst) inst.hide();
+                        fetchQcParametersAjax();
+                    });
                 },
                 error: function(xhr) {
                     Swal.fire({
@@ -1475,15 +1917,12 @@ $outOfControlCount = $logs->where('status_qc', 'OUT_OF_CONTROL')->count();
                                 text: res.message,
                                 timer: 1300,
                                 showConfirmButton: false
-                            }).then(() => location.reload());
+                            }).then(() => fetchQcParametersAjax());
                         }
                     });
                 }
             });
         });
-
-        const existingQcLogs = @json($logs);
-        const qcParametersList = @json($parameters);
 
         function evaluateQcLogSelection() {
             const matId = $('#log_qc_material_id').val();
@@ -1572,7 +2011,12 @@ $outOfControlCount = $logs->where('status_qc', 'OUT_OF_CONTROL')->count();
                         icon: res.status_qc === 'OUT_OF_CONTROL' ? 'warning' : 'success',
                         title: res.rule_triggered || 'Tersimpan',
                         text: `${res.message} (Z-Score: ${res.z_score} SD)`
-                    }).then(() => location.reload());
+                    }).then(() => {
+                        const modalEl = document.getElementById('modalInputQc');
+                        const inst = bootstrap.Modal.getInstance(modalEl);
+                        if (inst) inst.hide();
+                        fetchQcLogsAjax();
+                    });
                 },
                 error: function(xhr) {
                     Swal.fire({
@@ -1602,19 +2046,19 @@ $outOfControlCount = $logs->where('status_qc', 'OUT_OF_CONTROL')->count();
                         text: res.message,
                         timer: 1200,
                         showConfirmButton: false
-                    }).then(() => location.reload());
+                    }).then(() => fetchQcLogsAjax());
                 }
             });
         });
 
         // =========================================================
-        // LAPORAN & GRAFIK LEVEY-JENNINGS QC
+        // AJAX GET DATA: LAPORAN & GRAFIK LEVEY-JENNINGS QC
         // =========================================================
         let ljChartInstance = null;
         let statusDoughnutInstance = null;
         let currentFilteredLogs = [];
 
-        function getFilteredQcLogs() {
+        function getLocalFilteredQcLogs() {
             const matId = $('#report_material_id').val();
             const paramId = $('#report_parameter_id').val();
             const dateFrom = $('#report_date_from').val();
@@ -1881,11 +2325,32 @@ $outOfControlCount = $logs->where('status_qc', 'OUT_OF_CONTROL')->count();
             tbody.html(html);
         }
 
-        function refreshQcReportAndCharts() {
-            currentFilteredLogs = getFilteredQcLogs();
-            renderQcReportSummary(currentFilteredLogs);
-            renderLeveyJenningsChart(currentFilteredLogs);
-            renderQcReportTable(currentFilteredLogs);
+        function fetchQcReportAjax() {
+            const matId = $('#report_material_id').val();
+            const paramId = $('#report_parameter_id').val();
+            const dateFrom = $('#report_date_from').val();
+            const dateTo = $('#report_date_to').val();
+            const reviewStat = $('#report_review_status').val();
+
+            $('#tbodyQcReport').html('<tr><td colspan="10" class="text-center py-4 opacity-75"><i class="fas fa-spinner fa-spin me-1"></i> Memuat laporan & grafik QC...</td></tr>');
+
+            $.get("{{ route('lab_qc.ajax.report') }}", {
+                qc_material_id: matId,
+                qc_parameter_id: paramId,
+                date_from: dateFrom,
+                date_to: dateTo,
+                status_review: reviewStat
+            }, function(res) {
+                currentFilteredLogs = res.data || [];
+                renderQcReportSummary(currentFilteredLogs);
+                renderLeveyJenningsChart(currentFilteredLogs);
+                renderQcReportTable(currentFilteredLogs);
+            }).fail(function() {
+                currentFilteredLogs = getLocalFilteredQcLogs();
+                renderQcReportSummary(currentFilteredLogs);
+                renderLeveyJenningsChart(currentFilteredLogs);
+                renderQcReportTable(currentFilteredLogs);
+            });
         }
 
         $('#report_material_id').on('change', function() {
@@ -1899,15 +2364,15 @@ $outOfControlCount = $logs->where('status_qc', 'OUT_OF_CONTROL')->count();
                 }
             });
             $('#report_parameter_id').val('');
-            refreshQcReportAndCharts();
+            fetchQcReportAjax();
         });
 
         $('#report_parameter_id, #report_date_from, #report_date_to, #report_review_status').on('change', function() {
-            refreshQcReportAndCharts();
+            fetchQcReportAjax();
         });
 
         $('#tab-laporan-qc').on('shown.bs.tab', function() {
-            refreshQcReportAndCharts();
+            fetchQcReportAjax();
         });
 
         $('#btnPrintQcReport').on('click', function() {
@@ -1964,7 +2429,10 @@ $outOfControlCount = $logs->where('status_qc', 'OUT_OF_CONTROL')->count();
             URL.revokeObjectURL(url);
         });
 
-        refreshQcReportAndCharts();
+        currentFilteredLogs = getLocalFilteredQcLogs();
+        renderQcReportSummary(currentFilteredLogs);
+        renderLeveyJenningsChart(currentFilteredLogs);
+        renderQcReportTable(currentFilteredLogs);
     });
 </script>
 @endsection
