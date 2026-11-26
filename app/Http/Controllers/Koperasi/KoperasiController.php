@@ -29,6 +29,7 @@ use Maatwebsite\Excel\Facades\Excel;
 use App\Services\AccountingService;
 use Exception;
 use Illuminate\Support\Facades\Log;
+use Illuminate\Support\Facades\Schema;
 use Illuminate\Support\Facades\Storage;
 use Illuminate\Support\Facades\Validator;
 use Pion\Laravel\ChunkUpload\Handler\HandlerFactory;
@@ -261,6 +262,75 @@ class KoperasiController extends Controller
 
         // Redirect kembali dengan membawa parameter cabang agar tabel otomatis ter-filter lagi setelah reload
         return redirect()->back()->with('success', 'Simpanan pokok untuk ' . $peserta->kop_master_peserta_name . ' berhasil diproses menggunakan COA terpilih!');
+    }
+    public function aktifkanPeserta(Request $request)
+    {
+        $ids = $request->input('ids', []);
+
+        if (empty($ids) && $request->filled('id_kop_master_peserta')) {
+            $ids = [$request->input('id_kop_master_peserta')];
+        }
+
+        if (!is_array($ids)) {
+            $ids = [$ids];
+        }
+
+        $ids = array_values(array_unique(array_filter(array_map(function ($id) {
+            return is_numeric($id) ? (int) $id : null;
+        }, $ids))));
+
+        if (empty($ids)) {
+            return response()->json([
+                'status' => 'error',
+                'success' => false,
+                'message' => 'Pilih minimal satu peserta koperasi yang akan diaktifkan.',
+            ], 422);
+        }
+
+        try {
+            $updatedCount = DB::transaction(function () use ($ids) {
+                $updatePayload = [
+                    'kop_master_peserta_status' => 'AKTIF',
+                ];
+
+                if (Schema::hasColumn('kop_master_peserta', 'updated_at')) {
+                    $updatePayload['updated_at'] = now();
+                }
+
+                return DB::table('kop_master_peserta')
+                    ->whereIn('id_kop_master_peserta', $ids)
+                    ->where(function ($query) {
+                        $query->whereNull('kop_master_peserta_status')
+                            ->orWhere('kop_master_peserta_status', '!=', 'AKTIF');
+                    })
+                    ->update($updatePayload);
+            });
+
+            if ($updatedCount === 0) {
+                return response()->json([
+                    'status' => 'error',
+                    'success' => false,
+                    'message' => 'Peserta terpilih sudah berstatus AKTIF atau tidak ditemukan.',
+                ], 404);
+            }
+
+            return response()->json([
+                'status' => 'success',
+                'success' => true,
+                'updated_count' => $updatedCount,
+                'message' => $updatedCount === 1
+                    ? '1 peserta koperasi berhasil diaktifkan.'
+                    : "{$updatedCount} peserta koperasi berhasil diaktifkan.",
+            ]);
+        } catch (\Throwable $e) {
+            report($e);
+
+            return response()->json([
+                'status' => 'error',
+                'success' => false,
+                'message' => 'Gagal mengaktifkan peserta koperasi: ' . $e->getMessage(),
+            ], 500);
+        }
     }
     // MENU SIMPANAN WAJIB
     public function menu_koperasi_simpanan_wajib_koperasi($akses, $id)

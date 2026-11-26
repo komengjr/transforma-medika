@@ -62,7 +62,7 @@ Route::prefix('koperasi/')->group(function (): void {
 
     Route::get('menu-koperasi/simpanan-pokok/get-data', [KoperasiController::class, 'menu_koperasi_simpanan_pokok_get_data'])->name('menu_koperasi_simpanan_pokok_get_data');
     Route::post('menu-koperasi/simpanan-pokok/bayar/{id}', [KoperasiController::class, 'menu_koperasi_simpanan_pokok_bayar'])->name('menu_koperasi_simpanan_pokok_bayar');
-
+    Route::post('/koperasi/menu-koperasi/simpanan-pokok/aktifkan-peserta',[KoperasiController::class, 'aktifkanPeserta'])->name('menu_koperasi_simpanan_pokok_aktifkan_peserta');
     Route::get('menu-koperasi/simpanan-wajib/get-data', [KoperasiController::class, 'menu_koperasi_simpanan_wajib_get_data'])->name('menu_koperasi_simpanan_wajib_get_data');
     Route::post('menu-koperasi/simpanan-wajib/bayar', [KoperasiController::class, 'menu_koperasi_simpanan_wajib_bayar'])->name('menu_koperasi_simpanan_wajib_bayar');
 

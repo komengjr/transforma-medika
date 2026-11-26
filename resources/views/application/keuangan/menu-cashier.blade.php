@@ -294,6 +294,14 @@
         background-color: var(--bs-body-bg, var(--ent-solid-bg)) !important;
         color: var(--bs-body-color) !important;
     }
+
+    .cashier-page-select {
+        min-height: 30px !important;
+        height: 30px !important;
+        padding: 2px 24px 2px 8px !important;
+        font-size: 0.75rem !important;
+        border-radius: 8px !important;
+    }
 </style>
 @endsection
 
@@ -337,7 +345,7 @@
 
 <!-- BARIS FILTER UTAMA DI ATAS -->
 <div class="filter-bar-container">
-    <form id="form-filter-kasir" onsubmit="event.preventDefault(); loadAntreanKasir();" class="row g-2 align-items-end">
+    <form id="form-filter-kasir" onsubmit="event.preventDefault(); loadAntreanKasir(1);" class="row g-2 align-items-end">
         <!-- Tanggal Awal -->
         <div class="col-sm-6 col-md-2">
             <label class="form-label ent-field-label">Tanggal Awal</label>
@@ -389,28 +397,42 @@
 
     <!-- KOLOM KIRI: TABEL DAFTAR PASIEN / ANTREAN -->
     <div class="col-lg-6">
-        <div class="ent-card h-100">
-            <div class="ent-card-header d-flex justify-content-between align-items-center">
+        <div class="ent-card">
+            <div class="ent-card-header d-flex justify-content-between align-items-center flex-wrap gap-2">
                 <h6 class="mb-0 fw-bold d-flex align-items-center gap-2">
                     <i class="fas fa-users text-primary"></i> Daftar Kunjungan Pasien
                 </h6>
+                <div class="d-flex align-items-center gap-2">
+                    <span class="fs--2 opacity-75 fw-semibold">Tampil</span>
+                    <select id="antrean-per-page" class="form-select cashier-page-select" style="width: auto;" onchange="ubahJumlahBarisAntrean()">
+                        <option value="10" selected>10</option>
+                        <option value="25">25</option>
+                        <option value="50">50</option>
+                    </select>
+                </div>
             </div>
             <div class="table-responsive" style="max-height: 750px; overflow-y: auto;">
                 <table class="table table-hover table-custom-orange align-middle mb-0 fs--1">
                     <thead>
                         <tr>
-                            <th style="width: 25%;">TGL. TRANSAKSI</th>
-                            <th style="width: 25%;">NO REG</th>
-                            <th style="width: 25%;">NAMA PASIEN</th>
-                            <th style="width: 25%;">KEL.PELANGGAN</th>
+                            <th style="width: 28%;">TGL. TRANSAKSI</th>
+                            <th style="width: 32%;">NO REG</th>
+                            <th style="width: 40%;">NAMA PASIEN</th>
                         </tr>
                     </thead>
                     <tbody id="tabel-antrean-body">
                         <tr>
-                            <td colspan="4" class="text-center py-4 opacity-75">Memuat data antrean...</td>
+                            <td colspan="3" class="text-center py-4 opacity-75">Memuat data antrean...</td>
                         </tr>
                     </tbody>
                 </table>
+            </div>
+            <div class="card-footer d-flex flex-wrap justify-content-between align-items-center gap-2 py-2 px-3"
+                style="background-color: rgba(79, 70, 229, 0.04); border-top: 1px solid var(--ent-grid-border);">
+                <small class="fs--2 fw-semibold opacity-75" id="antrean-page-info">Menampilkan 0 data</small>
+                <nav aria-label="Pagination Daftar Kunjungan Pasien">
+                    <ul class="pagination pagination-sm mb-0" id="antrean-pagination"></ul>
+                </nav>
             </div>
         </div>
     </div>
@@ -552,9 +574,12 @@
     let selectedOrderCode = null;
     let currentDataList = [];
     let currentDetailItems = [];
+    let antreanCurrentPage = 1;
+    let antreanPerPage = 10;
 
     $(document).ready(function() {
-        loadAntreanKasir();
+        antreanPerPage = parseInt($('#antrean-per-page').val(), 10) || 10;
+        loadAntreanKasir(1);
 
         $('#inputCashJumlah').on('keyup change', function() {
             hitungKembalian();
@@ -572,14 +597,93 @@
         $('#inputCashKembali').val(kembalian.toLocaleString('id-ID'));
     }
 
-    function loadAntreanKasir() {
+    function ubahJumlahBarisAntrean() {
+        antreanPerPage = parseInt($('#antrean-per-page').val(), 10) || 10;
+        renderAntreanPaginated(1);
+    }
+
+    function renderAntreanPaginated(page = 1) {
+        const totalItems = currentDataList.length;
+        if (totalItems === 0) {
+            $('#tabel-antrean-body').html(`<tr><td colspan="3" class="text-center py-4 opacity-75">Tidak ada data kunjungan.</td></tr>`);
+            $('#antrean-page-info').text('Menampilkan 0 data');
+            $('#antrean-pagination').html('');
+            return;
+        }
+
+        const totalPages = Math.max(1, Math.ceil(totalItems / antreanPerPage));
+        antreanCurrentPage = Math.min(Math.max(1, page), totalPages);
+
+        const startIdx = (antreanCurrentPage - 1) * antreanPerPage;
+        const endIdx = Math.min(startIdx + antreanPerPage, totalItems);
+        const pageItems = currentDataList.slice(startIdx, endIdx);
+
+        let html = '';
+        pageItems.forEach((item) => {
+            let tglFormat = item.tanggal_registrasi ? item.tanggal_registrasi : '-';
+            let regId = item.id || item.registrasi_id || item.d_reg_order_code;
+            let namaPasien = item.patient_name || item.nama_pasien || '-';
+            let kelPelanggan = item.nama_sub_penjamin || item.kelompok_pelanggan || item.t_layanan_cat_code || item.jenis_layanan || '-';
+            let isSelected = selectedOrderCode !== null && String(selectedOrderCode) === String(regId);
+
+            html += `
+                <tr onclick="pilihPasienKasir('${regId}')" style="cursor: pointer;" id="row-${regId}" class="${isSelected ? 'row-selected' : ''}">
+                    <td class="text-nowrap">${tglFormat}</td>
+                    <td>
+                        <span class="text-danger fw-bold d-block" style="font-family: 'JetBrains Mono', monospace;">${item.d_reg_order_code || item.no_registrasi}</span>
+                        <span class="opacity-75 fw-semibold d-block" style="font-size: 0.75rem; font-family: 'JetBrains Mono', monospace;">RM: ${item.rm_code || item.pid}</span>
+                    </td>
+                    <td>
+                        <span class="fw-bold text-uppercase d-block">${namaPasien}</span>
+                        <small class="opacity-75 fw-semibold d-block" style="font-size: 0.72rem;">${kelPelanggan}</small>
+                    </td>
+                </tr>
+            `;
+        });
+
+        $('#tabel-antrean-body').html(html);
+        $('#antrean-page-info').text(`Menampilkan ${startIdx + 1}–${endIdx} dari ${totalItems} data (Hal. ${antreanCurrentPage}/${totalPages})`);
+
+        let pagHtml = '';
+        pagHtml += `
+            <li class="page-item ${antreanCurrentPage === 1 ? 'disabled' : ''}">
+                <a class="page-link" href="javascript:void(0)" onclick="renderAntreanPaginated(${antreanCurrentPage - 1})">Prev</a>
+            </li>
+        `;
+
+        let startPage = Math.max(1, antreanCurrentPage - 2);
+        let endPage = Math.min(totalPages, startPage + 4);
+        if (endPage - startPage < 4) {
+            startPage = Math.max(1, endPage - 4);
+        }
+
+        for (let p = startPage; p <= endPage; p++) {
+            pagHtml += `
+                <li class="page-item ${p === antreanCurrentPage ? 'active' : ''}">
+                    <a class="page-link" href="javascript:void(0)" onclick="renderAntreanPaginated(${p})">${p}</a>
+                </li>
+            `;
+        }
+
+        pagHtml += `
+            <li class="page-item ${antreanCurrentPage === totalPages ? 'disabled' : ''}">
+                <a class="page-link" href="javascript:void(0)" onclick="renderAntreanPaginated(${antreanCurrentPage + 1})">Next</a>
+            </li>
+        `;
+
+        $('#antrean-pagination').html(pagHtml);
+    }
+
+    function loadAntreanKasir(page = 1) {
         const tglAwal = $('#filter_tgl_awal').val();
         const tglAkhir = $('#filter_tgl_akhir').val();
         const penjamin = $('#filter_penjamin').val();
         const keyword = $('#filter_keyword').val();
         const status = $('#filter_status').val();
 
-        $('#tabel-antrean-body').html(`<tr><td colspan="4" class="text-center py-3 opacity-75"><div class="spinner-border spinner-border-sm me-2"></div>Memuat data...</td></tr>`);
+        $('#tabel-antrean-body').html(`<tr><td colspan="3" class="text-center py-3 opacity-75"><div class="spinner-border spinner-border-sm me-2"></div>Memuat data...</td></tr>`);
+        $('#antrean-page-info').text('Memuat...');
+        $('#antrean-pagination').html('');
 
         $.ajax({
             url: "{{ route('keuangan_menu_cashier_list_all_patient') }}",
@@ -592,40 +696,26 @@
                 status: status
             },
             success: function(res) {
-                if (res.success && res.data.length > 0) {
+                if (res.success && Array.isArray(res.data) && res.data.length > 0) {
                     currentDataList = res.data;
-                    let html = '';
-                    res.data.forEach((item) => {
-                        let tglFormat = item.tanggal_registrasi ? item.tanggal_registrasi : '-';
-                        let regId = item.id || item.registrasi_id || item.d_reg_order_code;
-                        html += `
-                            <tr onclick="pilihPasienKasir('${regId}')" style="cursor: pointer;" id="row-${regId}">
-                                <td class="text-nowrap">${tglFormat}</td>
-                                <td>
-                                    <span class="text-danger fw-bold d-block" style="font-family: 'JetBrains Mono', monospace;">${item.d_reg_order_code || item.no_registrasi}</span>
-                                    <span class="opacity-75 fw-semibold d-block" style="font-size: 0.75rem; font-family: 'JetBrains Mono', monospace;">RM: ${item.rm_code || item.pid}</span>
-                                </td>
-                                <td class="fw-bold text-uppercase">${item.patient_name || item.nama_pasien}</td>
-                                <td>
-                                    <span class="fw-semibold d-block">${item.t_layanan_cat_code || item.jenis_layanan}</span>
-                                </td>
-                            </tr>
-                        `;
-                    });
-                    $('#tabel-antrean-body').html(html);
+                    renderAntreanPaginated(page);
                 } else {
-                    $('#tabel-antrean-body').html(`<tr><td colspan="4" class="text-center py-4 opacity-75">Tidak ada data kunjungan.</td></tr>`);
+                    currentDataList = [];
+                    renderAntreanPaginated(1);
                 }
             },
             error: function() {
-                $('#tabel-antrean-body').html(`<tr><td colspan="4" class="text-center py-4 text-danger">Gagal memuat data antrean.</td></tr>`);
+                currentDataList = [];
+                $('#tabel-antrean-body').html(`<tr><td colspan="3" class="text-center py-4 text-danger">Gagal memuat data antrean.</td></tr>`);
+                $('#antrean-page-info').text('Gagal memuat data');
+                $('#antrean-pagination').html('');
             }
         });
     }
 
     function pilihPasienKasir(regId) {
         selectedOrderCode = regId;
-        $('tr').removeClass('row-selected');
+        $('#tabel-antrean-body tr').removeClass('row-selected');
         $(`#row-${regId}`).addClass('row-selected');
 
         $('#lbl-nama-pasien-tagihan').text('Memuat...');
@@ -668,7 +758,7 @@
             } else if (tggPasien > 0) {
                 checkboxHtml = `<input type="checkbox" class="form-check-input item-pilih-lunas" value="${item.id}" data-pasien="${tggPasien}" checked onchange="hitungTotalPilihanBayar()" style="width: 18px; height: 18px; cursor: pointer;">`;
             } else {
-                checkboxHtml = '<span class="badge bg-secondary text-white" style="font-size: 0.65rem;">Ditanggung Perusahaan</span>';
+                checkboxHtml = '<span class="badge bg-secondary text-white lh-sm" style="font-size: 0.65rem;">Ditanggung<br>Perusahaan</span>';
             }
 
             let splitButtonHtml = isLunas ?
@@ -1004,7 +1094,7 @@
                                 showConfirmButton: false
                             }).then(() => {
                                 window.open(res.redirect_url, '_blank');
-                                loadAntreanKasir();
+                                loadAntreanKasir(antreanCurrentPage);
                                 pilihPasienKasir(selectedOrderCode);
                             });
                         } else {
@@ -1202,7 +1292,7 @@
                         title: 'Berhasil!',
                         text: res.message,
                     }).then(() => {
-                        loadAntreanKasir();
+                        loadAntreanKasir(antreanCurrentPage);
                     });
                 } else {
                     Swal.fire('Gagal', res.message, 'error');

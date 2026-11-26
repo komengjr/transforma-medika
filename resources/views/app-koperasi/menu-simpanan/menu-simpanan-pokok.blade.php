@@ -111,6 +111,23 @@
         color: #ffffff;
     }
 
+    .ent-btn-activate {
+        background: linear-gradient(135deg, #0284c7 0%, #4f46e5 100%);
+        border: none;
+        color: #ffffff;
+        box-shadow: 0 4px 12px rgba(2, 132, 199, 0.25);
+    }
+
+    .ent-btn-activate:hover:not(:disabled) {
+        box-shadow: 0 6px 16px rgba(2, 132, 199, 0.38);
+        color: #ffffff;
+    }
+
+    .ent-btn:disabled {
+        opacity: 0.55;
+        cursor: not-allowed;
+    }
+
     /* Adaptive Floating Filters & Form Controls */
     .form-floating-custom {
         position: relative;
@@ -251,7 +268,7 @@
     }
 
     /* =========================================================
-       TABLE WITH COLORED GRID BORDERS & SOLID ACTION BUTTON
+       TABLE WITH COLORED GRID BORDERS & ACTION BUTTONS
        ========================================================= */
     .table-custom {
         width: 100% !important;
@@ -316,11 +333,18 @@
         background-color: var(--ent-action-bg) !important;
     }
 
-    .table-custom td.action-cell-full>.btn {
+    .table-custom td.action-cell-full>.action-btn-group {
+        display: flex;
+        width: 100%;
+        height: 100%;
+        min-height: 52px;
+    }
+
+    .table-custom td.action-cell-full .btn-action-cell {
         display: flex !important;
         align-items: center;
         justify-content: center;
-        width: 100% !important;
+        flex: 1 1 0;
         height: 100% !important;
         min-height: 52px;
         border-radius: 0 !important;
@@ -331,20 +355,45 @@
         opacity: 1 !important;
         box-shadow: inset 0 0 0 1px rgba(79, 70, 229, 0.16);
         transition: background-color 0.15s ease, color 0.15s ease;
+        font-size: 0.78rem;
+        font-weight: 600;
+        padding: 6px 10px;
+        white-space: nowrap;
     }
 
-    .table-custom td.action-cell-full>.btn:hover:not(:disabled),
-    .table-custom tbody tr:hover td.action-cell-full>.btn:not(:disabled) {
+    .table-custom td.action-cell-full .btn-action-cell:hover:not(:disabled),
+    .table-custom tbody tr:hover td.action-cell-full .btn-action-cell:not(:disabled) {
         background-color: var(--ent-action-hover-bg) !important;
         color: var(--ent-action-hover-color) !important;
         opacity: 1 !important;
     }
 
-    .table-custom td.action-cell-full>.btn:disabled {
+    .table-custom td.action-cell-full .btn-trigger-aktifkan-single {
+        background-color: rgba(2, 132, 199, 0.14) !important;
+        color: #0284c7 !important;
+    }
+
+    [data-bs-theme="dark"] .table-custom td.action-cell-full .btn-trigger-aktifkan-single,
+    .dark .table-custom td.action-cell-full .btn-trigger-aktifkan-single {
+        color: #38bdf8 !important;
+    }
+
+    .table-custom td.action-cell-full .btn-trigger-aktifkan-single:hover:not(:disabled) {
+        background-color: #0284c7 !important;
+        color: #ffffff !important;
+    }
+
+    .table-custom td.action-cell-full .btn-action-cell:disabled {
         background-color: rgba(16, 185, 129, 0.12) !important;
         color: #10b981 !important;
         opacity: 1 !important;
         cursor: default;
+    }
+
+    .peserta-checkbox {
+        width: 17px;
+        height: 17px;
+        cursor: pointer;
     }
 
     .ent-card-body-flush {
@@ -416,7 +465,7 @@
                                 <span style="color: #94a3b8; font-size: 0.75rem; font-weight: 600;">Simpanan Pokok Awal</span>
                             </div>
                             <h4 class="mb-0 fw-bold" style="letter-spacing: -0.02em;color: white;">Menu Simpanan Pokok Awal Anggota</h4>
-                            <p class="mb-0 small" style="color: #cbd5e1;">Kelola setoran simpanan pokok pendaftaran anggota baru dan alokasi jurnal COA.</p>
+                            <p class="mb-0 small" style="color: #cbd5e1;">Kelola setoran simpanan pokok pendaftaran anggota baru, aktivasi peserta, dan alokasi jurnal COA.</p>
                         </div>
                     </div>
                     <div class="col-lg-4 text-lg-end">
@@ -487,9 +536,14 @@
             <i class="fas fa-users text-primary"></i>
             <h6 class="mb-0 fw-bold">Daftar Anggota Koperasi - Cabang: <strong class="text-primary" id="label-cabang">-</strong></h6>
         </div>
-        <span class="ent-badge" style="background: rgba(79, 70, 229, 0.14); color: #6366f1; border: 1px solid rgba(79, 70, 229, 0.3); font-family: 'JetBrains Mono', monospace;">
-            Tarif Pokok: Rp {{ number_format($nominal_simpanan_pokok, 0, ',', '.') }}
-        </span>
+        <div class="d-flex align-items-center flex-wrap gap-2">
+            <button type="button" id="btn-aktifkan-peserta-massal" class="btn ent-btn ent-btn-activate px-3 py-2" disabled onclick="aktifkanPesertaTerpilih()">
+                <i class="fas fa-user-check me-1"></i> Aktifkan Peserta Koperasi <span class="badge bg-white text-dark ms-1" id="selected-peserta-count">0</span>
+            </button>
+            <span class="ent-badge" style="background: rgba(79, 70, 229, 0.14); color: #6366f1; border: 1px solid rgba(79, 70, 229, 0.3); font-family: 'JetBrains Mono', monospace;">
+                Tarif Pokok: Rp {{ number_format($nominal_simpanan_pokok, 0, ',', '.') }}
+            </span>
+        </div>
     </div>
 
     <div class="card-body ent-card-body-flush">
@@ -497,11 +551,14 @@
             <table class="table table-custom align-middle mb-0 w-100">
                 <thead>
                     <tr>
-                        <th class="text-center" style="width: 5%;">#</th>
-                        <th style="width: 18%;">Kode Anggota</th>
-                        <th style="width: 30%;">Nama Lengkap</th>
-                        <th style="width: 22%;">NIK / NIP</th>
-                        <th class="text-center" style="width: 25%;">Status Pembayaran</th>
+                        <th class="text-center" style="width: 4%;">
+                            <input type="checkbox" id="check-all-peserta" class="form-check-input peserta-checkbox" title="Pilih semua peserta belum aktif yang tampil" onchange="togglePilihSemuaPeserta(this)">
+                        </th>
+                        <th class="text-center" style="width: 18%;">Aksi</th>
+                        <th style="width: 16%;">Kode Anggota</th>
+                        <th style="width: 26%;">Nama Lengkap</th>
+                        <th style="width: 18%;">NIK / NIP</th>
+                        <th class="text-center" style="width: 18%;">Status Pembayaran</th>
                     </tr>
                 </thead>
                 <tbody id="tabel-peserta-body">
@@ -591,7 +648,10 @@
 @endsection
 
 @section('base.js')
+<script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
 <script>
+    const URL_AKTIFKAN_PESERTA = "{{ Route::has('menu_koperasi_simpanan_pokok_aktifkan_peserta') ? route('menu_koperasi_simpanan_pokok_aktifkan_peserta') : url('/koperasi/menu-koperasi/simpanan-pokok/aktifkan-peserta') }}";
+
     function resolvePesertaPhotoUrl(rawPhoto) {
         if (!rawPhoto) return '';
         let clean = rawPhoto.toString().replace(/\\/g, '/').trim().replace(/^\/+/, '');
@@ -609,12 +669,156 @@
         return `{{ url('/') }}/${clean}`;
     }
 
+    function getCheckedPesertaIds() {
+        return Array.from(document.querySelectorAll('#tabel-peserta-body tr:not([style*="display: none"]) .peserta-checkbox:checked'))
+            .map(cb => cb.value);
+    }
+
+    function syncPilihSemuaCheckbox() {
+        const checkAll = document.getElementById('check-all-peserta');
+        if (!checkAll) return;
+        const visibleCheckboxes = Array.from(document.querySelectorAll('#tabel-peserta-body tr:not([style*="display: none"]) .peserta-checkbox'));
+        if (visibleCheckboxes.length === 0) {
+            checkAll.checked = false;
+            checkAll.indeterminate = false;
+            return;
+        }
+        const checkedCount = visibleCheckboxes.filter(cb => cb.checked).length;
+        checkAll.checked = checkedCount === visibleCheckboxes.length;
+        checkAll.indeterminate = checkedCount > 0 && checkedCount < visibleCheckboxes.length;
+    }
+
+    function updateTombolAktifkanMassal() {
+        const selectedIds = getCheckedPesertaIds();
+        const btn = document.getElementById('btn-aktifkan-peserta-massal');
+        const counter = document.getElementById('selected-peserta-count');
+        if (counter) counter.textContent = selectedIds.length;
+        if (btn) btn.disabled = selectedIds.length === 0;
+        syncPilihSemuaCheckbox();
+    }
+
+    function togglePilihSemuaPeserta(source) {
+        const visibleCheckboxes = document.querySelectorAll('#tabel-peserta-body tr:not([style*="display: none"]) .peserta-checkbox');
+        visibleCheckboxes.forEach(cb => {
+            cb.checked = source.checked;
+        });
+        updateTombolAktifkanMassal();
+    }
+
     function filterPesertaPokokRows() {
         const kw = (document.getElementById('search-peserta-pokok').value || '').toString().trim().toLowerCase();
         const rows = document.querySelectorAll('#tabel-peserta-body tr[data-search]');
         rows.forEach(row => {
             const hay = (row.getAttribute('data-search') || '').toLowerCase();
-            row.style.display = (!kw || hay.includes(kw)) ? '' : 'none';
+            const isMatch = !kw || hay.includes(kw);
+            row.style.display = isMatch ? '' : 'none';
+            if (!isMatch) {
+                const cb = row.querySelector('.peserta-checkbox');
+                if (cb) cb.checked = false;
+            }
+        });
+        updateTombolAktifkanMassal();
+    }
+
+    function notifyUser(icon, title, text) {
+        if (typeof Swal !== 'undefined') {
+            return Swal.fire({
+                icon: icon,
+                title: title,
+                text: text,
+                confirmButtonColor: '#4f46e5'
+            });
+        }
+        alert(`${title}: ${text}`);
+        return Promise.resolve();
+    }
+
+    function confirmActivation(title, htmlText) {
+        if (typeof Swal !== 'undefined') {
+            return Swal.fire({
+                title: title,
+                html: htmlText,
+                icon: 'question',
+                showCancelButton: true,
+                confirmButtonColor: '#0284c7',
+                cancelButtonColor: '#64748b',
+                confirmButtonText: '<i class="fas fa-user-check me-1"></i> Ya, Aktifkan',
+                cancelButtonText: 'Batal'
+            }).then(res => res.isConfirmed);
+        }
+        return Promise.resolve(confirm(title));
+    }
+
+    function kirimAktivasiPeserta(ids) {
+        const cabang = document.getElementById('select-cabang').value;
+        const btnMassal = document.getElementById('btn-aktifkan-peserta-massal');
+        if (btnMassal) btnMassal.disabled = true;
+
+        if (typeof Swal !== 'undefined') {
+            Swal.fire({
+                title: 'Mengaktifkan Peserta...',
+                text: 'Memperbarui status keanggotaan koperasi tanpa jurnal.',
+                allowOutsideClick: false,
+                didOpen: () => Swal.showLoading()
+            });
+        }
+
+        fetch(URL_AKTIFKAN_PESERTA, {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json',
+                'Accept': 'application/json',
+                'X-CSRF-TOKEN': '{{ csrf_token() }}'
+            },
+            body: JSON.stringify({
+                ids: ids,
+                id_kop_master_peserta: ids.length === 1 ? ids[0] : null,
+                cabang: cabang
+            })
+        })
+        .then(async response => {
+            const data = await response.json().catch(() => ({}));
+            if (!response.ok || data.status === 'error' || data.success === false) {
+                throw new Error(data.message || 'Gagal mengaktifkan peserta koperasi.');
+            }
+            return data;
+        })
+        .then(async res => {
+            await notifyUser('success', 'Berhasil Diaktifkan', res.message || `${ids.length} peserta koperasi berhasil diaktifkan.`);
+            document.getElementById('select-cabang').dispatchEvent(new Event('change'));
+        })
+        .catch(err => {
+            console.error(err);
+            notifyUser('error', 'Gagal Mengaktifkan', err.message || 'Terjadi kesalahan sistem saat mengaktifkan peserta.');
+            updateTombolAktifkanMassal();
+        });
+    }
+
+    function aktifkanPesertaSatuan(id, nama, kode) {
+        if (!id) return;
+        confirmActivation(
+            'Aktifkan Peserta Koperasi?',
+            `Aktifkan peserta <strong class="text-uppercase">${nama}</strong> (<code>${kode}</code>) menjadi <strong>AKTIF</strong> tanpa masuk jurnal?`
+        ).then(confirmed => {
+            if (confirmed) {
+                kirimAktivasiPeserta([id]);
+            }
+        });
+    }
+
+    function aktifkanPesertaTerpilih() {
+        const ids = getCheckedPesertaIds();
+        if (ids.length === 0) {
+            notifyUser('warning', 'Belum Ada Peserta Dipilih', 'Centang minimal satu peserta koperasi terlebih dahulu.');
+            return;
+        }
+        confirmActivation(
+            'Aktifkan Peserta Terpilih?',
+            `Anda akan mengaktifkan <strong>${ids.length} peserta koperasi</strong> sekaligus menjadi <strong>AKTIF</strong> tanpa masuk jurnal.`
+        ).then(confirmed => {
+            if (confirmed) {
+                kirimAktivasiPeserta(ids);
+            }
         });
     }
 
@@ -626,6 +830,13 @@
         const cardPeserta = document.getElementById('card-peserta');
         const labelCabang = document.getElementById('label-cabang');
         const tabelBody = document.getElementById('tabel-peserta-body');
+        const checkAll = document.getElementById('check-all-peserta');
+
+        if (checkAll) {
+            checkAll.checked = false;
+            checkAll.indeterminate = false;
+        }
+        updateTombolAktifkanMassal();
 
         if (!cabang) {
             cardPeserta.classList.add('d-none');
@@ -663,39 +874,61 @@
                         const isAktif = item.kop_master_peserta_status === 'AKTIF';
                         const badgeClass = isAktif ? 'badge-lunas' : 'badge-pending';
                         const badgeText = isAktif ? 'Lunas (Aktif)' : 'Belum Bayar (Pending)';
+                        const safeName = (item.kop_master_peserta_name || 'AG').toString();
+                        const escapedName = safeName.replace(/"/g, '&quot;').replace(/'/g, '&#39;');
+                        const escapedCode = (item.kop_master_peserta_code || '').toString().replace(/"/g, '&quot;').replace(/'/g, '&#39;');
 
+                        let checkboxCell = '';
                         let actionButton = '';
                         if (!isAktif) {
+                            checkboxCell = `
+                                <input type="checkbox"
+                                       class="form-check-input peserta-checkbox"
+                                       value="${item.id_kop_master_peserta}"
+                                       onchange="updateTombolAktifkanMassal()"
+                                       title="Pilih peserta untuk diaktifkan">
+                            `;
                             actionButton = `
-                                <button type="button"
-                                        class="btn btn-trigger-bayar"
-                                        data-id="${item.id_kop_master_peserta}"
-                                        data-nama="${item.kop_master_peserta_name}"
-                                        data-kode="${item.kop_master_peserta_code}"
-                                        title="Bayar Simpanan Pokok">
-                                    <i class="fas fa-coins me-1"></i> Bayar Pokok
-                                </button>
+                                <div class="action-btn-group">
+                                    <button type="button"
+                                            class="btn-action-cell btn-trigger-aktifkan-single"
+                                            onclick="aktifkanPesertaSatuan('${item.id_kop_master_peserta}', '${escapedCode}', '${escapedName}')"
+                                            title="Aktifkan Peserta Koperasi (Tanpa Jurnal)">
+                                        <i class="fas fa-user-check me-1"></i> Aktifkan
+                                    </button>
+                                    <button type="button"
+                                            class="btn-action-cell btn-trigger-bayar"
+                                            data-id="${item.id_kop_master_peserta}"
+                                            data-nama="${escapedName}"
+                                            data-kode="${escapedCode}"
+                                            title="Bayar Simpanan Pokok & Jurnal">
+                                        <i class="fas fa-coins me-1"></i> Bayar Pokok
+                                    </button>
+                                </div>
                             `;
                         } else {
+                            checkboxCell = `<span class="opacity-25">-</span>`;
                             actionButton = `
-                                <button type="button" class="btn" disabled>
-                                    <i class="fas fa-check-circle me-1"></i> Selesai
-                                </button>
+                                <div class="action-btn-group">
+                                    <button type="button" class="btn-action-cell" disabled>
+                                        <i class="fas fa-check-circle me-1"></i> Selesai
+                                    </button>
+                                </div>
                             `;
                         }
 
-                        const safeName = (item.kop_master_peserta_name || 'AG').toString();
                         const initial = safeName.substring(0, 2).toUpperCase();
                         const photoUrl = resolvePesertaPhotoUrl(item.kop_master_peserta_photo);
 
                         const photoHtml = photoUrl ?
-                            `<img src="${photoUrl}" alt="${safeName}" class="rounded-3 object-fit-cover flex-shrink-0" style="width: 36px; height: 36px; border: 1px solid var(--ent-grid-border);" onerror="this.style.display='none'; this.nextElementSibling.style.display='flex';"><div class="peserta-avatar" style="display: none;">${initial}</div>` :
+                            `<img src="${photoUrl}" alt="${escapedName}" class="rounded-3 object-fit-cover flex-shrink-0" style="width: 36px; height: 36px; border: 1px solid var(--ent-grid-border);" onerror="this.style.display='none'; this.nextElementSibling.style.display='flex';"><div class="peserta-avatar" style="display: none;">${initial}</div>` :
                             `<div class="peserta-avatar">${initial}</div>`;
 
                         const searchText = `${item.kop_master_peserta_code || ''} ${safeName} ${item.kop_master_peserta_nik || ''} ${item.kop_master_peserta_nip || ''}`.toLowerCase();
 
                         const row = `
                             <tr data-search="${searchText.replace(/"/g, '&quot;')}">
+                                <td class="text-center align-middle">${checkboxCell}</td>
                                 <td class="action-cell-full text-center align-middle">${actionButton}</td>
                                 <td class="fw-bold text-primary" style="font-family: 'JetBrains Mono', monospace;">${item.kop_master_peserta_code}</td>
                                 <td>
