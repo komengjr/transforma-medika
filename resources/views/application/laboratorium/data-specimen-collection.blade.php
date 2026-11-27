@@ -36,7 +36,6 @@
         font-family: 'Plus Jakarta Sans', sans-serif;
     }
 
-    /* Adaptive Enterprise Card */
     .ent-card {
         border: 1px solid var(--ent-grid-border);
         border-radius: 16px;
@@ -52,7 +51,6 @@
         padding: 14px 18px;
     }
 
-    /* Hero Banner */
     .ent-header-banner {
         background: linear-gradient(135deg, #0f172a 0%, #1e1b4b 55%, #312e81 100%);
         border: 1px solid rgba(99, 102, 241, 0.35);
@@ -82,7 +80,6 @@
         color: #ffffff;
     }
 
-    /* Badges */
     .ent-badge {
         border-radius: 9999px;
         padding: 4px 10px;
@@ -94,14 +91,32 @@
         letter-spacing: 0.03em;
     }
 
-    /* Buttons */
+    .specimen-chip {
+        font-family: 'JetBrains Mono', monospace;
+        background-color: rgba(79, 70, 229, 0.1);
+        color: #4338ca;
+        border: 1px solid rgba(79, 70, 229, 0.25);
+        padding: 2px 8px;
+        border-radius: 7px;
+        font-weight: 700;
+        font-size: 0.7rem;
+        display: inline-block;
+    }
+
+    [data-bs-theme="dark"] .specimen-chip,
+    .dark .specimen-chip {
+        background-color: rgba(129, 140, 248, 0.16);
+        color: #a5b4fc;
+        border-color: rgba(129, 140, 248, 0.32);
+    }
+
     .ent-btn {
         font-weight: 600 !important;
         border-radius: 10px;
         transition: all 0.18s ease;
         letter-spacing: 0.01em;
         cursor: pointer;
-        font-size: 0.82rem;
+        font-size: 0.8rem;
     }
 
     .ent-btn:hover {
@@ -120,7 +135,6 @@
         color: #ffffff;
     }
 
-    /* Form Controls & Scanner Input Group */
     .ent-field-label {
         font-size: 0.7rem;
         font-weight: 700;
@@ -171,12 +185,32 @@
     }
 
     .scan-input-group .form-control {
-        min-height: 46px !important;
+        min-height: 44px !important;
         font-family: 'JetBrains Mono', monospace !important;
-        font-size: 0.92rem !important;
+        font-size: 0.88rem !important;
     }
 
-    /* Status Indicator Pulse */
+    .specimen-item-card {
+        transition: all 0.16s ease;
+        cursor: pointer;
+        border: 1px solid var(--ent-grid-border) !important;
+        border-left: 4px solid var(--ent-grid-border) !important;
+        border-radius: 12px !important;
+        background-color: var(--bs-body-bg, var(--ent-solid-bg));
+    }
+
+    .specimen-item-card:hover {
+        border-color: rgba(79, 70, 229, 0.5) !important;
+        border-left-color: var(--ent-indigo) !important;
+        background-color: rgba(79, 70, 229, 0.05);
+    }
+
+    .specimen-list-container {
+        max-height: 360px;
+        overflow-y: auto;
+        padding-right: 4px;
+    }
+
     .ready-pill {
         background-color: rgba(16, 185, 129, 0.12);
         border: 1px solid rgba(16, 185, 129, 0.35);
@@ -222,7 +256,6 @@
         }
     }
 
-    /* Modern Adaptive Empty State */
     .empty-specimen-state {
         border: 1px dashed var(--ent-grid-border);
         border-radius: 16px;
@@ -250,7 +283,6 @@
         color: #a5b4fc;
     }
 
-    /* Modal Adaptive */
     .modal-ent-content {
         border: 1px solid var(--ent-grid-border) !important;
         border-radius: 18px !important;
@@ -267,9 +299,8 @@
 <div class="row mb-3">
     <div class="col-12">
         <div class="card ent-header-banner p-1">
-            <div class="card-body p-3 p-md-4 text-white position-relative" style="z-index: 2;">
+            <div class="card-body p-3 p-md-3 text-white position-relative" style="z-index: 2;">
                 <div class="row align-items-center gy-3">
-                    <!-- Brand & App Label -->
                     <div class="col-lg-8 d-flex align-items-center">
                         <div class="ent-glass-pill me-3 d-flex align-items-center justify-content-center flex-shrink-0"
                             style="width: 60px; height: 60px;">
@@ -289,7 +320,6 @@
                         </div>
                     </div>
 
-                    <!-- Date Indicator Pill -->
                     <div class="col-lg-4 text-lg-end">
                         <div class="ent-glass-pill px-3 py-2 d-inline-flex align-items-center gap-2">
                             <i class="fas fa-calendar-check text-info"></i>
@@ -303,45 +333,81 @@
 </div>
 
 <!-- MAIN TWO-COLUMN LAYOUT -->
-<div class="row g-3 g-md-4">
+<div class="row g-3">
     <!-- LEFT COLUMN: SCANNER & FILTER PANEL -->
     <div class="col-lg-4">
         <div class="sticky-sidebar">
             <div class="card ent-card">
                 <div class="card-header py-3 d-flex align-items-center justify-content-between">
-                    <h6 class="mb-0 fw-bold d-flex align-items-center gap-2">
-                        <i class="fas fa-microscope text-primary"></i>
-                        <span>Specimen Collection</span>
-                    </h6>
+                    <div>
+                        <h6 class="mb-0 fw-bold d-flex align-items-center gap-2">
+                            <i class="fas fa-microscope text-primary"></i>
+                            <span>Specimen Collection</span>
+                        </h6>
+                        <small class="opacity-75" style="font-size: 0.7rem;" id="specimenFilterInfo">
+                            Hari Ini: {{ $default_today ?? date('d/m/Y') }} ({{ count($data) }} data)
+                        </small>
+                    </div>
                     <span class="ready-pill">
                         <span class="pulse-indicator"></span> Ready
                     </span>
                 </div>
 
-                <div class="card-body p-3 p-md-4">
-                    <!-- Date Range Picker -->
-                    <div class="mb-3">
-                        <label for="timepicker3" class="ent-field-label">Rentang Tanggal</label>
-                        <div class="input-group ent-input-group">
-                            <span class="input-group-text"><i class="fas fa-calendar-alt"></i></span>
-                            <input class="form-control datetimepicker ent-input" id="timepicker3" type="text"
-                                placeholder="Pilih rentang tanggal..."
-                                data-options='{"mode":"range","dateFormat":"d/m/y","disableMobile":true,"locale":"en"}' />
+                <div class="card-body p-3">
+                    <!-- Form Pencarian: Ketik No. Reg & Range Tanggal -> Klik Cari -->
+                    <form id="formSearchSpecimenCollection" class="mb-3">
+                        <div class="mb-3">
+                            <label for="no_reg" class="ent-field-label">Scan Barcode / No. Registrasi</label>
+                            <div class="input-group ent-input-group scan-input-group">
+                                <span class="input-group-text"><i class="fas fa-qrcode"></i></span>
+                                <input type="text"
+                                    name="no_reg"
+                                    class="form-control ent-input fw-bold"
+                                    id="no_reg"
+                                    placeholder="Ketik / scan No. Registrasi..."
+                                    onkeydown="search(this)"
+                                    autofocus
+                                    autocomplete="off">
+                            </div>
                         </div>
+
+                        <div class="mb-3">
+                            <label for="timepicker3" class="ent-field-label">Range Tanggal</label>
+                            <div class="input-group ent-input-group">
+                                <span class="input-group-text"><i class="fas fa-calendar-alt"></i></span>
+                                <input class="form-control datetimepicker ent-input"
+                                    name="range_tanggal"
+                                    id="timepicker3"
+                                    type="text"
+                                    placeholder="Pilih rentang tanggal..."
+                                    data-options='{"mode":"range","dateFormat":"d/m/y","disableMobile":true,"locale":"en"}' />
+                            </div>
+                        </div>
+
+                        <div class="row g-2">
+                            <div class="col-8">
+                                <button type="submit" class="btn ent-btn ent-btn-primary w-100 py-2" id="btnSearchSpecimen">
+                                    <i class="fas fa-search me-1"></i> Cari
+                                </button>
+                            </div>
+                            <div class="col-4">
+                                <button type="button" class="btn ent-btn btn-outline-secondary w-100 py-2" id="btnResetSpecimenToday" title="Tampilkan Data Hari Ini">
+                                    <i class="fas fa-calendar-day me-1"></i> Hari Ini
+                                </button>
+                            </div>
+                        </div>
+                    </form>
+
+                    <hr class="my-3" style="border-color: var(--ent-grid-border); opacity: 1;">
+
+                    <!-- Daftar Spesimen Sesuai Filter -->
+                    <div class="d-flex justify-content-between align-items-center mb-2">
+                        <span class="ent-field-label mb-0">Daftar Antrean Spesimen</span>
+                        <span class="specimen-chip" id="specimenTotalBadge">{{ count($data) }} Data</span>
                     </div>
 
-                    <!-- Barcode/QR Scanner Input -->
-                    <div class="mb-1">
-                        <label for="no_reg" class="ent-field-label">Scan Barcode / No. Registrasi</label>
-                        <div class="input-group ent-input-group scan-input-group">
-                            <span class="input-group-text"><i class="fas fa-qrcode"></i></span>
-                            <input type="text" name="no_reg"
-                                class="form-control ent-input fw-bold" id="no_reg"
-                                placeholder="Arahkan scanner ke sini..." onkeydown="search(this)" autofocus autocomplete="off">
-                        </div>
-                        <small class="opacity-75 mt-2 d-block" style="font-size: 0.74rem;">
-                            <i class="fas fa-info-circle me-1 text-primary"></i>Tekan <strong>Enter</strong> setelah melakukan scanning.
-                        </small>
+                    <div class="d-flex flex-column gap-2 specimen-list-container" id="specimenQueueList">
+                        @include('application.laboratorium.speciment-collection.specimen-collection-list', ['data' => $data])
                     </div>
                 </div>
             </div>
@@ -351,7 +417,6 @@
     <!-- RIGHT COLUMN: DETAILED SPECIMEN CONTENT -->
     <div class="col-lg-8">
         <div id="menu-detail-specimen">
-            <!-- EMPTY STATE INITIAL DISPLAY -->
             <div class="empty-specimen-state">
                 <div class="mb-3">
                     <div class="empty-icon-wrap">
@@ -360,7 +425,7 @@
                 </div>
                 <h5 class="fw-bold mb-2">Belum Ada Spesimen Dipilih</h5>
                 <p class="small opacity-75 mb-0 mx-auto" style="max-width: 420px;">
-                    Silakan scan barcode spesimen pasien menggunakan kolom input di sebelah kiri untuk menampilkan detail pemeriksaan laboratorium.
+                    Silakan cari atau scan barcode spesimen pasien menggunakan kolom input di sebelah kiri untuk menampilkan detail pemeriksaan laboratorium.
                 </p>
             </div>
         </div>
@@ -407,6 +472,7 @@
 
 <script>
     let activeSpecimenSearchAjax = null;
+    let activeSpecimenListAjax = null;
 
     $(document).ready(function() {
         if ($('#example').length) {
@@ -416,7 +482,6 @@
         }
     });
 
-    // TOAST NOTIFICATION HELPER
     const Toast = Swal.mixin({
         toast: true,
         position: "top-end",
@@ -429,7 +494,6 @@
         }
     });
 
-    // LOADING SPINNER UI
     const loadingCard = `
         <div class="card ent-card">
             <div class="card-body text-center py-5">
@@ -437,77 +501,167 @@
                     <span class="visually-hidden">Loading...</span>
                 </div>
                 <h6 class="fw-bold mb-1">Mencari Data Spesimen...</h6>
-                <p class="opacity-75 small mb-0">Sistem sedang memproses barcode registrasi</p>
+                <p class="opacity-75 small mb-0">Sistem sedang memproses data registrasi</p>
             </div>
         </div>
     `;
+
+    function muatDaftarSpesimen(resetHariIni = false) {
+        const noReg = resetHariIni ? '' : ($('#no_reg').val() || '').trim();
+        const rangeTgl = resetHariIni ? '' : ($('#timepicker3').val() || '').trim();
+
+        if (activeSpecimenListAjax && activeSpecimenListAjax.readyState !== 4) {
+            activeSpecimenListAjax.abort();
+        }
+
+        $('#specimenQueueList').html(`
+            <div class="text-center py-3">
+                <div class="spinner-border spinner-border-sm text-primary me-2" role="status"></div>
+                <span class="small fw-semibold">Memuat daftar spesimen...</span>
+            </div>
+        `);
+
+        activeSpecimenListAjax = $.ajax({
+            url: "{{ route('data_specimen_collection_lab_search') }}",
+            type: "POST",
+            data: {
+                "_token": "{{ csrf_token() }}",
+                "no_registrasi": noReg,
+                "range_tanggal": rangeTgl
+            },
+            dataType: 'json'
+        }).done(function(res) {
+            if (res && res.status) {
+                $('#specimenQueueList').html(res.html);
+                $('#specimenTotalBadge').text(`${res.total} Data`);
+
+                if (resetHariIni || (!noReg && !rangeTgl)) {
+                    $('#specimenFilterInfo').text(`Hari Ini: {{ $default_today ?? date('d/m/Y') }} (${res.total} data)`);
+                } else {
+                    const info = [noReg ? `Reg: ${noReg}` : '', rangeTgl ? `Tgl: ${rangeTgl}` : ''].filter(Boolean).join(' • ');
+                    $('#specimenFilterInfo').text(`${info} (${res.total} data)`);
+                }
+            }
+        }).fail(function(xhr, status) {
+            if (status === 'abort') return;
+            $('#specimenQueueList').html(`
+                <div class="alert alert-danger rounded-3 py-2 small mb-0">
+                    <i class="fas fa-exclamation-triangle me-1"></i> Gagal memuat daftar spesimen.
+                </div>
+            `);
+        }).always(function() {
+            activeSpecimenListAjax = null;
+        });
+    }
+
+    function cariDetailSpesimenByCode(codeValue) {
+        const cleanCode = (codeValue || '').trim();
+        if (!cleanCode) {
+            Toast.fire({
+                icon: "error",
+                title: "No. Registrasi / Scan Tidak Boleh Kosong"
+            });
+            return;
+        }
+
+        if (activeSpecimenSearchAjax && activeSpecimenSearchAjax.readyState !== 4) {
+            activeSpecimenSearchAjax.abort();
+        }
+
+        $('#menu-detail-specimen').html(loadingCard);
+
+        activeSpecimenSearchAjax = $.ajax({
+            url: "{{ route('data_specimen_collection_lab_cari_data') }}",
+            type: "POST",
+            cache: false,
+            data: {
+                "_token": "{{ csrf_token() }}",
+                "code": cleanCode,
+            },
+            dataType: 'html',
+        }).done(function(data) {
+            const inputEl = document.getElementById('no_reg');
+            if (inputEl) {
+                inputEl.focus();
+            }
+
+            if (data.trim() === 'false') {
+                resetToEmptyState();
+                Toast.fire({
+                    icon: "warning",
+                    title: "Data Tidak Ditemukan"
+                });
+            } else if (data.trim() === 'done') {
+                resetToEmptyState();
+                Toast.fire({
+                    icon: "info",
+                    title: "Data Sudah di Handling"
+                });
+            } else if (data.trim() === 'not') {
+                resetToEmptyState();
+                Toast.fire({
+                    icon: "warning",
+                    title: "Pasien Belum Melakukan Handling"
+                });
+            } else {
+                $('#menu-detail-specimen').html(data);
+                Toast.fire({
+                    icon: "success",
+                    title: "Data Ditemukan"
+                });
+            }
+        }).fail(function(xhr, status) {
+            if (status === 'abort') return;
+            resetToEmptyState();
+            Toast.fire({
+                icon: "error",
+                title: "Gagal terhubung ke server. Silakan coba lagi."
+            });
+        }).always(function() {
+            activeSpecimenSearchAjax = null;
+        });
+    }
+
+    // Pencarian daftar & detail saat form / tombol "Cari" diklik
+    $('#formSearchSpecimenCollection').on('submit', function(e) {
+        e.preventDefault();
+        muatDaftarSpesimen(false);
+        const noReg = ($('#no_reg').val() || '').trim();
+        if (noReg !== '') {
+            cariDetailSpesimenByCode(noReg);
+        }
+    });
+
+    // Kembali ke data hari ini saja
+    $('#btnResetSpecimenToday').on('click', function() {
+        $('#no_reg').val('');
+        const fpInstance = document.getElementById('timepicker3')?._flatpickr;
+        if (fpInstance) {
+            fpInstance.clear();
+        } else {
+            $('#timepicker3').val('');
+        }
+        resetToEmptyState();
+        muatDaftarSpesimen(true);
+    });
+
+    // Klik item antrean spesimen untuk isi No. Reg & buka detail
+    $(document).on("click", ".specimen-item-card", function() {
+        const regNo = $(this).data("reg");
+        const labCode = $(this).data("code");
+        const targetCode = regNo || labCode;
+        if (targetCode) {
+            $('#no_reg').val(targetCode);
+            cariDetailSpesimenByCode(targetCode);
+        }
+    });
 
     function search(ele) {
         if (event.key === 'Enter') {
             event.preventDefault();
             var code = document.getElementById('no_reg').value;
-            if (code.trim() === "") {
-                Toast.fire({
-                    icon: "error",
-                    title: "Scan Tidak Boleh Kosong"
-                });
-            } else {
-                if (activeSpecimenSearchAjax && activeSpecimenSearchAjax.readyState !== 4) {
-                    activeSpecimenSearchAjax.abort();
-                }
-
-                $('#menu-detail-specimen').html(loadingCard);
-
-                activeSpecimenSearchAjax = $.ajax({
-                    url: "{{ route('data_specimen_collection_lab_cari_data') }}",
-                    type: "POST",
-                    cache: false,
-                    data: {
-                        "_token": "{{ csrf_token() }}",
-                        "code": code,
-                    },
-                    dataType: 'html',
-                }).done(function(data) {
-                    const inputEl = document.getElementById('no_reg');
-                    inputEl.value = "";
-                    inputEl.focus();
-
-                    if (data.trim() === 'false') {
-                        resetToEmptyState();
-                        Toast.fire({
-                            icon: "warning",
-                            title: "Data Tidak Ditemukan"
-                        });
-                    } else if (data.trim() === 'done') {
-                        resetToEmptyState();
-                        Toast.fire({
-                            icon: "info",
-                            title: "Data Sudah di Handling"
-                        });
-                    } else if (data.trim() === 'not') {
-                        resetToEmptyState();
-                        Toast.fire({
-                            icon: "warning",
-                            title: "Pasien Belum Melakukan Handling"
-                        });
-                    } else {
-                        $('#menu-detail-specimen').html(data);
-                        Toast.fire({
-                            icon: "success",
-                            title: "Data Ditemukan"
-                        });
-                    }
-                }).fail(function(xhr, status) {
-                    if (status === 'abort') return;
-                    resetToEmptyState();
-                    Toast.fire({
-                        icon: "error",
-                        title: "Gagal terhubung ke server. Silakan coba lagi."
-                    });
-                }).always(function() {
-                    activeSpecimenSearchAjax = null;
-                });
-            }
+            muatDaftarSpesimen(false);
+            cariDetailSpesimenByCode(code);
         }
     }
 
@@ -521,7 +675,7 @@
                 </div>
                 <h5 class="fw-bold mb-2">Belum Ada Spesimen Dipilih</h5>
                 <p class="small opacity-75 mb-0 mx-auto" style="max-width: 420px;">
-                    Silakan scan barcode spesimen pasien menggunakan kolom input di sebelah kiri untuk menampilkan detail pemeriksaan laboratorium.
+                    Silakan cari atau scan barcode spesimen pasien menggunakan kolom input di sebelah kiri untuk menampilkan detail pemeriksaan laboratorium.
                 </p>
             </div>
         `);

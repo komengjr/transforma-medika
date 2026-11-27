@@ -36,7 +36,6 @@
         font-family: 'Plus Jakarta Sans', sans-serif;
     }
 
-    /* Adaptive Enterprise Card */
     .ent-card {
         border: 1px solid var(--ent-grid-border);
         border-radius: 16px;
@@ -52,7 +51,6 @@
         padding: 14px 18px;
     }
 
-    /* Hero Banner */
     .ent-header-banner {
         background: linear-gradient(135deg, #0f172a 0%, #1e1b4b 55%, #312e81 100%);
         border: 1px solid rgba(99, 102, 241, 0.35);
@@ -82,7 +80,6 @@
         color: #ffffff;
     }
 
-    /* Badges & Chips */
     .ent-badge {
         border-radius: 9999px;
         padding: 4px 10px;
@@ -113,7 +110,6 @@
         border-color: rgba(129, 140, 248, 0.32);
     }
 
-    /* Form Controls & Input Groups */
     .ent-field-label {
         font-size: 0.68rem;
         font-weight: 700;
@@ -163,7 +159,18 @@
         border-radius: 0 10px 10px 0 !important;
     }
 
-    /* Patient Queue Cards */
+    .ent-btn {
+        font-weight: 600 !important;
+        border-radius: 10px;
+        font-size: 0.8rem;
+    }
+
+    .ent-btn-primary {
+        background: linear-gradient(135deg, #4f46e5 0%, #4338ca 100%);
+        border: none;
+        color: #ffffff;
+    }
+
     .patient-card {
         transition: all 0.16s ease;
         cursor: pointer;
@@ -189,9 +196,8 @@
         box-shadow: 0 8px 20px -6px rgba(79, 70, 229, 0.25);
     }
 
-    /* Scrollable Patient List */
     .patient-list-container {
-        max-height: 520px;
+        max-height: 500px;
         overflow-y: auto;
         padding-right: 4px;
     }
@@ -213,7 +219,6 @@
         background: var(--ent-indigo);
     }
 
-    /* Empty State & Modal Adaptive */
     .empty-result-state {
         border: 1px dashed var(--ent-grid-border);
         border-radius: 16px;
@@ -249,6 +254,13 @@
         color: var(--bs-body-color);
         overflow: hidden;
     }
+
+    @media (min-width: 992px) {
+        .sticky-sidebar {
+            position: sticky;
+            top: 16px;
+        }
+    }
 </style>
 @endsection
 
@@ -259,7 +271,6 @@
         <div class="card ent-header-banner p-1">
             <div class="card-body p-3 p-md-4 text-white position-relative" style="z-index: 2;">
                 <div class="row align-items-center gy-3">
-                    <!-- Brand & App Label -->
                     <div class="col-lg-8 d-flex align-items-center">
                         <div class="ent-glass-pill me-3 d-flex align-items-center justify-content-center flex-shrink-0"
                             style="width: 60px; height: 60px;">
@@ -279,7 +290,6 @@
                         </div>
                     </div>
 
-                    <!-- Date Indicator Pill -->
                     <div class="col-lg-4 text-lg-end">
                         <div class="ent-glass-pill px-3 py-2 d-inline-flex align-items-center gap-2">
                             <i class="fas fa-calendar-check text-info"></i>
@@ -299,54 +309,63 @@
         <div class="sticky-sidebar">
             <div class="card ent-card">
                 <div class="ent-card-header py-3 px-3 d-flex justify-content-between align-items-center">
-                    <h6 class="mb-0 fw-bold d-flex align-items-center gap-2">
-                        <i class="fas fa-list-alt text-primary"></i>
-                        <span>Antrean Pasien Lab</span>
-                    </h6>
-                    <span class="code-chip">{{ count($data) }} Pasien</span>
+                    <div>
+                        <h6 class="mb-0 fw-bold d-flex align-items-center gap-2">
+                            <i class="fas fa-list-alt text-primary"></i>
+                            <span>Antrean Pasien Lab</span>
+                        </h6>
+                        <small class="opacity-75" style="font-size: 0.7rem;" id="prosesResultFilterInfo">
+                            Hari Ini: {{ $default_today ?? date('d/m/Y') }}
+                        </small>
+                    </div>
+                    <span class="code-chip" id="prosesResultTotalBadge">{{ count($data) }} Pasien</span>
                 </div>
 
                 <div class="card-body p-3">
-                    <!-- FILTER AREA -->
-                    <div class="mb-3">
-                        <label for="timepicker3" class="ent-field-label">Rentang Tanggal</label>
+                    <!-- FILTER AREA: Ketik No. Reg & Range Tanggal -> Klik Cari -->
+                    <form id="formSearchProsesResult" class="mb-3">
+                        <label for="searchNoReg" class="ent-field-label">No. Registrasi</label>
                         <div class="input-group ent-input-group mb-2">
-                            <span class="input-group-text"><i class="fas fa-calendar-alt"></i></span>
-                            <input class="form-control datetimepicker ent-input" id="timepicker3" type="text" placeholder="Pilih rentang tanggal..." data-options='{"mode":"range","dateFormat":"d/m/y","disableMobile":true,"locale":"en"}' />
+                            <span class="input-group-text"><i class="fas fa-qrcode"></i></span>
+                            <input type="text"
+                                name="no_registrasi"
+                                class="form-control ent-input"
+                                id="searchNoReg"
+                                placeholder="Ketik / scan No. Registrasi..."
+                                autocomplete="off"
+                                style="font-family: 'JetBrains Mono', monospace;">
                         </div>
 
-                        <label for="no_reg" class="ent-field-label">Scan / Cari No Reg</label>
-                        <div class="input-group ent-input-group">
-                            <span class="input-group-text"><i class="fas fa-qrcode"></i></span>
-                            <input type="text" name="no_reg" class="form-control ent-input" id="no_reg" placeholder="Scan barcode / ketik No Reg..." onkeydown="if(typeof search === 'function') search(this)" autofocus autocomplete="off" style="font-family: 'JetBrains Mono', monospace;">
+                        <label for="searchDateRange" class="ent-field-label">Range Tanggal</label>
+                        <div class="input-group ent-input-group mb-2">
+                            <span class="input-group-text"><i class="fas fa-calendar-alt"></i></span>
+                            <input class="form-control datetimepicker ent-input"
+                                name="range_tanggal"
+                                id="searchDateRange"
+                                type="text"
+                                placeholder="Pilih rentang tanggal..."
+                                data-options='{"mode":"range","dateFormat":"d/m/y","disableMobile":true,"locale":"en"}' />
                         </div>
-                    </div>
+
+                        <div class="row g-2 pt-1">
+                            <div class="col-8">
+                                <button type="submit" class="btn ent-btn ent-btn-primary w-100 py-2" id="btnSearchProsesResult">
+                                    <i class="fas fa-search me-1"></i> Cari
+                                </button>
+                            </div>
+                            <div class="col-4">
+                                <button type="button" class="btn ent-btn btn-outline-secondary w-100 py-2" id="btnResetProsesToday" title="Tampilkan Antrean Hari Ini">
+                                    <i class="fas fa-calendar-day me-1"></i> Hari Ini
+                                </button>
+                            </div>
+                        </div>
+                    </form>
 
                     <hr class="my-3" style="border-color: var(--ent-grid-border); opacity: 1;">
 
                     <!-- LIST PASIEN / REGISTRASI -->
-                    <div class="patient-list-container">
-                        @forelse ($data as $datas)
-                            <div class="patient-card remove-class button-pilih-registrasi p-2" data-code="{{ $datas->registrasi_id }}">
-                                <div class="d-flex justify-content-between align-items-start gap-2 mb-1">
-                                    <h6 class="mb-0 fw-bold small">{{ $datas->master_patient_name }}</h6>
-                                    <span class="code-chip flex-shrink-0">{{ $datas->no_registrasi }}</span>
-                                </div>
-                                <div class="d-flex justify-content-between align-items-center small opacity-75 fw-semibold" style="font-size: 0.74rem;">
-                                    <span style="font-family: 'JetBrains Mono', monospace;">
-                                        <i class="far fa-clock me-1 text-primary"></i>{{ $datas->d_reg_order_lab_date }}
-                                    </span>
-                                    <span class="fw-bold text-primary">
-                                        {{ $datas->total_pemeriksaan }} Pemeriksaan <i class="fas fa-chevron-right ms-1"></i>
-                                    </span>
-                                </div>
-                            </div>
-                        @empty
-                            <div class="text-center py-4 opacity-75">
-                                <i class="fas fa-inbox fa-2x mb-2 text-primary"></i>
-                                <p class="small fw-semibold mb-0">Tidak ada antrean registrasi lab</p>
-                            </div>
-                        @endforelse
+                    <div class="patient-list-container" id="prosesResultPatientList">
+                        @include('application.laboratorium.proses-result.proses-result-list', ['data' => $data])
                     </div>
                 </div>
             </div>
@@ -356,7 +375,6 @@
     <!-- KANAN: DETAIL RESULT PASIEN -->
     <div class="col-lg-8">
         <div id="menu-detail-result">
-            <!-- Empty Placeholder -->
             <div class="empty-result-state">
                 <div class="mb-3">
                     <div class="empty-icon-wrap">
@@ -365,7 +383,7 @@
                 </div>
                 <h5 class="fw-bold mb-2">Pilih Pasien Lab</h5>
                 <p class="small opacity-75 mb-0 mx-auto" style="max-width: 420px;">
-                    Klik salah satu pasien dari antrean di sebelah kiri atau scan Barcode untuk memproses hasil laboratorium.
+                    Klik salah satu pasien dari antrean di sebelah kiri atau cari berdasarkan No. Registrasi &amp; Range Tanggal untuk memproses hasil laboratorium.
                 </p>
             </div>
         </div>
@@ -412,6 +430,65 @@
 
 <script>
     let activeResultDetailAjax = null;
+
+    function cariAntreanProsesResult(resetHariIni = false) {
+        const noReg = resetHariIni ? '' : ($('#searchNoReg').val() || '').trim();
+        const rangeTgl = resetHariIni ? '' : ($('#searchDateRange').val() || '').trim();
+
+        $('#prosesResultPatientList').html(`
+            <div class="text-center py-4">
+                <div class="spinner-border spinner-border-sm text-primary me-2" role="status"></div>
+                <span class="fw-semibold small">Mencari antrean pasien lab...</span>
+            </div>
+        `);
+
+        $.ajax({
+            url: "{{ route('menu_lab_proses_result_search') }}",
+            type: "POST",
+            data: {
+                "_token": "{{ csrf_token() }}",
+                "no_registrasi": noReg,
+                "range_tanggal": rangeTgl
+            },
+            dataType: 'json'
+        }).done(function(res) {
+            if (res && res.status) {
+                $('#prosesResultPatientList').html(res.html);
+                $('#prosesResultTotalBadge').text(`${res.total} Pasien`);
+
+                if (resetHariIni || (!noReg && !rangeTgl)) {
+                    $('#prosesResultFilterInfo').text(`Hari Ini: {{ $default_today ?? date('d/m/Y') }}`);
+                } else {
+                    const info = [noReg ? `Reg: ${noReg}` : '', rangeTgl ? `Tgl: ${rangeTgl}` : ''].filter(Boolean).join(' • ');
+                    $('#prosesResultFilterInfo').text(info);
+                }
+            }
+        }).fail(function() {
+            $('#prosesResultPatientList').html(`
+                <div class="alert alert-danger rounded-3 py-2 small mb-0" role="alert">
+                    <i class="fas fa-exclamation-triangle me-1"></i> Gagal memuat hasil pencarian.
+                </div>
+            `);
+        });
+    }
+
+    // Pencarian hanya dijalankan saat form disubmit / tombol "Cari" diklik
+    $('#formSearchProsesResult').on('submit', function(e) {
+        e.preventDefault();
+        cariAntreanProsesResult(false);
+    });
+
+    // Kembali ke data hari ini saja
+    $('#btnResetProsesToday').on('click', function() {
+        $('#searchNoReg').val('');
+        const fpInstance = document.getElementById('searchDateRange')?._flatpickr;
+        if (fpInstance) {
+            fpInstance.clear();
+        } else {
+            $('#searchDateRange').val('');
+        }
+        cariAntreanProsesResult(true);
+    });
 
     // Event listener untuk klik antrean registrasi pasien lab di sebelah kiri
     $(document).on("click", ".button-pilih-registrasi", function(e) {

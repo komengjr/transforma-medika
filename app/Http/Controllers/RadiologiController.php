@@ -3,6 +3,7 @@
 namespace App\Http\Controllers;
 
 use Illuminate\Http\Request;
+use Illuminate\Support\Carbon;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Hash;
@@ -486,7 +487,7 @@ class RadiologiController extends Controller
             );
         }
 
-        // 3. Query Detail Pemeriksaan List
+        // 3. Query Detail Pemeriksaan List (status pembayaran dicek pada medical_transaksi_detail)
         $pemeriksaanList = DB::table('medical_transaksi_detail as td')
             ->join('medical_transaksi as t', 'td.transaksi_id', '=', 't.id')
             ->join('medical_master_pemeriksaan as mp', 'td.master_pemeriksaan_id', '=', 'mp.id')
@@ -502,9 +503,10 @@ class RadiologiController extends Controller
                 'td.id as detail_id',
                 'td.no_pemeriksaan as order_rad_list_code',
                 'td.status_pemeriksaan',
+                'td.status_pembayaran as detail_status_pembayaran',
+                't.status_pembayaran as transaksi_status_pembayaran',
                 'mp.kode_layanan as t_pemeriksaan_list_code',
                 'mp.nama_layanan as nama_pemeriksaan',
-                't.status_pembayaran',
                 'log.waktu_mulai',
                 'log.waktu_selesai',
                 'log.durasi_pengerjaan_menit',
@@ -512,8 +514,10 @@ class RadiologiController extends Controller
             )
             ->get();
 
-        // 4. Loop parameter ekspertise & validasi kesiapan
-        $pemeriksaanList->transform(function ($item) {
+        $paidStatuses = ['LUNAS', 'SEBAGIAN', 'ASURANSI'];
+
+        // 4. Loop parameter ekspertise & validasi kesiapan per item detail
+        $pemeriksaanList->transform(function ($item) use ($paidStatuses) {
             if (!empty($item->t_pemeriksaan_list_code)) {
                 $item->parameters = DB::table('t_pemeriksaan_list_val')
                     ->where('t_pemeriksaan_list_code', $item->t_pemeriksaan_list_code)
@@ -522,17 +526,30 @@ class RadiologiController extends Controller
                 $item->parameters = collect([]);
             }
 
-            // Validasi: Form aktif jika pembayaran valid & status handling minimal sudah proses/selesai
-            $isPaid = in_array($item->status_pembayaran, ['LUNAS', 'SEBAGIAN', 'ASURANSI']);
-            $item->is_ready = $isPaid && in_array($item->status_pemeriksaan, ['PROSES', 'SELESAI']);
+            // Prioritas utama pada status pembayaran di medical_transaksi_detail
+            $effectivePaymentStatus = strtoupper(trim((string) ($item->detail_status_pembayaran ?? $item->transaksi_status_pembayaran ?? '')));
+            $item->status_pembayaran = $effectivePaymentStatus;
+            $item->is_paid = in_array($effectivePaymentStatus, $paidStatuses, true);
+
+            // Form ekspertise aktif jika item transaksi detail sudah lunas/valid & status pemeriksaan PROSES/SELESAI
+            $item->is_ready = $item->is_paid && in_array(strtoupper((string)$item->status_pemeriksaan), ['PROSES', 'SELESAI'], true);
 
             return $item;
         });
 
+        // Minimal ada 1 item detail radiologi yang lunas/terbayar agar panel PACS & Ekspertise dapat dibuka
+        $hasAnyPaidItem = $pemeriksaanList->contains(function ($item) {
+            return $item->is_paid;
+        });
+
+        $fallbackDicomUrl = asset('dicom/data.dcm');
+
         return view('application.radiologi.radiologi-handling.form-handling-pasien', [
-            'data'            => $data,
-            'pemeriksaanList' => $pemeriksaanList,
-            'code'            => $code
+            'data'              => $data,
+            'pemeriksaanList'   => $pemeriksaanList,
+            'hasAnyPaidItem'    => $hasAnyPaidItem,
+            'fallbackDicomUrl'  => $fallbackDicomUrl,
+            'code'              => $code
         ]);
     }
     public function mulaiHandling(Request $request)
@@ -659,14 +676,12 @@ class RadiologiController extends Controller
             'code'            => $code
         ]);
     }
-    // 1. FUNGSI MENAMPILKAN FORM (Telah Diperbarui dengan Logika Kunci Form)
     public function menu_radiologi_verifikasi_handling_pasien(Request $request)
     {
         $registrasiId = $request->input('code');
         $orderRadCode = $request->input('reg');
 
         $dataPasien = DB::table('medical_registrasi as r')
-            ->join('medical_transaksi as t', 't.registrasi_id', '=', 'r.id')
             ->join('medical_patient as p', 'r.pasien_id', '=', 'p.id')
             ->select(
                 'r.id as registrasi_id',
@@ -679,42 +694,60 @@ class RadiologiController extends Controller
                 'p.no_hp as master_patient_no_hp',
                 'p.tempat_lahir as master_patient_tempat_lahir',
                 'p.agama as master_patient_agama',
-                'p.foto as master_patient_profile',
-                't.status_pembayaran'
+                'p.foto as master_patient_profile'
             )
             ->where('r.id', $registrasiId)
+            ->whereNull('r.deleted_at')
             ->first();
 
         if (!$dataPasien) {
             return "<div class='alert alert-danger p-3 rounded-3'>Data pasien tidak ditemukan.</div>";
         }
 
-        $pemeriksaanList = DB::table('medical_transaksi_detail as td')
-            ->join('medical_master_pemeriksaan as mp', 'td.master_pemeriksaan_id', '=', 'mp.id')
-            ->select(
-                'td.id as detail_id',
-                'td.no_pemeriksaan as order_rad_list_code',
-                'mp.kode_layanan as t_pemeriksaan_list_code',
-                'mp.nama_layanan as nama_pemeriksaan',
-                'td.status_pemeriksaan'
-            )
-            ->where('td.transaksi_id', function ($query) use ($registrasiId) {
-                $query->select('id')->from('medical_transaksi')->where('registrasi_id', $registrasiId)->limit(1);
-            })
-            ->where('td.no_pemeriksaan', 'LIKE', 'RAD%')
-            ->whereNull('td.deleted_at')
-            ->get();
+        $transaksiIds = DB::table('medical_transaksi')
+            ->where('registrasi_id', $registrasiId)
+            ->whereNull('deleted_at')
+            ->pluck('id');
 
+        $pemeriksaanList = collect();
+        if ($transaksiIds->isNotEmpty()) {
+            $pemeriksaanList = DB::table('medical_transaksi_detail as td')
+                ->join('medical_master_pemeriksaan as mp', 'td.master_pemeriksaan_id', '=', 'mp.id')
+                ->select(
+                    'td.id as detail_id',
+                    'td.master_pemeriksaan_id',
+                    'td.no_pemeriksaan as order_rad_list_code',
+                    'td.nama_item',
+                    'mp.kode_layanan as t_pemeriksaan_list_code',
+                    'mp.nama_layanan as nama_pemeriksaan',
+                    'td.status_pemeriksaan',
+                    'td.status_pembayaran as detail_status_pembayaran',
+                    'td.waktu_bayar'
+                )
+                ->whereIn('td.transaksi_id', $transaksiIds)
+                ->where('td.no_pemeriksaan', 'LIKE', 'RAD%')
+                ->whereNull('td.deleted_at')
+                ->get();
+        }
+
+        $paidCount = 0;
         foreach ($pemeriksaanList as $item) {
+            $payStatus = strtoupper($item->detail_status_pembayaran ?? 'BELUM LUNAS');
+            $item->status_pembayaran = $payStatus;
+            $item->is_paid = ($payStatus === 'LUNAS');
+            if ($item->is_paid) {
+                $paidCount++;
+            }
+
             $status = strtolower($item->status_pemeriksaan ?? '');
             $item->is_ready = ($status === 'proses' || $status === 'selesai');
 
-            // Ambil Data Header Tersimpan
-            $savedHeader = DB::table('medical_radiologi_hasil')->where('transaksi_detail_id', $item->detail_id)->first();
+            $savedHeader = DB::table('medical_radiologi_hasil')
+                ->where('transaksi_detail_id', $item->detail_id)
+                ->first();
             $item->saved_header = $savedHeader;
 
-            // FLAG PENTING: Cek apakah sudah diverifikasi final
-            $item->is_verified = ($savedHeader && $savedHeader->status_verifikasi === 'VERIFIED');
+            $item->is_verified = ($savedHeader && strtoupper($savedHeader->status_verifikasi ?? '') === 'VERIFIED');
 
             $item->parameters = DB::table('medical_master_pemeriksaan_parameter as mpp')
                 ->select(
@@ -726,26 +759,42 @@ class RadiologiController extends Controller
                     'mpp.opsi_input as t_pem_list_val_opt_code',
                     'mpp.baris_textarea as t_pem_list_val_kali'
                 )
-                ->where('mpp.master_pemeriksaan_id', function ($q) use ($item) {
-                    $q->select('id')->from('medical_master_pemeriksaan')->where('kode_layanan', $item->t_pemeriksaan_list_code)->first();
-                })
+                ->where('mpp.master_pemeriksaan_id', $item->master_pemeriksaan_id)
                 ->get();
 
             $savedDetails = collect();
             if ($savedHeader) {
                 $savedDetails = DB::table('medical_radiologi_hasil_detail')
-                    ->where('radiologi_hasil_id', $savedHeader->id)->get()->keyBy('parameter_code');
+                    ->where('radiologi_hasil_id', $savedHeader->id)
+                    ->get()
+                    ->keyBy('parameter_code');
             }
 
             foreach ($item->parameters as $param) {
-                $param->saved_value = $savedDetails->has($param->t_pem_list_val_code) ? $savedDetails[$param->t_pem_list_val_code]->nilai_hasil : '';
+                $param->saved_value = $savedDetails->has($param->t_pem_list_val_code)
+                    ? $savedDetails[$param->t_pem_list_val_code]->nilai_hasil
+                    : '';
             }
         }
 
+        $totalItems = $pemeriksaanList->count();
+        $hasAnyPaidItem = ($paidCount > 0);
+
+        if ($totalItems > 0 && $paidCount === $totalItems) {
+            $dataPasien->status_pembayaran = 'LUNAS';
+        } elseif ($paidCount > 0) {
+            $dataPasien->status_pembayaran = 'SEBAGIAN';
+        } else {
+            $dataPasien->status_pembayaran = 'BELUM LUNAS';
+        }
+
         return view('application.radiologi.verifikasi-hasil.form-verifikasi-hasil-pasien', [
-            'data'            => $dataPasien,
-            'pemeriksaanList' => $pemeriksaanList,
-            'code'            => $registrasiId
+            'data'             => $dataPasien,
+            'pemeriksaanList'  => $pemeriksaanList,
+            'code'             => $registrasiId,
+            'reg'              => $orderRadCode,
+            'hasAnyPaidItem'   => $hasAnyPaidItem,
+            'fallbackDicomUrl' => asset('dicom/data.dcm'),
         ]);
     }
     public function simpan_hasil_ekspertise(\Illuminate\Http\Request $request)
@@ -1081,8 +1130,6 @@ class RadiologiController extends Controller
             return Redirect::to('dashboard/home');
         }
     }
-
-    // 2. Fungsi BARU untuk mengambil data JSON (dipanggil via AJAX)
     public function getDataVerifikasiRadiologi(\Illuminate\Http\Request $request)
     {
         $tglAwal     = $request->input('tgl_awal', date('Y-m-d'));
@@ -1244,12 +1291,18 @@ class RadiologiController extends Controller
     }
     public function hasil_radiologi_verifikasi_data(Request $request)
     {
-        $registrasiId = $request->code; // ID Registrasi
-        $orderRadListCode = $request->reg; // Nomor detail pemeriksaan (order_rad_list_code)
+        $registrasiId = $request->code;       // ID Registrasi
+        $orderRadListCode = $request->reg;   // Nomor pemeriksaan (no_pemeriksaan / order_rad_list_code)
 
-        // 1. Ambil Data Pasien (Tanpa join users yang bermasalah)
+        if (empty($registrasiId) || empty($orderRadListCode)) {
+            return response()->json([
+                'status'  => false,
+                'message' => 'Parameter registrasi atau nomor pemeriksaan tidak lengkap.',
+            ], 422);
+        }
+
+        // 1. Ambil Data Pasien & Registrasi
         $dataPasien = DB::table('medical_registrasi as r')
-            ->join('medical_transaksi as t', 't.registrasi_id', '=', 'r.id')
             ->join('medical_patient as p', 'r.pasien_id', '=', 'p.id')
             ->select(
                 'r.id as registrasi_id',
@@ -1262,17 +1315,21 @@ class RadiologiController extends Controller
                 'r.created_at'
             )
             ->where('r.id', $registrasiId)
+            ->whereNull('r.deleted_at')
             ->first();
 
         if (!$dataPasien) {
-            return "Data registrasi pasien tidak ditemukan.";
+            return response()->json([
+                'status'  => false,
+                'message' => 'Data registrasi pasien tidak ditemukan.',
+            ], 404);
         }
 
-        // Tambahkan properti default untuk dokter rujukan agar aman dipanggil di PDF
         $dataPasien->dokter_rujukan = 'Dokter Rujukan / Luar';
 
-        // 2. Ambil Header Ekspertise & Master Layanan
+        // 2. Ambil Header Ekspertise & Master Layanan sesuai registrasi & no_pemeriksaan
         $pemeriksaanList = DB::table('medical_transaksi_detail as td')
+            ->join('medical_transaksi as t', 'td.transaksi_id', '=', 't.id')
             ->join('medical_master_pemeriksaan as mp', 'td.master_pemeriksaan_id', '=', 'mp.id')
             ->join('medical_radiologi_hasil as mrh', 'mrh.transaksi_detail_id', '=', 'td.id')
             ->select(
@@ -1287,8 +1344,18 @@ class RadiologiController extends Controller
                 'mrh.dokter_radiolog',
                 'mrh.tanggal_verifikasi'
             )
+            ->where('t.registrasi_id', $registrasiId)
             ->where('td.no_pemeriksaan', $orderRadListCode)
+            ->whereNull('t.deleted_at')
+            ->whereNull('td.deleted_at')
             ->get();
+
+        if ($pemeriksaanList->isEmpty()) {
+            return response()->json([
+                'status'  => false,
+                'message' => 'Data hasil ekspertise radiologi belum tersedia untuk dicetak.',
+            ], 404);
+        }
 
         // 3. Ambil Detail Ekspertise untuk setiap pemeriksaan
         foreach ($pemeriksaanList as $pem) {
@@ -1297,34 +1364,34 @@ class RadiologiController extends Controller
                 ->get();
         }
 
-        $image = base64_encode(file_get_contents(public_path('img/logo.png')));
+        $logoPath = public_path('img/logo.png');
+        $image = file_exists($logoPath) ? base64_encode(file_get_contents($logoPath)) : '';
 
-        // Render PDF
-        $pdf = \Barryvdh\DomPDF\Facade\Pdf::loadview('application.radiologi.verifikasi-hasil.report.report-hasil-radiologi', [
-            'code'            => $registrasiId,
-            'reg'             => $orderRadListCode,
-            'data'            => $dataPasien,
-            'pemeriksaanList' => $pemeriksaanList,
-        ], compact('image'))->setPaper('A4', 'portrait')->setOptions(['defaultFont' => 'Helvetica']);
+        // 4. Render & Simpan PDF sekali proses
+        $pdf = \Barryvdh\DomPDF\Facade\Pdf::loadView(
+            'application.radiologi.verifikasi-hasil.report.report-hasil-radiologi',
+            [
+                'code'            => $registrasiId,
+                'reg'             => $orderRadListCode,
+                'data'            => $dataPasien,
+                'pemeriksaanList' => $pemeriksaanList,
+                'image'           => $image,
+            ]
+        )->setPaper('A4', 'portrait')->setOptions(['defaultFont' => 'Helvetica']);
 
         $pdf->output();
         $canvas = $pdf->getDomPDF()->getCanvas();
-        $canvas->page_script('
-        $pdf->image("img/cover.png", 12, 12, 575, 823);
-    ');
+        if (file_exists(public_path('img/cover.png'))) {
+            $canvas->page_script('
+            $pdf->image("img/cover.png", 12, 12, 575, 823);
+        ');
+        }
 
-        // Password Enkripsi PDF berdasarkan tanggal lahir
         $tglLahir = $dataPasien->master_patient_tgl_lahir ?? date('Y-m-d');
-        $pdf->get_canvas()->get_cpdf()->setEncryption("admin", date('dmY', strtotime($tglLahir)));
+        $pdf->get_canvas()->get_cpdf()->setEncryption('admin', date('dmY', strtotime($tglLahir)));
 
-        // Proses penyimpanan PDF ke storage
-        $file = base64_encode($pdf->stream());
-        $base64Pdf = 'data:application/pdf;base64,' . $file;
-        list($type, $data) = explode(';', $base64Pdf);
-        list(, $data) = explode(',', $data);
-        $pdfBinaryData = base64_decode($data);
-
-        $tempPdfPath = storage_path('app/public/hasil/rad/' . $request->reg . '.pdf');
+        $pdfBinaryData = $pdf->output();
+        $tempPdfPath = storage_path('app/public/hasil/rad/' . $orderRadListCode . '.pdf');
 
         if (!file_exists(dirname($tempPdfPath))) {
             mkdir(dirname($tempPdfPath), 0755, true);
@@ -1332,7 +1399,22 @@ class RadiologiController extends Controller
 
         file_put_contents($tempPdfPath, $pdfBinaryData);
 
-        return 'berhasil';
+        // 5. Update status hasil pada medical_radiologi_hasil (sesuaikan nama kolom jika berbeda)
+        $hasilIds = $pemeriksaanList->pluck('radiologi_hasil_id')->filter()->values();
+        if ($hasilIds->isNotEmpty()) {
+            DB::table('medical_radiologi_hasil')
+                ->whereIn('id', $hasilIds)
+                ->update([
+                    'status_verifikasi' => 'VERIFIED',
+                    'updated_at'        => now(),
+                ]);
+        }
+
+        return response()->json([
+            'status'  => true,
+            'message' => 'berhasil',
+            'pdf_url' => asset('storage/hasil/rad/' . $orderRadListCode . '.pdf'),
+        ]);
     }
     public function hasil_radiologi_verifikasi_data_old(Request $request)
     {
@@ -1367,17 +1449,106 @@ class RadiologiController extends Controller
         return 'berhasil';
     }
     // DOKUMENTASI HASIL RADIOLOGI
-    public function hasil_radiologi_dokumnatasi($akses, $id)
+    public function hasil_radiologi_dokumnatasi(Request $request, $akses, $id)
     {
-        if ($this->url_akses_sub($akses, $id) == true) {
-            $data = DB::table('d_reg_order_rad')
-                ->join('d_reg_order', 'd_reg_order.d_reg_order_code', '=', 'd_reg_order_rad.d_reg_order_code')
-                ->join('master_patient', 'master_patient.master_patient_code', '=', 'd_reg_order.d_reg_order_rm')
-                ->get();
-            return view('application.radiologi.dokumentasi-hasil-radiologi', ['data' => $data, 'akses' => $akses, 'code' => $id]);
-        } else {
+        if ($this->url_akses_sub($akses, $id) != true) {
             return Redirect::to('dashboard/home');
         }
+
+        $today = Carbon::today()->toDateString(); // YYYY-MM-DD
+
+        $tglAwalInput = $request->input('tgl_awal');
+        $tglAkhirInput = $request->input('tgl_akhir');
+        $noRegFilter = trim((string) $request->input('no_reg', ''));
+
+        if ($request->filled('range_tanggal') && (!$tglAwalInput || !$tglAkhirInput)) {
+            $parts = preg_split('/\s*(?:to|-)\s*/i', trim($request->input('range_tanggal')));
+            if (!empty($parts[0])) {
+                try {
+                    $tglAwalInput = Carbon::createFromFormat('d/m/Y', $parts[0])->toDateString();
+                } catch (\Exception $e) {
+                    $tglAwalInput = $today;
+                }
+            }
+            if (!empty($parts[1])) {
+                try {
+                    $tglAkhirInput = Carbon::createFromFormat('d/m/Y', $parts[1])->toDateString();
+                } catch (\Exception $e) {
+                    $tglAkhirInput = $tglAwalInput;
+                }
+            } elseif (!empty($tglAwalInput)) {
+                $tglAkhirInput = $tglAwalInput;
+            }
+        }
+
+        $tglAwal = $tglAwalInput ? Carbon::parse($tglAwalInput)->toDateString() : $today;
+        $tglAkhir = $tglAkhirInput ? Carbon::parse($tglAkhirInput)->toDateString() : $tglAwal;
+
+        $query = DB::table('medical_transaksi_detail as td')
+            ->join('medical_transaksi as t', 'td.transaksi_id', '=', 't.id')
+            ->join('medical_registrasi as r', 't.registrasi_id', '=', 'r.id')
+            ->join('medical_patient as p', 'r.pasien_id', '=', 'p.id')
+            ->leftJoin('medical_master_pemeriksaan as mp', 'td.master_pemeriksaan_id', '=', 'mp.id')
+            ->leftJoin('medical_radiologi_hasil as mrh', 'mrh.transaksi_detail_id', '=', 'td.id')
+            ->select(
+                'r.id as registrasi_id',
+                'r.no_registrasi',
+                'r.no_registrasi as d_reg_order_code',
+                'r.tanggal_registrasi',
+                'r.created_at',
+                'p.pid as master_patient_code',
+                'p.nama as master_patient_name',
+                'p.no_id as master_patient_nik',
+                'td.id as detail_id',
+                'td.no_pemeriksaan',
+                'td.no_pemeriksaan as d_reg_order_rad_code',
+                'td.nama_item',
+                'mp.nama_layanan',
+                'td.status_pemeriksaan',
+                'td.status_pembayaran',
+                'mrh.id as radiologi_hasil_id',
+                'mrh.status_verifikasi',
+                'mrh.tanggal_verifikasi'
+            )
+            ->where('td.no_pemeriksaan', 'LIKE', 'RAD%')
+            ->whereNull('td.deleted_at')
+            ->whereNull('t.deleted_at')
+            ->whereNull('r.deleted_at')
+            ->whereDate('r.tanggal_registrasi', '>=', $tglAwal)
+            ->whereDate('r.tanggal_registrasi', '<=', $tglAkhir);
+
+        if ($noRegFilter !== '') {
+            $query->where(function ($q) use ($noRegFilter) {
+                $q->where('r.no_registrasi', 'LIKE', '%' . $noRegFilter . '%')
+                    ->orWhere('td.no_pemeriksaan', 'LIKE', '%' . $noRegFilter . '%')
+                    ->orWhere('p.nama', 'LIKE', '%' . $noRegFilter . '%')
+                    ->orWhere('p.pid', 'LIKE', '%' . $noRegFilter . '%')
+                    ->orWhere('p.no_id', 'LIKE', '%' . $noRegFilter . '%');
+            });
+        }
+
+        $data = $query->orderByDesc('r.tanggal_registrasi')->get();
+
+        foreach ($data as $row) {
+            $row->status_label = strtoupper($row->status_verifikasi ?? '') === 'VERIFIED'
+                ? 'VERIFIED'
+                : (strtoupper($row->status_pemeriksaan ?? '') ?: 'MENUNGGU');
+        }
+
+        $displayRange = Carbon::parse($tglAwal)->format('d/m/Y');
+        if ($tglAkhir !== $tglAwal) {
+            $displayRange .= ' to ' . Carbon::parse($tglAkhir)->format('d/m/Y');
+        }
+
+        return view('application.radiologi.dokumentasi-hasil-radiologi', [
+            'data'         => $data,
+            'akses'        => $akses,
+            'code'         => $id,
+            'tglAwal'      => $tglAwal,
+            'tglAkhir'     => $tglAkhir,
+            'noRegFilter'  => $noRegFilter,
+            'displayRange' => $displayRange,
+        ]);
     }
     public function dokumentasi_hasil_radiologi_detail(Request $request)
     {

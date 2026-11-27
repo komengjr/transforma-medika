@@ -1,3 +1,8 @@
+@php
+$canAccessVerification = !empty($hasAnyPaidItem) || in_array(strtoupper($data->status_pembayaran ?? ''), ['LUNAS', 'SEBAGIAN']);
+$resolvedFallbackDicom = $fallbackDicomUrl ?? asset('dicom/data.dcm');
+@endphp
+
 <!-- HEADER UTAMA VERIFIKASI & EKSPERTISE RADIOLOGI -->
 <div class="row g-3 mb-3">
     <div class="col-12">
@@ -25,19 +30,19 @@
                                 @endif
                             </div>
                             <h5 class="fw-bold mb-0 text-white" style="letter-spacing: -0.02em;">
-                                Verifikasi & Pengisian Ekspertise Hasil Radiologi
+                                Verifikasi &amp; Pengisian Ekspertise Hasil Radiologi
                             </h5>
                         </div>
                     </div>
 
                     <div class="d-flex align-items-center gap-2">
-                        @if(in_array($data->status_pembayaran ?? '', ['LUNAS', 'SEBAGIAN']))
+                        @if($canAccessVerification)
                         <span class="ent-badge px-3 py-2" style="background: rgba(5, 150, 105, 0.22); color: #6ee7b7; border: 1px solid rgba(5, 150, 105, 0.45);">
-                            <i class="fas fa-check-circle me-1"></i> {{ $data->status_pembayaran }}
+                            <i class="fas fa-check-circle me-1"></i> {{ $data->status_pembayaran ?? 'TERBAYAR' }}
                         </span>
                         @else
                         <span class="ent-badge px-3 py-2" style="background: rgba(225, 29, 72, 0.22); color: #fda4af; border: 1px solid rgba(225, 29, 72, 0.45);">
-                            <i class="fas fa-times-circle me-1"></i> {{ $data->status_pembayaran ?? 'BELUM LUNAS' }}
+                            <i class="fas fa-times-circle me-1"></i> {{ $data->status_pembayaran ?? 'LUNAS' }}
                         </span>
                         @endif
                     </div>
@@ -59,7 +64,6 @@
             </div>
             <div class="card-body ent-table-surface p-3">
                 <div class="row g-3 align-items-center">
-                    <!-- Avatar Ukuran Standar (50px) -->
                     <div class="col-auto">
                         <div class="patient-avatar-wrapper flex-shrink-0" style="width: 50px; height: 50px;">
                             <img src="{{ !empty($data->master_patient_profile) ? $data->master_patient_profile : 'https://png.pngtree.com/png-vector/20220529/ourmid/pngtree-blue-user-icon-profile-and-account-vector-design-vector-sign-vector-png-image_46129432.jpg' }}"
@@ -67,7 +71,6 @@
                                 alt="Foto Pasien" style="width: 50px; height: 50px; object-fit: cover; border: 2px solid var(--ent-grid-border);">
                         </div>
                     </div>
-                    <!-- Info Utama -->
                     <div class="col-md-4 col-lg-3" style="border-right: 1px solid var(--ent-grid-border);">
                         <h5 class="fw-bold mb-1 fs-0">{{ $data->master_patient_name }}</h5>
                         <span class="ent-badge mb-2" style="background: rgba(2, 132, 199, 0.14); color: #0284c7; border: 1px solid rgba(2, 132, 199, 0.35); font-family: 'JetBrains Mono', monospace;">RM: {{ $data->master_patient_code }}</span>
@@ -76,7 +79,6 @@
                             <span class="fs--2 fw-semibold opacity-75"><i class="fas fa-venus-mars text-primary me-1"></i> {{ $data->master_patient_jk == 'L' ? 'Laki-Laki' : ($data->master_patient_jk == 'P' ? 'Perempuan' : '-') }}</span>
                         </div>
                     </div>
-                    <!-- Info Tambahan -->
                     <div class="col-md-8 col-lg-8">
                         <div class="row g-2">
                             <div class="col-sm-4">
@@ -105,8 +107,8 @@
     </div>
 </div>
 
-<!-- CEK STATUS PEMBAYARAN PADA TRANSAKSI UTAMA -->
-@if(in_array($data->status_pembayaran, ['LUNAS', 'SEBAGIAN']))
+<!-- CEK STATUS PEMBAYARAN TRANSAKSI / ITEM -->
+@if($canAccessVerification)
 
 <!-- CONTAINER UTAMA FOTO RADIOLOGI & FORM EKSPERTISE -->
 <div class="row g-3 mb-4 align-items-stretch">
@@ -133,7 +135,7 @@
                         <ul class="dropdown-menu dropdown-menu-end ent-dropdown-menu py-1 fs--1 mt-1" aria-labelledby="dropdownOhifMenu" id="container-ohif-buttons" style="min-width: 250px;">
                             @forelse($pemeriksaanList as $index => $item)
                             <li>
-                                <a class="dropdown-item py-2 px-3 d-flex align-items-center justify-content-between link-ohif-item fw-semibold" href="#" target="_blank" data-code="{{ $item->order_rad_list_code }}">
+                                <a class="dropdown-item py-2 px-3 d-flex align-items-center justify-content-between link-ohif-item fw-semibold" href="#" target="_blank" data-code="{{ $item->order_rad_list_code }}" data-fallback-dicom="{{ $resolvedFallbackDicom }}">
                                     <span class="fs--1"><i class="fas fa-file-medical-alt text-primary me-2"></i> OHIF: <strong>{{ $item->nama_pemeriksaan }}</strong></span>
                                     <i class="fas fa-external-link-alt opacity-50 fs--2 ms-2"></i>
                                 </a>
@@ -149,7 +151,7 @@
                 </div>
             </div>
 
-            <div class="card-body p-3 ent-table-surface" style="max-height: 600px; overflow-y: auto;">
+            <div class="card-body p-3 ent-table-surface" style="max-height: 640px; overflow-y: auto;">
                 <div id="orthanc-alert" class="alert alert-danger alert-dismissible fade show d-none mb-3 fs--1 p-2 rounded-3" role="alert" style="border: 1px solid rgba(225, 29, 72, 0.35);">
                     <div class="d-flex align-items-center"><i class="fas fa-exclamation-triangle me-2 fs-0"></i><span id="orthanc-alert-text"></span></div>
                     <button type="button" class="btn-close py-2" onclick="document.getElementById('orthanc-alert').classList.add('d-none')"></button>
@@ -159,9 +161,37 @@
                     <p class="mt-2 fs--1 mb-0 fw-semibold opacity-75">Mengambil citra dari PACS Orthanc...</p>
                 </div>
                 <div id="orthanc-gallery" class="row g-2 d-none"></div>
-                <div id="orthanc-empty" class="text-center py-4 rounded d-none" style="border: 1px dashed var(--ent-grid-border); background: rgba(79, 70, 229, 0.04);">
-                    <i class="fas fa-file-medical-alt fa-2x text-primary opacity-75 mb-2"></i>
-                    <p class="mb-0 fs--1 fw-semibold opacity-75" id="orthanc-empty-text">Belum ada foto/citra radiologi yang diunggah.</p>
+
+                <!-- CARD RENDER OTOMATIS FILE DICOM DEFAULT (TANPA TOMBOL KLIK) -->
+                <div id="orthanc-empty" class="d-none">
+                    <div class="d-flex justify-content-between align-items-center flex-wrap gap-2 mb-2">
+                        <span class="ent-badge" style="background: rgba(2, 132, 199, 0.14); color: #0284c7; border: 1px solid rgba(2, 132, 199, 0.35);">
+                            <i class="fas fa-file-medical me-1"></i> Otomatis: public/dicom/data.dcm
+                        </span>
+                        <div class="d-inline-flex gap-1">
+                            <button type="button" class="btn btn-xs ent-btn ent-btn-reset px-2 py-1 btn-dicom-tool" data-target="#card-dicom-viewport" data-action="zoom-in" title="Perbesar">
+                                <i class="fas fa-search-plus"></i>
+                            </button>
+                            <button type="button" class="btn btn-xs ent-btn ent-btn-reset px-2 py-1 btn-dicom-tool" data-target="#card-dicom-viewport" data-action="zoom-out" title="Perkecil">
+                                <i class="fas fa-search-minus"></i>
+                            </button>
+                            <button type="button" class="btn btn-xs ent-btn ent-btn-reset px-2 py-1 btn-dicom-tool" data-target="#card-dicom-viewport" data-action="invert" title="Invert Warna">
+                                <i class="fas fa-adjust"></i>
+                            </button>
+                            <button type="button" class="btn btn-xs ent-btn ent-btn-reset px-2 py-1 btn-dicom-tool" data-target="#card-dicom-viewport" data-action="reset" title="Reset Tampilan">
+                                <i class="fas fa-undo"></i>
+                            </button>
+                        </div>
+                        <span id="card-dicom-status" class="opacity-75 fw-semibold fs--2">Memproses data.dcm...</span>
+                    </div>
+
+                    <div id="card-dicom-alert" class="alert alert-danger d-none fs--1 p-2 rounded-3 mb-2" role="alert"></div>
+
+                    <div class="dicom-viewport-wrap mb-3" style="position: relative; background-color: #020617; border: 1px solid rgba(99, 102, 241, 0.35); border-radius: 12px; width: 100%; height: 360px; overflow: hidden;">
+                        <div id="card-dicom-viewport" style="width: 100%; height: 100%;" oncontextmenu="return false"></div>
+                    </div>
+
+                    <div class="row g-2" id="card-dicom-metadata"></div>
                 </div>
             </div>
         </div>
@@ -179,11 +209,12 @@
                 <div class="pt-2 mt-2" style="border-top: 1px dashed var(--ent-grid-border);">
                     <ul class="nav nav-pills card-header-pills gap-1" id="ekspertiseTab" role="tablist">
                         @foreach($pemeriksaanList as $index => $item)
+                        @php $itemPaid = isset($item->is_paid) ? $item->is_paid : true; @endphp
                         <li class="nav-item" role="presentation">
-                            <button class="nav-link btn-sm py-1 px-3 fw-semibold fs--2 custom-tab-btn {{ $index === 0 ? 'active' : '' }} {{ !$item->is_ready ? 'disabled opacity-50' : '' }}"
+                            <button class="nav-link btn-sm py-1 px-3 fw-semibold fs--2 custom-tab-btn {{ $index === 0 ? 'active' : '' }} {{ (!$item->is_ready || !$itemPaid) ? 'disabled opacity-50' : '' }}"
                                 id="tab-item-{{ $index }}" data-bs-toggle="tab" data-bs-target="#content-item-{{ $index }}" type="button" role="tab"
-                                @if(!$item->is_ready) disabled tabindex="-1" aria-disabled="true" @endif>
-                                <i class="fas {{ !$item->is_ready ? 'fa-lock' : 'fa-x-ray' }} me-1"></i> {{ $item->nama_pemeriksaan }}
+                                @if(!$item->is_ready || !$itemPaid) disabled tabindex="-1" aria-disabled="true" @endif>
+                                <i class="fas {{ (!$item->is_ready || !$itemPaid) ? 'fa-lock' : 'fa-x-ray' }} me-1"></i> {{ $item->nama_pemeriksaan }}
                             </button>
                         </li>
                         @endforeach
@@ -192,7 +223,7 @@
                 @endif
             </div>
 
-            <div class="card-body p-3 ent-table-surface" style="max-height: 600px; overflow-y: auto;">
+            <div class="card-body p-3 ent-table-surface" style="max-height: 640px; overflow-y: auto;">
                 <div id="alert-no-image" class="alert alert-warning d-flex align-items-center mb-3 fs--1 p-2 rounded-3 fw-semibold" style="border: 1px solid rgba(217, 119, 6, 0.35);">
                     <i class="fas fa-exclamation-triangle me-2 fs-0 text-warning"></i>
                     <div><strong>Perhatian:</strong> Citra/foto radiologi belum termuat secara sempurna. Pastikan DICOM telah diunggah sebelum memverifikasi.</div>
@@ -203,12 +234,18 @@
                     @php
                     $totalParams = isset($item->parameters) ? count($item->parameters) : 0;
                     $header = $item->saved_header;
-                    $isLocked = (!$item->is_ready || $item->is_verified);
+                    $itemPaid = isset($item->is_paid) ? $item->is_paid : true;
+                    $isLocked = (!$itemPaid || !$item->is_ready || $item->is_verified);
                     @endphp
 
                     <div class="tab-pane fade {{ $index === 0 ? 'show active' : '' }}" id="content-item-{{ $index }}" role="tabpanel">
 
-                        @if(!$item->is_ready)
+                        @if(!$itemPaid)
+                        <div class="alert alert-danger d-flex align-items-center mb-3 fs--1 p-2 rounded-3 fw-semibold" style="background: rgba(225, 29, 72, 0.14); color: #e11d48; border: 1px solid rgba(225, 29, 72, 0.35);">
+                            <i class="fas fa-ban me-2 fs-0"></i>
+                            <div>Pembayaran item <strong>{{ $item->nama_pemeriksaan }}</strong> masih <strong>{{ $item->status_pembayaran ?? 'BELUM LUNAS' }}</strong>. Form terkunci.</div>
+                        </div>
+                        @elseif(!$item->is_ready)
                         <div class="alert alert-danger d-flex align-items-center mb-3 fs--1 p-2 rounded-3 fw-semibold" style="background: rgba(225, 29, 72, 0.14); color: #e11d48; border: 1px solid rgba(225, 29, 72, 0.35);">
                             <i class="fas fa-ban me-2 fs-0"></i>
                             <div>Status handling untuk <strong>{{ $item->nama_pemeriksaan }}</strong> belum diproses oleh petugas radiografer. Form terkunci.</div>
@@ -216,7 +253,7 @@
                         @elseif($item->is_verified)
                         <div class="alert alert-success d-flex align-items-center mb-3 fs--1 p-2 rounded-3 fw-semibold" style="background: rgba(5, 150, 105, 0.14); color: #059669; border: 1px solid rgba(5, 150, 105, 0.35);">
                             <i class="fas fa-check-circle me-2 fs-0"></i>
-                            <div>Ekspertise ini telah diverifikasi final pada <strong>{{ date('d-m-Y H:i', strtotime($header->tanggal_verifikasi)) }}</strong>. Data telah dikunci.</div>
+                            <div>Ekspertise ini telah diverifikasi final pada <strong>{{ !empty($header->tanggal_verifikasi) ? date('d-m-Y H:i', strtotime($header->tanggal_verifikasi)) : '-' }}</strong>. Data telah dikunci.</div>
                         </div>
                         @endif
 
@@ -228,7 +265,12 @@
                             <input type="hidden" name="t_pemeriksaan_list_code" value="{{ $item->t_pemeriksaan_list_code }}">
 
                             <div class="d-flex align-items-center justify-content-between p-2 mb-3 rounded-3" style="border: 1px solid var(--ent-grid-border); background: rgba(79, 70, 229, 0.05);">
-                                <span class="fs--1 fw-bold"><i class="fas fa-stethoscope text-primary me-1"></i> {{ $item->nama_pemeriksaan }}</span>
+                                <div>
+                                    <span class="fs--1 fw-bold"><i class="fas fa-stethoscope text-primary me-1"></i> {{ $item->nama_pemeriksaan }}</span>
+                                    <span class="ent-badge ms-1" style="{{ $itemPaid ? 'background: rgba(5, 150, 105, 0.14); color: #059669; border: 1px solid rgba(5, 150, 105, 0.35);' : 'background: rgba(225, 29, 72, 0.14); color: #e11d48; border: 1px solid rgba(225, 29, 72, 0.35);' }}">
+                                        {{ $item->status_pembayaran ?? 'LUNAS' }}
+                                    </span>
+                                </div>
                                 <span class="ent-badge" style="background: rgba(79, 70, 229, 0.12); color: var(--bs-body-color); border: 1px solid var(--ent-grid-border); font-family: 'JetBrains Mono', monospace;">{{ $item->t_pemeriksaan_list_code ?? '-' }}</span>
                             </div>
 
@@ -287,7 +329,7 @@
                                 </div>
                                 @empty
                                 <div class="text-center p-3 fw-semibold fs--2 rounded-3 mb-2 opacity-75" style="border: 1px dashed var(--ent-grid-border); background: rgba(79, 70, 229, 0.04);">
-                                    Tidak ada template parameter khusus. Silakan isi kesan & kesimpulan di bawah.
+                                    Tidak ada template parameter khusus. Silakan isi kesan &amp; kesimpulan di bawah.
                                 </div>
                                 @endforelse
 
@@ -295,7 +337,7 @@
                                     <label class="form-label fw-bold fs--1 mb-1 d-flex justify-content-between align-items-center">
                                         <span><i class="fas fa-clipboard-check text-primary me-1 fs--2"></i> Kesan / Kesimpulan (Impression) <span class="text-danger">*</span></span>
                                         @if(!$isLocked)
-                                        <button type="button" class="btn btn-sm ent-btn ent-btn-reset py-0 px-2 btn-open-editor" data-target="#textarea-kesan-{{ $item->detail_id }}" data-title="Kesan & Kesimpulan">
+                                        <button type="button" class="btn btn-sm ent-btn ent-btn-reset py-0 px-2 btn-open-editor" data-target="#textarea-kesan-{{ $item->detail_id }}" data-title="Kesan &amp; Kesimpulan">
                                             <i class="fas fa-expand-arrows-alt"></i>
                                         </button>
                                         @endif
@@ -336,6 +378,54 @@
     </div>
 </div>
 
+<!-- MODAL READER FILE DICOM (OTOMATIS TER-RENDER SAAT MODAL DIBUKA) -->
+<div class="modal fade" id="modal-dicom-viewer" tabindex="-1" aria-hidden="true" style="z-index: 1065;">
+    <div class="modal-dialog modal-lg modal-dialog-centered">
+        <div class="modal-content modal-ent-content">
+            <div class="modal-header ent-dark-header py-3 px-4">
+                <div>
+                    <h6 class="modal-title fw-bold text-white mb-0">
+                        <i class="fas fa-x-ray me-2 text-info"></i>
+                        <span id="dicom-modal-title">DICOM Reader</span>
+                    </h6>
+                    <small class="text-white-50 fs--2" id="dicom-modal-file-path"></small>
+                </div>
+                <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <div class="modal-body p-3">
+                <div class="d-flex justify-content-between align-items-center flex-wrap gap-2 mb-2">
+                    <span class="ent-badge" style="background: rgba(79, 70, 229, 0.14); color: var(--ent-indigo); border: 1px solid rgba(79, 70, 229, 0.3);">
+                        <i class="fas fa-book-open me-1"></i> Auto Render Modal
+                    </span>
+                    <div class="d-inline-flex gap-1">
+                        <button type="button" class="btn btn-xs ent-btn ent-btn-reset px-2 py-1 btn-dicom-tool" data-target="#dicom-cornerstone-element" data-action="zoom-in" title="Perbesar">
+                            <i class="fas fa-search-plus"></i>
+                        </button>
+                        <button type="button" class="btn btn-xs ent-btn ent-btn-reset px-2 py-1 btn-dicom-tool" data-target="#dicom-cornerstone-element" data-action="zoom-out" title="Perkecil">
+                            <i class="fas fa-search-minus"></i>
+                        </button>
+                        <button type="button" class="btn btn-xs ent-btn ent-btn-reset px-2 py-1 btn-dicom-tool" data-target="#dicom-cornerstone-element" data-action="invert" title="Invert Warna">
+                            <i class="fas fa-adjust"></i>
+                        </button>
+                        <button type="button" class="btn btn-xs ent-btn ent-btn-reset px-2 py-1 btn-dicom-tool" data-target="#dicom-cornerstone-element" data-action="reset" title="Reset Tampilan">
+                            <i class="fas fa-undo"></i>
+                        </button>
+                    </div>
+                    <span id="dicom-modal-status" class="opacity-75 fw-semibold fs--2">Memproses file DICOM...</span>
+                </div>
+                <div id="dicom-modal-alert" class="alert alert-danger d-none fs--1 p-2 rounded-3 mb-2" role="alert"></div>
+                <div class="dicom-viewport-wrap mb-3" style="position: relative; background-color: #020617; border: 1px solid rgba(99, 102, 241, 0.35); border-radius: 12px; width: 100%; height: 380px; overflow: hidden;">
+                    <div id="dicom-cornerstone-element" style="width: 100%; height: 100%;" oncontextmenu="return false"></div>
+                </div>
+                <div class="row g-2" id="dicom-modal-metadata"></div>
+            </div>
+            <div class="modal-footer py-2 px-4" style="border-top: 1px solid var(--ent-grid-border);">
+                <button type="button" class="btn btn-sm ent-btn ent-btn-reset px-3" data-bs-dismiss="modal">Tutup</button>
+            </div>
+        </div>
+    </div>
+</div>
+
 <!-- MODAL EDITOR LAYAR PENUH (FULL SCREEN TEXT EDITOR) -->
 <div class="modal fade" id="modal-text-editor" tabindex="-1" aria-hidden="true" style="z-index: 1060;">
     <div class="modal-dialog modal-xl modal-dialog-centered">
@@ -350,7 +440,7 @@
             <div class="modal-footer py-2" style="border-top: 1px solid var(--ent-grid-border);">
                 <span class="fw-semibold fs--2 me-auto opacity-75"><i class="fas fa-info-circle me-1 text-primary"></i> Teks akan tersimpan ke form saat Anda klik 'Terapkan'</span>
                 <button type="button" class="btn btn-sm ent-btn ent-btn-reset" data-bs-dismiss="modal">Batal</button>
-                <button type="button" class="btn btn-sm ent-btn ent-btn-primary px-4" id="btn-apply-editor">Terapkan & Tutup</button>
+                <button type="button" class="btn btn-sm ent-btn ent-btn-primary px-4" id="btn-apply-editor">Terapkan &amp; Tutup</button>
             </div>
         </div>
     </div>
@@ -368,14 +458,277 @@
     </div>
 </div>
 
-<!-- SCRIPT UNTUK MODAL EDITOR TEXT & VERIFIKASI -->
+<!-- SCRIPT UNTUK AUTO-RENDER DICOM DI CARD & MODAL, EDITOR TEXT & VERIFIKASI -->
 <script>
+    window.RAD_FALLBACK_DICOM_URL = "{{ $resolvedFallbackDicom }}";
+
+    window.ensureCornerstoneDicomReady = window.ensureCornerstoneDicomReady || function() {
+        if (window._csDicomPromise) return window._csDicomPromise;
+
+        function loadScript(src) {
+            return new Promise(function(resolve, reject) {
+                var existing = document.querySelector('script[src="' + src + '"]');
+                if (existing) {
+                    if (existing.dataset.loaded === '1') return resolve();
+                    existing.addEventListener('load', resolve);
+                    existing.addEventListener('error', reject);
+                    return;
+                }
+                var s = document.createElement('script');
+                s.src = src;
+                s.async = true;
+                s.onload = function() {
+                    s.dataset.loaded = '1';
+                    resolve();
+                };
+                s.onerror = reject;
+                document.head.appendChild(s);
+            });
+        }
+
+        window._csDicomPromise = loadScript('https://cdn.jsdelivr.net/npm/dicom-parser@1.8.21/dist/dicomParser.min.js')
+            .then(function() {
+                return loadScript('https://cdn.jsdelivr.net/npm/cornerstone-core@2.6.1/dist/cornerstone.min.js');
+            })
+            .then(function() {
+                return loadScript('https://cdn.jsdelivr.net/npm/cornerstone-wado-image-loader@4.13.2/dist/cornerstoneWADOImageLoader.bundle.min.js');
+            })
+            .then(function() {
+                if (window.cornerstoneWADOImageLoader && window.cornerstone && window.dicomParser) {
+                    window.cornerstoneWADOImageLoader.external.cornerstone = window.cornerstone;
+                    window.cornerstoneWADOImageLoader.external.dicomParser = window.dicomParser;
+                    if (!window._csWadoConfigured) {
+                        window.cornerstoneWADOImageLoader.configure({
+                            useWebWorkers: false,
+                            decodeConfig: {
+                                convertFloatPixelDataToInt: false
+                            }
+                        });
+                        window._csWadoConfigured = true;
+                    }
+                }
+            })
+            .catch(function(err) {
+                window._csDicomPromise = null;
+                throw err;
+            });
+
+        return window._csDicomPromise;
+    };
+
+    window.renderDicomMetadataGrid = window.renderDicomMetadataGrid || function(buffer, metaListEl) {
+        if (!metaListEl) return;
+        var patientName = '-',
+            modality = '-',
+            dimensions = '-',
+            transferSyntax = '-',
+            studyDate = '-',
+            seriesDesc = '-';
+
+        if (window.dicomParser) {
+            try {
+                var dataSet = window.dicomParser.parseDicom(new Uint8Array(buffer));
+                patientName = dataSet.string('x00100010') || '-';
+                modality = dataSet.string('x00080060') || '-';
+                studyDate = dataSet.string('x00080020') || '-';
+                seriesDesc = dataSet.string('x0008103e') || '-';
+                transferSyntax = dataSet.string('x00020010') || '-';
+                var rows = dataSet.uint16('x00280010');
+                var cols = dataSet.uint16('x00280011');
+                var bits = dataSet.uint16('x00280100');
+                if (rows && cols) {
+                    dimensions = cols + ' x ' + rows + ' px' + (bits ? ' (' + bits + '-bit)' : '');
+                }
+            } catch (e) {}
+        }
+
+        metaListEl.innerHTML =
+            '<div class="col-6"><div class="ent-info-box py-2"><div class="info-label">Nama Pasien (DICOM)</div><div class="info-value text-truncate">' + patientName + '</div></div></div>' +
+            '<div class="col-6"><div class="ent-info-box py-2"><div class="info-label">Kategori / Modality</div><div class="info-value">' + modality + (studyDate !== '-' ? ' • ' + studyDate : '') + '</div></div></div>' +
+            '<div class="col-6"><div class="ent-info-box py-2"><div class="info-label">Ukuran Citra</div><div class="info-value">' + dimensions + '</div></div></div>' +
+            '<div class="col-6"><div class="ent-info-box py-2"><div class="info-label">Transfer Syntax / Deskripsi</div><div class="info-value text-truncate" title="' + transferSyntax + '">' + (seriesDesc !== '-' ? seriesDesc : transferSyntax) + '</div></div></div>';
+    };
+
+    // Fungsi inti render DICOM langsung ke elemen target tanpa klik tombol
+    window.renderDicomIntoElement = function(dicomUrl, viewportEl, metaListEl, statusEl, alertEl) {
+        var targetUrl = dicomUrl || window.RAD_FALLBACK_DICOM_URL;
+        if (!viewportEl) return Promise.reject(new Error('Viewport tidak ditemukan'));
+
+        if (statusEl) statusEl.textContent = 'Memuat decoder & membaca file DICOM...';
+        if (alertEl) {
+            alertEl.classList.add('d-none');
+            alertEl.textContent = '';
+        }
+
+        return Promise.all([
+            window.ensureCornerstoneDicomReady(),
+            fetch(targetUrl, {
+                cache: 'no-store'
+            }).then(function(res) {
+                if (!res.ok) throw new Error('HTTP ' + res.status);
+                return res.arrayBuffer();
+            })
+        ])
+        .then(function(results) {
+            var buffer = results[1];
+            window.renderDicomMetadataGrid(buffer, metaListEl);
+
+            if (!window.cornerstone || !window.cornerstoneWADOImageLoader) {
+                throw new Error('Library Cornerstone DICOM gagal dimuat.');
+            }
+
+            try {
+                window.cornerstone.disable(viewportEl);
+            } catch (e) {}
+            window.cornerstone.enable(viewportEl);
+
+            var blob = new Blob([buffer], {
+                type: 'application/dicom'
+            });
+            var imageId = window.cornerstoneWADOImageLoader.wadouri.fileManager.add(blob);
+
+            return window.cornerstone.loadAndCacheImage(imageId).then(function(image) {
+                window.cornerstone.displayImage(viewportEl, image);
+                window.cornerstone.resize(viewportEl, true);
+                window.cornerstone.fitToWindow(viewportEl);
+                window._activeCsElement = viewportEl;
+
+                if (statusEl) {
+                    statusEl.textContent = 'Terbaca otomatis (' + image.columns + ' x ' + image.rows + ' px)';
+                }
+                return { rendered: true, rows: image.rows, cols: image.columns };
+            });
+        })
+        .catch(function(err) {
+            if (statusEl) statusEl.textContent = 'Gagal merender citra DICOM';
+            if (alertEl) {
+                alertEl.textContent = 'Gagal membaca gambar DICOM (' + targetUrl + '): ' + (err && err.message ? err.message : 'Format tidak didukung');
+                alertEl.classList.remove('d-none');
+            }
+        });
+    };
+
+    // Langsung tampilkan & render data.dcm di dalam card tanpa klik tombol
+    window.renderDefaultDicomFallback = function(reasonMessage) {
+        var alertBox = document.getElementById('orthanc-alert');
+        var alertText = document.getElementById('orthanc-alert-text');
+        var loaderBox = document.getElementById('orthanc-loader');
+        var emptyBox = document.getElementById('orthanc-empty');
+        var galleryBox = document.getElementById('orthanc-gallery');
+
+        if (loaderBox) loaderBox.classList.add('d-none');
+        if (galleryBox) galleryBox.classList.add('d-none');
+
+        if (reasonMessage && alertBox && alertText) {
+            alertText.textContent = reasonMessage;
+            alertBox.classList.remove('d-none');
+        }
+
+        if (emptyBox) {
+            emptyBox.classList.remove('d-none');
+            var vpEl = document.getElementById('card-dicom-viewport');
+            var metaEl = document.getElementById('card-dicom-metadata');
+            var statusEl = document.getElementById('card-dicom-status');
+            var alertEl = document.getElementById('card-dicom-alert');
+
+            setTimeout(function() {
+                window.renderDicomIntoElement(window.RAD_FALLBACK_DICOM_URL, vpEl, metaEl, statusEl, alertEl);
+            }, 120);
+        }
+    };
+
+    window.handleOrthancImageError = function() {
+        window.renderDefaultDicomFallback('Koneksi ke server PACS Orthanc gagal atau citra tidak ditemukan; menampilkan otomatis file public/dicom/data.dcm.');
+    };
+
+    // Jika dibuka sebagai modal / via window.openDicomReaderModal, langsung proses & render otomatis
+    window.openDicomReaderModal = function(dicomUrl, titleText) {
+        var targetUrl = dicomUrl || window.RAD_FALLBACK_DICOM_URL;
+        var modalEl = document.getElementById('modal-dicom-viewer');
+        if (!modalEl) return;
+
+        var titleEl = document.getElementById('dicom-modal-title');
+        var urlLabelEl = document.getElementById('dicom-modal-file-path');
+        var statusEl = document.getElementById('dicom-modal-status');
+        var metaEl = document.getElementById('dicom-modal-metadata');
+        var csEl = document.getElementById('dicom-cornerstone-element');
+        var alertEl = document.getElementById('dicom-modal-alert');
+
+        if (titleEl) titleEl.textContent = titleText || 'DICOM Reader — data.dcm';
+        if (urlLabelEl) urlLabelEl.textContent = targetUrl;
+        if (metaEl) metaEl.innerHTML = '';
+
+        var bsModal = bootstrap.Modal.getOrCreateInstance(modalEl);
+        bsModal.show();
+
+        setTimeout(function() {
+            window.renderDicomIntoElement(targetUrl, csEl, metaEl, statusEl, alertEl);
+        }, 220);
+    };
+
     (function($) {
         $(document).off('.radVerifModal');
 
         var currentTargetId = '';
         var isGeneratingPdf = false;
         var activePdfAjax = null;
+
+        $(document).ready(function() {
+            // Jika form ini tampil di dalam .modal, langsung render otomatis file DICOM modal
+            var $parentModal = $('#card-dicom-viewport').closest('.modal');
+            if ($parentModal.length) {
+                var modalCsEl = document.getElementById('card-dicom-viewport');
+                var modalMetaEl = document.getElementById('card-dicom-metadata');
+                var modalStatusEl = document.getElementById('card-dicom-status');
+                var modalAlertEl = document.getElementById('card-dicom-alert');
+                var emptyBox = document.getElementById('orthanc-empty');
+                var loaderBox = document.getElementById('orthanc-loader');
+                if (loaderBox) loaderBox.classList.add('d-none');
+                if (emptyBox) emptyBox.classList.remove('d-none');
+                setTimeout(function() {
+                    window.renderDicomIntoElement(window.RAD_FALLBACK_DICOM_URL, modalCsEl, modalMetaEl, modalStatusEl, modalAlertEl);
+                }, 250);
+            }
+
+            // Fallback otomatis di card bila fetch Orthanc tidak mengisi galeri
+            setTimeout(function() {
+                var loaderEl = document.getElementById('orthanc-loader');
+                var galleryEl = document.getElementById('orthanc-gallery');
+                var emptyEl = document.getElementById('orthanc-empty');
+                var galleryEmpty = !galleryEl || galleryEl.classList.contains('d-none') || galleryEl.children.length === 0;
+                var stillLoading = loaderEl && !loaderEl.classList.contains('d-none');
+                var emptyVisible = emptyEl && !emptyEl.classList.contains('d-none');
+
+                if (galleryEmpty && (stillLoading || emptyVisible)) {
+                    window.renderDefaultDicomFallback('');
+                }
+            }, 1800);
+        });
+
+        $(document).on('click.radVerifModal', '.btn-dicom-tool', function(e) {
+            e.preventDefault();
+            var action = $(this).data('action');
+            var targetSelector = $(this).data('target');
+            var el = targetSelector ? document.querySelector(targetSelector) : window._activeCsElement;
+            if (!el || !window.cornerstone) return;
+
+            try {
+                var vp = window.cornerstone.getViewport(el);
+                if (action === 'zoom-in') {
+                    vp.scale += 0.25;
+                    window.cornerstone.setViewport(el, vp);
+                } else if (action === 'zoom-out') {
+                    vp.scale = Math.max(0.2, vp.scale - 0.25);
+                    window.cornerstone.setViewport(el, vp);
+                } else if (action === 'invert') {
+                    vp.invert = !vp.invert;
+                    window.cornerstone.setViewport(el, vp);
+                } else if (action === 'reset') {
+                    window.cornerstone.reset(el);
+                    window.cornerstone.fitToWindow(el);
+                }
+            } catch (err) {}
+        });
 
         $(document).on('click.radVerifModal', '.btn-open-editor', function(e) {
             e.preventDefault();

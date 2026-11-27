@@ -413,11 +413,14 @@ class HrmController extends Controller
     }
     public function payroll_data_gaji_get_data(Request $request)
     {
-        $bulan = $request->input('bulan', date('n')); // Default bulan saat ini (1-12)
-        $tahun = $request->input('tahun', date('Y')); // Default tahun saat ini
+        $bulan = (int) $request->input('bulan', date('n'));
+        $tahun = (int) $request->input('tahun', date('Y'));
+        $periodeStr = sprintf('%04d-%02d', $tahun, $bulan);
 
         $query = DB::table('hrm_master_pegawai as p')
             ->leftJoin('hrm_departemen as d', 'p.hrm_m_position_code', '=', 'd.hrm_departemen_code')
+            ->leftJoin('hrm_pegawai_pajak_bpjs as cfg', 'p.hrm_m_pegawai_code', '=', 'cfg.hrm_m_pegawai_code')
+            ->leftJoin('hrm_master_ptkp as ptkp', 'cfg.hrm_ptkp_code', '=', 'ptkp.hrm_ptkp_code')
             ->select(
                 'p.hrm_m_pegawai_code',
                 'p.hrm_m_pegawai_name',
@@ -425,7 +428,15 @@ class HrmController extends Controller
                 'p.hrm_m_pegawai_nik',
                 'p.hrm_m_position_code',
                 'd.hrm_departemen_name',
-                'd.hrm_departemen_lokasi'
+                'd.hrm_departemen_lokasi',
+                'cfg.hrm_ptkp_code',
+                'ptkp.hrm_ter_kategori',
+                'cfg.metode_pajak',
+                'cfg.is_bpjs_kes_aktif',
+                'cfg.mode_bpjs_tk',
+                'cfg.gaji_pokok',
+                'cfg.tunjangan_tetap',
+                'cfg.dasar_upah_bpjs'
             );
 
         if ($request->filled('dept_code')) {
@@ -451,8 +462,33 @@ class HrmController extends Controller
             ->pluck('hrm_m_pegawai_code')
             ->toArray();
 
-        $data = $pegawaiList->map(function ($p) use ($gajiPaidList) {
-            // Check jika pegawai sudah punya setup di hrm_pegawai_komponen
+        // Ambil rekap potongan bulanan jika sudah di-generate untuk periode ini
+        $transaksiPotonganMap = DB::table('hrm_transaksi_potongan_bulanan')
+            ->where('periode_payroll', $periodeStr)
+            ->get()
+            ->keyBy('hrm_m_pegawai_code');
+
+        $bpjsConfig = DB::table('hrm_master_bpjs_config')
+            ->where('is_active', true)
+            ->first() ?? (object) [
+                'bpjs_kes_karyawan_persen' => 1.00,
+                'bpjs_kes_perusahaan_persen' => 4.00,
+                'bpjs_kes_max_upah' => 12000000,
+                'bpjs_jht_karyawan_persen' => 2.00,
+                'bpjs_jht_perusahaan_persen' => 3.70,
+                'bpjs_jp_karyawan_persen' => 1.00,
+                'bpjs_jp_perusahaan_persen' => 2.00,
+                'bpjs_jp_max_upah' => 10547400,
+                'bpjs_jkk_perusahaan_persen' => 0.24,
+                'bpjs_jkm_perusahaan_persen' => 0.30,
+            ];
+
+        $listTer = DB::table('hrm_master_ter_tarif')
+            ->orderBy('hrm_ter_kategori')
+            ->orderBy('bruto_min')
+            ->get();
+
+        $data = $pegawaiList->map(function ($p) use ($gajiPaidList, $transaksiPotonganMap, $bpjsConfig, $listTer) {
             $pegawaiKomponen = DB::table('hrm_pegawai_komponen as pk')
                 ->join('hrm_komponen_gaji as k', 'pk.id_komponen', '=', 'k.id_komponen')
                 ->where('pk.hrm_m_pegawai_code', $p->hrm_m_pegawai_code)
@@ -460,8 +496,8 @@ class HrmController extends Controller
                 ->select('k.tipe', 'pk.nominal')
                 ->get();
 
-            $totalPendapatan = 0;
-            $totalPotongan = 0;
+            $totalPendapatan = 0.0;
+            $totalPotonganKomponen = 0.0;
             $isConfigured = $pegawaiKomponen->isNotEmpty();
 
             if ($isConfigured) {
@@ -469,11 +505,10 @@ class HrmController extends Controller
                     if ($pk->tipe === 'pendapatan') {
                         $totalPendapatan += floatval($pk->nominal);
                     } else {
-                        $totalPotongan += floatval($pk->nominal);
+                        $totalPotonganKomponen += floatval($pk->nominal);
                     }
                 }
             } else {
-                // Ambil default nominal departemen jika pegawai belum di-setup khusus
                 $defaultDept = DB::table('hrm_departemen_komponen as dk')
                     ->join('hrm_komponen_gaji as k', 'dk.id_komponen', '=', 'k.id_komponen')
                     ->where('dk.hrm_departemen_code', $p->hrm_m_position_code)
@@ -485,16 +520,57 @@ class HrmController extends Controller
                     if ($dk->tipe === 'pendapatan') {
                         $totalPendapatan += floatval($dk->nominal_default);
                     } else {
-                        $totalPotongan += floatval($dk->nominal_default);
+                        $totalPotonganKomponen += floatval($dk->nominal_default);
                     }
                 }
             }
 
-            $p->total_pendapatan = $totalPendapatan;
-            $p->total_potongan = $totalPotongan;
-            $p->is_configured = $isConfigured;
+            // Gabungkan potongan BPJS Kes, BPJS TK & PPh 21
+            $trxPotongan = $transaksiPotonganMap->get($p->hrm_m_pegawai_code);
+            if ($trxPotongan) {
+                $potBpjsKes = (float) $trxPotongan->pot_bpjs_kes_karyawan;
+                $potJht = (float) $trxPotongan->pot_bpjs_jht_karyawan;
+                $potJp = (float) $trxPotongan->pot_bpjs_jp_karyawan;
+                $potBpjsTk = $potJht + $potJp;
+                $potPph21 = (float) $trxPotongan->pot_pph21_karyawan;
+                $tarifTerPersen = (float) $trxPotongan->tarif_ter_persen;
+                $totalPotonganBpjsPajak = (float) $trxPotongan->total_potongan_karyawan;
+            } else {
+                $brutoPajak = ((float) ($p->gaji_pokok ?? 0) + (float) ($p->tunjangan_tetap ?? 0)) > 0
+                    ? ((float) ($p->gaji_pokok ?? 0) + (float) ($p->tunjangan_tetap ?? 0))
+                    : $totalPendapatan;
 
-            // Cek apakah gaji pegawai ini sudah LUNAS di bulan & tahun terpilih
+                $dasarUpahBpjs = (float) ($p->dasar_upah_bpjs ?? 0) > 0
+                    ? (float) $p->dasar_upah_bpjs
+                    : $brutoPajak;
+
+                $calc = $this->hitungKomponenPotongan($p, $dasarUpahBpjs, $brutoPajak, $bpjsConfig, $listTer);
+                $potBpjsKes = $calc['pot_bpjs_kes'];
+                $potJht = $calc['pot_jht'];
+                $potJp = $calc['pot_jp'];
+                $potBpjsTk = $calc['pot_bpjs_tk'];
+                $potPph21 = $calc['pot_pph21_karyawan'];
+                $tarifTerPersen = $calc['tarif_ter_persen'];
+                $totalPotonganBpjsPajak = $calc['total_potongan'];
+            }
+
+            $p->total_pendapatan = $totalPendapatan;
+            $p->total_potongan_komponen = $totalPotonganKomponen;
+            $p->total_potongan_bpjs_pajak = $totalPotonganBpjsPajak;
+            $p->total_potongan = $totalPotonganKomponen + $totalPotonganBpjsPajak;
+            $p->potongan_detail = [
+                'bpjs_kes' => $potBpjsKes,
+                'bpjs_tk_jht' => $potJht,
+                'bpjs_tk_jp' => $potJp,
+                'bpjs_tk' => $potBpjsTk,
+                'pph21' => $potPph21,
+                'tarif_ter_persen' => $tarifTerPersen,
+                'ptkp' => $p->hrm_ptkp_code ?? 'TK/0',
+                'ter_kategori' => $p->hrm_ter_kategori ?? 'A',
+                'metode_pajak' => $p->metode_pajak ?? 'GROSS',
+                'sumber' => $trxPotongan ? 'TRANSAKSI_PERIODE' : 'SIMULASI_MASTER',
+            ];
+            $p->is_configured = $isConfigured;
             $p->is_paid = in_array($p->hrm_m_pegawai_code, $gajiPaidList);
 
             return $p;
@@ -506,16 +582,22 @@ class HrmController extends Controller
 
         return response()->json([
             'status' => true,
+            'periode' => $periodeStr,
             'data' => $data,
             'stats' => [
                 'totalPegawai' => $data->count(),
                 'totalGajiEstimasi' => 'Rp ' . number_format($totalGajiEstimasi, 0, ',', '.'),
-                'pendingGaji' => $data->where('is_paid', false)->count() // Pegawai yang belum lunas di periode ini
+                'pendingGaji' => $data->where('is_paid', false)->count()
             ]
         ]);
     }
+
     public function payroll_data_gaji_get_detail(Request $request, $pegawaiCode)
     {
+        $bulan = (int) $request->input('bulan', date('n'));
+        $tahun = (int) $request->input('tahun', date('Y'));
+        $periodeStr = sprintf('%04d-%02d', $tahun, $bulan);
+
         $pegawai = DB::table('hrm_master_pegawai as p')
             ->leftJoin('hrm_departemen as d', 'p.hrm_m_position_code', '=', 'd.hrm_departemen_code')
             ->where('p.hrm_m_pegawai_code', $pegawaiCode)
@@ -526,7 +608,6 @@ class HrmController extends Controller
             return response()->json(['status' => false, 'message' => 'Pegawai tidak ditemukan.'], 404);
         }
 
-        // Fetch Master Komponen + Default Dept + Saved Nominal dari Pivot
         $komponen = DB::table('hrm_komponen_gaji as k')
             ->leftJoin('hrm_departemen_komponen as dk', function ($join) use ($pegawai) {
                 $join->on('k.id_komponen', '=', 'dk.id_komponen')
@@ -551,11 +632,89 @@ class HrmController extends Controller
             ->where('hrm_m_pegawai_code', $pegawaiCode)
             ->first();
 
+        $pajakBpjsCfg = DB::table('hrm_pegawai_pajak_bpjs as cfg')
+            ->leftJoin('hrm_master_ptkp as ptkp', 'cfg.hrm_ptkp_code', '=', 'ptkp.hrm_ptkp_code')
+            ->where('cfg.hrm_m_pegawai_code', $pegawaiCode)
+            ->select('cfg.*', 'ptkp.hrm_ter_kategori')
+            ->first();
+
+        $trxPotongan = DB::table('hrm_transaksi_potongan_bulanan')
+            ->where('hrm_m_pegawai_code', $pegawaiCode)
+            ->where('periode_payroll', $periodeStr)
+            ->first();
+
+        $bpjsConfig = DB::table('hrm_master_bpjs_config')
+            ->where('is_active', true)
+            ->first() ?? (object) [
+                'bpjs_kes_karyawan_persen' => 1.00,
+                'bpjs_kes_perusahaan_persen' => 4.00,
+                'bpjs_kes_max_upah' => 12000000,
+                'bpjs_jht_karyawan_persen' => 2.00,
+                'bpjs_jht_perusahaan_persen' => 3.70,
+                'bpjs_jp_karyawan_persen' => 1.00,
+                'bpjs_jp_perusahaan_persen' => 2.00,
+                'bpjs_jp_max_upah' => 10547400,
+                'bpjs_jkk_perusahaan_persen' => 0.24,
+                'bpjs_jkm_perusahaan_persen' => 0.30,
+            ];
+
+        $listTer = DB::table('hrm_master_ter_tarif')
+            ->orderBy('hrm_ter_kategori')
+            ->orderBy('bruto_min')
+            ->get();
+
+        if ($trxPotongan) {
+            $potonganBpjsPajak = [
+                'bpjs_kes' => (float) $trxPotongan->pot_bpjs_kes_karyawan,
+                'bpjs_tk_jht' => (float) $trxPotongan->pot_bpjs_jht_karyawan,
+                'bpjs_tk_jp' => (float) $trxPotongan->pot_bpjs_jp_karyawan,
+                'bpjs_tk' => (float) $trxPotongan->pot_bpjs_jht_karyawan + (float) $trxPotongan->pot_bpjs_jp_karyawan,
+                'pph21' => (float) $trxPotongan->pot_pph21_karyawan,
+                'tarif_ter_persen' => (float) $trxPotongan->tarif_ter_persen,
+                'total_potongan' => (float) $trxPotongan->total_potongan_karyawan,
+                'ptkp' => $trxPotongan->hrm_ptkp_code ?? 'TK/0',
+                'ter_kategori' => $trxPotongan->hrm_ter_kategori ?? 'A',
+                'metode_pajak' => $trxPotongan->metode_pajak ?? 'GROSS',
+            ];
+        } else {
+            $totalPendapatanKomponen = $komponen->where('tipe', 'pendapatan')->sum('nominal_default');
+            $brutoPajak = ((float) ($pajakBpjsCfg->gaji_pokok ?? 0) + (float) ($pajakBpjsCfg->tunjangan_tetap ?? 0)) > 0
+                ? ((float) ($pajakBpjsCfg->gaji_pokok ?? 0) + (float) ($pajakBpjsCfg->tunjangan_tetap ?? 0))
+                : (float) $totalPendapatanKomponen;
+
+            $dasarUpahBpjs = (float) ($pajakBpjsCfg->dasar_upah_bpjs ?? 0) > 0
+                ? (float) $pajakBpjsCfg->dasar_upah_bpjs
+                : $brutoPajak;
+
+            $calc = $this->hitungKomponenPotongan(
+                $pajakBpjsCfg ?? (object) [],
+                $dasarUpahBpjs,
+                $brutoPajak,
+                $bpjsConfig,
+                $listTer
+            );
+
+            $potonganBpjsPajak = [
+                'bpjs_kes' => $calc['pot_bpjs_kes'],
+                'bpjs_tk_jht' => $calc['pot_jht'],
+                'bpjs_tk_jp' => $calc['pot_jp'],
+                'bpjs_tk' => $calc['pot_bpjs_tk'],
+                'pph21' => $calc['pot_pph21_karyawan'],
+                'tarif_ter_persen' => $calc['tarif_ter_persen'],
+                'total_potongan' => $calc['total_potongan'],
+                'ptkp' => $pajakBpjsCfg->hrm_ptkp_code ?? 'TK/0',
+                'ter_kategori' => $pajakBpjsCfg->hrm_ter_kategori ?? 'A',
+                'metode_pajak' => $pajakBpjsCfg->metode_pajak ?? 'GROSS',
+            ];
+        }
+
         return response()->json([
             'status' => true,
             'pegawai' => $pegawai,
             'komponen' => $komponen,
-            'gaji' => $gajiInfo
+            'gaji' => $gajiInfo,
+            'pajak_bpjs' => $pajakBpjsCfg,
+            'potongan_bpjs_pajak' => $potonganBpjsPajak,
         ]);
     }
     public function payroll_data_gaji_store(Request $request)
@@ -765,15 +924,515 @@ class HrmController extends Controller
             return Redirect::to('dashboard/home');
         }
     }
-    public function payroll_pajak_bpjs($akses, $id)
+    public function payroll_pajak_bpjs($akses, $id, Request $request = null)
     {
-        if ($this->url_akses_sub($akses, $id) == true) {
-            return view('app-hrm.payroll.bpjs-dan-pajak', ['akses' => $akses, 'code' => $id]);
-        } else {
+        if ($this->url_akses_sub($akses, $id) != true) {
             return Redirect::to('dashboard/home');
         }
+
+        $request = $request ?? request();
+        $periode = $request->get('periode', now()->format('Y-m'));
+
+        $bpjsConfig = DB::table('hrm_master_bpjs_config')
+            ->where('is_active', true)
+            ->first() ?? (object) [
+                'hrm_bpjs_config_code' => 'DEFAULT_2026',
+                'bpjs_kes_karyawan_persen' => 1.00,
+                'bpjs_kes_perusahaan_persen' => 4.00,
+                'bpjs_kes_max_upah' => 12000000,
+                'bpjs_jht_karyawan_persen' => 2.00,
+                'bpjs_jht_perusahaan_persen' => 3.70,
+                'bpjs_jp_karyawan_persen' => 1.00,
+                'bpjs_jp_perusahaan_persen' => 2.00,
+                'bpjs_jp_max_upah' => 10547400,
+                'bpjs_jkk_perusahaan_persen' => 0.24,
+                'bpjs_jkm_perusahaan_persen' => 0.30,
+            ];
+
+        $listPtkp = DB::table('hrm_master_ptkp')->orderBy('id_hrm_master_ptkp')->get();
+        $listDepartemen = DB::table('hrm_departemen')->orderBy('hrm_departemen_name')->get();
+        $listJabatan = DB::table('hrm_jabatan')->orderBy('hrm_jabatan_name')->get();
+        $listTer = DB::table('hrm_master_ter_tarif')
+            ->orderBy('hrm_ter_kategori')
+            ->orderBy('bruto_min')
+            ->get();
+
+        $pegawaiRows = DB::table('hrm_master_pegawai as p')
+            ->leftJoin('hrm_pegawai_pajak_bpjs as cfg', 'p.hrm_m_pegawai_code', '=', 'cfg.hrm_m_pegawai_code')
+            ->leftJoin('hrm_master_ptkp as ptkp', 'cfg.hrm_ptkp_code', '=', 'ptkp.hrm_ptkp_code')
+            ->leftJoin('hrm_departemen as dept', 'cfg.hrm_departemen_code', '=', 'dept.hrm_departemen_code')
+            ->leftJoin('hrm_jabatan as jab', 'cfg.hrm_jabatan_code', '=', 'jab.hrm_jabatan_code')
+            ->leftJoin('hrm_master_position as pos', 'p.hrm_m_position_code', '=', 'pos.hrm_master_position_code')
+            ->select([
+                'p.id_hrm_m_pegawai',
+                'p.hrm_m_pegawai_code',
+                'p.hrm_m_pegawai_nip',
+                'p.hrm_m_pegawai_nik',
+                'p.hrm_m_pegawai_name',
+                'p.hrm_m_position_code',
+                'pos.hrm_master_position_name',
+                DB::raw("COALESCE(dept.hrm_departemen_name, 'Umum') as nama_departemen"),
+                DB::raw("COALESCE(cfg.hrm_departemen_code, '') as hrm_departemen_code"),
+                DB::raw("COALESCE(jab.hrm_jabatan_name, pos.hrm_master_position_name, 'Staff') as nama_jabatan"),
+                DB::raw("COALESCE(cfg.hrm_jabatan_code, '') as hrm_jabatan_code"),
+                DB::raw("COALESCE(cfg.npwp_nomor, '-') as npwp_nomor"),
+                DB::raw("COALESCE(cfg.is_npwp_valid, 1) as is_npwp_valid"),
+                DB::raw("COALESCE(cfg.hrm_ptkp_code, 'TK/0') as hrm_ptkp_code"),
+                DB::raw("COALESCE(ptkp.hrm_ter_kategori, 'A') as hrm_ter_kategori"),
+                DB::raw("COALESCE(cfg.metode_pajak, 'GROSS') as metode_pajak"),
+                DB::raw("COALESCE(cfg.no_bpjs_kesehatan, '-') as no_bpjs_kesehatan"),
+                DB::raw("COALESCE(cfg.is_bpjs_kes_aktif, 1) as is_bpjs_kes_aktif"),
+                DB::raw("COALESCE(cfg.no_bpjs_ketenagakerjaan, '-') as no_bpjs_ketenagakerjaan"),
+                DB::raw("COALESCE(cfg.mode_bpjs_tk, 'FULL') as mode_bpjs_tk"),
+                DB::raw("COALESCE(cfg.gaji_pokok, 0) as gaji_pokok"),
+                DB::raw("COALESCE(cfg.tunjangan_tetap, 0) as tunjangan_tetap"),
+                DB::raw("COALESCE(cfg.dasar_upah_bpjs, 0) as dasar_upah_bpjs"),
+            ])
+            ->orderBy('p.hrm_m_pegawai_name')
+            ->get();
+
+        $pegawaiFormatted = $pegawaiRows->map(function ($row) use ($bpjsConfig, $listTer) {
+            $brutoPajak = (float) $row->gaji_pokok + (float) $row->tunjangan_tetap;
+            $dasarUpahBpjs = (float) $row->dasar_upah_bpjs > 0 ? (float) $row->dasar_upah_bpjs : $brutoPajak;
+
+            $calc = $this->hitungKomponenPotongan(
+                $row,
+                $dasarUpahBpjs,
+                $brutoPajak,
+                $bpjsConfig,
+                $listTer
+            );
+
+            return [
+                'id' => $row->id_hrm_m_pegawai,
+                'code' => $row->hrm_m_pegawai_code,
+                'nip' => $row->hrm_m_pegawai_nip,
+                'nik' => $row->hrm_m_pegawai_nik,
+                'nama' => $row->hrm_m_pegawai_name,
+                'divisi' => $row->nama_departemen,
+                'divisi_code' => $row->hrm_departemen_code,
+                'jabatan' => $row->nama_jabatan,
+                'jabatan_code' => $row->hrm_jabatan_code,
+                'ptkp' => $row->hrm_ptkp_code,
+                'ter_kategori' => $row->hrm_ter_kategori,
+                'npwp' => $row->npwp_nomor,
+                'hasNpwp' => (bool) $row->is_npwp_valid,
+                'gajiPokok' => (float) $row->gaji_pokok,
+                'tunjanganTetap' => (float) $row->tunjangan_tetap,
+                'upahBpjs' => $dasarUpahBpjs,
+                'brutoPajak' => $brutoPajak,
+                'bpjsKesAktif' => (bool) $row->is_bpjs_kes_aktif,
+                'bpjsTkMode' => strtolower($row->mode_bpjs_tk),
+                'metodePajak' => $row->metode_pajak,
+                'perhitungan' => $calc,
+            ];
+        })->values();
+
+        return view('app-hrm.payroll.bpjs-dan-pajak', [
+            'akses' => $akses,
+            'code' => $id,
+            'periode' => $periode,
+            'bpjsConfig' => $bpjsConfig,
+            'listPtkp' => $listPtkp,
+            'listDepartemen' => $listDepartemen,
+            'listJabatan' => $listJabatan,
+            'listTer' => $listTer,
+            'pegawaiData' => $pegawaiFormatted,
+        ]);
+    }
+    private function hitungKomponenPotongan($pegawai, float $dasarUpahBpjs, float $brutoPajak, $bpjsConfig, $listTer): array
+    {
+        $isKesAktif = (bool) ($pegawai->is_bpjs_kes_aktif ?? true);
+        $modeTk = strtoupper($pegawai->mode_bpjs_tk ?? 'FULL');
+        $kategoriTer = strtoupper($pegawai->hrm_ter_kategori ?? 'A');
+        $metodePajak = strtoupper($pegawai->metode_pajak ?? 'GROSS');
+
+        $dasarKes = min($dasarUpahBpjs, (float) $bpjsConfig->bpjs_kes_max_upah);
+        $potBpjsKes = $isKesAktif ? round($dasarKes * ((float) $bpjsConfig->bpjs_kes_karyawan_persen / 100)) : 0;
+        $ptBpjsKes = $isKesAktif ? round($dasarKes * ((float) $bpjsConfig->bpjs_kes_perusahaan_persen / 100)) : 0;
+
+        $potJht = 0;
+        $potJp = 0;
+        if (in_array($modeTk, ['FULL', 'JHT_ONLY'])) {
+            $potJht = round($dasarUpahBpjs * ((float) $bpjsConfig->bpjs_jht_karyawan_persen / 100));
+        }
+        if ($modeTk === 'FULL') {
+            $dasarJp = min($dasarUpahBpjs, (float) $bpjsConfig->bpjs_jp_max_upah);
+            $potJp = round($dasarJp * ((float) $bpjsConfig->bpjs_jp_karyawan_persen / 100));
+        }
+        $potBpjsTk = $potJht + $potJp;
+
+        $tarifRow = $listTer
+            ->where('hrm_ter_kategori', $kategoriTer)
+            ->filter(function ($item) use ($brutoPajak) {
+                $minOk = $brutoPajak >= (float) $item->bruto_min;
+                $maxOk = is_null($item->bruto_max) || $brutoPajak <= (float) $item->bruto_max;
+                return $minOk && $maxOk;
+            })
+            ->first();
+
+        $tarifPersen = $tarifRow ? (float) $tarifRow->tarif_persen : 0.0;
+        $nilaiPph21 = round($brutoPajak * ($tarifPersen / 100));
+        $potPph21Karyawan = ($metodePajak === 'GROSS') ? $nilaiPph21 : 0;
+
+        $totalPotongan = $potBpjsKes + $potBpjsTk + $potPph21Karyawan;
+
+        return [
+            'pot_bpjs_kes' => $potBpjsKes,
+            'pt_bpjs_kes' => $ptBpjsKes,
+            'pot_jht' => $potJht,
+            'pot_jp' => $potJp,
+            'pot_bpjs_tk' => $potBpjsTk,
+            'tarif_ter_persen' => $tarifPersen,
+            'nilai_pph21' => $nilaiPph21,
+            'pot_pph21_karyawan' => $potPph21Karyawan,
+            'total_potongan' => $totalPotongan,
+        ];
     }
 
+    public function simpan_skema_potongan_pegawai(Request $request)
+    {
+        $validated = $request->validate([
+            'hrm_m_pegawai_code' => 'required|string',
+            'hrm_ptkp_code' => 'required|string',
+            'npwp_nomor' => 'nullable|string|max:30',
+            'is_npwp_valid' => 'required|boolean',
+            'metode_pajak' => 'required|in:GROSS,NET,GROSS_UP',
+            'is_bpjs_kes_aktif' => 'required|boolean',
+            'mode_bpjs_tk' => 'required|in:FULL,JHT_ONLY,NONAKTIF',
+            'gaji_pokok' => 'required|numeric|min:0',
+            'tunjangan_tetap' => 'required|numeric|min:0',
+            'dasar_upah_bpjs' => 'required|numeric|min:0',
+        ]);
+
+        DB::table('hrm_pegawai_pajak_bpjs')->updateOrInsert(
+            ['hrm_m_pegawai_code' => $validated['hrm_m_pegawai_code']],
+            array_merge($validated, ['updated_at' => now()])
+        );
+
+        return response()->json([
+            'status' => 'success',
+            'message' => 'Pengaturan potongan pegawai berhasil disimpan.',
+        ]);
+    }
+    public function simpan_skema_potongan_massal(Request $request)
+    {
+        $validated = $request->validate([
+            'target_type' => 'required|in:all,divisi,jabatan',
+            'target_value' => 'nullable|string',
+            'is_bpjs_kes_aktif' => 'nullable|in:keep,0,1',
+            'mode_bpjs_tk' => 'nullable|in:keep,FULL,JHT_ONLY,NONAKTIF',
+            'metode_pajak' => 'nullable|in:keep,GROSS,NET,GROSS_UP',
+        ]);
+
+        $allPegawai = DB::table('hrm_master_pegawai')->pluck('hrm_m_pegawai_code');
+        foreach ($allPegawai as $kodePegawai) {
+            DB::table('hrm_pegawai_pajak_bpjs')->insertOrIgnore([
+                'hrm_m_pegawai_code' => $kodePegawai,
+                'hrm_ptkp_code' => 'TK/0',
+                'metode_pajak' => 'GROSS',
+                'is_bpjs_kes_aktif' => true,
+                'mode_bpjs_tk' => 'FULL',
+                'created_at' => now(),
+                'updated_at' => now(),
+            ]);
+        }
+
+        $query = DB::table('hrm_pegawai_pajak_bpjs');
+        if ($validated['target_type'] === 'divisi' && !empty($validated['target_value'])) {
+            $query->where('hrm_departemen_code', $validated['target_value']);
+        } elseif ($validated['target_type'] === 'jabatan' && !empty($validated['target_value'])) {
+            $query->where('hrm_jabatan_code', $validated['target_value']);
+        }
+
+        $updateData = ['updated_at' => now()];
+        if (!empty($validated['is_bpjs_kes_aktif']) && $validated['is_bpjs_kes_aktif'] !== 'keep') {
+            $updateData['is_bpjs_kes_aktif'] = (int) $validated['is_bpjs_kes_aktif'];
+        }
+        if (!empty($validated['mode_bpjs_tk']) && $validated['mode_bpjs_tk'] !== 'keep') {
+            $updateData['mode_bpjs_tk'] = $validated['mode_bpjs_tk'];
+        }
+        if (!empty($validated['metode_pajak']) && $validated['metode_pajak'] !== 'keep') {
+            $updateData['metode_pajak'] = $validated['metode_pajak'];
+        }
+
+        $affected = $query->update($updateData);
+
+        return response()->json([
+            'status' => 'success',
+            'message' => "Skema potongan berhasil diterapkan ke {$affected} data pegawai.",
+        ]);
+    }
+    public function simpan_master_tarif(Request $request)
+    {
+        $validated = $request->validate([
+            'bpjs_kes_max_upah' => 'required|numeric|min:0',
+            'bpjs_jp_max_upah' => 'required|numeric|min:0',
+            'bpjs_jkk_perusahaan_persen' => 'required|numeric|min:0',
+        ]);
+
+        DB::table('hrm_master_bpjs_config')
+            ->where('is_active', true)
+            ->update(array_merge($validated, ['updated_at' => now()]));
+
+        return response()->json([
+            'status' => 'success',
+            'message' => 'Parameter tarif BPJS berhasil diperbarui.',
+        ]);
+    }
+    public function simpan_potongan_periode(Request $request)
+    {
+        $validated = $request->validate([
+            'periode_payroll' => 'required|string|size:7', // YYYY-MM
+        ]);
+
+        $bpjsConfig = DB::table('hrm_master_bpjs_config')->where('is_active', true)->first();
+        if (!$bpjsConfig) {
+            return response()->json(['status' => 'error', 'message' => 'Konfigurasi BPJS aktif belum ditemukan.'], 422);
+        }
+
+        $listTer = DB::table('hrm_master_ter_tarif')->get();
+        $rows = DB::table('hrm_master_pegawai as p')
+            ->leftJoin('hrm_pegawai_pajak_bpjs as cfg', 'p.hrm_m_pegawai_code', '=', 'cfg.hrm_m_pegawai_code')
+            ->leftJoin('hrm_master_ptkp as ptkp', 'cfg.hrm_ptkp_code', '=', 'ptkp.hrm_ptkp_code')
+            ->select([
+                'p.hrm_m_pegawai_code',
+                'cfg.hrm_departemen_code',
+                'cfg.hrm_jabatan_code',
+                DB::raw("COALESCE(cfg.hrm_ptkp_code, 'TK/0') as hrm_ptkp_code"),
+                DB::raw("COALESCE(ptkp.hrm_ter_kategori, 'A') as hrm_ter_kategori"),
+                DB::raw("COALESCE(cfg.metode_pajak, 'GROSS') as metode_pajak"),
+                DB::raw("COALESCE(cfg.is_bpjs_kes_aktif, 1) as is_bpjs_kes_aktif"),
+                DB::raw("COALESCE(cfg.mode_bpjs_tk, 'FULL') as mode_bpjs_tk"),
+                DB::raw("COALESCE(cfg.gaji_pokok, 0) as gaji_pokok"),
+                DB::raw("COALESCE(cfg.tunjangan_tetap, 0) as tunjangan_tetap"),
+                DB::raw("COALESCE(cfg.dasar_upah_bpjs, 0) as dasar_upah_bpjs"),
+            ])
+            ->get();
+
+        foreach ($rows as $row) {
+            $bruto = (float) $row->gaji_pokok + (float) $row->tunjangan_tetap;
+            $dasarBpjs = (float) $row->dasar_upah_bpjs > 0 ? (float) $row->dasar_upah_bpjs : $bruto;
+            $calc = $this->hitungKomponenPotongan($row, $dasarBpjs, $bruto, $bpjsConfig, $listTer);
+
+            DB::table('hrm_transaksi_potongan_bulanan')->updateOrInsert(
+                [
+                    'periode_payroll' => $validated['periode_payroll'],
+                    'hrm_m_pegawai_code' => $row->hrm_m_pegawai_code,
+                ],
+                [
+                    'kode_transaksi_potongan' => 'POT-' . str_replace('-', '', $validated['periode_payroll']) . '-' . $row->hrm_m_pegawai_code,
+                    'hrm_departemen_code' => $row->hrm_departemen_code,
+                    'hrm_jabatan_code' => $row->hrm_jabatan_code,
+                    'hrm_ptkp_code' => $row->hrm_ptkp_code,
+                    'hrm_ter_kategori' => $row->hrm_ter_kategori,
+                    'metode_pajak' => $row->metode_pajak,
+                    'dasar_upah_bpjs' => $dasarBpjs,
+                    'penghasilan_bruto_pajak' => $bruto,
+                    'pot_bpjs_kes_karyawan' => $calc['pot_bpjs_kes'],
+                    'pot_bpjs_jht_karyawan' => $calc['pot_jht'],
+                    'pot_bpjs_jp_karyawan' => $calc['pot_jp'],
+                    'tarif_ter_persen' => $calc['tarif_ter_persen'],
+                    'nilai_pph21' => $calc['nilai_pph21'],
+                    'pot_pph21_karyawan' => $calc['pot_pph21_karyawan'],
+                    'total_potongan_karyawan' => $calc['total_potongan'],
+                    'tanggungan_bpjs_kes_pt' => $calc['pt_bpjs_kes'],
+                    'tanggungan_bpjs_jkk_pt' => round($dasarBpjs * ((float) $bpjsConfig->bpjs_jkk_perusahaan_persen / 100)),
+                    'tanggungan_bpjs_jkm_pt' => round($dasarBpjs * ((float) $bpjsConfig->bpjs_jkm_perusahaan_persen / 100)),
+                    'status_posting' => 'DRAFT',
+                    'updated_at' => now(),
+                ]
+            );
+        }
+
+        return response()->json([
+            'status' => 'success',
+            'message' => "Potongan periode {$validated['periode_payroll']} berhasil dihitung dan disimpan ke database.",
+        ]);
+    }
+
+    public function get_data_potongan_pegawai(Request $request)
+    {
+        $periode = $request->get('periode', now()->format('Y-m'));
+        $divisi = $request->get('divisi');
+        $jabatan = $request->get('jabatan');
+        $ptkpCode = $request->get('ptkp');
+
+        $bpjsConfig = DB::table('hrm_master_bpjs_config')
+            ->where('is_active', true)
+            ->first() ?? (object) [
+                'bpjs_kes_karyawan_persen' => 1.00,
+                'bpjs_kes_perusahaan_persen' => 4.00,
+                'bpjs_kes_max_upah' => 12000000,
+                'bpjs_jht_karyawan_persen' => 2.00,
+                'bpjs_jht_perusahaan_persen' => 3.70,
+                'bpjs_jp_karyawan_persen' => 1.00,
+                'bpjs_jp_perusahaan_persen' => 2.00,
+                'bpjs_jp_max_upah' => 10547400,
+                'bpjs_jkk_perusahaan_persen' => 0.24,
+                'bpjs_jkm_perusahaan_persen' => 0.30,
+            ];
+
+        $listTer = DB::table('hrm_master_ter_tarif')
+            ->orderBy('hrm_ter_kategori')
+            ->orderBy('bruto_min')
+            ->get();
+
+        $query = DB::table('hrm_master_pegawai as p')
+            ->leftJoin('hrm_pegawai_pajak_bpjs as cfg', 'p.hrm_m_pegawai_code', '=', 'cfg.hrm_m_pegawai_code')
+            ->leftJoin('hrm_master_ptkp as ptkp', 'cfg.hrm_ptkp_code', '=', 'ptkp.hrm_ptkp_code')
+            ->leftJoin('hrm_departemen as dept', 'cfg.hrm_departemen_code', '=', 'dept.hrm_departemen_code')
+            ->leftJoin('hrm_jabatan as jab', 'cfg.hrm_jabatan_code', '=', 'jab.hrm_jabatan_code')
+            ->leftJoin('hrm_master_position as pos', 'p.hrm_m_position_code', '=', 'pos.hrm_master_position_code')
+            ->select([
+                'p.id_hrm_m_pegawai',
+                'p.hrm_m_pegawai_code',
+                'p.hrm_m_pegawai_nip',
+                'p.hrm_m_pegawai_nik',
+                'p.hrm_m_pegawai_name',
+                DB::raw("COALESCE(dept.hrm_departemen_name, 'Umum') as nama_departemen"),
+                DB::raw("COALESCE(cfg.hrm_departemen_code, '') as hrm_departemen_code"),
+                DB::raw("COALESCE(jab.hrm_jabatan_name, pos.hrm_master_position_name, 'Staff') as nama_jabatan"),
+                DB::raw("COALESCE(cfg.hrm_jabatan_code, '') as hrm_jabatan_code"),
+                DB::raw("COALESCE(cfg.npwp_nomor, '-') as npwp_nomor"),
+                DB::raw("COALESCE(cfg.is_npwp_valid, 1) as is_npwp_valid"),
+                DB::raw("COALESCE(cfg.hrm_ptkp_code, 'TK/0') as hrm_ptkp_code"),
+                DB::raw("COALESCE(ptkp.hrm_ter_kategori, 'A') as hrm_ter_kategori"),
+                DB::raw("COALESCE(cfg.metode_pajak, 'GROSS') as metode_pajak"),
+                DB::raw("COALESCE(cfg.is_bpjs_kes_aktif, 1) as is_bpjs_kes_aktif"),
+                DB::raw("COALESCE(cfg.mode_bpjs_tk, 'FULL') as mode_bpjs_tk"),
+                DB::raw("COALESCE(cfg.gaji_pokok, 0) as gaji_pokok"),
+                DB::raw("COALESCE(cfg.tunjangan_tetap, 0) as tunjangan_tetap"),
+                DB::raw("COALESCE(cfg.dasar_upah_bpjs, 0) as dasar_upah_bpjs"),
+            ]);
+
+        if (!empty($divisi)) {
+            $query->where('cfg.hrm_departemen_code', $divisi);
+        }
+        if (!empty($jabatan)) {
+            $query->where('cfg.hrm_jabatan_code', $jabatan);
+        }
+        if (!empty($ptkpCode)) {
+            $query->where(DB::raw("COALESCE(cfg.hrm_ptkp_code, 'TK/0')"), $ptkpCode);
+        }
+
+        $rows = $query->orderBy('p.hrm_m_pegawai_name')->get();
+
+        $data = $rows->map(function ($row) use ($bpjsConfig, $listTer) {
+            $brutoPajak = (float) $row->gaji_pokok + (float) $row->tunjangan_tetap;
+            $dasarUpahBpjs = (float) $row->dasar_upah_bpjs > 0 ? (float) $row->dasar_upah_bpjs : $brutoPajak;
+            $calc = $this->hitungKomponenPotongan($row, $dasarUpahBpjs, $brutoPajak, $bpjsConfig, $listTer);
+
+            return [
+                'id' => $row->id_hrm_m_pegawai,
+                'code' => $row->hrm_m_pegawai_code,
+                'nip' => $row->hrm_m_pegawai_nip,
+                'nik' => $row->hrm_m_pegawai_nik,
+                'nama' => $row->hrm_m_pegawai_name,
+                'divisi' => $row->nama_departemen,
+                'divisi_code' => $row->hrm_departemen_code,
+                'jabatan' => $row->nama_jabatan,
+                'jabatan_code' => $row->hrm_jabatan_code,
+                'ptkp' => $row->hrm_ptkp_code,
+                'ter_kategori' => $row->hrm_ter_kategori,
+                'npwp' => $row->npwp_nomor,
+                'hasNpwp' => (bool) $row->is_npwp_valid,
+                'gajiPokok' => (float) $row->gaji_pokok,
+                'tunjanganTetap' => (float) $row->tunjangan_tetap,
+                'upahBpjs' => $dasarUpahBpjs,
+                'brutoPajak' => $brutoPajak,
+                'bpjsKesAktif' => (bool) $row->is_bpjs_kes_aktif,
+                'bpjsTkMode' => strtolower($row->mode_bpjs_tk),
+                'metodePajak' => $row->metode_pajak,
+                'perhitungan' => $calc,
+            ];
+        })->values();
+
+        return response()->json([
+            'status' => 'success',
+            'periode' => $periode,
+            'total_potongan' => $data->sum(fn($item) => $item['perhitungan']['total_potongan']),
+            'data' => $data,
+        ]);
+    }
+    public function get_detail_potongan_pegawai(string $pegawaiCode)
+    {
+        $pegawai = DB::table('hrm_master_pegawai as p')
+            ->leftJoin('hrm_pegawai_pajak_bpjs as cfg', 'p.hrm_m_pegawai_code', '=', 'cfg.hrm_m_pegawai_code')
+            ->leftJoin('hrm_master_ptkp as ptkp', 'cfg.hrm_ptkp_code', '=', 'ptkp.hrm_ptkp_code')
+            ->where('p.hrm_m_pegawai_code', $pegawaiCode)
+            ->select([
+                'p.*',
+                'cfg.hrm_departemen_code',
+                'cfg.hrm_jabatan_code',
+                'cfg.npwp_nomor',
+                'cfg.is_npwp_valid',
+                'cfg.hrm_ptkp_code',
+                'ptkp.hrm_ter_kategori',
+                'cfg.metode_pajak',
+                'cfg.no_bpjs_kesehatan',
+                'cfg.is_bpjs_kes_aktif',
+                'cfg.no_bpjs_ketenagakerjaan',
+                'cfg.mode_bpjs_tk',
+                'cfg.gaji_pokok',
+                'cfg.tunjangan_tetap',
+                'cfg.dasar_upah_bpjs',
+            ])
+            ->first();
+
+        if (!$pegawai) {
+            return response()->json(['status' => 'error', 'message' => 'Data pegawai tidak ditemukan.'], 404);
+        }
+
+        return response()->json(['status' => 'success', 'data' => $pegawai]);
+    }
+    public function get_master_referensi_pajak()
+    {
+        return response()->json([
+            'status' => 'success',
+            'bpjs_config' => DB::table('hrm_master_bpjs_config')->where('is_active', true)->first(),
+            'ptkp' => DB::table('hrm_master_ptkp')->orderBy('id_hrm_master_ptkp')->get(),
+            'ter_tarif' => DB::table('hrm_master_ter_tarif')->orderBy('hrm_ter_kategori')->orderBy('bruto_min')->get(),
+            'departemen' => DB::table('hrm_departemen')->orderBy('hrm_departemen_name')->get(),
+            'jabatan' => DB::table('hrm_jabatan')->orderBy('hrm_jabatan_name')->get(),
+        ]);
+    }
+    public function get_rekap_potongan_periode(Request $request)
+    {
+        $periode = $request->get('periode_payroll', now()->format('Y-m'));
+
+        $rows = DB::table('hrm_transaksi_potongan_bulanan as tr')
+            ->leftJoin('hrm_master_pegawai as p', 'tr.hrm_m_pegawai_code', '=', 'p.hrm_m_pegawai_code')
+            ->where('tr.periode_payroll', $periode)
+            ->select('tr.*', 'p.hrm_m_pegawai_name', 'p.hrm_m_pegawai_nik')
+            ->orderBy('p.hrm_m_pegawai_name')
+            ->get();
+
+        return response()->json([
+            'status' => 'success',
+            'periode_payroll' => $periode,
+            'total_potongan_karyawan' => $rows->sum('total_potongan_karyawan'),
+            'data' => $rows,
+        ]);
+    }
+    public function posting_potongan_periode(Request $request)
+    {
+        $validated = $request->validate([
+            'periode_payroll' => 'required|string|size:7',
+        ]);
+
+        $updated = DB::table('hrm_transaksi_potongan_bulanan')
+            ->where('periode_payroll', $validated['periode_payroll'])
+            ->update([
+                'status_posting' => 'FINAL',
+                'updated_at' => now(),
+            ]);
+
+        return response()->json([
+            'status' => 'success',
+            'message' => "Sebanyak {$updated} data potongan periode {$validated['periode_payroll']} berhasil di-posting (FINAL).",
+        ]);
+    }
     // TARGET KPI
     public function manajemen_kpi_target($akses, $id)
     {
@@ -1625,5 +2284,615 @@ class HrmController extends Controller
             'totalHighPerformer'  => $totalHighPerformer,
             'totalUnderPerformer' => $totalUnderPerformer,
         ]);
+    }
+    // MASTER KPI Rekap
+    public function accounting_hrm_payroll_payment($akses, $id)
+    {
+        if ($this->url_akses($akses, $id) == true) {
+            $departemens = DB::table('hrm_departemen')
+                ->orderBy('hrm_departemen_name')
+                ->get();
+
+            return view('app-hrm.accounting.payroll-payment', [
+                'id'          => $id,
+                'akses'       => $akses,
+                'code'        => $id,
+                'departemens' => $departemens,
+            ]);
+        } else {
+            return Redirect::to('dashboard/home');
+        }
+    }
+    public function payroll_payment_get_data(Request $request)
+    {
+        $bulan = (int) $request->input('bulan', date('n'));
+        $tahun = (int) $request->input('tahun', date('Y'));
+        $statusFilter = strtoupper((string) $request->input('status_bayar', '')); // '', 'PAID', 'UNPAID'
+        $periodeStr = sprintf('%04d-%02d', $tahun, $bulan);
+
+        $query = DB::table('hrm_master_pegawai as p')
+            ->leftJoin('hrm_departemen as d', 'p.hrm_m_position_code', '=', 'd.hrm_departemen_code')
+            ->leftJoin('hrm_m_gaji_pokok as g', 'p.hrm_m_pegawai_code', '=', 'g.hrm_m_pegawai_code')
+            ->leftJoin('hrm_pegawai_pajak_bpjs as cfg', 'p.hrm_m_pegawai_code', '=', 'cfg.hrm_m_pegawai_code')
+            ->leftJoin('hrm_master_ptkp as ptkp', 'cfg.hrm_ptkp_code', '=', 'ptkp.hrm_ptkp_code')
+            ->select(
+                'p.hrm_m_pegawai_code',
+                'p.hrm_m_pegawai_name',
+                'p.hrm_m_pegawai_nip',
+                'p.hrm_m_pegawai_nik',
+                'p.hrm_m_position_code',
+                'd.hrm_departemen_name',
+                'd.hrm_departemen_lokasi',
+                'g.nama_bank',
+                'g.nomor_rekening',
+                'cfg.hrm_ptkp_code',
+                'ptkp.hrm_ter_kategori',
+                'cfg.metode_pajak',
+                'cfg.is_bpjs_kes_aktif',
+                'cfg.mode_bpjs_tk',
+                'cfg.gaji_pokok',
+                'cfg.tunjangan_tetap',
+                'cfg.dasar_upah_bpjs'
+            );
+
+        if ($request->filled('dept_code')) {
+            $query->where('d.hrm_departemen_code', $request->dept_code);
+        }
+
+        if ($request->filled('search')) {
+            $search = $request->search;
+            $query->where(function ($q) use ($search) {
+                $q->where('p.hrm_m_pegawai_name', 'like', "%{$search}%")
+                    ->orWhere('p.hrm_m_pegawai_nip', 'like', "%{$search}%")
+                    ->orWhere('p.hrm_m_pegawai_nik', 'like', "%{$search}%");
+            });
+        }
+
+        $pegawaiList = $query->get();
+
+        // Data transaksi hrm_penggajian pada bulan & tahun terpilih
+        $penggajianMap = DB::table('hrm_penggajian')
+            ->where('bulan', $bulan)
+            ->where('tahun', $tahun)
+            ->get()
+            ->keyBy('hrm_m_pegawai_code');
+
+        // Rekap potongan bulanan jika sudah ada
+        $transaksiPotonganMap = DB::table('hrm_transaksi_potongan_bulanan')
+            ->where('periode_payroll', $periodeStr)
+            ->get()
+            ->keyBy('hrm_m_pegawai_code');
+
+        // Daftar pegawai yang punya konfigurasi komponen gaji SDM
+        $configuredPegawaiCodes = DB::table('hrm_pegawai_komponen')
+            ->distinct()
+            ->pluck('hrm_m_pegawai_code')
+            ->toArray();
+
+        $bpjsConfig = DB::table('hrm_master_bpjs_config')
+            ->where('is_active', true)
+            ->first() ?? (object) [
+                'bpjs_kes_karyawan_persen' => 1.00,
+                'bpjs_kes_perusahaan_persen' => 4.00,
+                'bpjs_kes_max_upah' => 12000000,
+                'bpjs_jht_karyawan_persen' => 2.00,
+                'bpjs_jht_perusahaan_persen' => 3.70,
+                'bpjs_jp_karyawan_persen' => 1.00,
+                'bpjs_jp_perusahaan_persen' => 2.00,
+                'bpjs_jp_max_upah' => 10547400,
+                'bpjs_jkk_perusahaan_persen' => 0.24,
+                'bpjs_jkm_perusahaan_persen' => 0.30,
+            ];
+
+        $listTer = DB::table('hrm_master_ter_tarif')
+            ->orderBy('hrm_ter_kategori')
+            ->orderBy('bruto_min')
+            ->get();
+
+        $items = $pegawaiList->map(function ($p) use ($penggajianMap, $transaksiPotonganMap, $configuredPegawaiCodes, $bpjsConfig, $listTer) {
+            $trxGaji = $penggajianMap->get($p->hrm_m_pegawai_code);
+            $hasKomponen = in_array($p->hrm_m_pegawai_code, $configuredPegawaiCodes);
+            $isVerified = $hasKomponen || ($trxGaji !== null);
+
+            $pegawaiKomponen = DB::table('hrm_pegawai_komponen as pk')
+                ->join('hrm_komponen_gaji as k', 'pk.id_komponen', '=', 'k.id_komponen')
+                ->where('pk.hrm_m_pegawai_code', $p->hrm_m_pegawai_code)
+                ->where('k.is_active', true)
+                ->select('k.tipe', 'pk.nominal')
+                ->get();
+
+            $totalPendapatan = 0.0;
+            $totalPotonganKomponen = 0.0;
+
+            if ($pegawaiKomponen->isNotEmpty()) {
+                foreach ($pegawaiKomponen as $pk) {
+                    if ($pk->tipe === 'pendapatan') {
+                        $totalPendapatan += floatval($pk->nominal);
+                    } else {
+                        $totalPotonganKomponen += floatval($pk->nominal);
+                    }
+                }
+            } else {
+                $defaultDept = DB::table('hrm_departemen_komponen as dk')
+                    ->join('hrm_komponen_gaji as k', 'dk.id_komponen', '=', 'k.id_komponen')
+                    ->where('dk.hrm_departemen_code', $p->hrm_m_position_code)
+                    ->where('k.is_active', true)
+                    ->select('k.tipe', 'dk.nominal_default')
+                    ->get();
+
+                foreach ($defaultDept as $dk) {
+                    if ($dk->tipe === 'pendapatan') {
+                        $totalPendapatan += floatval($dk->nominal_default);
+                    } else {
+                        $totalPotonganKomponen += floatval($dk->nominal_default);
+                    }
+                }
+            }
+
+            $trxPotongan = $transaksiPotonganMap->get($p->hrm_m_pegawai_code);
+            if ($trxPotongan) {
+                $potBpjsKes = (float) $trxPotongan->pot_bpjs_kes_karyawan;
+                $potJht = (float) $trxPotongan->pot_bpjs_jht_karyawan;
+                $potJp = (float) $trxPotongan->pot_bpjs_jp_karyawan;
+                $potBpjsTk = $potJht + $potJp;
+                $potPph21 = (float) $trxPotongan->pot_pph21_karyawan;
+                $totalPotonganBpjsPajak = (float) $trxPotongan->total_potongan_karyawan;
+            } else {
+                $brutoPajak = ((float) ($p->gaji_pokok ?? 0) + (float) ($p->tunjangan_tetap ?? 0)) > 0
+                    ? ((float) ($p->gaji_pokok ?? 0) + (float) ($p->tunjangan_tetap ?? 0))
+                    : $totalPendapatan;
+
+                $dasarUpahBpjs = (float) ($p->dasar_upah_bpjs ?? 0) > 0
+                    ? (float) $p->dasar_upah_bpjs
+                    : $brutoPajak;
+
+                $calc = method_exists($this, 'hitungKomponenPotongan')
+                    ? $this->hitungKomponenPotongan($p, $dasarUpahBpjs, $brutoPajak, $bpjsConfig, $listTer)
+                    : [
+                        'pot_bpjs_kes' => 0,
+                        'pot_jht' => 0,
+                        'pot_jp' => 0,
+                        'pot_bpjs_tk' => 0,
+                        'pot_pph21_karyawan' => 0,
+                        'total_potongan' => 0,
+                    ];
+
+                $potBpjsKes = $calc['pot_bpjs_kes'];
+                $potJht = $calc['pot_jht'];
+                $potJp = $calc['pot_jp'];
+                $potBpjsTk = $calc['pot_bpjs_tk'];
+                $potPph21 = $calc['pot_pph21_karyawan'];
+                $totalPotonganBpjsPajak = $calc['total_potongan'];
+            }
+
+            $totalPotongan = $totalPotonganKomponen + $totalPotonganBpjsPajak;
+            $thp = $totalPendapatan - $totalPotongan;
+
+            $isPaid = $trxGaji && strtoupper((string) $trxGaji->status) === 'PAID';
+            if ($trxGaji && isset($trxGaji->total_thp) && (float) $trxGaji->total_thp > 0) {
+                $thp = (float) $trxGaji->total_thp;
+            }
+
+            $p->is_verified = $isVerified;
+            $p->is_paid = $isPaid;
+            $p->payment_status = $isPaid ? 'PAID' : 'UNPAID';
+            $p->tanggal_bayar = $trxGaji->tanggal_bayar ?? null;
+            $p->metode_bayar = $trxGaji->metode_bayar ?? null;
+            $p->catatan_bayar = $trxGaji->catatan ?? null;
+            $p->total_pendapatan = $totalPendapatan;
+            $p->total_potongan_komponen = $totalPotonganKomponen;
+            $p->total_potongan_bpjs_pajak = $totalPotonganBpjsPajak;
+            $p->total_potongan = $totalPotongan;
+            $p->thp = $thp;
+            $p->potongan_detail = [
+                'bpjs_kes' => $potBpjsKes,
+                'bpjs_tk_jht' => $potJht,
+                'bpjs_tk_jp' => $potJp,
+                'bpjs_tk' => $potBpjsTk,
+                'pph21' => $potPph21,
+                'ptkp' => $p->hrm_ptkp_code ?? 'TK/0',
+            ];
+
+            return $p;
+        })
+            // Tampilkan hanya pegawai yang sudah diverifikasi SDM
+            ->filter(function ($item) {
+                return $item->is_verified === true;
+            });
+
+        if ($statusFilter === 'PAID') {
+            $items = $items->where('is_paid', true);
+        } elseif ($statusFilter === 'UNPAID') {
+            $items = $items->where('is_paid', false);
+        }
+
+        $data = $items->values();
+
+        $totalSiapBayar = $data->where('is_paid', false)->sum('thp');
+        $totalTerbayar = $data->where('is_paid', true)->sum('thp');
+        $belumDibayarCount = $data->where('is_paid', false)->count();
+
+        return response()->json([
+            'status' => true,
+            'periode' => $periodeStr,
+            'data' => $data,
+            'stats' => [
+                'totalPegawai' => $data->count(),
+                'totalSiapBayar' => 'Rp ' . number_format($totalSiapBayar, 0, ',', '.'),
+                'totalTerbayar' => 'Rp ' . number_format($totalTerbayar, 0, ',', '.'),
+                'belumDibayarCount' => $belumDibayarCount,
+            ]
+        ]);
+    }
+    public function payroll_payment_get_detail(Request $request, $pegawaiCode)
+    {
+        $bulan = (int) $request->input('bulan', date('n'));
+        $tahun = (int) $request->input('tahun', date('Y'));
+        $periodeStr = sprintf('%04d-%02d', $tahun, $bulan);
+
+        $pegawai = DB::table('hrm_master_pegawai as p')
+            ->leftJoin('hrm_departemen as d', 'p.hrm_m_position_code', '=', 'd.hrm_departemen_code')
+            ->leftJoin('hrm_m_gaji_pokok as g', 'p.hrm_m_pegawai_code', '=', 'g.hrm_m_pegawai_code')
+            ->where('p.hrm_m_pegawai_code', $pegawaiCode)
+            ->select(
+                'p.*',
+                'd.hrm_departemen_name',
+                'd.hrm_departemen_lokasi',
+                'g.nama_bank',
+                'g.nomor_rekening'
+            )
+            ->first();
+
+        if (!$pegawai) {
+            return response()->json(['status' => false, 'message' => 'Data pegawai tidak ditemukan.'], 404);
+        }
+
+        $komponen = DB::table('hrm_komponen_gaji as k')
+            ->leftJoin('hrm_departemen_komponen as dk', function ($join) use ($pegawai) {
+                $join->on('k.id_komponen', '=', 'dk.id_komponen')
+                    ->where('dk.hrm_departemen_code', '=', $pegawai->hrm_m_position_code);
+            })
+            ->leftJoin('hrm_pegawai_komponen as pk', function ($join) use ($pegawaiCode) {
+                $join->on('k.id_komponen', '=', 'pk.id_komponen')
+                    ->where('pk.hrm_m_pegawai_code', '=', $pegawaiCode);
+            })
+            ->where('k.is_active', true)
+            ->select(
+                'k.kode_komponen',
+                'k.nama_komponen',
+                'k.tipe',
+                DB::raw('COALESCE(pk.nominal, dk.nominal_default, 0) as nominal')
+            )
+            ->orderBy('k.id_komponen', 'asc')
+            ->get();
+
+        $trxGaji = DB::table('hrm_penggajian')
+            ->where('hrm_m_pegawai_code', $pegawaiCode)
+            ->where('bulan', $bulan)
+            ->where('tahun', $tahun)
+            ->first();
+
+        $trxPotongan = DB::table('hrm_transaksi_potongan_bulanan')
+            ->where('hrm_m_pegawai_code', $pegawaiCode)
+            ->where('periode_payroll', $periodeStr)
+            ->first();
+
+        return response()->json([
+            'status' => true,
+            'periode' => $periodeStr,
+            'pegawai' => $pegawai,
+            'komponen' => $komponen,
+            'potongan_bulanan' => $trxPotongan,
+            'pembayaran' => $trxGaji,
+        ]);
+    }
+    public function payroll_payment_pay(Request $request)
+    {
+        $request->validate([
+            'hrm_m_pegawai_code' => 'required|string',
+            'bulan'              => 'required|integer|min:1|max:12',
+            'tahun'              => 'required|integer|min:2020|max:2100',
+            'tanggal_bayar'      => 'required|date',
+            'metode_bayar'       => 'required|string|max:50',
+            'catatan'            => 'nullable|string|max:255',
+        ]);
+
+        $pegawaiCode = $request->hrm_m_pegawai_code;
+        $bulan = (int) $request->bulan;
+        $tahun = (int) $request->tahun;
+
+        $pegawai = DB::table('hrm_master_pegawai')
+            ->where('hrm_m_pegawai_code', $pegawaiCode)
+            ->first();
+
+        if (!$pegawai) {
+            return response()->json(['status' => false, 'message' => 'Pegawai tidak ditemukan.'], 404);
+        }
+
+        // Hitung ulang THP terkini agar nominal terbayar konsisten
+        $summary = $this->hitungRingkasanPayrollPegawai($pegawai, $bulan, $tahun);
+
+        DB::beginTransaction();
+        try {
+            $existing = DB::table('hrm_penggajian')
+                ->where('hrm_m_pegawai_code', $pegawaiCode)
+                ->where('bulan', $bulan)
+                ->where('tahun', $tahun)
+                ->first();
+
+            $payload = [
+                'total_pendapatan' => $summary['total_pendapatan'],
+                'total_potongan'   => $summary['total_potongan'],
+                'total_thp'        => $summary['thp'],
+                'status'           => 'PAID',
+                'tanggal_bayar'    => $request->tanggal_bayar,
+                'metode_bayar'     => $request->metode_bayar,
+                'catatan'          => $request->catatan,
+                'updated_at'       => now(),
+            ];
+
+            if (Auth::check()) {
+                $payload['paid_by'] = Auth::id();
+            }
+
+            if ($existing) {
+                DB::table('hrm_penggajian')
+                    ->where('id', $existing->id)
+                    ->update($payload);
+            } else {
+                $payload['hrm_m_pegawai_code'] = $pegawaiCode;
+                $payload['bulan'] = $bulan;
+                $payload['tahun'] = $tahun;
+                $payload['created_at'] = now();
+                DB::table('hrm_penggajian')->insert($payload);
+            }
+
+            DB::commit();
+
+            return response()->json([
+                'status'  => true,
+                'message' => 'Pembayaran gaji ' . $pegawai->hrm_m_pegawai_name . ' periode ' . sprintf('%02d/%04d', $bulan, $tahun) . ' berhasil ditandai PAID.',
+            ]);
+        } catch (\Throwable $e) {
+            DB::rollBack();
+            return response()->json([
+                'status'  => false,
+                'message' => 'Gagal memproses pembayaran: ' . $e->getMessage(),
+            ], 500);
+        }
+    }
+    public function payroll_payment_pay_bulk(Request $request)
+    {
+        $request->validate([
+            'pegawai_codes'   => 'required|array|min:1',
+            'pegawai_codes.*' => 'required|string',
+            'bulan'           => 'required|integer|min:1|max:12',
+            'tahun'           => 'required|integer|min:2020|max:2100',
+            'tanggal_bayar'   => 'required|date',
+            'metode_bayar'    => 'required|string|max:50',
+            'catatan'         => 'nullable|string|max:255',
+        ]);
+
+        $bulan = (int) $request->bulan;
+        $tahun = (int) $request->tahun;
+        $codes = array_unique($request->pegawai_codes);
+
+        DB::beginTransaction();
+        try {
+            $processed = 0;
+
+            foreach ($codes as $code) {
+                $pegawai = DB::table('hrm_master_pegawai')
+                    ->where('hrm_m_pegawai_code', $code)
+                    ->first();
+
+                if (!$pegawai) {
+                    continue;
+                }
+
+                $summary = $this->hitungRingkasanPayrollPegawai($pegawai, $bulan, $tahun);
+
+                $existing = DB::table('hrm_penggajian')
+                    ->where('hrm_m_pegawai_code', $code)
+                    ->where('bulan', $bulan)
+                    ->where('tahun', $tahun)
+                    ->first();
+
+                $payload = [
+                    'total_pendapatan' => $summary['total_pendapatan'],
+                    'total_potongan'   => $summary['total_potongan'],
+                    'total_thp'        => $summary['thp'],
+                    'status'           => 'PAID',
+                    'tanggal_bayar'    => $request->tanggal_bayar,
+                    'metode_bayar'     => $request->metode_bayar,
+                    'catatan'          => $request->catatan,
+                    'updated_at'       => now(),
+                ];
+
+                if (Auth::check()) {
+                    $payload['paid_by'] = Auth::id();
+                }
+
+                if ($existing) {
+                    DB::table('hrm_penggajian')
+                        ->where('id', $existing->id)
+                        ->update($payload);
+                } else {
+                    $payload['hrm_m_pegawai_code'] = $code;
+                    $payload['bulan'] = $bulan;
+                    $payload['tahun'] = $tahun;
+                    $payload['created_at'] = now();
+                    DB::table('hrm_penggajian')->insert($payload);
+                }
+
+                $processed++;
+            }
+
+            DB::commit();
+
+            return response()->json([
+                'status'  => true,
+                'message' => "{$processed} data gaji pegawai berhasil diproses menjadi PAID.",
+            ]);
+        } catch (\Throwable $e) {
+            DB::rollBack();
+            return response()->json([
+                'status'  => false,
+                'message' => 'Gagal memproses pembayaran massal: ' . $e->getMessage(),
+            ], 500);
+        }
+    }
+    public function payroll_payment_export_excel(Request $request)
+    {
+        $bulan = (int) $request->input('bulan', date('n'));
+        $tahun = (int) $request->input('tahun', date('Y'));
+        $periodeStr = sprintf('%04d-%02d', $tahun, $bulan);
+
+        $jsonResponse = $this->payroll_payment_get_data($request);
+        $payload = $jsonResponse->getData(true);
+        $rows = $payload['data'] ?? [];
+
+        $filename = "rekap-payment-payroll-{$periodeStr}.csv";
+        $headers = [
+            'Content-Type'        => 'text/csv; charset=UTF-8',
+            'Content-Disposition' => "attachment; filename=\"{$filename}\"",
+        ];
+
+        $callback = function () use ($rows, $periodeStr) {
+            $handle = fopen('php://output', 'w');
+            fprintf($handle, chr(0xEF) . chr(0xBB) . chr(0xBF));
+            fputcsv($handle, [
+                'Periode',
+                'Kode Pegawai',
+                'NIP',
+                'Nama Pegawai',
+                'Departemen',
+                'Bank',
+                'No Rekening',
+                'Total Pendapatan',
+                'Total Potongan',
+                'THP',
+                'Status Pembayaran',
+                'Tanggal Bayar',
+                'Metode Bayar',
+            ]);
+
+            foreach ($rows as $r) {
+                fputcsv($handle, [
+                    $periodeStr,
+                    $r['hrm_m_pegawai_code'] ?? '',
+                    $r['hrm_m_pegawai_nip'] ?? '',
+                    $r['hrm_m_pegawai_name'] ?? '',
+                    $r['hrm_departemen_name'] ?? '',
+                    $r['nama_bank'] ?? '',
+                    $r['nomor_rekening'] ?? '',
+                    $r['total_pendapatan'] ?? 0,
+                    $r['total_potongan'] ?? 0,
+                    $r['thp'] ?? 0,
+                    $r['payment_status'] ?? 'UNPAID',
+                    $r['tanggal_bayar'] ?? '-',
+                    $r['metode_bayar'] ?? '-',
+                ]);
+            }
+
+            fclose($handle);
+        };
+
+        return response()->stream($callback, 200, $headers);
+    }
+    private function hitungRingkasanPayrollPegawai($pegawai, int $bulan, int $tahun): array
+    {
+        $periodeStr = sprintf('%04d-%02d', $tahun, $bulan);
+
+        $pegawaiKomponen = DB::table('hrm_pegawai_komponen as pk')
+            ->join('hrm_komponen_gaji as k', 'pk.id_komponen', '=', 'k.id_komponen')
+            ->where('pk.hrm_m_pegawai_code', $pegawai->hrm_m_pegawai_code)
+            ->where('k.is_active', true)
+            ->select('k.tipe', 'pk.nominal')
+            ->get();
+
+        $totalPendapatan = 0.0;
+        $totalPotonganKomponen = 0.0;
+
+        if ($pegawaiKomponen->isNotEmpty()) {
+            foreach ($pegawaiKomponen as $pk) {
+                if ($pk->tipe === 'pendapatan') {
+                    $totalPendapatan += floatval($pk->nominal);
+                } else {
+                    $totalPotonganKomponen += floatval($pk->nominal);
+                }
+            }
+        } else {
+            $defaultDept = DB::table('hrm_departemen_komponen as dk')
+                ->join('hrm_komponen_gaji as k', 'dk.id_komponen', '=', 'k.id_komponen')
+                ->where('dk.hrm_departemen_code', $pegawai->hrm_m_position_code)
+                ->where('k.is_active', true)
+                ->select('k.tipe', 'dk.nominal_default')
+                ->get();
+
+            foreach ($defaultDept as $dk) {
+                if ($dk->tipe === 'pendapatan') {
+                    $totalPendapatan += floatval($dk->nominal_default);
+                } else {
+                    $totalPotonganKomponen += floatval($dk->nominal_default);
+                }
+            }
+        }
+
+        $trxPotongan = DB::table('hrm_transaksi_potongan_bulanan')
+            ->where('hrm_m_pegawai_code', $pegawai->hrm_m_pegawai_code)
+            ->where('periode_payroll', $periodeStr)
+            ->first();
+
+        if ($trxPotongan) {
+            $totalPotonganBpjsPajak = (float) $trxPotongan->total_potongan_karyawan;
+        } else {
+            $cfg = DB::table('hrm_pegawai_pajak_bpjs as c')
+                ->leftJoin('hrm_master_ptkp as t', 'c.hrm_ptkp_code', '=', 't.hrm_ptkp_code')
+                ->where('c.hrm_m_pegawai_code', $pegawai->hrm_m_pegawai_code)
+                ->select('c.*', 't.hrm_ter_kategori')
+                ->first();
+
+            $bpjsConfig = DB::table('hrm_master_bpjs_config')->where('is_active', true)->first() ?? (object) [
+                'bpjs_kes_karyawan_persen' => 1.00,
+                'bpjs_kes_perusahaan_persen' => 4.00,
+                'bpjs_kes_max_upah' => 12000000,
+                'bpjs_jht_karyawan_persen' => 2.00,
+                'bpjs_jht_perusahaan_persen' => 3.70,
+                'bpjs_jp_karyawan_persen' => 1.00,
+                'bpjs_jp_perusahaan_persen' => 2.00,
+                'bpjs_jp_max_upah' => 10547400,
+                'bpjs_jkk_perusahaan_persen' => 0.24,
+                'bpjs_jkm_perusahaan_persen' => 0.30,
+            ];
+
+            $listTer = DB::table('hrm_master_ter_tarif')
+                ->orderBy('hrm_ter_kategori')
+                ->orderBy('bruto_min')
+                ->get();
+
+            $brutoPajak = ((float) ($cfg->gaji_pokok ?? 0) + (float) ($cfg->tunjangan_tetap ?? 0)) > 0
+                ? ((float) ($cfg->gaji_pokok ?? 0) + (float) ($cfg->tunjangan_tetap ?? 0))
+                : $totalPendapatan;
+
+            $dasarUpahBpjs = (float) ($cfg->dasar_upah_bpjs ?? 0) > 0
+                ? (float) $cfg->dasar_upah_bpjs
+                : $brutoPajak;
+
+            $calc = method_exists($this, 'hitungKomponenPotongan')
+                ? $this->hitungKomponenPotongan($cfg ?? (object) [], $dasarUpahBpjs, $brutoPajak, $bpjsConfig, $listTer)
+                : ['total_potongan' => 0];
+
+            $totalPotonganBpjsPajak = (float) ($calc['total_potongan'] ?? 0);
+        }
+
+        $totalPotongan = $totalPotonganKomponen + $totalPotonganBpjsPajak;
+        $thp = $totalPendapatan - $totalPotongan;
+
+        return [
+            'total_pendapatan' => $totalPendapatan,
+            'total_potongan'   => $totalPotongan,
+            'thp'              => $thp,
+        ];
     }
 }

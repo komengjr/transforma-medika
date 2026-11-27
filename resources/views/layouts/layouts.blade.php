@@ -601,67 +601,67 @@
                                 </a>
 
                                 <!-- Dropdown Menu dengan Efek Glassmorphism & Enterprise Styling -->
-                                <div class="dropdown-menu dropdown-menu-end py-0 shadow-lg border border-1 border-light-subtle rounded-3 overflow-hidden ent-dropdown-anim" aria-labelledby="navbarDropdownUser" style="min-width: 260px; max-width: 420px; z-index: 1050; border-color: rgba(99, 102, 241, 0.2) !important;">
+                                <div class="dropdown-menu dropdown-menu-end p-2 shadow-lg border border-1 border-light-subtle rounded-4 ent-dropdown-anim" aria-labelledby="navbarDropdownUser" style="min-width: 280px; max-width: 360px; z-index: 1050; border-color: rgba(99, 102, 241, 0.18) !important;">
                                     <div class="bg-white dark__bg-1000">
-                                        <!-- Header Profil -->
-                                        <div class="p-3 text-center border-bottom border-light-subtle position-relative overflow-hidden" style="background: linear-gradient(135deg, rgba(79, 70, 229, 0.08) 0%, rgba(67, 56, 202, 0.03) 100%);">
-                                            <div class="position-absolute top-0 start-0 w-100 h-100 opacity-25" style="background-image: radial-gradient(circle at 80% 20%, rgba(79, 70, 229, 0.15) 0%, transparent 50%); z-index: 1;"></div>
-
-                                            <div class="position-relative" style="z-index: 2;">
-                                                <div class="avatar avatar-2xl mx-auto mb-2" style="width: 50px; height: 50px;">
-                                                    <img class="rounded-circle border border-2 border-primary shadow-sm" src="{{ asset('img/pp.png') }}" alt="" style="width: 50px; height: 50px; object-fit: cover;" />
+                                        <!-- Header Profil (Nama & Role di Kiri, Kotak Ikon/Avatar di Kanan) -->
+                                        <div class="p-3 mb-1 rounded-3 border border-light-subtle d-flex align-items-center justify-content-between gap-2" style="background: rgba(79, 70, 229, 0.03);">
+                                            <div class="min-w-0">
+                                                <div class="fw-bold text-dark dark__text-white text-truncate" style="font-size: 0.92rem; line-height: 1.25;">
+                                                    {{ Auth::user()->fullname }}
                                                 </div>
-                                                <h6 class="fw-extrabold text-dark dark__text-white mb-0" style="font-size: 0.88rem; letter-spacing: -0.01em;">{{ Auth::user()->fullname }}</h6>
-                                                <span class="badge bg-primary-subtle text-primary border border-primary-subtle rounded-pill px-2 py-1 mt-1 text-uppercase fw-bold" style="font-size: 0.62rem; letter-spacing: 0.04em;">
-                                                    <i class="fas fa-shield-alt me-1 text-primary"></i> {{ Auth::user()->access_code }}
+                                                <span class="badge bg-primary-subtle text-primary border border-primary-subtle rounded-2 px-2 py-1 mt-1 d-inline-block text-uppercase fw-bold" style="font-size: 0.65rem; letter-spacing: 0.04em;">
+                                                    {{ Auth::user()->access_code }}
                                                 </span>
+                                            </div>
+                                            <div class="d-flex align-items-center justify-content-center rounded-3 flex-shrink-0" style="width: 40px; height: 40px; background: rgba(79, 70, 229, 0.1); color: #4f46e5;">
+                                                <i class="fas fa-user-shield" style="font-size: 1rem;"></i>
                                             </div>
                                         </div>
 
-                                        <!-- Item Menu dengan Animasi Hover & Micro-Animations -->
-                                        <div class="p-2 d-flex flex-column gap-1">
-                                            <a class="dropdown-item rounded-2 py-2 px-3 d-flex align-items-center justify-content-between ent-menu-item" href="#!" id="button-setup-notification" data-bs-toggle="modal" data-bs-target="#modal-template-sm">
-                                                <span class="d-flex align-items-center gap-2">
-                                                    <span class="icon-box bg-warning-subtle text-warning d-flex align-items-center justify-content-center rounded-2" style="width: 28px; height: 28px;">
-                                                        <i class="fas fa-bell anim-shake" style="font-size: 0.82rem;"></i>
+                                        <!-- Item Menu -->
+                                        <div class="pt-1 d-flex flex-column gap-1">
+                                            <a class="dropdown-item rounded-3 py-2 px-2 d-flex align-items-center justify-content-between ent-menu-item" href="{{ route('dashboard.home') }}">
+                                                <span class="d-flex align-items-center gap-3">
+                                                    <span class="icon-box d-flex align-items-center justify-content-center rounded-3 flex-shrink-0" style="width: 34px; height: 34px; background: rgba(99, 102, 241, 0.12); color: #4f46e5;">
+                                                        <i class="fas fa-home anim-pulse-slow" style="font-size: 0.88rem;"></i>
                                                     </span>
-                                                    <span class="fw-semibold text-dark dark__text-light" style="font-size: 0.78rem;">Set Notification</span>
+                                                    <span class="fw-semibold text-dark dark__text-light" style="font-size: 0.84rem;">Halaman Utama</span>
                                                 </span>
-                                                <i class="fas fa-chevron-right text-muted opacity-50" style="font-size: 0.65rem;"></i>
+                                                <i class="fas fa-chevron-right text-muted opacity-75" style="font-size: 0.72rem;"></i>
                                             </a>
 
-                                            <a class="dropdown-item rounded-2 py-2 px-3 d-flex align-items-center justify-content-between ent-menu-item" href="#" id="button-setup-profil" data-bs-toggle="modal" data-bs-target="#modal-template-xl">
-                                                <span class="d-flex align-items-center gap-2">
-                                                    <span class="icon-box bg-info-subtle text-info d-flex align-items-center justify-content-center rounded-2" style="width: 28px; height: 28px;">
-                                                        <i class="fas fa-user-cog anim-spin-hover" style="font-size: 0.82rem;"></i>
+                                            <a class="dropdown-item rounded-3 py-2 px-2 d-flex align-items-center justify-content-between ent-menu-item" href="#" id="button-setup-profil" data-bs-toggle="modal" data-bs-target="#modal-template-xl">
+                                                <span class="d-flex align-items-center gap-3">
+                                                    <span class="icon-box d-flex align-items-center justify-content-center rounded-3 flex-shrink-0" style="width: 34px; height: 34px; background: rgba(245, 158, 11, 0.14); color: #d97706;">
+                                                        <i class="fas fa-key anim-spin-hover" style="font-size: 0.88rem;"></i>
                                                     </span>
-                                                    <span class="fw-semibold text-dark dark__text-light" style="font-size: 0.78rem;">Profile &amp; Account</span>
+                                                    <span class="fw-semibold text-dark dark__text-light" style="font-size: 0.84rem;">Ubah Kata Sandi</span>
                                                 </span>
-                                                <i class="fas fa-chevron-right text-muted opacity-50" style="font-size: 0.65rem;"></i>
+                                                <i class="fas fa-chevron-right text-muted opacity-75" style="font-size: 0.72rem;"></i>
                                             </a>
 
                                             @if (Auth::user()->access_code == 'master')
-                                            <a class="dropdown-item rounded-2 py-2 px-3 d-flex align-items-center justify-content-between ent-menu-item" href="{{ route('master_dashboard') }}">
-                                                <span class="d-flex align-items-center gap-2">
-                                                    <span class="icon-box bg-danger-subtle text-danger d-flex align-items-center justify-content-center rounded-2" style="width: 28px; height: 28px;">
-                                                        <i class="fas fa-th-large anim-pulse-slow" style="font-size: 0.82rem;"></i>
+                                            <a class="dropdown-item rounded-3 py-2 px-2 d-flex align-items-center justify-content-between ent-menu-item" href="{{ route('master_dashboard') }}">
+                                                <span class="d-flex align-items-center gap-3">
+                                                    <span class="icon-box d-flex align-items-center justify-content-center rounded-3 flex-shrink-0" style="width: 34px; height: 34px; background: rgba(168, 85, 247, 0.14); color: #9333ea;">
+                                                        <i class="fas fa-sliders-h anim-shake" style="font-size: 0.88rem;"></i>
                                                     </span>
-                                                    <span class="fw-semibold text-dark dark__text-light" style="font-size: 0.78rem;">Master Page</span>
+                                                    <span class="fw-semibold text-dark dark__text-light" style="font-size: 0.84rem;">Master Page</span>
                                                 </span>
-                                                <span class="badge bg-danger text-white rounded-pill" style="font-size: 0.58rem; font-weight: 800;">ROOT</span>
+                                                <i class="fas fa-chevron-right text-muted opacity-75" style="font-size: 0.72rem;"></i>
                                             </a>
                                             @endif
 
                                             <div class="dropdown-divider my-1 border-light-subtle"></div>
 
-                                            <a class="dropdown-item rounded-2 py-2 px-3 d-flex align-items-center justify-content-between ent-menu-item text-danger" href="{{ route('logout') }}">
-                                                <span class="d-flex align-items-center gap-2">
-                                                    <span class="icon-box bg-danger-subtle text-danger d-flex align-items-center justify-content-center rounded-2" style="width: 28px; height: 28px;">
-                                                        <i class="fas fa-sign-out-alt anim-slide-right" style="font-size: 0.82rem;"></i>
+                                            <a class="dropdown-item rounded-3 py-2 px-2 d-flex align-items-center justify-content-between ent-menu-item" href="{{ route('logout') }}">
+                                                <span class="d-flex align-items-center gap-3">
+                                                    <span class="icon-box d-flex align-items-center justify-content-center rounded-3 flex-shrink-0" style="width: 34px; height: 34px; background: rgba(244, 63, 94, 0.12); color: #e11d48;">
+                                                        <i class="fas fa-sign-out-alt anim-slide-right" style="font-size: 0.88rem;"></i>
                                                     </span>
-                                                    <span class="fw-bold" style="font-size: 0.78rem;">Logout</span>
+                                                    <span class="fw-semibold text-dark dark__text-light" style="font-size: 0.84rem;">Log Out</span>
                                                 </span>
-                                                <span class="small opacity-50 font-monospace" style="font-size: 0.62rem;"><i class="fas fa-power-off"></i></span>
+                                                <i class="fas fa-chevron-right text-muted opacity-75" style="font-size: 0.72rem;"></i>
                                             </a>
                                         </div>
                                     </div>

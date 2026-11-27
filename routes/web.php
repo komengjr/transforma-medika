@@ -144,6 +144,7 @@ Route::prefix('{akses}/{id}')->group(function (): void {
     Route::get('master-kpi/master-kpi', [HrmController::class, 'master_data_kpi'])->name('master_data_kpi');
     Route::get('master-kpi/master-kpi-pegawai', [HrmController::class, 'master_data_kpi_pegawai'])->name('master_data_kpi_pegawai');
     Route::get('master-kpi/master-kpi-rekap', [HrmController::class, 'master_data_kpi_rekap'])->name('master_data_kpi_rekap');
+    Route::get('accounting-hrm/payroll-payment', [HrmController::class, 'accounting_hrm_payroll_payment'])->name('accounting_hrm_payroll_payment');
     // Route::get('{id}/dashboard', [dashboardController::class, 'dashboard_medica'])->name('dashboard_medica');
     // INVENTARIS
     Route::get('menu-peminjaman/data-peminjaman', [PeminjamanController::class, 'menu_data_peminjaman'])->name('menu_data_peminjaman');

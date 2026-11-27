@@ -13,6 +13,7 @@ use Maatwebsite\Excel\Facades\Excel;
 use SimpleSoftwareIO\QrCode\Facades\QrCode;
 use Spatie\PdfToImage\Pdf;
 use App\Services\ZebraPrinterService;
+use Illuminate\Support\Carbon;
 
 class LaboratoriumController extends Controller
 {
@@ -358,38 +359,126 @@ class LaboratoriumController extends Controller
     public function data_specimen_collection_lab($akses, $id)
     {
         if ($this->url_akses_sub($akses, $id) == true) {
-            // Mengambil data registrasi laboratorium yang status pemeriksaannya masih MENUNGGU atau ber-prefix LAB
-            $data = DB::table('medical_transaksi_detail as td')
-                ->join('medical_master_pemeriksaan as mp', 'td.master_pemeriksaan_id', '=', 'mp.id')
-                ->join('medical_transaksi as t', 'td.transaksi_id', '=', 't.id')
-                ->join('medical_registrasi as reg', 't.registrasi_id', '=', 'reg.id')
-                ->join('medical_patient as p', 'reg.pasien_id', '=', 'p.id')
-                ->leftJoin('medical_tipe_layanan as tl', 'mp.tipe_layanan_id', '=', 'tl.id')
-                ->where(function ($q) {
-                    $q->where('tl.prefix', 'LIKE', '%LAB%')
-                        ->orWhere('td.no_pemeriksaan', 'LIKE', 'LAB%');
-                })
-                ->where('td.status_pemeriksaan', 'MENUNGGU') // Filter status spesimen yang belum diambil/diproses
-                ->select([
-                    'td.id as id_d_reg_order_lab',
-                    'td.no_pemeriksaan as d_reg_order_lab_code',
-                    'reg.no_registrasi as d_reg_order_code',
-                    'reg.tanggal_registrasi as d_reg_order_date',
-                    'p.pid as d_reg_order_rm',
-                    'p.title',
-                    'p.nama as master_patient_name',
-                    'td.status_pemeriksaan as d_reg_order_lab_status'
-                ])
-                ->orderBy('td.id', 'DESC')
-                ->get();
+            $today = Carbon::today()->toDateString();
+
+            $data = $this->querySpecimenCollectionLab([
+                'tgl_awal'      => $today,
+                'tgl_akhir'     => $today,
+                'no_registrasi' => null,
+            ]);
 
             return view('application.laboratorium.data-specimen-collection', [
-                'data' => $data,
-                'akses' => $akses,
-                'code' => $id
+                'data'          => $data,
+                'akses'         => $akses,
+                'code'          => $id,
+                'default_today' => Carbon::today()->format('d/m/Y'),
             ]);
         } else {
             return Redirect::to('dashboard/home');
+        }
+    }
+    public function data_specimen_collection_lab_search(Request $request)
+    {
+        $noReg = trim((string)$request->input('no_registrasi', ''));
+        $rangeRaw = trim((string)$request->input('range_tanggal', ''));
+
+        $tglAwal = null;
+        $tglAkhir = null;
+
+        if ($rangeRaw !== '') {
+            $parts = preg_split('/\s+to\s+|\s*-\s*/i', $rangeRaw);
+            $tglAwal = $this->parseTanggalSpecimen($parts[0] ?? null);
+            $tglAkhir = $this->parseTanggalSpecimen($parts[1] ?? ($parts[0] ?? null));
+
+            if ($tglAwal && $tglAkhir && $tglAwal > $tglAkhir) {
+                [$tglAwal, $tglAkhir] = [$tglAkhir, $tglAwal];
+            }
+        }
+
+        // Jika keduanya kosong, kembalikan data hari ini saja
+        if ($noReg === '' && !$tglAwal && !$tglAkhir) {
+            $today = Carbon::today()->toDateString();
+            $tglAwal = $today;
+            $tglAkhir = $today;
+        }
+
+        $data = $this->querySpecimenCollectionLab([
+            'tgl_awal'      => $tglAwal,
+            'tgl_akhir'     => $tglAkhir,
+            'no_registrasi' => $noReg,
+        ]);
+
+        $html = view('application.laboratorium.speciment-collection.specimen-collection-list', [
+            'data' => $data,
+        ])->render();
+
+        return response()->json([
+            'status' => true,
+            'total'  => $data->count(),
+            'html'   => $html,
+        ]);
+    }
+    private function querySpecimenCollectionLab(array $filters)
+    {
+        $query = DB::table('medical_transaksi_detail as td')
+            ->join('medical_master_pemeriksaan as mp', 'td.master_pemeriksaan_id', '=', 'mp.id')
+            ->join('medical_transaksi as t', 'td.transaksi_id', '=', 't.id')
+            ->join('medical_registrasi as reg', 't.registrasi_id', '=', 'reg.id')
+            ->join('medical_patient as p', 'reg.pasien_id', '=', 'p.id')
+            ->leftJoin('medical_tipe_layanan as tl', 'mp.tipe_layanan_id', '=', 'tl.id')
+            ->where(function ($q) {
+                $q->where('tl.prefix', 'LIKE', '%LAB%')
+                    ->orWhere('td.no_pemeriksaan', 'LIKE', 'LAB%');
+            })
+            ->where('td.status_pemeriksaan', 'MENUNGGU')
+            ->select([
+                'td.id as id_d_reg_order_lab',
+                'td.no_pemeriksaan as d_reg_order_lab_code',
+                'reg.no_registrasi as d_reg_order_code',
+                'reg.tanggal_registrasi as d_reg_order_date',
+                'p.pid as d_reg_order_rm',
+                'p.title',
+                'p.nama as master_patient_name',
+                'td.status_pemeriksaan as d_reg_order_lab_status'
+            ]);
+
+        if (!empty($filters['no_registrasi'])) {
+            $query->where(function ($q) use ($filters) {
+                $q->where('reg.no_registrasi', 'like', '\%' . $filters['no_registrasi'] . '%')
+                    ->orWhere('td.no_pemeriksaan', 'like', '%' . $filters['no_registrasi'] . '%');
+            });
+        }
+
+        if (!empty($filters['tgl_awal']) && !empty($filters['tgl_akhir'])) {
+            $query->whereBetween(DB::raw('DATE(reg.tanggal_registrasi)'), [$filters['tgl_awal'], $filters['tgl_akhir']]);
+        } elseif (!empty($filters['tgl_awal'])) {
+            $query->whereDate('reg.tanggal_registrasi', $filters['tgl_awal']);
+        }
+
+        return $query->orderBy('td.id', 'DESC')->get();
+    }
+    private function parseTanggalSpecimen(?string $raw): ?string
+    {
+        if (!$raw) {
+            return null;
+        }
+
+        $raw = trim($raw);
+        foreach (['d/m/y', 'd/m/Y', 'Y-m-d'] as $fmt) {
+            try {
+                $dt = Carbon::createFromFormat($fmt, $raw);
+                if ($dt !== false) {
+                    return $dt->toDateString();
+                }
+            } catch (\Throwable $e) {
+                // lanjut ke format berikutnya
+            }
+        }
+
+        try {
+            return Carbon::parse($raw)->toDateString();
+        } catch (\Throwable $e) {
+            return null;
         }
     }
     public function data_specimen_collection_lab_cari_data(Request $request)
@@ -870,47 +959,131 @@ class LaboratoriumController extends Controller
     public function menu_lab_proses_result($akses, $id)
     {
         if ($this->url_akses_sub($akses, $id) == true) {
-            // Ambil data detail transaksi lab yang masih proses/menunggu
-            $rawQuery = DB::table('medical_transaksi_detail as td')
-                ->join('medical_transaksi as t', 'td.transaksi_id', '=', 't.id')
-                ->join('medical_registrasi as reg', 't.registrasi_id', '=', 'reg.id')
-                ->join('medical_patient as p', 'reg.pasien_id', '=', 'p.id')
-                ->join('medical_master_pemeriksaan as mp', 'td.master_pemeriksaan_id', '=', 'mp.id')
-                ->whereIn('td.status_pemeriksaan', ['MENUNGGU', 'PROSES'])
-                ->select([
-                    'reg.id as registrasi_id',
-                    'reg.no_registrasi',
-                    'reg.tanggal_registrasi as d_reg_order_lab_date',
-                    'p.nama as master_patient_name',
-                    'p.pid as master_patient_rm',
-                    'td.id as detail_id',
-                    'td.no_pemeriksaan as d_reg_order_lab_code',
-                    'mp.nama_layanan'
-                ])
-                ->orderBy('reg.tanggal_registrasi', 'ASC')
-                ->get();
+            $today = Carbon::today()->toDateString();
 
-            // Grouping berdasarkan no_registrasi
-            $groupedData = $rawQuery->groupBy('no_registrasi')->map(function ($rows) {
-                $first = $rows->first();
-                return (object)[
-                    'registrasi_id'          => $first->registrasi_id,
-                    'no_registrasi'          => $first->no_registrasi,
-                    'd_reg_order_lab_date'   => $first->d_reg_order_lab_date,
-                    'master_patient_name'    => $first->master_patient_name,
-                    'master_patient_rm'      => $first->master_patient_rm,
-                    'total_pemeriksaan'      => $rows->count(),
-                    'items'                  => $rows // Semua pemeriksaan dalam registrasi ini
-                ];
-            })->values();
+            $groupedData = $this->queryProsesResultLab([
+                'tgl_awal'      => $today,
+                'tgl_akhir'     => $today,
+                'no_registrasi' => null,
+            ]);
 
             return view('application.laboratorium.proses-result', [
-                'data'  => $groupedData,
-                'akses' => $akses,
-                'code'  => $id
+                'data'          => $groupedData,
+                'akses'         => $akses,
+                'code'          => $id,
+                'default_today' => Carbon::today()->format('d/m/Y'),
             ]);
         } else {
             return Redirect::to('dashboard/home');
+        }
+    }
+    public function menu_lab_proses_result_search(Request $request)
+    {
+        $noReg = trim((string) $request->input('no_registrasi', ''));
+        $rangeRaw = trim((string) $request->input('range_tanggal', ''));
+
+        $tglAwal = null;
+        $tglAkhir = null;
+
+        if ($rangeRaw !== '') {
+            $parts = preg_split('/\s+to\s+|\s*-\s*/i', $rangeRaw);
+            $tglAwal = $this->parseTanggalProsesResult($parts[0] ?? null);
+            $tglAkhir = $this->parseTanggalProsesResult($parts[1] ?? ($parts[0] ?? null));
+
+            if ($tglAwal && $tglAkhir && $tglAwal > $tglAkhir) {
+                [$tglAwal, $tglAkhir] = [$tglAkhir, $tglAwal];
+            }
+        }
+
+        // Jika keduanya kosong, kembalikan antrean hari ini saja
+        if ($noReg === '' && !$tglAwal && !$tglAkhir) {
+            $today = Carbon::today()->toDateString();
+            $tglAwal = $today;
+            $tglAkhir = $today;
+        }
+
+        $groupedData = $this->queryProsesResultLab([
+            'tgl_awal'      => $tglAwal,
+            'tgl_akhir'     => $tglAkhir,
+            'no_registrasi' => $noReg,
+        ]);
+
+        $html = view('application.laboratorium.proses-result.proses-result-list', [
+            'data' => $groupedData,
+        ])->render();
+
+        return response()->json([
+            'status' => true,
+            'total'  => $groupedData->count(),
+            'html'   => $html,
+        ]);
+    }
+    private function queryProsesResultLab(array $filters)
+    {
+        $query = DB::table('medical_transaksi_detail as td')
+            ->join('medical_transaksi as t', 'td.transaksi_id', '=', 't.id')
+            ->join('medical_registrasi as reg', 't.registrasi_id', '=', 'reg.id')
+            ->join('medical_patient as p', 'reg.pasien_id', '=', 'p.id')
+            ->join('medical_master_pemeriksaan as mp', 'td.master_pemeriksaan_id', '=', 'mp.id')
+            ->whereIn('td.status_pemeriksaan', ['MENUNGGU', 'PROSES'])
+            ->select([
+                'reg.id as registrasi_id',
+                'reg.no_registrasi',
+                'reg.tanggal_registrasi as d_reg_order_lab_date',
+                'p.nama as master_patient_name',
+                'p.pid as master_patient_rm',
+                'td.id as detail_id',
+                'td.no_pemeriksaan as d_reg_order_lab_code',
+                'mp.nama_layanan'
+            ]);
+
+        if (!empty($filters['no_registrasi'])) {
+            $query->where('reg.no_registrasi', 'like', '%' . $filters['no_registrasi'] . '%');
+        }
+
+        if (!empty($filters['tgl_awal']) && !empty($filters['tgl_akhir'])) {
+            $query->whereBetween(DB::raw('DATE(reg.tanggal_registrasi)'), [$filters['tgl_awal'], $filters['tgl_akhir']]);
+        } elseif (!empty($filters['tgl_awal'])) {
+            $query->whereDate('reg.tanggal_registrasi', $filters['tgl_awal']);
+        }
+
+        $rawQuery = $query->orderBy('reg.tanggal_registrasi', 'ASC')->get();
+
+        return $rawQuery->groupBy('no_registrasi')->map(function ($rows) {
+            $first = $rows->first();
+            return (object)[
+                'registrasi_id'        => $first->registrasi_id,
+                'no_registrasi'        => $first->no_registrasi,
+                'd_reg_order_lab_date' => $first->d_reg_order_lab_date,
+                'master_patient_name'  => $first->master_patient_name,
+                'master_patient_rm'    => $first->master_patient_rm,
+                'total_pemeriksaan'    => $rows->count(),
+                'items'                => $rows
+            ];
+        })->values();
+    }
+    private function parseTanggalProsesResult(?string $raw): ?string
+    {
+        if (!$raw) {
+            return null;
+        }
+
+        $raw = trim($raw);
+        foreach (['d/m/y', 'd/m/Y', 'Y-m-d'] as $fmt) {
+            try {
+                $dt = Carbon::createFromFormat($fmt, $raw);
+                if ($dt !== false) {
+                    return $dt->toDateString();
+                }
+            } catch (\Throwable $e) {
+                // lanjut ke format berikutnya
+            }
+        }
+
+        try {
+            return Carbon::parse($raw)->toDateString();
+        } catch (\Throwable $e) {
+            return null;
         }
     }
     public function menu_lab_proses_result_detail(Request $request)
@@ -1788,47 +1961,135 @@ class LaboratoriumController extends Controller
     public function dokumentasi_hasil_laboratorium($akses, $id)
     {
         if ($this->url_akses_sub($akses, $id) == true) {
-            // Mengambil registrasi lab yang statusnya 'TERVERIFIKASI' atau setara (> 2)
-            $rawQuery = DB::table('medical_transaksi_detail as td')
-                ->join('medical_transaksi as t', 'td.transaksi_id', '=', 't.id')
-                ->join('medical_registrasi as reg', 't.registrasi_id', '=', 'reg.id')
-                ->join('medical_patient as p', 'reg.pasien_id', '=', 'p.id')
-                ->whereIn('td.status_pemeriksaan', ['TERVERIFIKASI', 'SELESAI']) // Disesuaikan dengan status tahap lanjut
-                ->select([
-                    'reg.id as registrasi_id',
-                    'reg.no_registrasi',
-                    'reg.tanggal_registrasi as d_reg_order_lab_date',
-                    'p.nama as master_patient_name',
-                    'p.pid as master_patient_rm',
-                    'td.id as detail_id',
-                    'td.no_pemeriksaan as d_reg_order_lab_code',
-                    'td.status_pemeriksaan'
-                ])
-                ->orderBy('reg.tanggal_registrasi', 'DESC')
-                ->get();
+            $today = Carbon::today()->toDateString();
 
-            // Grouping berdasarkan no_registrasi
-            $groupedData = $rawQuery->groupBy('no_registrasi')->map(function ($rows) {
-                $first = $rows->first();
-                return (object)[
-                    'registrasi_id'         => $first->registrasi_id,
-                    'no_registrasi'         => $first->no_registrasi,
-                    'd_reg_order_lab_date'  => $first->d_reg_order_lab_date,
-                    'master_patient_name'   => $first->master_patient_name,
-                    'master_patient_rm'     => $first->master_patient_rm,
-                    'd_reg_order_lab_code'  => $first->d_reg_order_lab_code, // Kode unik untuk target AJAX detail
-                    'total_pemeriksaan'     => $rows->count(),
-                    'items'                 => $rows
-                ];
-            })->values();
+            $groupedData = $this->queryDokumentasiLab([
+                'tgl_awal'      => $today,
+                'tgl_akhir'     => $today,
+                'no_registrasi' => null,
+            ]);
 
             return view('application.laboratorium.dokumentasi-hasil-lab', [
-                'data'  => $groupedData,
-                'akses' => $akses,
-                'code'  => $id
+                'data'          => $groupedData,
+                'akses'         => $akses,
+                'code'          => $id,
+                'default_today' => Carbon::today()->format('d/m/Y'),
             ]);
         } else {
             return Redirect::to('dashboard/home');
+        }
+    }
+
+    public function dokumentasi_hasil_laboratorium_search(Request $request)
+    {
+        $noReg = trim((string) $request->input('no_registrasi', ''));
+        $rangeRaw = trim((string) $request->input('range_tanggal', ''));
+
+        $tglAwal = null;
+        $tglAkhir = null;
+
+        if ($rangeRaw !== '') {
+            // Mendukung format "dd/mm/yy to dd/mm/yy", "dd/mm/yyyy - dd/mm/yyyy", atau satu tanggal
+            $parts = preg_split('/\s+to\s+|\s*-\s*/i', $rangeRaw);
+            $tglAwal = $this->parseTanggalInput($parts[0] ?? null);
+            $tglAkhir = $this->parseTanggalInput($parts[1] ?? ($parts[0] ?? null));
+
+            if ($tglAwal && $tglAkhir && $tglAwal > $tglAkhir) {
+                [$tglAwal, $tglAkhir] = [$tglAkhir, $tglAwal];
+            }
+        }
+
+        // Jika user tidak mengisi no_registrasi maupun range tanggal, kembalikan data hari ini
+        if ($noReg === '' && !$tglAwal && !$tglAkhir) {
+            $today = Carbon::today()->toDateString();
+            $tglAwal = $today;
+            $tglAkhir = $today;
+        }
+
+        $groupedData = $this->queryDokumentasiLab([
+            'tgl_awal'      => $tglAwal,
+            'tgl_akhir'     => $tglAkhir,
+            'no_registrasi' => $noReg,
+        ]);
+
+        $html = view('application.laboratorium.dokumentasi-hasil.dokumentasi-hasil-list', [
+            'data' => $groupedData,
+        ])->render();
+
+        return response()->json([
+            'status' => true,
+            'total'  => $groupedData->count(),
+            'html'   => $html,
+        ]);
+    }
+
+    private function queryDokumentasiLab(array $filters)
+    {
+        $query = DB::table('medical_transaksi_detail as td')
+            ->join('medical_transaksi as t', 'td.transaksi_id', '=', 't.id')
+            ->join('medical_registrasi as reg', 't.registrasi_id', '=', 'reg.id')
+            ->join('medical_patient as p', 'reg.pasien_id', '=', 'p.id')
+            ->whereIn('td.status_pemeriksaan', ['TERVERIFIKASI', 'SELESAI'])
+            ->select([
+                'reg.id as registrasi_id',
+                'reg.no_registrasi',
+                'reg.tanggal_registrasi as d_reg_order_lab_date',
+                'p.nama as master_patient_name',
+                'p.pid as master_patient_rm',
+                'td.id as detail_id',
+                'td.no_pemeriksaan as d_reg_order_lab_code',
+                'td.status_pemeriksaan'
+            ]);
+
+        if (!empty($filters['no_registrasi'])) {
+            $query->where('reg.no_registrasi', 'like', '%' . $filters['no_registrasi'] . '%');
+        }
+
+        if (!empty($filters['tgl_awal']) && !empty($filters['tgl_akhir'])) {
+            $query->whereBetween(DB::raw('DATE(reg.tanggal_registrasi)'), [$filters['tgl_awal'], $filters['tgl_akhir']]);
+        } elseif (!empty($filters['tgl_awal'])) {
+            $query->whereDate('reg.tanggal_registrasi', $filters['tgl_awal']);
+        }
+
+        $rawQuery = $query->orderBy('reg.tanggal_registrasi', 'DESC')->get();
+
+        return $rawQuery->groupBy('no_registrasi')->map(function ($rows) {
+            $first = $rows->first();
+            return (object)[
+                'registrasi_id'        => $first->registrasi_id,
+                'no_registrasi'        => $first->no_registrasi,
+                'd_reg_order_lab_date' => $first->d_reg_order_lab_date,
+                'master_patient_name'  => $first->master_patient_name,
+                'master_patient_rm'    => $first->master_patient_rm,
+                'd_reg_order_lab_code' => $first->d_reg_order_lab_code,
+                'total_pemeriksaan'    => $rows->count(),
+                'items'                => $rows
+            ];
+        })->values();
+    }
+
+    private function parseTanggalInput(?string $raw): ?string
+    {
+        if (!$raw) {
+            return null;
+        }
+
+        $raw = trim($raw);
+        foreach (['d/m/y', 'd/m/Y', 'Y-m-d'] as $fmt) {
+            try {
+                $dt = Carbon::createFromFormat($fmt, $raw);
+                if ($dt !== false) {
+                    return $dt->toDateString();
+                }
+            } catch (\Throwable $e) {
+                // lanjut ke format berikutnya
+            }
+        }
+
+        try {
+            return Carbon::parse($raw)->toDateString();
+        } catch (\Throwable $e) {
+            return null;
         }
     }
     public function dokumentasi_hasil_laboratorium_detail(Request $request)

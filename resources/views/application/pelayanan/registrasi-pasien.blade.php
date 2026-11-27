@@ -16,7 +16,7 @@
         --ent-indigo: #4f46e5;
         --ent-indigo-dark: #4338ca;
         --ent-indigo-soft: rgba(79, 70, 229, 0.12);
-        --ent-grid-border: rgba(99, 102, 241, 0.28);
+        --ent-grid-border: rgba(99, 102, 241, 0.22);
         --ent-emerald: #059669;
         --ent-sky: #0284c7;
         --ent-amber: #d97706;
@@ -29,6 +29,7 @@
     .dark {
         --ent-solid-bg: #0f172a;
         --ent-solid-text: #f8fafc;
+        --ent-grid-border: rgba(148, 163, 184, 0.2);
     }
 
     body {
@@ -40,22 +41,23 @@
         border: 1px solid var(--ent-grid-border);
         border-radius: 16px;
         background-color: var(--bs-body-bg, var(--ent-solid-bg));
-        box-shadow: 0 4px 20px -2px rgba(15, 23, 42, 0.08);
+        box-shadow: 0 6px 24px -4px rgba(15, 23, 42, 0.08);
         overflow: hidden;
+        transition: border-color 0.2s ease, box-shadow 0.2s ease;
     }
 
     .ent-card-header {
-        background-color: rgba(79, 70, 229, 0.06) !important;
+        background: linear-gradient(180deg, rgba(79, 70, 229, 0.07) 0%, rgba(79, 70, 229, 0.02) 100%) !important;
         border-bottom: 1px solid var(--ent-grid-border) !important;
         padding: 14px 18px;
     }
 
     /* Hero Banner */
     .ent-header-banner {
-        background: linear-gradient(135deg, #0f172a 0%, #1e1b4b 55%, #312e81 100%);
-        border: 1px solid rgba(99, 102, 241, 0.35);
-        border-radius: 16px;
-        box-shadow: 0 12px 28px -6px rgba(15, 23, 42, 0.22);
+        background: linear-gradient(135deg, #090d16 0%, #1e1b4b 52%, #312e81 100%);
+        border: 1px solid rgba(129, 140, 248, 0.35);
+        border-radius: 18px;
+        box-shadow: 0 14px 32px -8px rgba(15, 23, 42, 0.28);
         color: #ffffff;
         position: relative;
         overflow: hidden;
@@ -64,17 +66,28 @@
     .ent-header-banner::before {
         content: '';
         position: absolute;
-        top: -50%;
+        top: -55%;
         right: -5%;
-        width: 340px;
-        height: 340px;
-        background: radial-gradient(circle, rgba(56, 189, 248, 0.22) 0%, transparent 70%);
+        width: 360px;
+        height: 360px;
+        background: radial-gradient(circle, rgba(56, 189, 248, 0.24) 0%, transparent 70%);
+        pointer-events: none;
+    }
+
+    .ent-header-banner::after {
+        content: '';
+        position: absolute;
+        bottom: -60%;
+        left: 25%;
+        width: 280px;
+        height: 280px;
+        background: radial-gradient(circle, rgba(99, 102, 241, 0.2) 0%, transparent 70%);
         pointer-events: none;
     }
 
     .ent-glass-pill {
         background: rgba(255, 255, 255, 0.09);
-        backdrop-filter: blur(8px);
+        backdrop-filter: blur(10px);
         border: 1px solid rgba(255, 255, 255, 0.16);
         border-radius: 12px;
         color: #ffffff;
@@ -90,7 +103,7 @@
         font-size: 0.8rem;
     }
 
-    .ent-btn:hover {
+    .ent-btn:hover:not(:disabled) {
         transform: translateY(-1px);
     }
 
@@ -98,11 +111,11 @@
         background: linear-gradient(135deg, #4f46e5 0%, #4338ca 100%);
         border: none;
         color: #ffffff;
-        box-shadow: 0 4px 12px rgba(79, 70, 229, 0.25);
+        box-shadow: 0 4px 12px rgba(79, 70, 229, 0.26);
     }
 
-    .ent-btn-primary:hover {
-        box-shadow: 0 6px 16px rgba(79, 70, 229, 0.35);
+    .ent-btn-primary:hover:not(:disabled) {
+        box-shadow: 0 6px 16px rgba(79, 70, 229, 0.36);
         color: #ffffff;
     }
 
@@ -112,7 +125,7 @@
         color: #d97706;
     }
 
-    .ent-btn-warning:hover {
+    .ent-btn-warning:hover:not(:disabled) {
         background-color: #f59e0b;
         border-color: #f59e0b;
         color: #ffffff;
@@ -120,27 +133,27 @@
 
     /* Metric Boxes */
     .ent-metric-success {
-        background-color: rgba(5, 150, 105, 0.1);
-        border: 1px solid rgba(5, 150, 105, 0.32);
+        background: linear-gradient(135deg, rgba(5, 150, 105, 0.13) 0%, rgba(16, 185, 129, 0.05) 100%);
+        border: 1px solid rgba(5, 150, 105, 0.34);
         border-radius: 14px;
         transition: transform 0.18s ease, box-shadow 0.18s ease;
     }
 
     .ent-metric-success:hover {
         transform: translateY(-2px);
-        box-shadow: 0 8px 18px -6px rgba(5, 150, 105, 0.2);
+        box-shadow: 0 8px 18px -6px rgba(5, 150, 105, 0.22);
     }
 
     .ent-metric-danger {
-        background-color: rgba(225, 29, 72, 0.1);
-        border: 1px solid rgba(225, 29, 72, 0.32);
+        background: linear-gradient(135deg, rgba(225, 29, 72, 0.13) 0%, rgba(244, 63, 94, 0.05) 100%);
+        border: 1px solid rgba(225, 29, 72, 0.34);
         border-radius: 14px;
         transition: transform 0.18s ease, box-shadow 0.18s ease;
     }
 
     .ent-metric-danger:hover {
         transform: translateY(-2px);
-        box-shadow: 0 8px 18px -6px rgba(225, 29, 72, 0.2);
+        box-shadow: 0 8px 18px -6px rgba(225, 29, 72, 0.22);
     }
 
     /* List Group Items */
@@ -167,6 +180,65 @@
         align-items: center;
         font-size: 0.68rem;
         letter-spacing: 0.03em;
+    }
+
+    /* Activity Log Search & Filter Toolbar */
+    .activity-toolbar {
+        background-color: rgba(79, 70, 229, 0.035);
+        border-bottom: 1px solid var(--ent-grid-border);
+        padding: 10px 14px;
+    }
+
+    .activity-search-group .input-group-text {
+        background-color: var(--bs-body-bg, var(--ent-solid-bg));
+        border: 1px solid var(--ent-grid-border);
+        border-right: none;
+        border-radius: 10px 0 0 10px;
+        color: #6366f1;
+    }
+
+    .activity-search-group .form-control {
+        border: 1px solid var(--ent-grid-border);
+        border-left: none;
+        border-radius: 0 10px 10px 0;
+        background-color: var(--bs-body-bg, var(--ent-solid-bg));
+        font-size: 0.8rem;
+        padding-top: 7px;
+        padding-bottom: 7px;
+    }
+
+    .activity-search-group .form-control:focus {
+        box-shadow: 0 0 0 3px rgba(79, 70, 229, 0.12);
+        border-color: var(--ent-indigo);
+    }
+
+    .activity-filter-select {
+        border: 1px solid var(--ent-grid-border);
+        border-radius: 10px;
+        background-color: var(--bs-body-bg, var(--ent-solid-bg));
+        font-size: 0.78rem;
+        font-weight: 600;
+        padding: 6px 10px;
+    }
+
+    .activity-filter-select:focus {
+        box-shadow: 0 0 0 3px rgba(79, 70, 229, 0.12);
+        border-color: var(--ent-indigo);
+    }
+
+    .activity-log-item {
+        border-bottom: 1px solid var(--ent-grid-border);
+        padding: 10px 6px;
+        border-radius: 10px;
+        transition: background-color 0.15s ease;
+    }
+
+    .activity-log-item:last-child {
+        border-bottom: none;
+    }
+
+    .activity-log-item:hover {
+        background-color: rgba(79, 70, 229, 0.05);
     }
 
     /* Modal Adaptive Enterprise */
@@ -197,7 +269,7 @@
                         </div>
                         <div>
                             <div class="d-flex align-items-center gap-2 mb-1">
-                                <span class="ent-badge" style="background: rgba(245, 158, 11, 0.2); border: 1px solid rgba(245, 158, 11, 0.45); color: #fcd34d;">
+                                <span class="ent-badge" style="background: rgba(245, 158, 11, 0.22); border: 1px solid rgba(245, 158, 11, 0.45); color: #fcd34d;">
                                     <i class="fas fa-bolt me-1"></i> LIVE SYSTEM
                                 </span>
                                 <span style="color: #94a3b8; font-size: 0.75rem; font-weight: 600;">v2.4 Medical Suite</span>
@@ -345,25 +417,61 @@
 
     <!-- KOLOM KANAN: Activity Log Card -->
     <div class="col-lg-5">
-        <div class="ent-card h-100">
+        <div class="ent-card h-100 d-flex flex-column">
             <!-- Log Header -->
-            <div class="ent-card-header d-flex align-items-center justify-content-between">
+            <div class="ent-card-header d-flex align-items-center justify-content-between gap-2">
                 <div class="d-flex align-items-center">
                     <div class="p-2 rounded-3 me-2 d-flex align-items-center justify-content-center" style="width: 34px; height: 34px; background-color: rgba(2, 132, 199, 0.14); color: #0ea5e9; border: 1px solid rgba(2, 132, 199, 0.3);">
                         <i class="fas fa-stream"></i>
                     </div>
-                    <h6 class="fw-bold mb-0" style="font-size: 0.92rem;">Activity Log</h6>
+                    <div>
+                        <h6 class="fw-bold mb-0" style="font-size: 0.92rem;">Activity Log</h6>
+                        <small class="opacity-75" style="font-size: 0.7rem;" id="activityLogCount">{{ count($data) }} aktivitas tampil</small>
+                    </div>
                 </div>
-                <a class="btn btn-xs btn-outline-primary ent-btn rounded-pill fw-semibold px-3 py-1" href="#" style="font-size: 0.72rem;">View All</a>
+                <button type="button" class="btn btn-xs btn-outline-secondary ent-btn rounded-pill fw-semibold px-2 py-1 d-none" id="btnResetActivityFilter" style="font-size: 0.72rem;">
+                    <i class="fas fa-times me-1"></i> Reset
+                </button>
+            </div>
+
+            <!-- Filter & Live Search Bar (Tanpa perlu scroll ke bawah) -->
+            <div class="activity-toolbar">
+                <div class="row g-2 align-items-center">
+                    <div class="col-sm-7">
+                        <div class="input-group activity-search-group">
+                            <span class="input-group-text">
+                                <i class="fas fa-search" style="font-size: 0.78rem;"></i>
+                            </span>
+                            <input type="text"
+                                id="activitySearchInput"
+                                class="form-control"
+                                placeholder="Ketik nama pasien / no. order..."
+                                autocomplete="off">
+                        </div>
+                    </div>
+                    <div class="col-sm-5">
+                        <select id="activityCategoryFilter" class="form-select activity-filter-select">
+                            <option value="">Semua Kategori</option>
+                            @php
+                                $kategoriUnik = collect($data)->pluck('t_pasien_cat_name')->filter()->unique()->values();
+                            @endphp
+                            @foreach($kategoriUnik as $kat)
+                                <option value="{{ $kat }}">{{ $kat }}</option>
+                            @endforeach
+                        </select>
+                    </div>
+                </div>
             </div>
 
             <!-- Log Content List -->
-            <div class="card-body p-3 overflow-auto" style="max-height: 380px;">
+            <div class="card-body p-2 px-3 overflow-auto flex-grow-1" style="max-height: 335px;" id="activityLogList">
                 <div class="timeline-simple">
                     @foreach ($data as $datas)
-                    <div class="d-flex align-items-start mb-3 pb-2" style="border-bottom: 1px solid var(--ent-grid-border);">
+                    <div class="activity-log-item d-flex align-items-start"
+                        data-search="{{ strtolower(($datas->master_patient_name ?? '') . ' ' . ($datas->d_reg_order_code ?? '') . ' ' . ($datas->t_pasien_cat_name ?? '')) }}"
+                        data-category="{{ strtolower($datas->t_pasien_cat_name ?? '') }}">
                         <div class="avatar-container me-3 flex-shrink-0">
-                            <div class="rounded-3 d-flex align-items-center justify-content-center shadow-sm" style="width: 40px; height: 40px; background-color: rgba(79, 70, 229, 0.12); color: #6366f1; border: 1px solid var(--ent-grid-border);">
+                            <div class="rounded-3 d-flex align-items-center justify-content-center shadow-sm" style="width: 38px; height: 38px; background-color: rgba(79, 70, 229, 0.12); color: #6366f1; border: 1px solid var(--ent-grid-border);">
                                 <i class="fas fa-user-check"></i>
                             </div>
                         </div>
@@ -381,9 +489,11 @@
                     @endforeach
 
                     <!-- Dummy Event Item -->
-                    <div class="d-flex align-items-start pt-1">
+                    <div class="activity-log-item d-flex align-items-start"
+                        data-search="massachusetts institute of technology anthony hopkin event"
+                        data-category="">
                         <div class="avatar-container me-3 flex-shrink-0">
-                            <div class="rounded-3 d-flex align-items-center justify-content-center shadow-sm" style="width: 40px; height: 40px; background-color: rgba(2, 132, 199, 0.12); color: #0ea5e9; border: 1px solid var(--ent-grid-border);">
+                            <div class="rounded-3 d-flex align-items-center justify-content-center shadow-sm" style="width: 38px; height: 38px; background-color: rgba(2, 132, 199, 0.12); color: #0ea5e9; border: 1px solid var(--ent-grid-border);">
                                 <i class="fas fa-calendar-check"></i>
                             </div>
                         </div>
@@ -394,6 +504,13 @@
                             <span class="opacity-75 d-block" style="font-size: 0.72rem;"><i class="fas fa-clock me-1"></i> October 28, 12:00 PM</span>
                         </div>
                     </div>
+                </div>
+
+                <!-- Empty State jika pencarian tidak cocok -->
+                <div id="activityEmptyState" class="text-center py-4 d-none">
+                    <i class="fas fa-search-minus fs-3 opacity-50 mb-2 d-block"></i>
+                    <div class="fw-semibold" style="font-size: 0.82rem;">Pasien atau aktivitas tidak ditemukan</div>
+                    <small class="opacity-75" style="font-size: 0.74rem;">Coba kata kunci lain atau ubah filter kategori.</small>
                 </div>
             </div>
 
@@ -444,6 +561,74 @@
         });
     }
 </script>
+
+<!-- Filter & Ketik Pencarian Real-Time Activity Log -->
+<script>
+    document.addEventListener('DOMContentLoaded', function() {
+        const searchInput = document.getElementById('activitySearchInput');
+        const categoryFilter = document.getElementById('activityCategoryFilter');
+        const btnReset = document.getElementById('btnResetActivityFilter');
+        const logItems = document.querySelectorAll('#activityLogList .activity-log-item');
+        const emptyState = document.getElementById('activityEmptyState');
+        const countLabel = document.getElementById('activityLogCount');
+        const logContainer = document.getElementById('activityLogList');
+
+        function filterActivityLog() {
+            const keyword = (searchInput.value || '').trim().toLowerCase();
+            const selectedCat = (categoryFilter.value || '').trim().toLowerCase();
+            let visibleCount = 0;
+
+            logItems.forEach(item => {
+                const haystack = item.getAttribute('data-search') || '';
+                const itemCat = item.getAttribute('data-category') || '';
+
+                const matchKeyword = !keyword || haystack.includes(keyword);
+                const matchCategory = !selectedCat || itemCat === selectedCat;
+
+                if (matchKeyword && matchCategory) {
+                    item.classList.remove('d-none');
+                    visibleCount++;
+                } else {
+                    item.classList.add('d-none');
+                }
+            });
+
+            if (emptyState) {
+                emptyState.classList.toggle('d-none', visibleCount > 0);
+            }
+
+            if (countLabel) {
+                countLabel.textContent = `${visibleCount} aktivitas tampil`;
+            }
+
+            if (btnReset) {
+                btnReset.classList.toggle('d-none', !keyword && !selectedCat);
+            }
+
+            if (logContainer) {
+                logContainer.scrollTop = 0;
+            }
+        }
+
+        if (searchInput) {
+            searchInput.addEventListener('input', filterActivityLog);
+        }
+
+        if (categoryFilter) {
+            categoryFilter.addEventListener('change', filterActivityLog);
+        }
+
+        if (btnReset) {
+            btnReset.addEventListener('click', function() {
+                searchInput.value = '';
+                categoryFilter.value = '';
+                filterActivityLog();
+                searchInput.focus();
+            });
+        }
+    });
+</script>
+
 <script>
    $(document).on("click", "#button-registrasi-pasien", function(e) {
         e.preventDefault();

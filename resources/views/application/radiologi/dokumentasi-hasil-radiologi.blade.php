@@ -179,6 +179,11 @@
         border-radius: 0 10px 10px 0 !important;
     }
 
+    .ent-input-group .btn {
+        border-radius: 10px !important;
+        margin-left: 6px;
+    }
+
     /* Interactive Handling Item Card */
     .handling-item-card {
         border: 1px solid var(--ent-grid-border);
@@ -242,6 +247,15 @@
 @endsection
 
 @section('content')
+@php
+$todayIso = date('Y-m-d');
+$activeTglAwal = $tglAwal ?? $todayIso;
+$activeTglAkhir = $tglAkhir ?? $todayIso;
+$activeNoReg = $noRegFilter ?? '';
+$activeDisplayRange = $displayRange ?? date('d/m/Y');
+$isCustomFilter = ($activeNoReg !== '') || ($activeTglAwal !== $todayIso) || ($activeTglAkhir !== $todayIso);
+@endphp
+
 <!-- HERO HEADER RADIOLOGI -->
 <div class="row mb-3">
     <div class="col-12">
@@ -263,7 +277,7 @@
                             <h4 class="fw-bold mb-0" style="letter-spacing: -0.02em;color: white;">
                                 Modul <span style="text-decoration: underline;">Dokumentasi Hasil Radiologi</span>
                             </h4>
-                            <p class="mb-0 small" style="color: #cbd5e1;">Pengolahan, Verifikasi & Pengiriman Dokumentasi Pemeriksaan Radiologi</p>
+                            <p class="mb-0 small" style="color: #cbd5e1;">Pengolahan, Verifikasi &amp; Pengiriman Dokumentasi Pemeriksaan Radiologi</p>
                         </div>
                     </div>
 
@@ -296,16 +310,36 @@
                 <div class="card-body ent-table-surface p-3">
                     <!-- FILTER CONTROLS -->
                     <div class="col-12 mb-3">
-                        <label class="ent-field-label">Rentang Tanggal</label>
+                        <label class="ent-field-label">Rentang Tanggal (Default: Hari Ini)</label>
                         <div class="input-group input-group-sm ent-input-group mb-2">
                             <span class="input-group-text"><i class="fas fa-calendar-alt"></i></span>
-                            <input class="form-control datetimepicker" id="timepicker3" type="text" placeholder="Filter Rentang Tanggal..." data-options='{"mode":"range","dateFormat":"d/m/Y","disableMobile":true,"locale":"en"}' />
+                            <input class="form-control datetimepicker"
+                                id="timepicker3"
+                                type="text"
+                                value="{{ $activeDisplayRange }}"
+                                data-tgl-awal="{{ $activeTglAwal }}"
+                                data-tgl-akhir="{{ $activeTglAkhir }}"
+                                placeholder="Filter Rentang Tanggal..."
+                                data-options='{"mode":"range","dateFormat":"d/m/Y","disableMobile":true,"locale":"en"}' />
+                            <button type="button" id="btn-filter-tanggal" class="btn btn-sm ent-btn ent-btn-primary px-2.5" title="Terapkan Rentang Tanggal">
+                                <i class="fas fa-search"></i>
+                            </button>
                         </div>
 
-                        <label class="ent-field-label">Pencarian Cepat</label>
+                        <label class="ent-field-label">Pencarian No. Reg / Nama / NIK</label>
                         <div class="input-group input-group-sm ent-input-group">
                             <span class="input-group-text"><i class="fas fa-qrcode"></i></span>
-                            <input type="text" name="nik" class="form-control" id="nik" placeholder="Scan QR / Nama / No. Reg...">
+                            <input type="text"
+                                name="nik"
+                                class="form-control"
+                                id="nik"
+                                value="{{ $activeNoReg }}"
+                                placeholder="Scan QR / No. Reg / Nama...">
+                            @if($isCustomFilter)
+                            <button type="button" id="btn-reset-filter" class="btn btn-sm ent-btn ent-btn-reset px-2.5" title="Reset ke Hari Ini">
+                                <i class="fas fa-undo"></i>
+                            </button>
+                            @endif
                         </div>
                     </div>
 
@@ -316,7 +350,7 @@
                         @forelse ($data as $datas)
                         <div class="handling-item-card remove-class p-3 mb-2 button-dokumentasi-hasil-rad"
                             data-code="{{ $datas->d_reg_order_rad_code }}"
-                            data-search="{{ strtolower(($datas->master_patient_name ?? '') . ' ' . ($datas->d_reg_order_rad_code ?? '') . ' ' . ($datas->master_patient_nik ?? '')) }}">
+                            data-search="{{ strtolower(($datas->master_patient_name ?? '') . ' ' . ($datas->d_reg_order_rad_code ?? '') . ' ' . ($datas->d_reg_order_code ?? '') . ' ' . ($datas->master_patient_nik ?? '')) }}">
                             <div class="d-flex justify-content-between align-items-start mb-1">
                                 <h6 class="fw-bold patient-title mb-0" style="font-size: 0.88rem;">
                                     {{ $datas->master_patient_name }}
@@ -331,7 +365,7 @@
                         @empty
                         <div class="text-center py-4 px-2 rounded-3" style="border: 1px dashed var(--ent-grid-border); background: rgba(79, 70, 229, 0.04);">
                             <i class="fas fa-inbox text-primary opacity-75 fa-2x mb-2"></i>
-                            <p class="fw-semibold small mb-0 opacity-75">Tidak ada daftar handling pemeriksaan.</p>
+                            <p class="fw-semibold small mb-0 opacity-75">Tidak ada daftar handling pemeriksaan pada tanggal ini.</p>
                         </div>
                         @endforelse
                     </div>
@@ -399,6 +433,38 @@
 <script>
     let activeDokDetailAjax = null;
 
+    function toIsoDateFromDmy(dmy) {
+        var seg = (dmy || '').trim().split('/');
+        if (seg.length !== 3) return '';
+        return seg[2] + '-' + seg[1].padStart(2, '0') + '-' + seg[0].padStart(2, '0');
+    }
+
+    function applyRadiologiDateFilter(rangeStr) {
+        var parts = (rangeStr || '').split(/\s*(?:to|-)\s*/i).map(function(s) {
+            return s.trim();
+        }).filter(Boolean);
+
+        var startIso = parts[0] ? toIsoDateFromDmy(parts[0]) : ($('#timepicker3').data('tgl-awal') || '');
+        var endIso = parts[1] ? toIsoDateFromDmy(parts[1]) : (startIso || ($('#timepicker3').data('tgl-akhir') || ''));
+
+        var noRegVal = ($('#nik').val() || '').trim();
+        var url = new URL(window.location.href);
+
+        if (startIso) {
+            url.searchParams.set('tgl_awal', startIso);
+        }
+        if (endIso) {
+            url.searchParams.set('tgl_akhir', endIso);
+        }
+        if (noRegVal !== '') {
+            url.searchParams.set('no_reg', noRegVal);
+        } else {
+            url.searchParams.delete('no_reg');
+        }
+
+        window.location.href = url.toString();
+    }
+
     $(document).ready(function() {
         if ($('#example').length) {
             new DataTable('#example', {
@@ -406,14 +472,43 @@
             });
         }
 
-        // Filter cepat daftar handling berdasarkan Nama / No. Reg / NIK
-        $('#nik').on('input', function() {
-            const keyword = $(this).val().toLowerCase().trim();
+        function filterHandlingList() {
+            const keyword = ($('#nik').val() || '').toLowerCase().trim();
             $('.button-dokumentasi-hasil-rad').each(function() {
                 const searchable = $(this).data('search') || '';
                 $(this).toggle(searchable.indexOf(keyword) !== -1);
             });
+        }
+
+        $('#nik').on('input', filterHandlingList);
+        if (($('#nik').val() || '').trim() !== '') {
+            filterHandlingList();
+        }
+
+        $('#btn-filter-tanggal').on('click', function() {
+            applyRadiologiDateFilter($('#timepicker3').val());
         });
+
+        $('#nik').on('keypress', function(e) {
+            if (e.which === 13) {
+                e.preventDefault();
+                applyRadiologiDateFilter($('#timepicker3').val());
+            }
+        });
+
+        $('#btn-reset-filter').on('click', function() {
+            var baseUrl = window.location.origin + window.location.pathname;
+            window.location.href = baseUrl;
+        });
+
+        var fpInput = document.getElementById('timepicker3');
+        if (fpInput && fpInput._flatpickr) {
+            fpInput._flatpickr.config.onClose.push(function(selectedDates, dateStr) {
+                if (selectedDates.length >= 1) {
+                    applyRadiologiDateFilter(dateStr);
+                }
+            });
+        }
     });
 
     // Event Handler: Klik Item Antrean Handling Radiologi
@@ -421,7 +516,6 @@
         e.preventDefault();
         var code = $(this).data("code");
 
-        // Styling active item card
         $(".remove-class").removeClass("active-rad-item");
         $(this).addClass("active-rad-item");
 
@@ -429,7 +523,6 @@
             activeDokDetailAjax.abort();
         }
 
-        // Loading Indicator State
         $('#menu-detail-handling').html(`
             <div class="ent-card p-5 text-center ent-table-surface">
                 <div class="py-5">
@@ -442,7 +535,6 @@
             </div>
         `);
 
-        // Request Detail handling via AJAX
         activeDokDetailAjax = $.ajax({
             url: "{{ route('dokumentasi_hasil_radiologi_detail') }}",
             type: "POST",

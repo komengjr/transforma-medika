@@ -32,6 +32,29 @@ class HrmMasterPegawai extends Migration
             $table->string('hrm_m_jam_kerja_code', 50)->nullable()->after('hrm_m_position_loc');
             $table->timestamps();
         });
+        Schema::create('hrm_master_position', function (Blueprint $table) {
+            $table->id('id_hrm_master_position');
+            $table->string('hrm_master_position_code')->unique();
+            $table->string('hrm_master_position_name');
+            $table->string('hrm_master_position_lvl');
+            $table->timestamps();
+        });
+        Schema::create('hrm_jabatan', function (Blueprint $table) {
+            $table->id('id_hrm_jabatan');
+            $table->string('hrm_jabatan_code')->unique();
+            $table->string('hrm_jabatan_name');
+            $table->string('hrm_jabatan_level');
+            $table->text('hrm_jabatan_desc');
+            $table->timestamps();
+        });
+        Schema::create('hrm_departemen', function (Blueprint $table) {
+            $table->id('id_hrm_departemen');
+            $table->string('hrm_departemen_code')->unique();
+            $table->string('hrm_departemen_name');
+            $table->string('hrm_departemen_lokasi');
+            $table->string('hrm_departemen_kepala');
+            $table->timestamps();
+        });
     }
 
     /**
@@ -42,5 +65,8 @@ class HrmMasterPegawai extends Migration
     public function down()
     {
         Schema::dropIfExists('hrm_master_pegawai');
+        Schema::dropIfExists('hrm_master_position');
+        Schema::dropIfExists('hrm_jabatan');
+        Schema::dropIfExists('hrm_departemen');
     }
 }

@@ -253,7 +253,7 @@
     /* Layout Panel Kiri & Kanan */
     .layout-container {
         display: flex;
-        gap: 15px;
+        gap: 12px;
         align-items: flex-start;
     }
 
@@ -271,7 +271,7 @@
         flex: 1;
         display: flex;
         flex-direction: column;
-        gap: 15px;
+        gap: 12px;
     }
 
     @media (max-width: 991.98px) {

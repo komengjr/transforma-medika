@@ -46,6 +46,7 @@ Route::prefix('{akses}/{id}/application')->group(function () {
     Route::get('menu-laboratorium/proses-result', [LaboratoriumController::class, 'menu_lab_proses_result'])->name('menu_lab_proses_result');
     Route::get('hasil-lab/verifikasi-hasil', [LaboratoriumController::class, 'verifikasi_laboratorium'])->name('verifikasi_laboratorium');
     Route::get('hasil-lab/dokumentasi-hasil', [LaboratoriumController::class, 'dokumentasi_hasil_laboratorium'])->name('dokumentasi_hasil_laboratorium');
+
     Route::get('hasil-lab/pengiriman-hasil', [LaboratoriumController::class, 'pengiriman_hasil_laboratorium'])->name('pengiriman_hasil_laboratorium');
     Route::get('pendaftaran-lab/registrasi', [LaboratoriumController::class, 'pendaftaran_lab_registrasi'])->name('pendaftaran_lab_registrasi');
     Route::get('interface-lab/data-result', [LaboratoriumController::class, 'interfave_lab_data_result'])->name('interfave_lab_data_result');
@@ -482,3 +483,9 @@ Route::prefix('lab-qc')->group(function () {
     Route::get('/ajax/report', [LaboratoriumController::class, 'getReportAjax'])->name('lab_qc.ajax.report');
     Route::get('/ajax/parameters', [LaboratoriumController::class, 'getParametersAjax'])->name('lab_qc.ajax.parameters');
 });
+Route::post('/laboratorium/dokumentasi-hasil/search', [LaboratoriumController::class, 'dokumentasi_hasil_laboratorium_search'])
+    ->name('dokumentasi_hasil_laboratorium_search');
+Route::post('/laboratorium/proses-result/search', [LaboratoriumController::class, 'menu_lab_proses_result_search'])
+    ->name('menu_lab_proses_result_search');
+Route::post('/laboratorium/specimen-collection/search', [LaboratoriumController::class, 'data_specimen_collection_lab_search'])
+    ->name('data_specimen_collection_lab_search');
