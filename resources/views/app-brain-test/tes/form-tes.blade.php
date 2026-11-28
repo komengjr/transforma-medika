@@ -136,44 +136,113 @@
             pointer-events: auto;
         }
 
+        /* === PANEL NAVIGASI NOMOR SOAL DESKTOP (FIX TANPA SCROLL) === */
+        .desktop-nav-card {
+            position: sticky;
+            top: 16px;
+        }
+
+        .nav-progress-track {
+            height: 6px;
+            background-color: #e2e8f0;
+            border-radius: 999px;
+            overflow: hidden;
+        }
+
+        .nav-progress-fill {
+            height: 100%;
+            width: 0%;
+            background: linear-gradient(90deg, #10b981 0%, #4f46e5 100%);
+            border-radius: 999px;
+            transition: width 0.3s cubic-bezier(0.22, 1, 0.36, 1);
+        }
+
+        .nav-legend-grid {
+            display: grid;
+            grid-template-columns: repeat(2, minmax(0, 1fr));
+            gap: 6px 10px;
+            font-size: 0.75rem;
+        }
+
+        .nav-legend-dot {
+            width: 12px;
+            height: 12px;
+            border-radius: 4px;
+            flex-shrink: 0;
+        }
+
+        #nav-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(34px, 1fr));
+            gap: 6px;
+            max-height: none !important;
+            overflow: visible !important;
+        }
+
+        #nav-grid.is-dense {
+            grid-template-columns: repeat(auto-fill, minmax(29px, 1fr));
+            gap: 4px;
+        }
+
         .nav-box {
-            width: 42px;
-            height: 42px;
+            width: 100%;
+            aspect-ratio: 1 / 1;
+            min-height: 32px;
             display: flex;
             align-items: center;
             justify-content: center;
             font-weight: 700;
-            font-size: 0.85rem;
+            font-size: 0.76rem;
+            letter-spacing: -0.02em;
             cursor: pointer;
-            border-radius: 10px;
-            transition: all 0.18s ease;
+            border-radius: 8px;
+            transition: all 0.16s cubic-bezier(0.22, 1, 0.36, 1);
             border: 1.5px solid #cbd5e1;
             background-color: #ffffff;
             color: #334155;
+            position: relative;
+        }
+
+        #nav-grid.is-dense .nav-box {
+            min-height: 27px;
+            font-size: 0.68rem;
+            border-radius: 6px;
+        }
+
+        #nav-grid-mobile .nav-box {
+            width: 42px;
+            height: 42px;
+            aspect-ratio: auto;
+            font-size: 0.85rem;
+            border-radius: 10px;
         }
 
         .nav-box:hover {
-            transform: translateY(-2px);
+            transform: translateY(-2px) scale(1.06);
             border-color: var(--ent-indigo);
+            box-shadow: 0 4px 10px -2px rgba(79, 70, 229, 0.25);
+            z-index: 2;
         }
 
         .nav-box.answered {
-            background-color: #d1fae5;
+            background: linear-gradient(135deg, #ecfdf5 0%, #d1fae5 100%);
             border-color: #10b981;
             color: #065f46;
         }
 
         .nav-box.doubtful {
-            background-color: #fef3c7;
+            background: linear-gradient(135deg, #fffbeb 0%, #fef3c7 100%);
             border-color: #f59e0b;
             color: #92400e;
         }
 
         .nav-box.active {
-            background: linear-gradient(135deg, #4f46e5 0%, #3730a3 100%);
-            border-color: transparent;
-            color: #ffffff;
-            box-shadow: 0 0 0 3px rgba(79, 70, 229, 0.22);
+            background: linear-gradient(135deg, #4f46e5 0%, #3730a3 100%) !important;
+            border-color: transparent !important;
+            color: #ffffff !important;
+            transform: scale(1.06);
+            box-shadow: 0 4px 12px rgba(79, 70, 229, 0.38), 0 0 0 2.5px rgba(99, 102, 241, 0.28);
+            z-index: 3;
         }
 
         .option-label {
@@ -516,34 +585,61 @@
                     </div>
                 </div>
 
-                <!-- Kolom Panel Navigasi Nomor Soal (Mode Desktop) -->
+                <!-- Kolom Panel Navigasi Nomor Soal (Mode Desktop - Full View Tanpa Scroll) -->
                 <div class="col-lg-4 d-none d-lg-block">
-                    <div class="ent-card p-4 h-100 d-flex flex-column">
-                        <h6 class="fw-bold mb-3">
-                            <i class="fa-solid fa-list-check me-2 text-primary"></i>Navigasi Nomor Soal
-                        </h6>
+                    <div class="ent-card p-3 p-xl-4 desktop-nav-card d-flex flex-column">
+                        <div class="d-flex align-items-center justify-content-between mb-2">
+                            <h6 class="fw-bold mb-0 d-flex align-items-center gap-2">
+                                <span class="d-inline-flex align-items-center justify-content-center rounded-2 bg-primary-subtle text-primary" style="width: 28px; height: 28px;">
+                                    <i class="fa-solid fa-grip" style="font-size: 0.85rem;"></i>
+                                </span>
+                                <span>Navigasi Nomor Soal</span>
+                            </h6>
+                            <span class="badge bg-primary-subtle text-primary border border-primary-subtle font-mono-code rounded-pill px-2 py-1" id="navPanelCounterDesktop" style="font-size: 0.74rem;">
+                                0 / 0
+                            </span>
+                        </div>
 
-                        <div class="row g-2 mb-3 text-secondary small">
-                            <div class="col-6 d-flex align-items-center gap-2">
-                                <div style="width: 15px; height: 15px; background: #10b981; border-radius: 4px;"></div> Dijawab
+                        <!-- Progress Bar Penyelesaian -->
+                        <div class="mb-3">
+                            <div class="d-flex justify-content-between align-items-center mb-1" style="font-size: 0.72rem;">
+                                <span class="text-secondary fw-semibold">Progres Pengerjaan</span>
+                                <span class="fw-bold font-mono-code text-primary" id="navProgressPercentDesktop">0%</span>
                             </div>
-                            <div class="col-6 d-flex align-items-center gap-2">
-                                <div style="width: 15px; height: 15px; background: #ffffff; border: 1.5px solid #cbd5e1; border-radius: 4px;"></div> Belum
-                            </div>
-                            <div class="col-6 d-flex align-items-center gap-2 mt-1">
-                                <div style="width: 15px; height: 15px; background: #f59e0b; border-radius: 4px;"></div> Ragu-ragu
-                            </div>
-                            <div class="col-6 d-flex align-items-center gap-2 mt-1">
-                                <div style="width: 15px; height: 15px; background: #4f46e5; border-radius: 4px;"></div> Aktif
+                            <div class="nav-progress-track">
+                                <div class="nav-progress-fill" id="navProgressBarDesktop"></div>
                             </div>
                         </div>
-                        <hr class="my-2">
 
-                        <div id="nav-grid" class="d-flex flex-wrap gap-2 overflow-auto align-content-start my-2" style="max-height: 320px;"></div>
+                        <!-- Legenda Status Ringkas -->
+                        <div class="bg-light rounded-3 p-2 mb-3 border">
+                            <div class="nav-legend-grid text-secondary fw-medium">
+                                <div class="d-flex align-items-center gap-2">
+                                    <span class="nav-legend-dot" style="background: #10b981;"></span>
+                                    <span>Dijawab (<strong class="text-dark font-mono-code" id="legendCountAnswered">0</strong>)</span>
+                                </div>
+                                <div class="d-flex align-items-center gap-2">
+                                    <span class="nav-legend-dot" style="background: #ffffff; border: 1.5px solid #cbd5e1;"></span>
+                                    <span>Belum (<strong class="text-dark font-mono-code" id="legendCountUnanswered">0</strong>)</span>
+                                </div>
+                                <div class="d-flex align-items-center gap-2">
+                                    <span class="nav-legend-dot" style="background: #f59e0b;"></span>
+                                    <span>Ragu (<strong class="text-dark font-mono-code" id="legendCountDoubt">0</strong>)</span>
+                                </div>
+                                <div class="d-flex align-items-center gap-2">
+                                    <span class="nav-legend-dot" style="background: #4f46e5;"></span>
+                                    <span>Soal Aktif</span>
+                                </div>
+                            </div>
+                        </div>
 
-                        <div class="mt-auto pt-3 border-top">
-                            <button type="button" class="btn btn-danger w-100 py-3 fw-bold rounded-3 shadow-sm" id="btnOpenConfirmModal" data-bs-toggle="modal" data-bs-target="#confirmModal">
-                                <i class="fa-solid fa-paper-plane me-2"></i> Selesai &amp; Kirim Ujian
+                        <!-- Grid Nomor Soal Tampil Penuh Tanpa Scroll -->
+                        <div id="nav-grid" class="mb-3"></div>
+
+                        <div class="pt-3 border-top">
+                            <button type="button" class="btn btn-danger w-100 py-2 fw-bold rounded-3 shadow-sm d-flex align-items-center justify-content-center gap-2" id="btnOpenConfirmModal" data-bs-toggle="modal" data-bs-target="#confirmModal">
+                                <i class="fa-solid fa-paper-plane"></i>
+                                <span>Selesai &amp; Kirim Ujian</span>
                             </button>
                         </div>
                     </div>
@@ -1054,15 +1150,45 @@
         }
 
         function renderNavGrid() {
-            const containers = [
-                document.getElementById('nav-grid'),
-                document.getElementById('nav-grid-mobile')
-            ].filter(Boolean);
+            const desktopGrid = document.getElementById('nav-grid');
+            const mobileGrid = document.getElementById('nav-grid-mobile');
+            const containers = [desktopGrid, mobileGrid].filter(Boolean);
 
+            const totalCount = questions.length;
             const answeredCount = questions.filter(q => q.answer !== null).length;
+            const doubtCount = questions.filter(q => q.doubt).length;
+            const unansweredCount = Math.max(0, totalCount - answeredCount);
+            const percent = totalCount > 0 ? Math.round((answeredCount / totalCount) * 100) : 0;
+
             const counterMobile = document.getElementById('navPanelCounterMobile');
             if (counterMobile) {
-                counterMobile.textContent = `${answeredCount}/${questions.length}`;
+                counterMobile.textContent = `${answeredCount}/${totalCount}`;
+            }
+
+            const counterDesktop = document.getElementById('navPanelCounterDesktop');
+            if (counterDesktop) {
+                counterDesktop.textContent = `${answeredCount} / ${totalCount}`;
+            }
+
+            const percentDesktop = document.getElementById('navProgressPercentDesktop');
+            if (percentDesktop) {
+                percentDesktop.textContent = `${percent}%`;
+            }
+
+            const progressBarDesktop = document.getElementById('navProgressBarDesktop');
+            if (progressBarDesktop) {
+                progressBarDesktop.style.width = `${percent}%`;
+            }
+
+            const elAnswered = document.getElementById('legendCountAnswered');
+            const elUnanswered = document.getElementById('legendCountUnanswered');
+            const elDoubt = document.getElementById('legendCountDoubt');
+            if (elAnswered) elAnswered.textContent = answeredCount;
+            if (elUnanswered) elUnanswered.textContent = unansweredCount;
+            if (elDoubt) elDoubt.textContent = doubtCount;
+
+            if (desktopGrid) {
+                desktopGrid.classList.toggle('is-dense', totalCount > 120);
             }
 
             containers.forEach(grid => {
@@ -1076,6 +1202,7 @@
                         box.classList.add('answered');
                     }
                     box.innerText = index + 1;
+                    box.title = `Soal No. ${index + 1}${q.doubt ? ' (Ragu-ragu)' : (q.answer !== null ? ' (Sudah dijawab)' : ' (Belum dijawab)')}`;
                     box.onclick = () => {
                         currentIdx = index;
                         loadQuestion(currentIdx);
@@ -1148,6 +1275,11 @@
 
             if (isTimeExpired) {
                 lockExamInputs();
+            }
+
+            const doubtCheck = document.getElementById('doubtCheck');
+            if (doubtCheck) {
+                doubtCheck.checked = Boolean(q.doubt);
             }
 
             document.getElementById('prevBtn').disabled = idx === 0;

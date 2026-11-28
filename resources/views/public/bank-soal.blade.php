@@ -145,7 +145,7 @@
     <!-- ANIMASI PERPINDAHAN HALAMAN -->
     <div id="pageTransitionOverlay" class="page-transition-overlay" aria-hidden="true">
         <div class="transition-card text-center text-white px-6">
-            <div class="w-16 h-16 mx-auto mb-4 rounded-2xl bg-indigo-600/25 border border-indigo-400/40 flex items-center justify-content-center relative">
+            <div class="w-16 h-16 mx-auto mb-4 rounded-2xl bg-indigo-600/25 border border-indigo-400/40 flex items-center justify-center relative">
                 <div class="w-10 h-10 border-4 border-indigo-400 border-t-transparent rounded-full animate-spin"></div>
             </div>
             <p class="text-xs uppercase tracking-widest text-indigo-300 font-bold mb-1">Menyiapkan Lembar Ujian</p>
@@ -246,8 +246,8 @@
     <main class="max-w-7xl mx-auto px-6 py-10 w-full flex-grow space-y-12">
         @forelse($klasifikasis as $klas)
         @php
-            $paketsInKlas = $klas->pakets ?? collect();
-            $rowRef = 'netflixRow_' . $klas->id;
+        $paketsInKlas = $klas->pakets ?? collect();
+        $rowRef = 'netflixRow_' . $klas->id;
         @endphp
 
         <section x-show="selectedKlasifikasi === 'all' || selectedKlasifikasi === '{{ $klas->id }}'" x-transition
@@ -289,12 +289,12 @@
             <div id="{{ $rowRef }}" class="netflix-row flex gap-4 overflow-x-auto pb-4 pt-1 scroll-smooth">
                 @foreach($paketsInKlas as $pIdx => $paket)
                 @php
-                    $kategoris = $paket->kategoris ?? collect();
-                    $kategoriLabels = $kategoris->pluck('nama_kategori')->filter()->values();
-                    $kategoriSummaryText = $kategoriLabels->isNotEmpty() ? $kategoriLabels->implode(', ') : '-';
-                    $urutanCard = $kategoris->min('urutan') ?? ($paket->urutan ?? ($pIdx + 1));
-                    $tesUrl = route('brain-test.tes.halaman', $paket->id);
-                    $searchBlob = strtolower($paket->nama_test . ' ' . $kategoriSummaryText . ' ' . $klas->nama_klasifikasi);
+                $kategoris = $paket->kategoris ?? collect();
+                $kategoriLabels = $kategoris->pluck('nama_kategori')->filter()->values();
+                $kategoriSummaryText = $kategoriLabels->isNotEmpty() ? $kategoriLabels->implode(', ') : '-';
+                $urutanCard = $kategoris->min('urutan') ?? ($paket->urutan ?? ($pIdx + 1));
+                $tesUrl = route('brain-test.tes.halaman', $paket->id);
+                $searchBlob = strtolower($paket->nama_test . ' ' . $kategoriSummaryText . ' ' . $klas->nama_klasifikasi);
                 @endphp
 
                 <a href="{{ $tesUrl }}"
