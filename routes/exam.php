@@ -34,7 +34,7 @@ Route::group(['prefix' => 'admin/brain-test', 'as' => 'admin.brain-test.'], func
     Route::post('/kategori/{kategoriId}/soal/import', [BrainTestController::class, 'import'])->name('soal.import');
     Route::delete('/soal/{id}', [BrainTestController::class, 'destroy'])->name('soal.destroy');
     Route::get('/kategori/{kategoriId}/json-soal', [BrainTestController::class, 'getJsonSoal'])->name('soal.json');
-    Route::get('/kategori/template-excel', [BrainTestController::class, 'downloadTemplate'])->name('soal.template');
+    // Route::get('/kategori/template-excel', [BrainTestController::class, 'downloadTemplate'])->name('soal.template');
 
 
     Route::get('/preview/{paketId}', [BrainTestController::class, 'preview'])->name('preview');
