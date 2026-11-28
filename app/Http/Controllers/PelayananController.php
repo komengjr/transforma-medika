@@ -21,6 +21,7 @@ use Pion\Laravel\ChunkUpload\Receiver\FileReceiver;
 use Session;
 use Svg\Tag\Rect;
 use Illuminate\Support\Facades\File;
+use Illuminate\Support\Facades\Schema;
 
 class PelayananController extends Controller
 {
@@ -60,29 +61,129 @@ class PelayananController extends Controller
     // REGISTRASI
     public function registrasi_pasien($akses, $id, Request $request)
     {
-        if ($this->url_akses($akses, $id) == true) {
-            $ipClient = $request->ip(); // Mengambil IP Client/PC
-
-            $total = DB::table('d_reg_order')->where('d_reg_order_cabang', Auth::user()->access_cabang)->count();
-            $reject = DB::table('d_reg_order')->where('d_reg_order_cabang', Auth::user()->access_cabang)
-                ->where('d_reg_order_status', -1)->count();
-
-            $data = DB::table('d_reg_order')
-                ->join('master_patient', 'master_patient.master_patient_code', '=', 'd_reg_order.d_reg_order_rm')
-                ->join('t_pasien_cat', 't_pasien_cat.t_pasien_cat_code', '=', 'd_reg_order.t_pasien_cat_code')
-                ->where("d_reg_order_cabang", Auth::user()->access_cabang)->get();
-
-            return view('application.pelayanan.registrasi-pasien', [
-                'akses' => $akses,
-                'code' => $id,
-                'total' => $total,
-                'reject' => $reject,
-                'data' => $data,
-                'ipClient' => $ipClient // Pass IP ke View Utama
-            ]);
-        } else {
+        if ($this->url_akses($akses, $id) != true) {
             return Redirect::to('dashboard/home');
         }
+
+        $ipClient = $request->ip();
+        $today = Carbon::today()->toDateString();
+        $user = Auth::user();
+
+        $baseQuery = DB::table('medical_registrasi as r')
+            ->join('medical_patient as p', 'r.pasien_id', '=', 'p.id')
+            ->leftJoin('medical_transaksi as t', function ($join) {
+                $join->on('t.registrasi_id', '=', 'r.id')
+                    ->whereNull('t.deleted_at');
+            })
+            ->leftJoin('medical_sub_penjamin as sp', 'r.sub_penjamin_id', '=', 'sp.id')
+            ->leftJoin('medical_penjamin as mpn', 'sp.penjamin_id', '=', 'mpn.id')
+            ->leftJoin('medical_master_poli as mp', 'r.poli_id', '=', 'mp.id')
+            ->whereNull('r.deleted_at')
+            ->whereDate('r.tanggal_registrasi', $today);
+
+        if (!empty($user->access_cabang)) {
+            if (Schema::hasColumn('medical_registrasi', 'cabang_id')) {
+                $baseQuery->where('r.cabang_id', $user->access_cabang);
+            } elseif (Schema::hasColumn('medical_registrasi', 'd_reg_order_cabang')) {
+                $baseQuery->where('r.d_reg_order_cabang', $user->access_cabang);
+            }
+        }
+
+        $rows = (clone $baseQuery)
+            ->select(
+                'r.id as registrasi_id',
+                'r.no_registrasi',
+                'r.no_registrasi as d_reg_order_code',
+                'r.jenis_layanan',
+                'r.nomor_asuransi',
+                'r.status_kunjungan',
+                'r.tanggal_registrasi',
+                'r.created_at',
+                'p.pid as master_patient_code',
+                'p.nama as master_patient_name',
+                'p.no_id as master_patient_nik',
+                'p.no_hp as master_patient_no_hp',
+                't.id as transaksi_id',
+                't.total_tagihan',
+                't.tanggungan_pasien',
+                't.tanggungan_perusahaan',
+                't.total_bayar',
+                't.sisa_tagihan',
+                't.status_pembayaran',
+                'sp.id as sub_penjamin_id',
+                'sp.nama_sub_penjamin',
+                'sp.tipe_pembayaran',
+                'sp.pola_tanggungan',
+                'sp.wajib_surat_garansi',
+                'mpn.id as penjamin_id',
+                'mpn.nama_penjamin',
+                'mpn.jenis_kategori',
+                'mp.nama_poli'
+            )
+            ->orderByDesc('r.tanggal_registrasi')
+            ->get();
+
+        $layananMap = [
+            'RAWAT_JALAN' => 'Rawat Jalan',
+            'IGD'         => 'IGD',
+            'RAWAT_INAP'  => 'Rawat Inap',
+        ];
+
+        foreach ($rows as $row) {
+            $rawJenis = strtoupper((string) ($row->jenis_layanan ?? 'RAWAT_JALAN'));
+            $row->jenis_layanan = $rawJenis;
+            $row->jenis_layanan_label = $layananMap[$rawJenis] ?? str_replace('_', ' ', $rawJenis);
+
+            if (!empty($row->nama_sub_penjamin) && !empty($row->nama_penjamin)) {
+                $row->t_pasien_cat_name = $row->nama_penjamin . ' - ' . $row->nama_sub_penjamin;
+            } elseif (!empty($row->nama_penjamin)) {
+                $row->t_pasien_cat_name = $row->nama_penjamin;
+            } elseif (!empty($row->jenis_kategori)) {
+                $row->t_pasien_cat_name = $row->jenis_kategori;
+            } else {
+                $row->t_pasien_cat_name = $row->nama_poli ?: $row->jenis_layanan_label;
+            }
+        }
+
+        $total = $rows->count();
+        $reject = $rows->filter(function ($item) {
+            return strtoupper((string) ($item->status_kunjungan ?? '')) === 'BATAL';
+        })->count();
+
+        $unpaidCount = $rows->filter(function ($item) {
+            $st = strtoupper((string) ($item->status_pembayaran ?? 'BELUM LUNAS'));
+            return in_array($st, ['BELUM LUNAS', 'SEBAGIAN']);
+        })->count();
+
+        $penjaminList = DB::table('medical_sub_penjamin as sp')
+            ->join('medical_penjamin as mpn', 'sp.penjamin_id', '=', 'mpn.id')
+            ->where('sp.status_aktif', true)
+            ->select(
+                'sp.id as sub_penjamin_id',
+                'sp.nama_sub_penjamin',
+                'sp.tipe_pembayaran',
+                'sp.pola_tanggungan',
+                'sp.tanggungan_perusahaan_persen',
+                'sp.tanggungan_perusahaan_maksimal_rp',
+                'sp.wajib_surat_garansi',
+                'mpn.id as penjamin_id',
+                'mpn.nama_penjamin',
+                'mpn.jenis_kategori'
+            )
+            ->orderBy('mpn.nama_penjamin')
+            ->orderBy('sp.nama_sub_penjamin')
+            ->get();
+
+        return view('application.pelayanan.registrasi-pasien', [
+            'akses'        => $akses,
+            'code'         => $id,
+            'total'        => $total,
+            'reject'       => $reject,
+            'unpaidCount'  => $unpaidCount,
+            'data'         => $rows,
+            'penjaminList' => $penjaminList,
+            'ipClient'     => $ipClient,
+        ]);
     }
     public function registrasi_pasien_v2($akses, $id)
     {

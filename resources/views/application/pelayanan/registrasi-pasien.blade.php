@@ -254,6 +254,18 @@
 @endsection
 
 @section('content')
+@php
+$belumBayarCount = $unpaidCount ?? collect($data)->filter(function ($item) {
+    return in_array(strtoupper((string) ($item->status_pembayaran ?? 'BELUM LUNAS')), ['BELUM LUNAS', 'SEBAGIAN']);
+})->count();
+
+$layananLabelMap = [
+    'RAWAT_JALAN' => 'Rawat Jalan',
+    'IGD'         => 'IGD',
+    'RAWAT_INAP'  => 'Rawat Inap',
+];
+@endphp
+
 <!-- BANNER HEADER ATAS -->
 <div class="row mb-3">
     <div class="col-12">
@@ -274,8 +286,8 @@
                                 </span>
                                 <span style="color: #94a3b8; font-size: 0.75rem; font-weight: 600;">v2.4 Medical Suite</span>
                             </div>
-                            <h4 class="text-white fw-bold mb-0" style="letter-spacing: -0.02em;">
-                                Welcome to {{ Env('APP_LABEL')}} <span class="fw-normal" style="color: #cbd5e1;">Management System</span>
+                            <h4 class="fw-bold mb-0" style="letter-spacing: -0.02em;color: white;">
+                                Welcome to {{ env('APP_LABEL') }} <span class="fw-normal" style="color: #cbd5e1;">Management System</span>
                             </h4>
                         </div>
                     </div>
@@ -313,7 +325,7 @@
                         Selamat Datang, <span class="text-primary">{{ Auth::user()->fullname }}</span>!
                     </h5>
                     <p class="opacity-75 mb-3" style="font-size: 0.82rem;">
-                        Kelola antrian dan kelengkapan data pasien hari ini secara real-time.
+                        Kelola antrian dan kelengkapan data registrasi &amp; transaksi pasien hari ini secara real-time.
                     </p>
 
                     <!-- Metrics Stat Boxes -->
@@ -323,13 +335,13 @@
                             <div class="p-3 ent-metric-success position-relative overflow-hidden">
                                 <div class="d-flex align-items-center justify-content-between">
                                     <div>
-                                        <span class="text-success fw-bold text-uppercase d-block mb-1" style="font-size: 0.68rem; letter-spacing: 0.04em;">Order Selesai</span>
+                                        <span class="text-success fw-bold text-uppercase d-block mb-1" style="font-size: 0.68rem; letter-spacing: 0.04em;">Registrasi Aktif</span>
                                         <h3 class="text-success fw-bold mb-0" style="font-size: 1.5rem; font-family: 'JetBrains Mono', monospace;">
-                                            {{$total - $reject}} <span class="fw-semibold text-success opacity-75" style="font-size: 0.8rem; font-family: 'Plus Jakarta Sans', sans-serif;">Order</span>
+                                            {{ $total - $reject }} <span class="fw-semibold text-success opacity-75" style="font-size: 0.8rem; font-family: 'Plus Jakarta Sans', sans-serif;">Order</span>
                                         </h3>
                                     </div>
                                     <div class="p-2 bg-success text-white rounded-3 shadow-sm d-flex align-items-center justify-content-center" style="width: 40px; height: 40px;">
-                                        <i class="fas fa-check-circle fs-5"></i>
+                                        <i class="fas fa-check-circle fs-2"></i>
                                     </div>
                                 </div>
                             </div>
@@ -340,13 +352,13 @@
                             <div class="p-3 ent-metric-danger position-relative overflow-hidden">
                                 <div class="d-flex align-items-center justify-content-between">
                                     <div>
-                                        <span class="text-danger fw-bold text-uppercase d-block mb-1" style="font-size: 0.68rem; letter-spacing: 0.04em;">Order Batal</span>
+                                        <span class="text-danger fw-bold text-uppercase d-block mb-1" style="font-size: 0.68rem; letter-spacing: 0.04em;">Registrasi Batal</span>
                                         <h3 class="text-danger fw-bold mb-0" style="font-size: 1.5rem; font-family: 'JetBrains Mono', monospace;">
-                                            {{$reject}} <span class="fw-semibold text-danger opacity-75" style="font-size: 0.8rem; font-family: 'Plus Jakarta Sans', sans-serif;">Order</span>
+                                            {{ $reject }} <span class="fw-semibold text-danger opacity-75" style="font-size: 0.8rem; font-family: 'Plus Jakarta Sans', sans-serif;">Order</span>
                                         </h3>
                                     </div>
                                     <div class="p-2 bg-danger text-white rounded-3 shadow-sm d-flex align-items-center justify-content-center" style="width: 40px; height: 40px;">
-                                        <i class="fas fa-times-circle fs-5"></i>
+                                        <i class="fas fa-times-circle fs-2"></i>
                                     </div>
                                 </div>
                             </div>
@@ -367,7 +379,7 @@
                                 <i class="fas fa-user-plus fs-2"></i>
                             </div>
                             <div>
-                                <h6 class="mb-0 fw-bold" style="font-size: 0.88rem;">{{$total}} Order Pasien Hari Ini</h6>
+                                <h6 class="mb-0 fw-bold" style="font-size: 0.88rem;">{{ $total }} Registrasi Pasien Hari Ini</h6>
                                 <span class="opacity-75" style="font-size: 0.75rem;">Siap untuk alur pendaftaran pasien baru</span>
                             </div>
                         </div>
@@ -383,7 +395,7 @@
                                 <i class="fas fa-bullhorn fs-2"></i>
                             </div>
                             <div>
-                                <h6 class="mb-0 fw-bold" style="font-size: 0.88rem;">7 Orders Belum Bayar</h6>
+                                <h6 class="mb-0 fw-bold" style="font-size: 0.88rem;">{{ $belumBayarCount }} Transaksi Belum Lunas</h6>
                                 <span class="opacity-75" style="font-size: 0.75rem;">Menunggu instruksi panggilan antrian kasir</span>
                             </div>
                         </div>
@@ -400,7 +412,7 @@
                                 <i class="fas fa-power-off fs-2"></i>
                             </div>
                             <div>
-                                <h6 class="mb-0 fw-bold" style="font-size: 0.88rem;">{{$total}} Orders Semua Pasien</h6>
+                                <h6 class="mb-0 fw-bold" style="font-size: 0.88rem;">{{ $total }} Registrasi Semua Pasien</h6>
                                 <span class="opacity-75" style="font-size: 0.75rem;">Kunci &amp; selesaikan registrasi hari ini</span>
                             </div>
                         </div>
@@ -434,10 +446,10 @@
                 </button>
             </div>
 
-            <!-- Filter & Live Search Bar (Tanpa perlu scroll ke bawah) -->
+            <!-- Filter & Live Search Bar -->
             <div class="activity-toolbar">
                 <div class="row g-2 align-items-center">
-                    <div class="col-sm-7">
+                    <div class="col-12">
                         <div class="input-group activity-search-group">
                             <span class="input-group-text">
                                 <i class="fas fa-search" style="font-size: 0.78rem;"></i>
@@ -445,13 +457,21 @@
                             <input type="text"
                                 id="activitySearchInput"
                                 class="form-control"
-                                placeholder="Ketik nama pasien / no. order..."
+                                placeholder="Ketik nama pasien / no. reg / jenis layanan..."
                                 autocomplete="off">
                         </div>
                     </div>
-                    <div class="col-sm-5">
+                    <div class="col-sm-6">
+                        <select id="activityLayananFilter" class="form-select activity-filter-select">
+                            <option value="">Semua Jenis Layanan</option>
+                            <option value="RAWAT_JALAN">Rawat Jalan</option>
+                            <option value="IGD">IGD</option>
+                            <option value="RAWAT_INAP">Rawat Inap</option>
+                        </select>
+                    </div>
+                    <div class="col-sm-6">
                         <select id="activityCategoryFilter" class="form-select activity-filter-select">
-                            <option value="">Semua Kategori</option>
+                            <option value="">Semua Penjamin</option>
                             @php
                                 $kategoriUnik = collect($data)->pluck('t_pasien_cat_name')->filter()->unique()->values();
                             @endphp
@@ -464,11 +484,28 @@
             </div>
 
             <!-- Log Content List -->
-            <div class="card-body p-2 px-3 overflow-auto flex-grow-1" style="max-height: 335px;" id="activityLogList">
+            <div class="card-body p-2 px-3 overflow-auto flex-grow-1" style="max-height: 315px;" id="activityLogList">
                 <div class="timeline-simple">
                     @foreach ($data as $datas)
+                    @php
+                        $jenisRaw = strtoupper((string) ($datas->jenis_layanan ?? 'RAWAT_JALAN'));
+                        $jenisLabel = $datas->jenis_layanan_label ?? ($layananLabelMap[$jenisRaw] ?? str_replace('_', ' ', $jenisRaw));
+                        $jenisBadgeClass = $jenisRaw === 'IGD'
+                            ? 'bg-danger-subtle text-danger border-danger-subtle'
+                            : ($jenisRaw === 'RAWAT_INAP'
+                                ? 'bg-warning-subtle text-warning border-warning-subtle'
+                                : 'bg-info-subtle text-info border-info-subtle');
+
+                        $payStat = strtoupper((string) ($datas->status_pembayaran ?? 'BELUM LUNAS'));
+                        $payBadgeClass = $payStat === 'LUNAS'
+                            ? 'bg-success-subtle text-success border-success-subtle'
+                            : ($payStat === 'SEBAGIAN'
+                                ? 'bg-warning-subtle text-warning border-warning-subtle'
+                                : 'bg-danger-subtle text-danger border-danger-subtle');
+                    @endphp
                     <div class="activity-log-item d-flex align-items-start"
-                        data-search="{{ strtolower(($datas->master_patient_name ?? '') . ' ' . ($datas->d_reg_order_code ?? '') . ' ' . ($datas->t_pasien_cat_name ?? '')) }}"
+                        data-search="{{ strtolower(($datas->master_patient_name ?? '') . ' ' . ($datas->no_registrasi ?? '') . ' ' . ($datas->d_reg_order_code ?? '') . ' ' . ($datas->t_pasien_cat_name ?? '') . ' ' . $jenisLabel . ' ' . $jenisRaw . ' ' . $payStat) }}"
+                        data-layanan="{{ $jenisRaw }}"
                         data-category="{{ strtolower($datas->t_pasien_cat_name ?? '') }}">
                         <div class="avatar-container me-3 flex-shrink-0">
                             <div class="rounded-3 d-flex align-items-center justify-content-center shadow-sm" style="width: 38px; height: 38px; background-color: rgba(79, 70, 229, 0.12); color: #6366f1; border: 1px solid var(--ent-grid-border);">
@@ -477,40 +514,25 @@
                         </div>
                         <div class="flex-grow-1" style="font-size: 0.8rem;">
                             <p class="mb-1 lh-sm">
-                                <strong class="fw-bold">{{$datas->master_patient_name}}</strong>
-                                terdaftar pada <span class="badge bg-primary-subtle text-primary border border-primary-subtle rounded-pill px-2">{{ $datas->t_pasien_cat_name }}</span>
+                                <strong class="fw-bold">{{ $datas->master_patient_name }}</strong>
+                                <span class="badge {{ $jenisBadgeClass }} border rounded-pill px-2 ms-1">{{ $jenisLabel }}</span>
+                                <span class="badge bg-primary-subtle text-primary border border-primary-subtle rounded-pill px-2 ms-1">{{ $datas->t_pasien_cat_name }}</span>
+                                <span class="badge {{ $payBadgeClass }} border rounded-pill px-2 ms-1">{{ $payStat }}</span>
                             </p>
                             <div class="d-flex align-items-center opacity-75" style="font-size: 0.72rem;">
-                                <i class="fas fa-hashtag me-1"></i><strong class="me-2" style="font-family: 'JetBrains Mono', monospace;">{{ $datas->d_reg_order_code }}</strong>
-                                <i class="fas fa-clock me-1 ms-auto"></i> {{ $datas->created_at }}
+                                <i class="fas fa-hashtag me-1"></i><strong class="me-2" style="font-family: 'JetBrains Mono', monospace;">{{ $datas->no_registrasi ?? $datas->d_reg_order_code }}</strong>
+                                <i class="fas fa-clock me-1 ms-auto"></i> {{ $datas->tanggal_registrasi ?? $datas->created_at }}
                             </div>
                         </div>
                     </div>
                     @endforeach
-
-                    <!-- Dummy Event Item -->
-                    <div class="activity-log-item d-flex align-items-start"
-                        data-search="massachusetts institute of technology anthony hopkin event"
-                        data-category="">
-                        <div class="avatar-container me-3 flex-shrink-0">
-                            <div class="rounded-3 d-flex align-items-center justify-content-center shadow-sm" style="width: 38px; height: 38px; background-color: rgba(2, 132, 199, 0.12); color: #0ea5e9; border: 1px solid var(--ent-grid-border);">
-                                <i class="fas fa-calendar-check"></i>
-                            </div>
-                        </div>
-                        <div class="flex-grow-1" style="font-size: 0.8rem;">
-                            <p class="mb-1 lh-sm">
-                                <strong>Massachusetts Institute of Technology</strong> invited <strong>Anthony Hopkin</strong> to an event
-                            </p>
-                            <span class="opacity-75 d-block" style="font-size: 0.72rem;"><i class="fas fa-clock me-1"></i> October 28, 12:00 PM</span>
-                        </div>
-                    </div>
                 </div>
 
                 <!-- Empty State jika pencarian tidak cocok -->
                 <div id="activityEmptyState" class="text-center py-4 d-none">
                     <i class="fas fa-search-minus fs-3 opacity-50 mb-2 d-block"></i>
                     <div class="fw-semibold" style="font-size: 0.82rem;">Pasien atau aktivitas tidak ditemukan</div>
-                    <small class="opacity-75" style="font-size: 0.74rem;">Coba kata kunci lain atau ubah filter kategori.</small>
+                    <small class="opacity-75" style="font-size: 0.74rem;">Coba kata kunci lain atau ubah filter jenis layanan / penjamin.</small>
                 </div>
             </div>
 
@@ -566,6 +588,7 @@
 <script>
     document.addEventListener('DOMContentLoaded', function() {
         const searchInput = document.getElementById('activitySearchInput');
+        const layananFilter = document.getElementById('activityLayananFilter');
         const categoryFilter = document.getElementById('activityCategoryFilter');
         const btnReset = document.getElementById('btnResetActivityFilter');
         const logItems = document.querySelectorAll('#activityLogList .activity-log-item');
@@ -575,17 +598,20 @@
 
         function filterActivityLog() {
             const keyword = (searchInput.value || '').trim().toLowerCase();
+            const selectedLayanan = (layananFilter.value || '').trim().toUpperCase();
             const selectedCat = (categoryFilter.value || '').trim().toLowerCase();
             let visibleCount = 0;
 
             logItems.forEach(item => {
                 const haystack = item.getAttribute('data-search') || '';
+                const itemLayanan = (item.getAttribute('data-layanan') || '').toUpperCase();
                 const itemCat = item.getAttribute('data-category') || '';
 
                 const matchKeyword = !keyword || haystack.includes(keyword);
+                const matchLayanan = !selectedLayanan || itemLayanan === selectedLayanan;
                 const matchCategory = !selectedCat || itemCat === selectedCat;
 
-                if (matchKeyword && matchCategory) {
+                if (matchKeyword && matchLayanan && matchCategory) {
                     item.classList.remove('d-none');
                     visibleCount++;
                 } else {
@@ -602,7 +628,7 @@
             }
 
             if (btnReset) {
-                btnReset.classList.toggle('d-none', !keyword && !selectedCat);
+                btnReset.classList.toggle('d-none', !keyword && !selectedLayanan && !selectedCat);
             }
 
             if (logContainer) {
@@ -614,6 +640,10 @@
             searchInput.addEventListener('input', filterActivityLog);
         }
 
+        if (layananFilter) {
+            layananFilter.addEventListener('change', filterActivityLog);
+        }
+
         if (categoryFilter) {
             categoryFilter.addEventListener('change', filterActivityLog);
         }
@@ -621,6 +651,7 @@
         if (btnReset) {
             btnReset.addEventListener('click', function() {
                 searchInput.value = '';
+                layananFilter.value = '';
                 categoryFilter.value = '';
                 filterActivityLog();
                 searchInput.focus();
