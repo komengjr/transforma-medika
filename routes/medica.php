@@ -63,6 +63,8 @@ Route::prefix('{akses}/{id}/application')->group(function () {
     Route::get('keuangan/menu-kasir', [KeuanganController::class, 'keuangan_menu_cashier'])->name('keuangan_menu_cashier');
     Route::get('transaksi-keuangan/penerimaan-transaksi', [KeuanganController::class, 'keuangan_penerimaan_transaksi'])->name('keuangan_penerimaan_transaksi');
     Route::get('transaksi-keuangan/penagihan-keuangan', [KeuanganController::class, 'penagihan_transaksi_keuangan'])->name('penagihan_transaksi_keuangan');
+    Route::get('laporan-keuangan/jurnal-umum', [KeuanganController::class, 'laporan_keuangan_jurnal_umum'])->name('laporan_keuangan_jurnal_umum');
+
     Route::get('master-company', [ApplicationController::class, 'master_company'])->name('master_company');
     Route::get('mou-company', [ApplicationController::class, 'mou_company'])->name('mou_company');
     Route::get('agreement-perusahaan', [ApplicationController::class, 'agreement_perusahaan'])->name('agreement_perusahaan');
@@ -421,6 +423,11 @@ Route::prefix('application')->group(function () {
     Route::post('/api/penagihan/proses-pelunasan', [KeuanganController::class, 'prosesPelunasanPenagihanPerusahaan'])->name('api.pelunasan.penagihan.perusahaan');
     Route::get('/penagihan/download-pdf/{id}', [KeuanganController::class, 'downloadPdfPenagihan'])->name('penagihan.download.pdf');
     Route::post('/api/penagihan/kirim-pesan', [KeuanganController::class, 'kirimPesanTagihan'])->name('api.penagihan.kirim.pesan');
+
+
+    Route::post('/keuangan/laporan-jurnal-umum/data', [KeuanganController::class, 'laporan_keuangan_jurnal_umum_data'])->name('laporan_keuangan_jurnal_umum_data');
+    Route::post('/keuangan/laporan-jurnal-umum/store', [KeuanganController::class, 'laporan_keuangan_jurnal_umum_store'])->name('laporan_keuangan_jurnal_umum_store');
+    Route::post('/keuangan/laporan-jurnal-umum/delete', [KeuanganController::class, 'laporan_keuangan_jurnal_umum_delete'])->name('laporan_keuangan_jurnal_umum_delete');
 });
 // MENU KEUANGAN
 Route::prefix('master')->group(function () {

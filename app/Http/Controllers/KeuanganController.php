@@ -13,6 +13,8 @@ use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Hash;
 use Illuminate\Support\Facades\Redirect;
+use Illuminate\Support\Facades\Schema;
+use Illuminate\Support\Facades\Validator;
 use Illuminate\Support\Str;
 use League\CommonMark\Extension\CommonMark\Node\Inline\Code;
 use Maatwebsite\Excel\Facades\Excel;
@@ -1931,5 +1933,322 @@ class KeuanganController extends Controller
                 'message' => 'Fitur pengiriman Email belum dikonfigurasi.'
             ]);
         }
+    }
+
+    // PLAPORAN KEUANGAN JURNAL UMUM
+    public function laporan_keuangan_jurnal_umum($akses, $id)
+    {
+        if ($this->url_akses_sub($akses, $id) == true) {
+            $akunDefault = [
+                ['kode' => '1101.01', 'nama' => 'Kas Tunai Kasir / Front Office'],
+                ['kode' => '1102.01', 'nama' => 'Bank / QRIS / EDC Penerimaan'],
+                ['kode' => '1103.01', 'nama' => 'Piutang Pasien (Rawat Jalan / IGD / Ranap)'],
+                ['kode' => '1104.01', 'nama' => 'Piutang Penjamin / Asuransi / Perusahaan'],
+                ['kode' => '2101.01', 'nama' => 'Uang Muka / Titipan Pasien'],
+                ['kode' => '4101.01', 'nama' => 'Pendapatan Jasa Pelayanan Medis & Tindakan'],
+                ['kode' => '4102.01', 'nama' => 'Pendapatan Farmasi / Obat & BMHP'],
+                ['kode' => '4103.01', 'nama' => 'Pendapatan Kamar & Rawat Inap'],
+                ['kode' => '4199.01', 'nama' => 'Retur / Koreksi Pendapatan'],
+                ['kode' => '5101.01', 'nama' => 'Beban Operasional & Administrasi RS'],
+            ];
+
+            if (Schema::hasTable('medical_coa')) {
+                $dbAkun = DB::table('medical_coa')
+                    ->where('status_aktif', 1)
+                    ->orderBy('kode_akun')
+                    ->get(['kode_akun as kode', 'nama_akun as nama'])
+                    ->map(fn($a) => ['kode' => $a->kode, 'nama' => $a->nama])
+                    ->toArray();
+
+                if (!empty($dbAkun)) {
+                    $akunDefault = $dbAkun;
+                }
+            }
+
+            return view('application.keuangan.laporan-jurnal-umum', [
+                'akses'    => $akses,
+                'code'     => $id,
+                'akunList' => $akunDefault,
+            ]);
+        } else {
+            return Redirect::to('dashboard/home');
+        }
+    }
+
+    public function laporan_keuangan_jurnal_umum_data(Request $request)
+    {
+        if (!Schema::hasTable('medical_jurnal_umum') || !Schema::hasTable('medical_jurnal_umum_detail')) {
+            return response()->json([
+                'success' => true,
+                'data'    => [],
+                'summary' => [
+                    'total_debit'   => 0,
+                    'total_kredit'  => 0,
+                    'selisih'       => 0,
+                    'jumlah_jurnal' => 0,
+                ],
+            ]);
+        }
+
+        $tglAwal      = $request->input('tgl_awal', Carbon::today()->toDateString());
+        $tglAkhir     = $request->input('tgl_akhir', Carbon::today()->toDateString());
+        $noJurnal     = trim((string) $request->input('no_jurnal', ''));
+        $jenisJurnal  = trim((string) $request->input('jenis_jurnal', ''));
+        $statusJurnal = trim((string) $request->input('status_jurnal', ''));
+        $keyword      = trim((string) $request->input('keyword', ''));
+
+        $query = DB::table('medical_jurnal_umum as j')
+            ->whereNull('j.deleted_at')
+            ->whereDate('j.tanggal_jurnal', '>=', $tglAwal)
+            ->whereDate('j.tanggal_jurnal', '<=', $tglAkhir);
+
+        if ($noJurnal !== '') {
+            $query->where('j.no_jurnal', 'LIKE', '%' . $noJurnal . '%');
+        }
+
+        if ($jenisJurnal !== '') {
+            $query->where('j.jenis_jurnal', $jenisJurnal);
+        }
+
+        if ($statusJurnal !== '') {
+            $query->where('j.status_jurnal', $statusJurnal);
+        }
+
+        if ($keyword !== '') {
+            $query->where(function ($q) use ($keyword) {
+                $q->where('j.keterangan', 'LIKE', '%' . $keyword . '%')
+                    ->orWhere('j.no_referensi', 'LIKE', '%' . $keyword . '%')
+                    ->orWhere('j.user_id', 'LIKE', '%' . $keyword . '%');
+            });
+        }
+
+        $jurnals = $query->orderByDesc('j.tanggal_jurnal')
+            ->orderByDesc('j.id')
+            ->get();
+
+        $jurnalIds = $jurnals->pluck('id')->all();
+        $detailsByJurnal = [];
+
+        if (!empty($jurnalIds)) {
+            $details = DB::table('medical_jurnal_umum_detail')
+                ->whereIn('jurnal_umum_id', $jurnalIds)
+                ->orderBy('id')
+                ->get();
+
+            foreach ($details as $d) {
+                $detailsByJurnal[$d->jurnal_umum_id][] = $d;
+            }
+        }
+
+        $totalDebitAll = 0;
+        $totalKreditAll = 0;
+
+        $formattedData = $jurnals->map(function ($j) use ($detailsByJurnal, &$totalDebitAll, &$totalKreditAll) {
+            $items = $detailsByJurnal[$j->id] ?? [];
+            $debit = (float) ($j->total_debit ?? collect($items)->sum('debit'));
+            $kredit = (float) ($j->total_kredit ?? collect($items)->sum('kredit'));
+
+            if (strtoupper((string) $j->status_jurnal) !== 'BATAL') {
+                $totalDebitAll += $debit;
+                $totalKreditAll += $kredit;
+            }
+
+            return [
+                'id'             => $j->id,
+                'no_jurnal'      => $j->no_jurnal,
+                'tanggal_jurnal' => $j->tanggal_jurnal,
+                'jenis_jurnal'   => $j->jenis_jurnal,
+                'no_referensi'   => $j->no_referensi,
+                'keterangan'     => $j->keterangan,
+                'total_debit'    => $debit,
+                'total_kredit'   => $kredit,
+                'is_balanced'    => round($debit, 2) === round($kredit, 2),
+                'status_jurnal'  => $j->status_jurnal,
+                'user_id'        => $j->user_id,
+                'diposting_oleh' => $j->diposting_oleh,
+                'waktu_posting'  => $j->waktu_posting,
+                'details'        => $items,
+            ];
+        })->values();
+
+        return response()->json([
+            'success' => true,
+            'data'    => $formattedData,
+            'summary' => [
+                'total_debit'   => $totalDebitAll,
+                'total_kredit'  => $totalKreditAll,
+                'selisih'       => $totalDebitAll - $totalKreditAll,
+                'jumlah_jurnal' => $formattedData->count(),
+            ],
+        ]);
+    }
+
+    public function laporan_keuangan_jurnal_umum_store(Request $request)
+    {
+        $validator = Validator::make($request->all(), [
+            'tanggal_jurnal'      => 'required|date',
+            'jenis_jurnal'        => 'required|string|max:40',
+            'keterangan'          => 'required|string|max:1000',
+            'status_jurnal'       => 'nullable|in:DRAFT,POSTED',
+            'details'             => 'required|array|min:2',
+            'details.*.kode_akun' => 'required|string|max:30',
+            'details.*.nama_akun' => 'required|string|max:150',
+            'details.*.debit'     => 'nullable|numeric|min:0',
+            'details.*.kredit'    => 'nullable|numeric|min:0',
+        ], [
+            'details.min'         => 'Jurnal umum minimal memiliki 2 baris (Debit dan Kredit).',
+            'keterangan.required' => 'Keterangan jurnal wajib diisi.',
+        ]);
+
+        if ($validator->fails()) {
+            return response()->json([
+                'success' => false,
+                'message' => $validator->errors()->first(),
+            ], 422);
+        }
+
+        $rawDetails = $request->input('details', []);
+        $cleanDetails = [];
+        $totalDebit = 0;
+        $totalKredit = 0;
+
+        foreach ($rawDetails as $row) {
+            $debit = round((float) ($row['debit'] ?? 0), 2);
+            $kredit = round((float) ($row['kredit'] ?? 0), 2);
+
+            if ($debit <= 0 && $kredit <= 0) {
+                continue;
+            }
+            if ($debit > 0 && $kredit > 0) {
+                return response()->json([
+                    'success' => false,
+                    'message' => 'Setiap baris akun hanya boleh mengisi Debit atau Kredit (tidak keduanya sekaligus).',
+                ], 422);
+            }
+
+            $totalDebit += $debit;
+            $totalKredit += $kredit;
+
+            $cleanDetails[] = [
+                'kode_akun'     => trim((string) $row['kode_akun']),
+                'nama_akun'     => trim((string) $row['nama_akun']),
+                'catatan_baris' => isset($row['catatan_baris']) ? trim((string) $row['catatan_baris']) : null,
+                'debit'         => $debit,
+                'kredit'        => $kredit,
+            ];
+        }
+
+        if (count($cleanDetails) < 2) {
+            return response()->json([
+                'success' => false,
+                'message' => 'Minimal harus ada 2 baris akun bernilai nominal yang valid.',
+            ], 422);
+        }
+
+        if ($totalDebit <= 0 || round($totalDebit, 2) !== round($totalKredit, 2)) {
+            return response()->json([
+                'success' => false,
+                'message' => 'Total Debit (' . number_format($totalDebit, 2, ',', '.') . ') harus sama dengan Total Kredit (' . number_format($totalKredit, 2, ',', '.') . ').',
+            ], 422);
+        }
+
+        $jurnalId = $request->input('jurnal_id');
+        $status = $request->input('status_jurnal', 'POSTED');
+        $actor = Auth::user()->fullname ?? Auth::user()->name ?? Auth::user()->email ?? (string) Auth::id();
+        $tglJurnal = Carbon::parse($request->input('tanggal_jurnal'))->toDateString();
+
+        DB::beginTransaction();
+        try {
+            $noJurnal = trim((string) $request->input('no_jurnal', ''));
+            if ($noJurnal === '') {
+                $prefix = 'JRN-' . Carbon::parse($tglJurnal)->format('Ymd') . '-';
+                $lastNum = DB::table('medical_jurnal_umum')
+                    ->where('no_jurnal', 'LIKE', $prefix . '%')
+                    ->count();
+                $noJurnal = $prefix . str_pad((string) ($lastNum + 1), 4, '0', STR_PAD_LEFT);
+            }
+
+            $headerPayload = [
+                'no_jurnal'      => $noJurnal,
+                'tanggal_jurnal' => $tglJurnal,
+                'jenis_jurnal'   => strtoupper(trim((string) $request->input('jenis_jurnal'))),
+                'no_referensi'   => trim((string) $request->input('no_referensi', '')) ?: null,
+                'registrasi_id'  => $request->input('registrasi_id') ?: null,
+                'transaksi_id'   => $request->input('transaksi_id') ?: null,
+                'keterangan'     => trim((string) $request->input('keterangan')),
+                'total_debit'    => round($totalDebit, 2),
+                'total_kredit'   => round($totalKredit, 2),
+                'status_jurnal'  => $status,
+                'diposting_oleh' => $status === 'POSTED' ? $actor : null,
+                'waktu_posting'  => $status === 'POSTED' ? Carbon::now() : null,
+                'updated_at'     => Carbon::now(),
+            ];
+
+            if ($jurnalId) {
+                DB::table('medical_jurnal_umum')
+                    ->where('id', $jurnalId)
+                    ->update($headerPayload);
+
+                DB::table('medical_jurnal_umum_detail')
+                    ->where('jurnal_umum_id', $jurnalId)
+                    ->delete();
+            } else {
+                $headerPayload['user_id'] = $actor;
+                $headerPayload['created_at'] = Carbon::now();
+                $jurnalId = DB::table('medical_jurnal_umum')->insertGetId($headerPayload);
+            }
+
+            foreach ($cleanDetails as $d) {
+                DB::table('medical_jurnal_umum_detail')->insert([
+                    'jurnal_umum_id' => $jurnalId,
+                    'kode_akun'      => $d['kode_akun'],
+                    'nama_akun'      => $d['nama_akun'],
+                    'catatan_baris'  => $d['catatan_baris'],
+                    'debit'          => $d['debit'],
+                    'kredit'         => $d['kredit'],
+                    'created_at'     => Carbon::now(),
+                    'updated_at'     => Carbon::now(),
+                ]);
+            }
+
+            DB::commit();
+
+            return response()->json([
+                'success' => true,
+                'message' => 'Jurnal umum ' . $noJurnal . ' berhasil disimpan.',
+                'id'      => $jurnalId,
+            ]);
+        } catch (\Exception $e) {
+            DB::rollBack();
+
+            return response()->json([
+                'success' => false,
+                'message' => 'Gagal menyimpan jurnal umum: ' . $e->getMessage(),
+            ], 500);
+        }
+    }
+
+    public function laporan_keuangan_jurnal_umum_delete(Request $request)
+    {
+        $jurnalId = $request->input('id');
+        if (!$jurnalId) {
+            return response()->json([
+                'success' => false,
+                'message' => 'ID jurnal tidak ditemukan.',
+            ], 422);
+        }
+
+        DB::table('medical_jurnal_umum')
+            ->where('id', $jurnalId)
+            ->update([
+                'status_jurnal' => 'BATAL',
+                'deleted_at'    => Carbon::now(),
+                'updated_at'    => Carbon::now(),
+            ]);
+
+        return response()->json([
+            'success' => true,
+            'message' => 'Entri jurnal umum berhasil dibatalkan/dihapus.',
+        ]);
     }
 }

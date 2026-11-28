@@ -5,185 +5,257 @@
 <link rel="stylesheet" href="https://cdn.datatables.net/responsive/3.0.4/css/responsive.bootstrap5.css">
 <link href="{{ asset('vendors/choices/choices.min.css') }}" rel="stylesheet" />
 <link href="{{ asset('vendors/flatpickr/flatpickr.min.css') }}" rel="stylesheet" />
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
+<link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&family=JetBrains+Mono:wght@500;700&display=swap" rel="stylesheet">
 
 <style>
     /* =========================================
-           RETRO / NEUBRUTALISM THEME STYLES
-           ========================================= */
+       MODERN ENTERPRISE HEALTHCARE UI STYLES
+       (ADAPTIVE LIGHT & DARK MODE BOOTSTRAP 5)
+       ========================================= */
     :root {
-        --retro-dark: #1e1e24;
-        --retro-yellow: #ffde59;
-        --retro-pink: #ffa6c9;
-        --retro-cyan: #8bf0fa;
-        --retro-orange: #ff914d;
-        --retro-green: #c1ff72;
-        --retro-purple: #c8b6ff;
-        --retro-bg: #f4f0ea;
-        --retro-border: 3px solid var(--retro-dark);
-        --retro-shadow: 5px 5px 0px var(--retro-dark);
-        --retro-shadow-sm: 3px 3px 0px var(--retro-dark);
+        --ent-indigo: #4f46e5;
+        --ent-indigo-dark: #4338ca;
+        --ent-grid-border: rgba(99, 102, 241, 0.22);
+        --ent-solid-bg: #ffffff;
+        --ent-solid-text: #0f172a;
+    }
+
+    [data-bs-theme="dark"],
+    .dark {
+        --ent-solid-bg: #0f172a;
+        --ent-solid-text: #f8fafc;
+        --ent-grid-border: rgba(148, 163, 184, 0.2);
     }
 
     body {
-        /* background-color: var(--retro-bg); */
-        color: var(--retro-dark);
         font-family: 'Plus Jakarta Sans', sans-serif;
     }
 
-    .retro-card {
-        border: var(--retro-border);
-        border-radius: 12px;
-        box-shadow: var(--retro-shadow);
-        background-color: #ffffff;
+    .mono-code {
+        font-family: 'JetBrains Mono', monospace;
+        font-size: 0.76rem;
+        font-weight: 700;
+    }
+
+    /* Hero Header */
+    .ent-header-banner {
+        background: linear-gradient(135deg, #090d16 0%, #1e1b4b 52%, #0369a1 100%);
+        border: 1px solid rgba(129, 140, 248, 0.35);
+        border-radius: 18px;
+        box-shadow: 0 14px 32px -8px rgba(15, 23, 42, 0.28);
+        color: #ffffff;
+        position: relative;
         overflow: hidden;
     }
 
-    .retro-header-banner {
-        background: linear-gradient(135deg, var(--retro-cyan) 0%, var(--retro-purple) 100%);
-        border: var(--retro-border);
-        border-radius: 12px;
-        box-shadow: var(--retro-shadow);
-        color: var(--retro-dark);
-    }
-
-    .retro-badge {
-        border: 2px solid var(--retro-dark);
-        border-radius: 6px;
-        padding: 4px 8px;
-        font-weight: 800;
-        box-shadow: 2px 2px 0px var(--retro-dark);
-        text-transform: uppercase;
-        display: inline-block;
-        font-size: 0.7rem;
-    }
-
-    /* Filter Box Style */
-    .filter-wrapper {
-        background: #ffffff;
-        border: var(--retro-border);
-        box-shadow: var(--retro-shadow-sm);
-        padding: 15px;
-        display: flex;
-        gap: 12px;
-        align-items: center;
-        margin-bottom: 20px;
-        border-radius: 10px;
-    }
-
-    .custom-input-box {
-        border: 2px solid var(--retro-dark);
-        border-radius: 6px;
-        padding: 18px 10px 4px 10px;
-        position: relative;
-        background: #fff;
-        flex: 1;
-        box-shadow: 2px 2px 0px var(--retro-dark);
-    }
-
-    .custom-input-box label {
+    .ent-header-banner::before {
+        content: '';
         position: absolute;
-        top: 2px;
-        left: 8px;
-        font-size: 10px;
-        color: var(--retro-dark);
-        font-weight: 800;
+        top: -55%;
+        right: -5%;
+        width: 340px;
+        height: 340px;
+        background: radial-gradient(circle, rgba(56, 189, 248, 0.24) 0%, transparent 70%);
+        pointer-events: none;
+    }
+
+    .ent-glass-pill {
+        background: rgba(255, 255, 255, 0.09);
+        backdrop-filter: blur(10px);
+        border: 1px solid rgba(255, 255, 255, 0.16);
+        border-radius: 12px;
+        color: #ffffff;
+    }
+
+    .ent-badge {
+        border-radius: 9999px;
+        padding: 4px 10px;
+        font-weight: 700;
+        text-transform: uppercase;
+        display: inline-flex;
+        align-items: center;
+        font-size: 0.68rem;
+        letter-spacing: 0.03em;
+    }
+
+    /* Main Card */
+    .ent-card {
+        border: 1px solid var(--ent-grid-border);
+        border-radius: 16px;
+        background-color: var(--bs-body-bg, var(--ent-solid-bg));
+        box-shadow: 0 6px 24px -4px rgba(15, 23, 42, 0.08);
+        overflow: visible !important;
+    }
+
+    .ent-card-top-bar {
+        background: linear-gradient(90deg, #0f172a 0%, #1e1b4b 100%);
+        border-bottom: 1px solid var(--ent-grid-border);
+        border-radius: 16px 16px 0 0;
+        padding: 13px 18px;
+    }
+
+    /* Filter Box */
+    .ent-filter-wrapper {
+        background-color: var(--bs-body-bg, var(--ent-solid-bg));
+        border: 1px solid var(--ent-grid-border);
+        box-shadow: 0 4px 18px -4px rgba(15, 23, 42, 0.06);
+        padding: 14px 16px;
+        border-radius: 14px;
+    }
+
+    .ent-input-box {
+        border: 1px solid var(--ent-grid-border);
+        border-radius: 11px;
+        padding: 20px 12px 6px 12px;
+        position: relative;
+        background-color: rgba(79, 70, 229, 0.025);
+        transition: border-color 0.18s ease, box-shadow 0.18s ease;
+    }
+
+    .ent-input-box:focus-within {
+        border-color: var(--ent-indigo);
+        box-shadow: 0 0 0 3px rgba(79, 70, 229, 0.14);
+        background-color: var(--bs-body-bg, var(--ent-solid-bg));
+    }
+
+    .ent-input-box label {
+        position: absolute;
+        top: 5px;
+        left: 12px;
+        font-size: 0.64rem;
+        color: var(--bs-secondary-color, #64748b);
+        font-weight: 700;
         pointer-events: none;
         text-transform: uppercase;
+        letter-spacing: 0.04em;
     }
 
-    .custom-input-box input {
+    .ent-input-box input {
         border: none;
         outline: none;
         width: 100%;
         background: transparent;
-        font-size: 13px;
-        font-weight: 700;
-        color: var(--retro-dark);
+        font-size: 0.82rem;
+        font-weight: 600;
+        color: var(--bs-body-color, var(--ent-solid-text));
         padding: 0;
     }
 
-    .btn-search-retro {
-        background-color: var(--retro-yellow);
-        color: var(--retro-dark);
-        font-weight: 800;
-        border: 2px solid var(--retro-dark);
-        box-shadow: var(--retro-shadow-sm);
-        border-radius: 6px;
-        padding: 0 22px;
-        height: 44px;
-        display: flex;
+    .btn-search-ent {
+        background: linear-gradient(135deg, #4f46e5 0%, #4338ca 100%);
+        color: #ffffff;
+        font-weight: 700;
+        border: none;
+        box-shadow: 0 4px 12px rgba(79, 70, 229, 0.28);
+        border-radius: 11px;
+        padding: 0 20px;
+        height: 46px;
+        display: inline-flex;
         align-items: center;
         justify-content: center;
         cursor: pointer;
-        transition: 0.1s;
+        transition: all 0.18s ease;
     }
 
-    .btn-search-retro:hover {
-        transform: translate(2px, 2px);
-        box-shadow: 0px 0px 0px var(--retro-dark);
-        background-color: #ffd230;
+    .btn-search-ent:hover {
+        transform: translateY(-1px);
+        box-shadow: 0 6px 16px rgba(79, 70, 229, 0.38);
+        color: #ffffff;
+    }
+
+    .btn-refresh-ent {
+        width: 34px;
+        height: 34px;
+        border-radius: 10px;
+        background: rgba(255, 255, 255, 0.1);
+        color: #fbbf24;
+        border: 1px solid rgba(251, 191, 36, 0.35);
+        display: inline-flex;
+        align-items: center;
+        justify-content: center;
+        transition: all 0.18s ease;
+        cursor: pointer;
+    }
+
+    .btn-refresh-ent:hover {
+        background: #f59e0b;
+        color: #ffffff;
+        transform: rotate(-30deg);
     }
 
     /* Table Custom Styling */
-    .table-retro {
+    .table-ent {
         width: 100%;
         border-collapse: separate;
         border-spacing: 0;
+        font-size: 0.84rem;
     }
 
-    .table-retro thead th {
-        background-color: var(--retro-dark) !important;
-        color: var(--retro-green) !important;
-        font-weight: 800;
-        text-transform: uppercase;
-        font-size: 0.75rem;
-        letter-spacing: 0.6px;
-        border-bottom: 2px solid var(--retro-dark);
-        padding: 12px 10px;
-    }
-
-    .table-retro tbody tr td {
-        border-bottom: 2px solid var(--retro-dark);
-        border-right: 2px solid var(--retro-dark);
-        padding: 12px 10px;
+    .table-ent thead th {
+        background-color: rgba(79, 70, 229, 0.06);
+        color: var(--bs-secondary-color, #475569);
         font-weight: 700;
-        color: var(--retro-dark);
-        background-color: #ffffff;
+        text-transform: uppercase;
+        font-size: 0.69rem;
+        letter-spacing: 0.04em;
+        border-bottom: 1px solid var(--ent-grid-border);
+        padding: 11px 12px;
+        white-space: nowrap;
     }
 
-    .table-retro tbody tr td:last-child {
-        border-right: none;
+    .table-ent tbody tr td {
+        border-bottom: 1px solid var(--ent-grid-border);
+        padding: 11px 12px;
+        font-weight: 600;
+        vertical-align: middle;
+        transition: background-color 0.15s ease;
     }
 
-    .table-retro tbody tr:hover td {
-        background-color: var(--retro-cyan) !important;
+    .table-ent tbody tr:hover td {
+        background-color: rgba(79, 70, 229, 0.05) !important;
     }
 
-    /* Code Chips */
     .code-chip {
-        font-family: 'Courier New', Courier, monospace;
-        font-weight: 800;
-        padding: 3px 8px;
-        border-radius: 6px;
-        background-color: #ffffff;
-        border: 2px solid var(--retro-dark);
-        box-shadow: 2px 2px 0px var(--retro-dark);
+        padding: 4px 9px;
+        border-radius: 8px;
+        background-color: rgba(2, 132, 199, 0.1);
+        border: 1px solid rgba(2, 132, 199, 0.28);
         display: inline-block;
-        color: var(--retro-dark);
+        color: #0284c7;
+    }
+
+    [data-bs-theme="dark"] .code-chip,
+    .dark .code-chip {
+        color: #38bdf8;
+        background-color: rgba(56, 189, 248, 0.12);
+        border-color: rgba(56, 189, 248, 0.3);
+    }
+
+    .btn-option-ent {
+        background: linear-gradient(135deg, #4f46e5 0%, #4338ca 100%);
+        color: #ffffff;
+        border: none;
+        border-radius: 9px;
+        font-weight: 600;
+        font-size: 0.78rem;
+        box-shadow: 0 3px 10px rgba(79, 70, 229, 0.22);
+    }
+
+    .btn-option-ent:hover,
+    .btn-option-ent:focus {
+        color: #ffffff;
+        background: linear-gradient(135deg, #4338ca 0%, #3730a3 100%);
     }
 
     /* Modals */
-    .modal-content.retro-modal {
-        border: 3px solid var(--retro-dark);
-        border-radius: 14px;
-        box-shadow: 8px 8px 0px var(--retro-dark);
-        background-color: var(--retro-bg);
+    .modal-content.ent-modal {
+        border: 1px solid var(--ent-grid-border);
+        border-radius: 18px;
+        box-shadow: 0 25px 50px -12px rgba(15, 23, 42, 0.35);
+        background-color: var(--bs-body-bg, var(--ent-solid-bg));
+        color: var(--bs-body-color);
         overflow: hidden;
-    }
-
-    /* Mengatasi agar dropdown menu tidak terpotong oleh card/tabel */
-    .card.retro-card {
-        overflow: visible !important;
     }
 
     .table-responsive {
@@ -193,39 +265,42 @@
 
     .dropdown-menu {
         z-index: 1050 !important;
+        border-radius: 12px;
+        border: 1px solid var(--ent-grid-border);
     }
 </style>
 @endsection
 
 @section('content')
 <!-- HERO HEADER -->
-<div class="row mb-4">
-    <div class="col">
-        <div class="card retro-header-banner p-1">
-            <div class="card-body p-4 text-dark position-relative z-1">
+<div class="row mb-3">
+    <div class="col-12">
+        <div class="card ent-header-banner p-1">
+            <div class="card-body p-3 p-md-4 text-white position-relative" style="z-index: 2;">
                 <div class="row align-items-center gy-3">
                     <div class="col-lg-7 d-flex align-items-center">
-                        <div class="p-2 rounded-4 me-3 d-flex align-items-center justify-content-center"
-                            style="width: 65px; height: 65px; background: white; border: 2px solid var(--retro-dark); box-shadow: 3px 3px 0px var(--retro-dark);">
-                            <img src="{{ asset('img/keuangan.png') }}" alt="" width="42" />
+                        <div class="ent-glass-pill p-2 me-3 d-flex align-items-center justify-content-center flex-shrink-0"
+                            style="width: 62px; height: 62px;">
+                            <img src="{{ asset('img/keuangan.png') }}" alt="Keuangan" width="40" />
                         </div>
                         <div>
                             <div class="d-flex align-items-center gap-2 mb-1">
-                                <span class="retro-badge" style="background-color: var(--retro-yellow); color: var(--retro-dark);">
+                                <span class="ent-badge" style="background: rgba(251, 191, 36, 0.2); border: 1px solid rgba(251, 191, 36, 0.45); color: #fde68a;">
                                     <i class="fas fa-wallet me-1"></i> FINANCE SUITE v2.4
                                 </span>
+                                <span style="color: #cbd5e1; font-size: 0.74rem; font-weight: 600;">Modul Keuangan</span>
                             </div>
-                            <h3 class="fw-bolder mb-0 text-dark" style="font-size: 1.3rem;">
-                                Welcome to <span style="text-decoration: underline;">Trans Management System</span>
-                            </h3>
-                            <p class="text-dark fw-bold mb-0 small opacity-75" style="font-size: 0.75rem;">Modul Pengolahan Transaksi & Laporan Keuangan</p>
+                            <h4 class="fw-bold mb-0 text-white" style="letter-spacing: -0.02em;">
+                                Welcome to {{ env('APP_LABEL') }} <span style="color: #7dd3fc;">Management System</span>
+                            </h4>
+                            <p class="mb-0 small" style="color: #cbd5e1;">Pengolahan Transaksi, Setoran Kasir &amp; Verifikasi Keuangan</p>
                         </div>
                     </div>
                     <div class="col-lg-5 text-lg-end">
-                        <div class="d-inline-flex align-items-center bg-white px-3 py-2 rounded-pill" style="border: 2px solid var(--retro-dark); box-shadow: 3px 3px 0px var(--retro-dark);">
-                            <h6 class="fw-bolder mb-0 text-dark" style="font-size: 0.95rem;">
-                                <i class="fas fa-file-invoice-dollar me-1 text-success"></i> Menu : Transaksi Penerimaan
-                            </h6>
+                        <div class="ent-glass-pill d-inline-flex align-items-center px-3 py-2">
+                            <span class="fw-bold text-warning" style="font-size: 0.88rem;">
+                                <i class="fas fa-file-invoice-dollar me-1.5"></i> Menu : Transaksi Penerimaan
+                            </span>
                         </div>
                     </div>
                 </div>
@@ -235,80 +310,83 @@
 </div>
 
 <!-- FILTER BAR PENCARIAN -->
-<form id="form-filter-keuangan" class="filter-wrapper">
-    <!-- Tanggal Awal -->
-    <div class="custom-input-box">
-        <label>Tanggal Awal</label>
-        <input type="text" class="datetimepicker" name="tgl_awal" value="{{ date('Y-m-d') }}" data-options='{"dateFormat":"Y-m-d","disableMobile":true}'>
+<form id="form-filter-keuangan" class="ent-filter-wrapper mb-3">
+    <div class="row g-2 align-items-center">
+        <div class="col-6 col-md-3 col-lg-2">
+            <div class="ent-input-box">
+                <label>Tanggal Awal</label>
+                <input type="text" class="datetimepicker" name="tgl_awal" value="{{ date('Y-m-d') }}" data-options='{"dateFormat":"Y-m-d","disableMobile":true}'>
+            </div>
+        </div>
+        <div class="col-6 col-md-3 col-lg-2">
+            <div class="ent-input-box">
+                <label>Tanggal Akhir</label>
+                <input type="text" class="datetimepicker" name="tgl_akhir" value="{{ date('Y-m-d') }}" data-options='{"dateFormat":"Y-m-d","disableMobile":true}'>
+            </div>
+        </div>
+        <div class="col-6 col-md-3 col-lg-3">
+            <div class="ent-input-box">
+                <label>No Laporan</label>
+                <input type="text" name="no_laporan" placeholder="Cth: LAP-KSR...">
+            </div>
+        </div>
+        <div class="col-6 col-md-3 col-lg-3">
+            <div class="ent-input-box">
+                <label>Nama Penyetor</label>
+                <input type="text" name="nama_penyetor" placeholder="Nama user...">
+            </div>
+        </div>
+        <div class="col-12 col-lg-2 d-grid">
+            <button type="submit" class="btn-search-ent" title="Cari Data">
+                <i class="fas fa-search me-2"></i>
+                <span>Cari Data</span>
+            </button>
+        </div>
     </div>
-
-    <!-- Tanggal Akhir -->
-    <div class="custom-input-box">
-        <label>Tanggal Akhir</label>
-        <input type="text" class="datetimepicker" name="tgl_akhir" value="{{ date('Y-m-d') }}" data-options='{"dateFormat":"Y-m-d","disableMobile":true}'>
-    </div>
-
-    <!-- No Laporan -->
-    <div class="custom-input-box">
-        <label>No Laporan</label>
-        <input type="text" name="no_laporan" placeholder="Cth: LAP-KSR...">
-    </div>
-
-    <!-- Nama Penyetor -->
-    <div class="custom-input-box">
-        <label>Nama Penyetor</label>
-        <input type="text" name="nama_penyetor" placeholder="Nama user...">
-    </div>
-
-    <!-- Tombol Filter -->
-    <button type="submit" class="btn-search-retro" title="Cari Data">
-        <i class="fas fa-search"></i>
-    </button>
 </form>
 
 <!-- MAIN TABLE CARD -->
-<div class="card retro-card mb-4">
-    <div class="card-header py-3 px-4 d-flex justify-content-between align-items-center" style="background-color: var(--retro-dark); border-bottom: 3px solid var(--retro-dark);">
-        <div class="d-flex align-items-center gap-2">
-            <button class="btn btn-sm btn-light border border-dark rounded-circle p-2 d-flex align-items-center justify-content-center fw-bold shadow-sm"
+<div class="card ent-card mb-4">
+    <div class="ent-card-top-bar d-flex justify-content-between align-items-center">
+        <div class="d-flex align-items-center gap-2.5">
+            <button type="button"
+                class="btn-refresh-ent"
                 onclick="loadDataKeuangan();"
                 data-bs-toggle="tooltip"
-                title="Refresh Data"
-                style="width: 32px; height: 32px; background-color: var(--retro-yellow); color: var(--retro-dark);">
+                title="Refresh Data">
                 <span class="fas fa-undo"></span>
             </button>
             <span class="text-white-50">|</span>
-            <span class="fw-bolder fs--1 text-white">
-                <i class="fas fa-list-alt me-1 text-info"></i> Daftar Laporan & Transaksi Penerimaan
+            <span class="fw-bold text-white" style="font-size: 0.88rem;">
+                <i class="fas fa-list-alt me-1.5 text-info"></i> Daftar Laporan &amp; Transaksi Penerimaan
             </span>
         </div>
     </div>
 
     <div class="card-body p-0">
-
-        <table id="table-keuangan" class="table table-retro table-hover align-middle mb-0" style="width:100%">
-            <thead>
-                <tr>
-                    <th class="text-center" style="width: 50px;">No</th>
-                    <th>No Laporan</th>
-                    <th>User ID (Penyetor)</th>
-                    <th>Total Setoran</th>
-                    <th class="text-center">Jumlah Transaksi</th>
-                    <!-- Kolom Tambahan untuk Verifikasi Keuangan -->
-                    <th>Verifikasi Keuangan</th>
-                    <th class="text-center">Status Verifikasi</th>
-                    <th class="text-center" style="width: 120px;">Action</th>
-                </tr>
-            </thead>
-            <tbody class="fs--1" id="tbody-keuangan">
-                <tr>
-                    <td colspan="7" class="text-center py-4 fw-bold text-muted">
-                        <i class="fas fa-spinner fa-spin me-2"></i> Memuat data...
-                    </td>
-                </tr>
-            </tbody>
-        </table>
-
+        <div class="table-responsive">
+            <table id="table-keuangan" class="table table-ent table-hover align-middle mb-0" style="width:100%">
+                <thead>
+                    <tr>
+                        <th class="text-center" style="width: 54px;">No</th>
+                        <th>No Laporan</th>
+                        <th>User ID (Penyetor)</th>
+                        <th>Total Setoran</th>
+                        <th class="text-center">Jumlah Transaksi</th>
+                        <th>Verifikasi Keuangan</th>
+                        <th class="text-center">Status Verifikasi</th>
+                        <th class="text-center" style="width: 125px;">Action</th>
+                    </tr>
+                </thead>
+                <tbody id="tbody-keuangan">
+                    <tr>
+                        <td colspan="8" class="text-center py-4 fw-semibold opacity-75">
+                            <i class="fas fa-spinner fa-spin me-2"></i> Memuat data...
+                        </td>
+                    </tr>
+                </tbody>
+            </table>
+        </div>
     </div>
 </div>
 @endsection
@@ -318,9 +396,9 @@
 <div class="modal fade" id="modal-keuangan-full" data-bs-keyboard="false" data-bs-backdrop="static" tabindex="-1"
     aria-hidden="true">
     <div class="modal-dialog modal-dialog-centered" role="document" style="max-width: 95%;">
-        <div class="modal-content retro-modal border-0">
-            <div class="position-absolute top-0 end-0 mt-3 me-3 z-index-1">
-                <button class="btn-close btn btn-sm btn-circle d-flex flex-center transition-base bg-white border border-dark fw-bold shadow-sm"
+        <div class="modal-content ent-modal border-0">
+            <div class="position-absolute top-0 end-0 mt-3 me-3" style="z-index: 10;">
+                <button class="btn-close btn btn-sm btn-circle d-flex align-items-center justify-content-center shadow-sm"
                     data-bs-dismiss="modal" aria-label="Close"></button>
             </div>
             <div id="menu-keuangan-full"></div>
@@ -331,8 +409,8 @@
 <div class="modal fade" id="modal-keuangan" data-bs-keyboard="false" data-bs-backdrop="static" tabindex="-1"
     aria-hidden="true">
     <div class="modal-dialog modal-dialog-centered modal-xl" role="document">
-        <div class="modal-content retro-modal border-0">
-            <div class="position-absolute top-0 end-0 mt-3 me-3 z-index-1"></div>
+        <div class="modal-content ent-modal border-0">
+            <div class="position-absolute top-0 end-0 mt-3 me-3" style="z-index: 10;"></div>
             <div id="menu-keuangan"></div>
         </div>
     </div>
@@ -345,20 +423,17 @@
 <script src="https://cdn.datatables.net/responsive/3.0.4/js/responsive.bootstrap5.js"></script>
 <script src="{{ asset('vendors/choices/choices.min.js') }}"></script>
 <script src="{{ asset('asset/js/flatpickr.js') }}"></script>
-<!-- SweetAlert2 CDN -->
 <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
 <script>
-    // Variabel Global untuk menyimpan ID Laporan yang sedang dibuka di modal
     var currentLaporanId = null;
 
-    // Fungsi AJAX untuk memuat Data Table Keuangan berdasarkan filter
     function loadDataKeuangan() {
         var formData = $('#form-filter-keuangan').serialize();
 
         $('#tbody-keuangan').html(`
             <tr>
-                <td colspan="8" class="text-center py-4 fw-bold text-dark">
-                    <div class="spinner-border text-dark mb-2" role="status"></div>
+                <td colspan="8" class="text-center py-4 fw-semibold">
+                    <div class="spinner-border text-primary mb-2" role="status"></div>
                     <br>Mencari data laporan...
                 </td>
             </tr>
@@ -376,11 +451,11 @@
                         var isDisetujui = (val.status_verifikasi === 'DISETUJUI');
 
                         if (isDisetujui) {
-                            statusBadge = '<span class="badge bg-white text-success border border-dark rounded-2 px-2 py-1 fw-bolder shadow-sm"><i class="fas fa-check-circle me-1"></i> DISETUJUI</span>';
+                            statusBadge = '<span class="badge bg-success-subtle text-success border border-success-subtle rounded-pill px-2.5 py-1 fw-bold"><i class="fas fa-check-circle me-1"></i> DISETUJUI</span>';
                         } else if (val.status_verifikasi === 'PENDING') {
-                            statusBadge = '<span class="badge bg-white text-warning border border-dark rounded-2 px-2 py-1 fw-bolder shadow-sm" style="color: #b38600 !important;"><i class="fas fa-hourglass-half me-1"></i> PENDING</span>';
+                            statusBadge = '<span class="badge bg-warning-subtle text-warning border border-warning-subtle rounded-pill px-2.5 py-1 fw-bold"><i class="fas fa-hourglass-half me-1"></i> PENDING</span>';
                         } else {
-                            statusBadge = '<span class="badge bg-white text-danger border border-dark rounded-2 px-2 py-1 fw-bolder shadow-sm"><i class="fas fa-times-circle me-1"></i> DITOLAK</span>';
+                            statusBadge = '<span class="badge bg-danger-subtle text-danger border border-danger-subtle rounded-pill px-2.5 py-1 fw-bold"><i class="fas fa-times-circle me-1"></i> DITOLAK</span>';
                         }
 
                         var formattedSetoran = new Intl.NumberFormat('id-ID', {
@@ -388,26 +463,35 @@
                             currency: 'IDR'
                         }).format(val.total_setoran);
 
-                        // Informasi Bagian Keuangan (Verifikator, Waktu, dan Catatan)
-                        var diperiksaOleh = val.diperiksa_oleh ? `<span class="fw-bold text-dark"><i class="fas fa-user-check text-success me-1"></i> ${val.diperiksa_oleh}</span>` : `<span class="text-muted fst-italic">Belum diperiksa</span>`;
-                        var waktuDiperiksa = val.waktu_diperiksa ? `<div class="text-muted fs--2 mt-1"><i class="far fa-clock me-1"></i> ${val.waktu_diperiksa}</div>` : '';
-                        var catatanVerif = val.catatan ? `<div class="text-dark fs--2 mt-1 bg-light p-1 rounded border border-dark border-opacity-25"><strong>Catatan:</strong> ${val.catatan}</div>` : '';
+                        var diperiksaOleh = val.diperiksa_oleh
+                            ? `<span class="fw-bold"><i class="fas fa-user-check text-success me-1"></i> ${val.diperiksa_oleh}</span>`
+                            : `<span class="opacity-50 fst-italic">Belum diperiksa</span>`;
+                        var waktuDiperiksa = val.waktu_diperiksa
+                            ? `<div class="opacity-75 small mt-1"><i class="far fa-clock me-1"></i> ${val.waktu_diperiksa}</div>`
+                            : '';
+                        var catatanVerif = val.catatan
+                            ? `<div class="small mt-1 p-1.5 rounded" style="background: rgba(79, 70, 229, 0.06); border: 1px solid var(--ent-grid-border);"><strong>Catatan:</strong> ${val.catatan}</div>`
+                            : '';
 
-                        var prosesBtnClass = isDisetujui ? 'dropdown-item py-2 fw-bold text-muted disabled bg-light' : 'dropdown-item py-2 fw-bold text-dark d-flex align-items-center gap-2';
-                        var prosesAttr = isDisetujui ? 'aria-disabled="true" style="pointer-events: none; opacity: 0.6;"' : 'data-bs-toggle="modal" data-bs-target="#modal-keuangan" id="button-proses-transaksi"';
+                        var prosesBtnClass = isDisetujui
+                            ? 'dropdown-item py-2 fw-semibold text-muted disabled'
+                            : 'dropdown-item py-2 fw-semibold d-flex align-items-center gap-2';
+                        var prosesAttr = isDisetujui
+                            ? 'aria-disabled="true" style="pointer-events: none; opacity: 0.6;"'
+                            : 'data-bs-toggle="modal" data-bs-target="#modal-keuangan" id="button-proses-transaksi"';
 
                         html += `
                             <tr>
-                                <td class="text-center fw-bold">${index + 1}</td>
-                                <td><span class="code-chip code-chip-cyan fs--2">${val.no_laporan}</span></td>
+                                <td class="text-center mono-code">${index + 1}</td>
+                                <td><span class="code-chip mono-code">${val.no_laporan}</span></td>
                                 <td>
-                                    <span class="badge bg-white text-dark border border-dark fw-bold px-2 py-1 shadow-sm">
+                                    <span class="badge bg-primary-subtle text-primary border border-primary-subtle fw-semibold px-2.5 py-1 rounded-pill">
                                         <i class="fas fa-user me-1"></i> ${val.user_id}
                                     </span>
                                 </td>
-                                <td><span class="fw-bolder text-success">${formattedSetoran}</span></td>
+                                <td><span class="fw-bold text-success mono-code">${formattedSetoran}</span></td>
                                 <td class="text-center">
-                                    <span class="badge bg-white text-dark border border-dark fw-bold shadow-sm px-2 py-1">
+                                    <span class="badge bg-info-subtle text-info border border-info-subtle fw-semibold px-2.5 py-1 rounded-pill">
                                         ${val.jumlah_transaksi} Transaksi
                                     </span>
                                 </td>
@@ -419,14 +503,13 @@
                                 <td class="text-center">${statusBadge}</td>
                                 <td class="text-center">
                                     <div class="btn-group" role="group">
-                                        <button class="btn btn-sm dropdown-toggle fw-bolder border border-dark rounded-2 shadow-sm px-3"
-                                            type="button" data-bs-toggle="dropdown" aria-expanded="false"
-                                            style="background-color: var(--retro-yellow); color: var(--retro-dark);">
+                                        <button class="btn btn-sm dropdown-toggle btn-option-ent px-3 py-1.5"
+                                            type="button" data-bs-toggle="dropdown" aria-expanded="false">
                                             <span class="fas fa-align-left me-1"></span>Option
                                         </button>
-                                        <div class="dropdown-menu dropdown-menu-end border-2 border-dark shadow-lg py-1 fs--1" style="border-radius: 8px;">
+                                        <div class="dropdown-menu dropdown-menu-end shadow-lg py-1">
                                             <button class="${prosesBtnClass}" ${prosesAttr} data-code="${val.id}">
-                                                <span class="fab fa-amazon-pay text-warning fs-0"></span> ${isDisetujui ? 'Sudah Disetujui' : 'Proses Transaksi'}
+                                                <span class="fab fa-amazon-pay text-warning"></span> ${isDisetujui ? 'Sudah Disetujui' : 'Proses Transaksi'}
                                             </button>
                                         </div>
                                     </div>
@@ -435,7 +518,7 @@
                         `;
                     });
                 } else {
-                    html = `<tr><td colspan="8" class="text-center py-4 fw-bold text-muted">Tidak ada data laporan keuangan.</td></tr>`;
+                    html = `<tr><td colspan="8" class="text-center py-4 fw-semibold opacity-75">Tidak ada data laporan keuangan.</td></tr>`;
                 }
                 $('#tbody-keuangan').html(html);
             },
@@ -454,14 +537,13 @@
         });
     });
 
-    // 1. Saat tombol Proses Transaksi di tabel diklik, simpan ID Laporan ke variabel global
     $(document).on("click", "#button-proses-transaksi", function(e) {
         e.preventDefault();
         var code = $(this).data("code");
-        activeLaporanId = code; // Simpan ke variabel global
+        currentLaporanId = code;
 
         $('#menu-keuangan').html(
-            '<div class="text-center py-5"><div class="spinner-border text-dark mb-2" role="status"></div><br><span class="fw-bold text-dark">Memuat data proses transaksi...</span></div>'
+            '<div class="text-center py-5"><div class="spinner-border text-primary mb-2" role="status"></div><br><span class="fw-semibold">Memuat data proses transaksi...</span></div>'
         );
 
         $.ajax({
@@ -476,12 +558,13 @@
         }).done(function(data) {
             $('#menu-keuangan').html(data);
         }).fail(function() {
-            $('#menu-keuangan').html('<div class="alert alert-danger border-2 border-dark m-3 fw-bold text-center">Gagal memuat data dari server.</div>');
+            $('#menu-keuangan').html('<div class="alert alert-danger m-3 fw-semibold text-center rounded-3">Gagal memuat data dari server.</div>');
         });
     });
+
     $(document).on('click', '#button-simpan-proses-transaksi', function(e) {
         e.preventDefault();
-        let laporanId = $('#form-proses-transaksi').attr('data-laporan-id') || activeLaporanId;
+        let laporanId = $('#form-proses-transaksi').attr('data-laporan-id') || currentLaporanId;
         let catatanVerifikasi = $('#catatan_verifikasi').val() || 'Disetujui oleh bagian keuangan.';
 
         if (!laporanId) {
@@ -493,8 +576,8 @@
             text: 'Apakah Anda yakin ingin menyetujui dan memverifikasi setoran laporan keuangan ini?',
             icon: 'question',
             showCancelButton: true,
-            confirmButtonColor: '#198754',
-            cancelButtonColor: '#6c757d',
+            confirmButtonColor: '#059669',
+            cancelButtonColor: '#64748b',
             confirmButtonText: 'Ya, Setujui Sekarang!',
             cancelButtonText: 'Batal'
         }).then((result) => {
@@ -515,13 +598,9 @@
                                 title: 'Berhasil!',
                                 text: res.message,
                             }).then(() => {
-                                // Tutup modal Bootstrap menggunakan instance atau element selector
                                 $('#modal-keuangan').modal('hide');
-                                // Hapus backdrop modal jika tersisa
                                 $('.modal-backdrop').remove();
                                 $('body').removeClass('modal-open');
-
-                                // Refresh ulang data tabel utama
                                 loadDataKeuangan();
                             });
                         } else {
