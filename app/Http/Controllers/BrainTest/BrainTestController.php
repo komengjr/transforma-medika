@@ -4,6 +4,7 @@ namespace App\Http\Controllers\BrainTest;
 
 use App\Exports\BrainTestSoalTemplateExport;
 use App\Http\Controllers\Controller;
+use App\Http\Controllers\StreamController;
 use App\Imports\BrainTestSoalImport;
 use App\Models\BrainTest\BrainTestKategori;
 use App\Models\BrainTest\BrainTestKlasifikasi;
@@ -474,5 +475,565 @@ class BrainTestController extends Controller
             ->get();
 
         return response()->json($soals);
+    }
+    private function parseSpreadsheetRows($file, ?string $preferredSheet = null): array
+    {
+        $ext = strtolower($file->getClientOriginalExtension());
+        $path = $file->getRealPath();
+
+        // 1. Jika file CSV
+        if ($ext === 'csv') {
+            $rows = [];
+            if (($handle = fopen($path, 'r')) !== false) {
+                while (($line = fgetcsv($handle)) !== false) {
+                    $rows[] = $line;
+                }
+                fclose($handle);
+            }
+            return $rows;
+        }
+
+        // 2. Jika file XLSX (Native PHP ZipArchive + SimpleXML, tanpa PhpSpreadsheet)
+        if ($ext === 'xlsx') {
+            $zip = new \ZipArchive();
+            if ($zip->open($path) !== true) {
+                throw new \RuntimeException('File .xlsx tidak dapat dibuka atau rusak.');
+            }
+
+            // Baca sharedStrings.xml (kamus teks sel Excel)
+            $sharedStrings = [];
+            if (($sharedXml = $zip->getFromName('xl/sharedStrings.xml')) !== false) {
+                $xml = simplexml_load_string($sharedXml);
+                if ($xml && isset($xml->si)) {
+                    foreach ($xml->si as $si) {
+                        if (isset($si->t)) {
+                            $sharedStrings[] = (string) $si->t;
+                        } elseif (isset($si->r)) {
+                            $text = '';
+                            foreach ($si->r as $r) {
+                                $text .= (string) ($r->t ?? '');
+                            }
+                            $sharedStrings[] = $text;
+                        } else {
+                            $sharedStrings[] = '';
+                        }
+                    }
+                }
+            }
+
+            // Cari sheet target berdasarkan nama sheet (jika ada) atau default sheet1.xml
+            $targetSheetPath = 'xl/worksheets/sheet1.xml';
+            if ($preferredSheet && ($workbookXml = $zip->getFromName('xl/workbook.xml')) !== false) {
+                $wb = simplexml_load_string($workbookXml);
+                if ($wb && isset($wb->sheets->sheet)) {
+                    $sheetIndex = 1;
+                    foreach ($wb->sheets->sheet as $sheetNode) {
+                        $name = (string) $sheetNode['name'];
+                        if (strcasecmp(trim($name), trim($preferredSheet)) === 0) {
+                            $candidate = "xl/worksheets/sheet{$sheetIndex}.xml";
+                            if ($zip->locateName($candidate) !== false) {
+                                $targetSheetPath = $candidate;
+                            }
+                            break;
+                        }
+                        $sheetIndex++;
+                    }
+                }
+            }
+
+            $sheetXml = $zip->getFromName($targetSheetPath);
+            $zip->close();
+
+            if ($sheetXml === false) {
+                throw new \RuntimeException('Worksheet di dalam file .xlsx tidak ditemukan.');
+            }
+
+            $sheet = simplexml_load_string($sheetXml);
+            $rows = [];
+
+            if ($sheet && isset($sheet->sheetData->row)) {
+                foreach ($sheet->sheetData->row as $rowNode) {
+                    $rowArr = [];
+                    foreach ($rowNode->c as $cell) {
+                        // Konversi referensi kolom Excel (misal "A1", "AA4") ke index 0-based
+                        $cellRef = (string) $cell['r'];
+                        $colLetters = preg_replace('/[0-9]+/', '', $cellRef);
+                        $colIdx = 0;
+                        for ($i = 0; $i < strlen($colLetters); $i++) {
+                            $colIdx = $colIdx * 26 + (ord($colLetters[$i]) - 64);
+                        }
+                        $colIdx = max(0, $colIdx - 1);
+
+                        $type = (string) $cell['t'];
+                        $val = '';
+
+                        if ($type === 's') {
+                            $strIdx = (int) $cell->v;
+                            $val = $sharedStrings[$strIdx] ?? '';
+                        } elseif ($type === 'inlineStr') {
+                            $val = (string) ($cell->is->t ?? '');
+                        } else {
+                            $val = isset($cell->v) ? (string) $cell->v : '';
+                        }
+
+                        $rowArr[$colIdx] = $val;
+                    }
+
+                    if (!empty($rowArr)) {
+                        $maxCol = max(array_keys($rowArr));
+                        $normalizedRow = [];
+                        for ($c = 0; $c <= $maxCol; $c++) {
+                            $normalizedRow[] = $rowArr[$c] ?? '';
+                        }
+                        $rows[] = $normalizedRow;
+                    }
+                }
+            }
+
+            return $rows;
+        }
+
+        throw new \RuntimeException('Format tidak didukung. Gunakan file .xlsx atau .csv.');
+    }
+
+    /**
+     * Helper membuat slug unik pada tabel target
+     */
+    private function generateUniqueSlug(string $table, string $sourceText): string
+    {
+        $baseSlug = StreamController::slug($sourceText) ?: 'item';
+        $slug = $baseSlug;
+        $counter = 1;
+
+        while (DB::table($table)->where('slug', $slug)->exists()) {
+            $slug = $baseSlug . '-' . $counter;
+            $counter++;
+        }
+
+        return $slug;
+    }
+
+    /**
+     * Import Soal ke Kategori Tertentu (Level 4: brain_test_soal & brain_test_opsi_jawaban)
+     */
+    public function importSoal(Request $request, $kategoriId)
+    {
+        $kategori = DB::table('brain_test_kategori')->where('id', $kategoriId)->first();
+        if (!$kategori) {
+            return response()->json([
+                'status'  => 'error',
+                'message' => 'Kategori soal tidak ditemukan.',
+            ], 404);
+        }
+
+        $validator = Validator::make($request->all(), [
+            'file_excel' => 'required|file|mimes:xlsx,xls,csv|max:10240',
+        ], [
+            'file_excel.required' => 'File Excel/CSV wajib dipilih.',
+            'file_excel.mimes'    => 'Format file harus .xlsx, .xls, atau .csv.',
+        ]);
+
+        if ($validator->fails()) {
+            return response()->json([
+                'status'  => 'error',
+                'message' => $validator->errors()->first(),
+            ], 422);
+        }
+
+        try {
+            $rows = $this->parseSpreadsheetRows($request->file('file_excel'), 'Import_Bank_Soal');
+        } catch (\Throwable $e) {
+            return response()->json([
+                'status'  => 'error',
+                'message' => 'Gagal membaca file: ' . $e->getMessage(),
+            ], 422);
+        }
+
+        // Deteksi baris header yang memiliki kolom 'pertanyaan'
+        $headerIdx = null;
+        $colMap = [];
+        foreach ($rows as $idx => $row) {
+            $normalized = array_map(fn($v) => strtolower(trim((string) $v)), $row);
+            if (in_array('pertanyaan', $normalized, true)) {
+                $headerIdx = $idx;
+                foreach ($normalized as $cIdx => $colName) {
+                    if ($colName !== '') {
+                        $colMap[$colName] = $cIdx;
+                    }
+                }
+                break;
+            }
+        }
+
+        if ($headerIdx === null) {
+            return response()->json([
+                'status'  => 'error',
+                'message' => 'Kolom header "pertanyaan" tidak ditemukan di dalam file.',
+            ], 422);
+        }
+
+        $hurufList = ['A', 'B', 'C', 'D', 'E'];
+        $now = now();
+        $importedCount = 0;
+
+        DB::beginTransaction();
+        try {
+            for ($i = $headerIdx + 1; $i < count($rows); $i++) {
+                $r = $rows[$i];
+                $get = fn(string $key, $default = '') => isset($colMap[$key]) ? trim((string) ($r[$colMap[$key]] ?? $default)) : $default;
+
+                $pertanyaan = $get('pertanyaan');
+                if ($pertanyaan === '') {
+                    continue;
+                }
+
+                $tipeRaw = strtolower($get('tipe_soal', 'pilihan_ganda'));
+                $tipeSoal = in_array($tipeRaw, ['pilihan_ganda', 'isian'], true) ? $tipeRaw : 'pilihan_ganda';
+                $kunciIsian = $get('kunci_jawaban_isian') ?: null;
+                $bobotNilai = is_numeric($get('bobot_nilai')) && (int) $get('bobot_nilai') > 0
+                    ? (int) $get('bobot_nilai')
+                    : 1;
+                $pembahasan = $get('pembahasan') ?: null;
+
+                $soalId = DB::table('brain_test_soal')->insertGetId([
+                    'kategori_id'         => $kategori->id,
+                    'pertanyaan'          => $pertanyaan,
+                    'gambar'              => null,
+                    'tipe_soal'           => $tipeSoal,
+                    'kunci_jawaban_isian' => $tipeSoal === 'isian' ? $kunciIsian : null,
+                    'bobot_nilai'         => $bobotNilai,
+                    'pembahasan'          => $pembahasan,
+                    'created_at'          => $now,
+                    'updated_at'          => $now,
+                ]);
+
+                if ($tipeSoal === 'pilihan_ganda') {
+                    $kunciHuruf = strtoupper($get('kunci_jawaban'));
+                    $opsiRecords = [];
+
+                    foreach ($hurufList as $huruf) {
+                        $lower = strtolower($huruf);
+                        $teksOpsi = $get('opsi_' . $lower);
+                        if ($teksOpsi === '') {
+                            continue;
+                        }
+
+                        $isBenar = ($kunciHuruf === $huruf);
+                        $poinRaw = $get('poin_' . $lower, '');
+                        $poin = is_numeric($poinRaw)
+                            ? (int) $poinRaw
+                            : ($isBenar ? $bobotNilai : 0);
+
+                        $opsiRecords[] = [
+                            'soal_id'      => $soalId,
+                            'teks_jawaban' => $teksOpsi,
+                            'gambar'       => null,
+                            'is_benar'     => $isBenar,
+                            'poin'         => $poin,
+                            'created_at'   => $now,
+                            'updated_at'   => $now,
+                        ];
+                    }
+
+                    if (count($opsiRecords) < 2) {
+                        DB::rollBack();
+                        return response()->json([
+                            'status'  => 'error',
+                            'message' => 'Baris ke-' . ($i + 1) . ' (pilihan_ganda) minimal harus memiliki 2 opsi jawaban.',
+                        ], 422);
+                    }
+
+                    DB::table('brain_test_opsi_jawaban')->insert($opsiRecords);
+                }
+
+                $importedCount++;
+            }
+
+            if ($importedCount === 0) {
+                DB::rollBack();
+                return response()->json([
+                    'status'  => 'error',
+                    'message' => 'Tidak ada baris soal valid yang ditemukan pada file.',
+                ], 422);
+            }
+
+            DB::commit();
+
+            return response()->json([
+                'status'  => 'success',
+                'message' => "Berhasil mengimpor {$importedCount} soal ke kategori {$kategori->nama_kategori}.",
+            ]);
+        } catch (\Throwable $e) {
+            DB::rollBack();
+            return response()->json([
+                'status'  => 'error',
+                'message' => 'Terjadi kesalahan saat import soal: ' . $e->getMessage(),
+            ], 500);
+        }
+    }
+
+    /**
+     * Download Contoh Template Import Soal (CSV)
+     */
+    public function downloadTemplateSoal()
+    {
+        $headers = [
+            'tipe_soal',
+            'pertanyaan',
+            'opsi_a',
+            'poin_a',
+            'opsi_b',
+            'poin_b',
+            'opsi_c',
+            'poin_c',
+            'opsi_d',
+            'poin_d',
+            'opsi_e',
+            'poin_e',
+            'kunci_jawaban',
+            'kunci_jawaban_isian',
+            'bobot_nilai',
+            'pembahasan',
+        ];
+
+        $sample = [
+            [
+                'pilihan_ganda',
+                'Semboyan Bhinneka Tunggal Ika diambil dari kitab...',
+                'Negarakertagama',
+                0,
+                'Sutasoma',
+                5,
+                'Arjunawiwaha',
+                0,
+                'Bharatayuddha',
+                0,
+                'Pararaton',
+                0,
+                'B',
+                '',
+                5,
+                'Berasal dari Kitab Sutasoma karya Mpu Tantular.',
+            ],
+            [
+                'isian',
+                'Tanggal peringatan Hari Lahir Pancasila adalah...',
+                '',
+                0,
+                '',
+                0,
+                '',
+                0,
+                '',
+                0,
+                '',
+                0,
+                '',
+                '1 Juni',
+                5,
+                'Diperingati setiap 1 Juni.',
+            ],
+        ];
+
+        return response()->streamDownload(function () use ($headers, $sample) {
+            $out = fopen('php://output', 'w');
+            fputcsv($out, $headers);
+            foreach ($sample as $row) {
+                fputcsv($out, $row);
+            }
+            fclose($out);
+        }, 'template-import-soal-brain-test.csv', [
+            'Content-Type' => 'text/csv',
+        ]);
+    }
+
+    /**
+     * (Opsional) Import Hierarki Lengkap: Klasifikasi -> Paket -> Kategori -> Soal
+     */
+    public function importMasterLengkap(Request $request)
+    {
+        $validator = Validator::make($request->all(), [
+            'file_excel' => 'required|file|mimes:xlsx,xls,csv|max:10240',
+        ]);
+
+        if ($validator->fails()) {
+            return response()->json([
+                'status'  => 'error',
+                'message' => $validator->errors()->first(),
+            ], 422);
+        }
+
+        try {
+            $rows = $this->parseSpreadsheetRows($request->file('file_excel'), 'Import_Master_Lengkap');
+        } catch (\Throwable $e) {
+            return response()->json([
+                'status'  => 'error',
+                'message' => $e->getMessage(),
+            ], 422);
+        }
+
+        $headerIdx = null;
+        $colMap = [];
+        foreach ($rows as $idx => $row) {
+            $normalized = array_map(fn($v) => strtolower(trim((string) $v)), $row);
+            if (in_array('nama_klasifikasi', $normalized, true) && in_array('pertanyaan', $normalized, true)) {
+                $headerIdx = $idx;
+                foreach ($normalized as $cIdx => $colName) {
+                    if ($colName !== '') {
+                        $colMap[$colName] = $cIdx;
+                    }
+                }
+                break;
+            }
+        }
+
+        if ($headerIdx === null) {
+            return response()->json([
+                'status'  => 'error',
+                'message' => 'Header sheet Import_Master_Lengkap tidak sesuai.',
+            ], 422);
+        }
+
+        $hurufList = ['A', 'B', 'C', 'D', 'E'];
+        $now = now();
+        $totalSoal = 0;
+
+        DB::beginTransaction();
+        try {
+            for ($i = $headerIdx + 1; $i < count($rows); $i++) {
+                $r = $rows[$i];
+                $get = fn(string $key, $default = '') => isset($colMap[$key]) ? trim((string) ($r[$colMap[$key]] ?? $default)) : $default;
+
+                $namaKlasifikasi = $get('nama_klasifikasi');
+                $namaTest        = $get('nama_test');
+                $namaKategori    = $get('nama_kategori');
+                $pertanyaan      = $get('pertanyaan');
+
+                if ($namaKlasifikasi === '' || $namaTest === '' || $namaKategori === '' || $pertanyaan === '') {
+                    continue;
+                }
+
+                // Level 1: brain_test_klasifikasi
+                $klasifikasi = DB::table('brain_test_klasifikasi')
+                    ->where('nama_klasifikasi', $namaKlasifikasi)
+                    ->first();
+
+                if (!$klasifikasi) {
+                    $klasifikasiId = DB::table('brain_test_klasifikasi')->insertGetId([
+                        'nama_klasifikasi' => $namaKlasifikasi,
+                        'slug'             => $this->generateUniqueSlug('brain_test_klasifikasi', $namaKlasifikasi),
+                        'deskripsi'        => $get('deskripsi_klasifikasi') ?: null,
+                        'status'           => 'aktif',
+                        'created_at'       => $now,
+                        'updated_at'       => $now,
+                    ]);
+                } else {
+                    $klasifikasiId = $klasifikasi->id;
+                }
+
+                // Level 2: brain_test_paket
+                $paket = DB::table('brain_test_paket')
+                    ->where('klasifikasi_id', $klasifikasiId)
+                    ->where('nama_test', $namaTest)
+                    ->first();
+
+                if (!$paket) {
+                    $paketId = DB::table('brain_test_paket')->insertGetId([
+                        'klasifikasi_id' => $klasifikasiId,
+                        'nama_test'      => $namaTest,
+                        'slug'           => $this->generateUniqueSlug('brain_test_paket', $namaTest),
+                        'durasi_menit'   => (int) ($get('durasi_menit', 60) ?: 60),
+                        'passing_grade'  => (int) ($get('passing_grade_paket', 0) ?: 0),
+                        'deskripsi'      => null,
+                        'status'         => 'aktif',
+                        'created_at'     => $now,
+                        'updated_at'     => $now,
+                    ]);
+                } else {
+                    $paketId = $paket->id;
+                }
+
+                // Level 3: brain_test_kategori
+                $kategori = DB::table('brain_test_kategori')
+                    ->where('paket_id', $paketId)
+                    ->where('nama_kategori', $namaKategori)
+                    ->first();
+
+                if (!$kategori) {
+                    $kategoriId = DB::table('brain_test_kategori')->insertGetId([
+                        'paket_id'      => $paketId,
+                        'nama_kategori' => $namaKategori,
+                        'slug'          => $this->generateUniqueSlug('brain_test_kategori', $namaTest . '-' . $namaKategori),
+                        'passing_grade' => (int) ($get('passing_grade_kategori', 0) ?: 0),
+                        'urutan'        => (int) ($get('urutan_kategori', 1) ?: 1),
+                        'deskripsi'     => null,
+                        'created_at'    => $now,
+                        'updated_at'    => $now,
+                    ]);
+                } else {
+                    $kategoriId = $kategori->id;
+                }
+
+                // Level 4: brain_test_soal + brain_test_opsi_jawaban
+                $tipeSoal = in_array(strtolower($get('tipe_soal', 'pilihan_ganda')), ['pilihan_ganda', 'isian'], true)
+                    ? strtolower($get('tipe_soal', 'pilihan_ganda'))
+                    : 'pilihan_ganda';
+                $bobotNilai = max(1, (int) ($get('bobot_nilai', 1) ?: 1));
+
+                $soalId = DB::table('brain_test_soal')->insertGetId([
+                    'kategori_id'         => $kategoriId,
+                    'pertanyaan'          => $pertanyaan,
+                    'gambar'              => null,
+                    'tipe_soal'           => $tipeSoal,
+                    'kunci_jawaban_isian' => $tipeSoal === 'isian' ? ($get('kunci_jawaban_isian') ?: null) : null,
+                    'bobot_nilai'         => $bobotNilai,
+                    'pembahasan'          => $get('pembahasan') ?: null,
+                    'created_at'          => $now,
+                    'updated_at'          => $now,
+                ]);
+
+                if ($tipeSoal === 'pilihan_ganda') {
+                    $kunciHuruf = strtoupper($get('kunci_jawaban'));
+                    $opsiRecords = [];
+                    foreach ($hurufList as $huruf) {
+                        $lower = strtolower($huruf);
+                        $teksOpsi = $get('opsi_' . $lower);
+                        if ($teksOpsi === '') continue;
+
+                        $isBenar = ($kunciHuruf === $huruf);
+                        $poinRaw = $get('poin_' . $lower, '');
+                        $poin = is_numeric($poinRaw) ? (int) $poinRaw : ($isBenar ? $bobotNilai : 0);
+
+                        $opsiRecords[] = [
+                            'soal_id'      => $soalId,
+                            'teks_jawaban' => $teksOpsi,
+                            'gambar'       => null,
+                            'is_benar'     => $isBenar,
+                            'poin'         => $poin,
+                            'created_at'   => $now,
+                            'updated_at'   => $now,
+                        ];
+                    }
+                    if (!empty($opsiRecords)) {
+                        DB::table('brain_test_opsi_jawaban')->insert($opsiRecords);
+                    }
+                }
+
+                $totalSoal++;
+            }
+
+            DB::commit();
+
+            return response()->json([
+                'status'  => 'success',
+                'message' => "Import master lengkap berhasil ({$totalSoal} soal diproses).",
+            ]);
+        } catch (\Throwable $e) {
+            DB::rollBack();
+            return response()->json([
+                'status'  => 'error',
+                'message' => 'Gagal import master lengkap: ' . $e->getMessage(),
+            ], 500);
+        }
     }
 }

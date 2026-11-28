@@ -61,5 +61,12 @@ Route::prefix('bank-soal')->name('public.brain-test.')->group(function () {
     Route::get('/', [PageController::class, 'publicBankSoal'])->name('index');
 });
 // routes/web.php (contoh di dalam grup route admin)
-Route::post('admin/brain-test/sesi/{sesiId}/reset', [PageController::class, 'resetSesiResponden'])
-    ->name('admin.brain-test.sesi.reset');
+Route::post('admin/brain-test/sesi/{sesiId}/reset', [PageController::class, 'resetSesiResponden'])->name('admin.brain-test.sesi.reset');
+
+Route::prefix('admin/brain-test')->name('admin.brain-test.')->group(function () {
+    // Import soal ke dalam kategori tertentu (sesuai modalImportExcelInModal)
+    Route::post('/kategori/{kategoriId}/soal/import', [BrainTestController::class, 'importSoal'])->name('soal.import');
+    // Download template CSV/Excel contoh soal
+    Route::get('/soal/template', [BrainTestController::class, 'downloadTemplateSoal'])->name('soal.template');
+    Route::post('/master/import', [BrainTestController::class, 'importMasterLengkap'])->name('master.import');
+});

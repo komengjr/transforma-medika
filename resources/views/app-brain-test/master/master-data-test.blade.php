@@ -326,7 +326,7 @@
 <div class="card mb-3 ent-header-banner p-1">
     <div class="card-body position-relative p-4" style="z-index: 2;">
         <div class="row align-items-center gy-3">
-            <div class="col-lg-6">
+            <div class="col-lg-5">
                 <div class="ent-glass-pill d-inline-flex align-items-center rounded-pill px-3 py-1 mb-2">
                     <i class="fas fa-layer-group me-2 text-info" style="font-size: 0.78rem;"></i>
                     <small class="fw-semibold" style="font-size: 0.76rem; color: #cbd5e1;">Klasifikasi &rarr; Nama Tes &rarr; Kategori &rarr; Soal</small>
@@ -338,7 +338,10 @@
                     Kelola klasifikasi ujian, nama paket tes, kategori materi (TIU/TWK/TKP), dan bank soal.
                 </p>
             </div>
-            <div class="col-lg-6 d-flex flex-wrap justify-content-lg-end gap-2">
+            <div class="col-lg-7 d-flex flex-wrap justify-content-lg-end gap-2">
+                <button type="button" class="btn ent-btn px-3 py-2" style="background-color: rgba(16, 185, 129, 0.22); color: #6ee7b7; border: 1px solid rgba(110, 231, 183, 0.45);" data-bs-toggle="modal" data-bs-target="#modalImportMasterLengkap">
+                    <i class="fas fa-file-excel me-1"></i> Import Master Excel
+                </button>
                 <button type="button" class="btn ent-btn ent-btn-light px-3 py-2" data-bs-toggle="modal" data-bs-target="#modalTambahKlasifikasi">
                     <i class="fas fa-folder-plus me-1 text-primary"></i> Klasifikasi
                 </button>
@@ -470,7 +473,7 @@
                                     <div class="ent-kategori-row d-flex justify-content-between align-items-center py-1 px-2">
                                         <div>
                                             <span class="fw-bold" style="font-size: 0.82rem;">{{ $kat->nama_kategori }}</span>
-                                            <span class="opacity-75 font-mono-code ms-2" style="font-size: 0.72rem;">({{ $kat->soals_count ?? 0 }} Soal)</span>
+                                            <span class="opacity-75 font-mono-code ms-2" id="kat-count-all-{{ $kat->id }}" style="font-size: 0.72rem;">({{ $kat->soals_count ?? 0 }} Soal)</span>
                                         </div>
                                         <div class="d-flex align-items-center gap-1">
                                             <button type="button" class="btn ent-btn px-2 py-0.5 btn-kelola-soal"
@@ -514,7 +517,7 @@
             @empty
             <div class="col-12">
                 <div class="ent-card p-5 text-center">
-                    <p class="opacity-75 mb-0" style="font-size: 0.88rem;">Belum ada data klasifikasi tes. Silakan klik tombol <strong>Klasifikasi</strong> di atas.</p>
+                    <p class="opacity-75 mb-0" style="font-size: 0.88rem;">Belum ada data klasifikasi tes. Silakan klik tombol <strong>Klasifikasi</strong> atau <strong>Import Master Excel</strong> di atas.</p>
                 </div>
             </div>
             @endforelse
@@ -564,7 +567,7 @@
                                             data-bs-target="#modalKelolaSoal"
                                             data-id="{{ $kat->id }}"
                                             data-nama="{{ $paket->nama_test }} - {{ $kat->nama_kategori }}">
-                                            {{ $kat->nama_kategori }} ({{ $kat->soals_count ?? 0 }})
+                                            {{ $kat->nama_kategori }} (<span id="kat-count-tab-{{ $kat->id }}">{{ $kat->soals_count ?? 0 }}</span>)
                                         </button>
                                         @endforeach
                                     </div>
@@ -592,6 +595,46 @@
     </div>
     @endforeach
 
+</div>
+
+<!-- Modal Import Master Lengkap (Level 1 Klasifikasi -> Level 4 Soal) -->
+<div class="modal fade" id="modalImportMasterLengkap" tabindex="-1" aria-hidden="true">
+    <div class="modal-dialog modal-dialog-centered">
+        <div class="modal-content ent-modal-content">
+            <div class="ent-modal-header d-flex align-items-center justify-content-between">
+                <h6 class="fw-bold mb-0 d-flex align-items-center gap-2">
+                    <span class="icon-shape-sm" style="background-color: rgba(5, 150, 105, 0.14); color: #10b981;">
+                        <i class="fas fa-file-excel"></i>
+                    </span>
+                    Import Master Data Tes Lengkap
+                </h6>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <form id="formImportMasterLengkap" enctype="multipart/form-data">
+                @csrf
+                <div class="modal-body p-4">
+                    <div class="mb-3">
+                        <label class="form-label fw-bold" style="font-size: 0.78rem;">Pilih File Excel (.xlsx / .xls / .csv)</label>
+                        <input type="file" name="file_excel" class="form-control" accept=".xlsx,.xls,.csv" required>
+                    </div>
+                    <div class="p-3" style="border: 1px solid var(--ent-grid-border); border-radius: 12px; background-color: rgba(79, 70, 229, 0.04); font-size: 0.8rem;">
+                        <div class="fw-bold mb-1"><i class="fas fa-info-circle me-1 text-primary"></i> Ketentuan Sheet <code>Import_Master_Lengkap</code>:</div>
+                        <ul class="mb-0 ps-3 opacity-75">
+                            <li><strong>nama_klasifikasi, nama_test, nama_kategori</strong>: Otomatis dibuat jika belum ada</li>
+                            <li><strong>durasi_menit, passing_grade_paket, passing_grade_kategori, urutan_kategori</strong>: Konfigurasi paket &amp; kategori</li>
+                            <li><strong>tipe_soal, pertanyaan, opsi_a..opsi_e, poin_a..poin_e, kunci_jawaban, kunci_jawaban_isian, bobot_nilai, pembahasan</strong></li>
+                        </ul>
+                    </div>
+                </div>
+                <div class="modal-footer px-4 py-3" style="border-top: 1px solid var(--ent-grid-border);">
+                    <button type="button" class="btn ent-btn px-3 py-2" style="background-color: rgba(100, 116, 139, 0.12); border: 1px solid var(--ent-grid-border);" data-bs-dismiss="modal">Batal</button>
+                    <button type="submit" class="btn ent-btn px-4 py-2" style="background: linear-gradient(135deg, #059669 0%, #047857 100%); color: #ffffff; border: none;">
+                        <i class="fas fa-upload me-1"></i> Upload &amp; Import Master
+                    </button>
+                </div>
+            </form>
+        </div>
+    </div>
 </div>
 
 <!-- Modal Tambah Klasifikasi -->
@@ -745,7 +788,7 @@
             <div class="ent-modal-header d-flex align-items-center justify-content-between">
                 <div>
                     <h6 class="fw-bold mb-0" id="modalSoalTitle">Kelola Bank Soal</h6>
-                    <small class="opacity-75">Kelola pertanyaan (teks/gambar) dan opsi jawaban langsung dari sini.</small>
+                    <small class="opacity-75">Kelola pertanyaan (teks/gambar/isian) dan opsi jawaban langsung dari sini.</small>
                 </div>
                 <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
             </div>
@@ -775,9 +818,9 @@
                             <thead>
                                 <tr>
                                     <th class="py-3 ps-3" style="width: 60px;">No</th>
-                                    <th class="py-3">Pertanyaan &amp; Pilihan</th>
-                                    <th class="py-3 text-center" style="width: 110px;">Opsi</th>
-                                    <th class="py-3 pe-3 text-end" style="width: 100px;">Aksi</th>
+                                    <th class="py-3">Pertanyaan, Pilihan &amp; Pembahasan</th>
+                                    <th class="py-3 text-center" style="width: 130px;">Tipe / Opsi</th>
+                                    <th class="py-3 pe-3 text-end" style="width: 90px;">Aksi</th>
                                 </tr>
                             </thead>
                             <tbody id="tabelSoalBody"></tbody>
@@ -804,6 +847,20 @@
                 @csrf
                 <input type="hidden" name="kategori_id" id="inputKategoriId">
                 <div class="modal-body p-4">
+                    <div class="row g-2 mb-3">
+                        <div class="col-md-6">
+                            <label class="form-label fw-bold" style="font-size: 0.78rem;">Tipe Soal</label>
+                            <select name="tipe_soal" id="selectTipeSoalManual" class="form-select">
+                                <option value="pilihan_ganda" selected>Pilihan Ganda (A–E)</option>
+                                <option value="isian">Isian Singkat</option>
+                            </select>
+                        </div>
+                        <div class="col-md-6">
+                            <label class="form-label fw-bold" style="font-size: 0.78rem;">Bobot Nilai Default</label>
+                            <input type="number" name="bobot_nilai" class="form-control font-mono-code" value="5" min="1">
+                        </div>
+                    </div>
+
                     <div class="mb-3">
                         <label class="form-label fw-bold" style="font-size: 0.78rem;">Pertanyaan Soal</label>
                         <textarea name="pertanyaan" id="inputPertanyaanSoal" class="form-control" rows="2" placeholder="Tuliskan teks pertanyaan (boleh dikosongkan jika soal murni gambar)..."></textarea>
@@ -827,106 +884,121 @@
                         </div>
                     </div>
 
-                    <hr style="border-color: var(--ent-grid-border);">
-
-                    <div class="d-flex flex-wrap justify-content-between align-items-center gap-1 mb-2">
-                        <label class="form-label fw-bold mb-0" style="font-size: 0.78rem;">
-                            Pilihan Opsi Jawaban (A–E: Bisa Teks, Gambar, atau Keduanya)
-                        </label>
-                        <span class="opacity-75 font-mono-code" style="font-size: 0.72rem;">Radio = Kunci Jawaban</span>
+                    <!-- Box Kunci Jawaban Isian (Tampil jika tipe_soal == isian) -->
+                    <div id="boxKunciIsianManual" class="mb-3" style="display: none;">
+                        <label class="form-label fw-bold" style="font-size: 0.78rem;">Kunci Jawaban Isian</label>
+                        <input type="text" name="kunci_jawaban_isian" class="form-control" placeholder="Contoh: 1 Juni">
                     </div>
 
-                    <div id="opsi-container" class="d-flex flex-column gap-2">
-                        @php $hurufOpsi = ['A', 'B', 'C', 'D', 'E']; @endphp
-                        @for($i = 0; $i < 5; $i++)
-                            @php $isWajib=$i < 4; @endphp
-                            <div class="ent-opsi-card">
-                            <div class="d-flex flex-wrap align-items-center gap-2">
-                                <div class="d-flex align-items-center justify-content-center px-2 gap-1" style="height: 38px; min-width: 64px; border: 1px solid var(--ent-grid-border); border-radius: 10px; background-color: rgba(79, 70, 229, 0.05);">
-                                    <input class="form-check-input mt-0" type="radio" name="jawaban_benar" value="{{ $i }}" {{ $i == 0 ? 'checked' : '' }} title="Kunci Jawaban {{ $hurufOpsi[$i] }}">
-                                    <span class="fw-bold font-mono-code" style="font-size: 0.78rem;">{{ $hurufOpsi[$i] }}</span>
-                                </div>
-                                <input
-                                    type="text"
-                                    name="opsi[{{ $i }}][teks]"
-                                    class="form-control flex-grow-1"
-                                    style="min-width: 170px;"
-                                    placeholder="Teks pilihan {{ $hurufOpsi[$i] }}{{ !$isWajib ? ' (Opsional)' : ' (Boleh kosong jika pakai gambar)' }}">
-                                <input
-                                    type="number"
-                                    name="opsi[{{ $i }}][poin]"
-                                    class="form-control font-mono-code"
-                                    style="max-width: 90px;"
-                                    value="{{ $i == 0 ? 5 : 0 }}"
-                                    placeholder="Poin">
-                            </div>
+                    <div id="wrapperOpsiManual">
+                        <hr style="border-color: var(--ent-grid-border);">
 
-                            <div class="d-flex flex-wrap align-items-center justify-content-between gap-2 mt-2 pt-2" style="border-top: 1px dashed var(--ent-grid-border);">
-                                <div class="d-flex align-items-center gap-2 flex-grow-1">
-                                    <span class="opacity-75" style="font-size: 0.74rem; white-space: nowrap;">
-                                        <i class="fas fa-image me-1 text-info"></i> Gambar {{ $hurufOpsi[$i] }}:
-                                    </span>
-                                    <input
-                                        type="file"
-                                        name="opsi[{{ $i }}][gambar]"
-                                        id="inputGambarOpsi_{{ $i }}"
-                                        class="form-control"
-                                        accept="image/jpeg,image/png,image/webp,image/gif"
-                                        onchange="previewOpsiImage(this, {{ $i }})">
-                                    <button
-                                        type="button"
-                                        id="btnResetGambarOpsi_{{ $i }}"
-                                        class="btn ent-btn px-2 py-1"
-                                        style="display: none; background-color: rgba(225, 29, 72, 0.12); color: #e11d48; border: 1px solid rgba(225, 29, 72, 0.3);"
-                                        title="Hapus Gambar Opsi {{ $hurufOpsi[$i] }}"
-                                        onclick="resetOpsiImage({{ $i }})">
-                                        <i class="fas fa-times"></i>
-                                    </button>
-                                </div>
+                        <div class="d-flex flex-wrap justify-content-between align-items-center gap-1 mb-2">
+                            <label class="form-label fw-bold mb-0" style="font-size: 0.78rem;">
+                                Pilihan Opsi Jawaban (A–E: Bisa Teks, Gambar, atau Keduanya)
+                            </label>
+                            <span class="opacity-75 font-mono-code" style="font-size: 0.72rem;">Radio = Kunci Jawaban</span>
+                        </div>
 
-                                <div id="previewGambarOpsiWrapper_{{ $i }}" style="display: none;">
-                                    <img id="previewGambarOpsi_{{ $i }}" src="" alt="Preview Opsi {{ $hurufOpsi[$i] }}" class="opsi-list-img">
+                        <div id="opsi-container" class="d-flex flex-column gap-2">
+                            @php $hurufOpsi = ['A', 'B', 'C', 'D', 'E']; @endphp
+                            @for($i = 0; $i < 5; $i++)
+                                @php $isWajib=$i < 4; @endphp
+                                <div class="ent-opsi-card">
+                                    <div class="d-flex flex-wrap align-items-center gap-2">
+                                        <div class="d-flex align-items-center justify-content-center px-2 gap-1" style="height: 38px; min-width: 64px; border: 1px solid var(--ent-grid-border); border-radius: 10px; background-color: rgba(79, 70, 229, 0.05);">
+                                            <input class="form-check-input mt-0" type="radio" name="jawaban_benar" value="{{ $i }}" {{ $i == 0 ? 'checked' : '' }} title="Kunci Jawaban {{ $hurufOpsi[$i] }}">
+                                            <span class="fw-bold font-mono-code" style="font-size: 0.78rem;">{{ $hurufOpsi[$i] }}</span>
+                                        </div>
+                                        <input
+                                            type="text"
+                                            name="opsi[{{ $i }}][teks]"
+                                            class="form-control flex-grow-1"
+                                            style="min-width: 170px;"
+                                            placeholder="Teks pilihan {{ $hurufOpsi[$i] }}{{ !$isWajib ? ' (Opsional)' : ' (Boleh kosong jika pakai gambar)' }}">
+                                        <input
+                                            type="number"
+                                            name="opsi[{{ $i }}][poin]"
+                                            class="form-control font-mono-code"
+                                            style="max-width: 90px;"
+                                            value="{{ $i == 0 ? 5 : 0 }}"
+                                            placeholder="Poin">
+                                    </div>
+
+                                    <div class="d-flex flex-wrap align-items-center justify-content-between gap-2 mt-2 pt-2" style="border-top: 1px dashed var(--ent-grid-border);">
+                                        <div class="d-flex align-items-center gap-2 flex-grow-1">
+                                            <span class="opacity-75" style="font-size: 0.74rem; white-space: nowrap;">
+                                                <i class="fas fa-image me-1 text-info"></i> Gambar {{ $hurufOpsi[$i] }}:
+                                            </span>
+                                            <input
+                                                type="file"
+                                                name="opsi[{{ $i }}][gambar]"
+                                                id="inputGambarOpsi_{{ $i }}"
+                                                class="form-control"
+                                                accept="image/jpeg,image/png,image/webp,image/gif"
+                                                onchange="previewOpsiImage(this, {{ $i }})">
+                                            <button
+                                                type="button"
+                                                id="btnResetGambarOpsi_{{ $i }}"
+                                                class="btn ent-btn px-2 py-1"
+                                                style="display: none; background-color: rgba(225, 29, 72, 0.12); color: #e11d48; border: 1px solid rgba(225, 29, 72, 0.3);"
+                                                title="Hapus Gambar Opsi {{ $hurufOpsi[$i] }}"
+                                                onclick="resetOpsiImage({{ $i }})">
+                                                <i class="fas fa-times"></i>
+                                            </button>
+                                        </div>
+
+                                        <div id="previewGambarOpsiWrapper_{{ $i }}" style="display: none;">
+                                            <img id="previewGambarOpsi_{{ $i }}" src="" alt="Preview Opsi {{ $hurufOpsi[$i] }}" class="opsi-list-img">
+                                        </div>
+                                    </div>
                                 </div>
-                            </div>
+                            @endfor
+                        </div>
                     </div>
-                    @endfor
+
+                    <div class="mt-3">
+                        <label class="form-label fw-bold" style="font-size: 0.78rem;">Pembahasan Soal (Opsional)</label>
+                        <textarea name="pembahasan" class="form-control" rows="2" placeholder="Penjelasan kunci jawaban untuk peserta setelah ujian selesai..."></textarea>
+                    </div>
                 </div>
+                <div class="modal-footer px-4 py-3" style="border-top: 1px solid var(--ent-grid-border);">
+                    <button type="button" class="btn ent-btn px-3 py-2" style="background-color: rgba(100, 116, 139, 0.12); border: 1px solid var(--ent-grid-border);" data-bs-dismiss="modal">Batal</button>
+                    <button type="submit" class="btn ent-btn ent-btn-primary px-4 py-2">Simpan Soal</button>
+                </div>
+            </form>
         </div>
-        <div class="modal-footer px-4 py-3" style="border-top: 1px solid var(--ent-grid-border);">
-            <button type="button" class="btn ent-btn px-3 py-2" style="background-color: rgba(100, 116, 139, 0.12); border: 1px solid var(--ent-grid-border);" data-bs-dismiss="modal">Batal</button>
-            <button type="submit" class="btn ent-btn ent-btn-primary px-4 py-2">Simpan Soal</button>
-        </div>
-        </form>
     </div>
 </div>
-</div>
 
-<!-- Modal Import Excel (Sub-Modal) -->
+<!-- Modal Import Excel Soal per Kategori (Sub-Modal) -->
 <div class="modal fade" id="modalImportExcelInModal" tabindex="-1" aria-hidden="true" style="z-index: 1070;">
     <div class="modal-dialog modal-dialog-centered">
         <div class="modal-content ent-modal-content">
             <div class="ent-modal-header d-flex align-items-center justify-content-between">
-                <h6 class="fw-bold mb-0">Import Soal via Excel</h6>
+                <h6 class="fw-bold mb-0">Import Soal ke Kategori via Excel</h6>
                 <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
             </div>
             <form id="formImportExcel" enctype="multipart/form-data">
                 @csrf
                 <div class="modal-body p-4">
                     <div class="mb-3">
-                        <label class="form-label fw-bold" style="font-size: 0.78rem;">Pilih File Excel (.xlsx / .csv)</label>
+                        <label class="form-label fw-bold" style="font-size: 0.78rem;">Pilih File Excel (.xlsx / .xls / .csv)</label>
                         <input type="file" name="file_excel" class="form-control" accept=".xlsx, .xls, .csv" required>
                     </div>
                     <div class="mb-3">
                         <a href="{{ route('admin.brain-test.soal.template') }}" class="text-decoration-none fw-bold text-primary" style="font-size: 0.8rem;">
-                            <i class="fas fa-download me-1"></i> Download Contoh Format Template Excel
+                            <i class="fas fa-download me-1"></i> Download Contoh Format Template Soal (CSV)
                         </a>
                     </div>
                     <div class="p-3" style="border: 1px solid var(--ent-grid-border); border-radius: 12px; background-color: rgba(79, 70, 229, 0.04); font-size: 0.8rem;">
-                        <div class="fw-bold mb-1"><i class="fas fa-info-circle me-1 text-primary"></i> Ketentuan Kolom Excel:</div>
+                        <div class="fw-bold mb-1"><i class="fas fa-info-circle me-1 text-primary"></i> Ketentuan Kolom Excel (<code>Import_Bank_Soal</code>):</div>
                         <ul class="mb-0 ps-3 opacity-75">
-                            <li><strong>pertanyaan</strong>: Teks soal</li>
-                            <li><strong>opsi_a, opsi_b, opsi_c, opsi_d</strong>: Pilihan jawaban</li>
-                            <li><strong>kunci_jawaban</strong>: Huruf kapital (A, B, C, atau D)</li>
+                            <li><strong>tipe_soal</strong>: <code>pilihan_ganda</code> atau <code>isian</code></li>
+                            <li><strong>pertanyaan</strong>: Teks soal (Wajib)</li>
+                            <li><strong>opsi_a .. opsi_e</strong> &amp; <strong>poin_a .. poin_e</strong>: Pilihan jawaban &amp; poin masing-masing (misal 1–5 untuk TKP)</li>
+                            <li><strong>kunci_jawaban</strong>: Huruf kapital A–E (atau isi <strong>kunci_jawaban_isian</strong> untuk tipe <code>isian</code>)</li>
+                            <li><strong>bobot_nilai</strong> &amp; <strong>pembahasan</strong>: Opsional</li>
                         </ul>
                     </div>
                 </div>
@@ -1027,7 +1099,136 @@
         }
     }
 
+    function loadDaftarSoalKategori(kategoriId) {
+        document.getElementById('soalLoading').style.display = 'block';
+        document.getElementById('soalContentWrapper').style.display = 'none';
+
+        fetch(`{{ url('admin/brain-test/kategori') }}/${kategoriId}/json-soal`)
+            .then(response => response.json())
+            .then(data => {
+                let tbody = document.getElementById('tabelSoalBody');
+                tbody.innerHTML = '';
+
+                // Update counter soal di tampilan utama
+                const badgeAll = document.getElementById(`kat-count-all-${kategoriId}`);
+                const badgeTab = document.getElementById(`kat-count-tab-${kategoriId}`);
+                if (badgeAll) badgeAll.innerText = `(${data.length} Soal)`;
+                if (badgeTab) badgeTab.innerText = data.length;
+
+                if (data.length === 0) {
+                    tbody.innerHTML = `<tr><td colspan="4" class="text-center py-4 opacity-75 fst-italic">Belum ada soal pada kategori ini.</td></tr>`;
+                } else {
+                    const hurufArr = ['A', 'B', 'C', 'D', 'E'];
+                    data.forEach((soal, index) => {
+                        const tipeSoal = soal.tipe_soal || 'pilihan_ganda';
+                        const soalImgHtml = soal.gambar ?
+                            `<div class="mb-2"><img src="${escapeHtmlText(resolveStorageImg(soal.gambar))}" alt="Gambar Soal" class="soal-list-img"></div>` :
+                            '';
+
+                        let jawabanHtml = '';
+                        if (tipeSoal === 'isian') {
+                            jawabanHtml = `
+                                <div class="mt-1 px-2.5 py-1.5 rounded-3 d-inline-block" style="background-color: rgba(5, 150, 105, 0.1); border: 1px solid rgba(5, 150, 105, 0.3); font-size: 0.78rem;">
+                                    <span class="text-success fw-bold"><i class="fas fa-key me-1"></i> Kunci Isian:</span>
+                                    <span class="font-mono-code fw-semibold">${escapeHtmlText(soal.kunci_jawaban_isian || '-')}</span>
+                                </div>
+                            `;
+                        } else {
+                            jawabanHtml = (soal.opsi_jawabans || []).map((opt, idxOpt) => {
+                                const huruf = hurufArr[idxOpt] || '-';
+                                const optImgHtml = opt.gambar ?
+                                    `<div class="mt-1"><img src="${escapeHtmlText(resolveStorageImg(opt.gambar))}" alt="Gambar Opsi" class="opsi-list-img"></div>` :
+                                    '';
+
+                                return `
+                                    <div class="mb-1 ${opt.is_benar ? 'text-success fw-bold' : 'opacity-75'}" style="font-size: 0.78rem;">
+                                        <span class="font-mono-code fw-bold">${huruf}.</span> ${escapeHtmlText(opt.teks_jawaban || (opt.gambar ? '[Gambar]' : '-'))}
+                                        ${opt.is_benar ? '<span class="badge bg-success-subtle text-success ms-1">Kunci</span>' : ''}
+                                        <span class="font-mono-code opacity-75 ms-1">[${opt.poin ?? 0} poin]</span>
+                                        ${optImgHtml}
+                                    </div>
+                                `;
+                            }).join('');
+                        }
+
+                        const pembahasanHtml = soal.pembahasan ?
+                            `<div class="mt-2 p-2 rounded-3 opacity-85" style="background-color: rgba(2, 132, 199, 0.06); border-left: 3px solid var(--ent-sky); font-size: 0.76rem;">
+                                <strong class="text-info"><i class="fas fa-lightbulb me-1"></i>Pembahasan:</strong> ${escapeHtmlText(soal.pembahasan)}
+                            </div>` :
+                            '';
+
+                        const badgeTipe = tipeSoal === 'isian'
+                            ? `<span class="ent-badge mb-1" style="background-color: rgba(217, 119, 6, 0.14); color: #f59e0b; border: 1px solid rgba(217, 119, 6, 0.3);">Isian</span>`
+                            : `<span class="ent-badge mb-1" style="background-color: rgba(79, 70, 229, 0.12); color: #818cf8; border: 1px solid rgba(79, 70, 229, 0.28);">${(soal.opsi_jawabans || []).length} Opsi PG</span>`;
+
+                        tbody.innerHTML += `
+                            <tr>
+                                <td class="ps-3 fw-bold font-mono-code">${index + 1}</td>
+                                <td>
+                                    ${soal.pertanyaan ? `<div class="fw-bold mb-1">${escapeHtmlText(soal.pertanyaan)}</div>` : ''}
+                                    ${soalImgHtml}
+                                    <div>${jawabanHtml}</div>
+                                    ${pembahasanHtml}
+                                </td>
+                                <td class="text-center">
+                                    <div class="d-flex flex-column align-items-center">
+                                        ${badgeTipe}
+                                        <small class="font-mono-code opacity-75" style="font-size: 0.7rem;">Bobot: ${soal.bobot_nilai ?? 1}</small>
+                                    </div>
+                                </td>
+                                <td class="pe-3 text-end">
+                                    <button type="button" class="btn ent-btn px-2.5 py-1" style="background-color: rgba(225, 29, 72, 0.12); color: #e11d48; border: 1px solid rgba(225, 29, 72, 0.3);" onclick="hapusSoal(${soal.id})">
+                                        <i class="fas fa-trash"></i>
+                                    </button>
+                                </td>
+                            </tr>
+                        `;
+                    });
+                }
+
+                document.getElementById('soalLoading').style.display = 'none';
+                document.getElementById('soalContentWrapper').style.display = 'block';
+            })
+            .catch(error => {
+                console.error('Error:', error);
+                document.getElementById('soalLoading').innerHTML = `<p class="text-danger mb-0" style="font-size: 0.84rem;">Gagal memuat data soal.</p>`;
+            });
+    }
+
+    function hapusSoal(soalId) {
+        if (!confirm('Hapus soal ini?')) return;
+
+        fetch(`{{ url('admin/brain-test/soal') }}/${soalId}`, {
+                method: 'DELETE',
+                headers: {
+                    'X-CSRF-TOKEN': document.querySelector('meta[name="csrf-token"]')?.getAttribute('content') || '{{ csrf_token() }}',
+                    'Accept': 'application/json'
+                }
+            })
+            .then(response => response.json())
+            .then(res => {
+                if (res.status === 'success' || res.success) {
+                    if (window.activeKategoriId) {
+                        loadDaftarSoalKategori(window.activeKategoriId);
+                    }
+                } else {
+                    alert(res.message || 'Gagal menghapus soal.');
+                }
+            })
+            .catch(() => alert('Terjadi kesalahan saat menghapus soal.'));
+    }
+
     document.addEventListener('DOMContentLoaded', function() {
+        // Toggle form pilihan ganda vs isian pada modal tambah soal manual
+        const selectTipeSoal = document.getElementById('selectTipeSoalManual');
+        if (selectTipeSoal) {
+            selectTipeSoal.addEventListener('change', function() {
+                const isIsian = this.value === 'isian';
+                document.getElementById('boxKunciIsianManual').style.display = isIsian ? 'block' : 'none';
+                document.getElementById('wrapperOpsiManual').style.display = isIsian ? 'none' : 'block';
+            });
+        }
+
         // Pre-select klasifikasi saat tombol tambah tes di klasifikasi diklik
         document.querySelectorAll('.btn-tambah-paket').forEach(btn => {
             btn.addEventListener('click', function() {
@@ -1051,6 +1252,8 @@
         const modalKelolaSoal = document.getElementById('modalKelolaSoal');
         modalKelolaSoal.addEventListener('show.bs.modal', function(event) {
             const button = event.relatedTarget;
+            if (!button) return;
+
             const kategoriId = button.getAttribute('data-id');
             const namaKategori = button.getAttribute('data-nama');
 
@@ -1058,67 +1261,11 @@
             document.getElementById('inputKategoriId').value = kategoriId;
             window.activeKategoriId = kategoriId;
 
-            document.getElementById('soalLoading').style.display = 'block';
-            document.getElementById('soalContentWrapper').style.display = 'none';
-
-            fetch(`/admin/brain-test/kategori/${kategoriId}/json-soal`)
-                .then(response => response.json())
-                .then(data => {
-                    let tbody = document.getElementById('tabelSoalBody');
-                    tbody.innerHTML = '';
-
-                    if (data.length === 0) {
-                        tbody.innerHTML = `<tr><td colspan="4" class="text-center py-4 opacity-75 fst-italic">Belum ada soal pada kategori ini.</td></tr>`;
-                    } else {
-                        data.forEach((soal, index) => {
-                            const soalImgHtml = soal.gambar ?
-                                `<div class="mb-2"><img src="${escapeHtmlText(resolveStorageImg(soal.gambar))}" alt="Gambar Soal" class="soal-list-img"></div>` :
-                                '';
-
-                            let opsiHtml = (soal.opsi_jawabans || []).map(opt => {
-                                const optImgHtml = opt.gambar ?
-                                    `<div class="mt-1"><img src="${escapeHtmlText(resolveStorageImg(opt.gambar))}" alt="Gambar Opsi" class="opsi-list-img"></div>` :
-                                    '';
-
-                                return `
-                                    <div class="mb-1 ${opt.is_benar ? 'text-success fw-bold' : 'opacity-75'}" style="font-size: 0.78rem;">
-                                        - ${escapeHtmlText(opt.teks_jawaban || (opt.gambar ? '[Gambar]' : '-'))} ${opt.is_benar ? '(Kunci)' : ''} ${opt.poin ? '[' + opt.poin + ' poin]' : ''}
-                                        ${optImgHtml}
-                                    </div>
-                                `;
-                            }).join('');
-
-                            tbody.innerHTML += `
-                                <tr>
-                                    <td class="ps-3 fw-bold font-mono-code">${index + 1}</td>
-                                    <td>
-                                        ${soal.pertanyaan ? `<div class="fw-bold mb-1">${escapeHtmlText(soal.pertanyaan)}</div>` : ''}
-                                        ${soalImgHtml}
-                                        <div>${opsiHtml}</div>
-                                    </td>
-                                    <td class="text-center">
-                                        <span class="ent-badge" style="background-color: rgba(79, 70, 229, 0.12); color: #818cf8; border: 1px solid rgba(79, 70, 229, 0.28);">${(soal.opsi_jawabans || []).length} Opsi</span>
-                                    </td>
-                                    <td class="pe-3 text-end">
-                                        <button type="button" class="btn ent-btn px-2.5 py-1" style="background-color: rgba(225, 29, 72, 0.12); color: #e11d48; border: 1px solid rgba(225, 29, 72, 0.3);" onclick="hapusSoal(${soal.id})">
-                                            <i class="fas fa-trash"></i>
-                                        </button>
-                                    </td>
-                                </tr>
-                            `;
-                        });
-                    }
-
-                    document.getElementById('soalLoading').style.display = 'none';
-                    document.getElementById('soalContentWrapper').style.display = 'block';
-                })
-                .catch(error => {
-                    console.error('Error:', error);
-                    document.getElementById('soalLoading').innerHTML = `<p class="text-danger mb-0" style="font-size: 0.84rem;">Gagal memuat data soal.</p>`;
-                });
+            loadDaftarSoalKategori(kategoriId);
         });
     });
 
+    // Submit Tambah Soal Manual
     document.getElementById('formTambahSoalAjax').addEventListener('submit', function(e) {
         e.preventDefault();
         let form = this;
@@ -1159,18 +1306,25 @@
                 submitBtn.innerHTML = originalText;
 
                 if (res.status === 200 || res.status === 201 || res.body.status === 'success') {
+                    const subModalEl = document.getElementById('modalTambahSoalInModal');
+                    const subModal = bootstrap.Modal.getInstance(subModalEl);
+                    if (subModal) subModal.hide();
+
+                    form.reset();
+                    resetAllFormSoalMedia();
+                    document.getElementById('boxKunciIsianManual').style.display = 'none';
+                    document.getElementById('wrapperOpsiManual').style.display = 'block';
+
                     if (typeof Swal !== 'undefined') {
                         Swal.fire({
                             icon: 'success',
                             title: 'Berhasil!',
                             text: res.body.message || 'Soal berhasil ditambahkan!',
-                            timer: 1500,
+                            timer: 1400,
                             showConfirmButton: false
                         });
                     }
-                    form.reset();
-                    resetAllFormSoalMedia();
-                    location.reload();
+                    loadDaftarSoalKategori(kategoriId);
                 } else {
                     throw new Error(res.body.message || 'Gagal menyimpan soal.');
                 }
@@ -1182,6 +1336,7 @@
             });
     });
 
+    // Submit Import Soal Excel ke Kategori Aktif
     document.getElementById('formImportExcel').addEventListener('submit', function(e) {
         e.preventDefault();
         let form = this;
@@ -1215,6 +1370,61 @@
                 submitBtn.innerHTML = originalText;
 
                 if (res.status === 200 && res.body.status === 'success') {
+                    const importModalEl = document.getElementById('modalImportExcelInModal');
+                    const importModal = bootstrap.Modal.getInstance(importModalEl);
+                    if (importModal) importModal.hide();
+
+                    form.reset();
+
+                    if (typeof Swal !== 'undefined') {
+                        Swal.fire({
+                            icon: 'success',
+                            title: 'Import Berhasil!',
+                            text: res.body.message,
+                            timer: 1500,
+                            showConfirmButton: false
+                        });
+                    }
+                    loadDaftarSoalKategori(kategoriId);
+                } else {
+                    throw new Error(res.body.message || 'Terjadi kesalahan saat mengimpor data.');
+                }
+            })
+            .catch(error => {
+                submitBtn.disabled = false;
+                submitBtn.innerHTML = originalText;
+                alert('Gagal: ' + error.message);
+            });
+    });
+
+    // Submit Import Master Lengkap (Klasifikasi -> Paket -> Kategori -> Soal)
+    document.getElementById('formImportMasterLengkap').addEventListener('submit', function(e) {
+        e.preventDefault();
+        let form = this;
+        let formData = new FormData(form);
+
+        let submitBtn = form.querySelector('button[type="submit"]');
+        let originalText = submitBtn.innerHTML;
+        submitBtn.disabled = true;
+        submitBtn.innerHTML = `<span class="spinner-border spinner-border-sm me-1"></span> Mengimpor Master...`;
+
+        fetch(`{{ route('admin.brain-test.master.import') }}`, {
+                method: 'POST',
+                headers: {
+                    'X-CSRF-TOKEN': document.querySelector('meta[name="csrf-token"]')?.getAttribute('content') || '{{ csrf_token() }}',
+                    'Accept': 'application/json'
+                },
+                body: formData
+            })
+            .then(response => response.json().then(data => ({
+                status: response.status,
+                body: data
+            })))
+            .then(res => {
+                submitBtn.disabled = false;
+                submitBtn.innerHTML = originalText;
+
+                if (res.status === 200 && res.body.status === 'success') {
                     if (typeof Swal !== 'undefined') {
                         Swal.fire({
                             icon: 'success',
@@ -1222,12 +1432,13 @@
                             text: res.body.message,
                             timer: 1500,
                             showConfirmButton: false
-                        });
+                        }).then(() => location.reload());
+                    } else {
+                        alert(res.body.message);
+                        location.reload();
                     }
-                    form.reset();
-                    location.reload();
                 } else {
-                    throw new Error(res.body.message || 'Terjadi kesalahan saat mengimpor data.');
+                    throw new Error(res.body.message || 'Gagal mengimpor master data tes.');
                 }
             })
             .catch(error => {

@@ -21,6 +21,7 @@
         "midtrans/midtrans-php": "^2.6",
         "mike42/escpos-php": "^2.2",
         "milon/barcode": "^12.0",
+        "phpoffice/phpspreadsheet": "^1.30",
         "pion/laravel-chunk-upload": "^1.5",
         "rap2hpoutre/laravel-log-viewer": "^2.5",
         "simplesoftwareio/simple-qrcode": "^4.2",
